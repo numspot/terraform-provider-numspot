@@ -5,37 +5,38 @@ package provider
 
 import (
 	"context"
-	"net/http"
-
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/conns"
 )
 
-// Ensure ScaffoldingProvider satisfies various provider interfaces.
-var _ provider.Provider = &ScaffoldingProvider{}
+// Ensure NumspotProvider satisfies various provider interfaces.
+var _ provider.Provider = &NumspotProvider{}
 
-// ScaffoldingProvider defines the provider implementation.
-type ScaffoldingProvider struct {
+// NumspotProvider defines the provider implementation.
+type NumspotProvider struct {
 	// version is set to the provider version on release, "dev" when the
 	// provider is built and ran locally, and "test" when running acceptance
 	// testing.
 	version string
 }
 
-// ScaffoldingProviderModel describes the provider data model.
-type ScaffoldingProviderModel struct {
-	Endpoint types.String `tfsdk:"endpoint"`
+// NumspotProviderModel describes the provider data model.
+type NumspotProviderModel struct {
+	Endpoint  types.String `tfsdk:"endpoint"`
+	AccessKey types.String `tfsdk:"access_key"`
+	SecretKey types.String `tfsdk:"secret_key"`
 }
 
-func (p *ScaffoldingProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "scaffolding"
+func (p *NumspotProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "numspot"
 	resp.Version = p.version
 }
 
-func (p *ScaffoldingProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *NumspotProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
@@ -46,8 +47,8 @@ func (p *ScaffoldingProvider) Schema(ctx context.Context, req provider.SchemaReq
 	}
 }
 
-func (p *ScaffoldingProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	var data ScaffoldingProviderModel
+func (p *NumspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	var data NumspotProviderModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -56,21 +57,40 @@ func (p *ScaffoldingProvider) Configure(ctx context.Context, req provider.Config
 	}
 
 	// Configuration values are now available.
-	// if data.Endpoint.IsNull() { /* ... */ }
+	var endpoint string
+	if data.Endpoint.IsNull() {
+		endpoint = "http://localhost:8080"
+	} else {
+		endpoint = data.Endpoint.ValueString()
+	}
+
+	/*	accessKey := os.Getenv("NUMSPOT_ACCESS_KEY")
+		if !data.AccessKey.IsNull() {
+			accessKey = data.AccessKey.ValueString()
+		}
+
+		secretKey := os.Getenv("NUMSPOT_SECRET_KEY")
+		if !data.SecretKey.IsNull() {
+			secretKey = data.SecretKey.ValueString()
+		}*/
 
 	// Example client configuration for data sources and resources
-	client := http.DefaultClient
+	client, err := conns.NewClientWithResponses(endpoint)
+	if err != nil {
+		return
+	}
+
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }
 
-func (p *ScaffoldingProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *NumspotProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewExampleResource,
 	}
 }
 
-func (p *ScaffoldingProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p *NumspotProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewExampleDataSource,
 	}
@@ -78,7 +98,7 @@ func (p *ScaffoldingProvider) DataSources(ctx context.Context) []func() datasour
 
 func New(version string) func() provider.Provider {
 	return func() provider.Provider {
-		return &ScaffoldingProvider{
+		return &NumspotProvider{
 			version: version,
 		}
 	}
