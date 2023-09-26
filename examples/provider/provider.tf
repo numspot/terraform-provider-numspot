@@ -1,3 +1,3 @@
-provider "scaffolding" {
+provider "numspot" {
   # example configuration here
 }

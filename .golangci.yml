@@ -1,27 +1,107 @@
-# Visit https://golangci-lint.run/ for usage documentation
-# and information on other useful linters
-issues:
-  max-per-linter: 0
-  max-same-issues: 0
-
+run:
+  timeout: "10m"
 linters:
   disable-all: true
   enable:
-    - durationcheck
-    - errcheck
-    - exportloopref
-    - forcetypeassert
-    - godot
-    - gofmt
-    - gosimple
-    - ineffassign
-    - makezero
-    - misspell
-    - nilerr
-    - predeclared
-    - staticcheck
-    - tenv
-    - unconvert
-    - unparam
-    - unused
-    - vet
+    # Format
+    - "asciicheck"
+    - "bidichk"
+    - "gofmt"
+    - "gofumpt"
+    - "gci"
+    # Comments
+    - "misspell"
+    #- "revive"
+    # Context
+    - "containedctx"
+    - "contextcheck"
+    - "noctx"
+    # Simplify
+    - "ineffassign"
+    - "gosimple"
+    - "unused"
+    - "unconvert"
+    - "unparam"
+    - "typecheck"
+    - "goconst"
+    - "prealloc"
+    - "sloglint"
+    # Error
+    - "goerr113"
+    - "errname"
+    - "errcheck"
+    - "errchkjson"
+    - "nilerr"
+    - "nilnil"
+    - "wrapcheck"
+    # sql
+    - "rowserrcheck"
+    - "sqlclosecheck"
+    # Debug
+    - "govet"
+    - "bodyclose"
+    - "staticcheck"
+    # Code Complexity
+    - "maintidx"
+    - "gocognit"
+    - "gocritic"
+    - "gocyclo"
+    - "nakedret"
+    - "nolintlint"
+linters-settings:
+  sloglint:
+    attr-only: true
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(gitlab.numspot.cloud/cloud/terraform-provider-numspot)
+      - blank
+      - dot
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+        disabled: false
+        arguments:
+          - checkPrivateReceivers
+      - name: package-comments
+        severity: warning
+        disabled: true
+  wrapcheck:
+    ignorePackageGlobs:
+      - "google.golang.org/grpc/status"
+      - "google.golang.org/grpc/internal/status"
+  errcheck:
+    check-type-assertions: true
+    exclude-functions:
+      - (*net/http.Server).Shutdown(context.Context)
+      - (*database/sql.Rows).Close
+      - (*database/sql.DB).Close
+      - (io.Closer).Close
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+      - opinionated
+      - experimental
+  gocyclo:
+    min-complexity: 10
+  nolintlint:
+    allow-unused: false
+    allow-leading-space: false
+    allow-no-explanation:
+      - errcheck
+      - misspell
+    require-explanation: true
+    require-specific: true
+issues:
+  exclude-rules:
+    - path: (.+)_test.go
+      linters:
+        - goerr113
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+

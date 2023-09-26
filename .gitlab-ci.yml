@@ -1,0 +1,46 @@
+stages:
+  - test
+  - release
+
+test:
+  image: golang:1.20.10
+  stage: test
+  before_script:
+    - go mod download
+  variables:
+    TF_ACC: "1"
+    NUMSPOT_ENDPOINT: "https://numspot-services.staging.numspot.dev"
+  script:
+    - go test ./...
+
+lint:
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:golangci-lint-alpine
+  stage: test
+  script:
+    # Use default .golangci.yml file from the image if one is not present in the project root.
+    - '[ -e .golangci.yml ] || cp /golangci/.golangci.yml .'
+    # Write the code coverage report to gl-code-quality-report.json
+    # and print linting issues to stdout in the format: path/to/file:line description
+    # remove `--issues-exit-code 0` or set to non-zero to fail the job if linting issues are detected
+    - golangci-lint run --out-format code-climate:gl-code-quality-report.json,line-number --timeout 10m
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+    paths:
+      - gl-code-quality-report.json
+
+release:
+  stage: release
+  image:
+    name: goreleaser/goreleaser
+    entrypoint: ['']
+  only:
+    - tags
+  variables:
+    # Disable shallow cloning so that goreleaser can diff between tags to
+    # generate a changelog.
+    GIT_DEPTH: 0
+    GITLAB_TOKEN: $CI_JOB_TOKEN
+  script:
+    # - cat $COSIGN_KEY
+    - goreleaser --debug release --clean
