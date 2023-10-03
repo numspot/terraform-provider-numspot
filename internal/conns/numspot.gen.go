@@ -16,6 +16,80 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// DhcpOptionsSetItem defines model for DhcpOptionsSetItem.
+type DhcpOptionsSetItem struct {
+	DomainName        *string   `json:"domainName,omitempty"`
+	DomainNameServers *[]string `json:"domainNameServers,omitempty"`
+	Id                *string   `json:"id,omitempty"`
+	LogServers        *[]string `json:"logServers,omitempty"`
+	NtpServers        *[]string `json:"ntpServers,omitempty"`
+}
+
+// NumSpotError defines model for NumSpotError.
+type NumSpotError struct {
+	Code     string `json:"code"`
+	Detail   string `json:"detail"`
+	Instance string `json:"instance"`
+	Status   int    `json:"status"`
+	Title    string `json:"title"`
+	Type     string `json:"type"`
+}
+
+// SecurityGroupItem defines model for SecurityGroupItem.
+type SecurityGroupItem struct {
+	AccountId    *string `json:"accountId,omitempty"`
+	Description  *string `json:"description,omitempty"`
+	Id           *string `json:"id,omitempty"`
+	InboundRules *[]struct {
+		FromPortRange         *int      `json:"fromPortRange,omitempty"`
+		IpProtocol            *string   `json:"ipProtocol,omitempty"`
+		IpRanges              *[]string `json:"ipRanges,omitempty"`
+		SecurityGroupsMembers *[]struct {
+			AccountId         *string `json:"accountId,omitempty"`
+			SecurityGroupId   *string `json:"securityGroupId,omitempty"`
+			SecurityGroupName *string `json:"securityGroupName,omitempty"`
+		} `json:"securityGroupsMembers,omitempty"`
+		ServiceIds  *string `json:"serviceIds,omitempty"`
+		ToPortRange *int    `json:"toPortRange,omitempty"`
+	} `json:"inboundRules,omitempty"`
+	OutboundRules *[]struct {
+		FromPortRange         *int      `json:"fromPortRange,omitempty"`
+		IpProtocol            *string   `json:"ipProtocol,omitempty"`
+		IpRanges              *[]string `json:"ipRanges,omitempty"`
+		SecurityGroupsMembers *[]struct {
+			AccountId         *string `json:"accountId,omitempty"`
+			SecurityGroupId   *string `json:"securityGroupId,omitempty"`
+			SecurityGroupName *string `json:"securityGroupName,omitempty"`
+		} `json:"securityGroupsMembers,omitempty"`
+		ServiceIds  *string `json:"serviceIds,omitempty"`
+		ToPortRange *int    `json:"toPortRange,omitempty"`
+	} `json:"outboundRules,omitempty"`
+	SecurityGroupName *string `json:"securityGroupName,omitempty"`
+}
+
+// N400 defines model for 400.
+type N400 = NumSpotError
+
+// N404 defines model for 404.
+type N404 = NumSpotError
+
+// N405 defines model for 405.
+type N405 = NumSpotError
+
+// N409 defines model for 409.
+type N409 = NumSpotError
+
+// N500 defines model for 500.
+type N500 = NumSpotError
+
+// CreateDhcpOptionsSetJSONBody defines parameters for CreateDhcpOptionsSet.
+type CreateDhcpOptionsSetJSONBody struct {
+	DomainName        *string   `json:"domainName,omitempty"`
+	DomainNameServers *[]string `json:"domainNameServers,omitempty"`
+	LogServers        *[]string `json:"logServers,omitempty"`
+	NtpServers        *[]string `json:"ntpServers,omitempty"`
+}
+
 // CreateKeyPairJSONBody defines parameters for CreateKeyPair.
 type CreateKeyPairJSONBody struct {
 	Name string `json:"name"`
@@ -27,11 +101,33 @@ type ImportKeyPairJSONBody struct {
 	PublicKey string `json:"publicKey"`
 }
 
+// CreateSecurityGroupJSONBody defines parameters for CreateSecurityGroup.
+type CreateSecurityGroupJSONBody struct {
+	Description           *string `json:"description,omitempty"`
+	SecurityGroupName     *string `json:"securityGroupName,omitempty"`
+	VirtualPrivateCloudId string  `json:"virtualPrivateCloudId"`
+}
+
+// CreateVPCJSONBody defines parameters for CreateVPC.
+type CreateVPCJSONBody struct {
+	IpRange string  `json:"ipRange"`
+	Tenancy *string `json:"tenancy,omitempty"`
+}
+
+// CreateDhcpOptionsSetJSONRequestBody defines body for CreateDhcpOptionsSet for application/json ContentType.
+type CreateDhcpOptionsSetJSONRequestBody CreateDhcpOptionsSetJSONBody
+
 // CreateKeyPairJSONRequestBody defines body for CreateKeyPair for application/json ContentType.
 type CreateKeyPairJSONRequestBody CreateKeyPairJSONBody
 
 // ImportKeyPairJSONRequestBody defines body for ImportKeyPair for application/json ContentType.
 type ImportKeyPairJSONRequestBody ImportKeyPairJSONBody
+
+// CreateSecurityGroupJSONRequestBody defines body for CreateSecurityGroup for application/json ContentType.
+type CreateSecurityGroupJSONRequestBody CreateSecurityGroupJSONBody
+
+// CreateVPCJSONRequestBody defines body for CreateVPC for application/json ContentType.
+type CreateVPCJSONRequestBody CreateVPCJSONBody
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -106,6 +202,17 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// GetDhcpOptionsSet request
+	GetDhcpOptionsSet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateDhcpOptionsSetWithBody request with any body
+	CreateDhcpOptionsSetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateDhcpOptionsSet(ctx context.Context, body CreateDhcpOptionsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteDhcpOptionsSet request
+	DeleteDhcpOptionsSet(ctx context.Context, dhcpOptionsSetId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetKeyPairs request
 	GetKeyPairs(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -121,6 +228,76 @@ type ClientInterface interface {
 
 	// DeleteKeyPair request
 	DeleteKeyPair(ctx context.Context, keyPairName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSecurityGroups request
+	GetSecurityGroups(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateSecurityGroupWithBody request with any body
+	CreateSecurityGroupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateSecurityGroup(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSecurityGroup request
+	DeleteSecurityGroup(ctx context.Context, securityGroupId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetVPC request
+	GetVPC(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateVPCWithBody request with any body
+	CreateVPCWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateVPC(ctx context.Context, body CreateVPCJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteVPC request
+	DeleteVPC(ctx context.Context, virtualPrivateCloudId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) GetDhcpOptionsSet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetDhcpOptionsSetRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateDhcpOptionsSetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDhcpOptionsSetRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateDhcpOptionsSet(ctx context.Context, body CreateDhcpOptionsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDhcpOptionsSetRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteDhcpOptionsSet(ctx context.Context, dhcpOptionsSetId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDhcpOptionsSetRequest(c.Server, dhcpOptionsSetId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) GetKeyPairs(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -193,6 +370,203 @@ func (c *Client) DeleteKeyPair(ctx context.Context, keyPairName string, reqEdito
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+func (c *Client) GetSecurityGroups(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSecurityGroupsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSecurityGroupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSecurityGroupRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSecurityGroup(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSecurityGroupRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSecurityGroup(ctx context.Context, securityGroupId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecurityGroupRequest(c.Server, securityGroupId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetVPC(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetVPCRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateVPCWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVPCRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateVPC(ctx context.Context, body CreateVPCJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVPCRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteVPC(ctx context.Context, virtualPrivateCloudId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVPCRequest(c.Server, virtualPrivateCloudId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// NewGetDhcpOptionsSetRequest generates requests for GetDhcpOptionsSet
+func NewGetDhcpOptionsSetRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/dhcpOptionsSets")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateDhcpOptionsSetRequest calls the generic CreateDhcpOptionsSet builder with application/json body
+func NewCreateDhcpOptionsSetRequest(server string, body CreateDhcpOptionsSetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateDhcpOptionsSetRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateDhcpOptionsSetRequestWithBody generates requests for CreateDhcpOptionsSet with any type of body
+func NewCreateDhcpOptionsSetRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/dhcpOptionsSets")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteDhcpOptionsSetRequest generates requests for DeleteDhcpOptionsSet
+func NewDeleteDhcpOptionsSetRequest(server string, dhcpOptionsSetId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "dhcpOptionsSetId", runtime.ParamLocationPath, dhcpOptionsSetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/dhcpOptionsSets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewGetKeyPairsRequest generates requests for GetKeyPairs
@@ -336,6 +710,208 @@ func NewDeleteKeyPairRequest(server string, keyPairName string) (*http.Request, 
 	return req, nil
 }
 
+// NewGetSecurityGroupsRequest generates requests for GetSecurityGroups
+func NewGetSecurityGroupsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/securityGroups")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateSecurityGroupRequest calls the generic CreateSecurityGroup builder with application/json body
+func NewCreateSecurityGroupRequest(server string, body CreateSecurityGroupJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateSecurityGroupRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateSecurityGroupRequestWithBody generates requests for CreateSecurityGroup with any type of body
+func NewCreateSecurityGroupRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/securityGroups")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteSecurityGroupRequest generates requests for DeleteSecurityGroup
+func NewDeleteSecurityGroupRequest(server string, securityGroupId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "securityGroupId", runtime.ParamLocationPath, securityGroupId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/securityGroups/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetVPCRequest generates requests for GetVPC
+func NewGetVPCRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/virtualPrivateClouds")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateVPCRequest calls the generic CreateVPC builder with application/json body
+func NewCreateVPCRequest(server string, body CreateVPCJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateVPCRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateVPCRequestWithBody generates requests for CreateVPC with any type of body
+func NewCreateVPCRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/virtualPrivateClouds")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteVPCRequest generates requests for DeleteVPC
+func NewDeleteVPCRequest(server string, virtualPrivateCloudId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "virtualPrivateCloudId", runtime.ParamLocationPath, virtualPrivateCloudId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/virtualPrivateClouds/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -379,6 +955,17 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// GetDhcpOptionsSetWithResponse request
+	GetDhcpOptionsSetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetDhcpOptionsSetResponse, error)
+
+	// CreateDhcpOptionsSetWithBodyWithResponse request with any body
+	CreateDhcpOptionsSetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsSetResponse, error)
+
+	CreateDhcpOptionsSetWithResponse(ctx context.Context, body CreateDhcpOptionsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsSetResponse, error)
+
+	// DeleteDhcpOptionsSetWithResponse request
+	DeleteDhcpOptionsSetWithResponse(ctx context.Context, dhcpOptionsSetId string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsSetResponse, error)
+
 	// GetKeyPairsWithResponse request
 	GetKeyPairsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetKeyPairsResponse, error)
 
@@ -394,6 +981,95 @@ type ClientWithResponsesInterface interface {
 
 	// DeleteKeyPairWithResponse request
 	DeleteKeyPairWithResponse(ctx context.Context, keyPairName string, reqEditors ...RequestEditorFn) (*DeleteKeyPairResponse, error)
+
+	// GetSecurityGroupsWithResponse request
+	GetSecurityGroupsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSecurityGroupsResponse, error)
+
+	// CreateSecurityGroupWithBodyWithResponse request with any body
+	CreateSecurityGroupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error)
+
+	CreateSecurityGroupWithResponse(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error)
+
+	// DeleteSecurityGroupWithResponse request
+	DeleteSecurityGroupWithResponse(ctx context.Context, securityGroupId string, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error)
+
+	// GetVPCWithResponse request
+	GetVPCWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVPCResponse, error)
+
+	// CreateVPCWithBodyWithResponse request with any body
+	CreateVPCWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVPCResponse, error)
+
+	CreateVPCWithResponse(ctx context.Context, body CreateVPCJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVPCResponse, error)
+
+	// DeleteVPCWithResponse request
+	DeleteVPCWithResponse(ctx context.Context, virtualPrivateCloudId string, reqEditors ...RequestEditorFn) (*DeleteVPCResponse, error)
+}
+
+type GetDhcpOptionsSetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Items *[]DhcpOptionsSetItem `json:"items,omitempty"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r GetDhcpOptionsSetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetDhcpOptionsSetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateDhcpOptionsSetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *DhcpOptionsSetItem
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateDhcpOptionsSetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateDhcpOptionsSetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteDhcpOptionsSetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteDhcpOptionsSetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteDhcpOptionsSetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type GetKeyPairsResponse struct {
@@ -427,9 +1103,13 @@ type CreateKeyPairResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *struct {
-		Name       *string `json:"name,omitempty"`
-		PrivateKey *string `json:"privateKey,omitempty"`
+		Fingerprint *string `json:"fingerprint,omitempty"`
+		Name        *string `json:"name,omitempty"`
+		PrivateKey  *string `json:"privateKey,omitempty"`
 	}
+	JSON400 *N400
+	JSON409 *N409
+	JSON500 *N500
 }
 
 // Status returns HTTPResponse.Status
@@ -452,8 +1132,12 @@ type ImportKeyPairResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *struct {
-		Name *string `json:"name,omitempty"`
+		Fingerprint *string `json:"fingerprint,omitempty"`
+		Name        *string `json:"name,omitempty"`
 	}
+	JSON400 *N400
+	JSON409 *N409
+	JSON500 *N500
 }
 
 // Status returns HTTPResponse.Status
@@ -475,6 +1159,9 @@ func (r ImportKeyPairResponse) StatusCode() int {
 type DeleteKeyPairResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON400      *N400
+	JSON404      *N404
+	JSON500      *N500
 }
 
 // Status returns HTTPResponse.Status
@@ -491,6 +1178,196 @@ func (r DeleteKeyPairResponse) StatusCode() int {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
+}
+
+type GetSecurityGroupsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Items *[]SecurityGroupItem `json:"items,omitempty"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSecurityGroupsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSecurityGroupsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateSecurityGroupResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *SecurityGroupItem
+	JSON400      *N400
+	JSON409      *N409
+	JSON500      *N500
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateSecurityGroupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateSecurityGroupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSecurityGroupResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSecurityGroupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSecurityGroupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetVPCResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *struct {
+		Items *[]struct {
+			DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
+			Id               *string `json:"id,omitempty"`
+			IpRange          *string `json:"ipRange,omitempty"`
+			State            *string `json:"state,omitempty"`
+			Tenancy          *string `json:"tenancy,omitempty"`
+		} `json:"items,omitempty"`
+	}
+}
+
+// Status returns HTTPResponse.Status
+func (r GetVPCResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetVPCResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateVPCResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *struct {
+		DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
+		Id               *string `json:"id,omitempty"`
+		IpRange          *string `json:"ipRange,omitempty"`
+		State            *string `json:"state,omitempty"`
+		Tenancy          *string `json:"tenancy,omitempty"`
+	}
+	JSON400 *N400
+	JSON405 *N405
+	JSON500 *N500
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateVPCResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateVPCResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteVPCResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON404      *N404
+	JSON409      *N409
+	JSON500      *N500
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteVPCResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteVPCResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// GetDhcpOptionsSetWithResponse request returning *GetDhcpOptionsSetResponse
+func (c *ClientWithResponses) GetDhcpOptionsSetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetDhcpOptionsSetResponse, error) {
+	rsp, err := c.GetDhcpOptionsSet(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetDhcpOptionsSetResponse(rsp)
+}
+
+// CreateDhcpOptionsSetWithBodyWithResponse request with arbitrary body returning *CreateDhcpOptionsSetResponse
+func (c *ClientWithResponses) CreateDhcpOptionsSetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsSetResponse, error) {
+	rsp, err := c.CreateDhcpOptionsSetWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateDhcpOptionsSetResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateDhcpOptionsSetWithResponse(ctx context.Context, body CreateDhcpOptionsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsSetResponse, error) {
+	rsp, err := c.CreateDhcpOptionsSet(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateDhcpOptionsSetResponse(rsp)
+}
+
+// DeleteDhcpOptionsSetWithResponse request returning *DeleteDhcpOptionsSetResponse
+func (c *ClientWithResponses) DeleteDhcpOptionsSetWithResponse(ctx context.Context, dhcpOptionsSetId string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsSetResponse, error) {
+	rsp, err := c.DeleteDhcpOptionsSet(ctx, dhcpOptionsSetId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteDhcpOptionsSetResponse(rsp)
 }
 
 // GetKeyPairsWithResponse request returning *GetKeyPairsResponse
@@ -545,6 +1422,146 @@ func (c *ClientWithResponses) DeleteKeyPairWithResponse(ctx context.Context, key
 	return ParseDeleteKeyPairResponse(rsp)
 }
 
+// GetSecurityGroupsWithResponse request returning *GetSecurityGroupsResponse
+func (c *ClientWithResponses) GetSecurityGroupsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSecurityGroupsResponse, error) {
+	rsp, err := c.GetSecurityGroups(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSecurityGroupsResponse(rsp)
+}
+
+// CreateSecurityGroupWithBodyWithResponse request with arbitrary body returning *CreateSecurityGroupResponse
+func (c *ClientWithResponses) CreateSecurityGroupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error) {
+	rsp, err := c.CreateSecurityGroupWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSecurityGroupResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateSecurityGroupWithResponse(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error) {
+	rsp, err := c.CreateSecurityGroup(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSecurityGroupResponse(rsp)
+}
+
+// DeleteSecurityGroupWithResponse request returning *DeleteSecurityGroupResponse
+func (c *ClientWithResponses) DeleteSecurityGroupWithResponse(ctx context.Context, securityGroupId string, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error) {
+	rsp, err := c.DeleteSecurityGroup(ctx, securityGroupId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSecurityGroupResponse(rsp)
+}
+
+// GetVPCWithResponse request returning *GetVPCResponse
+func (c *ClientWithResponses) GetVPCWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVPCResponse, error) {
+	rsp, err := c.GetVPC(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetVPCResponse(rsp)
+}
+
+// CreateVPCWithBodyWithResponse request with arbitrary body returning *CreateVPCResponse
+func (c *ClientWithResponses) CreateVPCWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVPCResponse, error) {
+	rsp, err := c.CreateVPCWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateVPCResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateVPCWithResponse(ctx context.Context, body CreateVPCJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVPCResponse, error) {
+	rsp, err := c.CreateVPC(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateVPCResponse(rsp)
+}
+
+// DeleteVPCWithResponse request returning *DeleteVPCResponse
+func (c *ClientWithResponses) DeleteVPCWithResponse(ctx context.Context, virtualPrivateCloudId string, reqEditors ...RequestEditorFn) (*DeleteVPCResponse, error) {
+	rsp, err := c.DeleteVPC(ctx, virtualPrivateCloudId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteVPCResponse(rsp)
+}
+
+// ParseGetDhcpOptionsSetResponse parses an HTTP response from a GetDhcpOptionsSetWithResponse call
+func ParseGetDhcpOptionsSetResponse(rsp *http.Response) (*GetDhcpOptionsSetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetDhcpOptionsSetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Items *[]DhcpOptionsSetItem `json:"items,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateDhcpOptionsSetResponse parses an HTTP response from a CreateDhcpOptionsSetWithResponse call
+func ParseCreateDhcpOptionsSetResponse(rsp *http.Response) (*CreateDhcpOptionsSetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateDhcpOptionsSetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest DhcpOptionsSetItem
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteDhcpOptionsSetResponse parses an HTTP response from a DeleteDhcpOptionsSetWithResponse call
+func ParseDeleteDhcpOptionsSetResponse(rsp *http.Response) (*DeleteDhcpOptionsSetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteDhcpOptionsSetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
 // ParseGetKeyPairsResponse parses an HTTP response from a GetKeyPairsWithResponse call
 func ParseGetKeyPairsResponse(rsp *http.Response) (*GetKeyPairsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -592,13 +1609,35 @@ func ParseCreateKeyPairResponse(rsp *http.Response) (*CreateKeyPairResponse, err
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest struct {
-			Name       *string `json:"name,omitempty"`
-			PrivateKey *string `json:"privateKey,omitempty"`
+			Fingerprint *string `json:"fingerprint,omitempty"`
+			Name        *string `json:"name,omitempty"`
+			PrivateKey  *string `json:"privateKey,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest N409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
 
 	}
 
@@ -621,12 +1660,34 @@ func ParseImportKeyPairResponse(rsp *http.Response) (*ImportKeyPairResponse, err
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest struct {
-			Name *string `json:"name,omitempty"`
+			Fingerprint *string `json:"fingerprint,omitempty"`
+			Name        *string `json:"name,omitempty"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest N409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
 
 	}
 
@@ -644,6 +1705,248 @@ func ParseDeleteKeyPairResponse(rsp *http.Response) (*DeleteKeyPairResponse, err
 	response := &DeleteKeyPairResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSecurityGroupsResponse parses an HTTP response from a GetSecurityGroupsWithResponse call
+func ParseGetSecurityGroupsResponse(rsp *http.Response) (*GetSecurityGroupsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSecurityGroupsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Items *[]SecurityGroupItem `json:"items,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateSecurityGroupResponse parses an HTTP response from a CreateSecurityGroupWithResponse call
+func ParseCreateSecurityGroupResponse(rsp *http.Response) (*CreateSecurityGroupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateSecurityGroupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest SecurityGroupItem
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest N409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSecurityGroupResponse parses an HTTP response from a DeleteSecurityGroupWithResponse call
+func ParseDeleteSecurityGroupResponse(rsp *http.Response) (*DeleteSecurityGroupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSecurityGroupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseGetVPCResponse parses an HTTP response from a GetVPCWithResponse call
+func ParseGetVPCResponse(rsp *http.Response) (*GetVPCResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetVPCResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			Items *[]struct {
+				DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
+				Id               *string `json:"id,omitempty"`
+				IpRange          *string `json:"ipRange,omitempty"`
+				State            *string `json:"state,omitempty"`
+				Tenancy          *string `json:"tenancy,omitempty"`
+			} `json:"items,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateVPCResponse parses an HTTP response from a CreateVPCWithResponse call
+func ParseCreateVPCResponse(rsp *http.Response) (*CreateVPCResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateVPCResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest struct {
+			DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
+			Id               *string `json:"id,omitempty"`
+			IpRange          *string `json:"ipRange,omitempty"`
+			State            *string `json:"state,omitempty"`
+			Tenancy          *string `json:"tenancy,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 405:
+		var dest N405
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON405 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteVPCResponse parses an HTTP response from a DeleteVPCWithResponse call
+func ParseDeleteVPCResponse(rsp *http.Response) (*DeleteVPCResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteVPCResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest N409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
 	}
 
 	return response, nil

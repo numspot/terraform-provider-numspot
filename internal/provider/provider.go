@@ -5,12 +5,18 @@ package provider
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/conns"
+	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/service/dhcp_options_set"
+	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/service/key_pair"
+	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/service/security_group"
+	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/service/virtual_private_cloud"
 )
 
 // Ensure NumspotProvider satisfies various provider interfaces.
@@ -26,9 +32,7 @@ type NumspotProvider struct {
 
 // NumspotProviderModel describes the provider data model.
 type NumspotProviderModel struct {
-	Endpoint  types.String `tfsdk:"endpoint"`
-	AccessKey types.String `tfsdk:"access_key"`
-	SecretKey types.String `tfsdk:"secret_key"`
+	Endpoint types.String `tfsdk:"endpoint"`
 }
 
 func (p *NumspotProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -45,6 +49,11 @@ func (p *NumspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 			},
 		},
 	}
+}
+
+func Faker(ctx context.Context, req *http.Request) error {
+	req.Header.Add("Authorization", "Bearer token_200")
+	return nil
 }
 
 func (p *NumspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -75,7 +84,8 @@ func (p *NumspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		}*/
 
 	// Example client configuration for data sources and resources
-	client, err := conns.NewClientWithResponses(endpoint)
+	client, err := conns.NewClientWithResponses(endpoint, conns.WithRequestEditorFn(Faker))
+
 	if err != nil {
 		return
 	}
@@ -86,7 +96,10 @@ func (p *NumspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 func (p *NumspotProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		NewExampleResource,
+		key_pair.NewKeyPairResource,
+		virtual_private_cloud.NewVirtualPrivateCloudResource,
+		security_group.NewSecurityGroupResource,
+		dhcp_options_set.NewDhcpOptionsSetResource,
 	}
 }
 
