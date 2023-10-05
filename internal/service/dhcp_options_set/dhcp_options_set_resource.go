@@ -3,6 +3,9 @@ package dhcp_options_set
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -57,31 +60,44 @@ func (k *DhcpOptionsSetResource) Schema(ctx context.Context, request resource.Sc
 			"domain_name": schema.StringAttribute{
 				MarkdownDescription: "The NumSpot VPC resource ip range",
 				Optional:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"domain_name_servers": schema.ListAttribute{
 				MarkdownDescription: "The NumSpot VPC resource computed state.",
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplace(),
+				},
 			},
 			"log_servers": schema.ListAttribute{
 				MarkdownDescription: "The NumSpot VPC resource computed state.",
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplace(),
+				},
 			},
 			"ntp_servers": schema.ListAttribute{
 				MarkdownDescription: "The NumSpot VPC resource computed state.",
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplace(),
+				},
 			},
 		},
 	}
 }
 
 func (k *DhcpOptionsSetResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
+	pr := path.Root("id")
+	resource.ImportStatePassthroughID(ctx, pr, request, response)
 }
 
 func (k *DhcpOptionsSetResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
@@ -147,7 +163,7 @@ func (k *DhcpOptionsSetResource) Create(ctx context.Context, request resource.Cr
 		response.Diagnostics.Append(diags...)
 		return
 	}
-	body.LogServers = &ntpServersElements
+	body.NtpServers = &ntpServersElements
 
 	createDhcpOptionsSetResponse, err := k.client.CreateDhcpOptionsSet(ctx, body)
 	if err != nil {
@@ -214,6 +230,7 @@ func (k *DhcpOptionsSetResource) Read(ctx context.Context, request resource.Read
 
 	found := false
 	for _, e := range *dhcpOptionsSet.JSON200.Items {
+		// TODO: Complete compare Objects
 		if *e.Id == data.Id.ValueString() {
 			found = true
 
