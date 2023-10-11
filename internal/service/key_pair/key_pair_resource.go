@@ -203,7 +203,7 @@ func (k *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 					Name:        types.StringValue(*e.Name),
 					PrivateKey:  data.PrivateKey,
 					PublicKey:   data.PublicKey,
-					Fingerprint: data.Fingerprint,
+					Fingerprint: types.StringValue(*e.Fingerprint),
 				}
 				response.Diagnostics.Append(response.State.Set(ctx, &nData)...)
 			}
