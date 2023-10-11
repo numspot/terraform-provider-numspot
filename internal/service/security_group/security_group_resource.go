@@ -3,8 +3,6 @@ package security_group
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -26,6 +24,28 @@ type SecurityGroupResource struct {
 	client *conns.ClientWithResponses
 }
 
+type RuleModelType struct {
+	FromPortRange types.Int64  `tfsdk:"from_port_range"`
+	ToPortRange   types.Int64  `tfsdk:"to_port_range"`
+	IpProtocol    types.String `tfsdk:"ip_protocol"`
+	ServiceIds    types.String `tfsdk:"service_ids"`
+}
+
+type Custom struct {
+	Str types.String `tfsdk:"str"`
+}
+
+type SecurityGroupResourceModel struct {
+	Id                    types.String `tfsdk:"id"`
+	VirtualPrivateCloudId types.String `tfsdk:"virtual_private_cloud_id"`
+	SecurityGroupName     types.String `tfsdk:"security_group_name"`
+	AccountId             types.String `tfsdk:"account_id"`
+	Description           types.String `tfsdk:"description"`
+	Customs               types.List   `tfsdk:"customs"`
+	// InboundRules          types.List   `tfsdk:"inbound_rules"`
+	// OutboundRules types.List `tfsdk:"outbound_rules"`
+}
+
 func (k *SecurityGroupResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	// IT SHOULD NOT BE CALLED
 	var data SecurityGroupResourceModel
@@ -38,29 +58,6 @@ func (k *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 
 	// Save updated data into Terraform state
 	response.Diagnostics.Append(response.State.Set(ctx, &data)...)
-}
-
-type SecurityGroupsMember struct {
-	AccountId         basetypes.StringType `tfsdk:"account_id"`
-	SecurityGroupId   basetypes.StringType `tfsdk:"security_group_id"`
-	SecurityGroupName basetypes.StringType `tfsdk:"security_group_name"`
-}
-
-type RuleModel struct {
-	FromPortRange basetypes.Int64Type  `tfsdk:"from_port_range"`
-	ToPortRange   basetypes.Int64Type  `tfsdk:"to_port_range"`
-	IpProtocol    basetypes.StringType `tfsdk:"ip_protocol"`
-	ServiceIds    basetypes.StringType `tfsdk:"service_ids"`
-}
-
-type SecurityGroupResourceModel struct {
-	Id                    types.String `tfsdk:"id"`
-	VirtualPrivateCloudId types.String `tfsdk:"virtual_private_cloud_id"`
-	SecurityGroupName     types.String `tfsdk:"security_group_name"`
-	AccountId             types.String `tfsdk:"account_id"`
-	Description           types.String `tfsdk:"description"`
-	InboundRules          []RuleModel  `tfsdk:"inbound_rules"`
-	OutboundRules         []RuleModel  `tfsdk:"outbound_rules"`
 }
 
 func (k *SecurityGroupResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
@@ -85,9 +82,28 @@ func (k *SecurityGroupResource) Schema(ctx context.Context, request resource.Sch
 			},
 			"account_id": schema.StringAttribute{
 				MarkdownDescription: "",
+				Optional:            true,
 				Computed:            true,
 			},
-			"inbound_rules": schema.ListAttribute{
+			"customs": schema.ListNestedAttribute{
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"str": schema.StringAttribute{
+							Required: true,
+						},
+					},
+				},
+				Optional: true,
+			},
+			/*"custom": schema.ObjectAttribute{
+				AttributeTypes: map[string]attr.Type{
+					"a": types.StringType,
+					"b": types.Int64Type,
+				},
+				Optional: true,
+				Computed: true,
+			},*/
+			/*"inbound_rules": schema.ListAttribute{
 				ElementType: types.ObjectType{
 					AttrTypes: map[string]attr.Type{
 						"from_port_range": types.Int64Type,
@@ -96,9 +112,10 @@ func (k *SecurityGroupResource) Schema(ctx context.Context, request resource.Sch
 						"service_ids":     types.StringType,
 					},
 				},
+				Optional: true,
 				Computed: true,
-			},
-			"outbound_rules": schema.ListAttribute{
+			},*/
+			/*"outbound_rules": schema.ListAttribute{
 				ElementType: types.ObjectType{
 					AttrTypes: map[string]attr.Type{
 						"from_port_range": types.Int64Type,
@@ -107,8 +124,9 @@ func (k *SecurityGroupResource) Schema(ctx context.Context, request resource.Sch
 						"service_ids":     types.StringType,
 					},
 				},
+				Optional: true,
 				Computed: true,
-			},
+			},*/
 		},
 	}
 }
@@ -173,6 +191,14 @@ func (k *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	data.SecurityGroupName = types.StringValue(*createSecurityGroupResponse.JSON201.SecurityGroupName)
 	data.AccountId = types.StringValue(*createSecurityGroupResponse.JSON201.AccountId)
 
+	elements := make([]Custom, 0, 0)
+	diags := data.Customs.ElementsAs(ctx, &elements, false)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
 	// Save data into Terraform state
 	response.Diagnostics.Append(response.State.Set(ctx, &data)...)
 }
@@ -203,6 +229,9 @@ func (k *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 				Description:       types.StringValue(*e.Description),
 				AccountId:         types.StringValue(*e.AccountId),
 			}
+
+			nData.Customs = data.Customs
+
 			response.Diagnostics.Append(response.State.Set(ctx, &nData)...)
 		}
 	}

@@ -85,7 +85,7 @@ func (k *KeyPairResource) Schema(ctx context.Context, request resource.SchemaReq
 }
 
 func (k *KeyPairResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
+	resource.ImportStatePassthroughID(ctx, path.Root("name"), request, response)
 }
 
 func (k *KeyPairResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
@@ -192,17 +192,21 @@ func (k *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 
 	found := false
 	for _, e := range *keyPairs.JSON200.Items {
-		if *e.Name == data.Name.ValueString() && *e.Fingerprint == data.Fingerprint.ValueString() {
-			found = true
+		isFingerprintNull := data.Fingerprint.IsNull()
 
-			nData := KeyPairResourceModel{
-				Id:          types.StringValue(*e.Name),
-				Name:        types.StringValue(*e.Name),
-				PrivateKey:  data.PrivateKey,
-				PublicKey:   data.PublicKey,
-				Fingerprint: data.Fingerprint,
+		if *e.Name == data.Name.ValueString() {
+			if isFingerprintNull || *e.Fingerprint == data.Fingerprint.ValueString() {
+				found = true
+
+				nData := KeyPairResourceModel{
+					Id:          types.StringValue(*e.Name),
+					Name:        types.StringValue(*e.Name),
+					PrivateKey:  data.PrivateKey,
+					PublicKey:   data.PublicKey,
+					Fingerprint: data.Fingerprint,
+				}
+				response.Diagnostics.Append(response.State.Set(ctx, &nData)...)
 			}
-			response.Diagnostics.Append(response.State.Set(ctx, &nData)...)
 		}
 	}
 

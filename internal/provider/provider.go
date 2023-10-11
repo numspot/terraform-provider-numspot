@@ -68,7 +68,7 @@ func (p *NumspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	// Configuration values are now available.
 	var endpoint string
 	if data.Endpoint.IsNull() {
-		endpoint = "http://localhost:8080"
+		endpoint = "http://localhost:8080/v0/"
 	} else {
 		endpoint = data.Endpoint.ValueString()
 	}
