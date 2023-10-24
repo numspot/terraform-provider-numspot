@@ -49,8 +49,8 @@ type SecurityGroupItem struct {
 			SecurityGroupId   *string `json:"securityGroupId,omitempty"`
 			SecurityGroupName *string `json:"securityGroupName,omitempty"`
 		} `json:"securityGroupsMembers,omitempty"`
-		ServiceIds  *string `json:"serviceIds,omitempty"`
-		ToPortRange *int    `json:"toPortRange,omitempty"`
+		ServiceIds  *[]string `json:"serviceIds,omitempty"`
+		ToPortRange *int      `json:"toPortRange,omitempty"`
 	} `json:"inboundRules,omitempty"`
 	OutboundRules *[]struct {
 		FromPortRange         *int      `json:"fromPortRange,omitempty"`
