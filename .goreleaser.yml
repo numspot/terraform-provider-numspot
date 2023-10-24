@@ -5,7 +5,7 @@ before:
     # this is just an example and not a requirement for provider building/publishing
     - go mod tidy
 gitlab_urls:
-  api: https://gitlab.numspot.cloud/api/v4/
+  api: "{{ .Env.CI_API_V4_URL }}"
   download: https://gitlab.numspot.cloud
 
   # set to true if you use a self-signed certificate
