@@ -68,6 +68,8 @@ checksum:
 #      - "--detach-sign"
 #      - "${artifact}"
 release:
+  gitlab:
+    name: 168 # Use repository ID to prevent usage of the repository name
   extra_files:
     - glob: 'terraform-registry-manifest.json'
       name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
