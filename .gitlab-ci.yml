@@ -13,5 +13,7 @@ release:
     # generate a changelog.
     GIT_DEPTH: 0
     GITLAB_TOKEN: $GITLAB_TOKEN
+    # This is a dummy GPG key, change it asap !
+    GPG_FINGERPRINT: 7A086210584082E0F4E55994946B2104E80F2ABB
   script:
     - goreleaser release --clean
