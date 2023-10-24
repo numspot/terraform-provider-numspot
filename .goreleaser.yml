@@ -4,6 +4,23 @@ before:
   hooks:
     # this is just an example and not a requirement for provider building/publishing
     - go mod tidy
+gitlab_urls:
+  api: https://gitlab.numspot.com/api/v4/
+  download: https://gitlab.numspot.com
+
+  # set to true if you use a self-signed certificate
+  skip_tls_verify: false
+
+  # set to true if you want to upload to the Package Registry rather than attachments
+  # Only works with GitLab 13.5+
+  #
+  # Since: v1.3
+  use_package_registry: false
+
+  # Set this if you set GITLAB_TOKEN to the value of CI_JOB_TOKEN.
+  #
+  # Since: v1.11
+  use_job_token: true
 builds:
 - env:
     # goreleaser does not work with CGO, it could also complicate
