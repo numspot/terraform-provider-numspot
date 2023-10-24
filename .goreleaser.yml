@@ -20,7 +20,7 @@ gitlab_urls:
   # Set this if you set GITLAB_TOKEN to the value of CI_JOB_TOKEN.
   #
   # Since: v1.11
-  use_job_token: true
+  # use_job_token: true
 builds:
 - env:
     # goreleaser does not work with CGO, it could also complicate
