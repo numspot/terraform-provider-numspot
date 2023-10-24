@@ -3,6 +3,10 @@ package security_group
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -24,15 +28,79 @@ type SecurityGroupResource struct {
 	client *conns.ClientWithResponses
 }
 
-type RuleModelType struct {
-	FromPortRange types.Int64  `tfsdk:"from_port_range"`
-	ToPortRange   types.Int64  `tfsdk:"to_port_range"`
-	IpProtocol    types.String `tfsdk:"ip_protocol"`
-	ServiceIds    types.String `tfsdk:"service_ids"`
+type Rule struct {
+	Protocol types.String `tfsdk:"protocol"`
+	FromPort types.Number `tfsdk:"from_port"`
+	ToPort   types.Number `tfsdk:"to_port"`
+	Source   types.String `tfsdk:"source"`
 }
 
-type Custom struct {
-	Str types.String `tfsdk:"str"`
+func (r Rule) Type(ctx context.Context) attr.Type {
+	return RuleType{}
+}
+
+func (r Rule) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r Rule) Equal(value attr.Value) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r Rule) IsNull() bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r Rule) IsUnknown() bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r Rule) String() string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r Rule) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	//TODO implement me
+	panic("implement me")
+}
+
+var _ basetypes.ObjectValuable = &Rule{}
+
+type RuleType struct{}
+
+func (r RuleType) TerraformType(ctx context.Context) tftypes.Type {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r RuleType) ValueFromTerraform(ctx context.Context, value tftypes.Value) (attr.Value, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r RuleType) ValueType(ctx context.Context) attr.Value {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r RuleType) Equal(t attr.Type) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r RuleType) String() string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r RuleType) ApplyTerraform5AttributePathStep(step tftypes.AttributePathStep) (interface{}, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 type SecurityGroupResourceModel struct {
@@ -41,8 +109,7 @@ type SecurityGroupResourceModel struct {
 	SecurityGroupName     types.String `tfsdk:"security_group_name"`
 	AccountId             types.String `tfsdk:"account_id"`
 	Description           types.String `tfsdk:"description"`
-	Customs               types.List   `tfsdk:"customs"`
-	// InboundRules          types.List   `tfsdk:"inbound_rules"`
+	InboundRules          []Rule       `tfsdk:"inbound_rules"`
 	// OutboundRules types.List `tfsdk:"outbound_rules"`
 }
 
@@ -58,6 +125,15 @@ func (k *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 
 	// Save updated data into Terraform state
 	response.Diagnostics.Append(response.State.Set(ctx, &data)...)
+}
+
+func ruleSchema() map[string]attr.Type {
+	return map[string]attr.Type{
+		"protocol":  types.StringType,
+		"from_port": types.NumberType,
+		"to_port":   types.NumberType,
+		"source":    types.StringType,
+	}
 }
 
 func (k *SecurityGroupResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
@@ -85,48 +161,9 @@ func (k *SecurityGroupResource) Schema(ctx context.Context, request resource.Sch
 				Optional:            true,
 				Computed:            true,
 			},
-			"customs": schema.ListNestedAttribute{
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"str": schema.StringAttribute{
-							Required: true,
-						},
-					},
-				},
-				Optional: true,
+			"inbound_rules": schema.ListAttribute{
+				ElementType: RuleType{},
 			},
-			/*"custom": schema.ObjectAttribute{
-				AttributeTypes: map[string]attr.Type{
-					"a": types.StringType,
-					"b": types.Int64Type,
-				},
-				Optional: true,
-				Computed: true,
-			},*/
-			/*"inbound_rules": schema.ListAttribute{
-				ElementType: types.ObjectType{
-					AttrTypes: map[string]attr.Type{
-						"from_port_range": types.Int64Type,
-						"to_port_range":   types.Int64Type,
-						"ip_protocol":     types.StringType,
-						"service_ids":     types.StringType,
-					},
-				},
-				Optional: true,
-				Computed: true,
-			},*/
-			/*"outbound_rules": schema.ListAttribute{
-				ElementType: types.ObjectType{
-					AttrTypes: map[string]attr.Type{
-						"from_port_range": types.Int64Type,
-						"to_port_range":   types.Int64Type,
-						"ip_protocol":     types.StringType,
-						"service_ids":     types.StringType,
-					},
-				},
-				Optional: true,
-				Computed: true,
-			},*/
 		},
 	}
 }
@@ -191,14 +228,6 @@ func (k *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	data.SecurityGroupName = types.StringValue(*createSecurityGroupResponse.JSON201.SecurityGroupName)
 	data.AccountId = types.StringValue(*createSecurityGroupResponse.JSON201.AccountId)
 
-	elements := make([]Custom, 0, 0)
-	diags := data.Customs.ElementsAs(ctx, &elements, false)
-
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
-		return
-	}
-
 	// Save data into Terraform state
 	response.Diagnostics.Append(response.State.Set(ctx, &data)...)
 }
@@ -229,8 +258,6 @@ func (k *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 				Description:       types.StringValue(*e.Description),
 				AccountId:         types.StringValue(*e.AccountId),
 			}
-
-			nData.Customs = data.Customs
 
 			response.Diagnostics.Append(response.State.Set(ctx, &nData)...)
 		}

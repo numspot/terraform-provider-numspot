@@ -154,7 +154,7 @@ func (k *VirtualPrivateCloudResource) Read(ctx context.Context, request resource
 
 	found := false
 	for _, e := range *keyPairs.JSON200.Items {
-		if *e.IpRange == data.IpRange.ValueString() {
+		if *e.Id == data.Id.ValueString() {
 			found = true
 
 			nData := VirtualPrivateCloudResourceModel{
