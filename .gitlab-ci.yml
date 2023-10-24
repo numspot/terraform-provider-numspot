@@ -14,4 +14,4 @@ release:
     GIT_DEPTH: 0
     GITLAB_TOKEN: $GITLAB_TOKEN
   script:
-    - goreleaser release --clean
+    - goreleaser --debug release --clean
