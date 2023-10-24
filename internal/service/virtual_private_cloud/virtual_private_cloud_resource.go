@@ -3,6 +3,8 @@ package virtual_private_cloud
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -57,6 +59,9 @@ func (k *VirtualPrivateCloudResource) Schema(ctx context.Context, request resour
 			"ip_range": schema.StringAttribute{
 				MarkdownDescription: "The NumSpot VPC resource ip range",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"state": schema.StringAttribute{
 				MarkdownDescription: "The NumSpot VPC resource computed state.",
@@ -68,7 +73,11 @@ func (k *VirtualPrivateCloudResource) Schema(ctx context.Context, request resour
 			},
 			"tenancy": schema.StringAttribute{
 				MarkdownDescription: "The NumSpot VPC resource DHCP tenancy.",
+				Optional:            true,
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 		},
 	}
@@ -114,6 +123,7 @@ func (k *VirtualPrivateCloudResource) Create(ctx context.Context, request resour
 
 	body := conns.CreateVPCJSONRequestBody{
 		IpRange: data.IpRange.ValueString(),
+		Tenancy: data.Tenancy.ValueStringPointer(),
 	}
 
 	createVPCResponse, err := k.client.CreateVPCWithResponse(ctx, body)
