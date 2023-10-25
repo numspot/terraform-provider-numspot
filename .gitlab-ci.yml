@@ -8,6 +8,7 @@ test:
     - go mod download
   variables:
     TF_ACC: "1"
+    NUMSPOT_ENDPOINT: "numspot-services.staging.numspot.dev"
   script:
     - go test ./...
 

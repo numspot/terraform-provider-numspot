@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -68,7 +69,10 @@ func (p *NumspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	// Configuration values are now available.
 	var endpoint string
 	if data.Endpoint.IsNull() {
-		endpoint = "http://localhost:8080/v0/"
+		endpoint = os.Getenv("NUMSPOT_ENDPOINT")
+		if endpoint == "" {
+			endpoint = "http://localhost:8080/v0/"
+		}
 	} else {
 		endpoint = data.Endpoint.ValueString()
 	}
