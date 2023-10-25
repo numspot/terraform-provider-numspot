@@ -66,6 +66,7 @@ signs:
       - "${artifact}"
       - "--yes" # needed on cosign 2.0.0+
     artifacts: all
+
 release:
   gitlab:
     name: 168 # Use repository ID to prevent usage of the repository name
