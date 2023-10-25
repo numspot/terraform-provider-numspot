@@ -15,7 +15,7 @@ gitlab_urls:
   # Only works with GitLab 13.5+
   #
   # Since: v1.3
-  use_package_registry: true
+  # use_package_registry: true
 
   # Set this if you set GITLAB_TOKEN to the value of CI_JOB_TOKEN.
   #
@@ -68,8 +68,8 @@ checksum:
 #      - "--detach-sign"
 #      - "${artifact}"
 release:
-  # gitlab:
-  #   name: 168 # Use repository ID to prevent usage of the repository name
+  gitlab:
+    name: 168 # Use repository ID to prevent usage of the repository name
   extra_files:
     - glob: 'terraform-registry-manifest.json'
       name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
