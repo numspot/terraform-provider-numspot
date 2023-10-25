@@ -9,7 +9,7 @@ test:
   before_script:
     - apk --no-cache add curl
   script: |
-    curl --header "Private-Token: $CI_JOB_TOKEN" https://gitlab.numspot.cloud/api/v4/projects/168/releases
+    curl --header "Private-Token: $GITLAB_TOKEN" https://gitlab.numspot.cloud/api/v4/projects/168/releases
 
 release:
   stage: release
