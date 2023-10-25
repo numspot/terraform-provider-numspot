@@ -3,7 +3,11 @@ stages:
   - release
 
 test:
+  image:
+    name: alpine
   stage: test
+  before_script:
+    - apk --no-cache add curl
   script: |
     curl --header "Private-Token: $CI_JOB_TOKEN" https://gitlab.numspot.cloud/api/v4/projects/168/releases
 
