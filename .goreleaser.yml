@@ -5,8 +5,8 @@ before:
     # this is just an example and not a requirement for provider building/publishing
     - go mod tidy
 gitlab_urls:
-  api: "{{ .Env.CI_API_V4_URL }}"
-  download: https://gitlab.numspot.cloud
+  # api: "{{ .Env.CI_API_V4_URL }}"
+  # download: https://gitlab.numspot.cloud
 
   # set to true if you use a self-signed certificate
   # skip_tls_verify: false
@@ -15,7 +15,7 @@ gitlab_urls:
   # Only works with GitLab 13.5+
   #
   # Since: v1.3
-  use_package_registry: false
+  use_package_registry: true
 
   # Set this if you set GITLAB_TOKEN to the value of CI_JOB_TOKEN.
   #
