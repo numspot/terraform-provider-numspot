@@ -13,5 +13,6 @@ release:
     # generate a changelog.
     GIT_DEPTH: 0
     GITLAB_TOKEN: $CI_JOB_TOKEN
+    COSIGN_KEY: $COSIGN_KEY
   script:
     - goreleaser --debug release --clean
