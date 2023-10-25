@@ -8,6 +8,8 @@ test:
   stage: test
   before_script:
     - apk --no-cache add curl
+  variables:
+    GITLAB_TOKEN: $GITLAB_TOKEN
   script: |
     curl --header "Private-Token: $GITLAB_TOKEN" https://gitlab.numspot.cloud/api/v4/projects/$CI_PROJECT_ID/releases
 
