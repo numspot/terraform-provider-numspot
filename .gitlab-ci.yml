@@ -10,9 +10,11 @@ test:
     - apk --no-cache add curl
   variables:
     GITLAB_TOKEN: $GITLAB_TOKEN
-    CI_PROJECT_ID: $CI_PROJECT_ID
   script: |
-    curl --header "Private-Token: $GITLAB_TOKEN" https://gitlab.numspot.cloud/api/v4/projects/$CI_PROJECT_ID/releases
+    echo "$GITLAB_TOKEN"
+    echo "$CI_API_V4_URL"
+    echo "$CI_PROJECT_ID"
+    curl --header "Private-Token: $GITLAB_TOKEN" $CI_API_V4_URL/projects/$CI_PROJECT_ID/releases -v
 
 release:
   stage: release
