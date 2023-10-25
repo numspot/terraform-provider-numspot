@@ -1,5 +1,15 @@
 stages:
+  - test
   - release
+
+test:
+  image: golang:1.20.10
+  before_script:
+    - go mod download
+  variables:
+    - TF_ACC: "1"
+  script:
+    - go test ./...
 
 release:
   stage: release
