@@ -56,18 +56,16 @@ checksum:
       name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
   name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
   algorithm: sha256
-#signs:
-#  - artifacts: checksum
-#    args:
-#      # if you are using this in a GitHub action or some other automated pipeline, you
-#      # need to pass the batch flag to indicate its not interactive.
-#      - "--batch"
-#      - "--local-user"
-#      - "{{ .Env.GPG_FINGERPRINT }}" # set this environment variable for your signing key
-#      - "--output"
-#      - "${signature}"
-#      - "--detach-sign"
-#      - "${artifact}"
+signs:
+  - cmd: cosign
+    stdin: '{{ .Env.COSIGN_PWD }}'
+    args:
+      - "sign-blob"
+      - "--key={{ .Env.COSIGN_KEY }}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - "--yes" # needed on cosign 2.0.0+
+    artifacts: all
 release:
   gitlab:
     name: 168 # Use repository ID to prevent usage of the repository name
