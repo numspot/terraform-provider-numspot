@@ -8,8 +8,6 @@ test:
   stage: test
   before_script:
     - apk --no-cache add curl
-  variables:
-    GITLAB_TOKEN: $GITLAB_TOKEN
   script: |
     echo "$GITLAB_TOKEN"
     echo "$CI_API_V4_URL"
