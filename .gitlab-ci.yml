@@ -7,7 +7,7 @@ test:
   before_script:
     - go mod download
   variables:
-    - TF_ACC: "1"
+    TF_ACC: "1"
   script:
     - go test ./...
 
