@@ -43,5 +43,4 @@ release:
     GITLAB_TOKEN: $CI_JOB_TOKEN
     COSIGN_KEY: $COSIGN_KEY
   script:
-    # - cat $COSIGN_KEY
     - goreleaser --debug release --clean
