@@ -4,6 +4,7 @@ stages:
 
 test:
   image: golang:1.20.10
+  stage: test
   before_script:
     - go mod download
   variables:
@@ -11,6 +12,22 @@ test:
     NUMSPOT_ENDPOINT: "https://numspot-services.staging.numspot.dev"
   script:
     - go test ./...
+
+lint:
+  image: registry.gitlab.com/gitlab-org/gitlab-build-images:golangci-lint-alpine
+  stage: test
+  script:
+    # Use default .golangci.yml file from the image if one is not present in the project root.
+    - '[ -e .golangci.yml ] || cp /golangci/.golangci.yml .'
+    # Write the code coverage report to gl-code-quality-report.json
+    # and print linting issues to stdout in the format: path/to/file:line description
+    # remove `--issues-exit-code 0` or set to non-zero to fail the job if linting issues are detected
+    - golangci-lint run --out-format code-climate:gl-code-quality-report.json,line-number
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+    paths:
+      - gl-code-quality-report.json
 
 release:
   stage: release
@@ -26,4 +43,5 @@ release:
     GITLAB_TOKEN: $CI_JOB_TOKEN
     COSIGN_KEY: $COSIGN_KEY
   script:
+    # - cat $COSIGN_KEY
     - goreleaser --debug release --clean
