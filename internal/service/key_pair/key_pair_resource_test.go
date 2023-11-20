@@ -3,13 +3,13 @@ package key_pair_test
 import (
 	"fmt"
 	"github.com/stretchr/testify/require"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
 	"math/rand"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/provider"
 )
 
 var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
