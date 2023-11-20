@@ -2,12 +2,12 @@ package virtual_private_cloud_test
 
 import (
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/provider"
 	"github.com/stretchr/testify/require"
 )
 

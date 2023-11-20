@@ -5,6 +5,12 @@ package provider
 
 import (
 	"context"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/dhcp_options_set"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/key_pair"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/security_group"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/subnet"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/virtual_private_cloud"
 	"net/http"
 	"os"
 
@@ -13,11 +19,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/conns"
-	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/service/dhcp_options_set"
-	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/service/key_pair"
-	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/service/security_group"
-	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/service/virtual_private_cloud"
 )
 
 // Ensure NumspotProvider satisfies various provider interfaces.
@@ -102,6 +103,7 @@ func (p *NumspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		virtual_private_cloud.NewVirtualPrivateCloudResource,
 		security_group.NewSecurityGroupResource,
 		dhcp_options_set.NewDhcpOptionsSetResource,
+		subnet.NewSubnetResource,
 	}
 }
 

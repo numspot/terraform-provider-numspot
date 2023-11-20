@@ -6,10 +6,10 @@ package main
 import (
 	"context"
 	"flag"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/provider"
 )
 
 // Run "go generate" to format example terraform files and generate the docs for the registry/website
