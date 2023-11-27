@@ -188,7 +188,7 @@ func (k *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	data.Id = types.StringValue(*createSecurityGroupResponse.JSON201.Id)
 	data.Description = types.StringValue(*createSecurityGroupResponse.JSON201.Description)
 	data.SecurityGroupName = types.StringValue(*createSecurityGroupResponse.JSON201.SecurityGroupName)
-	data.AccountId = types.StringValue(*createSecurityGroupResponse.JSON201.AccountId)
+	// data.AccountId = types.StringValue(*createSecurityGroupResponse.JSON201.AccountId)
 
 	// InboundRules
 	inboundRules := make([]Rule, 0, len(*createSecurityGroupResponse.JSON201.InboundRules))
@@ -283,7 +283,6 @@ func (k *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 			data.Id = types.StringValue(*e.Id)
 			data.SecurityGroupName = types.StringValue(*e.SecurityGroupName)
 			data.Description = types.StringValue(*e.Description)
-			data.AccountId = types.StringValue(*e.AccountId)
 
 			response.Diagnostics.Append(response.State.Set(ctx, &data)...)
 		}
@@ -305,7 +304,7 @@ func (k *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 
 	res, err := k.client.DeleteSecurityGroupWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
-		response.Diagnostics.AddError("Deleting Key Pair", err.Error())
+		response.Diagnostics.AddError("Deleting Security Group", err.Error())
 		return
 	}
 

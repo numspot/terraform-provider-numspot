@@ -14,10 +14,148 @@ import (
 	"strings"
 
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-// DhcpOptionsSetItem defines model for DhcpOptionsSetItem.
-type DhcpOptionsSetItem struct {
+const (
+	BearerAuthScopes = "bearerAuth.Scopes"
+)
+
+// Error For HTTP errors, we implement the https://www.rfc-editor.org/rfc/rfc7807#section-3.1[RFC 7807]
+type Error struct {
+	// Code Specific error code
+	Code interface{} `json:"code"`
+
+	// Detail Detailed explanation of error
+	Detail string `json:"detail"`
+
+	// Instance Resource on which error is applied
+	Instance string `json:"instance"`
+
+	// Status HTTP status code
+	Status int32 `json:"status"`
+
+	// Title HTTP error title
+	Title string `json:"title"`
+
+	// Type Documentation URL
+	Type string `json:"type"`
+}
+
+// AddRouteReq defines model for add-route-req.
+type AddRouteReq struct {
+	DestinationIpRange string `json:"destinationIpRange"`
+	Target             string `json:"target"`
+	TargetType         string `json:"targetType"`
+}
+
+// AddSecondaryPrivateIpReq defines model for add-secondary-private-ip-req.
+type AddSecondaryPrivateIpReq struct {
+	Address *string `json:"address,omitempty"`
+}
+
+// AssociateReq defines model for associate-req.
+type AssociateReq struct {
+	DeviceNumber int    `json:"deviceNumber"`
+	VmId         string `json:"vmId"`
+}
+
+// AssociateSuccessRes defines model for associate-success-res.
+type AssociateSuccessRes struct {
+	AssociationId *string `json:"associationId,omitempty"`
+}
+
+// Attachment defines model for attachment.
+type Attachment struct {
+	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
+}
+
+// CreateDhcpOptionsSetReq defines model for create-dhcp-options-set-req.
+type CreateDhcpOptionsSetReq struct {
+	DomainName        *string   `json:"domainName,omitempty"`
+	DomainNameServers *[]string `json:"domainNameServers,omitempty"`
+	LogServers        *[]string `json:"logServers,omitempty"`
+	NtpServers        *[]string `json:"ntpServers,omitempty"`
+}
+
+// CreateReq defines model for create-req.
+type CreateReq struct {
+	AvailabilityZone string  `json:"availabilityZone"`
+	Iops             *string `json:"iops,omitempty"`
+	Size             *int    `json:"size,omitempty"`
+	SnapshotId       *string `json:"snapshotId,omitempty"`
+
+	// VolumeType Block Storage Volume type.
+	// Can be:
+	// - io1
+	// - gp2
+	// - standard
+	VolumeType *string `json:"volumeType,omitempty"`
+}
+
+// CreateReq2 defines model for create-req-2.
+type CreateReq2 struct {
+	Description           *string `json:"description,omitempty"`
+	SecurityGroupName     *string `json:"securityGroupName,omitempty"`
+	VirtualPrivateCloudId string  `json:"virtualPrivateCloudId"`
+}
+
+// CreateReq3 defines model for create-req-3.
+type CreateReq3 struct {
+	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
+}
+
+// CreateReq4 defines model for create-req-4.
+type CreateReq4 struct {
+	Description *string `json:"description,omitempty"`
+
+	// PrivateIps List of Private IP
+	PrivateIps       *PrivateIpsLight `json:"privateIps,omitempty"`
+	SecurityGroupIds *[]string        `json:"securityGroupIds,omitempty"`
+	SubnetId         string           `json:"subnetId"`
+}
+
+// CreateReq5 defines model for create-req-5.
+type CreateReq5 struct {
+	// AvailabilityZone The name of the region in which the NunSpot subnet is located
+	AvailabilityZone *string `json:"availabilityZone,omitempty"`
+
+	// IpRange The list of network prefixes used by the NumSpot subnet
+	IpRange string `json:"ipRange"`
+
+	// VirtualPrivateCloudId The id of the parent NumSpot VPC in which the Subnet is
+	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
+}
+
+// CreateSuccessRes defines model for create-success-res.
+type CreateSuccessRes struct {
+	// AvailabilityZone The name of the region in which the NunSpot subnet is located
+	AvailabilityZone *string `json:"availabilityZone,omitempty"`
+
+	// AvailableIpsCount The number of available IPs in the Subnets
+	AvailableIpsCount *int `json:"availableIpsCount,omitempty"`
+
+	// Id The NumSpot subnet resource ID
+	Id *string `json:"id,omitempty"`
+
+	// IpRange The list of network prefixes used by the NumSpot subnet
+	IpRange string `json:"ipRange"`
+
+	// MapPublicIpOnLaunch If true, a public IP is assigned to the network interface cards (NICs) created in the NumSpot Subnet
+	MapPublicIpOnLaunch *bool `json:"mapPublicIpOnLaunch,omitempty"`
+
+	// State The state of the NumSpot subnet
+	State *string `json:"state,omitempty"`
+
+	// Tags One or more tags associated with the resource.
+	Tags *Tag `json:"tags,omitempty"`
+
+	// VirtualPrivateCloudId The id of the parent NumSpot VPC in which the Subnet is
+	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
+}
+
+// DhcpOptionsSet defines model for dhcp-options-set.
+type DhcpOptionsSet struct {
 	DomainName        *string   `json:"domainName,omitempty"`
 	DomainNameServers *[]string `json:"domainNameServers,omitempty"`
 	Id                *string   `json:"id,omitempty"`
@@ -25,7 +163,15 @@ type DhcpOptionsSetItem struct {
 	NtpServers        *[]string `json:"ntpServers,omitempty"`
 }
 
-// InternetGateway defines model for InternetGateway.
+// DissociateReq defines model for dissociate-req.
+type DissociateReq struct {
+	AssociationId string `json:"associationId"`
+}
+
+// InternetGatewayId defines model for internet-gateway-id.
+type InternetGatewayId = string
+
+// InternetGateway defines model for internetGateway.
 type InternetGateway struct {
 	// Id Internet Gateway ID
 	Id *string `json:"id,omitempty"`
@@ -40,19 +186,151 @@ type InternetGateway struct {
 	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
 }
 
-// NumSpotError defines model for NumSpotError.
-type NumSpotError struct {
-	Code     string `json:"code"`
-	Detail   string `json:"detail"`
-	Instance string `json:"instance"`
-	Status   int    `json:"status"`
-	Title    string `json:"title"`
-	Type     string `json:"type"`
+// LinkRouteTable defines model for link-route-table.
+type LinkRouteTable struct {
+	Id           string  `json:"id"`
+	Main         bool    `json:"main"`
+	RouteTableId string  `json:"routeTableId"`
+	SubnetId     *string `json:"subnetId,omitempty"`
 }
 
-// SecurityGroupItem defines model for SecurityGroupItem.
-type SecurityGroupItem struct {
-	AccountId    *string `json:"accountId,omitempty"`
+// ListRes defines model for list-res.
+type ListRes struct {
+	Items *[]SecurityGroup `json:"items,omitempty"`
+}
+
+// ListRes2 defines model for list-res-2.
+type ListRes2 struct {
+	Items *[]RouteTable `json:"items,omitempty"`
+}
+
+// ListRes3 defines model for list-res-3.
+type ListRes3 struct {
+	Items *[]Subnet `json:"items,omitempty"`
+}
+
+// ListSuccessRes defines model for list-success-res.
+type ListSuccessRes struct {
+	Items *[]DhcpOptionsSet `json:"items,omitempty"`
+}
+
+// ListSuccessRes2 defines model for list-success-res-2.
+type ListSuccessRes2 = interface{}
+
+// NetworkInterfaceCard defines model for network-interface-card.
+type NetworkInterfaceCard struct {
+	AvailabilityZone    *string      `json:"availabilityZone,omitempty"`
+	Description         *string      `json:"description,omitempty"`
+	Id                  *string      `json:"id,omitempty"`
+	IsSourceDestChecked *bool        `json:"isSourceDestChecked,omitempty"`
+	MacAddress          *string      `json:"macAddress,omitempty"`
+	PrimaryPrivateIp    *PrivateIp   `json:"primaryPrivateIp,omitempty"`
+	PrivateDnsName      *string      `json:"privateDnsName,omitempty"`
+	SecondaryPrivateIps *[]PrivateIp `json:"secondaryPrivateIps,omitempty"`
+
+	// SecurityGroups List of Security Group
+	SecurityGroups *SecurityGroupRef `json:"securityGroups,omitempty"`
+	State          *string           `json:"state,omitempty"`
+	SubnetId       *string           `json:"subnetId,omitempty"`
+
+	// Tags One or more tags associated with the resource.
+	Tags                  *Tag    `json:"tags,omitempty"`
+	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
+}
+
+// PrivateIp defines model for private-ip.
+type PrivateIp struct {
+	Address string  `json:"address"`
+	DnsName *string `json:"dnsName,omitempty"`
+}
+
+// PrivateIps List of Private IP
+type PrivateIps = []struct {
+	IsPrimary      *bool   `json:"isPrimary,omitempty"`
+	PrivateDnsName *string `json:"privateDnsName,omitempty"`
+	PrivateIp      *string `json:"privateIp,omitempty"`
+}
+
+// PrivateIpsLight List of Private IP
+type PrivateIpsLight = []struct {
+	IsPrimary *bool   `json:"isPrimary,omitempty"`
+	PrivateIp *string `json:"privateIp,omitempty"`
+}
+
+// PublicIp defines model for public-ip.
+type PublicIp struct {
+	Id       *string        `json:"id,omitempty"`
+	PublicIp *string        `json:"publicIp,omitempty"`
+	Tags     *[]interface{} `json:"tags,omitempty"`
+}
+
+// ReqCreate defines model for req-create.
+type ReqCreate struct {
+	Name string `json:"name"`
+}
+
+// ReqImport defines model for req-import.
+type ReqImport struct {
+	Name      string `json:"name"`
+	PublicKey string `json:"publicKey"`
+}
+
+// ResCreate defines model for res-create.
+type ResCreate struct {
+	Fingerprint *string `json:"fingerprint,omitempty"`
+	Name        *string `json:"name,omitempty"`
+	PrivateKey  *string `json:"privateKey,omitempty"`
+}
+
+// ResImport defines model for res-import.
+type ResImport struct {
+	Fingerprint *string `json:"fingerprint,omitempty"`
+	Name        *string `json:"name,omitempty"`
+}
+
+// ResList defines model for res-list.
+type ResList struct {
+	Items *[]struct {
+		Fingerprint *string `json:"fingerprint,omitempty"`
+		Name        *string `json:"name,omitempty"`
+	} `json:"items,omitempty"`
+}
+
+// Route defines model for route.
+type Route struct {
+	DestinationIpRange string `json:"destinationIpRange"`
+	Target             string `json:"target"`
+	TargetType         string `json:"targetType"`
+}
+
+// RoutePropagatingVirtualGateway defines model for route-propagating-virtual-gateway.
+type RoutePropagatingVirtualGateway struct {
+	Id string `json:"id"`
+}
+
+// RouteTable defines model for route-table.
+type RouteTable struct {
+	Id                              string                            `json:"id"`
+	LinkRouteTables                 *[]LinkRouteTable                 `json:"linkRouteTables,omitempty"`
+	RoutePropagatingVirtualGateways *[]RoutePropagatingVirtualGateway `json:"routePropagatingVirtualGateways,omitempty"`
+	Routes                          *[]Route                          `json:"routes,omitempty"`
+	VirtualPrivateCloudId           string                            `json:"virtualPrivateCloudId"`
+}
+
+// RuleReq defines model for rule-req.
+type RuleReq struct {
+	Flow          string  `json:"flow"`
+	FromPortRange int32   `json:"fromPortRange"`
+	IpProtocol    *string `json:"ipProtocol,omitempty"`
+	Target        struct {
+		IpRange *string `json:"ipRange,omitempty"`
+	} `json:"target"`
+	TargetType  string `json:"targetType"`
+	ToPortRange int32  `json:"toPortRange"`
+}
+
+// SecurityGroup defines model for security-group.
+type SecurityGroup struct {
 	Description  *string `json:"description,omitempty"`
 	Id           *string `json:"id,omitempty"`
 	InboundRules *[]struct {
@@ -79,10 +357,43 @@ type SecurityGroupItem struct {
 		ServiceIds  *string `json:"serviceIds,omitempty"`
 		ToPortRange *int    `json:"toPortRange,omitempty"`
 	} `json:"outboundRules,omitempty"`
+	SecurityGroupName     *string `json:"securityGroupName,omitempty"`
+	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
+}
+
+// SecurityGroupRef List of Security Group
+type SecurityGroupRef = []struct {
+	SecurityGroupId   *string `json:"securityGroupId,omitempty"`
 	SecurityGroupName *string `json:"securityGroupName,omitempty"`
 }
 
-// Subnet defines model for Subnet.
+// Snapshot defines model for snapshot.
+type Snapshot struct {
+	CreationDate *openapi_types.Date `json:"creationDate,omitempty"`
+	Description  *string             `json:"description,omitempty"`
+	Id           *string             `json:"id,omitempty"`
+	Progress     *int                `json:"progress,omitempty"`
+	State        *interface{}        `json:"state,omitempty"`
+
+	// Tags One or more tags associated with the resource.
+	Tags       *Tag    `json:"tags,omitempty"`
+	VolumeId   *string `json:"volumeId,omitempty"`
+	VolumeSize *int    `json:"volumeSize,omitempty"`
+}
+
+// SnapshotSource defines model for snapshot-source.
+type SnapshotSource struct {
+	// RegionName Region name of the source snapshot
+	RegionName *string `json:"regionName,omitempty"`
+
+	// SnapshotId ID of the source snapshot
+	SnapshotId *string `json:"snapshotId,omitempty"`
+
+	// VolumeId ID of the source volume
+	VolumeId *string `json:"volumeId,omitempty"`
+}
+
+// Subnet defines model for subnet.
 type Subnet struct {
 	// AvailabilityZone The name of the region in which the NunSpot subnet is located
 	AvailabilityZone *string `json:"availabilityZone,omitempty"`
@@ -103,14 +414,14 @@ type Subnet struct {
 	State *string `json:"state,omitempty"`
 
 	// Tags One or more tags associated with the resource.
-	Tags *Tags `json:"tags,omitempty"`
+	Tags *Tag `json:"tags,omitempty"`
 
 	// VirtualPrivateCloudId The id of the parent NumSpot VPC in which the Subnet is
 	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
 }
 
-// Tag defines model for Tag.
-type Tag struct {
+// Tag One or more tags associated with the resource.
+type Tag = []struct {
 	// Key The key of the tag.
 	Key string `json:"key"`
 
@@ -118,101 +429,249 @@ type Tag struct {
 	Value string `json:"value"`
 }
 
-// Tags One or more tags associated with the resource.
-type Tags = []Tag
-
-// N400 defines model for 400.
-type N400 = NumSpotError
-
-// N404 defines model for 404.
-type N404 = NumSpotError
-
-// N405 defines model for 405.
-type N405 = NumSpotError
-
-// N409 defines model for 409.
-type N409 = NumSpotError
-
-// N500 defines model for 500.
-type N500 = NumSpotError
-
-// CreateDhcpOptionsSetJSONBody defines parameters for CreateDhcpOptionsSet.
-type CreateDhcpOptionsSetJSONBody struct {
-	DomainName        *string   `json:"domainName,omitempty"`
-	DomainNameServers *[]string `json:"domainNameServers,omitempty"`
-	LogServers        *[]string `json:"logServers,omitempty"`
-	NtpServers        *[]string `json:"ntpServers,omitempty"`
-}
-
-// AttachInternetGatewayJSONBody defines parameters for AttachInternetGateway.
-type AttachInternetGatewayJSONBody struct {
-	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
-}
-
-// DetachInternetGatewayJSONBody defines parameters for DetachInternetGateway.
-type DetachInternetGatewayJSONBody struct {
-	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
-}
-
-// CreateKeyPairJSONBody defines parameters for CreateKeyPair.
-type CreateKeyPairJSONBody struct {
-	Name string `json:"name"`
-}
-
-// ImportKeyPairJSONBody defines parameters for ImportKeyPair.
-type ImportKeyPairJSONBody struct {
-	Name      string `json:"name"`
-	PublicKey string `json:"publicKey"`
-}
-
-// CreateSecurityGroupJSONBody defines parameters for CreateSecurityGroup.
-type CreateSecurityGroupJSONBody struct {
-	Description           *string `json:"description,omitempty"`
-	SecurityGroupName     *string `json:"securityGroupName,omitempty"`
-	VirtualPrivateCloudId string  `json:"virtualPrivateCloudId"`
-}
-
-// CreateSubnetJSONBody defines parameters for CreateSubnet.
-type CreateSubnetJSONBody struct {
-	// AvailabilityZone The name of the region in which the NunSpot subnet is located
-	AvailabilityZone *string `json:"availabilityZone,omitempty"`
-
-	// IpRange The list of network prefixes used by the NumSpot subnet
-	IpRange string `json:"ipRange"`
-
-	// VirtualPrivateCloudId The id of the parent NumSpot VPC in which the Subnet is
-	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
-}
-
-// CreateVPCJSONBody defines parameters for CreateVPC.
-type CreateVPCJSONBody struct {
+// VpcReqCreate defines model for vpc-req-create.
+type VpcReqCreate struct {
 	IpRange string  `json:"ipRange"`
 	Tenancy *string `json:"tenancy,omitempty"`
 }
 
+// VpcResCreate defines model for vpc-res-create.
+type VpcResCreate struct {
+	DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
+	Id               *string `json:"id,omitempty"`
+	IpRange          *string `json:"ipRange,omitempty"`
+	State            *string `json:"state,omitempty"`
+	Tenancy          *string `json:"tenancy,omitempty"`
+}
+
+// VpcResList defines model for vpc-res-list.
+type VpcResList struct {
+	Items *[]struct {
+		DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
+		Id               *string `json:"id,omitempty"`
+		IpRange          *string `json:"ipRange,omitempty"`
+		State            *string `json:"state,omitempty"`
+		Tenancy          *string `json:"tenancy,omitempty"`
+	} `json:"items,omitempty"`
+}
+
+// DhcpOptionsSetIdPart defines model for dhcp-options-set-id.part.
+type DhcpOptionsSetIdPart = string
+
+// KeyPairNamePart defines model for key-pair-name.part.
+type KeyPairNamePart = string
+
+// NetworkInterfaceCardIdPart defines model for network-interface-card-id.part.
+type NetworkInterfaceCardIdPart = string
+
+// SecurityGroupIdPart defines model for security-group-id.part.
+type SecurityGroupIdPart = string
+
+// SnapshotIdPart defines model for snapshot-id.part.
+type SnapshotIdPart = string
+
+// SubnetIdPart defines model for subnet-id.part.
+type SubnetIdPart = string
+
+// N400Part For HTTP errors, we implement the https://www.rfc-editor.org/rfc/rfc7807#section-3.1[RFC 7807]
+type N400Part = Error
+
+// N401Part For HTTP errors, we implement the https://www.rfc-editor.org/rfc/rfc7807#section-3.1[RFC 7807]
+type N401Part = Error
+
+// N403Part For HTTP errors, we implement the https://www.rfc-editor.org/rfc/rfc7807#section-3.1[RFC 7807]
+type N403Part = Error
+
+// N404Part For HTTP errors, we implement the https://www.rfc-editor.org/rfc/rfc7807#section-3.1[RFC 7807]
+type N404Part = Error
+
+// N405Part For HTTP errors, we implement the https://www.rfc-editor.org/rfc/rfc7807#section-3.1[RFC 7807]
+type N405Part = Error
+
+// N409Part For HTTP errors, we implement the https://www.rfc-editor.org/rfc/rfc7807#section-3.1[RFC 7807]
+type N409Part = Error
+
+// N500Part For HTTP errors, we implement the https://www.rfc-editor.org/rfc/rfc7807#section-3.1[RFC 7807]
+type N500Part = Error
+
+// AddRouteSuccessPart defines model for add-route-success.part.
+type AddRouteSuccessPart = Route
+
+// AddRuleSuccessPart defines model for add-rule-success.part.
+type AddRuleSuccessPart = SecurityGroup
+
+// AddSecondaryPrivateIpSuccessPart defines model for add-secondary-private-ip-success.part.
+type AddSecondaryPrivateIpSuccessPart = NetworkInterfaceCard
+
+// AssociateSuccessPart defines model for associate-success.part.
+type AssociateSuccessPart = AssociateSuccessRes
+
+// CreateSuccessResPart defines model for create-success-res.part.
+type CreateSuccessResPart = CreateSuccessRes
+
+// CreateSuccessPart defines model for create-success.part.
+type CreateSuccessPart = InternetGateway
+
+// CreateSuccessPart2 defines model for create-success.part-2.
+type CreateSuccessPart2 = ResCreate
+
+// CreateSuccessPart3 defines model for create-success.part-3.
+type CreateSuccessPart3 = SecurityGroup
+
+// CreateSuccessPart4 defines model for create-success.part-4.
+type CreateSuccessPart4 = DhcpOptionsSet
+
+// CreateSuccessPart5 defines model for create-success.part-5.
+type CreateSuccessPart5 = PublicIp
+
+// CreateSuccessPart6 defines model for create-success.part-6.
+type CreateSuccessPart6 = RouteTable
+
+// CreateSuccessPart7 defines model for create-success.part-7.
+type CreateSuccessPart7 = Snapshot
+
+// CreateSuccessPart8 defines model for create-success.part-8.
+type CreateSuccessPart8 = NetworkInterfaceCard
+
+// ListSuccessPart defines model for list-success.part.
+type ListSuccessPart = []InternetGateway
+
+// ListSuccessPart2 defines model for list-success.part-2.
+type ListSuccessPart2 = ListRes
+
+// ListSuccessPart3 defines model for list-success.part-3.
+type ListSuccessPart3 = ListSuccessRes
+
+// ListSuccessPart4 defines model for list-success.part-4.
+type ListSuccessPart4 = ListRes2
+
+// ListSuccessPart5 defines model for list-success.part-5.
+type ListSuccessPart5 = ListSuccessRes2
+
+// ListSuccessPart6 defines model for list-success.part-6.
+type ListSuccessPart6 = ListRes3
+
+// RemoveRuleSuccessPart defines model for remove-rule-success.part.
+type RemoveRuleSuccessPart = SecurityGroup
+
+// VpcCreateSuccessPart defines model for vpc-create-success.part.
+type VpcCreateSuccessPart = VpcResCreate
+
+// VpcListSuccessPart defines model for vpc-list-success.part.
+type VpcListSuccessPart = VpcResList
+
+// AddRoutePart defines model for add-route.part.
+type AddRoutePart = AddRouteReq
+
+// AddSecondaryPrivateIpPart defines model for add-secondary-private-ip.part.
+type AddSecondaryPrivateIpPart = AddSecondaryPrivateIpReq
+
+// AssociatePart defines model for associate.part.
+type AssociatePart = AssociateReq
+
+// AttachPart defines model for attach.part.
+type AttachPart = Attachment
+
+// CreateKeyPairPart defines model for create-key-pair.part.
+type CreateKeyPairPart = ReqCreate
+
+// CreatePart defines model for create.part.
+type CreatePart = CreateReq
+
+// CreatePart2 defines model for create.part-2.
+type CreatePart2 = CreateReq2
+
+// CreatePart3 defines model for create.part-3.
+type CreatePart3 = CreateReq3
+
+// CreatePart4 defines model for create.part-4.
+type CreatePart4 struct {
+	Description *string        `json:"description,omitempty"`
+	Source      SnapshotSource `json:"source"`
+	SourceType  string         `json:"sourceType"`
+}
+
+// CreatePart5 defines model for create.part-5.
+type CreatePart5 = CreateReq4
+
+// CreatePart6 defines model for create.part-6.
+type CreatePart6 = CreateReq5
+
+// DetachPart defines model for detach.part.
+type DetachPart = Attachment
+
+// DhcpOptionsSetCreatePart defines model for dhcp-options-set-create.part.
+type DhcpOptionsSetCreatePart = CreateDhcpOptionsSetReq
+
+// DissociatePart defines model for dissociate.part.
+type DissociatePart = DissociateReq
+
+// RulePart defines model for rule.part.
+type RulePart = RuleReq
+
+// VpcCreatePart defines model for vpc-create.part.
+type VpcCreatePart = VpcReqCreate
+
+// CreateSnapshotJSONBody defines parameters for CreateSnapshot.
+type CreateSnapshotJSONBody struct {
+	Description *string        `json:"description,omitempty"`
+	Source      SnapshotSource `json:"source"`
+	SourceType  string         `json:"sourceType"`
+}
+
+// CreateVolumeJSONRequestBody defines body for CreateVolume for application/json ContentType.
+type CreateVolumeJSONRequestBody = CreateReq
+
 // CreateDhcpOptionsSetJSONRequestBody defines body for CreateDhcpOptionsSet for application/json ContentType.
-type CreateDhcpOptionsSetJSONRequestBody CreateDhcpOptionsSetJSONBody
+type CreateDhcpOptionsSetJSONRequestBody = CreateDhcpOptionsSetReq
 
 // AttachInternetGatewayJSONRequestBody defines body for AttachInternetGateway for application/json ContentType.
-type AttachInternetGatewayJSONRequestBody AttachInternetGatewayJSONBody
+type AttachInternetGatewayJSONRequestBody = Attachment
 
 // DetachInternetGatewayJSONRequestBody defines body for DetachInternetGateway for application/json ContentType.
-type DetachInternetGatewayJSONRequestBody DetachInternetGatewayJSONBody
+type DetachInternetGatewayJSONRequestBody = Attachment
 
 // CreateKeyPairJSONRequestBody defines body for CreateKeyPair for application/json ContentType.
-type CreateKeyPairJSONRequestBody CreateKeyPairJSONBody
+type CreateKeyPairJSONRequestBody = ReqCreate
 
 // ImportKeyPairJSONRequestBody defines body for ImportKeyPair for application/json ContentType.
-type ImportKeyPairJSONRequestBody ImportKeyPairJSONBody
+type ImportKeyPairJSONRequestBody = ReqImport
+
+// CreateNetworkInterfaceCardJSONRequestBody defines body for CreateNetworkInterfaceCard for application/json ContentType.
+type CreateNetworkInterfaceCardJSONRequestBody = CreateReq4
+
+// AssociateNICJSONRequestBody defines body for AssociateNIC for application/json ContentType.
+type AssociateNICJSONRequestBody = AssociateReq
+
+// AddSecondaryPrivateIPJSONRequestBody defines body for AddSecondaryPrivateIP for application/json ContentType.
+type AddSecondaryPrivateIPJSONRequestBody = AddSecondaryPrivateIpReq
+
+// CreateRouteTableJSONRequestBody defines body for CreateRouteTable for application/json ContentType.
+type CreateRouteTableJSONRequestBody = CreateReq3
+
+// AddRouteJSONRequestBody defines body for AddRoute for application/json ContentType.
+type AddRouteJSONRequestBody = AddRouteReq
+
+// DissociateRouteTableJSONRequestBody defines body for DissociateRouteTable for application/json ContentType.
+type DissociateRouteTableJSONRequestBody = DissociateReq
 
 // CreateSecurityGroupJSONRequestBody defines body for CreateSecurityGroup for application/json ContentType.
-type CreateSecurityGroupJSONRequestBody CreateSecurityGroupJSONBody
+type CreateSecurityGroupJSONRequestBody = CreateReq2
+
+// AddRuleSecurityGroupJSONRequestBody defines body for AddRuleSecurityGroup for application/json ContentType.
+type AddRuleSecurityGroupJSONRequestBody = RuleReq
+
+// RemoveRuleSecurityGroupJSONRequestBody defines body for RemoveRuleSecurityGroup for application/json ContentType.
+type RemoveRuleSecurityGroupJSONRequestBody = RuleReq
+
+// CreateSnapshotJSONRequestBody defines body for CreateSnapshot for application/json ContentType.
+type CreateSnapshotJSONRequestBody CreateSnapshotJSONBody
 
 // CreateSubnetJSONRequestBody defines body for CreateSubnet for application/json ContentType.
-type CreateSubnetJSONRequestBody CreateSubnetJSONBody
+type CreateSubnetJSONRequestBody = CreateReq5
 
 // CreateVPCJSONRequestBody defines body for CreateVPC for application/json ContentType.
-type CreateVPCJSONRequestBody CreateVPCJSONBody
+type CreateVPCJSONRequestBody = VpcReqCreate
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -287,6 +746,14 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// CreateVolumeWithBody request with any body
+	CreateVolumeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateVolume(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteBlockStorageVolume request
+	DeleteBlockStorageVolume(ctx context.Context, blockStorageVolumeId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetDhcpOptionsSet request
 	GetDhcpOptionsSet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -296,10 +763,10 @@ type ClientInterface interface {
 	CreateDhcpOptionsSet(ctx context.Context, body CreateDhcpOptionsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteDhcpOptionsSet request
-	DeleteDhcpOptionsSet(ctx context.Context, dhcpOptionsSetId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteDhcpOptionsSet(ctx context.Context, dhcpOptionsSetId DhcpOptionsSetIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetInternetGateways request
-	GetInternetGateways(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ListInternetGateway request
+	ListInternetGateway(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateInternetGateway request
 	CreateInternetGateway(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -308,14 +775,14 @@ type ClientInterface interface {
 	DeleteInternetGateway(ctx context.Context, internetGatewayId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AttachInternetGatewayWithBody request with any body
-	AttachInternetGatewayWithBody(ctx context.Context, internetGatewayId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AttachInternetGatewayWithBody(ctx context.Context, internetGatewayId InternetGatewayId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	AttachInternetGateway(ctx context.Context, internetGatewayId string, body AttachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AttachInternetGateway(ctx context.Context, internetGatewayId InternetGatewayId, body AttachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DetachInternetGatewayWithBody request with any body
-	DetachInternetGatewayWithBody(ctx context.Context, internetGatewayId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DetachInternetGatewayWithBody(ctx context.Context, internetGatewayId InternetGatewayId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	DetachInternetGateway(ctx context.Context, internetGatewayId string, body DetachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DetachInternetGateway(ctx context.Context, internetGatewayId InternetGatewayId, body DetachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetKeyPairs request
 	GetKeyPairs(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -331,13 +798,55 @@ type ClientInterface interface {
 	ImportKeyPair(ctx context.Context, body ImportKeyPairJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteKeyPair request
-	DeleteKeyPair(ctx context.Context, keyPairName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteKeyPair(ctx context.Context, keyPairName KeyPairNamePart, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListNetworkInterfaceCard request
+	ListNetworkInterfaceCard(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateNetworkInterfaceCardWithBody request with any body
+	CreateNetworkInterfaceCardWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateNetworkInterfaceCard(ctx context.Context, body CreateNetworkInterfaceCardJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteNetworkInterfaceCard request
+	DeleteNetworkInterfaceCard(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AssociateNICWithBody request with any body
+	AssociateNICWithBody(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AssociateNIC(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AssociateNICJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AddSecondaryPrivateIPWithBody request with any body
+	AddSecondaryPrivateIPWithBody(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AddSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreatePublicIp request
 	CreatePublicIp(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeletePublicIp request
 	DeletePublicIp(ctx context.Context, publicIpId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListRouteTables request
+	ListRouteTables(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateRouteTableWithBody request with any body
+	CreateRouteTableWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateRouteTable(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteRouteTable request
+	DeleteRouteTable(ctx context.Context, routeTableId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AddRouteWithBody request with any body
+	AddRouteWithBody(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AddRoute(ctx context.Context, routeTableId string, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DissociateRouteTableWithBody request with any body
+	DissociateRouteTableWithBody(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DissociateRouteTable(ctx context.Context, routeTableId string, body DissociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSecurityGroups request
 	GetSecurityGroups(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -348,7 +857,28 @@ type ClientInterface interface {
 	CreateSecurityGroup(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteSecurityGroup request
-	DeleteSecurityGroup(ctx context.Context, securityGroupId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteSecurityGroup(ctx context.Context, securityGroupId SecurityGroupIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AddRuleSecurityGroupWithBody request with any body
+	AddRuleSecurityGroupWithBody(ctx context.Context, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AddRuleSecurityGroup(ctx context.Context, securityGroupId SecurityGroupIdPart, body AddRuleSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RemoveRuleSecurityGroupWithBody request with any body
+	RemoveRuleSecurityGroupWithBody(ctx context.Context, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RemoveRuleSecurityGroup(ctx context.Context, securityGroupId SecurityGroupIdPart, body RemoveRuleSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateSnapshotWithBody request with any body
+	CreateSnapshotWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateSnapshot(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSnapshot request
+	DeleteSnapshot(ctx context.Context, snapshotId SnapshotIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSubnet request
+	DeleteSubnet(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSubnets request
 	GetSubnets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -357,9 +887,6 @@ type ClientInterface interface {
 	CreateSubnetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateSubnet(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteSubnet request
-	DeleteSubnet(ctx context.Context, subnetId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetVPC request
 	GetVPC(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -371,6 +898,42 @@ type ClientInterface interface {
 
 	// DeleteVPC request
 	DeleteVPC(ctx context.Context, virtualPrivateCloudId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) CreateVolumeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVolumeRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateVolume(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVolumeRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteBlockStorageVolume(ctx context.Context, blockStorageVolumeId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteBlockStorageVolumeRequest(c.Server, blockStorageVolumeId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) GetDhcpOptionsSet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -409,7 +972,7 @@ func (c *Client) CreateDhcpOptionsSet(ctx context.Context, body CreateDhcpOption
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteDhcpOptionsSet(ctx context.Context, dhcpOptionsSetId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteDhcpOptionsSet(ctx context.Context, dhcpOptionsSetId DhcpOptionsSetIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteDhcpOptionsSetRequest(c.Server, dhcpOptionsSetId)
 	if err != nil {
 		return nil, err
@@ -421,8 +984,8 @@ func (c *Client) DeleteDhcpOptionsSet(ctx context.Context, dhcpOptionsSetId stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetInternetGateways(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetInternetGatewaysRequest(c.Server)
+func (c *Client) ListInternetGateway(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListInternetGatewayRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -457,7 +1020,7 @@ func (c *Client) DeleteInternetGateway(ctx context.Context, internetGatewayId st
 	return c.Client.Do(req)
 }
 
-func (c *Client) AttachInternetGatewayWithBody(ctx context.Context, internetGatewayId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AttachInternetGatewayWithBody(ctx context.Context, internetGatewayId InternetGatewayId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAttachInternetGatewayRequestWithBody(c.Server, internetGatewayId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -469,7 +1032,7 @@ func (c *Client) AttachInternetGatewayWithBody(ctx context.Context, internetGate
 	return c.Client.Do(req)
 }
 
-func (c *Client) AttachInternetGateway(ctx context.Context, internetGatewayId string, body AttachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AttachInternetGateway(ctx context.Context, internetGatewayId InternetGatewayId, body AttachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAttachInternetGatewayRequest(c.Server, internetGatewayId, body)
 	if err != nil {
 		return nil, err
@@ -481,7 +1044,7 @@ func (c *Client) AttachInternetGateway(ctx context.Context, internetGatewayId st
 	return c.Client.Do(req)
 }
 
-func (c *Client) DetachInternetGatewayWithBody(ctx context.Context, internetGatewayId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DetachInternetGatewayWithBody(ctx context.Context, internetGatewayId InternetGatewayId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDetachInternetGatewayRequestWithBody(c.Server, internetGatewayId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -493,7 +1056,7 @@ func (c *Client) DetachInternetGatewayWithBody(ctx context.Context, internetGate
 	return c.Client.Do(req)
 }
 
-func (c *Client) DetachInternetGateway(ctx context.Context, internetGatewayId string, body DetachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DetachInternetGateway(ctx context.Context, internetGatewayId InternetGatewayId, body DetachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDetachInternetGatewayRequest(c.Server, internetGatewayId, body)
 	if err != nil {
 		return nil, err
@@ -565,8 +1128,104 @@ func (c *Client) ImportKeyPair(ctx context.Context, body ImportKeyPairJSONReques
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteKeyPair(ctx context.Context, keyPairName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteKeyPair(ctx context.Context, keyPairName KeyPairNamePart, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteKeyPairRequest(c.Server, keyPairName)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListNetworkInterfaceCard(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListNetworkInterfaceCardRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateNetworkInterfaceCardWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNetworkInterfaceCardRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateNetworkInterfaceCard(ctx context.Context, body CreateNetworkInterfaceCardJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNetworkInterfaceCardRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteNetworkInterfaceCard(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNetworkInterfaceCardRequest(c.Server, networkInterfaceCardId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AssociateNICWithBody(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAssociateNICRequestWithBody(c.Server, networkInterfaceCardId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AssociateNIC(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AssociateNICJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAssociateNICRequest(c.Server, networkInterfaceCardId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddSecondaryPrivateIPWithBody(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddSecondaryPrivateIPRequestWithBody(c.Server, networkInterfaceCardId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddSecondaryPrivateIPRequest(c.Server, networkInterfaceCardId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -591,6 +1250,102 @@ func (c *Client) CreatePublicIp(ctx context.Context, reqEditors ...RequestEditor
 
 func (c *Client) DeletePublicIp(ctx context.Context, publicIpId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeletePublicIpRequest(c.Server, publicIpId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListRouteTables(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRouteTablesRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRouteTableWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRouteTableRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRouteTable(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRouteTableRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteRouteTable(ctx context.Context, routeTableId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRouteTableRequest(c.Server, routeTableId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRouteWithBody(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRouteRequestWithBody(c.Server, routeTableId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRoute(ctx context.Context, routeTableId string, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRouteRequest(c.Server, routeTableId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DissociateRouteTableWithBody(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDissociateRouteTableRequestWithBody(c.Server, routeTableId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DissociateRouteTable(ctx context.Context, routeTableId string, body DissociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDissociateRouteTableRequest(c.Server, routeTableId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -637,8 +1392,104 @@ func (c *Client) CreateSecurityGroup(ctx context.Context, body CreateSecurityGro
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSecurityGroup(ctx context.Context, securityGroupId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteSecurityGroup(ctx context.Context, securityGroupId SecurityGroupIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteSecurityGroupRequest(c.Server, securityGroupId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRuleSecurityGroupWithBody(ctx context.Context, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRuleSecurityGroupRequestWithBody(c.Server, securityGroupId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRuleSecurityGroup(ctx context.Context, securityGroupId SecurityGroupIdPart, body AddRuleSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRuleSecurityGroupRequest(c.Server, securityGroupId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RemoveRuleSecurityGroupWithBody(ctx context.Context, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveRuleSecurityGroupRequestWithBody(c.Server, securityGroupId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RemoveRuleSecurityGroup(ctx context.Context, securityGroupId SecurityGroupIdPart, body RemoveRuleSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveRuleSecurityGroupRequest(c.Server, securityGroupId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSnapshotWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSnapshotRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSnapshot(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSnapshotRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSnapshot(ctx context.Context, snapshotId SnapshotIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSnapshotRequest(c.Server, snapshotId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSubnet(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSubnetRequest(c.Server, subnetId)
 	if err != nil {
 		return nil, err
 	}
@@ -675,18 +1526,6 @@ func (c *Client) CreateSubnetWithBody(ctx context.Context, contentType string, b
 
 func (c *Client) CreateSubnet(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateSubnetRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteSubnet(ctx context.Context, subnetId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSubnetRequest(c.Server, subnetId)
 	if err != nil {
 		return nil, err
 	}
@@ -743,6 +1582,80 @@ func (c *Client) DeleteVPC(ctx context.Context, virtualPrivateCloudId string, re
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewCreateVolumeRequest calls the generic CreateVolume builder with application/json body
+func NewCreateVolumeRequest(server string, body CreateVolumeJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateVolumeRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateVolumeRequestWithBody generates requests for CreateVolume with any type of body
+func NewCreateVolumeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/blockStorageVolume")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteBlockStorageVolumeRequest generates requests for DeleteBlockStorageVolume
+func NewDeleteBlockStorageVolumeRequest(server string, blockStorageVolumeId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "blockStorageVolumeId", runtime.ParamLocationPath, blockStorageVolumeId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/blockStorageVolumes/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewGetDhcpOptionsSetRequest generates requests for GetDhcpOptionsSet
@@ -813,7 +1726,7 @@ func NewCreateDhcpOptionsSetRequestWithBody(server string, contentType string, b
 }
 
 // NewDeleteDhcpOptionsSetRequest generates requests for DeleteDhcpOptionsSet
-func NewDeleteDhcpOptionsSetRequest(server string, dhcpOptionsSetId string) (*http.Request, error) {
+func NewDeleteDhcpOptionsSetRequest(server string, dhcpOptionsSetId DhcpOptionsSetIdPart) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -846,8 +1759,8 @@ func NewDeleteDhcpOptionsSetRequest(server string, dhcpOptionsSetId string) (*ht
 	return req, nil
 }
 
-// NewGetInternetGatewaysRequest generates requests for GetInternetGateways
-func NewGetInternetGatewaysRequest(server string) (*http.Request, error) {
+// NewListInternetGatewayRequest generates requests for ListInternetGateway
+func NewListInternetGatewayRequest(server string) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -935,7 +1848,7 @@ func NewDeleteInternetGatewayRequest(server string, internetGatewayId string) (*
 }
 
 // NewAttachInternetGatewayRequest calls the generic AttachInternetGateway builder with application/json body
-func NewAttachInternetGatewayRequest(server string, internetGatewayId string, body AttachInternetGatewayJSONRequestBody) (*http.Request, error) {
+func NewAttachInternetGatewayRequest(server string, internetGatewayId InternetGatewayId, body AttachInternetGatewayJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -946,7 +1859,7 @@ func NewAttachInternetGatewayRequest(server string, internetGatewayId string, bo
 }
 
 // NewAttachInternetGatewayRequestWithBody generates requests for AttachInternetGateway with any type of body
-func NewAttachInternetGatewayRequestWithBody(server string, internetGatewayId string, contentType string, body io.Reader) (*http.Request, error) {
+func NewAttachInternetGatewayRequestWithBody(server string, internetGatewayId InternetGatewayId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -982,7 +1895,7 @@ func NewAttachInternetGatewayRequestWithBody(server string, internetGatewayId st
 }
 
 // NewDetachInternetGatewayRequest calls the generic DetachInternetGateway builder with application/json body
-func NewDetachInternetGatewayRequest(server string, internetGatewayId string, body DetachInternetGatewayJSONRequestBody) (*http.Request, error) {
+func NewDetachInternetGatewayRequest(server string, internetGatewayId InternetGatewayId, body DetachInternetGatewayJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -993,7 +1906,7 @@ func NewDetachInternetGatewayRequest(server string, internetGatewayId string, bo
 }
 
 // NewDetachInternetGatewayRequestWithBody generates requests for DetachInternetGateway with any type of body
-func NewDetachInternetGatewayRequestWithBody(server string, internetGatewayId string, contentType string, body io.Reader) (*http.Request, error) {
+func NewDetachInternetGatewayRequestWithBody(server string, internetGatewayId InternetGatewayId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1136,7 +2049,7 @@ func NewImportKeyPairRequestWithBody(server string, contentType string, body io.
 }
 
 // NewDeleteKeyPairRequest generates requests for DeleteKeyPair
-func NewDeleteKeyPairRequest(server string, keyPairName string) (*http.Request, error) {
+func NewDeleteKeyPairRequest(server string, keyPairName KeyPairNamePart) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1165,6 +2078,201 @@ func NewDeleteKeyPairRequest(server string, keyPairName string) (*http.Request, 
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewListNetworkInterfaceCardRequest generates requests for ListNetworkInterfaceCard
+func NewListNetworkInterfaceCardRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/networkInterfaceCards")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateNetworkInterfaceCardRequest calls the generic CreateNetworkInterfaceCard builder with application/json body
+func NewCreateNetworkInterfaceCardRequest(server string, body CreateNetworkInterfaceCardJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateNetworkInterfaceCardRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateNetworkInterfaceCardRequestWithBody generates requests for CreateNetworkInterfaceCard with any type of body
+func NewCreateNetworkInterfaceCardRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/networkInterfaceCards")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteNetworkInterfaceCardRequest generates requests for DeleteNetworkInterfaceCard
+func NewDeleteNetworkInterfaceCardRequest(server string, networkInterfaceCardId NetworkInterfaceCardIdPart) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "networkInterfaceCardId", runtime.ParamLocationPath, networkInterfaceCardId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/networkInterfaceCards/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAssociateNICRequest calls the generic AssociateNIC builder with application/json body
+func NewAssociateNICRequest(server string, networkInterfaceCardId NetworkInterfaceCardIdPart, body AssociateNICJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAssociateNICRequestWithBody(server, networkInterfaceCardId, "application/json", bodyReader)
+}
+
+// NewAssociateNICRequestWithBody generates requests for AssociateNIC with any type of body
+func NewAssociateNICRequestWithBody(server string, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "networkInterfaceCardId", runtime.ParamLocationPath, networkInterfaceCardId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/networkInterfaceCards/%s/associate", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAddSecondaryPrivateIPRequest calls the generic AddSecondaryPrivateIP builder with application/json body
+func NewAddSecondaryPrivateIPRequest(server string, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAddSecondaryPrivateIPRequestWithBody(server, networkInterfaceCardId, "application/json", bodyReader)
+}
+
+// NewAddSecondaryPrivateIPRequestWithBody generates requests for AddSecondaryPrivateIP with any type of body
+func NewAddSecondaryPrivateIPRequestWithBody(server string, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "networkInterfaceCardId", runtime.ParamLocationPath, networkInterfaceCardId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/networkInterfaceCards/%s/secondaryPrivateIPs", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -1226,6 +2334,201 @@ func NewDeletePublicIpRequest(server string, publicIpId string) (*http.Request, 
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewListRouteTablesRequest generates requests for ListRouteTables
+func NewListRouteTablesRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/routeTables")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateRouteTableRequest calls the generic CreateRouteTable builder with application/json body
+func NewCreateRouteTableRequest(server string, body CreateRouteTableJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateRouteTableRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateRouteTableRequestWithBody generates requests for CreateRouteTable with any type of body
+func NewCreateRouteTableRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/routeTables")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteRouteTableRequest generates requests for DeleteRouteTable
+func NewDeleteRouteTableRequest(server string, routeTableId string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "routeTableId", runtime.ParamLocationPath, routeTableId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/routeTables/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAddRouteRequest calls the generic AddRoute builder with application/json body
+func NewAddRouteRequest(server string, routeTableId string, body AddRouteJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAddRouteRequestWithBody(server, routeTableId, "application/json", bodyReader)
+}
+
+// NewAddRouteRequestWithBody generates requests for AddRoute with any type of body
+func NewAddRouteRequestWithBody(server string, routeTableId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "routeTableId", runtime.ParamLocationPath, routeTableId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/routeTables/%s/addRoute", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDissociateRouteTableRequest calls the generic DissociateRouteTable builder with application/json body
+func NewDissociateRouteTableRequest(server string, routeTableId string, body DissociateRouteTableJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDissociateRouteTableRequestWithBody(server, routeTableId, "application/json", bodyReader)
+}
+
+// NewDissociateRouteTableRequestWithBody generates requests for DissociateRouteTable with any type of body
+func NewDissociateRouteTableRequestWithBody(server string, routeTableId string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "routeTableId", runtime.ParamLocationPath, routeTableId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/routeTables/%s/dissociate", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -1298,7 +2601,7 @@ func NewCreateSecurityGroupRequestWithBody(server string, contentType string, bo
 }
 
 // NewDeleteSecurityGroupRequest generates requests for DeleteSecurityGroup
-func NewDeleteSecurityGroupRequest(server string, securityGroupId string) (*http.Request, error) {
+func NewDeleteSecurityGroupRequest(server string, securityGroupId SecurityGroupIdPart) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1314,6 +2617,208 @@ func NewDeleteSecurityGroupRequest(server string, securityGroupId string) (*http
 	}
 
 	operationPath := fmt.Sprintf("/securityGroups/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAddRuleSecurityGroupRequest calls the generic AddRuleSecurityGroup builder with application/json body
+func NewAddRuleSecurityGroupRequest(server string, securityGroupId SecurityGroupIdPart, body AddRuleSecurityGroupJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAddRuleSecurityGroupRequestWithBody(server, securityGroupId, "application/json", bodyReader)
+}
+
+// NewAddRuleSecurityGroupRequestWithBody generates requests for AddRuleSecurityGroup with any type of body
+func NewAddRuleSecurityGroupRequestWithBody(server string, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "securityGroupId", runtime.ParamLocationPath, securityGroupId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/securityGroups/%s/addRule", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRemoveRuleSecurityGroupRequest calls the generic RemoveRuleSecurityGroup builder with application/json body
+func NewRemoveRuleSecurityGroupRequest(server string, securityGroupId SecurityGroupIdPart, body RemoveRuleSecurityGroupJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRemoveRuleSecurityGroupRequestWithBody(server, securityGroupId, "application/json", bodyReader)
+}
+
+// NewRemoveRuleSecurityGroupRequestWithBody generates requests for RemoveRuleSecurityGroup with any type of body
+func NewRemoveRuleSecurityGroupRequestWithBody(server string, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "securityGroupId", runtime.ParamLocationPath, securityGroupId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/securityGroups/%s/removeRule", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateSnapshotRequest calls the generic CreateSnapshot builder with application/json body
+func NewCreateSnapshotRequest(server string, body CreateSnapshotJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateSnapshotRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateSnapshotRequestWithBody generates requests for CreateSnapshot with any type of body
+func NewCreateSnapshotRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/snapshots")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteSnapshotRequest generates requests for DeleteSnapshot
+func NewDeleteSnapshotRequest(server string, snapshotId SnapshotIdPart) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "snapshotId", runtime.ParamLocationPath, snapshotId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/snapshots/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteSubnetRequest generates requests for DeleteSubnet
+func NewDeleteSubnetRequest(server string, subnetId SubnetIdPart) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "subnetId", runtime.ParamLocationPath, subnetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/subnet/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1394,40 +2899,6 @@ func NewCreateSubnetRequestWithBody(server string, contentType string, body io.R
 	}
 
 	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewDeleteSubnetRequest generates requests for DeleteSubnet
-func NewDeleteSubnetRequest(server string, subnetId string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "subnetId", runtime.ParamLocationPath, subnetId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/subnets/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
 
 	return req, nil
 }
@@ -1576,6 +3047,14 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// CreateVolumeWithBodyWithResponse request with any body
+	CreateVolumeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error)
+
+	CreateVolumeWithResponse(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error)
+
+	// DeleteBlockStorageVolumeWithResponse request
+	DeleteBlockStorageVolumeWithResponse(ctx context.Context, blockStorageVolumeId string, reqEditors ...RequestEditorFn) (*DeleteBlockStorageVolumeResponse, error)
+
 	// GetDhcpOptionsSetWithResponse request
 	GetDhcpOptionsSetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetDhcpOptionsSetResponse, error)
 
@@ -1585,10 +3064,10 @@ type ClientWithResponsesInterface interface {
 	CreateDhcpOptionsSetWithResponse(ctx context.Context, body CreateDhcpOptionsSetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsSetResponse, error)
 
 	// DeleteDhcpOptionsSetWithResponse request
-	DeleteDhcpOptionsSetWithResponse(ctx context.Context, dhcpOptionsSetId string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsSetResponse, error)
+	DeleteDhcpOptionsSetWithResponse(ctx context.Context, dhcpOptionsSetId DhcpOptionsSetIdPart, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsSetResponse, error)
 
-	// GetInternetGatewaysWithResponse request
-	GetInternetGatewaysWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetInternetGatewaysResponse, error)
+	// ListInternetGatewayWithResponse request
+	ListInternetGatewayWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListInternetGatewayResponse, error)
 
 	// CreateInternetGatewayWithResponse request
 	CreateInternetGatewayWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreateInternetGatewayResponse, error)
@@ -1597,14 +3076,14 @@ type ClientWithResponsesInterface interface {
 	DeleteInternetGatewayWithResponse(ctx context.Context, internetGatewayId string, reqEditors ...RequestEditorFn) (*DeleteInternetGatewayResponse, error)
 
 	// AttachInternetGatewayWithBodyWithResponse request with any body
-	AttachInternetGatewayWithBodyWithResponse(ctx context.Context, internetGatewayId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AttachInternetGatewayResponse, error)
+	AttachInternetGatewayWithBodyWithResponse(ctx context.Context, internetGatewayId InternetGatewayId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AttachInternetGatewayResponse, error)
 
-	AttachInternetGatewayWithResponse(ctx context.Context, internetGatewayId string, body AttachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*AttachInternetGatewayResponse, error)
+	AttachInternetGatewayWithResponse(ctx context.Context, internetGatewayId InternetGatewayId, body AttachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*AttachInternetGatewayResponse, error)
 
 	// DetachInternetGatewayWithBodyWithResponse request with any body
-	DetachInternetGatewayWithBodyWithResponse(ctx context.Context, internetGatewayId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DetachInternetGatewayResponse, error)
+	DetachInternetGatewayWithBodyWithResponse(ctx context.Context, internetGatewayId InternetGatewayId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DetachInternetGatewayResponse, error)
 
-	DetachInternetGatewayWithResponse(ctx context.Context, internetGatewayId string, body DetachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*DetachInternetGatewayResponse, error)
+	DetachInternetGatewayWithResponse(ctx context.Context, internetGatewayId InternetGatewayId, body DetachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*DetachInternetGatewayResponse, error)
 
 	// GetKeyPairsWithResponse request
 	GetKeyPairsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetKeyPairsResponse, error)
@@ -1620,13 +3099,55 @@ type ClientWithResponsesInterface interface {
 	ImportKeyPairWithResponse(ctx context.Context, body ImportKeyPairJSONRequestBody, reqEditors ...RequestEditorFn) (*ImportKeyPairResponse, error)
 
 	// DeleteKeyPairWithResponse request
-	DeleteKeyPairWithResponse(ctx context.Context, keyPairName string, reqEditors ...RequestEditorFn) (*DeleteKeyPairResponse, error)
+	DeleteKeyPairWithResponse(ctx context.Context, keyPairName KeyPairNamePart, reqEditors ...RequestEditorFn) (*DeleteKeyPairResponse, error)
+
+	// ListNetworkInterfaceCardWithResponse request
+	ListNetworkInterfaceCardWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListNetworkInterfaceCardResponse, error)
+
+	// CreateNetworkInterfaceCardWithBodyWithResponse request with any body
+	CreateNetworkInterfaceCardWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNetworkInterfaceCardResponse, error)
+
+	CreateNetworkInterfaceCardWithResponse(ctx context.Context, body CreateNetworkInterfaceCardJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNetworkInterfaceCardResponse, error)
+
+	// DeleteNetworkInterfaceCardWithResponse request
+	DeleteNetworkInterfaceCardWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, reqEditors ...RequestEditorFn) (*DeleteNetworkInterfaceCardResponse, error)
+
+	// AssociateNICWithBodyWithResponse request with any body
+	AssociateNICWithBodyWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AssociateNICResponse, error)
+
+	AssociateNICWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AssociateNICJSONRequestBody, reqEditors ...RequestEditorFn) (*AssociateNICResponse, error)
+
+	// AddSecondaryPrivateIPWithBodyWithResponse request with any body
+	AddSecondaryPrivateIPWithBodyWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddSecondaryPrivateIPResponse, error)
+
+	AddSecondaryPrivateIPWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*AddSecondaryPrivateIPResponse, error)
 
 	// CreatePublicIpWithResponse request
 	CreatePublicIpWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error)
 
 	// DeletePublicIpWithResponse request
 	DeletePublicIpWithResponse(ctx context.Context, publicIpId string, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error)
+
+	// ListRouteTablesWithResponse request
+	ListRouteTablesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListRouteTablesResponse, error)
+
+	// CreateRouteTableWithBodyWithResponse request with any body
+	CreateRouteTableWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error)
+
+	CreateRouteTableWithResponse(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error)
+
+	// DeleteRouteTableWithResponse request
+	DeleteRouteTableWithResponse(ctx context.Context, routeTableId string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error)
+
+	// AddRouteWithBodyWithResponse request with any body
+	AddRouteWithBodyWithResponse(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRouteResponse, error)
+
+	AddRouteWithResponse(ctx context.Context, routeTableId string, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRouteResponse, error)
+
+	// DissociateRouteTableWithBodyWithResponse request with any body
+	DissociateRouteTableWithBodyWithResponse(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DissociateRouteTableResponse, error)
+
+	DissociateRouteTableWithResponse(ctx context.Context, routeTableId string, body DissociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DissociateRouteTableResponse, error)
 
 	// GetSecurityGroupsWithResponse request
 	GetSecurityGroupsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSecurityGroupsResponse, error)
@@ -1637,7 +3158,28 @@ type ClientWithResponsesInterface interface {
 	CreateSecurityGroupWithResponse(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error)
 
 	// DeleteSecurityGroupWithResponse request
-	DeleteSecurityGroupWithResponse(ctx context.Context, securityGroupId string, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error)
+	DeleteSecurityGroupWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error)
+
+	// AddRuleSecurityGroupWithBodyWithResponse request with any body
+	AddRuleSecurityGroupWithBodyWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRuleSecurityGroupResponse, error)
+
+	AddRuleSecurityGroupWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, body AddRuleSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRuleSecurityGroupResponse, error)
+
+	// RemoveRuleSecurityGroupWithBodyWithResponse request with any body
+	RemoveRuleSecurityGroupWithBodyWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRuleSecurityGroupResponse, error)
+
+	RemoveRuleSecurityGroupWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, body RemoveRuleSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRuleSecurityGroupResponse, error)
+
+	// CreateSnapshotWithBodyWithResponse request with any body
+	CreateSnapshotWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error)
+
+	CreateSnapshotWithResponse(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error)
+
+	// DeleteSnapshotWithResponse request
+	DeleteSnapshotWithResponse(ctx context.Context, snapshotId SnapshotIdPart, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error)
+
+	// DeleteSubnetWithResponse request
+	DeleteSubnetWithResponse(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error)
 
 	// GetSubnetsWithResponse request
 	GetSubnetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSubnetsResponse, error)
@@ -1646,9 +3188,6 @@ type ClientWithResponsesInterface interface {
 	CreateSubnetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error)
 
 	CreateSubnetWithResponse(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error)
-
-	// DeleteSubnetWithResponse request
-	DeleteSubnetWithResponse(ctx context.Context, subnetId string, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error)
 
 	// GetVPCWithResponse request
 	GetVPCWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVPCResponse, error)
@@ -1662,12 +3201,56 @@ type ClientWithResponsesInterface interface {
 	DeleteVPCWithResponse(ctx context.Context, virtualPrivateCloudId string, reqEditors ...RequestEditorFn) (*DeleteVPCResponse, error)
 }
 
+type CreateVolumeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateVolumeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateVolumeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteBlockStorageVolumeResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteBlockStorageVolumeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteBlockStorageVolumeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetDhcpOptionsSetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *struct {
-		Items *[]DhcpOptionsSetItem `json:"items,omitempty"`
-	}
+	JSON200      *ListSuccessPart3
 }
 
 // Status returns HTTPResponse.Status
@@ -1689,7 +3272,7 @@ func (r GetDhcpOptionsSetResponse) StatusCode() int {
 type CreateDhcpOptionsSetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *DhcpOptionsSetItem
+	JSON201      *CreateSuccessPart4
 }
 
 // Status returns HTTPResponse.Status
@@ -1729,15 +3312,15 @@ func (r DeleteDhcpOptionsSetResponse) StatusCode() int {
 	return 0
 }
 
-type GetInternetGatewaysResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *[]InternetGateway
-	JSON500      *N500
+type ListInternetGatewayResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListSuccessPart
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
-func (r GetInternetGatewaysResponse) Status() string {
+func (r ListInternetGatewayResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1745,7 +3328,7 @@ func (r GetInternetGatewaysResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetInternetGatewaysResponse) StatusCode() int {
+func (r ListInternetGatewayResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1753,10 +3336,10 @@ func (r GetInternetGatewaysResponse) StatusCode() int {
 }
 
 type CreateInternetGatewayResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *InternetGateway
-	JSON500      *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSuccessPart
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -1776,9 +3359,9 @@ func (r CreateInternetGatewayResponse) StatusCode() int {
 }
 
 type DeleteInternetGatewayResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON500      *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -1798,9 +3381,9 @@ func (r DeleteInternetGatewayResponse) StatusCode() int {
 }
 
 type AttachInternetGatewayResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON500      *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -1820,9 +3403,9 @@ func (r AttachInternetGatewayResponse) StatusCode() int {
 }
 
 type DetachInternetGatewayResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON500      *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -1844,12 +3427,7 @@ func (r DetachInternetGatewayResponse) StatusCode() int {
 type GetKeyPairsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *struct {
-		Items *[]struct {
-			Fingerprint *string `json:"fingerprint,omitempty"`
-			Name        *string `json:"name,omitempty"`
-		} `json:"items,omitempty"`
-	}
+	JSON200      *ResList
 }
 
 // Status returns HTTPResponse.Status
@@ -1869,16 +3447,12 @@ func (r GetKeyPairsResponse) StatusCode() int {
 }
 
 type CreateKeyPairResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *struct {
-		Fingerprint *string `json:"fingerprint,omitempty"`
-		Name        *string `json:"name,omitempty"`
-		PrivateKey  *string `json:"privateKey,omitempty"`
-	}
-	JSON400 *N400
-	JSON409 *N409
-	JSON500 *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSuccessPart2
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON409 *N409Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -1898,15 +3472,12 @@ func (r CreateKeyPairResponse) StatusCode() int {
 }
 
 type ImportKeyPairResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *struct {
-		Fingerprint *string `json:"fingerprint,omitempty"`
-		Name        *string `json:"name,omitempty"`
-	}
-	JSON400 *N400
-	JSON409 *N409
-	JSON500 *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *ResImport
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON409 *N409Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -1926,11 +3497,11 @@ func (r ImportKeyPairResponse) StatusCode() int {
 }
 
 type DeleteKeyPairResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON400      *N400
-	JSON404      *N404
-	JSON500      *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -1949,17 +3520,141 @@ func (r DeleteKeyPairResponse) StatusCode() int {
 	return 0
 }
 
-type CreatePublicIpResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *struct {
-		Id       *string        `json:"id,omitempty"`
-		PublicIp *string        `json:"publicIp,omitempty"`
-		Tags     *[]interface{} `json:"tags,omitempty"`
+type ListNetworkInterfaceCardResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListSuccessPart5
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r ListNetworkInterfaceCardResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
 	}
-	JSON400 *N400
-	JSON409 *N409
-	JSON500 *N500
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListNetworkInterfaceCardResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateNetworkInterfaceCardResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSuccessPart8
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateNetworkInterfaceCardResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateNetworkInterfaceCardResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteNetworkInterfaceCardResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON409 *N409Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteNetworkInterfaceCardResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteNetworkInterfaceCardResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AssociateNICResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *AssociateSuccessPart
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r AssociateNICResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AssociateNICResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AddSecondaryPrivateIPResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *AddSecondaryPrivateIpSuccessPart
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r AddSecondaryPrivateIPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AddSecondaryPrivateIPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreatePublicIpResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSuccessPart5
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON409 *N409Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -1999,12 +3694,124 @@ func (r DeletePublicIpResponse) StatusCode() int {
 	return 0
 }
 
+type ListRouteTablesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ListSuccessPart4
+}
+
+// Status returns HTTPResponse.Status
+func (r ListRouteTablesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListRouteTablesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateRouteTableResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSuccessPart6
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON404 *N404Part
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateRouteTableResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateRouteTableResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteRouteTableResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *N401Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteRouteTableResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteRouteTableResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AddRouteResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *AddRouteSuccessPart
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON404 *N404Part
+}
+
+// Status returns HTTPResponse.Status
+func (r AddRouteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AddRouteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DissociateRouteTableResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *N401Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DissociateRouteTableResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DissociateRouteTableResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetSecurityGroupsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *struct {
-		Items *[]SecurityGroupItem `json:"items,omitempty"`
-	}
+	JSON200      *ListSuccessPart2
 }
 
 // Status returns HTTPResponse.Status
@@ -2024,12 +3831,12 @@ func (r GetSecurityGroupsResponse) StatusCode() int {
 }
 
 type CreateSecurityGroupResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *SecurityGroupItem
-	JSON400      *N400
-	JSON409      *N409
-	JSON500      *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSuccessPart3
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON409 *N409Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -2069,13 +3876,141 @@ func (r DeleteSecurityGroupResponse) StatusCode() int {
 	return 0
 }
 
-type GetSubnetsResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *struct {
-		Items *[]Subnet `json:"items,omitempty"`
+type AddRuleSecurityGroupResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *AddRuleSuccessPart
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON409 *N409Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r AddRuleSecurityGroupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
 	}
-	JSON500 *N500
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AddRuleSecurityGroupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RemoveRuleSecurityGroupResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *RemoveRuleSuccessPart
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON409 *N409Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r RemoveRuleSecurityGroupResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RemoveRuleSecurityGroupResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateSnapshotResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSuccessPart7
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateSnapshotResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateSnapshotResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSnapshotResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSnapshotResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSnapshotResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSubnetResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSubnetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSubnetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSubnetsResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListSuccessPart6
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -2095,10 +4030,13 @@ func (r GetSubnetsResponse) StatusCode() int {
 }
 
 type CreateSubnetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *Subnet
-	JSON500      *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSuccessResPart
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -2117,40 +4055,10 @@ func (r CreateSubnetResponse) StatusCode() int {
 	return 0
 }
 
-type DeleteSubnetResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON500      *N500
-}
-
-// Status returns HTTPResponse.Status
-func (r DeleteSubnetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r DeleteSubnetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type GetVPCResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *struct {
-		Items *[]struct {
-			DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
-			Id               *string `json:"id,omitempty"`
-			IpRange          *string `json:"ipRange,omitempty"`
-			State            *string `json:"state,omitempty"`
-			Tenancy          *string `json:"tenancy,omitempty"`
-		} `json:"items,omitempty"`
-	}
+	JSON200      *VpcListSuccessPart
 }
 
 // Status returns HTTPResponse.Status
@@ -2170,18 +4078,12 @@ func (r GetVPCResponse) StatusCode() int {
 }
 
 type CreateVPCResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *struct {
-		DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
-		Id               *string `json:"id,omitempty"`
-		IpRange          *string `json:"ipRange,omitempty"`
-		State            *string `json:"state,omitempty"`
-		Tenancy          *string `json:"tenancy,omitempty"`
-	}
-	JSON400 *N400
-	JSON405 *N405
-	JSON500 *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *VpcCreateSuccessPart
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON405 *N405Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -2201,11 +4103,11 @@ func (r CreateVPCResponse) StatusCode() int {
 }
 
 type DeleteVPCResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON404      *N404
-	JSON409      *N409
-	JSON500      *N500
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON409 *N409Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -2222,6 +4124,32 @@ func (r DeleteVPCResponse) StatusCode() int {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
+}
+
+// CreateVolumeWithBodyWithResponse request with arbitrary body returning *CreateVolumeResponse
+func (c *ClientWithResponses) CreateVolumeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error) {
+	rsp, err := c.CreateVolumeWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateVolumeResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateVolumeWithResponse(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error) {
+	rsp, err := c.CreateVolume(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateVolumeResponse(rsp)
+}
+
+// DeleteBlockStorageVolumeWithResponse request returning *DeleteBlockStorageVolumeResponse
+func (c *ClientWithResponses) DeleteBlockStorageVolumeWithResponse(ctx context.Context, blockStorageVolumeId string, reqEditors ...RequestEditorFn) (*DeleteBlockStorageVolumeResponse, error) {
+	rsp, err := c.DeleteBlockStorageVolume(ctx, blockStorageVolumeId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteBlockStorageVolumeResponse(rsp)
 }
 
 // GetDhcpOptionsSetWithResponse request returning *GetDhcpOptionsSetResponse
@@ -2251,7 +4179,7 @@ func (c *ClientWithResponses) CreateDhcpOptionsSetWithResponse(ctx context.Conte
 }
 
 // DeleteDhcpOptionsSetWithResponse request returning *DeleteDhcpOptionsSetResponse
-func (c *ClientWithResponses) DeleteDhcpOptionsSetWithResponse(ctx context.Context, dhcpOptionsSetId string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsSetResponse, error) {
+func (c *ClientWithResponses) DeleteDhcpOptionsSetWithResponse(ctx context.Context, dhcpOptionsSetId DhcpOptionsSetIdPart, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsSetResponse, error) {
 	rsp, err := c.DeleteDhcpOptionsSet(ctx, dhcpOptionsSetId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2259,13 +4187,13 @@ func (c *ClientWithResponses) DeleteDhcpOptionsSetWithResponse(ctx context.Conte
 	return ParseDeleteDhcpOptionsSetResponse(rsp)
 }
 
-// GetInternetGatewaysWithResponse request returning *GetInternetGatewaysResponse
-func (c *ClientWithResponses) GetInternetGatewaysWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetInternetGatewaysResponse, error) {
-	rsp, err := c.GetInternetGateways(ctx, reqEditors...)
+// ListInternetGatewayWithResponse request returning *ListInternetGatewayResponse
+func (c *ClientWithResponses) ListInternetGatewayWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListInternetGatewayResponse, error) {
+	rsp, err := c.ListInternetGateway(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseGetInternetGatewaysResponse(rsp)
+	return ParseListInternetGatewayResponse(rsp)
 }
 
 // CreateInternetGatewayWithResponse request returning *CreateInternetGatewayResponse
@@ -2287,7 +4215,7 @@ func (c *ClientWithResponses) DeleteInternetGatewayWithResponse(ctx context.Cont
 }
 
 // AttachInternetGatewayWithBodyWithResponse request with arbitrary body returning *AttachInternetGatewayResponse
-func (c *ClientWithResponses) AttachInternetGatewayWithBodyWithResponse(ctx context.Context, internetGatewayId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AttachInternetGatewayResponse, error) {
+func (c *ClientWithResponses) AttachInternetGatewayWithBodyWithResponse(ctx context.Context, internetGatewayId InternetGatewayId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AttachInternetGatewayResponse, error) {
 	rsp, err := c.AttachInternetGatewayWithBody(ctx, internetGatewayId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2295,7 +4223,7 @@ func (c *ClientWithResponses) AttachInternetGatewayWithBodyWithResponse(ctx cont
 	return ParseAttachInternetGatewayResponse(rsp)
 }
 
-func (c *ClientWithResponses) AttachInternetGatewayWithResponse(ctx context.Context, internetGatewayId string, body AttachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*AttachInternetGatewayResponse, error) {
+func (c *ClientWithResponses) AttachInternetGatewayWithResponse(ctx context.Context, internetGatewayId InternetGatewayId, body AttachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*AttachInternetGatewayResponse, error) {
 	rsp, err := c.AttachInternetGateway(ctx, internetGatewayId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2304,7 +4232,7 @@ func (c *ClientWithResponses) AttachInternetGatewayWithResponse(ctx context.Cont
 }
 
 // DetachInternetGatewayWithBodyWithResponse request with arbitrary body returning *DetachInternetGatewayResponse
-func (c *ClientWithResponses) DetachInternetGatewayWithBodyWithResponse(ctx context.Context, internetGatewayId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DetachInternetGatewayResponse, error) {
+func (c *ClientWithResponses) DetachInternetGatewayWithBodyWithResponse(ctx context.Context, internetGatewayId InternetGatewayId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DetachInternetGatewayResponse, error) {
 	rsp, err := c.DetachInternetGatewayWithBody(ctx, internetGatewayId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2312,7 +4240,7 @@ func (c *ClientWithResponses) DetachInternetGatewayWithBodyWithResponse(ctx cont
 	return ParseDetachInternetGatewayResponse(rsp)
 }
 
-func (c *ClientWithResponses) DetachInternetGatewayWithResponse(ctx context.Context, internetGatewayId string, body DetachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*DetachInternetGatewayResponse, error) {
+func (c *ClientWithResponses) DetachInternetGatewayWithResponse(ctx context.Context, internetGatewayId InternetGatewayId, body DetachInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*DetachInternetGatewayResponse, error) {
 	rsp, err := c.DetachInternetGateway(ctx, internetGatewayId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2364,12 +4292,81 @@ func (c *ClientWithResponses) ImportKeyPairWithResponse(ctx context.Context, bod
 }
 
 // DeleteKeyPairWithResponse request returning *DeleteKeyPairResponse
-func (c *ClientWithResponses) DeleteKeyPairWithResponse(ctx context.Context, keyPairName string, reqEditors ...RequestEditorFn) (*DeleteKeyPairResponse, error) {
+func (c *ClientWithResponses) DeleteKeyPairWithResponse(ctx context.Context, keyPairName KeyPairNamePart, reqEditors ...RequestEditorFn) (*DeleteKeyPairResponse, error) {
 	rsp, err := c.DeleteKeyPair(ctx, keyPairName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseDeleteKeyPairResponse(rsp)
+}
+
+// ListNetworkInterfaceCardWithResponse request returning *ListNetworkInterfaceCardResponse
+func (c *ClientWithResponses) ListNetworkInterfaceCardWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListNetworkInterfaceCardResponse, error) {
+	rsp, err := c.ListNetworkInterfaceCard(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListNetworkInterfaceCardResponse(rsp)
+}
+
+// CreateNetworkInterfaceCardWithBodyWithResponse request with arbitrary body returning *CreateNetworkInterfaceCardResponse
+func (c *ClientWithResponses) CreateNetworkInterfaceCardWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNetworkInterfaceCardResponse, error) {
+	rsp, err := c.CreateNetworkInterfaceCardWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateNetworkInterfaceCardResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateNetworkInterfaceCardWithResponse(ctx context.Context, body CreateNetworkInterfaceCardJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNetworkInterfaceCardResponse, error) {
+	rsp, err := c.CreateNetworkInterfaceCard(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateNetworkInterfaceCardResponse(rsp)
+}
+
+// DeleteNetworkInterfaceCardWithResponse request returning *DeleteNetworkInterfaceCardResponse
+func (c *ClientWithResponses) DeleteNetworkInterfaceCardWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, reqEditors ...RequestEditorFn) (*DeleteNetworkInterfaceCardResponse, error) {
+	rsp, err := c.DeleteNetworkInterfaceCard(ctx, networkInterfaceCardId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteNetworkInterfaceCardResponse(rsp)
+}
+
+// AssociateNICWithBodyWithResponse request with arbitrary body returning *AssociateNICResponse
+func (c *ClientWithResponses) AssociateNICWithBodyWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AssociateNICResponse, error) {
+	rsp, err := c.AssociateNICWithBody(ctx, networkInterfaceCardId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAssociateNICResponse(rsp)
+}
+
+func (c *ClientWithResponses) AssociateNICWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AssociateNICJSONRequestBody, reqEditors ...RequestEditorFn) (*AssociateNICResponse, error) {
+	rsp, err := c.AssociateNIC(ctx, networkInterfaceCardId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAssociateNICResponse(rsp)
+}
+
+// AddSecondaryPrivateIPWithBodyWithResponse request with arbitrary body returning *AddSecondaryPrivateIPResponse
+func (c *ClientWithResponses) AddSecondaryPrivateIPWithBodyWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddSecondaryPrivateIPResponse, error) {
+	rsp, err := c.AddSecondaryPrivateIPWithBody(ctx, networkInterfaceCardId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddSecondaryPrivateIPResponse(rsp)
+}
+
+func (c *ClientWithResponses) AddSecondaryPrivateIPWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*AddSecondaryPrivateIPResponse, error) {
+	rsp, err := c.AddSecondaryPrivateIP(ctx, networkInterfaceCardId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddSecondaryPrivateIPResponse(rsp)
 }
 
 // CreatePublicIpWithResponse request returning *CreatePublicIpResponse
@@ -2388,6 +4385,75 @@ func (c *ClientWithResponses) DeletePublicIpWithResponse(ctx context.Context, pu
 		return nil, err
 	}
 	return ParseDeletePublicIpResponse(rsp)
+}
+
+// ListRouteTablesWithResponse request returning *ListRouteTablesResponse
+func (c *ClientWithResponses) ListRouteTablesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListRouteTablesResponse, error) {
+	rsp, err := c.ListRouteTables(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListRouteTablesResponse(rsp)
+}
+
+// CreateRouteTableWithBodyWithResponse request with arbitrary body returning *CreateRouteTableResponse
+func (c *ClientWithResponses) CreateRouteTableWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error) {
+	rsp, err := c.CreateRouteTableWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRouteTableResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateRouteTableWithResponse(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error) {
+	rsp, err := c.CreateRouteTable(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRouteTableResponse(rsp)
+}
+
+// DeleteRouteTableWithResponse request returning *DeleteRouteTableResponse
+func (c *ClientWithResponses) DeleteRouteTableWithResponse(ctx context.Context, routeTableId string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error) {
+	rsp, err := c.DeleteRouteTable(ctx, routeTableId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteRouteTableResponse(rsp)
+}
+
+// AddRouteWithBodyWithResponse request with arbitrary body returning *AddRouteResponse
+func (c *ClientWithResponses) AddRouteWithBodyWithResponse(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRouteResponse, error) {
+	rsp, err := c.AddRouteWithBody(ctx, routeTableId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRouteResponse(rsp)
+}
+
+func (c *ClientWithResponses) AddRouteWithResponse(ctx context.Context, routeTableId string, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRouteResponse, error) {
+	rsp, err := c.AddRoute(ctx, routeTableId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRouteResponse(rsp)
+}
+
+// DissociateRouteTableWithBodyWithResponse request with arbitrary body returning *DissociateRouteTableResponse
+func (c *ClientWithResponses) DissociateRouteTableWithBodyWithResponse(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DissociateRouteTableResponse, error) {
+	rsp, err := c.DissociateRouteTableWithBody(ctx, routeTableId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDissociateRouteTableResponse(rsp)
+}
+
+func (c *ClientWithResponses) DissociateRouteTableWithResponse(ctx context.Context, routeTableId string, body DissociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DissociateRouteTableResponse, error) {
+	rsp, err := c.DissociateRouteTable(ctx, routeTableId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDissociateRouteTableResponse(rsp)
 }
 
 // GetSecurityGroupsWithResponse request returning *GetSecurityGroupsResponse
@@ -2417,12 +4483,81 @@ func (c *ClientWithResponses) CreateSecurityGroupWithResponse(ctx context.Contex
 }
 
 // DeleteSecurityGroupWithResponse request returning *DeleteSecurityGroupResponse
-func (c *ClientWithResponses) DeleteSecurityGroupWithResponse(ctx context.Context, securityGroupId string, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error) {
+func (c *ClientWithResponses) DeleteSecurityGroupWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error) {
 	rsp, err := c.DeleteSecurityGroup(ctx, securityGroupId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseDeleteSecurityGroupResponse(rsp)
+}
+
+// AddRuleSecurityGroupWithBodyWithResponse request with arbitrary body returning *AddRuleSecurityGroupResponse
+func (c *ClientWithResponses) AddRuleSecurityGroupWithBodyWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRuleSecurityGroupResponse, error) {
+	rsp, err := c.AddRuleSecurityGroupWithBody(ctx, securityGroupId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRuleSecurityGroupResponse(rsp)
+}
+
+func (c *ClientWithResponses) AddRuleSecurityGroupWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, body AddRuleSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRuleSecurityGroupResponse, error) {
+	rsp, err := c.AddRuleSecurityGroup(ctx, securityGroupId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRuleSecurityGroupResponse(rsp)
+}
+
+// RemoveRuleSecurityGroupWithBodyWithResponse request with arbitrary body returning *RemoveRuleSecurityGroupResponse
+func (c *ClientWithResponses) RemoveRuleSecurityGroupWithBodyWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRuleSecurityGroupResponse, error) {
+	rsp, err := c.RemoveRuleSecurityGroupWithBody(ctx, securityGroupId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveRuleSecurityGroupResponse(rsp)
+}
+
+func (c *ClientWithResponses) RemoveRuleSecurityGroupWithResponse(ctx context.Context, securityGroupId SecurityGroupIdPart, body RemoveRuleSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRuleSecurityGroupResponse, error) {
+	rsp, err := c.RemoveRuleSecurityGroup(ctx, securityGroupId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveRuleSecurityGroupResponse(rsp)
+}
+
+// CreateSnapshotWithBodyWithResponse request with arbitrary body returning *CreateSnapshotResponse
+func (c *ClientWithResponses) CreateSnapshotWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error) {
+	rsp, err := c.CreateSnapshotWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSnapshotResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateSnapshotWithResponse(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error) {
+	rsp, err := c.CreateSnapshot(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSnapshotResponse(rsp)
+}
+
+// DeleteSnapshotWithResponse request returning *DeleteSnapshotResponse
+func (c *ClientWithResponses) DeleteSnapshotWithResponse(ctx context.Context, snapshotId SnapshotIdPart, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error) {
+	rsp, err := c.DeleteSnapshot(ctx, snapshotId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSnapshotResponse(rsp)
+}
+
+// DeleteSubnetWithResponse request returning *DeleteSubnetResponse
+func (c *ClientWithResponses) DeleteSubnetWithResponse(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error) {
+	rsp, err := c.DeleteSubnet(ctx, subnetId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSubnetResponse(rsp)
 }
 
 // GetSubnetsWithResponse request returning *GetSubnetsResponse
@@ -2449,15 +4584,6 @@ func (c *ClientWithResponses) CreateSubnetWithResponse(ctx context.Context, body
 		return nil, err
 	}
 	return ParseCreateSubnetResponse(rsp)
-}
-
-// DeleteSubnetWithResponse request returning *DeleteSubnetResponse
-func (c *ClientWithResponses) DeleteSubnetWithResponse(ctx context.Context, subnetId string, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error) {
-	rsp, err := c.DeleteSubnet(ctx, subnetId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteSubnetResponse(rsp)
 }
 
 // GetVPCWithResponse request returning *GetVPCResponse
@@ -2495,6 +4621,69 @@ func (c *ClientWithResponses) DeleteVPCWithResponse(ctx context.Context, virtual
 	return ParseDeleteVPCResponse(rsp)
 }
 
+// ParseCreateVolumeResponse parses an HTTP response from a CreateVolumeWithResponse call
+func ParseCreateVolumeResponse(rsp *http.Response) (*CreateVolumeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateVolumeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseDeleteBlockStorageVolumeResponse parses an HTTP response from a DeleteBlockStorageVolumeWithResponse call
+func ParseDeleteBlockStorageVolumeResponse(rsp *http.Response) (*DeleteBlockStorageVolumeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteBlockStorageVolumeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetDhcpOptionsSetResponse parses an HTTP response from a GetDhcpOptionsSetWithResponse call
 func ParseGetDhcpOptionsSetResponse(rsp *http.Response) (*GetDhcpOptionsSetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2510,9 +4699,7 @@ func ParseGetDhcpOptionsSetResponse(rsp *http.Response) (*GetDhcpOptionsSetRespo
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Items *[]DhcpOptionsSetItem `json:"items,omitempty"`
-		}
+		var dest ListSuccessPart3
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2538,7 +4725,7 @@ func ParseCreateDhcpOptionsSetResponse(rsp *http.Response) (*CreateDhcpOptionsSe
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest DhcpOptionsSetItem
+		var dest CreateSuccessPart4
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2565,33 +4752,33 @@ func ParseDeleteDhcpOptionsSetResponse(rsp *http.Response) (*DeleteDhcpOptionsSe
 	return response, nil
 }
 
-// ParseGetInternetGatewaysResponse parses an HTTP response from a GetInternetGatewaysWithResponse call
-func ParseGetInternetGatewaysResponse(rsp *http.Response) (*GetInternetGatewaysResponse, error) {
+// ParseListInternetGatewayResponse parses an HTTP response from a ListInternetGatewayWithResponse call
+func ParseListInternetGatewayResponse(rsp *http.Response) (*ListInternetGatewayResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetInternetGatewaysResponse{
+	response := &ListInternetGatewayResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest []InternetGateway
+		var dest ListSuccessPart
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -2613,18 +4800,18 @@ func ParseCreateInternetGatewayResponse(rsp *http.Response) (*CreateInternetGate
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest InternetGateway
+		var dest CreateSuccessPart
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -2646,11 +4833,11 @@ func ParseDeleteInternetGatewayResponse(rsp *http.Response) (*DeleteInternetGate
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -2672,11 +4859,11 @@ func ParseAttachInternetGatewayResponse(rsp *http.Response) (*AttachInternetGate
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -2698,11 +4885,11 @@ func ParseDetachInternetGatewayResponse(rsp *http.Response) (*DetachInternetGate
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -2724,12 +4911,7 @@ func ParseGetKeyPairsResponse(rsp *http.Response) (*GetKeyPairsResponse, error) 
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Items *[]struct {
-				Fingerprint *string `json:"fingerprint,omitempty"`
-				Name        *string `json:"name,omitempty"`
-			} `json:"items,omitempty"`
-		}
+		var dest ResList
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2755,36 +4937,32 @@ func ParseCreateKeyPairResponse(rsp *http.Response) (*CreateKeyPairResponse, err
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest struct {
-			Fingerprint *string `json:"fingerprint,omitempty"`
-			Name        *string `json:"name,omitempty"`
-			PrivateKey  *string `json:"privateKey,omitempty"`
-		}
+		var dest CreateSuccessPart2
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest N400
+		var dest N400Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON400 = &dest
+		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest N409
+		var dest N409Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON409 = &dest
+		response.ApplicationproblemJSON409 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -2806,35 +4984,32 @@ func ParseImportKeyPairResponse(rsp *http.Response) (*ImportKeyPairResponse, err
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest struct {
-			Fingerprint *string `json:"fingerprint,omitempty"`
-			Name        *string `json:"name,omitempty"`
-		}
+		var dest ResImport
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest N400
+		var dest N400Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON400 = &dest
+		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest N409
+		var dest N409Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON409 = &dest
+		response.ApplicationproblemJSON409 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -2856,25 +5031,281 @@ func ParseDeleteKeyPairResponse(rsp *http.Response) (*DeleteKeyPairResponse, err
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest N400
+		var dest N400Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON400 = &dest
+		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest N404
+		var dest N404Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON404 = &dest
+		response.ApplicationproblemJSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListNetworkInterfaceCardResponse parses an HTTP response from a ListNetworkInterfaceCardWithResponse call
+func ParseListNetworkInterfaceCardResponse(rsp *http.Response) (*ListNetworkInterfaceCardResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListNetworkInterfaceCardResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListSuccessPart5
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateNetworkInterfaceCardResponse parses an HTTP response from a CreateNetworkInterfaceCardWithResponse call
+func ParseCreateNetworkInterfaceCardResponse(rsp *http.Response) (*CreateNetworkInterfaceCardResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateNetworkInterfaceCardResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateSuccessPart8
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteNetworkInterfaceCardResponse parses an HTTP response from a DeleteNetworkInterfaceCardWithResponse call
+func ParseDeleteNetworkInterfaceCardResponse(rsp *http.Response) (*DeleteNetworkInterfaceCardResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteNetworkInterfaceCardResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest N409Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAssociateNICResponse parses an HTTP response from a AssociateNICWithResponse call
+func ParseAssociateNICResponse(rsp *http.Response) (*AssociateNICResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AssociateNICResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AssociateSuccessPart
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAddSecondaryPrivateIPResponse parses an HTTP response from a AddSecondaryPrivateIPWithResponse call
+func ParseAddSecondaryPrivateIPResponse(rsp *http.Response) (*AddSecondaryPrivateIPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AddSecondaryPrivateIPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest AddSecondaryPrivateIpSuccessPart
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -2896,36 +5327,32 @@ func ParseCreatePublicIpResponse(rsp *http.Response) (*CreatePublicIpResponse, e
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest struct {
-			Id       *string        `json:"id,omitempty"`
-			PublicIp *string        `json:"publicIp,omitempty"`
-			Tags     *[]interface{} `json:"tags,omitempty"`
-		}
+		var dest CreateSuccessPart5
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest N400
+		var dest N400Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON400 = &dest
+		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest N409
+		var dest N409Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON409 = &dest
+		response.ApplicationproblemJSON409 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -2948,6 +5375,164 @@ func ParseDeletePublicIpResponse(rsp *http.Response) (*DeletePublicIpResponse, e
 	return response, nil
 }
 
+// ParseListRouteTablesResponse parses an HTTP response from a ListRouteTablesWithResponse call
+func ParseListRouteTablesResponse(rsp *http.Response) (*ListRouteTablesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListRouteTablesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListSuccessPart4
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateRouteTableResponse parses an HTTP response from a CreateRouteTableWithResponse call
+func ParseCreateRouteTableResponse(rsp *http.Response) (*CreateRouteTableResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateRouteTableResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateSuccessPart6
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteRouteTableResponse parses an HTTP response from a DeleteRouteTableWithResponse call
+func ParseDeleteRouteTableResponse(rsp *http.Response) (*DeleteRouteTableResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteRouteTableResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAddRouteResponse parses an HTTP response from a AddRouteWithResponse call
+func ParseAddRouteResponse(rsp *http.Response) (*AddRouteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AddRouteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AddRouteSuccessPart
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDissociateRouteTableResponse parses an HTTP response from a DissociateRouteTableWithResponse call
+func ParseDissociateRouteTableResponse(rsp *http.Response) (*DissociateRouteTableResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DissociateRouteTableResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetSecurityGroupsResponse parses an HTTP response from a GetSecurityGroupsWithResponse call
 func ParseGetSecurityGroupsResponse(rsp *http.Response) (*GetSecurityGroupsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2963,9 +5548,7 @@ func ParseGetSecurityGroupsResponse(rsp *http.Response) (*GetSecurityGroupsRespo
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Items *[]SecurityGroupItem `json:"items,omitempty"`
-		}
+		var dest ListSuccessPart2
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -2991,32 +5574,32 @@ func ParseCreateSecurityGroupResponse(rsp *http.Response) (*CreateSecurityGroupR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest SecurityGroupItem
+		var dest CreateSuccessPart3
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest N400
+		var dest N400Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON400 = &dest
+		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest N409
+		var dest N409Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON409 = &dest
+		response.ApplicationproblemJSON409 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -3039,6 +5622,262 @@ func ParseDeleteSecurityGroupResponse(rsp *http.Response) (*DeleteSecurityGroupR
 	return response, nil
 }
 
+// ParseAddRuleSecurityGroupResponse parses an HTTP response from a AddRuleSecurityGroupWithResponse call
+func ParseAddRuleSecurityGroupResponse(rsp *http.Response) (*AddRuleSecurityGroupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AddRuleSecurityGroupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest AddRuleSuccessPart
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest N409Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRemoveRuleSecurityGroupResponse parses an HTTP response from a RemoveRuleSecurityGroupWithResponse call
+func ParseRemoveRuleSecurityGroupResponse(rsp *http.Response) (*RemoveRuleSecurityGroupResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RemoveRuleSecurityGroupResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest RemoveRuleSuccessPart
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest N409Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateSnapshotResponse parses an HTTP response from a CreateSnapshotWithResponse call
+func ParseCreateSnapshotResponse(rsp *http.Response) (*CreateSnapshotResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateSnapshotResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateSuccessPart7
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSnapshotResponse parses an HTTP response from a DeleteSnapshotWithResponse call
+func ParseDeleteSnapshotResponse(rsp *http.Response) (*DeleteSnapshotResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSnapshotResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSubnetResponse parses an HTTP response from a DeleteSubnetWithResponse call
+func ParseDeleteSubnetResponse(rsp *http.Response) (*DeleteSubnetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSubnetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetSubnetsResponse parses an HTTP response from a GetSubnetsWithResponse call
 func ParseGetSubnetsResponse(rsp *http.Response) (*GetSubnetsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -3054,20 +5893,32 @@ func ParseGetSubnetsResponse(rsp *http.Response) (*GetSubnetsResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Items *[]Subnet `json:"items,omitempty"`
-		}
+		var dest ListSuccessPart6
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -3089,44 +5940,39 @@ func ParseCreateSubnetResponse(rsp *http.Response) (*CreateSubnetResponse, error
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest Subnet
+		var dest CreateSuccessResPart
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON400 = &dest
 
-	}
-
-	return response, nil
-}
-
-// ParseDeleteSubnetResponse parses an HTTP response from a DeleteSubnetWithResponse call
-func ParseDeleteSubnetResponse(rsp *http.Response) (*DeleteSubnetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &DeleteSubnetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -3148,15 +5994,7 @@ func ParseGetVPCResponse(rsp *http.Response) (*GetVPCResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Items *[]struct {
-				DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
-				Id               *string `json:"id,omitempty"`
-				IpRange          *string `json:"ipRange,omitempty"`
-				State            *string `json:"state,omitempty"`
-				Tenancy          *string `json:"tenancy,omitempty"`
-			} `json:"items,omitempty"`
-		}
+		var dest VpcListSuccessPart
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3182,38 +6020,32 @@ func ParseCreateVPCResponse(rsp *http.Response) (*CreateVPCResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest struct {
-			DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
-			Id               *string `json:"id,omitempty"`
-			IpRange          *string `json:"ipRange,omitempty"`
-			State            *string `json:"state,omitempty"`
-			Tenancy          *string `json:"tenancy,omitempty"`
-		}
+		var dest VpcCreateSuccessPart
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest N400
+		var dest N400Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON400 = &dest
+		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 405:
-		var dest N405
+		var dest N405Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON405 = &dest
+		response.ApplicationproblemJSON405 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -3235,25 +6067,25 @@ func ParseDeleteVPCResponse(rsp *http.Response) (*DeleteVPCResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest N404
+		var dest N404Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON404 = &dest
+		response.ApplicationproblemJSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest N409
+		var dest N409Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON409 = &dest
+		response.ApplicationproblemJSON409 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500
+		var dest N500Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON500 = &dest
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 

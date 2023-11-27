@@ -8,6 +8,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/dhcp_options_set"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/key_pair"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/route_table"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/security_group"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/subnet"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/virtual_private_cloud"
@@ -104,6 +105,7 @@ func (p *NumspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		security_group.NewSecurityGroupResource,
 		dhcp_options_set.NewDhcpOptionsSetResource,
 		subnet.NewSubnetResource,
+		route_table.NewRouteTableResource,
 	}
 }
 

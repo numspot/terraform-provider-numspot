@@ -137,7 +137,7 @@ func (k *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	numspotError := conns.HandleError(http.StatusCreated, createSubnetResponse.HTTPResponse)
+	numspotError := conns.HandleErrorBis(http.StatusCreated, createSubnetResponse.HTTPResponse.StatusCode, createSubnetResponse.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return
@@ -157,14 +157,20 @@ func (k *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 		return
 	}
 
-	subnets, err := k.client.GetSubnetsWithResponse(ctx)
+	res, err := k.client.GetSubnetsWithResponse(ctx)
 	if err != nil {
 		response.Diagnostics.AddError("Reading Subnet", err.Error())
 		return
 	}
 
+	numspotError := conns.HandleErrorBis(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
+	if numspotError != nil {
+		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
+		return
+	}
+
 	found := false
-	for _, e := range *subnets.JSON200.Items {
+	for _, e := range *res.JSON200.Items {
 		if *e.Id == data.Id.ValueString() {
 			found = true
 
@@ -179,9 +185,9 @@ func (k *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 			}
 			response.Diagnostics.Append(response.State.Set(ctx, &nData)...)
 		}
-		if !found {
-			response.State.RemoveResource(ctx)
-		}
+	}
+	if !found {
+		response.State.RemoveResource(ctx)
 	}
 }
 
@@ -199,7 +205,7 @@ func (k *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 		return
 	}
 
-	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse)
+	numspotError := conns.HandleErrorBis(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return

@@ -17,9 +17,9 @@ var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServe
 }
 
 func TestSubnetResourceCreate(t *testing.T) {
-	ipRange := "172.16.0.0/20"
-	ipRangeUpdate := "172.16.16.0/20"
-	virtualPrivateCloudId := "vpc-64669a51"
+	ipRange := "10.0.1.0/24"
+	ipRangeUpdate := "10.0.2.0/24"
+	virtualPrivateCloudId := "vpc-c3726ca8"
 
 	var subnetId string
 
