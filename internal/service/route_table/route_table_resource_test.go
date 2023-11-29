@@ -2,19 +2,12 @@ package route_table_test
 
 import (
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/stretchr/testify/require"
-
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
 )
-
-var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-	"numspot": providerserver.NewProtocol6WithError(provider.New("test")()),
-}
 
 func TestRouteTableResourceCreate(t *testing.T) {
 	firstVPCID := "vpc-c3726ca8"
@@ -23,7 +16,7 @@ func TestRouteTableResourceCreate(t *testing.T) {
 	var initialRouteTableID string
 
 	resource.ParallelTest(t, resource.TestCase{
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		ProtoV6ProviderFactories: acctest.TestAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testRouteTableConfigCreate(firstVPCID),

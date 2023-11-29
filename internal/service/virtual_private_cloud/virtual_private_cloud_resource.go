@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns"
+	api_client "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -23,7 +24,7 @@ func NewVirtualPrivateCloudResource() resource.Resource {
 }
 
 type VirtualPrivateCloudResource struct {
-	client *conns.ClientWithResponses
+	client *api_client.ClientWithResponses
 }
 
 func (k *VirtualPrivateCloudResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
@@ -93,7 +94,7 @@ func (k *VirtualPrivateCloudResource) Configure(ctx context.Context, request res
 		return
 	}
 
-	client, ok := request.ProviderData.(*conns.ClientWithResponses)
+	client, ok := request.ProviderData.(*api_client.ClientWithResponses)
 
 	if !ok {
 		response.Diagnostics.AddError(
@@ -121,28 +122,32 @@ func (k *VirtualPrivateCloudResource) Create(ctx context.Context, request resour
 		return
 	}
 
-	body := conns.CreateVPCJSONRequestBody{
+	body := api_client.CreateVPCJSONRequestBody{
 		IpRange: data.IpRange.ValueString(),
-		Tenancy: data.Tenancy.ValueStringPointer(),
 	}
 
-	createVPCResponse, err := k.client.CreateVPCWithResponse(ctx, body)
+	ten := data.Tenancy.ValueString()
+	if ten != "" {
+		body.Tenancy = &ten
+	}
+
+	res, err := k.client.CreateVPCWithResponse(ctx, body)
 	if err != nil {
 		response.Diagnostics.AddError(fmt.Sprintf("Creating VPC (%s)", data.IpRange.ValueString()), err.Error())
 		return
 	}
 
-	numspotError := conns.HandleError(http.StatusCreated, createVPCResponse.HTTPResponse)
+	numspotError := conns.HandleErrorBis(http.StatusCreated, res.HTTPResponse.StatusCode, res.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return
 	}
 
-	data.Id = types.StringValue(*createVPCResponse.JSON201.Id)
-	data.IpRange = types.StringValue(*createVPCResponse.JSON201.IpRange)
-	data.Tenancy = types.StringValue(*createVPCResponse.JSON201.Tenancy)
-	data.DhcpOptionsSetId = types.StringValue(*createVPCResponse.JSON201.DhcpOptionsSetId)
-	data.State = types.StringValue(*createVPCResponse.JSON201.State)
+	data.Id = types.StringValue(*res.JSON201.Id)
+	data.IpRange = types.StringValue(*res.JSON201.IpRange)
+	data.Tenancy = types.StringValue(*res.JSON201.Tenancy)
+	data.DhcpOptionsSetId = types.StringValue(*res.JSON201.DhcpOptionsSetId)
+	data.State = types.StringValue(*res.JSON201.State)
 
 	response.Diagnostics.Append(response.State.Set(ctx, &data)...)
 }
@@ -170,7 +175,7 @@ func (k *VirtualPrivateCloudResource) Read(ctx context.Context, request resource
 			nData := VirtualPrivateCloudResourceModel{
 				Id:               types.StringValue(*e.Id),
 				IpRange:          types.StringValue(*e.IpRange),
-				Tenancy:          types.StringValue(*e.Tenancy),
+				Tenancy:          types.StringPointerValue(e.Tenancy),
 				State:            types.StringValue(*e.State),
 				DhcpOptionsSetId: types.StringValue(*e.DhcpOptionsSetId),
 			}
@@ -198,7 +203,7 @@ func (k *VirtualPrivateCloudResource) Delete(ctx context.Context, request resour
 		return
 	}
 
-	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse)
+	numspotError := conns.HandleErrorBis(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return

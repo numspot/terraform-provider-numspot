@@ -107,12 +107,11 @@ type CreateReq3 struct {
 
 // CreateReq4 defines model for create-req-4.
 type CreateReq4 struct {
-	Description *string `json:"description,omitempty"`
-
-	// PrivateIps List of Private IP
-	PrivateIps       *PrivateIpsLight `json:"privateIps,omitempty"`
-	SecurityGroupIds *[]string        `json:"securityGroupIds,omitempty"`
-	SubnetId         string           `json:"subnetId"`
+	Description         *string             `json:"description,omitempty"`
+	PrimaryPrivateIp    PrivateIpRequest    `json:"primaryPrivateIp"`
+	SecondaryPrivateIps *[]PrivateIpRequest `json:"secondaryPrivateIps,omitempty"`
+	SecurityGroupIds    *[]string           `json:"securityGroupIds,omitempty"`
+	SubnetId            string              `json:"subnetId"`
 }
 
 // CreateReq5 defines model for create-req-5.
@@ -215,46 +214,41 @@ type ListSuccessRes struct {
 }
 
 // ListSuccessRes2 defines model for list-success-res-2.
-type ListSuccessRes2 = interface{}
+type ListSuccessRes2 struct {
+	Items []NetworkInterfaceCard `json:"items"`
+}
 
 // NetworkInterfaceCard defines model for network-interface-card.
 type NetworkInterfaceCard struct {
-	AvailabilityZone    *string      `json:"availabilityZone,omitempty"`
-	Description         *string      `json:"description,omitempty"`
-	Id                  *string      `json:"id,omitempty"`
-	IsSourceDestChecked *bool        `json:"isSourceDestChecked,omitempty"`
-	MacAddress          *string      `json:"macAddress,omitempty"`
-	PrimaryPrivateIp    *PrivateIp   `json:"primaryPrivateIp,omitempty"`
-	PrivateDnsName      *string      `json:"privateDnsName,omitempty"`
-	SecondaryPrivateIps *[]PrivateIp `json:"secondaryPrivateIps,omitempty"`
+	AvailabilityZone    string      `json:"availabilityZone"`
+	Description         string      `json:"description"`
+	Id                  string      `json:"id"`
+	IsSourceDestChecked bool        `json:"isSourceDestChecked"`
+	MacAddress          string      `json:"macAddress"`
+	PrimaryPrivateIp    PrivateIp   `json:"primaryPrivateIp"`
+	PrivateDnsName      string      `json:"privateDnsName"`
+	SecondaryPrivateIps []PrivateIp `json:"secondaryPrivateIps"`
 
 	// SecurityGroups List of Security Group
-	SecurityGroups *SecurityGroupRef `json:"securityGroups,omitempty"`
-	State          *string           `json:"state,omitempty"`
-	SubnetId       *string           `json:"subnetId,omitempty"`
+	SecurityGroups SecurityGroupRef `json:"securityGroups"`
+	State          string           `json:"state"`
+	SubnetId       string           `json:"subnetId"`
 
 	// Tags One or more tags associated with the resource.
-	Tags                  *Tag    `json:"tags,omitempty"`
-	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
+	Tags                  Tag    `json:"tags"`
+	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
 }
 
 // PrivateIp defines model for private-ip.
 type PrivateIp struct {
 	Address string  `json:"address"`
 	DnsName *string `json:"dnsName,omitempty"`
+	Id      string  `json:"id"`
 }
 
-// PrivateIps List of Private IP
-type PrivateIps = []struct {
-	IsPrimary      *bool   `json:"isPrimary,omitempty"`
-	PrivateDnsName *string `json:"privateDnsName,omitempty"`
-	PrivateIp      *string `json:"privateIp,omitempty"`
-}
-
-// PrivateIpsLight List of Private IP
-type PrivateIpsLight = []struct {
-	IsPrimary *bool   `json:"isPrimary,omitempty"`
-	PrivateIp *string `json:"privateIp,omitempty"`
+// PrivateIpRequest defines model for private-ip-request.
+type PrivateIpRequest struct {
+	Address string `json:"address"`
 }
 
 // PublicIp defines model for public-ip.
@@ -463,6 +457,9 @@ type KeyPairNamePart = string
 
 // NetworkInterfaceCardIdPart defines model for network-interface-card-id.part.
 type NetworkInterfaceCardIdPart = string
+
+// PrivateIpIdPart defines model for private-ip-id.part.
+type PrivateIpIdPart = string
 
 // SecurityGroupIdPart defines model for security-group-id.part.
 type SecurityGroupIdPart = string
@@ -820,6 +817,9 @@ type ClientInterface interface {
 	AddSecondaryPrivateIPWithBody(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	AddSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSecondaryPrivateIP request
+	DeleteSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreatePublicIp request
 	CreatePublicIp(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1226,6 +1226,18 @@ func (c *Client) AddSecondaryPrivateIPWithBody(ctx context.Context, networkInter
 
 func (c *Client) AddSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddSecondaryPrivateIPRequest(c.Server, networkInterfaceCardId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecondaryPrivateIPRequest(c.Server, networkInterfaceCardId, secondaryPrivateIpId)
 	if err != nil {
 		return nil, err
 	}
@@ -2277,6 +2289,47 @@ func NewAddSecondaryPrivateIPRequestWithBody(server string, networkInterfaceCard
 	return req, nil
 }
 
+// NewDeleteSecondaryPrivateIPRequest generates requests for DeleteSecondaryPrivateIP
+func NewDeleteSecondaryPrivateIPRequest(server string, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "networkInterfaceCardId", runtime.ParamLocationPath, networkInterfaceCardId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "secondaryPrivateIpId", runtime.ParamLocationPath, secondaryPrivateIpId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/networkInterfaceCards/%s/secondaryPrivateIPs/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewCreatePublicIpRequest generates requests for CreatePublicIp
 func NewCreatePublicIpRequest(server string) (*http.Request, error) {
 	var err error
@@ -3122,6 +3175,9 @@ type ClientWithResponsesInterface interface {
 
 	AddSecondaryPrivateIPWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*AddSecondaryPrivateIPResponse, error)
 
+	// DeleteSecondaryPrivateIPWithResponse request
+	DeleteSecondaryPrivateIPWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart, reqEditors ...RequestEditorFn) (*DeleteSecondaryPrivateIPResponse, error)
+
 	// CreatePublicIpWithResponse request
 	CreatePublicIpWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error)
 
@@ -3629,6 +3685,7 @@ type AddSecondaryPrivateIPResponse struct {
 	JSON201                   *AddSecondaryPrivateIpSuccessPart
 	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
 	ApplicationproblemJSON500 *N500Part
 }
 
@@ -3642,6 +3699,32 @@ func (r AddSecondaryPrivateIPResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r AddSecondaryPrivateIPResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSecondaryPrivateIPResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON404 *N403Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSecondaryPrivateIPResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSecondaryPrivateIPResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4367,6 +4450,15 @@ func (c *ClientWithResponses) AddSecondaryPrivateIPWithResponse(ctx context.Cont
 		return nil, err
 	}
 	return ParseAddSecondaryPrivateIPResponse(rsp)
+}
+
+// DeleteSecondaryPrivateIPWithResponse request returning *DeleteSecondaryPrivateIPResponse
+func (c *ClientWithResponses) DeleteSecondaryPrivateIPWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart, reqEditors ...RequestEditorFn) (*DeleteSecondaryPrivateIPResponse, error) {
+	rsp, err := c.DeleteSecondaryPrivateIP(ctx, networkInterfaceCardId, secondaryPrivateIpId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSecondaryPrivateIPResponse(rsp)
 }
 
 // CreatePublicIpWithResponse request returning *CreatePublicIpResponse
@@ -5299,6 +5391,67 @@ func ParseAddSecondaryPrivateIPResponse(rsp *http.Response) (*AddSecondaryPrivat
 			return nil, err
 		}
 		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSecondaryPrivateIPResponse parses an HTTP response from a DeleteSecondaryPrivateIPWithResponse call
+func ParseDeleteSecondaryPrivateIPResponse(rsp *http.Response) (*DeleteSecondaryPrivateIPResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSecondaryPrivateIPResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest N500Part

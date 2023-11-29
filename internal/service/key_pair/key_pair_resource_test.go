@@ -3,24 +3,21 @@ package key_pair_test
 import (
 	"fmt"
 	"github.com/stretchr/testify/require"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 	"math/rand"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
-
-var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-	"numspot": providerserver.NewProtocol6WithError(provider.New("test")()),
-}
 
 func TestKeypairResource_Create(t *testing.T) {
 	name := fmt.Sprintf("%s%d", "TEST_TERRAFORM_KEYPAIR_", rand.Uint64())
 
+	pr := acctest.TestAccProtoV6ProviderFactories
+
 	resource.ParallelTest(t, resource.TestCase{
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		ProtoV6ProviderFactories: pr,
+
 		Steps: []resource.TestStep{
 			{
 				Config: testKeyPairConfig_Create(name),
@@ -64,7 +61,7 @@ func TestKeypairResource_Import(t *testing.T) {
 	publicKey := "c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFCQVFDT3dNUEorWjR4WUNXV2VKVWpk\nd1M3TC9JYzdEQ0RwUTZmU1pqekx5SktWTno4OFVqbm0yK09JYjVMcGVFMHhHZ1hLTWZlZ2hGYytl\nNlNVTnRCOUFwSGMrMlNub1Y3SjVkTktkb3FPTFpaRFVKR1EzTnVrNGtyS00zMWRyMlBSS2IzNHdV\nYzZYQUV6NXFQTUI2YTNvUm90eGxWWTduU1FEL0J2UUZXRkhQaHNiOWtsbkhTd2gwOHlIU3B0Q3hS\nUmhyQlc4Wmk1L25FY1hOTjlGTEZzaVNJWGliRVNJQWZrYlZMdFlUSUhOL2ZWTWpqNVd5UjFRd3Rk\nMmUwb1RDZ1FhZUxZSWNhN0NjSmt3N0JvYXhKUlZRSmE5dm1LbUdSQjRoWDlpZTNDK2hjeEswRS9H\nVjN4dktwem91Vno0WEdSaktldEsvZmo1aWVjbm5yRnFOQXR2Z2ogdG90YXJAbG9jYWxob3N0Cg=="
 
 	resource.ParallelTest(t, resource.TestCase{
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		ProtoV6ProviderFactories: acctest.TestAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testKeyPairConfig_Import(name, publicKey),

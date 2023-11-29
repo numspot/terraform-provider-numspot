@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns"
+	api_client "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -24,7 +25,7 @@ func NewDhcpOptionsSetResource() resource.Resource {
 }
 
 type DhcpOptionsSetResource struct {
-	client *conns.ClientWithResponses
+	client *api_client.ClientWithResponses
 }
 
 type DhcpOptionsSetResourceModel struct {
@@ -106,7 +107,7 @@ func (k *DhcpOptionsSetResource) Configure(ctx context.Context, request resource
 		return
 	}
 
-	client, ok := request.ProviderData.(*conns.ClientWithResponses)
+	client, ok := request.ProviderData.(*api_client.ClientWithResponses)
 
 	if !ok {
 		response.Diagnostics.AddError(
@@ -134,7 +135,7 @@ func (k *DhcpOptionsSetResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	body := conns.CreateDhcpOptionsSetJSONRequestBody{
+	body := api_client.CreateDhcpOptionsSetJSONRequestBody{
 		DomainName: data.DomainName.ValueStringPointer(),
 	}
 
@@ -177,7 +178,7 @@ func (k *DhcpOptionsSetResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	createDhcpOptionsSet, err := conns.ParseCreateDhcpOptionsSetResponse(createDhcpOptionsSetResponse)
+	createDhcpOptionsSet, err := api_client.ParseCreateDhcpOptionsSetResponse(createDhcpOptionsSetResponse)
 	if err != nil {
 		response.Diagnostics.AddError(fmt.Sprintf("Parsing Dhcp Options Set (%s)", data.Id.ValueString()), err.Error())
 		return

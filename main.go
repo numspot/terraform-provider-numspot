@@ -6,10 +6,10 @@ package main
 import (
 	"context"
 	"flag"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
 )
 
 // Run "go generate" to format example terraform files and generate the docs for the registry/website
@@ -33,8 +33,10 @@ var (
 
 func main() {
 	var debug bool
+	var development bool
 
 	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	flag.BoolVar(&development, "dev", false, "set to true to run the provider in development mode")
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
@@ -43,7 +45,7 @@ func main() {
 		Debug:   debug,
 	}
 
-	err := providerserver.Serve(context.Background(), provider.New(version), opts)
+	err := providerserver.Serve(context.Background(), provider.New(version, development), opts)
 
 	if err != nil {
 		log.Fatal(err.Error())

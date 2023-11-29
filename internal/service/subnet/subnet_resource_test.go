@@ -2,19 +2,13 @@ package subnet_test
 
 import (
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
-
-var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-	"numspot": providerserver.NewProtocol6WithError(provider.New("test")()),
-}
 
 func TestSubnetResourceCreate(t *testing.T) {
 	ipRange := "10.0.1.0/24"
@@ -24,7 +18,7 @@ func TestSubnetResourceCreate(t *testing.T) {
 	var subnetId string
 
 	resource.ParallelTest(t, resource.TestCase{
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		ProtoV6ProviderFactories: acctest.TestAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testSubnetConfigCreate(ipRange, virtualPrivateCloudId),

@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns"
+	api_client "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -22,14 +25,13 @@ func NewSecurityGroupResource() resource.Resource {
 }
 
 type SecurityGroupResource struct {
-	client *conns.ClientWithResponses
+	client *api_client.ClientWithResponses
 }
 
 type SecurityGroupResourceModel struct {
 	Id                    types.String `tfsdk:"id"`
 	VirtualPrivateCloudId types.String `tfsdk:"virtual_private_cloud_id"`
-	SecurityGroupName     types.String `tfsdk:"security_group_name"`
-	AccountId             types.String `tfsdk:"account_id"`
+	Name                  types.String `tfsdk:"name"`
 	Description           types.String `tfsdk:"description"`
 	InboundRules          types.List   `tfsdk:"inbound_rules"`
 	OutboundRules         types.List   `tfsdk:"outbound_rules"`
@@ -94,7 +96,6 @@ func RuleSchema() schema.ListNestedAttribute {
 				},
 			},
 		},
-		Optional: true,
 		Computed: true,
 	}
 }
@@ -110,19 +111,23 @@ func (k *SecurityGroupResource) Schema(ctx context.Context, request resource.Sch
 			"virtual_private_cloud_id": schema.StringAttribute{
 				MarkdownDescription: "The NumSpot Security Group Virtual Private Cloud id.",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
-			"security_group_name": schema.StringAttribute{
+			"name": schema.StringAttribute{
 				MarkdownDescription: "The NumSpot Security Group resource name.",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "The NumSpot Security Group resource description.",
 				Required:            true,
-			},
-			"account_id": schema.StringAttribute{
-				MarkdownDescription: "",
-				Optional:            true,
-				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"inbound_rules":  RuleSchema(),
 			"outbound_rules": RuleSchema(),
@@ -140,7 +145,7 @@ func (k *SecurityGroupResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	client, ok := request.ProviderData.(*conns.ClientWithResponses)
+	client, ok := request.ProviderData.(*api_client.ClientWithResponses)
 
 	if !ok {
 		response.Diagnostics.AddError(
@@ -167,9 +172,9 @@ func (k *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	body := conns.CreateSecurityGroupJSONRequestBody{
+	body := api_client.CreateSecurityGroupJSONRequestBody{
 		VirtualPrivateCloudId: data.VirtualPrivateCloudId.ValueString(),
-		SecurityGroupName:     data.SecurityGroupName.ValueStringPointer(),
+		SecurityGroupName:     data.Name.ValueStringPointer(),
 		Description:           data.Description.ValueStringPointer(),
 	}
 
@@ -187,7 +192,7 @@ func (k *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 	data.Id = types.StringValue(*createSecurityGroupResponse.JSON201.Id)
 	data.Description = types.StringValue(*createSecurityGroupResponse.JSON201.Description)
-	data.SecurityGroupName = types.StringValue(*createSecurityGroupResponse.JSON201.SecurityGroupName)
+	data.Name = types.StringValue(*createSecurityGroupResponse.JSON201.SecurityGroupName)
 	// data.AccountId = types.StringValue(*createSecurityGroupResponse.JSON201.AccountId)
 
 	// InboundRules
@@ -281,8 +286,75 @@ func (k *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 			found = true
 
 			data.Id = types.StringValue(*e.Id)
-			data.SecurityGroupName = types.StringValue(*e.SecurityGroupName)
 			data.Description = types.StringValue(*e.Description)
+			data.Name = types.StringValue(*e.SecurityGroupName)
+			// data.AccountId = types.StringValue(*createSecurityGroupResponse.JSON201.AccountId)
+
+			// InboundRules
+			inboundRules := make([]Rule, 0, len(*e.InboundRules))
+			for _, inboundRule := range *e.InboundRules {
+				// ServiceIds
+				servicesIdTf, diags := types.ListValueFrom(ctx, types.StringType, inboundRule.ServiceIds)
+				if diags.HasError() {
+					response.Diagnostics.Append(diags...)
+					return
+				}
+
+				// IpRanges
+				ipRangesTf, diags := types.ListValueFrom(ctx, types.StringType, inboundRule.IpRanges)
+				if diags.HasError() {
+					response.Diagnostics.Append(diags...)
+					return
+				}
+
+				inboundRules = append(inboundRules, Rule{
+					FromPortRange: types.Int64Value(0),
+					ToPortRange:   types.Int64Value(0),
+					IpProtocol:    types.StringValue(*inboundRule.IpProtocol),
+					ServiceIds:    servicesIdTf,
+					IpRanges:      ipRangesTf,
+				})
+			}
+
+			inboundRulesTf, diags := types.ListValueFrom(ctx, RuleType(), inboundRules)
+			if diags.HasError() {
+				response.Diagnostics.Append(diags...)
+				return
+			}
+			data.InboundRules = inboundRulesTf
+
+			// OutboundRules
+			outboundRules := make([]Rule, 0, len(*e.OutboundRules))
+			for _, outboundRUle := range *e.OutboundRules {
+				// ServiceIds
+				servicesIdTf, diags := types.ListValueFrom(ctx, types.StringType, outboundRUle.ServiceIds)
+				if diags.HasError() {
+					response.Diagnostics.Append(diags...)
+					return
+				}
+
+				// IpRanges
+				ipRangesTf, diags := types.ListValueFrom(ctx, types.StringType, outboundRUle.IpRanges)
+				if diags.HasError() {
+					response.Diagnostics.Append(diags...)
+					return
+				}
+
+				outboundRules = append(outboundRules, Rule{
+					FromPortRange: types.Int64Value(0),
+					ToPortRange:   types.Int64Value(0),
+					IpProtocol:    types.StringValue(*outboundRUle.IpProtocol),
+					ServiceIds:    servicesIdTf,
+					IpRanges:      ipRangesTf,
+				})
+			}
+
+			outboundRulesTf, diags := types.ListValueFrom(ctx, RuleType(), outboundRules)
+			if diags.HasError() {
+				response.Diagnostics.Append(diags...)
+				return
+			}
+			data.OutboundRules = outboundRulesTf
 
 			response.Diagnostics.Append(response.State.Set(ctx, &data)...)
 		}

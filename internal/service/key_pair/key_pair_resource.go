@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns"
+	api_client "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -23,7 +24,7 @@ func NewKeyPairResource() resource.Resource {
 }
 
 type KeyPairResource struct {
-	client *conns.ClientWithResponses
+	client *api_client.ClientWithResponses
 }
 
 func (k *KeyPairResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
@@ -94,7 +95,7 @@ func (k *KeyPairResource) Configure(ctx context.Context, request resource.Config
 		return
 	}
 
-	client, ok := request.ProviderData.(*conns.ClientWithResponses)
+	client, ok := request.ProviderData.(*api_client.ClientWithResponses)
 
 	if !ok {
 		response.Diagnostics.AddError(
@@ -124,50 +125,50 @@ func (k *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 
 	isNotImport := data.PublicKey.IsNull()
 	if isNotImport {
-		body := conns.CreateKeyPairJSONRequestBody{
+		body := api_client.CreateKeyPairJSONRequestBody{
 			Name: data.Name.ValueString(),
 		}
 
-		createKeyPairResponse, err := k.client.CreateKeyPairWithResponse(ctx, body)
+		res, err := k.client.CreateKeyPairWithResponse(ctx, body)
 		if err != nil {
 			response.Diagnostics.AddError(fmt.Sprintf("Creating Key Pair (%s)", data.Name.ValueString()), err.Error())
 			return
 		}
 
-		numspotError := conns.HandleError(http.StatusCreated, createKeyPairResponse.HTTPResponse)
+		numspotError := conns.HandleErrorBis(http.StatusCreated, res.HTTPResponse.StatusCode, res.Body)
 		if numspotError != nil {
 			response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 			return
 		}
 
-		data.Id = types.StringValue(*createKeyPairResponse.JSON201.Name)
-		data.Name = types.StringValue(*createKeyPairResponse.JSON201.Name)
-		data.PrivateKey = types.StringValue(*createKeyPairResponse.JSON201.PrivateKey)
-		data.Fingerprint = types.StringValue(*createKeyPairResponse.JSON201.Fingerprint)
+		data.Id = types.StringValue(*res.JSON201.Name)
+		data.Name = types.StringValue(*res.JSON201.Name)
+		data.PrivateKey = types.StringValue(*res.JSON201.PrivateKey)
+		data.Fingerprint = types.StringValue(*res.JSON201.Fingerprint)
 
 		// Save data into Terraform state
 		response.Diagnostics.Append(response.State.Set(ctx, &data)...)
 	} else {
-		body := conns.ImportKeyPairJSONRequestBody{
+		body := api_client.ImportKeyPairJSONRequestBody{
 			Name:      data.Name.ValueString(),
 			PublicKey: data.PublicKey.ValueString(),
 		}
 
-		importKeyPairResponse, err := k.client.ImportKeyPairWithResponse(ctx, body)
+		res, err := k.client.ImportKeyPairWithResponse(ctx, body)
 		if err != nil {
 			response.Diagnostics.AddError(fmt.Sprintf("Importing Key Pair (%s)", data.Name.ValueString()), err.Error())
 			return
 		}
 
-		numspotError := conns.HandleError(http.StatusCreated, importKeyPairResponse.HTTPResponse)
+		numspotError := conns.HandleErrorBis(http.StatusCreated, res.HTTPResponse.StatusCode, res.Body)
 		if numspotError != nil {
 			response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 			return
 		}
 
-		data.Id = types.StringValue(*importKeyPairResponse.JSON201.Name)
-		data.Name = types.StringValue(*importKeyPairResponse.JSON201.Name)
-		data.Fingerprint = types.StringValue(*importKeyPairResponse.JSON201.Fingerprint)
+		data.Id = types.StringValue(*res.JSON201.Name)
+		data.Name = types.StringValue(*res.JSON201.Name)
+		data.Fingerprint = types.StringValue(*res.JSON201.Fingerprint)
 		data.PrivateKey = types.StringNull()
 
 		// Save data into Terraform state
@@ -184,14 +185,20 @@ func (k *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 		return
 	}
 
-	keyPairs, err := k.client.GetKeyPairsWithResponse(ctx)
+	res, err := k.client.GetKeyPairsWithResponse(ctx)
 	if err != nil {
 		response.Diagnostics.AddError("Reading Key Pairs", err.Error())
 		return
 	}
 
+	numspotError := conns.HandleErrorBis(http.StatusOK, res.HTTPResponse.StatusCode, res.Body)
+	if numspotError != nil {
+		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
+		return
+	}
+
 	found := false
-	for _, e := range *keyPairs.JSON200.Items {
+	for _, e := range *res.JSON200.Items {
 		isFingerprintNull := data.Fingerprint.IsNull()
 
 		if *e.Name == data.Name.ValueString() {

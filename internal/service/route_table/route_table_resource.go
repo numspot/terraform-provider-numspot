@@ -2,6 +2,7 @@ package route_table
 
 import (
 	"context"
+	api_client "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -29,7 +30,7 @@ func NewRouteTableResource() resource.Resource {
 }
 
 type RouteTableResource struct {
-	client *conns.ClientWithResponses
+	client *api_client.ClientWithResponses
 }
 
 type RouteTableResourceModel struct {
@@ -143,7 +144,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	createRouteTableBody := conns.CreateRouteTableJSONRequestBody{
+	createRouteTableBody := api_client.CreateRouteTableJSONRequestBody{
 		VirtualPrivateCloudId: routeTablePlan.VPCID.ValueString(),
 	}
 
@@ -186,7 +187,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 
 	routeTable := slice.FindFirst(
 		*routeTables.JSON200.Items,
-		func(table conns.RouteTable) bool { return table.Id == routeTableState.ID.ValueString() },
+		func(table api_client.RouteTable) bool { return table.Id == routeTableState.ID.ValueString() },
 	)
 
 	if routeTable == nil {
@@ -240,7 +241,7 @@ func (r *RouteTableResource) ImportState(ctx context.Context, request resource.I
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func mapToRouteTableResourceModel(ctx context.Context, routeTable *conns.RouteTable) (*RouteTableResourceModel, diag.Diagnostics) {
+func mapToRouteTableResourceModel(ctx context.Context, routeTable *api_client.RouteTable) (*RouteTableResourceModel, diag.Diagnostics) {
 	routePropagatingVirtualGateways, diags := mapToModelRoutePropagatingVirtualGateways(ctx, *routeTable.RoutePropagatingVirtualGateways)
 	if diags.HasError() {
 		return nil, diags
@@ -259,11 +260,11 @@ func mapToRouteTableResourceModel(ctx context.Context, routeTable *conns.RouteTa
 	}, diags
 }
 
-func mapToModelRoutePropagatingVirtualGateways(ctx context.Context, routePropagatingVirtualGateways []conns.RoutePropagatingVirtualGateway) (basetypes.ListValue, diag.Diagnostics) {
-	return conns.MapHttpListToModelList[conns.RoutePropagatingVirtualGateway, RoutePropagatingVirtualGateway](
+func mapToModelRoutePropagatingVirtualGateways(ctx context.Context, routePropagatingVirtualGateways []api_client.RoutePropagatingVirtualGateway) (basetypes.ListValue, diag.Diagnostics) {
+	return conns.MapHttpListToModelList[api_client.RoutePropagatingVirtualGateway, RoutePropagatingVirtualGateway](
 		ctx,
 		routePropagatingVirtualGateways,
-		func(routePropagatingVirtualGateway conns.RoutePropagatingVirtualGateway) RoutePropagatingVirtualGateway {
+		func(routePropagatingVirtualGateway api_client.RoutePropagatingVirtualGateway) RoutePropagatingVirtualGateway {
 			return RoutePropagatingVirtualGateway{
 				ID: types.StringValue(routePropagatingVirtualGateway.Id),
 			}
@@ -272,11 +273,11 @@ func mapToModelRoutePropagatingVirtualGateways(ctx context.Context, routePropaga
 	)
 }
 
-func mapToModelLinkRouteTables(ctx context.Context, linkRouteTables []conns.LinkRouteTable) (basetypes.ListValue, diag.Diagnostics) {
-	return conns.MapHttpListToModelList[conns.LinkRouteTable, LinkRouteTable](
+func mapToModelLinkRouteTables(ctx context.Context, linkRouteTables []api_client.LinkRouteTable) (basetypes.ListValue, diag.Diagnostics) {
+	return conns.MapHttpListToModelList[api_client.LinkRouteTable, LinkRouteTable](
 		ctx,
 		linkRouteTables,
-		func(linkRouteTable conns.LinkRouteTable) LinkRouteTable {
+		func(linkRouteTable api_client.LinkRouteTable) LinkRouteTable {
 			return LinkRouteTable{
 				ID:           types.StringValue(linkRouteTable.Id),
 				Main:         types.BoolValue(linkRouteTable.Main),

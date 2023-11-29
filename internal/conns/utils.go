@@ -4,18 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
-
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/common/slice"
+	conns "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
+	"net/http"
 )
 
-func HandleError(expectedStatusCode int, response *http.Response) *Error {
+func HandleError(expectedStatusCode int, response *http.Response) *conns.Error {
 	if expectedStatusCode != response.StatusCode {
-		var numspotError Error
+		var numspotError conns.Error
 		defer response.Body.Close()
 		err := json.NewDecoder(response.Body).Decode(&numspotError)
 		fmt.Println(err)
@@ -26,12 +26,12 @@ func HandleError(expectedStatusCode int, response *http.Response) *Error {
 	return nil
 }
 
-func GetClient(request resource.ConfigureRequest, response *resource.ConfigureResponse) *ClientWithResponses {
+func GetClient(request resource.ConfigureRequest, response *resource.ConfigureResponse) *conns.ClientWithResponses {
 	if request.ProviderData == nil {
 		return nil
 	}
 
-	client, ok := request.ProviderData.(*ClientWithResponses)
+	client, ok := request.ProviderData.(*conns.ClientWithResponses)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -45,9 +45,9 @@ func GetClient(request resource.ConfigureRequest, response *resource.ConfigureRe
 }
 
 // TODO: to refactor.
-func HandleErrorBis(expectedStatusCode int, responseStatusCode int, responseBody []byte) *Error {
+func HandleErrorBis(expectedStatusCode int, responseStatusCode int, responseBody []byte) *conns.Error {
 	if expectedStatusCode != responseStatusCode {
-		var numSpotError Error
+		var numSpotError conns.Error
 		err := json.Unmarshal(responseBody, &numSpotError)
 		fmt.Println(err)
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns"
+	api_client "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -25,7 +26,7 @@ func NewSubnetResource() resource.Resource {
 }
 
 type SubnetResource struct {
-	client *conns.ClientWithResponses
+	client *api_client.ClientWithResponses
 }
 
 type SubnetResourceModel struct {
@@ -102,7 +103,7 @@ func (k *SubnetResource) Configure(ctx context.Context, request resource.Configu
 	if request.ProviderData == nil {
 		return
 	}
-	client, ok := request.ProviderData.(*conns.ClientWithResponses)
+	client, ok := request.ProviderData.(*api_client.ClientWithResponses)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type", fmt.Sprintf("%T", request.ProviderData),
@@ -125,7 +126,7 @@ func (k *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	body := conns.CreateSubnetJSONRequestBody{
+	body := api_client.CreateSubnetJSONRequestBody{
 		IpRange:               data.IpRange.ValueString(),
 		VirtualPrivateCloudId: data.VpcId.ValueString(),
 		AvailabilityZone:      data.AvailabilityZone.ValueStringPointer(),
@@ -212,7 +213,7 @@ func (k *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	}
 }
 
-func (data *SubnetResourceModel) importResponse(r *conns.CreateSubnetResponse) {
+func (data *SubnetResourceModel) importResponse(r *api_client.CreateSubnetResponse) {
 	data.Id = types.StringValue(*r.JSON201.Id)
 	data.IpRange = types.StringValue(r.JSON201.IpRange)
 	data.State = types.StringValue(*r.JSON201.State)
