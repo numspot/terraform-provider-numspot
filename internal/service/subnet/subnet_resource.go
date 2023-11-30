@@ -138,7 +138,7 @@ func (k *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	numspotError := conns.HandleErrorBis(http.StatusCreated, createSubnetResponse.HTTPResponse.StatusCode, createSubnetResponse.Body)
+	numspotError := conns.HandleError(http.StatusCreated, createSubnetResponse.HTTPResponse.StatusCode, createSubnetResponse.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return
@@ -164,7 +164,7 @@ func (k *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 		return
 	}
 
-	numspotError := conns.HandleErrorBis(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
+	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return
@@ -206,7 +206,7 @@ func (k *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 		return
 	}
 
-	numspotError := conns.HandleErrorBis(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
+	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return

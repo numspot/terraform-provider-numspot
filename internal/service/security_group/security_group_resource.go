@@ -184,7 +184,7 @@ func (k *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	numspotError := conns.HandleError(http.StatusCreated, createSecurityGroupResponse.HTTPResponse)
+	numspotError := conns.HandleError(http.StatusCreated, createSecurityGroupResponse.HTTPResponse.StatusCode, createSecurityGroupResponse.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return
@@ -380,7 +380,7 @@ func (k *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 		return
 	}
 
-	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse)
+	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return

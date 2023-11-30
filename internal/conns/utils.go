@@ -10,21 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/common/slice"
 	conns "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
-	"net/http"
 )
-
-func HandleError(expectedStatusCode int, response *http.Response) *conns.Error {
-	if expectedStatusCode != response.StatusCode {
-		var numspotError conns.Error
-		defer response.Body.Close()
-		err := json.NewDecoder(response.Body).Decode(&numspotError)
-		fmt.Println(err)
-
-		return &numspotError
-	}
-
-	return nil
-}
 
 func GetClient(request resource.ConfigureRequest, response *resource.ConfigureResponse) *conns.ClientWithResponses {
 	if request.ProviderData == nil {
@@ -44,8 +30,7 @@ func GetClient(request resource.ConfigureRequest, response *resource.ConfigureRe
 	return client
 }
 
-// TODO: to refactor.
-func HandleErrorBis(expectedStatusCode int, responseStatusCode int, responseBody []byte) *conns.Error {
+func HandleError(expectedStatusCode int, responseStatusCode int, responseBody []byte) *conns.Error {
 	if expectedStatusCode != responseStatusCode {
 		var numSpotError conns.Error
 		err := json.Unmarshal(responseBody, &numSpotError)

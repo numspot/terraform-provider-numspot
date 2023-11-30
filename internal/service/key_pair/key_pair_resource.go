@@ -135,7 +135,7 @@ func (k *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 			return
 		}
 
-		numspotError := conns.HandleErrorBis(http.StatusCreated, res.HTTPResponse.StatusCode, res.Body)
+		numspotError := conns.HandleError(http.StatusCreated, res.HTTPResponse.StatusCode, res.Body)
 		if numspotError != nil {
 			response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 			return
@@ -160,7 +160,7 @@ func (k *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 			return
 		}
 
-		numspotError := conns.HandleErrorBis(http.StatusCreated, res.HTTPResponse.StatusCode, res.Body)
+		numspotError := conns.HandleError(http.StatusCreated, res.HTTPResponse.StatusCode, res.Body)
 		if numspotError != nil {
 			response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 			return
@@ -191,7 +191,7 @@ func (k *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 		return
 	}
 
-	numspotError := conns.HandleErrorBis(http.StatusOK, res.HTTPResponse.StatusCode, res.Body)
+	numspotError := conns.HandleError(http.StatusOK, res.HTTPResponse.StatusCode, res.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return
@@ -237,7 +237,7 @@ func (k *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 		return
 	}
 
-	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse)
+	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return

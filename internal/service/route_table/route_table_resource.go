@@ -154,7 +154,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	numSpotError := conns.HandleErrorBis(http.StatusCreated, res.HTTPResponse.StatusCode, res.Body)
+	numSpotError := conns.HandleError(http.StatusCreated, res.HTTPResponse.StatusCode, res.Body)
 	if numSpotError != nil {
 		response.Diagnostics.AddError(numSpotError.Title, numSpotError.Detail)
 		return
@@ -222,7 +222,7 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 		return
 	}
 
-	numSpotError := conns.HandleErrorBis(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
+	numSpotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
 	if numSpotError != nil {
 		response.Diagnostics.AddError(numSpotError.Title, numSpotError.Detail)
 		return

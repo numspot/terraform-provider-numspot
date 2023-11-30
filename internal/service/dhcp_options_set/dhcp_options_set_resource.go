@@ -166,29 +166,23 @@ func (k *DhcpOptionsSetResource) Create(ctx context.Context, request resource.Cr
 	}
 	body.NtpServers = &ntpServersElements
 
-	createDhcpOptionsSetResponse, err := k.client.CreateDhcpOptionsSet(ctx, body)
+	createDhcpOptionsSetResponse, err := k.client.CreateDhcpOptionsSetWithResponse(ctx, body)
 	if err != nil {
 		response.Diagnostics.AddError(fmt.Sprintf("Creating Dhcp Options Set (%s)", data.Id.ValueString()), err.Error())
 		return
 	}
 
-	numspotError := conns.HandleError(http.StatusCreated, createDhcpOptionsSetResponse)
+	numspotError := conns.HandleError(http.StatusCreated, createDhcpOptionsSetResponse.HTTPResponse.StatusCode, createDhcpOptionsSetResponse.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return
 	}
 
-	createDhcpOptionsSet, err := api_client.ParseCreateDhcpOptionsSetResponse(createDhcpOptionsSetResponse)
-	if err != nil {
-		response.Diagnostics.AddError(fmt.Sprintf("Parsing Dhcp Options Set (%s)", data.Id.ValueString()), err.Error())
-		return
-	}
-
-	data.Id = types.StringValue(*createDhcpOptionsSet.JSON201.Id)
-	data.DomainName = types.StringValue(*createDhcpOptionsSet.JSON201.DomainName)
+	data.Id = types.StringValue(*createDhcpOptionsSetResponse.JSON201.Id)
+	data.DomainName = types.StringValue(*createDhcpOptionsSetResponse.JSON201.DomainName)
 
 	// Domain Name Servers
-	domainNameServers, diag := types.ListValueFrom(ctx, types.StringType, createDhcpOptionsSet.JSON201.DomainNameServers)
+	domainNameServers, diag := types.ListValueFrom(ctx, types.StringType, createDhcpOptionsSetResponse.JSON201.DomainNameServers)
 	response.Diagnostics.Append(diag...)
 	if response.Diagnostics.HasError() {
 		return
@@ -196,7 +190,7 @@ func (k *DhcpOptionsSetResource) Create(ctx context.Context, request resource.Cr
 	data.DomainNameServers = domainNameServers
 
 	// Log Servers
-	logServers, diag := types.ListValueFrom(ctx, types.StringType, createDhcpOptionsSet.JSON201.LogServers)
+	logServers, diag := types.ListValueFrom(ctx, types.StringType, createDhcpOptionsSetResponse.JSON201.LogServers)
 	response.Diagnostics.Append(diag...)
 	if response.Diagnostics.HasError() {
 		return
@@ -204,7 +198,7 @@ func (k *DhcpOptionsSetResource) Create(ctx context.Context, request resource.Cr
 	data.LogServers = logServers
 
 	// Ntp Servers
-	ntpServers, diag := types.ListValueFrom(ctx, types.StringType, createDhcpOptionsSet.JSON201.NtpServers)
+	ntpServers, diag := types.ListValueFrom(ctx, types.StringType, createDhcpOptionsSetResponse.JSON201.NtpServers)
 	response.Diagnostics.Append(diag...)
 	if response.Diagnostics.HasError() {
 		return
@@ -288,7 +282,7 @@ func (k *DhcpOptionsSetResource) Delete(ctx context.Context, request resource.De
 		return
 	}
 
-	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse)
+	numspotError := conns.HandleError(http.StatusNoContent, res.HTTPResponse.StatusCode, res.Body)
 	if numspotError != nil {
 		response.Diagnostics.AddError(numspotError.Title, numspotError.Detail)
 		return
