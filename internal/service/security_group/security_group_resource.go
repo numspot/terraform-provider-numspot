@@ -16,9 +16,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-var _ resource.Resource = &SecurityGroupResource{}
-var _ resource.ResourceWithConfigure = &SecurityGroupResource{}
-var _ resource.ResourceWithImportState = &SecurityGroupResource{}
+var (
+	_ resource.Resource                = &SecurityGroupResource{}
+	_ resource.ResourceWithConfigure   = &SecurityGroupResource{}
+	_ resource.ResourceWithImportState = &SecurityGroupResource{}
+)
 
 func NewSecurityGroupResource() resource.Resource {
 	return &SecurityGroupResource{}

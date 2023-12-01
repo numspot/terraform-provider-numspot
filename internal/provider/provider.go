@@ -8,6 +8,8 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
+	"net/http"
+
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -18,13 +20,11 @@ import (
 	api_client "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/iam"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/dhcp_options_set"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/internet_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/key_pair"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/route_table"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/security_group"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/subnet"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/virtual_private_cloud"
-
-	"net/http"
 )
 
 // Ensure NumspotProvider satisfies various provider interfaces.
@@ -111,9 +111,10 @@ func (p *NumspotProvider) apiClientWithAuth(ctx context.Context, diag diag.Diagn
 	}
 
 	apiClient, err := api_client.NewClientWithResponses(endpoint, api_client.WithRequestEditorFn(bearerProvider.Intercept),
-		api_client.WithHTTPClient(&http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
+		api_client.WithHTTPClient(&http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
 		}),
 	)
 	if err != nil {
@@ -207,7 +208,8 @@ func (p *NumspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		security_group.NewSecurityGroupResource,
 		dhcp_options_set.NewDhcpOptionsSetResource,
 		subnet.NewSubnetResource,
-		route_table.NewRouteTableResource,
+		// route_table.NewRouteTableResource,
+		internet_gateway.NewInternetGatewayResource,
 	}
 }
 

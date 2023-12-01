@@ -49,13 +49,13 @@ type AddRouteReq struct {
 	TargetType         string `json:"targetType"`
 }
 
-// AddSecondaryPrivateIpReq defines model for add-secondary-private-ip-req.
-type AddSecondaryPrivateIpReq struct {
-	Address *string `json:"address,omitempty"`
-}
-
 // AssociateReq defines model for associate-req.
 type AssociateReq struct {
+	SubnetId string `json:"subnetId"`
+}
+
+// AssociateReq2 defines model for associate-req-2.
+type AssociateReq2 struct {
 	DeviceNumber int    `json:"deviceNumber"`
 	VmId         string `json:"vmId"`
 }
@@ -63,6 +63,11 @@ type AssociateReq struct {
 // AssociateSuccessRes defines model for associate-success-res.
 type AssociateSuccessRes struct {
 	AssociationId *string `json:"associationId,omitempty"`
+}
+
+// Association defines model for association.
+type Association struct {
+	AssociationId string `json:"associationId"`
 }
 
 // Attachment defines model for attachment.
@@ -107,15 +112,6 @@ type CreateReq3 struct {
 
 // CreateReq4 defines model for create-req-4.
 type CreateReq4 struct {
-	Description         *string             `json:"description,omitempty"`
-	PrimaryPrivateIp    PrivateIpRequest    `json:"primaryPrivateIp"`
-	SecondaryPrivateIps *[]PrivateIpRequest `json:"secondaryPrivateIps,omitempty"`
-	SecurityGroupIds    *[]string           `json:"securityGroupIds,omitempty"`
-	SubnetId            string              `json:"subnetId"`
-}
-
-// CreateReq5 defines model for create-req-5.
-type CreateReq5 struct {
 	// AvailabilityZone The name of the region in which the NunSpot subnet is located
 	AvailabilityZone *string `json:"availabilityZone,omitempty"`
 
@@ -126,8 +122,40 @@ type CreateReq5 struct {
 	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
 }
 
+// CreateRes defines model for create-res.
+type CreateRes struct {
+	Description *string `json:"description,omitempty"`
+
+	// PrivateIps List of Private IP
+	PrivateIps       *PrivateIpsLight `json:"privateIps,omitempty"`
+	SecurityGroupIds *[]string        `json:"securityGroupIds,omitempty"`
+	SubnetId         string           `json:"subnetId"`
+}
+
 // CreateSuccessRes defines model for create-success-res.
 type CreateSuccessRes struct {
+	AvailabilityZone    *string `json:"availabilityZone,omitempty"`
+	Description         *string `json:"description,omitempty"`
+	Id                  *string `json:"id,omitempty"`
+	IsSourceDestChecked *bool   `json:"isSourceDestChecked,omitempty"`
+	MacAddress          *string `json:"macAddress,omitempty"`
+	PrivateDnsName      *string `json:"privateDnsName,omitempty"`
+
+	// PrivateIps List of Private IP
+	PrivateIps *PrivateIps `json:"privateIps,omitempty"`
+
+	// SecurityGroups List of Security Group
+	SecurityGroups *SecurityGroupRef `json:"securityGroups,omitempty"`
+	State          *string           `json:"state,omitempty"`
+	SubnetId       *string           `json:"subnetId,omitempty"`
+
+	// Tags One or more tags associated with the resource.
+	Tags                  *Tag    `json:"tags,omitempty"`
+	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
+}
+
+// CreateSuccessRes2 defines model for create-success-res-2.
+type CreateSuccessRes2 struct {
 	// AvailabilityZone The name of the region in which the NunSpot subnet is located
 	AvailabilityZone *string `json:"availabilityZone,omitempty"`
 
@@ -153,6 +181,11 @@ type CreateSuccessRes struct {
 	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
 }
 
+// DeleteRouteReq defines model for delete-route-req.
+type DeleteRouteReq struct {
+	DestinationIpRange string `json:"destinationIpRange"`
+}
+
 // DhcpOptionsSet defines model for dhcp-options-set.
 type DhcpOptionsSet struct {
 	DomainName        *string   `json:"domainName,omitempty"`
@@ -162,8 +195,8 @@ type DhcpOptionsSet struct {
 	NtpServers        *[]string `json:"ntpServers,omitempty"`
 }
 
-// DissociateReq defines model for dissociate-req.
-type DissociateReq struct {
+// DisassociateReq defines model for disassociate-req.
+type DisassociateReq struct {
 	AssociationId string `json:"associationId"`
 }
 
@@ -174,12 +207,6 @@ type InternetGatewayId = string
 type InternetGateway struct {
 	// Id Internet Gateway ID
 	Id *string `json:"id,omitempty"`
-
-	// Tags Tags
-	Tags *struct {
-		Key   *string `json:"key,omitempty"`
-		Value *string `json:"value,omitempty"`
-	} `json:"tags,omitempty"`
 
 	// VirtualPrivateCloudId Virtual Private Cloud ID
 	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
@@ -195,16 +222,21 @@ type LinkRouteTable struct {
 
 // ListRes defines model for list-res.
 type ListRes struct {
-	Items *[]SecurityGroup `json:"items,omitempty"`
+	Items *[]InternetGateway `json:"items,omitempty"`
 }
 
 // ListRes2 defines model for list-res-2.
 type ListRes2 struct {
-	Items *[]RouteTable `json:"items,omitempty"`
+	Items *[]SecurityGroup `json:"items,omitempty"`
 }
 
 // ListRes3 defines model for list-res-3.
 type ListRes3 struct {
+	Items []RouteTable `json:"items"`
+}
+
+// ListRes4 defines model for list-res-4.
+type ListRes4 struct {
 	Items *[]Subnet `json:"items,omitempty"`
 }
 
@@ -214,41 +246,19 @@ type ListSuccessRes struct {
 }
 
 // ListSuccessRes2 defines model for list-success-res-2.
-type ListSuccessRes2 struct {
-	Items []NetworkInterfaceCard `json:"items"`
+type ListSuccessRes2 = interface{}
+
+// PrivateIps List of Private IP
+type PrivateIps = []struct {
+	IsPrimary      *bool   `json:"isPrimary,omitempty"`
+	PrivateDnsName *string `json:"privateDnsName,omitempty"`
+	PrivateIp      *string `json:"privateIp,omitempty"`
 }
 
-// NetworkInterfaceCard defines model for network-interface-card.
-type NetworkInterfaceCard struct {
-	AvailabilityZone    string      `json:"availabilityZone"`
-	Description         string      `json:"description"`
-	Id                  string      `json:"id"`
-	IsSourceDestChecked bool        `json:"isSourceDestChecked"`
-	MacAddress          string      `json:"macAddress"`
-	PrimaryPrivateIp    PrivateIp   `json:"primaryPrivateIp"`
-	PrivateDnsName      string      `json:"privateDnsName"`
-	SecondaryPrivateIps []PrivateIp `json:"secondaryPrivateIps"`
-
-	// SecurityGroups List of Security Group
-	SecurityGroups SecurityGroupRef `json:"securityGroups"`
-	State          string           `json:"state"`
-	SubnetId       string           `json:"subnetId"`
-
-	// Tags One or more tags associated with the resource.
-	Tags                  Tag    `json:"tags"`
-	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
-}
-
-// PrivateIp defines model for private-ip.
-type PrivateIp struct {
-	Address string  `json:"address"`
-	DnsName *string `json:"dnsName,omitempty"`
-	Id      string  `json:"id"`
-}
-
-// PrivateIpRequest defines model for private-ip-request.
-type PrivateIpRequest struct {
-	Address string `json:"address"`
+// PrivateIpsLight List of Private IP
+type PrivateIpsLight = []struct {
+	IsPrimary *bool   `json:"isPrimary,omitempty"`
+	PrivateIp *string `json:"privateIp,omitempty"`
 }
 
 // PublicIp defines model for public-ip.
@@ -304,11 +314,11 @@ type RoutePropagatingVirtualGateway struct {
 
 // RouteTable defines model for route-table.
 type RouteTable struct {
-	Id                              string                            `json:"id"`
-	LinkRouteTables                 *[]LinkRouteTable                 `json:"linkRouteTables,omitempty"`
-	RoutePropagatingVirtualGateways *[]RoutePropagatingVirtualGateway `json:"routePropagatingVirtualGateways,omitempty"`
-	Routes                          *[]Route                          `json:"routes,omitempty"`
-	VirtualPrivateCloudId           string                            `json:"virtualPrivateCloudId"`
+	Id                              string                           `json:"id"`
+	LinkRouteTables                 []LinkRouteTable                 `json:"linkRouteTables"`
+	RoutePropagatingVirtualGateways []RoutePropagatingVirtualGateway `json:"routePropagatingVirtualGateways"`
+	Routes                          []Route                          `json:"routes"`
+	VirtualPrivateCloudId           string                           `json:"virtualPrivateCloudId"`
 }
 
 // RuleReq defines model for rule-req.
@@ -458,8 +468,8 @@ type KeyPairNamePart = string
 // NetworkInterfaceCardIdPart defines model for network-interface-card-id.part.
 type NetworkInterfaceCardIdPart = string
 
-// PrivateIpIdPart defines model for private-ip-id.part.
-type PrivateIpIdPart = string
+// RouteTableIdPart defines model for route-table-id.part.
+type RouteTableIdPart = string
 
 // SecurityGroupIdPart defines model for security-group-id.part.
 type SecurityGroupIdPart = string
@@ -497,14 +507,14 @@ type AddRouteSuccessPart = Route
 // AddRuleSuccessPart defines model for add-rule-success.part.
 type AddRuleSuccessPart = SecurityGroup
 
-// AddSecondaryPrivateIpSuccessPart defines model for add-secondary-private-ip-success.part.
-type AddSecondaryPrivateIpSuccessPart = NetworkInterfaceCard
+// AssociateRouteTableSuccessPart defines model for associate-route-table-success.part.
+type AssociateRouteTableSuccessPart = Association
 
 // AssociateSuccessPart defines model for associate-success.part.
 type AssociateSuccessPart = AssociateSuccessRes
 
 // CreateSuccessResPart defines model for create-success-res.part.
-type CreateSuccessResPart = CreateSuccessRes
+type CreateSuccessResPart = CreateSuccessRes2
 
 // CreateSuccessPart defines model for create-success.part.
 type CreateSuccessPart = InternetGateway
@@ -528,25 +538,28 @@ type CreateSuccessPart6 = RouteTable
 type CreateSuccessPart7 = Snapshot
 
 // CreateSuccessPart8 defines model for create-success.part-8.
-type CreateSuccessPart8 = NetworkInterfaceCard
+type CreateSuccessPart8 = CreateSuccessRes
+
+// DeleteRouteSuccessPart defines model for delete-route-success.part.
+type DeleteRouteSuccessPart = RouteTable
 
 // ListSuccessPart defines model for list-success.part.
-type ListSuccessPart = []InternetGateway
+type ListSuccessPart = ListRes
 
 // ListSuccessPart2 defines model for list-success.part-2.
-type ListSuccessPart2 = ListRes
+type ListSuccessPart2 = ListRes2
 
 // ListSuccessPart3 defines model for list-success.part-3.
 type ListSuccessPart3 = ListSuccessRes
 
 // ListSuccessPart4 defines model for list-success.part-4.
-type ListSuccessPart4 = ListRes2
+type ListSuccessPart4 = ListRes3
 
 // ListSuccessPart5 defines model for list-success.part-5.
 type ListSuccessPart5 = ListSuccessRes2
 
 // ListSuccessPart6 defines model for list-success.part-6.
-type ListSuccessPart6 = ListRes3
+type ListSuccessPart6 = ListRes4
 
 // RemoveRuleSuccessPart defines model for remove-rule-success.part.
 type RemoveRuleSuccessPart = SecurityGroup
@@ -560,14 +573,11 @@ type VpcListSuccessPart = VpcResList
 // AddRoutePart defines model for add-route.part.
 type AddRoutePart = AddRouteReq
 
-// AddSecondaryPrivateIpPart defines model for add-secondary-private-ip.part.
-type AddSecondaryPrivateIpPart = AddSecondaryPrivateIpReq
-
 // AssociatePart defines model for associate.part.
 type AssociatePart = AssociateReq
 
-// AttachPart defines model for attach.part.
-type AttachPart = Attachment
+// AssociatePart2 defines model for associate.part-2.
+type AssociatePart2 = AssociateReq2
 
 // CreateKeyPairPart defines model for create-key-pair.part.
 type CreateKeyPairPart = ReqCreate
@@ -589,19 +599,19 @@ type CreatePart4 struct {
 }
 
 // CreatePart5 defines model for create.part-5.
-type CreatePart5 = CreateReq4
+type CreatePart5 = CreateRes
 
 // CreatePart6 defines model for create.part-6.
-type CreatePart6 = CreateReq5
+type CreatePart6 = CreateReq4
 
-// DetachPart defines model for detach.part.
-type DetachPart = Attachment
+// DeleteRoutePart defines model for delete-route.part.
+type DeleteRoutePart = DeleteRouteReq
 
 // DhcpOptionsSetCreatePart defines model for dhcp-options-set-create.part.
 type DhcpOptionsSetCreatePart = CreateDhcpOptionsSetReq
 
-// DissociatePart defines model for dissociate.part.
-type DissociatePart = DissociateReq
+// DisassociatePart defines model for disassociate.part.
+type DisassociatePart = DisassociateReq
 
 // RulePart defines model for rule.part.
 type RulePart = RuleReq
@@ -635,13 +645,10 @@ type CreateKeyPairJSONRequestBody = ReqCreate
 type ImportKeyPairJSONRequestBody = ReqImport
 
 // CreateNetworkInterfaceCardJSONRequestBody defines body for CreateNetworkInterfaceCard for application/json ContentType.
-type CreateNetworkInterfaceCardJSONRequestBody = CreateReq4
+type CreateNetworkInterfaceCardJSONRequestBody = CreateRes
 
 // AssociateNICJSONRequestBody defines body for AssociateNIC for application/json ContentType.
-type AssociateNICJSONRequestBody = AssociateReq
-
-// AddSecondaryPrivateIPJSONRequestBody defines body for AddSecondaryPrivateIP for application/json ContentType.
-type AddSecondaryPrivateIPJSONRequestBody = AddSecondaryPrivateIpReq
+type AssociateNICJSONRequestBody = AssociateReq2
 
 // CreateRouteTableJSONRequestBody defines body for CreateRouteTable for application/json ContentType.
 type CreateRouteTableJSONRequestBody = CreateReq3
@@ -649,8 +656,17 @@ type CreateRouteTableJSONRequestBody = CreateReq3
 // AddRouteJSONRequestBody defines body for AddRoute for application/json ContentType.
 type AddRouteJSONRequestBody = AddRouteReq
 
-// DissociateRouteTableJSONRequestBody defines body for DissociateRouteTable for application/json ContentType.
-type DissociateRouteTableJSONRequestBody = DissociateReq
+// AssociateRouteTableJSONRequestBody defines body for AssociateRouteTable for application/json ContentType.
+type AssociateRouteTableJSONRequestBody = AssociateReq
+
+// DeleteRouteFromRouteTableJSONRequestBody defines body for DeleteRouteFromRouteTable for application/json ContentType.
+type DeleteRouteFromRouteTableJSONRequestBody = DeleteRouteReq
+
+// DisassociateRouteTableJSONRequestBody defines body for DisassociateRouteTable for application/json ContentType.
+type DisassociateRouteTableJSONRequestBody = DisassociateReq
+
+// UpdateRouteJSONRequestBody defines body for UpdateRoute for application/json ContentType.
+type UpdateRouteJSONRequestBody = AddRouteReq
 
 // CreateSecurityGroupJSONRequestBody defines body for CreateSecurityGroup for application/json ContentType.
 type CreateSecurityGroupJSONRequestBody = CreateReq2
@@ -665,7 +681,7 @@ type RemoveRuleSecurityGroupJSONRequestBody = RuleReq
 type CreateSnapshotJSONRequestBody CreateSnapshotJSONBody
 
 // CreateSubnetJSONRequestBody defines body for CreateSubnet for application/json ContentType.
-type CreateSubnetJSONRequestBody = CreateReq5
+type CreateSubnetJSONRequestBody = CreateReq4
 
 // CreateVPCJSONRequestBody defines body for CreateVPC for application/json ContentType.
 type CreateVPCJSONRequestBody = VpcReqCreate
@@ -813,14 +829,6 @@ type ClientInterface interface {
 
 	AssociateNIC(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AssociateNICJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// AddSecondaryPrivateIPWithBody request with any body
-	AddSecondaryPrivateIPWithBody(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	AddSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteSecondaryPrivateIP request
-	DeleteSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// CreatePublicIp request
 	CreatePublicIp(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -836,17 +844,32 @@ type ClientInterface interface {
 	CreateRouteTable(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteRouteTable request
-	DeleteRouteTable(ctx context.Context, routeTableId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteRouteTable(ctx context.Context, routeTableId RouteTableIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AddRouteWithBody request with any body
-	AddRouteWithBody(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AddRouteWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	AddRoute(ctx context.Context, routeTableId string, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AddRoute(ctx context.Context, routeTableId RouteTableIdPart, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DissociateRouteTableWithBody request with any body
-	DissociateRouteTableWithBody(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// AssociateRouteTableWithBody request with any body
+	AssociateRouteTableWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	DissociateRouteTable(ctx context.Context, routeTableId string, body DissociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AssociateRouteTable(ctx context.Context, routeTableId RouteTableIdPart, body AssociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteRouteFromRouteTableWithBody request with any body
+	DeleteRouteFromRouteTableWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteRouteFromRouteTable(ctx context.Context, routeTableId RouteTableIdPart, body DeleteRouteFromRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DisassociateRouteTableWithBody request with any body
+	DisassociateRouteTableWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DisassociateRouteTable(ctx context.Context, routeTableId RouteTableIdPart, body DisassociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateRouteWithBody request with any body
+	UpdateRouteWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateRoute(ctx context.Context, routeTableId RouteTableIdPart, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSecurityGroups request
 	GetSecurityGroups(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -877,9 +900,6 @@ type ClientInterface interface {
 	// DeleteSnapshot request
 	DeleteSnapshot(ctx context.Context, snapshotId SnapshotIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteSubnet request
-	DeleteSubnet(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// GetSubnets request
 	GetSubnets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -887,6 +907,9 @@ type ClientInterface interface {
 	CreateSubnetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateSubnet(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSubnet request
+	DeleteSubnet(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetVPC request
 	GetVPC(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1212,42 +1235,6 @@ func (c *Client) AssociateNIC(ctx context.Context, networkInterfaceCardId Networ
 	return c.Client.Do(req)
 }
 
-func (c *Client) AddSecondaryPrivateIPWithBody(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAddSecondaryPrivateIPRequestWithBody(c.Server, networkInterfaceCardId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) AddSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAddSecondaryPrivateIPRequest(c.Server, networkInterfaceCardId, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteSecondaryPrivateIP(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSecondaryPrivateIPRequest(c.Server, networkInterfaceCardId, secondaryPrivateIpId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) CreatePublicIp(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreatePublicIpRequest(c.Server)
 	if err != nil {
@@ -1308,7 +1295,7 @@ func (c *Client) CreateRouteTable(ctx context.Context, body CreateRouteTableJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteRouteTable(ctx context.Context, routeTableId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteRouteTable(ctx context.Context, routeTableId RouteTableIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteRouteTableRequest(c.Server, routeTableId)
 	if err != nil {
 		return nil, err
@@ -1320,7 +1307,7 @@ func (c *Client) DeleteRouteTable(ctx context.Context, routeTableId string, reqE
 	return c.Client.Do(req)
 }
 
-func (c *Client) AddRouteWithBody(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddRouteWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddRouteRequestWithBody(c.Server, routeTableId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -1332,7 +1319,7 @@ func (c *Client) AddRouteWithBody(ctx context.Context, routeTableId string, cont
 	return c.Client.Do(req)
 }
 
-func (c *Client) AddRoute(ctx context.Context, routeTableId string, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddRoute(ctx context.Context, routeTableId RouteTableIdPart, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddRouteRequest(c.Server, routeTableId, body)
 	if err != nil {
 		return nil, err
@@ -1344,8 +1331,8 @@ func (c *Client) AddRoute(ctx context.Context, routeTableId string, body AddRout
 	return c.Client.Do(req)
 }
 
-func (c *Client) DissociateRouteTableWithBody(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDissociateRouteTableRequestWithBody(c.Server, routeTableId, contentType, body)
+func (c *Client) AssociateRouteTableWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAssociateRouteTableRequestWithBody(c.Server, routeTableId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1356,8 +1343,80 @@ func (c *Client) DissociateRouteTableWithBody(ctx context.Context, routeTableId 
 	return c.Client.Do(req)
 }
 
-func (c *Client) DissociateRouteTable(ctx context.Context, routeTableId string, body DissociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDissociateRouteTableRequest(c.Server, routeTableId, body)
+func (c *Client) AssociateRouteTable(ctx context.Context, routeTableId RouteTableIdPart, body AssociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAssociateRouteTableRequest(c.Server, routeTableId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteRouteFromRouteTableWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRouteFromRouteTableRequestWithBody(c.Server, routeTableId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteRouteFromRouteTable(ctx context.Context, routeTableId RouteTableIdPart, body DeleteRouteFromRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRouteFromRouteTableRequest(c.Server, routeTableId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DisassociateRouteTableWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDisassociateRouteTableRequestWithBody(c.Server, routeTableId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DisassociateRouteTable(ctx context.Context, routeTableId RouteTableIdPart, body DisassociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDisassociateRouteTableRequest(c.Server, routeTableId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRouteWithBody(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRouteRequestWithBody(c.Server, routeTableId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRoute(ctx context.Context, routeTableId RouteTableIdPart, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRouteRequest(c.Server, routeTableId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1500,18 +1559,6 @@ func (c *Client) DeleteSnapshot(ctx context.Context, snapshotId SnapshotIdPart, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSubnet(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSubnetRequest(c.Server, subnetId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) GetSubnets(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetSubnetsRequest(c.Server)
 	if err != nil {
@@ -1538,6 +1585,18 @@ func (c *Client) CreateSubnetWithBody(ctx context.Context, contentType string, b
 
 func (c *Client) CreateSubnet(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateSubnetRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSubnet(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSubnetRequest(c.Server, subnetId)
 	if err != nil {
 		return nil, err
 	}
@@ -2242,94 +2301,6 @@ func NewAssociateNICRequestWithBody(server string, networkInterfaceCardId Networ
 	return req, nil
 }
 
-// NewAddSecondaryPrivateIPRequest calls the generic AddSecondaryPrivateIP builder with application/json body
-func NewAddSecondaryPrivateIPRequest(server string, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewAddSecondaryPrivateIPRequestWithBody(server, networkInterfaceCardId, "application/json", bodyReader)
-}
-
-// NewAddSecondaryPrivateIPRequestWithBody generates requests for AddSecondaryPrivateIP with any type of body
-func NewAddSecondaryPrivateIPRequestWithBody(server string, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "networkInterfaceCardId", runtime.ParamLocationPath, networkInterfaceCardId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/networkInterfaceCards/%s/secondaryPrivateIPs", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewDeleteSecondaryPrivateIPRequest generates requests for DeleteSecondaryPrivateIP
-func NewDeleteSecondaryPrivateIPRequest(server string, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "networkInterfaceCardId", runtime.ParamLocationPath, networkInterfaceCardId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "secondaryPrivateIpId", runtime.ParamLocationPath, secondaryPrivateIpId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/networkInterfaceCards/%s/secondaryPrivateIPs/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewCreatePublicIpRequest generates requests for CreatePublicIp
 func NewCreatePublicIpRequest(server string) (*http.Request, error) {
 	var err error
@@ -2459,7 +2430,7 @@ func NewCreateRouteTableRequestWithBody(server string, contentType string, body 
 }
 
 // NewDeleteRouteTableRequest generates requests for DeleteRouteTable
-func NewDeleteRouteTableRequest(server string, routeTableId string) (*http.Request, error) {
+func NewDeleteRouteTableRequest(server string, routeTableId RouteTableIdPart) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2493,7 +2464,7 @@ func NewDeleteRouteTableRequest(server string, routeTableId string) (*http.Reque
 }
 
 // NewAddRouteRequest calls the generic AddRoute builder with application/json body
-func NewAddRouteRequest(server string, routeTableId string, body AddRouteJSONRequestBody) (*http.Request, error) {
+func NewAddRouteRequest(server string, routeTableId RouteTableIdPart, body AddRouteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -2504,7 +2475,7 @@ func NewAddRouteRequest(server string, routeTableId string, body AddRouteJSONReq
 }
 
 // NewAddRouteRequestWithBody generates requests for AddRoute with any type of body
-func NewAddRouteRequestWithBody(server string, routeTableId string, contentType string, body io.Reader) (*http.Request, error) {
+func NewAddRouteRequestWithBody(server string, routeTableId RouteTableIdPart, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2539,19 +2510,19 @@ func NewAddRouteRequestWithBody(server string, routeTableId string, contentType 
 	return req, nil
 }
 
-// NewDissociateRouteTableRequest calls the generic DissociateRouteTable builder with application/json body
-func NewDissociateRouteTableRequest(server string, routeTableId string, body DissociateRouteTableJSONRequestBody) (*http.Request, error) {
+// NewAssociateRouteTableRequest calls the generic AssociateRouteTable builder with application/json body
+func NewAssociateRouteTableRequest(server string, routeTableId RouteTableIdPart, body AssociateRouteTableJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewDissociateRouteTableRequestWithBody(server, routeTableId, "application/json", bodyReader)
+	return NewAssociateRouteTableRequestWithBody(server, routeTableId, "application/json", bodyReader)
 }
 
-// NewDissociateRouteTableRequestWithBody generates requests for DissociateRouteTable with any type of body
-func NewDissociateRouteTableRequestWithBody(server string, routeTableId string, contentType string, body io.Reader) (*http.Request, error) {
+// NewAssociateRouteTableRequestWithBody generates requests for AssociateRouteTable with any type of body
+func NewAssociateRouteTableRequestWithBody(server string, routeTableId RouteTableIdPart, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -2566,7 +2537,148 @@ func NewDissociateRouteTableRequestWithBody(server string, routeTableId string, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables/%s/dissociate", pathParam0)
+	operationPath := fmt.Sprintf("/routeTables/%s/associate", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteRouteFromRouteTableRequest calls the generic DeleteRouteFromRouteTable builder with application/json body
+func NewDeleteRouteFromRouteTableRequest(server string, routeTableId RouteTableIdPart, body DeleteRouteFromRouteTableJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteRouteFromRouteTableRequestWithBody(server, routeTableId, "application/json", bodyReader)
+}
+
+// NewDeleteRouteFromRouteTableRequestWithBody generates requests for DeleteRouteFromRouteTable with any type of body
+func NewDeleteRouteFromRouteTableRequestWithBody(server string, routeTableId RouteTableIdPart, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "routeTableId", runtime.ParamLocationPath, routeTableId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/routeTables/%s/deleteRoute", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDisassociateRouteTableRequest calls the generic DisassociateRouteTable builder with application/json body
+func NewDisassociateRouteTableRequest(server string, routeTableId RouteTableIdPart, body DisassociateRouteTableJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDisassociateRouteTableRequestWithBody(server, routeTableId, "application/json", bodyReader)
+}
+
+// NewDisassociateRouteTableRequestWithBody generates requests for DisassociateRouteTable with any type of body
+func NewDisassociateRouteTableRequestWithBody(server string, routeTableId RouteTableIdPart, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "routeTableId", runtime.ParamLocationPath, routeTableId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/routeTables/%s/disassociate", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewUpdateRouteRequest calls the generic UpdateRoute builder with application/json body
+func NewUpdateRouteRequest(server string, routeTableId RouteTableIdPart, body UpdateRouteJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateRouteRequestWithBody(server, routeTableId, "application/json", bodyReader)
+}
+
+// NewUpdateRouteRequestWithBody generates requests for UpdateRoute with any type of body
+func NewUpdateRouteRequestWithBody(server string, routeTableId RouteTableIdPart, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "routeTableId", runtime.ParamLocationPath, routeTableId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/routeTables/%s/updateRoute", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2855,40 +2967,6 @@ func NewDeleteSnapshotRequest(server string, snapshotId SnapshotIdPart) (*http.R
 	return req, nil
 }
 
-// NewDeleteSubnetRequest generates requests for DeleteSubnet
-func NewDeleteSubnetRequest(server string, subnetId SubnetIdPart) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "subnetId", runtime.ParamLocationPath, subnetId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/subnet/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewGetSubnetsRequest generates requests for GetSubnets
 func NewGetSubnetsRequest(server string) (*http.Request, error) {
 	var err error
@@ -2952,6 +3030,40 @@ func NewCreateSubnetRequestWithBody(server string, contentType string, body io.R
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteSubnetRequest generates requests for DeleteSubnet
+func NewDeleteSubnetRequest(server string, subnetId SubnetIdPart) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "subnetId", runtime.ParamLocationPath, subnetId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/subnets/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -3170,14 +3282,6 @@ type ClientWithResponsesInterface interface {
 
 	AssociateNICWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AssociateNICJSONRequestBody, reqEditors ...RequestEditorFn) (*AssociateNICResponse, error)
 
-	// AddSecondaryPrivateIPWithBodyWithResponse request with any body
-	AddSecondaryPrivateIPWithBodyWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddSecondaryPrivateIPResponse, error)
-
-	AddSecondaryPrivateIPWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*AddSecondaryPrivateIPResponse, error)
-
-	// DeleteSecondaryPrivateIPWithResponse request
-	DeleteSecondaryPrivateIPWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart, reqEditors ...RequestEditorFn) (*DeleteSecondaryPrivateIPResponse, error)
-
 	// CreatePublicIpWithResponse request
 	CreatePublicIpWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error)
 
@@ -3193,17 +3297,32 @@ type ClientWithResponsesInterface interface {
 	CreateRouteTableWithResponse(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error)
 
 	// DeleteRouteTableWithResponse request
-	DeleteRouteTableWithResponse(ctx context.Context, routeTableId string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error)
+	DeleteRouteTableWithResponse(ctx context.Context, routeTableId RouteTableIdPart, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error)
 
 	// AddRouteWithBodyWithResponse request with any body
-	AddRouteWithBodyWithResponse(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRouteResponse, error)
+	AddRouteWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRouteResponse, error)
 
-	AddRouteWithResponse(ctx context.Context, routeTableId string, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRouteResponse, error)
+	AddRouteWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRouteResponse, error)
 
-	// DissociateRouteTableWithBodyWithResponse request with any body
-	DissociateRouteTableWithBodyWithResponse(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DissociateRouteTableResponse, error)
+	// AssociateRouteTableWithBodyWithResponse request with any body
+	AssociateRouteTableWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AssociateRouteTableResponse, error)
 
-	DissociateRouteTableWithResponse(ctx context.Context, routeTableId string, body DissociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DissociateRouteTableResponse, error)
+	AssociateRouteTableWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body AssociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*AssociateRouteTableResponse, error)
+
+	// DeleteRouteFromRouteTableWithBodyWithResponse request with any body
+	DeleteRouteFromRouteTableWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteFromRouteTableResponse, error)
+
+	DeleteRouteFromRouteTableWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body DeleteRouteFromRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteRouteFromRouteTableResponse, error)
+
+	// DisassociateRouteTableWithBodyWithResponse request with any body
+	DisassociateRouteTableWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DisassociateRouteTableResponse, error)
+
+	DisassociateRouteTableWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body DisassociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DisassociateRouteTableResponse, error)
+
+	// UpdateRouteWithBodyWithResponse request with any body
+	UpdateRouteWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error)
+
+	UpdateRouteWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error)
 
 	// GetSecurityGroupsWithResponse request
 	GetSecurityGroupsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSecurityGroupsResponse, error)
@@ -3234,9 +3353,6 @@ type ClientWithResponsesInterface interface {
 	// DeleteSnapshotWithResponse request
 	DeleteSnapshotWithResponse(ctx context.Context, snapshotId SnapshotIdPart, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error)
 
-	// DeleteSubnetWithResponse request
-	DeleteSubnetWithResponse(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error)
-
 	// GetSubnetsWithResponse request
 	GetSubnetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSubnetsResponse, error)
 
@@ -3244,6 +3360,9 @@ type ClientWithResponsesInterface interface {
 	CreateSubnetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error)
 
 	CreateSubnetWithResponse(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error)
+
+	// DeleteSubnetWithResponse request
+	DeleteSubnetWithResponse(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error)
 
 	// GetVPCWithResponse request
 	GetVPCWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVPCResponse, error)
@@ -3679,58 +3798,6 @@ func (r AssociateNICResponse) StatusCode() int {
 	return 0
 }
 
-type AddSecondaryPrivateIPResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	JSON201                   *AddSecondaryPrivateIpSuccessPart
-	ApplicationproblemJSON400 *N400Part
-	ApplicationproblemJSON401 *N401Part
-	ApplicationproblemJSON403 *N403Part
-	ApplicationproblemJSON500 *N500Part
-}
-
-// Status returns HTTPResponse.Status
-func (r AddSecondaryPrivateIPResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r AddSecondaryPrivateIPResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type DeleteSecondaryPrivateIPResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	ApplicationproblemJSON400 *N400Part
-	ApplicationproblemJSON401 *N401Part
-	ApplicationproblemJSON403 *N403Part
-	ApplicationproblemJSON404 *N403Part
-	ApplicationproblemJSON500 *N500Part
-}
-
-// Status returns HTTPResponse.Status
-func (r DeleteSecondaryPrivateIPResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r DeleteSecondaryPrivateIPResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type CreatePublicIpResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -3778,9 +3845,12 @@ func (r DeletePublicIpResponse) StatusCode() int {
 }
 
 type ListRouteTablesResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *ListSuccessPart4
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListSuccessPart4
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -3803,8 +3873,10 @@ type CreateRouteTableResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON201                   *CreateSuccessPart6
+	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON401 *N401Part
-	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -3826,7 +3898,11 @@ func (r CreateRouteTableResponse) StatusCode() int {
 type DeleteRouteTableResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -3849,8 +3925,11 @@ type AddRouteResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *AddRouteSuccessPart
+	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
 	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
@@ -3869,14 +3948,19 @@ func (r AddRouteResponse) StatusCode() int {
 	return 0
 }
 
-type DissociateRouteTableResponse struct {
+type AssociateRouteTableResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
+	JSON200                   *AssociateRouteTableSuccessPart
+	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON500 *N500Part
 }
 
 // Status returns HTTPResponse.Status
-func (r DissociateRouteTableResponse) Status() string {
+func (r AssociateRouteTableResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -3884,7 +3968,87 @@ func (r DissociateRouteTableResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r DissociateRouteTableResponse) StatusCode() int {
+func (r AssociateRouteTableResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteRouteFromRouteTableResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *DeleteRouteSuccessPart
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteRouteFromRouteTableResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteRouteFromRouteTableResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DisassociateRouteTableResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DisassociateRouteTableResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DisassociateRouteTableResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateRouteResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *AddRouteSuccessPart
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON404 *N403Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateRouteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateRouteResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4061,32 +4225,6 @@ func (r DeleteSnapshotResponse) StatusCode() int {
 	return 0
 }
 
-type DeleteSubnetResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	ApplicationproblemJSON400 *N400Part
-	ApplicationproblemJSON401 *N401Part
-	ApplicationproblemJSON403 *N403Part
-	ApplicationproblemJSON404 *N404Part
-	ApplicationproblemJSON500 *N500Part
-}
-
-// Status returns HTTPResponse.Status
-func (r DeleteSubnetResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r DeleteSubnetResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type GetSubnetsResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -4132,6 +4270,32 @@ func (r CreateSubnetResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r CreateSubnetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteSubnetResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON401 *N401Part
+	ApplicationproblemJSON403 *N403Part
+	ApplicationproblemJSON404 *N404Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSubnetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSubnetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4435,32 +4599,6 @@ func (c *ClientWithResponses) AssociateNICWithResponse(ctx context.Context, netw
 	return ParseAssociateNICResponse(rsp)
 }
 
-// AddSecondaryPrivateIPWithBodyWithResponse request with arbitrary body returning *AddSecondaryPrivateIPResponse
-func (c *ClientWithResponses) AddSecondaryPrivateIPWithBodyWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddSecondaryPrivateIPResponse, error) {
-	rsp, err := c.AddSecondaryPrivateIPWithBody(ctx, networkInterfaceCardId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseAddSecondaryPrivateIPResponse(rsp)
-}
-
-func (c *ClientWithResponses) AddSecondaryPrivateIPWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, body AddSecondaryPrivateIPJSONRequestBody, reqEditors ...RequestEditorFn) (*AddSecondaryPrivateIPResponse, error) {
-	rsp, err := c.AddSecondaryPrivateIP(ctx, networkInterfaceCardId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseAddSecondaryPrivateIPResponse(rsp)
-}
-
-// DeleteSecondaryPrivateIPWithResponse request returning *DeleteSecondaryPrivateIPResponse
-func (c *ClientWithResponses) DeleteSecondaryPrivateIPWithResponse(ctx context.Context, networkInterfaceCardId NetworkInterfaceCardIdPart, secondaryPrivateIpId PrivateIpIdPart, reqEditors ...RequestEditorFn) (*DeleteSecondaryPrivateIPResponse, error) {
-	rsp, err := c.DeleteSecondaryPrivateIP(ctx, networkInterfaceCardId, secondaryPrivateIpId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteSecondaryPrivateIPResponse(rsp)
-}
-
 // CreatePublicIpWithResponse request returning *CreatePublicIpResponse
 func (c *ClientWithResponses) CreatePublicIpWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error) {
 	rsp, err := c.CreatePublicIp(ctx, reqEditors...)
@@ -4506,7 +4644,7 @@ func (c *ClientWithResponses) CreateRouteTableWithResponse(ctx context.Context, 
 }
 
 // DeleteRouteTableWithResponse request returning *DeleteRouteTableResponse
-func (c *ClientWithResponses) DeleteRouteTableWithResponse(ctx context.Context, routeTableId string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error) {
+func (c *ClientWithResponses) DeleteRouteTableWithResponse(ctx context.Context, routeTableId RouteTableIdPart, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error) {
 	rsp, err := c.DeleteRouteTable(ctx, routeTableId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -4515,7 +4653,7 @@ func (c *ClientWithResponses) DeleteRouteTableWithResponse(ctx context.Context, 
 }
 
 // AddRouteWithBodyWithResponse request with arbitrary body returning *AddRouteResponse
-func (c *ClientWithResponses) AddRouteWithBodyWithResponse(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRouteResponse, error) {
+func (c *ClientWithResponses) AddRouteWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRouteResponse, error) {
 	rsp, err := c.AddRouteWithBody(ctx, routeTableId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -4523,7 +4661,7 @@ func (c *ClientWithResponses) AddRouteWithBodyWithResponse(ctx context.Context, 
 	return ParseAddRouteResponse(rsp)
 }
 
-func (c *ClientWithResponses) AddRouteWithResponse(ctx context.Context, routeTableId string, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRouteResponse, error) {
+func (c *ClientWithResponses) AddRouteWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body AddRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRouteResponse, error) {
 	rsp, err := c.AddRoute(ctx, routeTableId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -4531,21 +4669,72 @@ func (c *ClientWithResponses) AddRouteWithResponse(ctx context.Context, routeTab
 	return ParseAddRouteResponse(rsp)
 }
 
-// DissociateRouteTableWithBodyWithResponse request with arbitrary body returning *DissociateRouteTableResponse
-func (c *ClientWithResponses) DissociateRouteTableWithBodyWithResponse(ctx context.Context, routeTableId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DissociateRouteTableResponse, error) {
-	rsp, err := c.DissociateRouteTableWithBody(ctx, routeTableId, contentType, body, reqEditors...)
+// AssociateRouteTableWithBodyWithResponse request with arbitrary body returning *AssociateRouteTableResponse
+func (c *ClientWithResponses) AssociateRouteTableWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AssociateRouteTableResponse, error) {
+	rsp, err := c.AssociateRouteTableWithBody(ctx, routeTableId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseDissociateRouteTableResponse(rsp)
+	return ParseAssociateRouteTableResponse(rsp)
 }
 
-func (c *ClientWithResponses) DissociateRouteTableWithResponse(ctx context.Context, routeTableId string, body DissociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DissociateRouteTableResponse, error) {
-	rsp, err := c.DissociateRouteTable(ctx, routeTableId, body, reqEditors...)
+func (c *ClientWithResponses) AssociateRouteTableWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body AssociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*AssociateRouteTableResponse, error) {
+	rsp, err := c.AssociateRouteTable(ctx, routeTableId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseDissociateRouteTableResponse(rsp)
+	return ParseAssociateRouteTableResponse(rsp)
+}
+
+// DeleteRouteFromRouteTableWithBodyWithResponse request with arbitrary body returning *DeleteRouteFromRouteTableResponse
+func (c *ClientWithResponses) DeleteRouteFromRouteTableWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteFromRouteTableResponse, error) {
+	rsp, err := c.DeleteRouteFromRouteTableWithBody(ctx, routeTableId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteRouteFromRouteTableResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteRouteFromRouteTableWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body DeleteRouteFromRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteRouteFromRouteTableResponse, error) {
+	rsp, err := c.DeleteRouteFromRouteTable(ctx, routeTableId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteRouteFromRouteTableResponse(rsp)
+}
+
+// DisassociateRouteTableWithBodyWithResponse request with arbitrary body returning *DisassociateRouteTableResponse
+func (c *ClientWithResponses) DisassociateRouteTableWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DisassociateRouteTableResponse, error) {
+	rsp, err := c.DisassociateRouteTableWithBody(ctx, routeTableId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDisassociateRouteTableResponse(rsp)
+}
+
+func (c *ClientWithResponses) DisassociateRouteTableWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body DisassociateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DisassociateRouteTableResponse, error) {
+	rsp, err := c.DisassociateRouteTable(ctx, routeTableId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDisassociateRouteTableResponse(rsp)
+}
+
+// UpdateRouteWithBodyWithResponse request with arbitrary body returning *UpdateRouteResponse
+func (c *ClientWithResponses) UpdateRouteWithBodyWithResponse(ctx context.Context, routeTableId RouteTableIdPart, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error) {
+	rsp, err := c.UpdateRouteWithBody(ctx, routeTableId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRouteResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateRouteWithResponse(ctx context.Context, routeTableId RouteTableIdPart, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error) {
+	rsp, err := c.UpdateRoute(ctx, routeTableId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRouteResponse(rsp)
 }
 
 // GetSecurityGroupsWithResponse request returning *GetSecurityGroupsResponse
@@ -4643,15 +4832,6 @@ func (c *ClientWithResponses) DeleteSnapshotWithResponse(ctx context.Context, sn
 	return ParseDeleteSnapshotResponse(rsp)
 }
 
-// DeleteSubnetWithResponse request returning *DeleteSubnetResponse
-func (c *ClientWithResponses) DeleteSubnetWithResponse(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error) {
-	rsp, err := c.DeleteSubnet(ctx, subnetId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteSubnetResponse(rsp)
-}
-
 // GetSubnetsWithResponse request returning *GetSubnetsResponse
 func (c *ClientWithResponses) GetSubnetsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSubnetsResponse, error) {
 	rsp, err := c.GetSubnets(ctx, reqEditors...)
@@ -4676,6 +4856,15 @@ func (c *ClientWithResponses) CreateSubnetWithResponse(ctx context.Context, body
 		return nil, err
 	}
 	return ParseCreateSubnetResponse(rsp)
+}
+
+// DeleteSubnetWithResponse request returning *DeleteSubnetResponse
+func (c *ClientWithResponses) DeleteSubnetWithResponse(ctx context.Context, subnetId SubnetIdPart, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error) {
+	rsp, err := c.DeleteSubnet(ctx, subnetId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSubnetResponse(rsp)
 }
 
 // GetVPCWithResponse request returning *GetVPCResponse
@@ -5357,114 +5546,6 @@ func ParseAssociateNICResponse(rsp *http.Response) (*AssociateNICResponse, error
 	return response, nil
 }
 
-// ParseAddSecondaryPrivateIPResponse parses an HTTP response from a AddSecondaryPrivateIPWithResponse call
-func ParseAddSecondaryPrivateIPResponse(rsp *http.Response) (*AddSecondaryPrivateIPResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &AddSecondaryPrivateIPResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest AddSecondaryPrivateIpSuccessPart
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON201 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest N400Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest N401Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest N403Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseDeleteSecondaryPrivateIPResponse parses an HTTP response from a DeleteSecondaryPrivateIPWithResponse call
-func ParseDeleteSecondaryPrivateIPResponse(rsp *http.Response) (*DeleteSecondaryPrivateIPResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &DeleteSecondaryPrivateIPResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest N400Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest N401Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest N403Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest N403Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseCreatePublicIpResponse parses an HTTP response from a CreatePublicIpWithResponse call
 func ParseCreatePublicIpResponse(rsp *http.Response) (*CreatePublicIpResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -5549,6 +5630,27 @@ func ParseListRouteTablesResponse(rsp *http.Response) (*ListRouteTablesResponse,
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
 	}
 
 	return response, nil
@@ -5575,6 +5677,13 @@ func ParseCreateRouteTableResponse(rsp *http.Response) (*CreateRouteTableRespons
 		}
 		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
 		var dest N401Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -5582,12 +5691,19 @@ func ParseCreateRouteTableResponse(rsp *http.Response) (*CreateRouteTableRespons
 		}
 		response.ApplicationproblemJSON401 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest N404Part
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.ApplicationproblemJSON404 = &dest
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -5608,12 +5724,40 @@ func ParseDeleteRouteTableResponse(rsp *http.Response) (*DeleteRouteTableRespons
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
 		var dest N401Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -5641,12 +5785,26 @@ func ParseAddRouteResponse(rsp *http.Response) (*AddRouteResponse, error) {
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
 		var dest N401Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest N404Part
@@ -5655,31 +5813,249 @@ func ParseAddRouteResponse(rsp *http.Response) (*AddRouteResponse, error) {
 		}
 		response.ApplicationproblemJSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
 	}
 
 	return response, nil
 }
 
-// ParseDissociateRouteTableResponse parses an HTTP response from a DissociateRouteTableWithResponse call
-func ParseDissociateRouteTableResponse(rsp *http.Response) (*DissociateRouteTableResponse, error) {
+// ParseAssociateRouteTableResponse parses an HTTP response from a AssociateRouteTableWithResponse call
+func ParseAssociateRouteTableResponse(rsp *http.Response) (*AssociateRouteTableResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DissociateRouteTableResponse{
+	response := &AssociateRouteTableResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AssociateRouteTableSuccessPart
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
 		var dest N401Part
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteRouteFromRouteTableResponse parses an HTTP response from a DeleteRouteFromRouteTableWithResponse call
+func ParseDeleteRouteFromRouteTableResponse(rsp *http.Response) (*DeleteRouteFromRouteTableResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteRouteFromRouteTableResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest DeleteRouteSuccessPart
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDisassociateRouteTableResponse parses an HTTP response from a DisassociateRouteTableWithResponse call
+func ParseDisassociateRouteTableResponse(rsp *http.Response) (*DisassociateRouteTableResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DisassociateRouteTableResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateRouteResponse parses an HTTP response from a UpdateRouteWithResponse call
+func ParseUpdateRouteResponse(rsp *http.Response) (*UpdateRouteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateRouteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AddRouteSuccessPart
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -5977,60 +6353,6 @@ func ParseDeleteSnapshotResponse(rsp *http.Response) (*DeleteSnapshotResponse, e
 	return response, nil
 }
 
-// ParseDeleteSubnetResponse parses an HTTP response from a DeleteSubnetWithResponse call
-func ParseDeleteSubnetResponse(rsp *http.Response) (*DeleteSubnetResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &DeleteSubnetResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest N400Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest N401Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest N403Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest N404Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest N500Part
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseGetSubnetsResponse parses an HTTP response from a GetSubnetsWithResponse call
 func ParseGetSubnetsResponse(rsp *http.Response) (*GetSubnetsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -6119,6 +6441,60 @@ func ParseCreateSubnetResponse(rsp *http.Response) (*CreateSubnetResponse, error
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSubnetResponse parses an HTTP response from a DeleteSubnetWithResponse call
+func ParseDeleteSubnetResponse(rsp *http.Response) (*DeleteSubnetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSubnetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest N401Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest N403Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest N404Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest N500Part

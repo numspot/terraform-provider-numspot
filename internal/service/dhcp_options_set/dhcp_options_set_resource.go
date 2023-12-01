@@ -16,9 +16,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-var _ resource.Resource = &DhcpOptionsSetResource{}
-var _ resource.ResourceWithConfigure = &DhcpOptionsSetResource{}
-var _ resource.ResourceWithImportState = &DhcpOptionsSetResource{}
+var (
+	_ resource.Resource                = &DhcpOptionsSetResource{}
+	_ resource.ResourceWithConfigure   = &DhcpOptionsSetResource{}
+	_ resource.ResourceWithImportState = &DhcpOptionsSetResource{}
+)
 
 func NewDhcpOptionsSetResource() resource.Resource {
 	return &DhcpOptionsSetResource{}

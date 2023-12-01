@@ -3,9 +3,10 @@ package subnet
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns"
 	api_client "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"

@@ -15,9 +15,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-var _ resource.Resource = &VirtualPrivateCloudResource{}
-var _ resource.ResourceWithConfigure = &VirtualPrivateCloudResource{}
-var _ resource.ResourceWithImportState = &VirtualPrivateCloudResource{}
+var (
+	_ resource.Resource                = &VirtualPrivateCloudResource{}
+	_ resource.ResourceWithConfigure   = &VirtualPrivateCloudResource{}
+	_ resource.ResourceWithImportState = &VirtualPrivateCloudResource{}
+)
 
 func NewVirtualPrivateCloudResource() resource.Resource {
 	return &VirtualPrivateCloudResource{}
