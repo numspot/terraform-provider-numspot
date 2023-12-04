@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
@@ -19,6 +20,20 @@ import (
 
 const (
 	BearerAuthScopes = "bearerAuth.Scopes"
+)
+
+// Defines values for BlockDeviceMappingsBsuVolumeType.
+const (
+	Gp2      BlockDeviceMappingsBsuVolumeType = "gp2"
+	Io1      BlockDeviceMappingsBsuVolumeType = "io1"
+	Standard BlockDeviceMappingsBsuVolumeType = "standard"
+)
+
+// Defines values for ImageState.
+const (
+	Available ImageState = "available"
+	Failed    ImageState = "failed"
+	Pending   ImageState = "pending"
 )
 
 // Error For HTTP errors, we implement the https://www.rfc-editor.org/rfc/rfc7807#section-3.1[RFC 7807]
@@ -75,12 +90,57 @@ type Attachment struct {
 	VirtualPrivateCloudId string `json:"virtualPrivateCloudId"`
 }
 
+// BlockDeviceMappings defines model for block-device-mappings.
+type BlockDeviceMappings = []struct {
+	Bsu *struct {
+		DeleteOnVmDeletion *bool                             `json:"deleteOnVmDeletion,omitempty"`
+		Iops               *int                              `json:"iops,omitempty"`
+		SnapshotId         *string                           `json:"snapshotId,omitempty"`
+		VolumeSize         *int                              `json:"volumeSize,omitempty"`
+		VolumeType         *BlockDeviceMappingsBsuVolumeType `json:"volumeType,omitempty"`
+	} `json:"bsu,omitempty"`
+	DeviceName string `json:"deviceName"`
+}
+
+// BlockDeviceMappingsBsuVolumeType defines model for BlockDeviceMappings.Bsu.VolumeType.
+type BlockDeviceMappingsBsuVolumeType string
+
 // CreateDhcpOptionsSetReq defines model for create-dhcp-options-set-req.
 type CreateDhcpOptionsSetReq struct {
 	DomainName        *string   `json:"domainName,omitempty"`
 	DomainNameServers *[]string `json:"domainNameServers,omitempty"`
 	LogServers        *[]string `json:"logServers,omitempty"`
 	NtpServers        *[]string `json:"ntpServers,omitempty"`
+}
+
+// CreateImageReq defines model for create-image-req.
+type CreateImageReq struct {
+	CreationParameters *CreateImageReq_CreationParameters `json:"creationParameters,omitempty"`
+	Description        *string                            `json:"description,omitempty"`
+	ImageName          string                             `json:"imageName"`
+}
+
+// CreateImageReqCreationParameters0 create a machine image from a VM
+type CreateImageReqCreationParameters0 struct {
+	NoReboot *bool  `json:"noReboot,omitempty"`
+	VmId     string `json:"vmId"`
+}
+
+// CreateImageReqCreationParameters1 create machine image from an existing image
+type CreateImageReqCreationParameters1 struct {
+	SourceImageId    string `json:"sourceImageId"`
+	SourceRegionName string `json:"sourceRegionName"`
+}
+
+// CreateImageReqCreationParameters2 create machine image from a snapshot
+type CreateImageReqCreationParameters2 struct {
+	BlockDeviceMappings BlockDeviceMappings `json:"blockDeviceMappings"`
+	RouteDeviceName     string              `json:"routeDeviceName"`
+}
+
+// CreateImageReq_CreationParameters defines model for CreateImageReq.CreationParameters.
+type CreateImageReq_CreationParameters struct {
+	union json.RawMessage
 }
 
 // CreateReq defines model for create-req.
@@ -200,17 +260,41 @@ type DisassociateReq struct {
 	AssociationId string `json:"associationId"`
 }
 
-// InternetGatewayId defines model for internet-gateway-id.
-type InternetGatewayId = string
+// Image defines model for image.
+type Image struct {
+	Architecture        *string              `json:"architecture,omitempty"`
+	BlockDeviceMappings *BlockDeviceMappings `json:"blockDeviceMappings,omitempty"`
+	CreationDate        *time.Time           `json:"creationDate,omitempty"`
+	Description         *string              `json:"description,omitempty"`
+	FileLocation        *string              `json:"fileLocation,omitempty"`
+	ImageId             *string              `json:"imageId,omitempty"`
+	ImageName           *string              `json:"imageName,omitempty"`
+	ImageType           *string              `json:"imageType,omitempty"`
+	RootDeviceName      *string              `json:"rootDeviceName,omitempty"`
+	State               *ImageState          `json:"state,omitempty"`
+	Tags                *[]struct {
+		Key   *string `json:"key,omitempty"`
+		Value *string `json:"value,omitempty"`
+	} `json:"tags,omitempty"`
+}
 
-// InternetGateway defines model for internetGateway.
+// ImageState defines model for Image.State.
+type ImageState string
+
+// InternetGateway defines model for internet-gateway.
 type InternetGateway struct {
 	// Id Internet Gateway ID
-	Id *string `json:"id,omitempty"`
+	Id string `json:"id"`
+
+	// Tags One or more tags associated with the resource.
+	Tags Tag `json:"tags"`
 
 	// VirtualPrivateCloudId Virtual Private Cloud ID
 	VirtualPrivateCloudId *string `json:"virtualPrivateCloudId,omitempty"`
 }
+
+// InternetGatewayId defines model for internet-gateway-id.
+type InternetGatewayId = string
 
 // LinkRouteTable defines model for link-route-table.
 type LinkRouteTable struct {
@@ -222,7 +306,7 @@ type LinkRouteTable struct {
 
 // ListRes defines model for list-res.
 type ListRes struct {
-	Items *[]InternetGateway `json:"items,omitempty"`
+	Items []InternetGateway `json:"items"`
 }
 
 // ListRes2 defines model for list-res-2.
@@ -502,7 +586,7 @@ type N409Part = Error
 type N500Part = Error
 
 // AddRouteSuccessPart defines model for add-route-success.part.
-type AddRouteSuccessPart = Route
+type AddRouteSuccessPart = RouteTable
 
 // AddRuleSuccessPart defines model for add-rule-success.part.
 type AddRuleSuccessPart = SecurityGroup
@@ -523,22 +607,25 @@ type CreateSuccessPart = InternetGateway
 type CreateSuccessPart2 = ResCreate
 
 // CreateSuccessPart3 defines model for create-success.part-3.
-type CreateSuccessPart3 = SecurityGroup
+type CreateSuccessPart3 = Image
 
 // CreateSuccessPart4 defines model for create-success.part-4.
-type CreateSuccessPart4 = DhcpOptionsSet
+type CreateSuccessPart4 = SecurityGroup
 
 // CreateSuccessPart5 defines model for create-success.part-5.
-type CreateSuccessPart5 = PublicIp
+type CreateSuccessPart5 = DhcpOptionsSet
 
 // CreateSuccessPart6 defines model for create-success.part-6.
-type CreateSuccessPart6 = RouteTable
+type CreateSuccessPart6 = PublicIp
 
 // CreateSuccessPart7 defines model for create-success.part-7.
-type CreateSuccessPart7 = Snapshot
+type CreateSuccessPart7 = RouteTable
 
 // CreateSuccessPart8 defines model for create-success.part-8.
-type CreateSuccessPart8 = CreateSuccessRes
+type CreateSuccessPart8 = Snapshot
+
+// CreateSuccessPart9 defines model for create-success.part-9.
+type CreateSuccessPart9 = CreateSuccessRes
 
 // DeleteRouteSuccessPart defines model for delete-route-success.part.
 type DeleteRouteSuccessPart = RouteTable
@@ -578,6 +665,9 @@ type AssociatePart = AssociateReq
 
 // AssociatePart2 defines model for associate.part-2.
 type AssociatePart2 = AssociateReq2
+
+// CreateImagePart defines model for create-image.part.
+type CreateImagePart = CreateImageReq
 
 // CreateKeyPairPart defines model for create-key-pair.part.
 type CreateKeyPairPart = ReqCreate
@@ -644,6 +734,9 @@ type CreateKeyPairJSONRequestBody = ReqCreate
 // ImportKeyPairJSONRequestBody defines body for ImportKeyPair for application/json ContentType.
 type ImportKeyPairJSONRequestBody = ReqImport
 
+// CreateImageJSONRequestBody defines body for CreateImage for application/json ContentType.
+type CreateImageJSONRequestBody = CreateImageReq
+
 // CreateNetworkInterfaceCardJSONRequestBody defines body for CreateNetworkInterfaceCard for application/json ContentType.
 type CreateNetworkInterfaceCardJSONRequestBody = CreateRes
 
@@ -685,6 +778,94 @@ type CreateSubnetJSONRequestBody = CreateReq4
 
 // CreateVPCJSONRequestBody defines body for CreateVPC for application/json ContentType.
 type CreateVPCJSONRequestBody = VpcReqCreate
+
+// AsCreateImageReqCreationParameters0 returns the union data inside the CreateImageReq_CreationParameters as a CreateImageReqCreationParameters0
+func (t CreateImageReq_CreationParameters) AsCreateImageReqCreationParameters0() (CreateImageReqCreationParameters0, error) {
+	var body CreateImageReqCreationParameters0
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCreateImageReqCreationParameters0 overwrites any union data inside the CreateImageReq_CreationParameters as the provided CreateImageReqCreationParameters0
+func (t *CreateImageReq_CreationParameters) FromCreateImageReqCreationParameters0(v CreateImageReqCreationParameters0) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCreateImageReqCreationParameters0 performs a merge with any union data inside the CreateImageReq_CreationParameters, using the provided CreateImageReqCreationParameters0
+func (t *CreateImageReq_CreationParameters) MergeCreateImageReqCreationParameters0(v CreateImageReqCreationParameters0) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCreateImageReqCreationParameters1 returns the union data inside the CreateImageReq_CreationParameters as a CreateImageReqCreationParameters1
+func (t CreateImageReq_CreationParameters) AsCreateImageReqCreationParameters1() (CreateImageReqCreationParameters1, error) {
+	var body CreateImageReqCreationParameters1
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCreateImageReqCreationParameters1 overwrites any union data inside the CreateImageReq_CreationParameters as the provided CreateImageReqCreationParameters1
+func (t *CreateImageReq_CreationParameters) FromCreateImageReqCreationParameters1(v CreateImageReqCreationParameters1) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCreateImageReqCreationParameters1 performs a merge with any union data inside the CreateImageReq_CreationParameters, using the provided CreateImageReqCreationParameters1
+func (t *CreateImageReq_CreationParameters) MergeCreateImageReqCreationParameters1(v CreateImageReqCreationParameters1) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCreateImageReqCreationParameters2 returns the union data inside the CreateImageReq_CreationParameters as a CreateImageReqCreationParameters2
+func (t CreateImageReq_CreationParameters) AsCreateImageReqCreationParameters2() (CreateImageReqCreationParameters2, error) {
+	var body CreateImageReqCreationParameters2
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCreateImageReqCreationParameters2 overwrites any union data inside the CreateImageReq_CreationParameters as the provided CreateImageReqCreationParameters2
+func (t *CreateImageReq_CreationParameters) FromCreateImageReqCreationParameters2(v CreateImageReqCreationParameters2) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCreateImageReqCreationParameters2 performs a merge with any union data inside the CreateImageReq_CreationParameters, using the provided CreateImageReqCreationParameters2
+func (t *CreateImageReq_CreationParameters) MergeCreateImageReqCreationParameters2(v CreateImageReqCreationParameters2) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JsonMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t CreateImageReq_CreationParameters) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *CreateImageReq_CreationParameters) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -812,6 +993,11 @@ type ClientInterface interface {
 
 	// DeleteKeyPair request
 	DeleteKeyPair(ctx context.Context, keyPairName KeyPairNamePart, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateImageWithBody request with any body
+	CreateImageWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateImage(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListNetworkInterfaceCard request
 	ListNetworkInterfaceCard(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1153,6 +1339,30 @@ func (c *Client) ImportKeyPair(ctx context.Context, body ImportKeyPairJSONReques
 
 func (c *Client) DeleteKeyPair(ctx context.Context, keyPairName KeyPairNamePart, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteKeyPairRequest(c.Server, keyPairName)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateImageWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateImageRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateImage(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateImageRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2149,6 +2359,46 @@ func NewDeleteKeyPairRequest(server string, keyPairName KeyPairNamePart) (*http.
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewCreateImageRequest calls the generic CreateImage builder with application/json body
+func NewCreateImageRequest(server string, body CreateImageJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateImageRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateImageRequestWithBody generates requests for CreateImage with any type of body
+func NewCreateImageRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/machineImages")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -3266,6 +3516,11 @@ type ClientWithResponsesInterface interface {
 	// DeleteKeyPairWithResponse request
 	DeleteKeyPairWithResponse(ctx context.Context, keyPairName KeyPairNamePart, reqEditors ...RequestEditorFn) (*DeleteKeyPairResponse, error)
 
+	// CreateImageWithBodyWithResponse request with any body
+	CreateImageWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateImageResponse, error)
+
+	CreateImageWithResponse(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateImageResponse, error)
+
 	// ListNetworkInterfaceCardWithResponse request
 	ListNetworkInterfaceCardWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListNetworkInterfaceCardResponse, error)
 
@@ -3447,7 +3702,7 @@ func (r GetDhcpOptionsSetResponse) StatusCode() int {
 type CreateDhcpOptionsSetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *CreateSuccessPart4
+	JSON201      *CreateSuccessPart5
 }
 
 // Status returns HTTPResponse.Status
@@ -3695,6 +3950,31 @@ func (r DeleteKeyPairResponse) StatusCode() int {
 	return 0
 }
 
+type CreateImageResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateSuccessPart3
+	ApplicationproblemJSON400 *N400Part
+	ApplicationproblemJSON409 *N409Part
+	ApplicationproblemJSON500 *N500Part
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateImageResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateImageResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListNetworkInterfaceCardResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -3723,7 +4003,7 @@ func (r ListNetworkInterfaceCardResponse) StatusCode() int {
 type CreateNetworkInterfaceCardResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *CreateSuccessPart8
+	JSON201                   *CreateSuccessPart9
 	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON401 *N401Part
 	ApplicationproblemJSON403 *N403Part
@@ -3801,7 +4081,7 @@ func (r AssociateNICResponse) StatusCode() int {
 type CreatePublicIpResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *CreateSuccessPart5
+	JSON201                   *CreateSuccessPart6
 	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON409 *N409Part
 	ApplicationproblemJSON500 *N500Part
@@ -3872,7 +4152,7 @@ func (r ListRouteTablesResponse) StatusCode() int {
 type CreateRouteTableResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *CreateSuccessPart6
+	JSON201                   *CreateSuccessPart7
 	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON401 *N401Part
 	ApplicationproblemJSON403 *N403Part
@@ -4080,7 +4360,7 @@ func (r GetSecurityGroupsResponse) StatusCode() int {
 type CreateSecurityGroupResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *CreateSuccessPart3
+	JSON201                   *CreateSuccessPart4
 	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON409 *N409Part
 	ApplicationproblemJSON500 *N500Part
@@ -4126,7 +4406,7 @@ func (r DeleteSecurityGroupResponse) StatusCode() int {
 type AddRuleSecurityGroupResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *AddRuleSuccessPart
+	JSON200                   *AddRuleSuccessPart
 	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON409 *N409Part
 	ApplicationproblemJSON500 *N500Part
@@ -4151,7 +4431,7 @@ func (r AddRuleSecurityGroupResponse) StatusCode() int {
 type RemoveRuleSecurityGroupResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *RemoveRuleSuccessPart
+	JSON200                   *RemoveRuleSuccessPart
 	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON409 *N409Part
 	ApplicationproblemJSON500 *N500Part
@@ -4176,7 +4456,7 @@ func (r RemoveRuleSecurityGroupResponse) StatusCode() int {
 type CreateSnapshotResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *CreateSuccessPart7
+	JSON201                   *CreateSuccessPart8
 	ApplicationproblemJSON400 *N400Part
 	ApplicationproblemJSON401 *N401Part
 	ApplicationproblemJSON403 *N403Part
@@ -4545,6 +4825,23 @@ func (c *ClientWithResponses) DeleteKeyPairWithResponse(ctx context.Context, key
 		return nil, err
 	}
 	return ParseDeleteKeyPairResponse(rsp)
+}
+
+// CreateImageWithBodyWithResponse request with arbitrary body returning *CreateImageResponse
+func (c *ClientWithResponses) CreateImageWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateImageResponse, error) {
+	rsp, err := c.CreateImageWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateImageResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateImageWithResponse(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateImageResponse, error) {
+	rsp, err := c.CreateImage(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateImageResponse(rsp)
 }
 
 // ListNetworkInterfaceCardWithResponse request returning *ListNetworkInterfaceCardResponse
@@ -5006,7 +5303,7 @@ func ParseCreateDhcpOptionsSetResponse(rsp *http.Response) (*CreateDhcpOptionsSe
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateSuccessPart4
+		var dest CreateSuccessPart5
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -5337,6 +5634,53 @@ func ParseDeleteKeyPairResponse(rsp *http.Response) (*DeleteKeyPairResponse, err
 	return response, nil
 }
 
+// ParseCreateImageResponse parses an HTTP response from a CreateImageWithResponse call
+func ParseCreateImageResponse(rsp *http.Response) (*CreateImageResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateImageResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateSuccessPart3
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest N400Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest N409Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest N500Part
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListNetworkInterfaceCardResponse parses an HTTP response from a ListNetworkInterfaceCardWithResponse call
 func ParseListNetworkInterfaceCardResponse(rsp *http.Response) (*ListNetworkInterfaceCardResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -5399,7 +5743,7 @@ func ParseCreateNetworkInterfaceCardResponse(rsp *http.Response) (*CreateNetwork
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateSuccessPart8
+		var dest CreateSuccessPart9
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -5561,7 +5905,7 @@ func ParseCreatePublicIpResponse(rsp *http.Response) (*CreatePublicIpResponse, e
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateSuccessPart5
+		var dest CreateSuccessPart6
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -5671,7 +6015,7 @@ func ParseCreateRouteTableResponse(rsp *http.Response) (*CreateRouteTableRespons
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateSuccessPart6
+		var dest CreateSuccessPart7
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -6103,7 +6447,7 @@ func ParseCreateSecurityGroupResponse(rsp *http.Response) (*CreateSecurityGroupR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateSuccessPart3
+		var dest CreateSuccessPart4
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -6165,12 +6509,12 @@ func ParseAddRuleSecurityGroupResponse(rsp *http.Response) (*AddRuleSecurityGrou
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest AddRuleSuccessPart
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest N400Part
@@ -6212,12 +6556,12 @@ func ParseRemoveRuleSecurityGroupResponse(rsp *http.Response) (*RemoveRuleSecuri
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest RemoveRuleSuccessPart
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest N400Part
@@ -6260,7 +6604,7 @@ func ParseCreateSnapshotResponse(rsp *http.Response) (*CreateSnapshotResponse, e
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateSuccessPart7
+		var dest CreateSuccessPart8
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

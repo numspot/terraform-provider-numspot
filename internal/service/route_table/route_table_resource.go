@@ -186,7 +186,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 	}
 
 	routeTable := slice.FindFirst(
-		*routeTables.JSON200.Items,
+		routeTables.JSON200.Items,
 		func(table api_client.RouteTable) bool { return table.Id == routeTableState.ID.ValueString() },
 	)
 
@@ -242,12 +242,12 @@ func (r *RouteTableResource) ImportState(ctx context.Context, request resource.I
 }
 
 func mapToRouteTableResourceModel(ctx context.Context, routeTable *api_client.RouteTable) (*RouteTableResourceModel, diag.Diagnostics) {
-	routePropagatingVirtualGateways, diags := mapToModelRoutePropagatingVirtualGateways(ctx, *routeTable.RoutePropagatingVirtualGateways)
+	routePropagatingVirtualGateways, diags := mapToModelRoutePropagatingVirtualGateways(ctx, routeTable.RoutePropagatingVirtualGateways)
 	if diags.HasError() {
 		return nil, diags
 	}
 
-	linkRouteTables, diags := mapToModelLinkRouteTables(ctx, *routeTable.LinkRouteTables)
+	linkRouteTables, diags := mapToModelLinkRouteTables(ctx, routeTable.LinkRouteTables)
 	if diags.HasError() {
 		return nil, diags
 	}

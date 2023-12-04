@@ -95,7 +95,7 @@ func (k *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	if !plan.VpcId.IsNull() {
 
 		// Attach internet gateway to the vpc
-		err, numspotError = k.attachInternetGateway(ctx, *createInternetGatewayResponse.JSON201.Id, plan.VpcId.ValueString())
+		err, numspotError = k.attachInternetGateway(ctx, createInternetGatewayResponse.JSON201.Id, plan.VpcId.ValueString())
 		if err != nil {
 			response.Diagnostics.AddError("Attaching Internet Gateway", err.Error())
 			return
@@ -107,7 +107,7 @@ func (k *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	}
 
 	data := InternetGatewayResourceModel{
-		Id:    types.StringValue(*createInternetGatewayResponse.JSON201.Id),
+		Id:    types.StringValue(createInternetGatewayResponse.JSON201.Id),
 		VpcId: plan.VpcId,
 	}
 
@@ -180,9 +180,9 @@ func (k *InternetGatewayResource) Read(ctx context.Context, request resource.Rea
 	}
 
 	internetGateway := slice.FindFirst(
-		*internetGateways.JSON200.Items,
+		internetGateways.JSON200.Items,
 		func(e api_client.InternetGateway) bool {
-			return *e.Id == data.Id.ValueString()
+			return e.Id == data.Id.ValueString()
 		},
 	)
 
@@ -204,7 +204,7 @@ func mapToInternetGatewayModel(internetGateway *api_client.InternetGateway) Inte
 	}
 
 	return InternetGatewayResourceModel{
-		Id:    types.StringValue(*internetGateway.Id),
+		Id:    types.StringValue(internetGateway.Id),
 		VpcId: vpcID,
 	}
 }
