@@ -1,6 +1,3 @@
-// Copyright (c) HashiCorp, Inc.
-// SPDX-License-Identifier: MPL-2.0
-
 package provider
 
 import (
@@ -9,54 +6,52 @@ import (
 	"encoding/base64"
 	"errors"
 	"net/http"
+	"os"
 
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	api_client "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api_client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/iam"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/dhcp_options_set"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/internet_gateway"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/key_pair"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/route_table"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/security_group"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/subnet"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/service/virtual_private_cloud"
 )
 
-// Ensure NumspotProvider satisfies various provider interfaces.
-var _ provider.Provider = &NumspotProvider{}
+var _ provider.Provider = (*numspotProvider)(nil)
 
-// NumspotProvider defines the provider implementation.
-type NumspotProvider struct {
-	// version is set to the provider version on release, "dev" when the
-	// provider is built and ran locally, and "test" when running acceptance
-	// testing.
+func New(version string, development bool) func() provider.Provider {
+	return func() provider.Provider {
+		return &numspotProvider{
+			version:     version,
+			development: development,
+		}
+	}
+}
+
+type numspotProvider struct {
 	version     string
 	development bool
 }
 
-// NumspotProviderModel describes the provider data model.
 type NumspotProviderModel struct {
-	Endpoint     types.String `tfsdk:"endpoint"`
+	Host         types.String `tfsdk:"host"`
+	IAMHost      types.String `tfsdk:"iam_host"`
 	ClientId     types.String `tfsdk:"client_id"`
 	ClientSecret types.String `tfsdk:"client_secret"`
 }
 
-func (p *NumspotProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "numspot"
-	resp.Version = p.version
-}
-
-func (p *NumspotProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "Example provider attribute",
+			"host": schema.StringAttribute{
+				MarkdownDescription: "Numspot API host",
+				Optional:            true,
+			},
+			"iam_host": schema.StringAttribute{
+				MarkdownDescription: "Numspot IAM host",
 				Optional:            true,
 			},
 			"client_id": schema.StringAttribute{
@@ -69,112 +64,14 @@ func (p *NumspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 			},
 		},
 	}
+
 }
 
-func buildBasicAuth(username, password string) string {
-	auth := username + ":" + password
-	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
-}
-
-func AddSecurityCredentialsToRequestHeaders(ctx context.Context, req *http.Request) error {
-	clientId, ok := ctx.Value("client_id").(string)
-	if !ok {
-		return errors.New("Can't find client_id")
-	}
-
-	clientSecret, ok := ctx.Value("client_secret").(string)
-	if !ok {
-		return errors.New("Can't find client_secret")
-	}
-
-	req.Header.Add("Authorization", buildBasicAuth(clientId, clientSecret))
-	return nil
-}
-
-func (p *NumspotProvider) apiClientWithAuth(ctx context.Context, diag diag.Diagnostics, data NumspotProviderModel) *api_client.ClientWithResponses {
-	var endpoint string
-	if data.Endpoint.IsNull() {
-		endpoint = "http://localhost:8080/v0/"
-	} else {
-		endpoint = data.Endpoint.ValueString()
-	}
-
-	err, accessToken := p.authenticateUser(ctx, data)
-	if err != nil {
-		diag.AddError("Failed to authenticate", err.Error())
-		return nil
-	}
-
-	bearerProvider, err := securityprovider.NewSecurityProviderBearerToken(*accessToken)
-	if err != nil {
-		diag.AddError("Failed to create bearer provider token", err.Error())
-		return nil
-	}
-
-	apiClient, err := api_client.NewClientWithResponses(endpoint, api_client.WithRequestEditorFn(bearerProvider.Intercept),
-		api_client.WithHTTPClient(&http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			},
-		}),
-	)
-	if err != nil {
-		diag.AddError("Failed to create NumSpot api client", err.Error())
-		return nil
-	}
-
-	return apiClient
-}
-
-func faker(_ context.Context, req *http.Request) error {
-	req.Header.Add("Authorization", "Bearer token_200")
-	return nil
-}
-
-func (p *NumspotProvider) apiClientWithFakeAuth(diag diag.Diagnostics, data NumspotProviderModel) *api_client.ClientWithResponses {
-	var endpoint string
-	if data.Endpoint.IsNull() {
-		endpoint = "http://localhost:8080/v0/"
-	} else {
-		endpoint = data.Endpoint.ValueString()
-	}
-
-	apiClient, err := api_client.NewClientWithResponses(endpoint, api_client.WithRequestEditorFn(faker))
-	if err != nil {
-		diag.AddError("Failed to create NumSpot api client", err.Error())
-		return nil
-	}
-
-	return apiClient
-}
-
-func (p *NumspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	var data NumspotProviderModel
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	var apiClient *api_client.ClientWithResponses
-	if p.development {
-		apiClient = p.apiClientWithFakeAuth(resp.Diagnostics, data)
-	} else {
-		apiClient = p.apiClientWithAuth(ctx, resp.Diagnostics, data)
-	}
-
-	if resp.Diagnostics.HasError() {
-		resp.Diagnostics.AddError("Failed to create NumSpot api client", "")
-	}
-
-	resp.DataSourceData = apiClient
-	resp.ResourceData = apiClient
-}
-
-func (p *NumspotProvider) authenticateUser(ctx context.Context, data NumspotProviderModel) (error, *string) {
+func (p *numspotProvider) authenticateUser(ctx context.Context, data NumspotProviderModel) (error, *string) {
 	ctx = context.WithValue(ctx, "client_id", data.ClientId.ValueString())
 	ctx = context.WithValue(ctx, "client_secret", data.ClientSecret.ValueString())
 
-	iamEndpoint := "https://authentication-manager.integration.numspot.dev"
+	iamEndpoint := data.IAMHost.ValueString()
 	tmp := func(c *iam.Client) error {
 		c.Client = &http.Client{
 			Transport: &http.Transport{
@@ -202,29 +99,227 @@ func (p *NumspotProvider) authenticateUser(ctx context.Context, data NumspotProv
 	return err, accessToken
 }
 
-func (p *NumspotProvider) Resources(ctx context.Context) []func() resource.Resource {
+func buildBasicAuth(username, password string) string {
+	auth := username + ":" + password
+	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+}
+
+func AddSecurityCredentialsToRequestHeaders(ctx context.Context, req *http.Request) error {
+	clientId, ok := ctx.Value("client_id").(string)
+	if !ok {
+		return errors.New("Can't find client_id")
+	}
+
+	clientSecret, ok := ctx.Value("client_secret").(string)
+	if !ok {
+		return errors.New("Can't find client_secret")
+	}
+
+	req.Header.Add("Authorization", buildBasicAuth(clientId, clientSecret))
+	return nil
+}
+
+func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag diag.Diagnostics, data NumspotProviderModel) *api.ClientWithResponses {
+	err, accessToken := p.authenticateUser(ctx, data)
+	if err != nil {
+		diag.AddError("Failed to authenticate", err.Error())
+		return nil
+	}
+
+	bearerProvider, err := securityprovider.NewSecurityProviderBearerToken(*accessToken)
+
+	if err != nil {
+		diag.AddError("Failed to create bearer provider token", err.Error())
+		return nil
+	}
+
+	numspotClient, err := api.NewClientWithResponses(data.Host.ValueString(), api.WithRequestEditorFn(bearerProvider.Intercept),
+		api.WithHTTPClient(&http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		}),
+	)
+	if err != nil {
+		diag.AddError("Failed to create NumSpot api client", err.Error())
+		return nil
+	}
+
+	return numspotClient
+}
+
+func (p *numspotProvider) apiClientWithFakeAuth(data NumspotProviderModel, diag diag.Diagnostics) *api.ClientWithResponses {
+	numspotClient, err := api.NewClientWithResponses(data.Host.ValueString(), api.WithRequestEditorFn(faker))
+	if err != nil {
+		diag.AddError("Failed to create NumSpot api client", err.Error())
+		return nil
+	}
+
+	return numspotClient
+}
+
+func faker(_ context.Context, req *http.Request) error {
+	req.Header.Add("Authorization", "Bearer token_200")
+	return nil
+}
+
+func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	// Retrieve provider data from configuration
+	var config NumspotProviderModel
+	diags := req.Config.Get(ctx, &config)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// If practitioner provided a configuration value for any of the
+	// attributes, it must be a known value.
+
+	if config.Host.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("host"),
+			"Unknown Numspot API Host",
+			"The provider cannot create the Numspot API client as there is an unknown configuration value for the Numspot API host. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_API_HOST environment variable.",
+		)
+	}
+
+	if config.IAMHost.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("iam_host"),
+			"Unknown IAM API Host",
+			"The provider cannot create the IAM API client as there is an unknown configuration value for the IAM API host. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_IAM_HOST environment variable.",
+		)
+	}
+
+	if config.ClientId.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("client_id"),
+			"Unknown Numspot Client id",
+			"The provider cannot create the Numspot API client as there is an unknown configuration value for the Numspot IAM API client ID. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_CLIENT_ID environment variable.",
+		)
+	}
+
+	if config.ClientSecret.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("client_secret"),
+			"Unknown Numspot Client secret",
+			"The provider cannot create the Numspot API client as there is an unknown configuration value for the Numspot IAM API client secret. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_CLIENT_SECRET environment variable.",
+		)
+	}
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Default values to environment variables, but override
+	// with Terraform configuration value if set.
+
+	host := os.Getenv("NUMSPOT_API_HOST")
+	iamHost := os.Getenv("NUMSPOT_IAM_HOST")
+	clientID := os.Getenv("NUMSPOT_CLIENT_ID")
+	clientSecret := os.Getenv("NUMSPOT_CLIENT_SECRET")
+
+	if !config.Host.IsNull() {
+		host = config.Host.ValueString()
+	}
+
+	if !config.IAMHost.IsNull() {
+		iamHost = config.IAMHost.ValueString()
+	}
+
+	if !config.ClientId.IsNull() {
+		clientID = config.ClientId.ValueString()
+	}
+
+	if !config.ClientSecret.IsNull() {
+		clientSecret = config.ClientSecret.ValueString()
+	}
+
+	// If any of the expected configurations are missing, return
+	// errors with provider-specific guidance.
+
+	if host == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("host"),
+			"Missing Numspot API Host",
+			"The provider cannot create the Numspot API client as there is a missing or empty value for the Numspot API host. "+
+				"Set the host value in the configuration or use the NUMSPOT_API_HOST environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
+	if iamHost == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("iam_host"),
+			"Missing Numspot IAM API Host",
+			"The provider cannot create the Numspot API client as there is a missing or empty value for the Numspot IAM API host. "+
+				"Set the iam_host value in the configuration or use the NUMSPOT_IAM_HOST environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
+	if clientID == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("client_id"),
+			"Missing Numspot Client ID",
+			"The provider cannot create the Numspot API client as there is a missing or empty value for the Numspot Client ID. "+
+				"Set the client_id value in the configuration or use the NUMSPOT_CLIENT_ID environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
+	if clientSecret == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("client_secret"),
+			"Missing Numspot Client Secret",
+			"The provider cannot create the Numspot API client as there is a missing or empty value for the Numspot Client Secret. "+
+				"Set the client_secret value in the configuration or use the NUMSPOT_CLIENT_SECRET environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	config.IAMHost = types.StringValue(iamHost)
+	config.Host = types.StringValue(host)
+	config.ClientId = types.StringValue(clientID)
+	config.ClientSecret = types.StringValue(clientSecret)
+
+	// Create a new Numspot client using the configuration values
+	var client *api.ClientWithResponses
+	if p.development {
+		client = p.apiClientWithFakeAuth(config, resp.Diagnostics)
+	} else {
+		client = p.apiClientWithAuth(ctx, resp.Diagnostics, config)
+	}
+
+	if resp.Diagnostics.HasError() {
+		resp.Diagnostics.AddError("Failed to create NumSpot api client", "")
+	}
+
+	// Make the Numspot client available during DataSource and Resource
+	// type Configure methods.
+	resp.DataSourceData = client
+	resp.ResourceData = client
+}
+
+func (p *numspotProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "numspot"
+	resp.Version = p.version
+}
+
+func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+	return []func() datasource.DataSource{}
+}
+
+func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		key_pair.NewKeyPairResource,
-		virtual_private_cloud.NewVirtualPrivateCloudResource,
-		security_group.NewSecurityGroupResource,
-		dhcp_options_set.NewDhcpOptionsSetResource,
-		subnet.NewSubnetResource,
-		route_table.NewRouteTableResource,
-		internet_gateway.NewInternetGatewayResource,
-	}
-}
-
-func (p *NumspotProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{
-		NewExampleDataSource,
-	}
-}
-
-func New(version string, development bool) func() provider.Provider {
-	return func() provider.Provider {
-		return &NumspotProvider{
-			version:     version,
-			development: development,
-		}
+		NewClientGatewayResource,
 	}
 }

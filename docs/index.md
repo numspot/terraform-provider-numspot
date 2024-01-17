@@ -25,4 +25,5 @@ provider "numspot" {
 
 - `client_id` (String) Client ID to authenticate user.
 - `client_secret` (String) Client secret to authenticate user.
-- `endpoint` (String) Example provider attribute
+- `host` (String) Numspot API host
+- `iam_host` (String) Numspot IAM host
