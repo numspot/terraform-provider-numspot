@@ -321,5 +321,23 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewClientGatewayResource,
+		NewDirectLinkResource,
+		NewDirectLinkInterfaceResource,
+		NewFlexibleGpuResource,
+		NewImageResource,
+		NewInternetServiceResource,
+		NewListenerRuleResource,
+		NewLoadBalancerResource,
+		NewNatServiceResource,
+		NewNetResource,
+		NewNetAccessPointResource,
+		NewNicResource,
+		NewPublicIpResource,
+		NewRouteTableResource,
+		NewSecurityGroupResource,
+		NewSnapshotResource,
+		NewSubnetResource,
+		NewVolumeResource,
+		NewVpnConnectionResource,
 	}
 }
