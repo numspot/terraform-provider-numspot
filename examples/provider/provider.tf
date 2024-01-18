@@ -1,3 +1,6 @@
 provider "numspot" {
-  # example configuration here
+  host          = ""
+  iam_host      = ""
+  client_id     = ""
+  client_secret = ""
 }
