@@ -1,11 +1,10 @@
 package provider
 
 import (
-  "fmt"
-  "testing"
+	"testing"
 
-  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
-  "github.com/stretchr/testify/require"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccSecurityGroupResource(t *testing.T) {
@@ -25,9 +24,9 @@ func TestAccSecurityGroupResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "numspot_security_group.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "numspot_security_group.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -48,6 +47,6 @@ func testSecurityGroupConfig_Create() string {
   			}`
 }
 func testSecurityGroupConfig_Update() string {
-		return `resource "numspot_security_group" "test" {
+	return `resource "numspot_security_group" "test" {
     			}`
 }

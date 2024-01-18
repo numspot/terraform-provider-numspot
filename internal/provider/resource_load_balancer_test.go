@@ -1,11 +1,10 @@
 package provider
 
 import (
-  "fmt"
-  "testing"
+	"testing"
 
-  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
-  "github.com/stretchr/testify/require"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccLoadBalancerResource(t *testing.T) {
@@ -25,9 +24,9 @@ func TestAccLoadBalancerResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "numspot_load_balancer.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "numspot_load_balancer.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -48,6 +47,6 @@ func testLoadBalancerConfig_Create() string {
   			}`
 }
 func testLoadBalancerConfig_Update() string {
-		return `resource "numspot_load_balancer" "test" {
+	return `resource "numspot_load_balancer" "test" {
     			}`
 }

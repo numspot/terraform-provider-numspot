@@ -1,11 +1,10 @@
 package provider
 
 import (
-  "fmt"
-  "testing"
+	"testing"
 
-  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
-  "github.com/stretchr/testify/require"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccPublicIpResource(t *testing.T) {
@@ -25,9 +24,9 @@ func TestAccPublicIpResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "numspot_public_ip.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "numspot_public_ip.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -48,6 +47,6 @@ func testPublicIpConfig_Create() string {
   			}`
 }
 func testPublicIpConfig_Update() string {
-		return `resource "numspot_public_ip" "test" {
+	return `resource "numspot_public_ip" "test" {
     			}`
 }

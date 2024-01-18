@@ -18,13 +18,14 @@ func ClientGatewayFromTfToHttp(tf resource_client_gateway.ClientGatewayModel) *a
 }
 
 func ClientGatewayFromHttpToTf(http *api.ClientGatewaySchema) resource_client_gateway.ClientGatewayModel {
-	return resource_client_gateway.ClientGatewayModel{
+	tmp := resource_client_gateway.ClientGatewayModel{
 		BgpAsn:         utils.FromIntPtrToTfInt64(http.BgpAsn),
 		ConnectionType: types.StringPointerValue(http.ConnectionType),
 		Id:             types.StringPointerValue(http.Id),
 		PublicIp:       types.StringPointerValue(http.PublicIp),
 		State:          types.StringPointerValue(http.State),
 	}
+	return tmp
 }
 
 func ClientGatewayFromTfToCreateRequest(tf resource_client_gateway.ClientGatewayModel) api.CreateClientGatewayJSONRequestBody {
