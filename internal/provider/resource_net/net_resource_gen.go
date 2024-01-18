@@ -23,8 +23,7 @@ func NetResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Net.",
 			},
 			"ip_range": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The IP range for the Net, in CIDR notation (for example, `10.0.0.0/16`).",
 				MarkdownDescription: "The IP range for the Net, in CIDR notation (for example, `10.0.0.0/16`).",
 			},

@@ -1,10 +1,11 @@
 package provider
 
 import (
-	"testing"
+  "fmt"
+  "testing"
 
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
+  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
+  "github.com/stretchr/testify/require"
 )
 
 func TestAccListenerRuleResource(t *testing.T) {
@@ -24,9 +25,9 @@ func TestAccListenerRuleResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_listener_rule.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
+				ResourceName:      "numspot_listener_rule.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,10 +44,10 @@ func TestAccListenerRuleResource(t *testing.T) {
 	})
 }
 func testListenerRuleConfig_Create() string {
-	return `resource "numspot_listener_rule" "test" {
-  			}`
+	return fmt.Sprintf(`resource "numspot_listener_rule" "test" {
+  			}`)
 }
 func testListenerRuleConfig_Update() string {
-	return `resource "numspot_listener_rule" "test" {
+		return `resource "numspot_listener_rule" "test" {
     			}`
 }

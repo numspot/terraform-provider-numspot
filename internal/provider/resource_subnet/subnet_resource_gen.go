@@ -23,8 +23,7 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Subnet.",
 			},
 			"ip_range": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About VPCs](https://docs.outscale.com/en/userguide/About-VPCs.html).",
 				MarkdownDescription: "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About VPCs](https://docs.outscale.com/en/userguide/About-VPCs.html).",
 			},
@@ -34,8 +33,7 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.",
 			},
 			"net_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the Net for which you want to create a Subnet.",
 				MarkdownDescription: "The ID of the Net for which you want to create a Subnet.",
 			},

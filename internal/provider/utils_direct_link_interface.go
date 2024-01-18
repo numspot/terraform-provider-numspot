@@ -46,7 +46,7 @@ func DirectLinkInterfaceFromHttpToTf(http *api.DirectLinkInterfacesSchema) resou
 
 func DirectLinkInterfaceFromTfToCreateRequest(tf resource_direct_link_interface.DirectLinkInterfaceModel) api.CreateDirectLinkInterfaceJSONRequestBody {
 	return api.CreateDirectLinkInterfaceJSONRequestBody{
-		DirectLinkId:        tf.DirectLinkId.ValueStringPointer(),
-		DirectLinkInterface: nil,
+		DirectLinkId:        tf.DirectLinkId.ValueString(),
+		DirectLinkInterface: api.DirectLinkInterfaceSchema{},
 	}
 }

@@ -1,10 +1,11 @@
 package provider
 
 import (
-	"testing"
+  "fmt"
+  "testing"
 
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
+  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
+  "github.com/stretchr/testify/require"
 )
 
 func TestAccInternetServiceResource(t *testing.T) {
@@ -24,9 +25,9 @@ func TestAccInternetServiceResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_internet_service.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
+				ResourceName:      "numspot_internet_service.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,10 +44,10 @@ func TestAccInternetServiceResource(t *testing.T) {
 	})
 }
 func testInternetServiceConfig_Create() string {
-	return `resource "numspot_internet_service" "test" {
-  			}`
+	return fmt.Sprintf(`resource "numspot_internet_service" "test" {
+  			}`)
 }
 func testInternetServiceConfig_Update() string {
-	return `resource "numspot_internet_service" "test" {
+		return `resource "numspot_internet_service" "test" {
     			}`
 }

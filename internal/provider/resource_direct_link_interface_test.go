@@ -1,10 +1,11 @@
 package provider
 
 import (
-	"testing"
+  "fmt"
+  "testing"
 
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
+  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
+  "github.com/stretchr/testify/require"
 )
 
 func TestAccDirectLinkInterfaceResource(t *testing.T) {
@@ -24,9 +25,9 @@ func TestAccDirectLinkInterfaceResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_direct_link_interface.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
+				ResourceName:      "numspot_direct_link_interface.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,10 +44,10 @@ func TestAccDirectLinkInterfaceResource(t *testing.T) {
 	})
 }
 func testDirectLinkInterfaceConfig_Create() string {
-	return `resource "numspot_direct_link_interface" "test" {
-  			}`
+	return fmt.Sprintf(`resource "numspot_direct_link_interface" "test" {
+  			}`)
 }
 func testDirectLinkInterfaceConfig_Update() string {
-	return `resource "numspot_direct_link_interface" "test" {
+		return `resource "numspot_direct_link_interface" "test" {
     			}`
 }

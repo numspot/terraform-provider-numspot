@@ -197,8 +197,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The state of the NIC (`available` \\| `attaching` \\| `in-use` \\| `detaching`).",
 			},
 			"subnet_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the Subnet in which you want to create the NIC.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the NIC.",
 			},

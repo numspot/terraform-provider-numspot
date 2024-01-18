@@ -116,8 +116,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"backend_port": schema.Int64Attribute{
-							Optional:            true,
-							Computed:            true,
+							Required:            true,
 							Description:         "The port on which the back-end VM is listening (between `1` and `65535`, both included).",
 							MarkdownDescription: "The port on which the back-end VM is listening (between `1` and `65535`, both included).",
 						},
@@ -128,14 +127,12 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The protocol for routing traffic to back-end VMs (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`).",
 						},
 						"load_balancer_port": schema.Int64Attribute{
-							Optional:            true,
-							Computed:            true,
+							Required:            true,
 							Description:         "The port on which the load balancer is listening (between `1` and `65535`, both included).",
 							MarkdownDescription: "The port on which the load balancer is listening (between `1` and `65535`, both included).",
 						},
 						"load_balancer_protocol": schema.StringAttribute{
-							Optional:            true,
-							Computed:            true,
+							Required:            true,
 							Description:         "The routing protocol (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`).",
 							MarkdownDescription: "The routing protocol (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`).",
 						},
@@ -157,14 +154,12 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "One or more listeners to create.",
 				MarkdownDescription: "One or more listeners to create.",
 			},
 			"load_balancer_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).",
 				MarkdownDescription: "The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).",
 			},

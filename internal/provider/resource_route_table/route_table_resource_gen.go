@@ -24,8 +24,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the route table.",
 			},
 			"net_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the Net for which you want to create a route table.",
 				MarkdownDescription: "The ID of the Net for which you want to create a route table.",
 			},

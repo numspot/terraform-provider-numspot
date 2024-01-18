@@ -13,14 +13,12 @@ func DirectLinkResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"bandwidth": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The bandwidth of the DirectLink (`1Gbps` \\| `10Gbps`).",
 				MarkdownDescription: "The bandwidth of the DirectLink (`1Gbps` \\| `10Gbps`).",
 			},
 			"direct_link_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The name of the DirectLink.",
 				MarkdownDescription: "The name of the DirectLink.",
 			},
@@ -30,8 +28,7 @@ func DirectLinkResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the DirectLink (for example, `dxcon-xxxxxxxx`).",
 			},
 			"location": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The code of the requested location for the DirectLink, returned by the [ReadLocations](#readlocations) method.",
 				MarkdownDescription: "The code of the requested location for the DirectLink, returned by the [ReadLocations](#readlocations) method.",
 			},

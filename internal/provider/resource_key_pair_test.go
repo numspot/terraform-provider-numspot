@@ -1,10 +1,11 @@
 package provider
 
 import (
-	"testing"
+  "fmt"
+  "testing"
 
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
+  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
+  "github.com/stretchr/testify/require"
 )
 
 func TestAccKeyPairResource(t *testing.T) {
@@ -24,9 +25,9 @@ func TestAccKeyPairResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_key_pair.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
+				ResourceName:      "numspot_key_pair.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,10 +44,10 @@ func TestAccKeyPairResource(t *testing.T) {
 	})
 }
 func testKeyPairConfig_Create() string {
-	return `resource "numspot_key_pair" "test" {
-  			}`
+	return fmt.Sprintf(`resource "numspot_key_pair" "test" {
+  			}`)
 }
 func testKeyPairConfig_Update() string {
-	return `resource "numspot_key_pair" "test" {
+		return `resource "numspot_key_pair" "test" {
     			}`
 }

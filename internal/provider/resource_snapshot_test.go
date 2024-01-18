@@ -1,10 +1,11 @@
 package provider
 
 import (
-	"testing"
+  "fmt"
+  "testing"
 
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
+  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
+  "github.com/stretchr/testify/require"
 )
 
 func TestAccSnapshotResource(t *testing.T) {
@@ -24,9 +25,9 @@ func TestAccSnapshotResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_snapshot.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
+				ResourceName:      "numspot_snapshot.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,10 +44,10 @@ func TestAccSnapshotResource(t *testing.T) {
 	})
 }
 func testSnapshotConfig_Create() string {
-	return `resource "numspot_snapshot" "test" {
-  			}`
+	return fmt.Sprintf(`resource "numspot_snapshot" "test" {
+  			}`)
 }
 func testSnapshotConfig_Update() string {
-	return `resource "numspot_snapshot" "test" {
+		return `resource "numspot_snapshot" "test" {
     			}`
 }

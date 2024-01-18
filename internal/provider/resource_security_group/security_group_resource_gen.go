@@ -24,8 +24,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The account ID of a user that has been granted permission.",
 			},
 			"description": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "A description for the security group, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
 				MarkdownDescription: "A description for the security group, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
 			},
@@ -176,8 +175,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The outbound rules associated with the security group.",
 			},
 			"security_group_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
 				MarkdownDescription: "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
 			},

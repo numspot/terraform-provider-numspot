@@ -28,7 +28,7 @@ func NetFromHttpToTf(http *api.NetSchema) resource_net.NetModel {
 
 func NetFromTfToCreateRequest(tf resource_net.NetModel) api.CreateNetJSONRequestBody {
 	return api.CreateNetJSONRequestBody{
-		IpRange: tf.IpRange.ValueStringPointer(),
+		IpRange: tf.IpRange.ValueString(),
 		Tenancy: tf.Tenancy.ValueStringPointer(),
 	}
 }

@@ -33,8 +33,8 @@ func SubnetFromHttpToTf(http *api.SubnetSchema) resource_subnet.SubnetModel {
 
 func SubnetFromTfToCreateRequest(tf resource_subnet.SubnetModel) api.CreateSubnetJSONRequestBody {
 	return api.CreateSubnetJSONRequestBody{
-		IpRange:       tf.IpRange.ValueStringPointer(),
-		NetId:         tf.NetId.ValueStringPointer(),
+		IpRange:       tf.IpRange.ValueString(),
+		NetId:         tf.NetId.ValueString(),
 		SubregionName: tf.SubregionName.ValueStringPointer(),
 	}
 }

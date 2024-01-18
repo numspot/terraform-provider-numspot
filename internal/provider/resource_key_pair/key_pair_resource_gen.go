@@ -23,14 +23,8 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "ID for /keypairs",
 				MarkdownDescription: "ID for /keypairs",
 			},
-			"keypair_fingerprint": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The MD5 public key fingerprint as specified in section 4 of RFC 4716.",
-				MarkdownDescription: "The MD5 public key fingerprint as specified in section 4 of RFC 4716.",
-			},
 			"keypair_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
 				MarkdownDescription: "A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
 			},
@@ -55,11 +49,10 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type KeyPairModel struct {
-	Fingerprint        types.String `tfsdk:"fingerprint"`
-	Id                 types.String `tfsdk:"id"`
-	KeypairFingerprint types.String `tfsdk:"keypair_fingerprint"`
-	KeypairName        types.String `tfsdk:"keypair_name"`
-	Name               types.String `tfsdk:"name"`
-	PrivateKey         types.String `tfsdk:"private_key"`
-	PublicKey          types.String `tfsdk:"public_key"`
+	Fingerprint types.String `tfsdk:"fingerprint"`
+	Id          types.String `tfsdk:"id"`
+	KeypairName types.String `tfsdk:"keypair_name"`
+	Name        types.String `tfsdk:"name"`
+	PrivateKey  types.String `tfsdk:"private_key"`
+	PublicKey   types.String `tfsdk:"public_key"`
 }

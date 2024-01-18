@@ -18,8 +18,7 @@ func NetAccessPointResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Net access point.",
 			},
 			"net_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the Net.",
 				MarkdownDescription: "The ID of the Net.",
 			},
@@ -31,8 +30,7 @@ func NetAccessPointResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "One or more IDs of route tables to use for the connection.",
 			},
 			"service_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The name of the service (in the format `com.outscale.region.service`).",
 				MarkdownDescription: "The name of the service (in the format `com.outscale.region.service`).",
 			},

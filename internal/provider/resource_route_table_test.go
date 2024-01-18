@@ -1,10 +1,11 @@
 package provider
 
 import (
-	"testing"
+  "fmt"
+  "testing"
 
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
+  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
+  "github.com/stretchr/testify/require"
 )
 
 func TestAccRouteTableResource(t *testing.T) {
@@ -24,9 +25,9 @@ func TestAccRouteTableResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_route_table.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
+				ResourceName:      "numspot_route_table.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,10 +44,10 @@ func TestAccRouteTableResource(t *testing.T) {
 	})
 }
 func testRouteTableConfig_Create() string {
-	return `resource "numspot_route_table" "test" {
-  			}`
+	return fmt.Sprintf(`resource "numspot_route_table" "test" {
+  			}`)
 }
 func testRouteTableConfig_Update() string {
-	return `resource "numspot_route_table" "test" {
+		return `resource "numspot_route_table" "test" {
     			}`
 }

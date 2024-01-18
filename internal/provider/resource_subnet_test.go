@@ -1,10 +1,11 @@
 package provider
 
 import (
-	"testing"
+  "fmt"
+  "testing"
 
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
+  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
+  "github.com/stretchr/testify/require"
 )
 
 func TestAccSubnetResource(t *testing.T) {
@@ -24,9 +25,9 @@ func TestAccSubnetResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_subnet.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
+				ResourceName:      "numspot_subnet.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,10 +44,10 @@ func TestAccSubnetResource(t *testing.T) {
 	})
 }
 func testSubnetConfig_Create() string {
-	return `resource "numspot_subnet" "test" {
-  			}`
+	return fmt.Sprintf(`resource "numspot_subnet" "test" {
+  			}`)
 }
 func testSubnetConfig_Update() string {
-	return `resource "numspot_subnet" "test" {
+		return `resource "numspot_subnet" "test" {
     			}`
 }

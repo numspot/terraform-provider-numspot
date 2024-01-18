@@ -32,8 +32,7 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the fGPU.",
 			},
 			"model_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The model of fGPU you want to allocate. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).",
 				MarkdownDescription: "The model of fGPU you want to allocate. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).",
 			},
@@ -43,8 +42,7 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The state of the fGPU (`allocated` \\| `attaching` \\| `attached` \\| `detaching`).",
 			},
 			"subregion_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The Subregion in which you want to create the fGPU.",
 				MarkdownDescription: "The Subregion in which you want to create the fGPU.",
 			},

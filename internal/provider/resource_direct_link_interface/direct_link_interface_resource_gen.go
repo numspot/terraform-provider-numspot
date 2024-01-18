@@ -34,16 +34,14 @@ func DirectLinkInterfaceResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The IP on the customer's side of the DirectLink interface.",
 			},
 			"direct_link_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the existing DirectLink for which you want to create the DirectLink interface.",
 				MarkdownDescription: "The ID of the existing DirectLink for which you want to create the DirectLink interface.",
 			},
 			"direct_link_interface": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
 					"bgp_asn": schema.Int64Attribute{
-						Optional:            true,
-						Computed:            true,
+						Required:            true,
 						Description:         "The BGP (Border Gateway Protocol) ASN (Autonomous System Number) on the customer's side of the DirectLink interface. This number must be between `64512` and `65534`.",
 						MarkdownDescription: "The BGP (Border Gateway Protocol) ASN (Autonomous System Number) on the customer's side of the DirectLink interface. This number must be between `64512` and `65534`.",
 					},
@@ -72,14 +70,12 @@ func DirectLinkInterfaceResourceSchema(ctx context.Context) schema.Schema {
 						MarkdownDescription: "The IP on the OUTSCALE side of the DirectLink interface.",
 					},
 					"virtual_gateway_id": schema.StringAttribute{
-						Optional:            true,
-						Computed:            true,
+						Required:            true,
 						Description:         "The ID of the target virtual gateway.",
 						MarkdownDescription: "The ID of the target virtual gateway.",
 					},
 					"vlan": schema.Int64Attribute{
-						Optional:            true,
-						Computed:            true,
+						Required:            true,
 						Description:         "The VLAN number associated with the DirectLink interface.",
 						MarkdownDescription: "The VLAN number associated with the DirectLink interface.",
 					},
@@ -89,8 +85,7 @@ func DirectLinkInterfaceResourceSchema(ctx context.Context) schema.Schema {
 						AttrTypes: DirectLinkInterfaceValue{}.AttributeTypes(ctx),
 					},
 				},
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "Information about the DirectLink interface.",
 				MarkdownDescription: "Information about the DirectLink interface.",
 			},

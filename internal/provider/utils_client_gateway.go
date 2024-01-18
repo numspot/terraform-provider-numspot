@@ -30,8 +30,8 @@ func ClientGatewayFromHttpToTf(http *api.ClientGatewaySchema) resource_client_ga
 
 func ClientGatewayFromTfToCreateRequest(tf resource_client_gateway.ClientGatewayModel) api.CreateClientGatewayJSONRequestBody {
 	return api.CreateClientGatewayJSONRequestBody{
-		BgpAsn:         utils.FromTfInt64ToIntPtr(tf.BgpAsn),
-		ConnectionType: tf.ConnectionType.ValueStringPointer(),
-		PublicIp:       tf.PublicIp.ValueStringPointer(),
+		BgpAsn:         utils.FromTfInt64ToInt(tf.BgpAsn),
+		ConnectionType: tf.ConnectionType.ValueString(),
+		PublicIp:       tf.PublicIp.ValueString(),
 	}
 }

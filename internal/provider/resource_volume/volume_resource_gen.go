@@ -52,8 +52,7 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 			},
 			"subregion_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The Subregion in which you want to create the volume.",
 				MarkdownDescription: "The Subregion in which you want to create the volume.",
 			},

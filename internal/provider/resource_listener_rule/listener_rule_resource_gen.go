@@ -36,14 +36,12 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 			"listener": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
 					"load_balancer_name": schema.StringAttribute{
-						Optional:            true,
-						Computed:            true,
+						Required:            true,
 						Description:         "The name of the load balancer to which the listener is attached.",
 						MarkdownDescription: "The name of the load balancer to which the listener is attached.",
 					},
 					"load_balancer_port": schema.Int64Attribute{
-						Optional:            true,
-						Computed:            true,
+						Required:            true,
 						Description:         "The port of load balancer on which the load balancer is listening (between `1` and `65535` both included).",
 						MarkdownDescription: "The port of load balancer on which the load balancer is listening (between `1` and `65535` both included).",
 					},
@@ -53,8 +51,7 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 						AttrTypes: ListenerValue{}.AttributeTypes(ctx),
 					},
 				},
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "Information about the load balancer.",
 				MarkdownDescription: "Information about the load balancer.",
 			},
@@ -78,8 +75,7 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 						MarkdownDescription: "A host-name pattern for the rule, with a maximum length of 128 characters. This host-name pattern supports maximum three wildcards, and must not contain any special characters except [-.?]. ",
 					},
 					"listener_rule_name": schema.StringAttribute{
-						Optional:            true,
-						Computed:            true,
+						Required:            true,
 						Description:         "A human-readable name for the listener rule.",
 						MarkdownDescription: "A human-readable name for the listener rule.",
 					},
@@ -90,8 +86,7 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 						MarkdownDescription: "A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~&quot;'@:+?].",
 					},
 					"priority": schema.Int64Attribute{
-						Optional:            true,
-						Computed:            true,
+						Required:            true,
 						Description:         "The priority level of the listener rule, between `1` and `19999` both included. Each rule must have a unique priority level. Otherwise, an error is returned.",
 						MarkdownDescription: "The priority level of the listener rule, between `1` and `19999` both included. Each rule must have a unique priority level. Otherwise, an error is returned.",
 					},
@@ -101,8 +96,7 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 						AttrTypes: ListenerRuleValue{}.AttributeTypes(ctx),
 					},
 				},
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "Information about the listener rule.",
 				MarkdownDescription: "Information about the listener rule.",
 			},
@@ -123,8 +117,7 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"vm_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The IDs of the backend VMs.",
 				MarkdownDescription: "The IDs of the backend VMs.",
 			},

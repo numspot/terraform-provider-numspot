@@ -1,10 +1,11 @@
 package provider
 
 import (
-	"testing"
+  "fmt"
+  "testing"
 
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
+  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
+  "github.com/stretchr/testify/require"
 )
 
 func TestAccVolumeResource(t *testing.T) {
@@ -24,9 +25,9 @@ func TestAccVolumeResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_volume.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
+				ResourceName:      "numspot_volume.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,10 +44,10 @@ func TestAccVolumeResource(t *testing.T) {
 	})
 }
 func testVolumeConfig_Create() string {
-	return `resource "numspot_volume" "test" {
-  			}`
+	return fmt.Sprintf(`resource "numspot_volume" "test" {
+  			}`)
 }
 func testVolumeConfig_Update() string {
-	return `resource "numspot_volume" "test" {
+		return `resource "numspot_volume" "test" {
     			}`
 }

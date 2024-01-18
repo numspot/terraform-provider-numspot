@@ -46,8 +46,7 @@ func NetPeeringResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Information about the accepter Net.",
 			},
 			"accepter_net_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the Net you want to connect with.",
 				MarkdownDescription: "The ID of the Net you want to connect with.",
 			},
@@ -84,8 +83,7 @@ func NetPeeringResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Information about the source Net.",
 			},
 			"source_net_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the Net you send the peering request from.",
 				MarkdownDescription: "The ID of the Net you send the peering request from.",
 			},

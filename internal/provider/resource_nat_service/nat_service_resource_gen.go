@@ -29,8 +29,7 @@ func NatServiceResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Net in which the NAT service is.",
 			},
 			"public_ip_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The allocation ID of the public IP to associate with the NAT service.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
 				MarkdownDescription: "The allocation ID of the public IP to associate with the NAT service.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
 			},
@@ -64,8 +63,7 @@ func NatServiceResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The state of the NAT service (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 			},
 			"subnet_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the Subnet in which you want to create the NAT service.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the NAT service.",
 			},

@@ -13,14 +13,12 @@ func ClientGatewayResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"bgp_asn": schema.Int64Attribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The Autonomous System Number (ASN) used by the Border Gateway Protocol (BGP) to find the path to your client gateway through the Internet. This number must be between `1` and `4294967295`.",
 				MarkdownDescription: "The Autonomous System Number (ASN) used by the Border Gateway Protocol (BGP) to find the path to your client gateway through the Internet. This number must be between `1` and `4294967295`.",
 			},
 			"connection_type": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The communication protocol used to establish tunnel with your client gateway (only `ipsec.1` is supported).",
 				MarkdownDescription: "The communication protocol used to establish tunnel with your client gateway (only `ipsec.1` is supported).",
 			},
@@ -30,8 +28,7 @@ func ClientGatewayResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the client gateway.",
 			},
 			"public_ip": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The public fixed IPv4 address of your client gateway.",
 				MarkdownDescription: "The public fixed IPv4 address of your client gateway.",
 			},

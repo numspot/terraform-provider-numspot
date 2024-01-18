@@ -44,7 +44,7 @@ const (
 // AcceptNetPeeringRequestSchema defines model for AcceptNetPeeringRequestSchema.
 type AcceptNetPeeringRequestSchema struct {
 	// NetPeeringId The ID of the Net peering you want to accept.
-	NetPeeringId *string `json:"netPeeringId,omitempty"`
+	NetPeeringId string `json:"netPeeringId"`
 }
 
 // AcceptNetPeeringResponseSchema defines model for AcceptNetPeeringResponseSchema.
@@ -210,13 +210,13 @@ type ClientGatewaySchema struct {
 // CreateClientGatewayRequestSchema defines model for CreateClientGatewayRequestSchema.
 type CreateClientGatewayRequestSchema struct {
 	// BgpAsn The Autonomous System Number (ASN) used by the Border Gateway Protocol (BGP) to find the path to your client gateway through the Internet. This number must be between `1` and `4294967295`.
-	BgpAsn *int `json:"bgpAsn,omitempty"`
+	BgpAsn int `json:"bgpAsn"`
 
 	// ConnectionType The communication protocol used to establish tunnel with your client gateway (only `ipsec.1` is supported).
-	ConnectionType *string `json:"connectionType,omitempty"`
+	ConnectionType string `json:"connectionType"`
 
 	// PublicIp The public fixed IPv4 address of your client gateway.
-	PublicIp *string `json:"publicIp,omitempty"`
+	PublicIp string `json:"publicIp"`
 }
 
 // CreateDhcpOptionsRequestSchema defines model for CreateDhcpOptionsRequestSchema.
@@ -237,22 +237,22 @@ type CreateDhcpOptionsRequestSchema struct {
 // CreateDirectLinkInterfaceRequestSchema defines model for CreateDirectLinkInterfaceRequestSchema.
 type CreateDirectLinkInterfaceRequestSchema struct {
 	// DirectLinkId The ID of the existing DirectLink for which you want to create the DirectLink interface.
-	DirectLinkId *string `json:"directLinkId,omitempty"`
+	DirectLinkId string `json:"directLinkId"`
 
 	// DirectLinkInterface Information about the DirectLink interface.
-	DirectLinkInterface *DirectLinkInterfaceSchema `json:"directLinkInterface,omitempty"`
+	DirectLinkInterface DirectLinkInterfaceSchema `json:"directLinkInterface"`
 }
 
 // CreateDirectLinkRequestSchema defines model for CreateDirectLinkRequestSchema.
 type CreateDirectLinkRequestSchema struct {
 	// Bandwidth The bandwidth of the DirectLink (`1Gbps` \| `10Gbps`).
-	Bandwidth *string `json:"bandwidth,omitempty"`
+	Bandwidth string `json:"bandwidth"`
 
 	// DirectLinkName The name of the DirectLink.
-	DirectLinkName *string `json:"directLinkName,omitempty"`
+	DirectLinkName string `json:"directLinkName"`
 
 	// Location The code of the requested location for the DirectLink, returned by the [ReadLocations](#readlocations) method.
-	Location *string `json:"location,omitempty"`
+	Location string `json:"location"`
 }
 
 // CreateFlexibleGpuRequestSchema defines model for CreateFlexibleGpuRequestSchema.
@@ -264,10 +264,10 @@ type CreateFlexibleGpuRequestSchema struct {
 	Generation *string `json:"generation,omitempty"`
 
 	// ModelName The model of fGPU you want to allocate. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).
-	ModelName *string `json:"modelName,omitempty"`
+	ModelName string `json:"modelName"`
 
 	// SubregionName The Subregion in which you want to create the fGPU.
-	SubregionName *string `json:"subregionName,omitempty"`
+	SubregionName string `json:"subregionName"`
 }
 
 // CreateImageRequestSchema defines model for CreateImageRequestSchema.
@@ -310,7 +310,7 @@ type CreateInternetServiceRequestSchema = map[string]interface{}
 // CreateKeypairRequestSchema defines model for CreateKeypairRequestSchema.
 type CreateKeypairRequestSchema struct {
 	// KeypairName A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
-	KeypairName *string `json:"keypairName,omitempty"`
+	KeypairName string `json:"keypairName"`
 
 	// PublicKey The public key. It must be Base64-encoded.
 	PublicKey *string `json:"publicKey,omitempty"`
@@ -319,22 +319,22 @@ type CreateKeypairRequestSchema struct {
 // CreateListenerRuleRequestSchema defines model for CreateListenerRuleRequestSchema.
 type CreateListenerRuleRequestSchema struct {
 	// Listener Information about the load balancer.
-	Listener *LoadBalancerLightSchema `json:"listener,omitempty"`
+	Listener LoadBalancerLightSchema `json:"listener"`
 
 	// ListenerRule Information about the listener rule.
-	ListenerRule *ListenerRuleForCreationSchema `json:"listenerRule,omitempty"`
+	ListenerRule ListenerRuleForCreationSchema `json:"listenerRule"`
 
 	// VmIds The IDs of the backend VMs.
-	VmIds *[]string `json:"vmIds,omitempty"`
+	VmIds []string `json:"vmIds"`
 }
 
 // CreateLoadBalancerListenersRequestSchema defines model for CreateLoadBalancerListenersRequestSchema.
 type CreateLoadBalancerListenersRequestSchema struct {
 	// Listeners One or more listeners for the load balancer.
-	Listeners *[]ListenerForCreationSchema `json:"listeners,omitempty"`
+	Listeners []ListenerForCreationSchema `json:"listeners"`
 
 	// LoadBalancerName The name of the load balancer for which you want to create listeners.
-	LoadBalancerName *string `json:"loadBalancerName,omitempty"`
+	LoadBalancerName string `json:"loadBalancerName"`
 }
 
 // CreateLoadBalancerPolicyRequestSchema defines model for CreateLoadBalancerPolicyRequestSchema.
@@ -346,22 +346,22 @@ type CreateLoadBalancerPolicyRequestSchema struct {
 	CookieName *string `json:"cookieName,omitempty"`
 
 	// LoadBalancerName The name of the load balancer for which you want to create a policy.
-	LoadBalancerName *string `json:"loadBalancerName,omitempty"`
+	LoadBalancerName string `json:"loadBalancerName"`
 
 	// PolicyName The name of the policy. This name must be unique and consist of alphanumeric characters and dashes (-).
-	PolicyName *string `json:"policyName,omitempty"`
+	PolicyName string `json:"policyName"`
 
 	// PolicyType The type of stickiness policy you want to create: `app` or `load_balancer`.
-	PolicyType *string `json:"policyType,omitempty"`
+	PolicyType string `json:"policyType"`
 }
 
 // CreateLoadBalancerRequestSchema defines model for CreateLoadBalancerRequestSchema.
 type CreateLoadBalancerRequestSchema struct {
 	// Listeners One or more listeners to create.
-	Listeners *[]ListenerForCreationSchema `json:"listeners,omitempty"`
+	Listeners []ListenerForCreationSchema `json:"listeners"`
 
 	// LoadBalancerName The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).
-	LoadBalancerName *string `json:"loadBalancerName,omitempty"`
+	LoadBalancerName string `json:"loadBalancerName"`
 
 	// LoadBalancerType The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.
 	LoadBalancerType *string `json:"loadBalancerType,omitempty"`
@@ -382,47 +382,47 @@ type CreateLoadBalancerRequestSchema struct {
 // CreateLoadBalancerTagsRequestSchema defines model for CreateLoadBalancerTagsRequestSchema.
 type CreateLoadBalancerTagsRequestSchema struct {
 	// LoadBalancerNames One or more load balancer names.
-	LoadBalancerNames *[]string `json:"loadBalancerNames,omitempty"`
+	LoadBalancerNames []string `json:"loadBalancerNames"`
 
 	// Tags One or more tags to add to the specified load balancers.
-	Tags *[]ResourceTagSchema `json:"tags,omitempty"`
+	Tags []ResourceTagSchema `json:"tags"`
 }
 
 // CreateNatServiceRequestSchema defines model for CreateNatServiceRequestSchema.
 type CreateNatServiceRequestSchema struct {
 	// PublicIpId The allocation ID of the public IP to associate with the NAT service.<br />
 	// If the public IP is already associated with another resource, you must first disassociate it.
-	PublicIpId *string `json:"publicIpId,omitempty"`
+	PublicIpId string `json:"publicIpId"`
 
 	// SubnetId The ID of the Subnet in which you want to create the NAT service.
-	SubnetId *string `json:"subnetId,omitempty"`
+	SubnetId string `json:"subnetId"`
 }
 
 // CreateNetAccessPointRequestSchema defines model for CreateNetAccessPointRequestSchema.
 type CreateNetAccessPointRequestSchema struct {
 	// NetId The ID of the Net.
-	NetId *string `json:"netId,omitempty"`
+	NetId string `json:"netId"`
 
 	// RouteTableIds One or more IDs of route tables to use for the connection.
 	RouteTableIds *[]string `json:"routeTableIds,omitempty"`
 
 	// ServiceName The name of the service (in the format `com.outscale.region.service`).
-	ServiceName *string `json:"serviceName,omitempty"`
+	ServiceName string `json:"serviceName"`
 }
 
 // CreateNetPeeringRequestSchema defines model for CreateNetPeeringRequestSchema.
 type CreateNetPeeringRequestSchema struct {
 	// AccepterNetId The ID of the Net you want to connect with.
-	AccepterNetId *string `json:"accepterNetId,omitempty"`
+	AccepterNetId string `json:"accepterNetId"`
 
 	// SourceNetId The ID of the Net you send the peering request from.
-	SourceNetId *string `json:"sourceNetId,omitempty"`
+	SourceNetId string `json:"sourceNetId"`
 }
 
 // CreateNetRequestSchema defines model for CreateNetRequestSchema.
 type CreateNetRequestSchema struct {
 	// IpRange The IP range for the Net, in CIDR notation (for example, `10.0.0.0/16`).
-	IpRange *string `json:"ipRange,omitempty"`
+	IpRange string `json:"ipRange"`
 
 	// Tenancy The tenancy options for the VMs (`default` if a VM created in a Net can be launched with any tenancy, `dedicated` if it can be launched with dedicated tenancy VMs running on single-tenant hardware).
 	Tenancy *string `json:"tenancy,omitempty"`
@@ -442,7 +442,7 @@ type CreateNicRequestSchema struct {
 	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
 
 	// SubnetId The ID of the Subnet in which you want to create the NIC.
-	SubnetId *string `json:"subnetId,omitempty"`
+	SubnetId string `json:"subnetId"`
 }
 
 // CreatePublicIpRequestSchema defines model for CreatePublicIpRequestSchema.
@@ -451,7 +451,7 @@ type CreatePublicIpRequestSchema = map[string]interface{}
 // CreateRouteRequestSchema defines model for CreateRouteRequestSchema.
 type CreateRouteRequestSchema struct {
 	// DestinationIpRange The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
-	DestinationIpRange *string `json:"destinationIpRange,omitempty"`
+	DestinationIpRange string `json:"destinationIpRange"`
 
 	// GatewayId The ID of an Internet service or virtual gateway attached to your Net.
 	GatewayId *string `json:"gatewayId,omitempty"`
@@ -466,7 +466,7 @@ type CreateRouteRequestSchema struct {
 	NicId *string `json:"nicId,omitempty"`
 
 	// RouteTableId The ID of the route table for which you want to create a route.
-	RouteTableId *string `json:"routeTableId,omitempty"`
+	RouteTableId string `json:"routeTableId"`
 
 	// VmId The ID of a NAT VM in your Net (attached to exactly one NIC).
 	VmId *string `json:"vmId,omitempty"`
@@ -475,13 +475,13 @@ type CreateRouteRequestSchema struct {
 // CreateRouteTableRequestSchema defines model for CreateRouteTableRequestSchema.
 type CreateRouteTableRequestSchema struct {
 	// NetId The ID of the Net for which you want to create a route table.
-	NetId *string `json:"netId,omitempty"`
+	NetId string `json:"netId"`
 }
 
 // CreateSecurityGroupRequestSchema defines model for CreateSecurityGroupRequestSchema.
 type CreateSecurityGroupRequestSchema struct {
 	// Description A description for the security group, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
-	Description *string `json:"description,omitempty"`
+	Description string `json:"description"`
 
 	// NetId The ID of the Net for the security group.
 	NetId *string `json:"netId,omitempty"`
@@ -489,13 +489,13 @@ type CreateSecurityGroupRequestSchema struct {
 	// SecurityGroupName The name of the security group.<br />
 	// This name must not start with `sg-`.</br>
 	// This name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.
-	SecurityGroupName *string `json:"securityGroupName,omitempty"`
+	SecurityGroupName string `json:"securityGroupName"`
 }
 
 // CreateSecurityGroupRuleRequestSchema defines model for CreateSecurityGroupRuleRequestSchema.
 type CreateSecurityGroupRuleRequestSchema struct {
 	// Flow The direction of the flow: `Inbound` or `Outbound`. You can specify `Outbound` for Nets only.
-	Flow *string `json:"flow,omitempty"`
+	Flow string `json:"flow"`
 
 	// FromPortRange The beginning of the port range for the TCP and UDP protocols, or an ICMP type number. If you specify this parameter, you cannot specify the `Rules` parameter and its subparameters.
 	FromPortRange *int `json:"fromPortRange,omitempty"`
@@ -513,7 +513,7 @@ type CreateSecurityGroupRuleRequestSchema struct {
 	SecurityGroupAccountIdToLink *string `json:"securityGroupAccountIdToLink,omitempty"`
 
 	// SecurityGroupId The ID of the security group for which you want to create a rule.
-	SecurityGroupId *string `json:"securityGroupId,omitempty"`
+	SecurityGroupId string `json:"securityGroupId"`
 
 	// SecurityGroupNameToLink The ID of a source or destination security group that you want to link to the security group of the rule.
 	SecurityGroupNameToLink *string `json:"securityGroupNameToLink,omitempty"`
@@ -541,10 +541,10 @@ type CreateSnapshotRequestSchema struct {
 type CreateSubnetRequestSchema struct {
 	// IpRange The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />
 	// The IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About VPCs](https://docs.outscale.com/en/userguide/About-VPCs.html).
-	IpRange *string `json:"ipRange,omitempty"`
+	IpRange string `json:"ipRange"`
 
 	// NetId The ID of the Net for which you want to create a Subnet.
-	NetId *string `json:"netId,omitempty"`
+	NetId string `json:"netId"`
 
 	// SubregionName The name of the Subregion in which you want to create the Subnet.
 	SubregionName *string `json:"subregionName,omitempty"`
@@ -553,16 +553,16 @@ type CreateSubnetRequestSchema struct {
 // CreateTagsRequestSchema defines model for CreateTagsRequestSchema.
 type CreateTagsRequestSchema struct {
 	// ResourceIds One or more resource IDs.
-	ResourceIds *[]string `json:"resourceIds,omitempty"`
+	ResourceIds []string `json:"resourceIds"`
 
 	// Tags One or more tags to add to the specified resources.
-	Tags *[]ResourceTagSchema `json:"tags,omitempty"`
+	Tags []ResourceTagSchema `json:"tags"`
 }
 
 // CreateVirtualGatewayRequestSchema defines model for CreateVirtualGatewayRequestSchema.
 type CreateVirtualGatewayRequestSchema struct {
 	// ConnectionType The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).
-	ConnectionType *string `json:"connectionType,omitempty"`
+	ConnectionType string `json:"connectionType"`
 }
 
 // CreateVmsRequestSchema defines model for CreateVmsRequestSchema.
@@ -583,7 +583,7 @@ type CreateVmsRequestSchema struct {
 	DeletionProtection *bool `json:"deletionProtection,omitempty"`
 
 	// ImageId The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.
-	ImageId *string `json:"imageId,omitempty"`
+	ImageId string `json:"imageId"`
 
 	// KeypairName The name of the keypair.
 	KeypairName *string `json:"keypairName,omitempty"`
@@ -650,7 +650,7 @@ type CreateVolumeRequestSchema struct {
 	SnapshotId *string `json:"snapshotId,omitempty"`
 
 	// SubregionName The Subregion in which you want to create the volume.
-	SubregionName *string `json:"subregionName,omitempty"`
+	SubregionName string `json:"subregionName"`
 
 	// VolumeType The type of volume you want to create (`io1` \| `gp2` \ | `standard`). If not specified, a `standard` volume is created.<br />
 	//  For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
@@ -660,31 +660,31 @@ type CreateVolumeRequestSchema struct {
 // CreateVpnConnectionRequestSchema defines model for CreateVpnConnectionRequestSchema.
 type CreateVpnConnectionRequestSchema struct {
 	// ClientGatewayId The ID of the client gateway.
-	ClientGatewayId *string `json:"clientGatewayId,omitempty"`
+	ClientGatewayId string `json:"clientGatewayId"`
 
 	// ConnectionType The type of VPN connection (only `ipsec.1` is supported).
-	ConnectionType *string `json:"connectionType,omitempty"`
+	ConnectionType string `json:"connectionType"`
 
 	// StaticRoutesOnly If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).
 	StaticRoutesOnly *bool `json:"staticRoutesOnly,omitempty"`
 
 	// VirtualGatewayId The ID of the virtual gateway.
-	VirtualGatewayId *string `json:"virtualGatewayId,omitempty"`
+	VirtualGatewayId string `json:"virtualGatewayId"`
 }
 
 // CreateVpnConnectionRouteRequestSchema defines model for CreateVpnConnectionRouteRequestSchema.
 type CreateVpnConnectionRouteRequestSchema struct {
 	// DestinationIpRange The network prefix of the route, in CIDR notation (for example, `10.12.0.0/16`).
-	DestinationIpRange *string `json:"destinationIpRange,omitempty"`
+	DestinationIpRange string `json:"destinationIpRange"`
 
 	// VpnConnectionId The ID of the target VPN connection of the static route.
-	VpnConnectionId *string `json:"vpnConnectionId,omitempty"`
+	VpnConnectionId string `json:"vpnConnectionId"`
 }
 
 // DeleteLoadBalancerListenersRequestSchema defines model for DeleteLoadBalancerListenersRequestSchema.
 type DeleteLoadBalancerListenersRequestSchema struct {
 	// LoadBalancerPorts One or more port numbers of the listeners you want to delete.
-	LoadBalancerPorts *[]int `json:"loadBalancerPorts,omitempty"`
+	LoadBalancerPorts []int `json:"loadBalancerPorts"`
 }
 
 // DeleteLoadBalancerListenersResponseSchema defines model for DeleteLoadBalancerListenersResponseSchema.
@@ -696,7 +696,7 @@ type DeleteLoadBalancerListenersResponseSchema struct {
 // DeleteLoadBalancerPolicyRequestSchema defines model for DeleteLoadBalancerPolicyRequestSchema.
 type DeleteLoadBalancerPolicyRequestSchema struct {
 	// PolicyName The name of the policy you want to delete.
-	PolicyName *string `json:"policyName,omitempty"`
+	PolicyName string `json:"policyName"`
 }
 
 // DeleteLoadBalancerPolicyResponseSchema defines model for DeleteLoadBalancerPolicyResponseSchema.
@@ -708,7 +708,7 @@ type DeleteLoadBalancerPolicyResponseSchema struct {
 // DeleteLoadBalancerTagsRequestSchema defines model for DeleteLoadBalancerTagsRequestSchema.
 type DeleteLoadBalancerTagsRequestSchema struct {
 	// Tags One or more tags to delete from the load balancers.
-	Tags *[]ResourceLoadBalancerTagSchema `json:"tags,omitempty"`
+	Tags []ResourceLoadBalancerTagSchema `json:"tags"`
 }
 
 // DeletePublicIpRequestSchema defines model for DeletePublicIpRequestSchema.
@@ -720,7 +720,7 @@ type DeletePublicIpRequestSchema struct {
 // DeleteRouteRequestSchema defines model for DeleteRouteRequestSchema.
 type DeleteRouteRequestSchema struct {
 	// DestinationIpRange The exact IP range for the route.
-	DestinationIpRange *string `json:"destinationIpRange,omitempty"`
+	DestinationIpRange string `json:"destinationIpRange"`
 }
 
 // DeleteRouteResponseSchema defines model for DeleteRouteResponseSchema.
@@ -738,7 +738,7 @@ type DeleteSecurityGroupRequestSchema struct {
 // DeleteSecurityGroupRuleRequestSchema defines model for DeleteSecurityGroupRuleRequestSchema.
 type DeleteSecurityGroupRuleRequestSchema struct {
 	// Flow The direction of the flow: `Inbound` or `Outbound`. You can specify `Outbound` for Nets only.
-	Flow *string `json:"flow,omitempty"`
+	Flow string `json:"flow"`
 
 	// FromPortRange The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.
 	FromPortRange *int `json:"fromPortRange,omitempty"`
@@ -771,7 +771,7 @@ type DeleteSecurityGroupRuleResponseSchema struct {
 // DeleteTagsRequestSchema defines model for DeleteTagsRequestSchema.
 type DeleteTagsRequestSchema struct {
 	// Tags One or more tags to delete (if you set a tag value, only the tags matching exactly this value are deleted).
-	Tags *[]ResourceTagSchema `json:"tags,omitempty"`
+	Tags []ResourceTagSchema `json:"tags"`
 }
 
 // DeleteVmsResponseSchema defines model for DeleteVmsResponseSchema.
@@ -783,7 +783,7 @@ type DeleteVmsResponseSchema struct {
 // DeleteVpnConnectionRouteRequestSchema defines model for DeleteVpnConnectionRouteRequestSchema.
 type DeleteVpnConnectionRouteRequestSchema struct {
 	// DestinationIpRange The network prefix of the route to delete, in CIDR notation (for example, `10.12.0.0/16`).
-	DestinationIpRange *string `json:"destinationIpRange,omitempty"`
+	DestinationIpRange string `json:"destinationIpRange"`
 }
 
 // DhcpOptionsSetSchema Information about the DHCP options set.
@@ -813,7 +813,7 @@ type DhcpOptionsSetSchema struct {
 // DirectLinkInterfaceSchema Information about the DirectLink interface.
 type DirectLinkInterfaceSchema struct {
 	// BgpAsn The BGP (Border Gateway Protocol) ASN (Autonomous System Number) on the customer's side of the DirectLink interface. This number must be between `64512` and `65534`.
-	BgpAsn *int `json:"bgpAsn,omitempty"`
+	BgpAsn int `json:"bgpAsn"`
 
 	// BgpKey The BGP authentication key.
 	BgpKey *string `json:"bgpKey,omitempty"`
@@ -828,10 +828,10 @@ type DirectLinkInterfaceSchema struct {
 	NumspotPrivateIp *string `json:"numspotPrivateIp,omitempty"`
 
 	// VirtualGatewayId The ID of the target virtual gateway.
-	VirtualGatewayId *string `json:"virtualGatewayId,omitempty"`
+	VirtualGatewayId string `json:"virtualGatewayId"`
 
 	// Vlan The VLAN number associated with the DirectLink interface.
-	Vlan *int `json:"vlan,omitempty"`
+	Vlan int `json:"vlan"`
 }
 
 // DirectLinkInterfacesSchema Information about the DirectLink interfaces.
@@ -965,25 +965,25 @@ type FlexibleGpuSchema struct {
 // HealthCheckSchema Information about the health check configuration.
 type HealthCheckSchema struct {
 	// CheckInterval The number of seconds between two pings (between `5` and `600` both included).
-	CheckInterval *int `json:"checkInterval,omitempty"`
+	CheckInterval int `json:"checkInterval"`
 
 	// HealthyThreshold The number of consecutive successful pings before considering the VM as healthy (between `2` and `10` both included).
-	HealthyThreshold *int `json:"healthyThreshold,omitempty"`
+	HealthyThreshold int `json:"healthyThreshold"`
 
 	// Path If you use the HTTP or HTTPS protocols, the ping path.
 	Path *string `json:"path,omitempty"`
 
 	// Port The port number (between `1` and `65535`, both included).
-	Port *int `json:"port,omitempty"`
+	Port int `json:"port"`
 
 	// Protocol The protocol for the URL of the VM (`HTTP` \| `HTTPS` \| `TCP` \| `SSL`).
-	Protocol *string `json:"protocol,omitempty"`
+	Protocol string `json:"protocol"`
 
 	// Timeout The maximum waiting time for a response before considering the VM as unhealthy, in seconds (between `2` and `60` both included).
-	Timeout *int `json:"timeout,omitempty"`
+	Timeout int `json:"timeout"`
 
 	// UnhealthyThreshold The number of consecutive failed pings before considering the VM as unhealthy (between `2` and `10` both included).
-	UnhealthyThreshold *int `json:"unhealthyThreshold,omitempty"`
+	UnhealthyThreshold int `json:"unhealthyThreshold"`
 }
 
 // ImageSchema Information about the OMI.
@@ -1045,11 +1045,11 @@ type InternetServiceSchema struct {
 
 // KeypairCreatedSchema Information about the created keypair.
 type KeypairCreatedSchema struct {
-	// KeypairFingerprint The MD5 public key fingerprint as specified in section 4 of RFC 4716.
-	KeypairFingerprint *string `json:"keypairFingerprint,omitempty"`
+	// Fingerprint The MD5 public key fingerprint as specified in section 4 of RFC 4716.
+	Fingerprint *string `json:"fingerprint,omitempty"`
 
-	// KeypairName The name of the keypair.
-	KeypairName *string `json:"keypairName,omitempty"`
+	// Name The name of the keypair.
+	Name *string `json:"name,omitempty"`
 
 	// PrivateKey The private key. When saving the private key in a .rsa file, replace the `\n` escape sequences with line breaks.
 	PrivateKey *string `json:"privateKey,omitempty"`
@@ -1067,13 +1067,13 @@ type KeypairSchema struct {
 // LinkFlexibleGpuRequestSchema defines model for LinkFlexibleGpuRequestSchema.
 type LinkFlexibleGpuRequestSchema struct {
 	// VmId The ID of the VM you want to attach the fGPU to.
-	VmId *string `json:"vmId,omitempty"`
+	VmId string `json:"vmId"`
 }
 
 // LinkInternetServiceRequestSchema defines model for LinkInternetServiceRequestSchema.
 type LinkInternetServiceRequestSchema struct {
 	// NetId The ID of the Net to which you want to attach the Internet service.
-	NetId *string `json:"netId,omitempty"`
+	NetId string `json:"netId"`
 }
 
 // LinkLoadBalancerBackendMachinesRequestSchema defines model for LinkLoadBalancerBackendMachinesRequestSchema.
@@ -1103,10 +1103,10 @@ type LinkNicLightSchema struct {
 // LinkNicRequestSchema defines model for LinkNicRequestSchema.
 type LinkNicRequestSchema struct {
 	// DeviceNumber The index of the VM device for the NIC attachment (between `1` and `7`, both included).
-	DeviceNumber *int `json:"deviceNumber,omitempty"`
+	DeviceNumber int `json:"deviceNumber"`
 
 	// VmId The ID of the VM to which you want to attach the NIC.
-	VmId *string `json:"vmId,omitempty"`
+	VmId string `json:"vmId"`
 }
 
 // LinkNicResponseSchema defines model for LinkNicResponseSchema.
@@ -1195,7 +1195,7 @@ type LinkPublicIpSchema struct {
 // LinkRouteTableRequestSchema defines model for LinkRouteTableRequestSchema.
 type LinkRouteTableRequestSchema struct {
 	// SubnetId The ID of the Subnet.
-	SubnetId *string `json:"subnetId,omitempty"`
+	SubnetId string `json:"subnetId"`
 }
 
 // LinkRouteTableResponseSchema defines model for LinkRouteTableResponseSchema.
@@ -1207,7 +1207,7 @@ type LinkRouteTableResponseSchema struct {
 // LinkVirtualGatewayRequestSchema defines model for LinkVirtualGatewayRequestSchema.
 type LinkVirtualGatewayRequestSchema struct {
 	// NetId The ID of the Net to which you want to attach the virtual gateway.
-	NetId *string `json:"netId,omitempty"`
+	NetId string `json:"netId"`
 }
 
 // LinkVirtualGatewayResponseSchema defines model for LinkVirtualGatewayResponseSchema.
@@ -1219,10 +1219,10 @@ type LinkVirtualGatewayResponseSchema struct {
 // LinkVolumeRequestSchema defines model for LinkVolumeRequestSchema.
 type LinkVolumeRequestSchema struct {
 	// DeviceName The name of the device. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`).
-	DeviceName *string `json:"deviceName,omitempty"`
+	DeviceName string `json:"deviceName"`
 
 	// VmId The ID of the VM you want to attach the volume to.
-	VmId *string `json:"vmId,omitempty"`
+	VmId string `json:"vmId"`
 }
 
 // LinkedVolumeSchema Information about volume attachment.
@@ -1246,16 +1246,16 @@ type LinkedVolumeSchema struct {
 // ListenerForCreationSchema Information about the listener to create.
 type ListenerForCreationSchema struct {
 	// BackendPort The port on which the back-end VM is listening (between `1` and `65535`, both included).
-	BackendPort *int `json:"backendPort,omitempty"`
+	BackendPort int `json:"backendPort"`
 
 	// BackendProtocol The protocol for routing traffic to back-end VMs (`HTTP` \| `HTTPS` \| `TCP` \| `SSL`).
 	BackendProtocol *string `json:"backendProtocol,omitempty"`
 
 	// LoadBalancerPort The port on which the load balancer is listening (between `1` and `65535`, both included).
-	LoadBalancerPort *int `json:"loadBalancerPort,omitempty"`
+	LoadBalancerPort int `json:"loadBalancerPort"`
 
 	// LoadBalancerProtocol The routing protocol (`HTTP` \| `HTTPS` \| `TCP` \| `SSL`).
-	LoadBalancerProtocol *string `json:"loadBalancerProtocol,omitempty"`
+	LoadBalancerProtocol string `json:"loadBalancerProtocol"`
 }
 
 // ListenerRuleForCreationSchema Information about the listener rule.
@@ -1267,13 +1267,13 @@ type ListenerRuleForCreationSchema struct {
 	HostNamePattern *string `json:"hostNamePattern,omitempty"`
 
 	// ListenerRuleName A human-readable name for the listener rule.
-	ListenerRuleName *string `json:"listenerRuleName,omitempty"`
+	ListenerRuleName string `json:"listenerRuleName"`
 
 	// PathPattern A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~&quot;'@:+?].
 	PathPattern *string `json:"pathPattern,omitempty"`
 
 	// Priority The priority level of the listener rule, between `1` and `19999` both included. Each rule must have a unique priority level. Otherwise, an error is returned.
-	Priority *int `json:"priority,omitempty"`
+	Priority int `json:"priority"`
 }
 
 // ListenerRuleSchema Information about the listener rule.
@@ -1327,10 +1327,10 @@ type ListenerSchema struct {
 // LoadBalancerLightSchema Information about the load balancer.
 type LoadBalancerLightSchema struct {
 	// LoadBalancerName The name of the load balancer to which the listener is attached.
-	LoadBalancerName *string `json:"loadBalancerName,omitempty"`
+	LoadBalancerName string `json:"loadBalancerName"`
 
 	// LoadBalancerPort The port of load balancer on which the load balancer is listening (between `1` and `65535` both included).
-	LoadBalancerPort *int `json:"loadBalancerPort,omitempty"`
+	LoadBalancerPort int `json:"loadBalancerPort"`
 }
 
 // LoadBalancerSchema Information about the load balancer.
@@ -1814,7 +1814,7 @@ type PublicIpSchema struct {
 // ReadAdminPasswordRequestSchema defines model for ReadAdminPasswordRequestSchema.
 type ReadAdminPasswordRequestSchema struct {
 	// VmId The ID of the VM.
-	VmId *string `json:"vmId,omitempty"`
+	VmId string `json:"vmId"`
 }
 
 // ReadAdminPasswordResponseSchema defines model for ReadAdminPasswordResponseSchema.
@@ -1835,7 +1835,7 @@ type ReadClientGatewaysResponseSchema struct {
 // ReadConsoleOutputRequestSchema defines model for ReadConsoleOutputRequestSchema.
 type ReadConsoleOutputRequestSchema struct {
 	// VmId The ID of the VM.
-	VmId *string `json:"vmId,omitempty"`
+	VmId string `json:"vmId"`
 }
 
 // ReadConsoleOutputResponseSchema defines model for ReadConsoleOutputResponseSchema.
@@ -1907,7 +1907,7 @@ type ReadListenerRulesResponseSchema struct {
 // ReadLoadBalancerTagsRequestSchema defines model for ReadLoadBalancerTagsRequestSchema.
 type ReadLoadBalancerTagsRequestSchema struct {
 	// LoadBalancerNames One or more load balancer names.
-	LoadBalancerNames *[]string `json:"loadBalancerNames,omitempty"`
+	LoadBalancerNames []string `json:"loadBalancerNames"`
 }
 
 // ReadLoadBalancerTagsResponseSchema defines model for ReadLoadBalancerTagsResponseSchema.
@@ -2024,7 +2024,7 @@ type ReadVmsHealthRequestSchema struct {
 	BackendVmIds *[]string `json:"backendVmIds,omitempty"`
 
 	// LoadBalancerName The name of the load balancer.
-	LoadBalancerName *string `json:"loadBalancerName,omitempty"`
+	LoadBalancerName string `json:"loadBalancerName"`
 }
 
 // ReadVmsHealthResponseSchema defines model for ReadVmsHealthResponseSchema.
@@ -2060,13 +2060,13 @@ type ReadVpnConnectionsResponseSchema struct {
 // RebootVmsRequestSchema defines model for RebootVmsRequestSchema.
 type RebootVmsRequestSchema struct {
 	// VmIds One or more IDs of the VMs you want to reboot.
-	VmIds *[]string `json:"vmIds,omitempty"`
+	VmIds []string `json:"vmIds"`
 }
 
 // RejectNetPeeringRequestSchema defines model for RejectNetPeeringRequestSchema.
 type RejectNetPeeringRequestSchema struct {
 	// NetPeeringId The ID of the Net peering you want to reject.
-	NetPeeringId *string `json:"netPeeringId,omitempty"`
+	NetPeeringId string `json:"netPeeringId"`
 }
 
 // ResourceLoadBalancerTagSchema Information about the tag.
@@ -2078,10 +2078,10 @@ type ResourceLoadBalancerTagSchema struct {
 // ResourceTagSchema Information about the tag.
 type ResourceTagSchema struct {
 	// Key The key of the tag, with a minimum of 1 character.
-	Key *string `json:"key,omitempty"`
+	Key string `json:"key"`
 
 	// Value The value of the tag, between 0 and 255 characters.
-	Value *string `json:"value,omitempty"`
+	Value string `json:"value"`
 }
 
 // RouteLightSchema Information about the route.
@@ -2283,7 +2283,7 @@ type SourceSecurityGroupSchema struct {
 // StartVmsRequestSchema defines model for StartVmsRequestSchema.
 type StartVmsRequestSchema struct {
 	// VmIds One or more IDs of VMs.
-	VmIds *[]string `json:"vmIds,omitempty"`
+	VmIds []string `json:"vmIds"`
 }
 
 // StartVmsResponseSchema defines model for StartVmsResponseSchema.
@@ -2307,7 +2307,7 @@ type StopVmsRequestSchema struct {
 	ForceStop *bool `json:"forceStop,omitempty"`
 
 	// VmIds One or more IDs of VMs.
-	VmIds *[]string `json:"vmIds,omitempty"`
+	VmIds []string `json:"vmIds"`
 }
 
 // StopVmsResponseSchema defines model for StopVmsResponseSchema.
@@ -2361,7 +2361,7 @@ type TagSchema struct {
 // UnlinkInternetServiceRequestSchema defines model for UnlinkInternetServiceRequestSchema.
 type UnlinkInternetServiceRequestSchema struct {
 	// NetId The ID of the Net from which you want to detach the Internet service.
-	NetId *string `json:"netId,omitempty"`
+	NetId string `json:"netId"`
 }
 
 // UnlinkLoadBalancerBackendMachinesRequestSchema defines model for UnlinkLoadBalancerBackendMachinesRequestSchema.
@@ -2376,7 +2376,7 @@ type UnlinkLoadBalancerBackendMachinesRequestSchema struct {
 // UnlinkPrivateIpsRequestSchema defines model for UnlinkPrivateIpsRequestSchema.
 type UnlinkPrivateIpsRequestSchema struct {
 	// PrivateIps One or more secondary private IPs you want to unassign from the NIC.
-	PrivateIps *[]string `json:"privateIps,omitempty"`
+	PrivateIps []string `json:"privateIps"`
 }
 
 // UnlinkPublicIpRequestSchema defines model for UnlinkPublicIpRequestSchema.
@@ -2388,7 +2388,7 @@ type UnlinkPublicIpRequestSchema struct {
 // UnlinkVirtualGatewayRequestSchema defines model for UnlinkVirtualGatewayRequestSchema.
 type UnlinkVirtualGatewayRequestSchema struct {
 	// NetId The ID of the Net from which you want to detach the virtual gateway.
-	NetId *string `json:"netId,omitempty"`
+	NetId string `json:"netId"`
 }
 
 // UnlinkVolumeRequestSchema defines model for UnlinkVolumeRequestSchema.
@@ -2400,7 +2400,7 @@ type UnlinkVolumeRequestSchema struct {
 // UpdateDirectLinkInterfaceRequestSchema defines model for UpdateDirectLinkInterfaceRequestSchema.
 type UpdateDirectLinkInterfaceRequestSchema struct {
 	// Mtu The maximum transmission unit (MTU) of the DirectLink interface, in bytes (always `1500`).
-	Mtu *UpdateDirectLinkInterfaceRequestSchemaMtu `json:"mtu,omitempty"`
+	Mtu UpdateDirectLinkInterfaceRequestSchemaMtu `json:"mtu"`
 }
 
 // UpdateDirectLinkInterfaceRequestSchemaMtu The maximum transmission unit (MTU) of the DirectLink interface, in bytes (always `1500`).
@@ -2428,7 +2428,7 @@ type UpdateFlexibleGpuResponseSchema struct {
 type UpdateImageRequestSchema struct {
 	// PermissionsToLaunch Information about the permissions for the resource.<br />
 	// Specify either the `Additions` or the `Removals` parameter.
-	PermissionsToLaunch *PermissionsOnResourceCreationSchema `json:"permissionsToLaunch,omitempty"`
+	PermissionsToLaunch PermissionsOnResourceCreationSchema `json:"permissionsToLaunch"`
 }
 
 // UpdateImageResponseSchema defines model for UpdateImageResponseSchema.
@@ -2497,7 +2497,7 @@ type UpdateNetAccessPointResponseSchema struct {
 // UpdateNetRequestSchema defines model for UpdateNetRequestSchema.
 type UpdateNetRequestSchema struct {
 	// DhcpOptionsSetId The ID of the DHCP options set (or `default` if you want to associate the default one).
-	DhcpOptionsSetId *string `json:"dhcpOptionsSetId,omitempty"`
+	DhcpOptionsSetId string `json:"dhcpOptionsSetId"`
 }
 
 // UpdateNetResponseSchema defines model for UpdateNetResponseSchema.
@@ -2528,10 +2528,10 @@ type UpdateNicResponseSchema struct {
 // UpdateRoutePropagationRequestSchema defines model for UpdateRoutePropagationRequestSchema.
 type UpdateRoutePropagationRequestSchema struct {
 	// Enable If true, a virtual gateway can propagate routes to a specified route table of a Net. If false, the propagation is disabled.
-	Enable *bool `json:"enable,omitempty"`
+	Enable bool `json:"enable"`
 
 	// VirtualGatewayId The ID of the virtual gateway.
-	VirtualGatewayId *string `json:"virtualGatewayId,omitempty"`
+	VirtualGatewayId string `json:"virtualGatewayId"`
 }
 
 // UpdateRoutePropagationResponseSchema defines model for UpdateRoutePropagationResponseSchema.
@@ -2543,7 +2543,7 @@ type UpdateRoutePropagationResponseSchema struct {
 // UpdateRouteRequestSchema defines model for UpdateRouteRequestSchema.
 type UpdateRouteRequestSchema struct {
 	// DestinationIpRange The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
-	DestinationIpRange *string `json:"destinationIpRange,omitempty"`
+	DestinationIpRange string `json:"destinationIpRange"`
 
 	// GatewayId The ID of an Internet service or virtual gateway attached to your Net.
 	GatewayId *string `json:"gatewayId,omitempty"`
@@ -2570,7 +2570,7 @@ type UpdateRouteResponseSchema struct {
 // UpdateSubnetRequestSchema defines model for UpdateSubnetRequestSchema.
 type UpdateSubnetRequestSchema struct {
 	// MapPublicIpOnLaunch If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.
-	MapPublicIpOnLaunch *bool `json:"mapPublicIpOnLaunch,omitempty"`
+	MapPublicIpOnLaunch bool `json:"mapPublicIpOnLaunch"`
 }
 
 // UpdateSubnetResponseSchema defines model for UpdateSubnetResponseSchema.

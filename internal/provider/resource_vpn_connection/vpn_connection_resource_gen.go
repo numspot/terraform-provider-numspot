@@ -24,14 +24,12 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Example configuration for the client gateway.",
 			},
 			"client_gateway_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the client gateway.",
 				MarkdownDescription: "The ID of the client gateway.",
 			},
 			"connection_type": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The type of VPN connection (only `ipsec.1` is supported).",
 				MarkdownDescription: "The type of VPN connection (only `ipsec.1` is supported).",
 			},
@@ -120,8 +118,7 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Information about the current state of one or more of the VPN tunnels.",
 			},
 			"virtual_gateway_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the virtual gateway.",
 				MarkdownDescription: "The ID of the virtual gateway.",
 			},
