@@ -26,7 +26,7 @@ func KeyPairFromHttpToTf(http *api.KeypairSchema) resource_key_pair.KeyPairModel
 
 func KeyPairFromTfToCreateRequest(tf resource_key_pair.KeyPairModel) api.CreateKeypairJSONRequestBody {
 	return api.CreateKeypairJSONRequestBody{
-		KeypairName: tf.Name.ValueString(),
-		PublicKey:   tf.PublicKey.ValueStringPointer(),
+		Name:      tf.Name.ValueStringPointer(),
+		PublicKey: tf.PublicKey.ValueStringPointer(),
 	}
 }

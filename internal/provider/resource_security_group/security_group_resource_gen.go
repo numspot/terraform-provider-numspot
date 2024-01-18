@@ -38,17 +38,20 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 					Attributes: map[string]schema.Attribute{
 						"from_port_range": schema.Int64Attribute{
 							Computed:            true,
+							Optional: true,
 							Description:         "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 							MarkdownDescription: "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 						},
 						"ip_protocol": schema.StringAttribute{
 							Computed:            true,
+							Optional: true,
 							Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 							MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 						},
 						"ip_ranges": schema.ListAttribute{
 							ElementType:         types.StringType,
 							Computed:            true,
+							Optional: true,
 							Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 							MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 						},
@@ -57,6 +60,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 								Attributes: map[string]schema.Attribute{
 									"account_id": schema.StringAttribute{
 										Computed:            true,
+										Optional: true,
 										Description:         "The account ID that owns the source or destination security group.",
 										MarkdownDescription: "The account ID that owns the source or destination security group.",
 									},
@@ -79,11 +83,13 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 						"service_ids": schema.ListAttribute{
 							ElementType:         types.StringType,
 							Computed:            true,
+							Optional: true,
 							Description:         "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
 							MarkdownDescription: "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
 						},
 						"to_port_range": schema.Int64Attribute{
 							Computed:            true,
+							Optional: true,
 							Description:         "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 							MarkdownDescription: "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 						},
@@ -94,14 +100,16 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Computed:            true,
+				Optional:            true,
+				Computed: 			true,
 				Description:         "The inbound rules associated with the security group.",
 				MarkdownDescription: "The inbound rules associated with the security group.",
 			},
 			"name": schema.StringAttribute{
+				Optional:            true,
 				Computed:            true,
-				Description:         "The name of the security group.",
-				MarkdownDescription: "The name of the security group.",
+				Description:         "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
+				MarkdownDescription: "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
 			},
 			"net_id": schema.StringAttribute{
 				Optional:            true,
@@ -170,28 +178,23 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Computed:            true,
+				Optional:            true,
+				Computed: 			true,
 				Description:         "The outbound rules associated with the security group.",
 				MarkdownDescription: "The outbound rules associated with the security group.",
-			},
-			"security_group_name": schema.StringAttribute{
-				Required:            true,
-				Description:         "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
-				MarkdownDescription: "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
 			},
 		},
 	}
 }
 
 type SecurityGroupModel struct {
-	AccountId         types.String `tfsdk:"account_id"`
-	Description       types.String `tfsdk:"description"`
-	Id                types.String `tfsdk:"id"`
-	InboundRules      types.List   `tfsdk:"inbound_rules"`
-	Name              types.String `tfsdk:"name"`
-	NetId             types.String `tfsdk:"net_id"`
-	OutboundRules     types.List   `tfsdk:"outbound_rules"`
-	SecurityGroupName types.String `tfsdk:"security_group_name"`
+	AccountId     types.String `tfsdk:"account_id"`
+	Description   types.String `tfsdk:"description"`
+	Id            types.String `tfsdk:"id"`
+	InboundRules  types.List   `tfsdk:"inbound_rules"`
+	Name          types.String `tfsdk:"name"`
+	NetId         types.String `tfsdk:"net_id"`
+	OutboundRules types.List   `tfsdk:"outbound_rules"`
 }
 
 var _ basetypes.ObjectTypable = InboundRulesType{}
@@ -1918,24 +1921,3 @@ func (v OutboundRulesValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"to_port_range": basetypes.Int64Type{},
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -18,7 +18,7 @@ func InternetServiceResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Internet service.",
 			},
 			"net_id": schema.StringAttribute{
-				Computed:            true,
+				Optional:            true,
 				Description:         "The ID of the Net attached to the Internet service.",
 				MarkdownDescription: "The ID of the Net attached to the Internet service.",
 			},

@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	ApiKeyAuthScopes = "ApiKeyAuth.Scopes"
+	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
 // Defines values for CreateVmsRequestSchemaPerformance.
@@ -248,11 +248,11 @@ type CreateDirectLinkRequestSchema struct {
 	// Bandwidth The bandwidth of the DirectLink (`1Gbps` \| `10Gbps`).
 	Bandwidth string `json:"bandwidth"`
 
-	// DirectLinkName The name of the DirectLink.
-	DirectLinkName string `json:"directLinkName"`
-
 	// Location The code of the requested location for the DirectLink, returned by the [ReadLocations](#readlocations) method.
 	Location string `json:"location"`
+
+	// Name The name of the DirectLink.
+	Name *string `json:"name,omitempty"`
 }
 
 // CreateFlexibleGpuRequestSchema defines model for CreateFlexibleGpuRequestSchema.
@@ -281,9 +281,9 @@ type CreateImageRequestSchema struct {
 	// Description A description for the new OMI.
 	Description *string `json:"description,omitempty"`
 
-	// ImageName A unique name for the new OMI.<br />
+	// Name A unique name for the new OMI.<br />
 	// Constraints: 3-128 alphanumeric characters, underscores (_), spaces ( ), parentheses (()), slashes (/), periods (.), or dashes (-).
-	ImageName *string `json:"imageName,omitempty"`
+	Name *string `json:"name,omitempty"`
 
 	// NoReboot If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.
 	NoReboot *bool `json:"noReboot,omitempty"`
@@ -293,9 +293,6 @@ type CreateImageRequestSchema struct {
 
 	// RootDeviceName The name of the root device. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.
 	RootDeviceName *string `json:"rootDeviceName,omitempty"`
-
-	// SourceImageId The ID of the OMI you want to copy. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.
-	SourceImageId *string `json:"sourceImageId,omitempty"`
 
 	// SourceRegionName The name of the source Region, which must be the same as the Region of your account.
 	SourceRegionName *string `json:"sourceRegionName,omitempty"`
@@ -309,8 +306,8 @@ type CreateInternetServiceRequestSchema = map[string]interface{}
 
 // CreateKeypairRequestSchema defines model for CreateKeypairRequestSchema.
 type CreateKeypairRequestSchema struct {
-	// KeypairName A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
-	KeypairName string `json:"keypairName"`
+	// Name A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
+	Name *string `json:"name,omitempty"`
 
 	// PublicKey The public key. It must be Base64-encoded.
 	PublicKey *string `json:"publicKey,omitempty"`
@@ -360,11 +357,8 @@ type CreateLoadBalancerRequestSchema struct {
 	// Listeners One or more listeners to create.
 	Listeners []ListenerForCreationSchema `json:"listeners"`
 
-	// LoadBalancerName The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).
-	LoadBalancerName string `json:"loadBalancerName"`
-
-	// LoadBalancerType The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.
-	LoadBalancerType *string `json:"loadBalancerType,omitempty"`
+	// Name The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).
+	Name *string `json:"name,omitempty"`
 
 	// PublicIp (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by 3DS OUTSCALE is associated.
 	PublicIp *string `json:"publicIp,omitempty"`
@@ -377,6 +371,9 @@ type CreateLoadBalancerRequestSchema struct {
 
 	// Tags One or more tags assigned to the load balancer.
 	Tags *[]ResourceTagSchema `json:"tags,omitempty"`
+
+	// Type The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.
+	Type *string `json:"type,omitempty"`
 }
 
 // CreateLoadBalancerTagsRequestSchema defines model for CreateLoadBalancerTagsRequestSchema.
@@ -465,8 +462,8 @@ type CreateRouteRequestSchema struct {
 	// NicId The ID of a NIC.
 	NicId *string `json:"nicId,omitempty"`
 
-	// RouteTableId The ID of the route table for which you want to create a route.
-	RouteTableId string `json:"routeTableId"`
+	// TableId The ID of the route table for which you want to create a route.
+	TableId *string `json:"tableId,omitempty"`
 
 	// VmId The ID of a NAT VM in your Net (attached to exactly one NIC).
 	VmId *string `json:"vmId,omitempty"`
@@ -483,13 +480,13 @@ type CreateSecurityGroupRequestSchema struct {
 	// Description A description for the security group, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
 	Description string `json:"description"`
 
-	// NetId The ID of the Net for the security group.
-	NetId *string `json:"netId,omitempty"`
-
-	// SecurityGroupName The name of the security group.<br />
+	// Name The name of the security group.<br />
 	// This name must not start with `sg-`.</br>
 	// This name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.
-	SecurityGroupName string `json:"securityGroupName"`
+	Name *string `json:"name,omitempty"`
+
+	// NetId The ID of the Net for the security group.
+	NetId *string `json:"netId,omitempty"`
 }
 
 // CreateSecurityGroupRuleRequestSchema defines model for CreateSecurityGroupRuleRequestSchema.
@@ -529,9 +526,6 @@ type CreateSnapshotRequestSchema struct {
 
 	// SourceRegionName (When copying) The name of the source Region, which must be the same as the Region of your account.
 	SourceRegionName *string `json:"sourceRegionName,omitempty"`
-
-	// SourceSnapshotId (When copying) The ID of the snapshot you want to copy.
-	SourceSnapshotId *string `json:"sourceSnapshotId,omitempty"`
 
 	// VolumeId (When creating) The ID of the volume you want to create a snapshot of.
 	VolumeId *string `json:"volumeId,omitempty"`
@@ -588,12 +582,6 @@ type CreateVmsRequestSchema struct {
 	// KeypairName The name of the keypair.
 	KeypairName *string `json:"keypairName,omitempty"`
 
-	// MaxVmsCount The maximum number of VMs you want to create. If all the VMs cannot be created, the largest possible number of VMs above MinVmsCount is created.
-	MaxVmsCount *int `json:"maxVmsCount,omitempty"`
-
-	// MinVmsCount The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.
-	MinVmsCount *int `json:"minVmsCount,omitempty"`
-
 	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
 	NestedVirtualization *bool `json:"nestedVirtualization,omitempty"`
 
@@ -627,6 +615,9 @@ type CreateVmsRequestSchema struct {
 	// VmType The type of VM. You can specify a TINA type (in the `tinavW.cXrYpZ` or `tinavW.cXrY` format), or an AWS type (for example, `t2.small`, which is the default value).<br />
 	// If you specify an AWS type, it is converted in the background to its corresponding TINA type, but the AWS type is still returned. If the specified or converted TINA type includes a performance flag, this performance flag is applied regardless of the value you may have provided in the `Performance` parameter. For more information, see [Instance Types](https://docs.outscale.com/en/userguide/Instance-Types.html).
 	VmType *string `json:"vmType,omitempty"`
+
+	// VmsCount The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.
+	VmsCount *int `json:"vmsCount,omitempty"`
 }
 
 // CreateVmsRequestSchemaPerformance The performance of the VM (`medium` \| `high` \|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `VmType` parameter.
@@ -652,9 +643,9 @@ type CreateVolumeRequestSchema struct {
 	// SubregionName The Subregion in which you want to create the volume.
 	SubregionName string `json:"subregionName"`
 
-	// VolumeType The type of volume you want to create (`io1` \| `gp2` \ | `standard`). If not specified, a `standard` volume is created.<br />
+	// Type The type of volume you want to create (`io1` \| `gp2` \ | `standard`). If not specified, a `standard` volume is created.<br />
 	//  For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
-	VolumeType *string `json:"volumeType,omitempty"`
+	Type *string `json:"type,omitempty"`
 }
 
 // CreateVpnConnectionRequestSchema defines model for CreateVpnConnectionRequestSchema.
@@ -713,8 +704,8 @@ type DeleteLoadBalancerTagsRequestSchema struct {
 
 // DeletePublicIpRequestSchema defines model for DeletePublicIpRequestSchema.
 type DeletePublicIpRequestSchema struct {
-	// PublicIp The public IP. In the public Cloud, this parameter is required.
-	PublicIp *string `json:"publicIp,omitempty"`
+	// PublicIpId The ID representing the association of the public IP with the VM or the NIC. In a Net, this parameter is required.
+	PublicIpId *string `json:"publicIpId,omitempty"`
 }
 
 // DeleteRouteRequestSchema defines model for DeleteRouteRequestSchema.
@@ -900,24 +891,6 @@ type DirectLinkSchema struct {
 	//  * `deleting`: The deletion process is in progress.<br />
 	// * `deleted`: The DirectLink is deleted.
 	State *string `json:"state,omitempty"`
-}
-
-// ErrorResponseSchema defines model for ErrorResponseSchema.
-type ErrorResponseSchema struct {
-	// Errors One or more errors.
-	Errors *[]ErrorsSchema `json:"errors,omitempty"`
-}
-
-// ErrorsSchema Information about the errors.
-type ErrorsSchema struct {
-	// Code The code of the error.
-	Code *string `json:"code,omitempty"`
-
-	// Details The details of the error.
-	Details *string `json:"details,omitempty"`
-
-	// Type The type of the error.
-	Type *string `json:"type,omitempty"`
 }
 
 // FlexibleGpuCatalogSchema Information about the flexible GPU (fGPU) that is available in the public catalog.
@@ -1111,8 +1084,8 @@ type LinkNicRequestSchema struct {
 
 // LinkNicResponseSchema defines model for LinkNicResponseSchema.
 type LinkNicResponseSchema struct {
-	// LinkNicId The ID of the NIC attachment.
-	LinkNicId *string `json:"linkNicId,omitempty"`
+	// Id The ID of the NIC attachment.
+	Id *string `json:"id,omitempty"`
 }
 
 // LinkNicToUpdateSchema Information about the NIC attachment. If you are modifying the `DeleteOnVmDeletion` attribute, you must specify the ID of the NIC attachment.
@@ -1170,8 +1143,8 @@ type LinkPublicIpRequestSchema struct {
 
 // LinkPublicIpResponseSchema defines model for LinkPublicIpResponseSchema.
 type LinkPublicIpResponseSchema struct {
-	// LinkPublicIpId (Net only) The ID representing the association of the public IP with the VM or the NIC.
-	LinkPublicIpId *string `json:"linkPublicIpId,omitempty"`
+	// Id (Net only) The ID representing the association of the public IP with the VM or the NIC.
+	Id *string `json:"id,omitempty"`
 }
 
 // LinkPublicIpSchema Information about the public IP association.
@@ -1200,8 +1173,8 @@ type LinkRouteTableRequestSchema struct {
 
 // LinkRouteTableResponseSchema defines model for LinkRouteTableResponseSchema.
 type LinkRouteTableResponseSchema struct {
-	// LinkRouteTableId The ID of the association between the route table and the Subnet.
-	LinkRouteTableId *string `json:"linkRouteTableId,omitempty"`
+	// Id The ID of the association between the route table and the Subnet.
+	Id *string `json:"id,omitempty"`
 }
 
 // LinkVirtualGatewayRequestSchema defines model for LinkVirtualGatewayRequestSchema.
@@ -18601,10 +18574,6 @@ type AcceptNetPeeringResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *AcceptNetPeeringResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON409      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -18627,9 +18596,6 @@ type ReadAdminPasswordResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadAdminPasswordResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -18652,9 +18618,6 @@ type ReadAdminPasswordByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadAdminPasswordResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -18764,9 +18727,6 @@ type ReadConsoleOutputResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadConsoleOutputResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -18789,9 +18749,6 @@ type ReadConsoleOutputByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadConsoleOutputResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19292,9 +19249,6 @@ type ReadImagesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadImagesResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19317,9 +19271,6 @@ type CreateImageResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *ImageSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19341,9 +19292,6 @@ func (r CreateImageResponse) StatusCode() int {
 type DeleteImageResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19366,9 +19314,6 @@ type ReadImagesByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ImageSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19391,9 +19336,6 @@ type UpdateImageResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *UpdateImageResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19416,9 +19358,6 @@ type ReadInternetServicesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadInternetServicesResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19441,9 +19380,6 @@ type CreateInternetServiceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *InternetServiceSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19465,9 +19401,6 @@ func (r CreateInternetServiceResponse) StatusCode() int {
 type DeleteInternetServiceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19490,9 +19423,6 @@ type ReadInternetServicesByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *InternetServiceSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19514,9 +19444,6 @@ func (r ReadInternetServicesByIdResponse) StatusCode() int {
 type LinkInternetServiceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19538,9 +19465,6 @@ func (r LinkInternetServiceResponse) StatusCode() int {
 type UnlinkInternetServiceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19563,9 +19487,6 @@ type ReadKeypairsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadKeypairsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19588,10 +19509,6 @@ type CreateKeypairResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *KeypairCreatedSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON409      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19613,9 +19530,6 @@ func (r CreateKeypairResponse) StatusCode() int {
 type DeleteKeypairResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19638,9 +19552,6 @@ type ReadKeypairsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *KeypairSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20141,9 +20052,6 @@ type ReadNatServicesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadNatServicesResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20166,9 +20074,6 @@ type CreateNatServiceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *NatServiceSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20190,9 +20095,6 @@ func (r CreateNatServiceResponse) StatusCode() int {
 type DeleteNatServiceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20215,9 +20117,6 @@ type ReadNatServicesByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *NatServiceSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20349,9 +20248,6 @@ type ReadNetPeeringsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadNetPeeringsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20374,9 +20270,6 @@ type CreateNetPeeringResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *NetPeeringSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20398,10 +20291,6 @@ func (r CreateNetPeeringResponse) StatusCode() int {
 type DeleteNetPeeringResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON409      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20424,9 +20313,6 @@ type ReadNetPeeringsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *NetPeeringSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20449,9 +20335,6 @@ type ReadNetsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadNetsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20474,10 +20357,6 @@ type CreateNetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *NetSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON409      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20499,9 +20378,6 @@ func (r CreateNetResponse) StatusCode() int {
 type DeleteNetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20524,9 +20400,6 @@ type ReadNetsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *NetSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20549,9 +20422,6 @@ type UpdateNetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *UpdateNetResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20574,9 +20444,6 @@ type ReadNicsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadNicsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20599,9 +20466,6 @@ type CreateNicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *NicSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20623,9 +20487,6 @@ func (r CreateNicResponse) StatusCode() int {
 type DeleteNicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20648,9 +20509,6 @@ type ReadNicsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *NicSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20673,9 +20531,6 @@ type UpdateNicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *UpdateNicResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20698,9 +20553,6 @@ type LinkNicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *LinkNicResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20722,9 +20574,6 @@ func (r LinkNicResponse) StatusCode() int {
 type UnlinkNicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20746,9 +20595,6 @@ func (r UnlinkNicResponse) StatusCode() int {
 type LinkPrivateIpsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20770,9 +20616,6 @@ func (r LinkPrivateIpsResponse) StatusCode() int {
 type UnlinkPrivateIpsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20883,9 +20726,6 @@ type ReadPublicIpsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadPublicIpsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20908,9 +20748,6 @@ type CreatePublicIpResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *PublicIpSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20932,9 +20769,6 @@ func (r CreatePublicIpResponse) StatusCode() int {
 type DeletePublicIpResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20957,9 +20791,6 @@ type ReadPublicIpsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *PublicIpSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20982,9 +20813,6 @@ type LinkPublicIpResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *LinkPublicIpResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21006,9 +20834,6 @@ func (r LinkPublicIpResponse) StatusCode() int {
 type UnlinkPublicIpResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21030,9 +20855,6 @@ func (r UnlinkPublicIpResponse) StatusCode() int {
 type RebootVmsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21054,10 +20876,6 @@ func (r RebootVmsResponse) StatusCode() int {
 type RejectNetPeeringResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON409      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21102,9 +20920,6 @@ type ReadRouteTablesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadRouteTablesResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21127,9 +20942,6 @@ type CreateRouteTableResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *RouteTableSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21151,9 +20963,6 @@ func (r CreateRouteTableResponse) StatusCode() int {
 type DeleteRouteTableResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21176,9 +20985,6 @@ type ReadRouteTablesByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *RouteTableSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21201,9 +21007,6 @@ type LinkRouteTableResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *LinkRouteTableResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21225,9 +21028,6 @@ func (r LinkRouteTableResponse) StatusCode() int {
 type UnlinkRouteTableResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21250,9 +21050,6 @@ type CreateRouteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *RouteTableSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21275,9 +21072,6 @@ type DeleteRouteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON204      *DeleteRouteResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21300,9 +21094,6 @@ type UpdateRouteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *UpdateRouteResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21325,9 +21116,6 @@ type CreateSecurityGroupRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *SecurityGroupSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21350,9 +21138,6 @@ type DeleteSecurityGroupRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON204      *DeleteSecurityGroupRuleResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21375,9 +21160,6 @@ type ReadSecurityGroupsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadSecurityGroupsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21400,9 +21182,6 @@ type CreateSecurityGroupResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *SecurityGroupSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21424,9 +21203,6 @@ func (r CreateSecurityGroupResponse) StatusCode() int {
 type DeleteSecurityGroupResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21449,9 +21225,6 @@ type ReadSecurityGroupsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *SecurityGroupSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21474,9 +21247,6 @@ type ReadSnapshotsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadSnapshotsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21499,9 +21269,6 @@ type CreateSnapshotResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *SnapshotSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21523,9 +21290,6 @@ func (r CreateSnapshotResponse) StatusCode() int {
 type DeleteSnapshotResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21548,9 +21312,6 @@ type ReadSnapshotsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *SnapshotSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21573,9 +21334,6 @@ type StartVmsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *StartVmsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21598,9 +21356,6 @@ type StopVmsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *StopVmsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21623,9 +21378,6 @@ type ReadSubnetsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadSubnetsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21648,10 +21400,6 @@ type CreateSubnetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *SubnetSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON409      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21673,9 +21421,6 @@ func (r CreateSubnetResponse) StatusCode() int {
 type DeleteSubnetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21698,9 +21443,6 @@ type ReadSubnetsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *SubnetSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21723,9 +21465,6 @@ type UpdateSubnetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *UpdateSubnetResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21748,9 +21487,6 @@ type ReadTagsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadTagsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21772,9 +21508,6 @@ func (r ReadTagsResponse) StatusCode() int {
 type CreateTagsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21796,9 +21529,6 @@ func (r CreateTagsResponse) StatusCode() int {
 type DeleteTagsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21821,9 +21551,6 @@ type ReadTagsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *TagSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21976,9 +21703,6 @@ type ReadVmsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadVmsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22001,9 +21725,6 @@ type CreateVmsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *CreateVmsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22026,9 +21747,6 @@ type DeleteVmsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON204      *DeleteVmsResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22051,9 +21769,6 @@ type ReadVmsByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *VmSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22076,9 +21791,6 @@ type UpdateVmResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *UpdateVmResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22145,9 +21857,6 @@ type ReadVmsStateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadVmsStateResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22170,9 +21879,6 @@ type ReadVmsStateByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *VmStatesSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22195,9 +21901,6 @@ type ReadVolumesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ReadVolumesResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22220,9 +21923,6 @@ type CreateVolumeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *VolumeSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22244,9 +21944,6 @@ func (r CreateVolumeResponse) StatusCode() int {
 type DeleteVolumeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22269,9 +21966,6 @@ type ReadVolumesByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *VolumeSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22294,9 +21988,6 @@ type UpdateVolumeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *UpdateVolumeResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22318,9 +22009,6 @@ func (r UpdateVolumeResponse) StatusCode() int {
 type LinkVolumeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22342,9 +22030,6 @@ func (r LinkVolumeResponse) StatusCode() int {
 type UnlinkVolumeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22496,9 +22181,6 @@ type UpdateVpnConnectionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *UpdateVpnConnectionResponseSchema
-	JSON400      *ErrorResponseSchema
-	JSON401      *ErrorResponseSchema
-	JSON500      *ErrorResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -24689,34 +24371,6 @@ func ParseAcceptNetPeeringResponse(rsp *http.Response) (*AcceptNetPeeringRespons
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON409 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -24743,27 +24397,6 @@ func ParseReadAdminPasswordResponse(rsp *http.Response) (*ReadAdminPasswordRespo
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -24789,27 +24422,6 @@ func ParseReadAdminPasswordByIdResponse(rsp *http.Response) (*ReadAdminPasswordB
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -24931,27 +24543,6 @@ func ParseReadConsoleOutputResponse(rsp *http.Response) (*ReadConsoleOutputRespo
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -24977,27 +24568,6 @@ func ParseReadConsoleOutputByIdResponse(rsp *http.Response) (*ReadConsoleOutputB
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -25537,27 +25107,6 @@ func ParseReadImagesResponse(rsp *http.Response) (*ReadImagesResponse, error) {
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -25584,27 +25133,6 @@ func ParseCreateImageResponse(rsp *http.Response) (*CreateImageResponse, error) 
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -25621,30 +25149,6 @@ func ParseDeleteImageResponse(rsp *http.Response) (*DeleteImageResponse, error) 
 	response := &DeleteImageResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -25670,27 +25174,6 @@ func ParseReadImagesByIdResponse(rsp *http.Response) (*ReadImagesByIdResponse, e
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -25718,27 +25201,6 @@ func ParseUpdateImageResponse(rsp *http.Response) (*UpdateImageResponse, error) 
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -25764,27 +25226,6 @@ func ParseReadInternetServicesResponse(rsp *http.Response) (*ReadInternetService
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -25812,27 +25253,6 @@ func ParseCreateInternetServiceResponse(rsp *http.Response) (*CreateInternetServ
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -25849,30 +25269,6 @@ func ParseDeleteInternetServiceResponse(rsp *http.Response) (*DeleteInternetServ
 	response := &DeleteInternetServiceResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -25899,27 +25295,6 @@ func ParseReadInternetServicesByIdResponse(rsp *http.Response) (*ReadInternetSer
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -25938,30 +25313,6 @@ func ParseLinkInternetServiceResponse(rsp *http.Response) (*LinkInternetServiceR
 		HTTPResponse: rsp,
 	}
 
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
 	return response, nil
 }
 
@@ -25976,30 +25327,6 @@ func ParseUnlinkInternetServiceResponse(rsp *http.Response) (*UnlinkInternetServ
 	response := &UnlinkInternetServiceResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -26025,27 +25352,6 @@ func ParseReadKeypairsResponse(rsp *http.Response) (*ReadKeypairsResponse, error
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -26073,34 +25379,6 @@ func ParseCreateKeypairResponse(rsp *http.Response) (*CreateKeypairResponse, err
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON409 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -26117,30 +25395,6 @@ func ParseDeleteKeypairResponse(rsp *http.Response) (*DeleteKeypairResponse, err
 	response := &DeleteKeypairResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -26166,27 +25420,6 @@ func ParseReadKeypairsByIdResponse(rsp *http.Response) (*ReadKeypairsByIdRespons
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -26726,27 +25959,6 @@ func ParseReadNatServicesResponse(rsp *http.Response) (*ReadNatServicesResponse,
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -26773,27 +25985,6 @@ func ParseCreateNatServiceResponse(rsp *http.Response) (*CreateNatServiceRespons
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -26810,30 +26001,6 @@ func ParseDeleteNatServiceResponse(rsp *http.Response) (*DeleteNatServiceRespons
 	response := &DeleteNatServiceResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -26859,27 +26026,6 @@ func ParseReadNatServicesByIdResponse(rsp *http.Response) (*ReadNatServicesByIdR
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -27027,27 +26173,6 @@ func ParseReadNetPeeringsResponse(rsp *http.Response) (*ReadNetPeeringsResponse,
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27074,27 +26199,6 @@ func ParseCreateNetPeeringResponse(rsp *http.Response) (*CreateNetPeeringRespons
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27111,37 +26215,6 @@ func ParseDeleteNetPeeringResponse(rsp *http.Response) (*DeleteNetPeeringRespons
 	response := &DeleteNetPeeringResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON409 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27167,27 +26240,6 @@ func ParseReadNetPeeringsByIdResponse(rsp *http.Response) (*ReadNetPeeringsByIdR
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -27215,27 +26267,6 @@ func ParseReadNetsResponse(rsp *http.Response) (*ReadNetsResponse, error) {
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27262,34 +26293,6 @@ func ParseCreateNetResponse(rsp *http.Response) (*CreateNetResponse, error) {
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON409 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27306,30 +26309,6 @@ func ParseDeleteNetResponse(rsp *http.Response) (*DeleteNetResponse, error) {
 	response := &DeleteNetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27355,27 +26334,6 @@ func ParseReadNetsByIdResponse(rsp *http.Response) (*ReadNetsByIdResponse, error
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -27403,27 +26361,6 @@ func ParseUpdateNetResponse(rsp *http.Response) (*UpdateNetResponse, error) {
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27449,27 +26386,6 @@ func ParseReadNicsResponse(rsp *http.Response) (*ReadNicsResponse, error) {
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -27497,27 +26413,6 @@ func ParseCreateNicResponse(rsp *http.Response) (*CreateNicResponse, error) {
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27534,30 +26429,6 @@ func ParseDeleteNicResponse(rsp *http.Response) (*DeleteNicResponse, error) {
 	response := &DeleteNicResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27583,27 +26454,6 @@ func ParseReadNicsByIdResponse(rsp *http.Response) (*ReadNicsByIdResponse, error
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -27631,27 +26481,6 @@ func ParseUpdateNicResponse(rsp *http.Response) (*UpdateNicResponse, error) {
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27678,27 +26507,6 @@ func ParseLinkNicResponse(rsp *http.Response) (*LinkNicResponse, error) {
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27717,30 +26525,6 @@ func ParseUnlinkNicResponse(rsp *http.Response) (*UnlinkNicResponse, error) {
 		HTTPResponse: rsp,
 	}
 
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
 	return response, nil
 }
 
@@ -27757,30 +26541,6 @@ func ParseLinkPrivateIpsResponse(rsp *http.Response) (*LinkPrivateIpsResponse, e
 		HTTPResponse: rsp,
 	}
 
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
 	return response, nil
 }
 
@@ -27795,30 +26555,6 @@ func ParseUnlinkPrivateIpsResponse(rsp *http.Response) (*UnlinkPrivateIpsRespons
 	response := &UnlinkPrivateIpsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27949,27 +26685,6 @@ func ParseReadPublicIpsResponse(rsp *http.Response) (*ReadPublicIpsResponse, err
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -27996,27 +26711,6 @@ func ParseCreatePublicIpResponse(rsp *http.Response) (*CreatePublicIpResponse, e
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28033,30 +26727,6 @@ func ParseDeletePublicIpResponse(rsp *http.Response) (*DeletePublicIpResponse, e
 	response := &DeletePublicIpResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28082,27 +26752,6 @@ func ParseReadPublicIpsByIdResponse(rsp *http.Response) (*ReadPublicIpsByIdRespo
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -28130,27 +26779,6 @@ func ParseLinkPublicIpResponse(rsp *http.Response) (*LinkPublicIpResponse, error
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28169,30 +26797,6 @@ func ParseUnlinkPublicIpResponse(rsp *http.Response) (*UnlinkPublicIpResponse, e
 		HTTPResponse: rsp,
 	}
 
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
 	return response, nil
 }
 
@@ -28209,30 +26813,6 @@ func ParseRebootVmsResponse(rsp *http.Response) (*RebootVmsResponse, error) {
 		HTTPResponse: rsp,
 	}
 
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
 	return response, nil
 }
 
@@ -28247,37 +26827,6 @@ func ParseRejectNetPeeringResponse(rsp *http.Response) (*RejectNetPeeringRespons
 	response := &RejectNetPeeringResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON409 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28330,27 +26879,6 @@ func ParseReadRouteTablesResponse(rsp *http.Response) (*ReadRouteTablesResponse,
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28377,27 +26905,6 @@ func ParseCreateRouteTableResponse(rsp *http.Response) (*CreateRouteTableRespons
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28414,30 +26921,6 @@ func ParseDeleteRouteTableResponse(rsp *http.Response) (*DeleteRouteTableRespons
 	response := &DeleteRouteTableResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28463,27 +26946,6 @@ func ParseReadRouteTablesByIdResponse(rsp *http.Response) (*ReadRouteTablesByIdR
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -28511,27 +26973,6 @@ func ParseLinkRouteTableResponse(rsp *http.Response) (*LinkRouteTableResponse, e
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28548,30 +26989,6 @@ func ParseUnlinkRouteTableResponse(rsp *http.Response) (*UnlinkRouteTableRespons
 	response := &UnlinkRouteTableResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28597,27 +27014,6 @@ func ParseCreateRouteResponse(rsp *http.Response) (*CreateRouteResponse, error) 
 			return nil, err
 		}
 		response.JSON201 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -28645,27 +27041,6 @@ func ParseDeleteRouteResponse(rsp *http.Response) (*DeleteRouteResponse, error) 
 		}
 		response.JSON204 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28691,27 +27066,6 @@ func ParseUpdateRouteResponse(rsp *http.Response) (*UpdateRouteResponse, error) 
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -28739,27 +27093,6 @@ func ParseCreateSecurityGroupRuleResponse(rsp *http.Response) (*CreateSecurityGr
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28785,27 +27118,6 @@ func ParseDeleteSecurityGroupRuleResponse(rsp *http.Response) (*DeleteSecurityGr
 			return nil, err
 		}
 		response.JSON204 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -28833,27 +27145,6 @@ func ParseReadSecurityGroupsResponse(rsp *http.Response) (*ReadSecurityGroupsRes
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28880,27 +27171,6 @@ func ParseCreateSecurityGroupResponse(rsp *http.Response) (*CreateSecurityGroupR
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28917,30 +27187,6 @@ func ParseDeleteSecurityGroupResponse(rsp *http.Response) (*DeleteSecurityGroupR
 	response := &DeleteSecurityGroupResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -28966,27 +27212,6 @@ func ParseReadSecurityGroupsByIdResponse(rsp *http.Response) (*ReadSecurityGroup
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -29014,27 +27239,6 @@ func ParseReadSnapshotsResponse(rsp *http.Response) (*ReadSnapshotsResponse, err
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29061,27 +27265,6 @@ func ParseCreateSnapshotResponse(rsp *http.Response) (*CreateSnapshotResponse, e
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29098,30 +27281,6 @@ func ParseDeleteSnapshotResponse(rsp *http.Response) (*DeleteSnapshotResponse, e
 	response := &DeleteSnapshotResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29147,27 +27306,6 @@ func ParseReadSnapshotsByIdResponse(rsp *http.Response) (*ReadSnapshotsByIdRespo
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -29195,27 +27333,6 @@ func ParseStartVmsResponse(rsp *http.Response) (*StartVmsResponse, error) {
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29241,27 +27358,6 @@ func ParseStopVmsResponse(rsp *http.Response) (*StopVmsResponse, error) {
 			return nil, err
 		}
 		response.JSON201 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -29289,27 +27385,6 @@ func ParseReadSubnetsResponse(rsp *http.Response) (*ReadSubnetsResponse, error) 
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29336,34 +27411,6 @@ func ParseCreateSubnetResponse(rsp *http.Response) (*CreateSubnetResponse, error
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON409 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29380,30 +27427,6 @@ func ParseDeleteSubnetResponse(rsp *http.Response) (*DeleteSubnetResponse, error
 	response := &DeleteSubnetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29429,27 +27452,6 @@ func ParseReadSubnetsByIdResponse(rsp *http.Response) (*ReadSubnetsByIdResponse,
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -29477,27 +27479,6 @@ func ParseUpdateSubnetResponse(rsp *http.Response) (*UpdateSubnetResponse, error
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29524,27 +27505,6 @@ func ParseReadTagsResponse(rsp *http.Response) (*ReadTagsResponse, error) {
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29563,30 +27523,6 @@ func ParseCreateTagsResponse(rsp *http.Response) (*CreateTagsResponse, error) {
 		HTTPResponse: rsp,
 	}
 
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
 	return response, nil
 }
 
@@ -29601,30 +27537,6 @@ func ParseDeleteTagsResponse(rsp *http.Response) (*DeleteTagsResponse, error) {
 	response := &DeleteTagsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29650,27 +27562,6 @@ func ParseReadTagsByIdResponse(rsp *http.Response) (*ReadTagsByIdResponse, error
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -29834,27 +27725,6 @@ func ParseReadVmsResponse(rsp *http.Response) (*ReadVmsResponse, error) {
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29880,27 +27750,6 @@ func ParseCreateVmsResponse(rsp *http.Response) (*CreateVmsResponse, error) {
 			return nil, err
 		}
 		response.JSON201 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -29928,27 +27777,6 @@ func ParseDeleteVmsResponse(rsp *http.Response) (*DeleteVmsResponse, error) {
 		}
 		response.JSON204 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -29975,27 +27803,6 @@ func ParseReadVmsByIdResponse(rsp *http.Response) (*ReadVmsByIdResponse, error) 
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -30021,27 +27828,6 @@ func ParseUpdateVmResponse(rsp *http.Response) (*UpdateVmResponse, error) {
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -30121,27 +27907,6 @@ func ParseReadVmsStateResponse(rsp *http.Response) (*ReadVmsStateResponse, error
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -30167,27 +27932,6 @@ func ParseReadVmsStateByIdResponse(rsp *http.Response) (*ReadVmsStateByIdRespons
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -30215,27 +27959,6 @@ func ParseReadVolumesResponse(rsp *http.Response) (*ReadVolumesResponse, error) 
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -30262,27 +27985,6 @@ func ParseCreateVolumeResponse(rsp *http.Response) (*CreateVolumeResponse, error
 		}
 		response.JSON201 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -30299,30 +28001,6 @@ func ParseDeleteVolumeResponse(rsp *http.Response) (*DeleteVolumeResponse, error
 	response := &DeleteVolumeResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -30348,27 +28026,6 @@ func ParseReadVolumesByIdResponse(rsp *http.Response) (*ReadVolumesByIdResponse,
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -30396,27 +28053,6 @@ func ParseUpdateVolumeResponse(rsp *http.Response) (*UpdateVolumeResponse, error
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -30435,30 +28071,6 @@ func ParseLinkVolumeResponse(rsp *http.Response) (*LinkVolumeResponse, error) {
 		HTTPResponse: rsp,
 	}
 
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
 	return response, nil
 }
 
@@ -30473,30 +28085,6 @@ func ParseUnlinkVolumeResponse(rsp *http.Response) (*UnlinkVolumeResponse, error
 	response := &UnlinkVolumeResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
 	}
 
 	return response, nil
@@ -30648,27 +28236,6 @@ func ParseUpdateVpnConnectionResponse(rsp *http.Response) (*UpdateVpnConnectionR
 			return nil, err
 		}
 		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 

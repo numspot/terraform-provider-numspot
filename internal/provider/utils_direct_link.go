@@ -31,8 +31,8 @@ func DirectLinkFromHttpToTf(http *api.DirectLinkSchema) resource_direct_link.Dir
 
 func DirectLinkFromTfToCreateRequest(tf resource_direct_link.DirectLinkModel) api.CreateDirectLinkJSONRequestBody {
 	return api.CreateDirectLinkJSONRequestBody{
-		Bandwidth:      tf.Bandwidth.ValueString(),
-		DirectLinkName: tf.Name.ValueString(),
-		Location:       tf.Location.ValueString(),
+		Bandwidth: tf.Bandwidth.ValueString(),
+		Name:      tf.Name.ValueStringPointer(),
+		Location:  tf.Location.ValueString(),
 	}
 }

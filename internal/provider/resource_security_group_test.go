@@ -1,11 +1,11 @@
 package provider
 
 import (
-  "fmt"
-  "testing"
+	"fmt"
+	"testing"
 
-  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
-  "github.com/stretchr/testify/require"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccSecurityGroupResource(t *testing.T) {
@@ -14,7 +14,7 @@ func TestAccSecurityGroupResource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testSecurityGroupConfig_Create(),
+				Config: testSecurityGroupConfig("name-2", "description-2"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_security_group.test", "field", "value"),
 					resource.TestCheckResourceAttrWith("numspot_security_group.test", "field", func(v string) error {
@@ -25,9 +25,9 @@ func TestAccSecurityGroupResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "numspot_security_group.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "numspot_security_group.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,11 +43,22 @@ func TestAccSecurityGroupResource(t *testing.T) {
 		},
 	})
 }
-func testSecurityGroupConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_security_group" "test" {
-  			}`)
+func testSecurityGroupConfig(name, description string) string {
+	return fmt.Sprintf(`
+resource "numspot_security_group" "test" {
+	name = %[1]q
+	description = %[2]q
+	inbound_rules = [
+		{
+			from_port_range = 22
+			to_port_range = 22
+			ip_ranges = ["0.0.0.0/0"]
+			ip_protocol = "-1"
+		}
+	]
+}`, name, description)
 }
 func testSecurityGroupConfig_Update() string {
-		return `resource "numspot_security_group" "test" {
+	return `resource "numspot_security_group" "test" {
     			}`
 }
