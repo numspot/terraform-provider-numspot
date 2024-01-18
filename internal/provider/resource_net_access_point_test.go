@@ -1,11 +1,11 @@
 package provider
 
 import (
-  "fmt"
-  "testing"
+	"fmt"
+	"testing"
 
-  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
-  "github.com/stretchr/testify/require"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccNetAccessPointResource(t *testing.T) {
@@ -25,9 +25,9 @@ func TestAccNetAccessPointResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "numspot_net_access_point.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "numspot_net_access_point.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,11 +43,13 @@ func TestAccNetAccessPointResource(t *testing.T) {
 		},
 	})
 }
+
 func testNetAccessPointConfig_Create() string {
 	return fmt.Sprintf(`resource "numspot_net_access_point" "test" {
   			}`)
 }
+
 func testNetAccessPointConfig_Update() string {
-		return `resource "numspot_net_access_point" "test" {
+	return `resource "numspot_net_access_point" "test" {
     			}`
 }

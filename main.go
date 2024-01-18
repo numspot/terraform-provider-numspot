@@ -9,6 +9,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
 )
 

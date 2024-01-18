@@ -3,15 +3,19 @@ package provider
 import (
 	"context"
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_security_group"
 )
 
-var _ resource.Resource = &SecurityGroupResource{}
-var _ resource.ResourceWithConfigure = &SecurityGroupResource{}
-var _ resource.ResourceWithImportState = &SecurityGroupResource{}
+var (
+	_ resource.Resource                = &SecurityGroupResource{}
+	_ resource.ResourceWithConfigure   = &SecurityGroupResource{}
+	_ resource.ResourceWithImportState = &SecurityGroupResource{}
+)
 
 type SecurityGroupResource struct {
 	client *api.ClientWithResponses
@@ -62,7 +66,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 201 // FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to create SecurityGroup", "My Custom Error")
@@ -96,14 +100,14 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
+	// TODO: Implement READ operation
 	res, err := r.client.ReadSecurityGroupsByIdWithResponse(ctx, data.Id.String())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to read SecurityGroup", "My Custom Error")
@@ -115,7 +119,7 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 }
 
 func (r *SecurityGroupResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+
 	panic("implement me")
 }
 
@@ -123,7 +127,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement DELETE operation
+	// TODO: Implement DELETE operation
 	res, err := r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.String(), api.DeleteSecurityGroupRequestSchema{})
 	if err != nil {
 		// TODO: Handle Error
@@ -131,7 +135,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 		return
 	}
 
-	expectedStatusCode := 204 //FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to delete SecurityGroup", "My Custom Error")

@@ -11,9 +11,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_key_pair"
 )
 
-var _ resource.Resource = &KeyPairResource{}
-var _ resource.ResourceWithConfigure = &KeyPairResource{}
-var _ resource.ResourceWithImportState = &KeyPairResource{}
+var (
+	_ resource.Resource                = &KeyPairResource{}
+	_ resource.ResourceWithConfigure   = &KeyPairResource{}
+	_ resource.ResourceWithImportState = &KeyPairResource{}
+)
 
 type KeyPairResource struct {
 	client *api.ClientWithResponses
@@ -64,7 +66,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 		response.Diagnostics.AddError("Failed to create KeyPair", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 201 // FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to create KeyPair", "My Custom Error")
@@ -79,14 +81,14 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
+	// TODO: Implement READ operation
 	res, err := r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.String())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to read KeyPair", "My Custom Error")
@@ -98,7 +100,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 }
 
 func (r *KeyPairResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+
 	panic("implement me")
 }
 
@@ -106,7 +108,7 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement DELETE operation
+	// TODO: Implement DELETE operation
 	res, err := r.client.DeleteKeypairWithResponse(ctx, data.Id.String())
 	if err != nil {
 		// TODO: Handle Error
@@ -114,7 +116,7 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 		return
 	}
 
-	expectedStatusCode := 204 //FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to delete KeyPair", "My Custom Error")

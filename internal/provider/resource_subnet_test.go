@@ -54,6 +54,7 @@ func TestAccSubnetResource(t *testing.T) {
 		},
 	})
 }
+
 func testSubnetConfig(netIpRange, subnetIpRange string) string {
 	return fmt.Sprintf(`
 resource "net" "main" {

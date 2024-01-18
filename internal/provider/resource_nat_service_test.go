@@ -1,11 +1,11 @@
 package provider
 
 import (
-  "fmt"
-  "testing"
+	"fmt"
+	"testing"
 
-  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
-  "github.com/stretchr/testify/require"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccNatServiceResource(t *testing.T) {
@@ -25,9 +25,9 @@ func TestAccNatServiceResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "numspot_nat_service.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "numspot_nat_service.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,11 +43,13 @@ func TestAccNatServiceResource(t *testing.T) {
 		},
 	})
 }
+
 func testNatServiceConfig_Create() string {
 	return fmt.Sprintf(`resource "numspot_nat_service" "test" {
   			}`)
 }
+
 func testNatServiceConfig_Update() string {
-		return `resource "numspot_nat_service" "test" {
+	return `resource "numspot_nat_service" "test" {
     			}`
 }

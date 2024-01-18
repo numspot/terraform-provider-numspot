@@ -43,6 +43,7 @@ func TestAccSecurityGroupResource(t *testing.T) {
 		},
 	})
 }
+
 func testSecurityGroupConfig(name, description string) string {
 	return fmt.Sprintf(`
 resource "numspot_security_group" "test" {
@@ -58,6 +59,7 @@ resource "numspot_security_group" "test" {
 	]
 }`, name, description)
 }
+
 func testSecurityGroupConfig_Update() string {
 	return `resource "numspot_security_group" "test" {
     			}`

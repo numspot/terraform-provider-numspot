@@ -45,11 +45,13 @@ func TestAccNetResource(t *testing.T) {
 		},
 	})
 }
+
 func testNetConfig_Create(ipRange string) string {
 	return fmt.Sprintf(`resource "numspot_net" "test" {
 			ip_range=%s
   			}`, ipRange)
 }
+
 func testNetConfig_Update(ipRange string) string {
 	return fmt.Sprintf(`resource "numspot_net" "test" {
 			ip_range=%s

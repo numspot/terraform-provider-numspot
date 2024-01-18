@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/iam"
 )
@@ -64,7 +65,6 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 			},
 		},
 	}
-
 }
 
 func (p *numspotProvider) authenticateUser(ctx context.Context, data NumspotProviderModel) (error, *string) {
@@ -127,7 +127,6 @@ func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag diag.Diagn
 	}
 
 	bearerProvider, err := securityprovider.NewSecurityProviderBearerToken(*accessToken)
-
 	if err != nil {
 		diag.AddError("Failed to create bearer provider token", err.Error())
 		return nil

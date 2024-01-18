@@ -1,11 +1,11 @@
 package provider
 
 import (
-  "fmt"
-  "testing"
+	"fmt"
+	"testing"
 
-  "github.com/hashicorp/terraform-plugin-testing/helper/resource"
-  "github.com/stretchr/testify/require"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAccNetPeeringResource(t *testing.T) {
@@ -25,9 +25,9 @@ func TestAccNetPeeringResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "numspot_net_peering.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "numspot_net_peering.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
@@ -43,11 +43,13 @@ func TestAccNetPeeringResource(t *testing.T) {
 		},
 	})
 }
+
 func testNetPeeringConfig_Create() string {
 	return fmt.Sprintf(`resource "numspot_net_peering" "test" {
   			}`)
 }
+
 func testNetPeeringConfig_Update() string {
-		return `resource "numspot_net_peering" "test" {
+	return `resource "numspot_net_peering" "test" {
     			}`
 }
