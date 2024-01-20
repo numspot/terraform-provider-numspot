@@ -71,12 +71,12 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	if res.JSON201 == nil || res.JSON201.Vms == nil {
+	if res.JSON200 == nil || res.JSON200.Vms == nil {
 		response.Diagnostics.AddError("Failed to create Vm", "My Custom Error")
 		return
 	}
 
-	vms := *res.JSON201.Vms
+	vms := *res.JSON200.Vms
 	tf := VmFromHttpToTf(&vms[0])
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }

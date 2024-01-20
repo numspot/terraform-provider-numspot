@@ -71,7 +71,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 		return
 	}
 	//Update state
-	tf := InternetServiceFromHttpToTf(res.JSON201) // FIXME
+	tf := InternetServiceFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 
 	//Call Link Internet Service to VPC

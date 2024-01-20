@@ -73,7 +73,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 
-	tf := ImageFromHttpToTf(res.JSON201) // FIXME
+	tf := ImageFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

@@ -4,6 +4,9 @@ package resource_client_gateway
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -14,11 +17,17 @@ func ClientGatewayResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"bgp_asn": schema.Int64Attribute{
 				Required:            true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplace(),
+				},
 				Description:         "The Autonomous System Number (ASN) used by the Border Gateway Protocol (BGP) to find the path to your client gateway through the Internet. This number must be between `1` and `4294967295`.",
 				MarkdownDescription: "The Autonomous System Number (ASN) used by the Border Gateway Protocol (BGP) to find the path to your client gateway through the Internet. This number must be between `1` and `4294967295`.",
 			},
 			"connection_type": schema.StringAttribute{
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 				Description:         "The communication protocol used to establish tunnel with your client gateway (only `ipsec.1` is supported).",
 				MarkdownDescription: "The communication protocol used to establish tunnel with your client gateway (only `ipsec.1` is supported).",
 			},
@@ -29,6 +38,9 @@ func ClientGatewayResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"public_ip": schema.StringAttribute{
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 				Description:         "The public fixed IPv4 address of your client gateway.",
 				MarkdownDescription: "The public fixed IPv4 address of your client gateway.",
 			},

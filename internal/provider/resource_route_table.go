@@ -73,7 +73,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf := RouteTableFromHttpToTf(res.JSON201) // FIXME
+	tf := RouteTableFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

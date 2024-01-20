@@ -73,7 +73,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	tf := VpnConnectionFromHttpToTf(res.JSON201) // FIXME
+	tf := VpnConnectionFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

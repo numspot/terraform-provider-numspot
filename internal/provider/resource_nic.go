@@ -73,7 +73,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	tf := NicFromHttpToTf(res.JSON201) // FIXME
+	tf := NicFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

@@ -73,7 +73,7 @@ func (r *NetPeeringResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf := NetPeeringFromHttpToTf(res.JSON201) // FIXME
+	tf := NetPeeringFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

@@ -4,6 +4,8 @@ package resource_net
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -26,6 +28,9 @@ func NetResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The IP range for the Net, in CIDR notation (for example, `10.0.0.0/16`).",
 				MarkdownDescription: "The IP range for the Net, in CIDR notation (for example, `10.0.0.0/16`).",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,

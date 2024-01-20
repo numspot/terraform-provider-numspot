@@ -73,7 +73,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	tf := VolumeFromHttpToTf(res.JSON201) // FIXME
+	tf := VolumeFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

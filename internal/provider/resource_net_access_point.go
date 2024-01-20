@@ -73,7 +73,7 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	tf := NetAccessPointFromHttpToTf(res.JSON201) // FIXME
+	tf := NetAccessPointFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

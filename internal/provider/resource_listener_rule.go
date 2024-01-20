@@ -73,7 +73,7 @@ func (r *ListenerRuleResource) Create(ctx context.Context, request resource.Crea
 		return
 	}
 
-	tf := ListenerRuleFromHttpToTf(res.JSON201) // FIXME
+	tf := ListenerRuleFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

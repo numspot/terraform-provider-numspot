@@ -73,7 +73,7 @@ func (r *DirectLinkResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf := DirectLinkFromHttpToTf(res.JSON201) // FIXME
+	tf := DirectLinkFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

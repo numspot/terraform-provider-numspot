@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -66,14 +69,46 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		response.Diagnostics.AddError("Failed to create Subnet", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create Subnet", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to create Subnet", apiError.Error())
 		return
 	}
 
-	tf := SubnetFromHttpToTf(res.JSON201) // FIXME
+	createdId := *res.JSON200.Id
+	createStateConf := &retry.StateChangeConf{
+		Pending: []string{"pending"},
+		Target:  []string{"available"},
+		Refresh: func() (result interface{}, state string, err error) {
+			res, err := r.client.ReadSubnetsByIdWithResponse(ctx, createdId)
+			if err != nil {
+				response.Diagnostics.AddError("Failed to read Subnet", err.Error())
+			}
+
+			expectedStatusCode := 200
+			if res.StatusCode() != expectedStatusCode {
+				// TODO: Handle NumSpot error
+				apiError := utils.HandleError(res.Body)
+				response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
+				return
+			}
+
+			return res.JSON200, *res.JSON200.State, nil
+		},
+		Timeout: 5 * time.Minute,
+		Delay:   3 * time.Second,
+	}
+
+	_, err = createStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		// return fmt.Errorf("Error waiting for example instance (%s) to be created: %s", d.Id(), err)
+		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *res.JSON200.Id, err))
+		return
+	}
+
+	tf := SubnetFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -82,7 +117,7 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	//TODO: Implement READ operation
-	res, err := r.client.ReadSubnetsByIdWithResponse(ctx, data.Id.String())
+	res, err := r.client.ReadSubnetsByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -91,7 +126,8 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read Subnet", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
 		return
 	}
 
@@ -109,17 +145,53 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteSubnetWithResponse(ctx, data.Id.String())
+	res, err := r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete Subnet", err.Error())
 		return
 	}
 
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete Subnet", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to delete Subnet", apiError.Error())
 		return
 	}
+
+	deleteStateConf := &retry.StateChangeConf{
+		Pending: []string{"pending", "available"},
+		Target:  []string{"deleted"},
+		Refresh: func() (result interface{}, state string, err error) {
+			res, err := r.client.ReadSubnetsByIdWithResponse(ctx, data.Id.ValueString())
+			if err != nil {
+				response.Diagnostics.AddError("Failed to read Subnet on delete", err.Error())
+			}
+
+			expectedStatusCode := 200
+			if res.StatusCode() != expectedStatusCode {
+				// TODO: Handle NumSpot error
+				apiError := utils.HandleError(res.Body)
+				if apiError.Error() == "No Subnets found" {
+					return data, "deleted", nil
+				}
+				response.Diagnostics.AddError("Failed to read Subnet on delete", apiError.Error())
+				return
+			}
+
+			return data, *res.JSON200.State, nil
+		},
+		Timeout: 5 * time.Minute,
+		Delay:   5 * time.Second,
+	}
+
+	_, err = deleteStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		// return fmt.Errorf("Error waiting for example instance (%s) to be created: %s", d.Id(), err)
+		response.Diagnostics.AddError("Failed to delete Net", fmt.Sprintf("Error waiting for instance (%s) to be deleted: %s", data.Id.ValueString(), err))
+		return
+	}
+
+	response.State.RemoveResource(ctx)
 }

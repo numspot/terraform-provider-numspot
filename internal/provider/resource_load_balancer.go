@@ -73,7 +73,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 		return
 	}
 
-	tf := LoadBalancerFromHttpToTf(res.JSON201) // FIXME
+	tf := LoadBalancerFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

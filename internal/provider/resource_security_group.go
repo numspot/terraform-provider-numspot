@@ -92,7 +92,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	fmt.Println(createOutboundRulesResponse)
 
 	// Read before store
-	tf := SecurityGroupFromHttpToTf(res.JSON201)
+	tf := SecurityGroupFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

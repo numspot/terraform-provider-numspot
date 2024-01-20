@@ -18573,7 +18573,7 @@ type ClientWithResponsesInterface interface {
 type AcceptNetPeeringResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *AcceptNetPeeringResponseSchema
+	JSON200      *AcceptNetPeeringResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -18661,7 +18661,7 @@ func (r ReadClientGatewaysResponse) StatusCode() int {
 type CreateClientGatewayResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *ClientGatewaySchema
+	JSON200      *ClientGatewaySchema
 }
 
 // Status returns HTTPResponse.Status
@@ -18792,7 +18792,7 @@ func (r ReadDhcpOptionsResponse) StatusCode() int {
 type CreateDhcpOptionsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *DhcpOptionsSetSchema
+	JSON200      *DhcpOptionsSetSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -18879,7 +18879,7 @@ func (r ReadDirectLinkInterfacesResponse) StatusCode() int {
 type CreateDirectLinkInterfaceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *DirectLinkInterfacesSchema
+	JSON200      *DirectLinkInterfacesSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -18988,7 +18988,7 @@ func (r ReadDirectLinksResponse) StatusCode() int {
 type CreateDirectLinkResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *DirectLinkSchema
+	JSON200      *DirectLinkSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19119,7 +19119,7 @@ func (r ReadFlexibleGpusResponse) StatusCode() int {
 type CreateFlexibleGpuResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *FlexibleGpuSchema
+	JSON200      *FlexibleGpuSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19270,7 +19270,7 @@ func (r ReadImagesResponse) StatusCode() int {
 type CreateImageResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *ImageSchema
+	JSON200      *ImageSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19379,7 +19379,7 @@ func (r ReadInternetServicesResponse) StatusCode() int {
 type CreateInternetServiceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *InternetServiceSchema
+	JSON200      *InternetServiceSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19508,7 +19508,7 @@ func (r ReadKeypairsResponse) StatusCode() int {
 type CreateKeypairResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *KeypairCreatedSchema
+	JSON200      *KeypairCreatedSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19595,7 +19595,7 @@ func (r ReadListenerRulesResponse) StatusCode() int {
 type CreateListenerRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *ListenerRuleSchema
+	JSON200      *ListenerRuleSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19724,7 +19724,7 @@ func (r UnlinkLoadBalancerBackendMachinesResponse) StatusCode() int {
 type CreateLoadBalancerListenersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *LoadBalancerSchema
+	JSON200      *LoadBalancerSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19768,7 +19768,7 @@ func (r DeleteLoadBalancerListenersResponse) StatusCode() int {
 type CreateLoadBalancerPolicyResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *LoadBalancerSchema
+	JSON200      *LoadBalancerSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -19920,7 +19920,7 @@ func (r ReadLoadBalancersResponse) StatusCode() int {
 type CreateLoadBalancerResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *LoadBalancerSchema
+	JSON200      *LoadBalancerSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20073,7 +20073,7 @@ func (r ReadNatServicesResponse) StatusCode() int {
 type CreateNatServiceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *NatServiceSchema
+	JSON200      *NatServiceSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20160,7 +20160,7 @@ func (r ReadNetAccessPointsResponse) StatusCode() int {
 type CreateNetAccessPointResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *NetAccessPointSchema
+	JSON200      *NetAccessPointSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20269,7 +20269,7 @@ func (r ReadNetPeeringsResponse) StatusCode() int {
 type CreateNetPeeringResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *NetPeeringSchema
+	JSON200      *NetPeeringSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20356,7 +20356,7 @@ func (r ReadNetsResponse) StatusCode() int {
 type CreateNetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *NetSchema
+	JSON200      *NetSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20465,7 +20465,7 @@ func (r ReadNicsResponse) StatusCode() int {
 type CreateNicResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *NicSchema
+	JSON200      *NicSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20747,7 +20747,7 @@ func (r ReadPublicIpsResponse) StatusCode() int {
 type CreatePublicIpResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *PublicIpSchema
+	JSON200      *PublicIpSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -20941,7 +20941,7 @@ func (r ReadRouteTablesResponse) StatusCode() int {
 type CreateRouteTableResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *RouteTableSchema
+	JSON200      *RouteTableSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21049,7 +21049,7 @@ func (r UnlinkRouteTableResponse) StatusCode() int {
 type CreateRouteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *RouteTableSchema
+	JSON200      *RouteTableSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21115,7 +21115,7 @@ func (r UpdateRouteResponse) StatusCode() int {
 type CreateSecurityGroupRuleResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *SecurityGroupSchema
+	JSON200      *SecurityGroupSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21181,7 +21181,7 @@ func (r ReadSecurityGroupsResponse) StatusCode() int {
 type CreateSecurityGroupResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *SecurityGroupSchema
+	JSON200      *SecurityGroupSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21268,7 +21268,7 @@ func (r ReadSnapshotsResponse) StatusCode() int {
 type CreateSnapshotResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *SnapshotSchema
+	JSON200      *SnapshotSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21333,7 +21333,7 @@ func (r ReadSnapshotsByIdResponse) StatusCode() int {
 type StartVmsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *StartVmsResponseSchema
+	JSON200      *StartVmsResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21355,7 +21355,7 @@ func (r StartVmsResponse) StatusCode() int {
 type StopVmsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *StopVmsResponseSchema
+	JSON200      *StopVmsResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21399,7 +21399,7 @@ func (r ReadSubnetsResponse) StatusCode() int {
 type CreateSubnetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *SubnetSchema
+	JSON200      *SubnetSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21594,7 +21594,7 @@ func (r ReadVirtualGatewaysResponse) StatusCode() int {
 type CreateVirtualGatewayResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *VirtualGatewaySchema
+	JSON200      *VirtualGatewaySchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21724,7 +21724,7 @@ func (r ReadVmsResponse) StatusCode() int {
 type CreateVmsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *CreateVmsResponseSchema
+	JSON200      *CreateVmsResponseSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -21922,7 +21922,7 @@ func (r ReadVolumesResponse) StatusCode() int {
 type CreateVolumeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *VolumeSchema
+	JSON200      *VolumeSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -22115,7 +22115,7 @@ func (r ReadVpnConnectionsResponse) StatusCode() int {
 type CreateVpnConnectionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON201      *VpnConnectionSchema
+	JSON200      *VpnConnectionSchema
 }
 
 // Status returns HTTPResponse.Status
@@ -24364,12 +24364,12 @@ func ParseAcceptNetPeeringResponse(rsp *http.Response) (*AcceptNetPeeringRespons
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest AcceptNetPeeringResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -24468,12 +24468,12 @@ func ParseCreateClientGatewayResponse(rsp *http.Response) (*CreateClientGatewayR
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest ClientGatewaySchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -24614,12 +24614,12 @@ func ParseCreateDhcpOptionsResponse(rsp *http.Response) (*CreateDhcpOptionsRespo
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest DhcpOptionsSetSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -24708,12 +24708,12 @@ func ParseCreateDirectLinkInterfaceResponse(rsp *http.Response) (*CreateDirectLi
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest DirectLinkInterfacesSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -24828,12 +24828,12 @@ func ParseCreateDirectLinkResponse(rsp *http.Response) (*CreateDirectLinkRespons
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest DirectLinkSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -24974,12 +24974,12 @@ func ParseCreateFlexibleGpuResponse(rsp *http.Response) (*CreateFlexibleGpuRespo
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest FlexibleGpuSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -25126,12 +25126,12 @@ func ParseCreateImageResponse(rsp *http.Response) (*CreateImageResponse, error) 
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest ImageSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -25246,12 +25246,12 @@ func ParseCreateInternetServiceResponse(rsp *http.Response) (*CreateInternetServ
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest InternetServiceSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -25372,12 +25372,12 @@ func ParseCreateKeypairResponse(rsp *http.Response) (*CreateKeypairResponse, err
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest KeypairCreatedSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -25466,12 +25466,12 @@ func ParseCreateListenerRuleResponse(rsp *http.Response) (*CreateListenerRuleRes
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest ListenerRuleSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -25592,12 +25592,12 @@ func ParseCreateLoadBalancerListenersResponse(rsp *http.Response) (*CreateLoadBa
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest LoadBalancerSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -25644,12 +25644,12 @@ func ParseCreateLoadBalancerPolicyResponse(rsp *http.Response) (*CreateLoadBalan
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest LoadBalancerSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -25806,12 +25806,12 @@ func ParseCreateLoadBalancerResponse(rsp *http.Response) (*CreateLoadBalancerRes
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest LoadBalancerSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -25978,12 +25978,12 @@ func ParseCreateNatServiceResponse(rsp *http.Response) (*CreateNatServiceRespons
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest NatServiceSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -26072,12 +26072,12 @@ func ParseCreateNetAccessPointResponse(rsp *http.Response) (*CreateNetAccessPoin
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest NetAccessPointSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -26192,12 +26192,12 @@ func ParseCreateNetPeeringResponse(rsp *http.Response) (*CreateNetPeeringRespons
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest NetPeeringSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -26286,12 +26286,12 @@ func ParseCreateNetResponse(rsp *http.Response) (*CreateNetResponse, error) {
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest NetSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -26406,12 +26406,12 @@ func ParseCreateNicResponse(rsp *http.Response) (*CreateNicResponse, error) {
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest NicSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -26704,12 +26704,12 @@ func ParseCreatePublicIpResponse(rsp *http.Response) (*CreatePublicIpResponse, e
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest PublicIpSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -26898,12 +26898,12 @@ func ParseCreateRouteTableResponse(rsp *http.Response) (*CreateRouteTableRespons
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest RouteTableSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27008,12 +27008,12 @@ func ParseCreateRouteResponse(rsp *http.Response) (*CreateRouteResponse, error) 
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest RouteTableSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27086,12 +27086,12 @@ func ParseCreateSecurityGroupRuleResponse(rsp *http.Response) (*CreateSecurityGr
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest SecurityGroupSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27164,12 +27164,12 @@ func ParseCreateSecurityGroupResponse(rsp *http.Response) (*CreateSecurityGroupR
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest SecurityGroupSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27258,12 +27258,12 @@ func ParseCreateSnapshotResponse(rsp *http.Response) (*CreateSnapshotResponse, e
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest SnapshotSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27326,12 +27326,12 @@ func ParseStartVmsResponse(rsp *http.Response) (*StartVmsResponse, error) {
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest StartVmsResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27352,12 +27352,12 @@ func ParseStopVmsResponse(rsp *http.Response) (*StopVmsResponse, error) {
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest StopVmsResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27404,12 +27404,12 @@ func ParseCreateSubnetResponse(rsp *http.Response) (*CreateSubnetResponse, error
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest SubnetSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27608,12 +27608,12 @@ func ParseCreateVirtualGatewayResponse(rsp *http.Response) (*CreateVirtualGatewa
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest VirtualGatewaySchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27744,12 +27744,12 @@ func ParseCreateVmsResponse(rsp *http.Response) (*CreateVmsResponse, error) {
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest CreateVmsResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -27978,12 +27978,12 @@ func ParseCreateVolumeResponse(rsp *http.Response) (*CreateVolumeResponse, error
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest VolumeSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 
@@ -28162,12 +28162,12 @@ func ParseCreateVpnConnectionResponse(rsp *http.Response) (*CreateVpnConnectionR
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest VpnConnectionSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSON201 = &dest
+		response.JSON200 = &dest
 
 	}
 

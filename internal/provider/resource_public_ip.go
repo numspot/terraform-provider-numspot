@@ -73,7 +73,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	tf := PublicIpFromHttpToTf(res.JSON201) // FIXME
+	tf := PublicIpFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

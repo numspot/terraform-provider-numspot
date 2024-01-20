@@ -73,7 +73,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	tf := SnapshotFromHttpToTf(res.JSON201) // FIXME
+	tf := SnapshotFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

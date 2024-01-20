@@ -64,7 +64,7 @@ func CreateInboundRulesRequest(ctx context.Context, data resource_security_group
 
 	inboundRulesCreationBody := api.CreateSecurityGroupRuleJSONRequestBody{
 		Flow:            "Inbound",
-		SecurityGroupId: *res.JSON201.Id,
+		SecurityGroupId: *res.JSON200.Id,
 		Rules:           &inboundRules,
 	}
 	return inboundRulesCreationBody
@@ -94,7 +94,7 @@ func CreateOutboundRulesRequest(ctx context.Context, data resource_security_grou
 
 	outboundRulesCreationBody := api.CreateSecurityGroupRuleJSONRequestBody{
 		Flow:            "Inbound",
-		SecurityGroupId: *res.JSON201.Id,
+		SecurityGroupId: *res.JSON200.Id,
 		Rules:           &outboundRules,
 	}
 	return outboundRulesCreationBody

@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -66,14 +69,46 @@ func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest
 		response.Diagnostics.AddError("Failed to create Net", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create Net", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to create Net", apiError.Error())
 		return
 	}
 
-	tf := NetFromHttpToTf(res.JSON201) // FIXME
+	createdId := *res.JSON200.Id
+	createStateConf := &retry.StateChangeConf{
+		Pending: []string{"pending"},
+		Target:  []string{"available"},
+		Refresh: func() (result interface{}, state string, err error) {
+			res, err := r.client.ReadNetsByIdWithResponse(ctx, createdId)
+			if err != nil {
+				response.Diagnostics.AddError("Failed to read Net", err.Error())
+			}
+
+			expectedStatusCode := 200
+			if res.StatusCode() != expectedStatusCode {
+				// TODO: Handle NumSpot error
+				apiError := utils.HandleError(res.Body)
+				response.Diagnostics.AddError("Failed to read Net", apiError.Error())
+				return
+			}
+
+			return res.JSON200, *res.JSON200.State, nil
+		},
+		Timeout: 5 * time.Minute,
+		Delay:   3 * time.Second,
+	}
+
+	_, err = createStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		// return fmt.Errorf("Error waiting for example instance (%s) to be created: %s", d.Id(), err)
+		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *res.JSON200.Id, err))
+		return
+	}
+
+	tf := NetFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -82,7 +117,7 @@ func (r *NetResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	//TODO: Implement READ operation
-	res, err := r.client.ReadNetsByIdWithResponse(ctx, data.Id.String())
+	res, err := r.client.ReadNetsByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -91,7 +126,8 @@ func (r *NetResource) Read(ctx context.Context, request resource.ReadRequest, re
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read Net", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to read Net", apiError.Error())
 		return
 	}
 
@@ -109,17 +145,53 @@ func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteNetWithResponse(ctx, data.Id.String())
+	res, err := r.client.DeleteNetWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete Net", err.Error())
 		return
 	}
 
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete Net", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to delete Net", apiError.Error())
 		return
 	}
+
+	deleteStateConf := &retry.StateChangeConf{
+		Pending: []string{"pending", "available", "deleting"},
+		Target:  []string{"deleted"},
+		Refresh: func() (result interface{}, state string, err error) {
+			res, err := r.client.ReadNetsByIdWithResponse(ctx, data.Id.ValueString())
+			if err != nil {
+				response.Diagnostics.AddError("Failed to read Net on delete", err.Error())
+			}
+
+			expectedStatusCode := 200
+			if res.StatusCode() != expectedStatusCode {
+				// TODO: Handle NumSpot error
+				apiError := utils.HandleError(res.Body)
+				if apiError.Error() == "No Nets found" {
+					return data, "deleted", nil
+				}
+				response.Diagnostics.AddError("Failed to read Net on delete", apiError.Error())
+				return
+			}
+
+			return data, *res.JSON200.State, nil
+		},
+		Timeout: 5 * time.Minute,
+		Delay:   5 * time.Second,
+	}
+
+	_, err = deleteStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		// return fmt.Errorf("Error waiting for example instance (%s) to be created: %s", d.Id(), err)
+		response.Diagnostics.AddError("Failed to delete Net", fmt.Sprintf("Error waiting for instance (%s) to be deleted: %s", data.Id.ValueString(), err))
+		return
+	}
+
+	response.State.RemoveResource(ctx)
 }

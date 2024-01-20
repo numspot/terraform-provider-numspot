@@ -31,7 +31,7 @@ func (r *ClientGatewayResource) Configure(ctx context.Context, request resource.
 	}
 
 	client, ok := request.ProviderData.(*api.ClientWithResponses)
-	if !ok {
+	if !ok || client == nil {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
 			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
@@ -66,15 +66,16 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 		response.Diagnostics.AddError("Failed to create ClientGateway", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create ClientGateway", "My Custom Error")
+		fmt.Println(string(res.Body))
+		response.Diagnostics.AddError("Failed to create ClientGateway", string(res.Body))
 		return
 	}
 
-	tf := ClientGatewayFromHttpToTf(res.JSON201) // FIXME
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	tf := ClientGatewayFromHttpToTf(res.JSON200) // FIXME
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
@@ -82,7 +83,7 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	//TODO: Implement READ operation
-	res, err := r.client.ReadClientGatewaysByIdWithResponse(ctx, data.Id.String())
+	res, err := r.client.ReadClientGatewaysByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -91,12 +92,13 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read ClientGateway", "My Custom Error")
+		fmt.Println(string(res.Body))
+		response.Diagnostics.AddError("Failed to read ClientGateway", string(res.Body))
 		return
 	}
 
 	tf := ClientGatewayFromHttpToTf(res.JSON200) // FIXME
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *ClientGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
@@ -109,17 +111,18 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteClientGatewayWithResponse(ctx, data.Id.String())
+	res, err := r.client.DeleteClientGatewayWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete ClientGateway", err.Error())
 		return
 	}
 
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete ClientGateway", "My Custom Error")
+		fmt.Println()
+		response.Diagnostics.AddError("Failed to delete ClientGateway", string(res.Body))
 		return
 	}
 }

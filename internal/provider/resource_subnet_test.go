@@ -12,9 +12,9 @@ func TestAccSubnetResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	netIpRange := "10.0.0.0/16"
-	subnetIpRange := "10.0.1.0/24"
-	updatedIpRange := "10.0.2.0/24"
+	netIpRange := "10.101.0.0/16"
+	subnetIpRange := "10.101.1.0/24"
+	updatedIpRange := "10.101.2.0/24"
 
 	// Computed
 	subnetId := ""
@@ -45,7 +45,7 @@ func TestAccSubnetResource(t *testing.T) {
 				Config: testSubnetConfig(netIpRange, updatedIpRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_subnet.test", "ip_range", updatedIpRange),
-					resource.TestCheckResourceAttrWith("numspot_subnet.test", "field", func(v string) error {
+					resource.TestCheckResourceAttrWith("numspot_subnet.test", "id", func(v string) error {
 						require.NotEqual(t, v, subnetId)
 						return nil
 					}),
@@ -57,12 +57,12 @@ func TestAccSubnetResource(t *testing.T) {
 
 func testSubnetConfig(netIpRange, subnetIpRange string) string {
 	return fmt.Sprintf(`
-resource "net" "main" {
+resource "numspot_net" "main" {
 	ip_range = %[1]q
 }
 
 resource "numspot_subnet" "test" {
-	net_id 		= net.main.id
+	net_id 		= numspot_net.main.id
 	ip_range 	= %[2]q
 }`, netIpRange, subnetIpRange)
 }

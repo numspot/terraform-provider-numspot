@@ -73,7 +73,7 @@ func (r *NatServiceResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf := NatServiceFromHttpToTf(res.JSON201) // FIXME
+	tf := NatServiceFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

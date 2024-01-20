@@ -73,7 +73,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 		return
 	}
 
-	tf := FlexibleGpuFromHttpToTf(res.JSON201) // FIXME
+	tf := FlexibleGpuFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

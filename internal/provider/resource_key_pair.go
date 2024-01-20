@@ -73,7 +73,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 		return
 	}
 
-	// tf := KeyPairFromHttpToTf(res.JSON201) // FIXME
+	// tf := KeyPairFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &data)...)
 }
 
