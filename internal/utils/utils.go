@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -23,8 +24,7 @@ func FromIntPtrToTfInt64(val *int) types.Int64 {
 	return FromIntToTfInt64(*val)
 }
 
-func FromStringListToTfStringList(arr []string) types.List {
+func FromStringListToTfStringList(arr []string) (types.List, diag.Diagnostics) {
 	ctx := context.Background()
-	listValue, _ := types.ListValueFrom(ctx, types.StringType, arr)
-	return listValue
+	return types.ListValueFrom(ctx, types.StringType, arr)
 }

@@ -13,6 +13,7 @@ func TestAccSecurityGroupResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
 	netId := "vpc-f1f48ebd"
+
 	rand := rand.Intn(9999-1000) + 1000
 	name := fmt.Sprintf("security-group-name-%d", rand)
 	descrition := fmt.Sprintf("security-group-description-%d", rand)
@@ -53,9 +54,13 @@ resource "numspot_security_group" "test" {
 	net_id = %[1]q
 	name = %[2]q
 	description = %[3]q
+	inbound_rules = [
+		{
+			from_port_range = 80
+			to_port_range = 80
+			ip_ranges = ["0.0.0.0/0"]
+			ip_protocol = "tcp"
+		}
+	]
 }`, netId, name, description)
-}
-
-func testSecurityGroupConfig_Update() string {
-	return `resource "numspot_security_group" "test" {}`
 }

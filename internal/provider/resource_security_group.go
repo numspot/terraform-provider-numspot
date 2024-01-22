@@ -79,24 +79,38 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 	// Inbound
 	if len(data.InboundRules.Elements()) > 0 {
-		inboundRulesCreationBody := CreateInboundRulesRequest(ctx, data, res)
-		createInboundRulesResponse, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, inboundRulesCreationBody)
+		inboundRules := make([]resource_security_group.InboundRulesValue, 0, len(data.InboundRules.Elements()))
+		data.InboundRules.ElementsAs(ctx, &inboundRules, false)
+		ibBody := CreateInboundRulesRequest(ctx, *createdId, inboundRules)
+		createIbRes, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, ibBody)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
 			return
 		}
-		fmt.Println(createInboundRulesResponse)
+
+		if createIbRes.StatusCode() != 200 {
+			apiError := utils.HandleError(createIbRes.Body)
+			response.Diagnostics.AddError("Failed to create SecurityGroup", apiError.Error())
+			return
+		}
 	}
 
 	// Outbound
 	if len(data.OutboundRules.Elements()) > 0 {
-		outboundRulesCreationBody := CreateOutboundRulesRequest(ctx, data, res)
-		createOutboundRulesResponse, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, outboundRulesCreationBody)
+		outboundRules := make([]resource_security_group.OutboundRulesValue, 0, len(data.OutboundRules.Elements()))
+		data.OutboundRules.ElementsAs(ctx, &outboundRules, false)
+		otbBody := CreateOutboundRulesRequest(ctx, *createdId, outboundRules)
+		createOtbRes, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, otbBody)
 		if err != nil {
-			response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
+			response.Diagnostics.AddError("Failed to create SecurityGroup outbound rule", err.Error())
 			return
 		}
-		fmt.Println(createOutboundRulesResponse)
+
+		if createOtbRes.StatusCode() != 200 {
+			apiError := utils.HandleError(createOtbRes.Body)
+			response.Diagnostics.AddError("Failed to create SecurityGroup outbound rule", apiError.Error())
+			return
+		}
 	}
 
 	// Read before store
@@ -128,7 +142,7 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 	if diag.HasError() {
 		response.Diagnostics.Append(diag...)
 		return
-	} // FIXME
+	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -150,6 +164,7 @@ func (r *SecurityGroupResource) readSecurityGroup(
 		diag.AddError("Failed to read SecurityGroup", "My Custom Error")
 		return nil
 	}
+
 	return res
 }
 
@@ -163,7 +178,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.String(), api.DeleteSecurityGroupRequestSchema{})
+	res, err := r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.ValueString(), api.DeleteSecurityGroupRequestSchema{})
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete SecurityGroup", err.Error())
