@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -66,14 +67,20 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		response.Diagnostics.AddError("Failed to create RouteTable", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create RouteTable", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to create RouteTable", apiError.Error())
 		return
 	}
 
-	tf := RouteTableFromHttpToTf(res.JSON200) // FIXME
+	tf, diag := RouteTableFromHttpToTf(ctx, res.JSON200) // FIXME
+	if diag.HasError() {
+		response.Diagnostics.Append(diag...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -82,7 +89,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	//TODO: Implement READ operation
-	res, err := r.client.ReadRouteTablesByIdWithResponse(ctx, data.Id.String())
+	res, err := r.client.ReadRouteTablesByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -91,11 +98,17 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read RouteTable", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to read RouteTable", apiError.Error())
 		return
 	}
 
-	tf := RouteTableFromHttpToTf(res.JSON200) // FIXME
+	tf, diag := RouteTableFromHttpToTf(ctx, res.JSON200) // FIXME
+	if diag.HasError() {
+		response.Diagnostics.Append(diag...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -109,17 +122,17 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteRouteTableWithResponse(ctx, data.Id.String())
+	res, err := r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete RouteTable", err.Error())
 		return
 	}
 
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete RouteTable", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to delete RouteTable", apiError.Error())
 		return
 	}
 }

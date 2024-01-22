@@ -20,7 +20,10 @@ func (a ApiError) Type() string {
 }
 
 func (a ApiError) Error() string {
-	return a.Errors[0].Details
+	if len(a.Errors) > 0 {
+		return a.Errors[0].Details
+	}
+	return ""
 }
 
 func HandleError(httpResponseBody []byte) error {
