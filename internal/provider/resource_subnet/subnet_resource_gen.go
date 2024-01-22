@@ -34,6 +34,7 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"map_public_ip_on_launch": schema.BoolAttribute{
 				Computed:            true,
+				Optional: 			true,
 				Description:         "If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.",
 				MarkdownDescription: "If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.",
 			},

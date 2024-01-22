@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -108,7 +109,36 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	tf := SubnetFromHttpToTf(res.JSON200) // FIXME
+	if data.MapPublicIpOnLaunch.ValueBool() {
+		updateRes, err := r.client.UpdateSubnetWithResponse(ctx, createdId, api.UpdateSubnetJSONRequestBody{
+			MapPublicIpOnLaunch: true,
+		})
+
+		if err != nil {
+			response.Diagnostics.AddError("Failed to read Subnet", err.Error())
+			return
+		}
+
+		if updateRes.StatusCode() != http.StatusOK {
+			apiError := utils.HandleError(res.Body)
+			response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
+			return
+		}
+	}
+
+	readRes, err := r.client.ReadSubnetsByIdWithResponse(ctx, createdId)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+		return
+	}
+
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(readRes.Body)
+		response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
+		return
+	}
+
+	tf := SubnetFromHttpToTf(readRes.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

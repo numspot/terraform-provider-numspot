@@ -444,7 +444,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						"highest",
 					),
 				},
-				Default: stringdefault.StaticString("high"),
 			},
 			"placement": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{

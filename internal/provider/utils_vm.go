@@ -13,14 +13,13 @@ func VmFromTfToHttp(tf resource_vm.VmModel) *api.VmSchema {
 }
 
 func VmFromHttpToTf(http *api.VmSchema) resource_vm.VmModel {
-	launchNumber := utils.FromIntPtrToTfInt64(http.LaunchNumber)
 	vmsCount := utils.FromIntToTfInt64(-1)
 
 	privateIps, _ := types.ListValueFrom(context.Background(), types.StringType, []string{*http.PrivateIp})
 	// securityGroupIds, _ := types.ListValueFrom(context.Background(), types.StringType, []string{})
 	productCodes, _ := types.ListValueFrom(context.Background(), types.StringType, http.ProductCodes)
 
-	return resource_vm.VmModel{
+	r := resource_vm.VmModel{
 		//
 		Architecture:        types.StringPointerValue(http.Architecture),
 		BlockDeviceMappings: types.ListNull(resource_vm.BlockDeviceMappingsValue{}.Type(context.Background())),
@@ -37,7 +36,6 @@ func VmFromHttpToTf(http *api.VmSchema) resource_vm.VmModel {
 		IsSourceDestChecked:       types.BoolPointerValue(http.IsSourceDestChecked),
 		KeypairName:               types.StringPointerValue(http.KeypairName),
 		//
-		LaunchNumber:         launchNumber,
 		NestedVirtualization: types.BoolPointerValue(http.NestedVirtualization),
 		NetId:                types.StringPointerValue(http.NetId),
 		Nics:                 types.ListNull(resource_vm.NicsValue{}.Type(context.Background())),
@@ -65,9 +63,32 @@ func VmFromHttpToTf(http *api.VmSchema) resource_vm.VmModel {
 		VmType:                      types.StringPointerValue(http.Type),
 		VmsCount:                    vmsCount,
 	}
+
+	if http.LaunchNumber != nil {
+		launchNumber := utils.FromIntPtrToTfInt64(http.LaunchNumber)
+		r.LaunchNumber = launchNumber
+	}
+
+	if http.SecurityGroups != nil {
+		sg := make([]string, 0, len(*http.SecurityGroups))
+		for _, e := range *http.SecurityGroups {
+			sg = append(sg, *e.SecurityGroupId)
+		}
+		listValue, _ := types.ListValueFrom(context.Background(), types.StringType, sg)
+		r.SecurityGroupIds = listValue
+	}
+
+	return r
 }
 
 func VmFromTfToCreateRequest(tf resource_vm.VmModel) api.CreateVmsJSONRequestBody {
+	securityGroupIdsTf := make([]types.String, 0, len(tf.SecurityGroupIds.Elements()))
+	tf.SecurityGroupIds.ElementsAs(context.Background(), &securityGroupIdsTf, false)
+	securityGroupIds := []string{}
+	for _, sgid := range securityGroupIdsTf {
+		securityGroupIds = append(securityGroupIds, sgid.ValueString())
+	}
+
 	return api.CreateVmsJSONRequestBody{
 		BootOnCreation:              nil,
 		BsuOptimized:                nil,
@@ -80,7 +101,7 @@ func VmFromTfToCreateRequest(tf resource_vm.VmModel) api.CreateVmsJSONRequestBod
 		Performance:                 nil,
 		Placement:                   nil,
 		PrivateIps:                  nil,
-		SecurityGroupIds:            nil,
+		SecurityGroupIds:            &securityGroupIds,
 		SecurityGroups:              nil,
 		SubnetId:                    tf.SubnetId.ValueStringPointer(),
 		UserData:                    nil,

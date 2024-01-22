@@ -3,7 +3,10 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -78,9 +81,42 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		response.Diagnostics.AddError("Failed to create Vm", "My Custom Error")
 		return
 	}
-
 	vms := *res.JSON200.Vms
-	tf := VmFromHttpToTf(&vms[0])
+	createdId := vms[0].Id
+
+	createStateConf := &retry.StateChangeConf{
+		Pending: []string{"pending"},
+		Target:  []string{"running"},
+		Refresh: func() (result interface{}, state string, err error) {
+			res, err := r.client.ReadVmsByIdWithResponse(ctx, *createdId)
+			if err != nil {
+				// TODO: Handle Error
+				response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+			}
+
+			expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
+			if res.StatusCode() != expectedStatusCode {
+				apiError := utils.HandleError(res.Body)
+				response.Diagnostics.AddError("Failed to read Vm", apiError.Error())
+				return
+			}
+
+			return *res.JSON200, *res.JSON200.State, nil
+		},
+		Timeout: 5 * time.Minute,
+		Delay:   3 * time.Second,
+	}
+
+	rr, err := createStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *createdId, err))
+		return
+	}
+
+	vmSchema := rr.(api.VmSchema)
+	tf := VmFromHttpToTf(&vmSchema)
+	tf.Id = types.StringPointerValue(createdId)
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -88,8 +124,8 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadVmsByIdWithResponse(ctx, data.Id.String())
+	id := data.Id.ValueString()
+	res, err := r.client.ReadVmsByIdWithResponse(ctx, id)
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -103,6 +139,7 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	}
 
 	tf := VmFromHttpToTf(res.JSON200) // FIXME
+	tf.Id = types.StringValue(id)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -117,7 +154,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 
 	//TODO: Implement DELETE operation
 	interfaceSlice := make([]interface{}, 1)
-	interfaceSlice[0] = data.Id
+	interfaceSlice[0] = data.Id.ValueString()
 	res, err := r.client.DeleteVmsWithResponse(ctx, interfaceSlice)
 	if err != nil {
 		// TODO: Handle Error

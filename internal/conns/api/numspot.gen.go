@@ -2691,7 +2691,7 @@ type VmSchema struct {
 	Hypervisor *string `json:"hypervisor,omitempty"`
 
 	// Id The ID of the VM.
-	Id *string `json:"id,omitempty"`
+	Id *string `json:"vmId,omitempty"`
 
 	// ImageId The ID of the OMI used to create the VM.
 	ImageId *string `json:"imageId,omitempty"`
