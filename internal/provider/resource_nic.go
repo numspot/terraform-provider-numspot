@@ -66,7 +66,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		response.Diagnostics.AddError("Failed to create Nic", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to create Nic", "My Custom Error")
@@ -82,7 +82,7 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	//TODO: Implement READ operation
-	res, err := r.client.ReadNicsByIdWithResponse(ctx, data.Id.String())
+	res, err := r.client.ReadNicsByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -109,14 +109,14 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteNicWithResponse(ctx, data.Id.String())
+	res, err := r.client.DeleteNicWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete Nic", err.Error())
 		return
 	}
 
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to delete Nic", "My Custom Error")

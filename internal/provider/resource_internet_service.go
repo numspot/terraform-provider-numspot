@@ -64,7 +64,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 		response.Diagnostics.AddError("Failed to create InternetService", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to create InternetService", "My Custom Error")

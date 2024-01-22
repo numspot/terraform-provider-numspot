@@ -106,8 +106,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The inbound rules associated with the security group.",
 			},
 			"name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required: 			true,
 				Description:         "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
 				MarkdownDescription: "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
 			},

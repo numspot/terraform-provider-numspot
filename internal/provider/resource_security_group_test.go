@@ -61,6 +61,5 @@ resource "numspot_security_group" "test" {
 }
 
 func testSecurityGroupConfig_Update() string {
-	return `resource "numspot_security_group" "test" {
-    			}`
+	return `resource "numspot_security_group" "test" {}`
 }

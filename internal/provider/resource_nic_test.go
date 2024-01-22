@@ -45,8 +45,9 @@ func TestAccNicResource(t *testing.T) {
 }
 
 func testNicConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_nic" "test" {
-  			}`)
+	return fmt.Sprintf(`
+resource "numspot_nic" "test" {
+}`)
 }
 
 func testNicConfig_Update() string {

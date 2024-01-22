@@ -66,7 +66,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
 	}
 
-	expectedStatusCode := 201 // FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to create SecurityGroup", "My Custom Error")
@@ -135,7 +135,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 		return
 	}
 
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to delete SecurityGroup", "My Custom Error")
