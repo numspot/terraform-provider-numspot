@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -63,19 +64,52 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	body := RouteTableFromTfToCreateRequest(data)
 	res, err := r.client.CreateRouteTableWithResponse(ctx, body)
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create RouteTable", err.Error())
+		return
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 200
 	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to create RouteTable", apiError.Error())
 		return
 	}
 
-	tf, diag := RouteTableFromHttpToTf(ctx, res.JSON200) // FIXME
+	createdId := res.JSON200.Id
+
+	// Delete default
+
+	routes := make([]resource_route_table.RoutesValue, 0, len(data.Routes.Elements()))
+	data.Routes.ElementsAs(ctx, &routes, false)
+	for _, route := range routes {
+		createRouteRes, err := r.client.CreateRouteWithResponse(ctx, api.CreateRouteJSONRequestBody{
+			DestinationIpRange: route.DestinationIpRange.ValueString(),
+			GatewayId:          route.GatewayId.ValueStringPointer(),
+			NatServiceId:       route.NatServiceId.ValueStringPointer(),
+			NetPeeringId:       route.NetPeeringId.ValueStringPointer(),
+			NicId:              route.NicId.ValueStringPointer(),
+			TableId:            createdId,
+			VmId:               route.VmId.ValueStringPointer(),
+		})
+
+		if err != nil {
+			response.Diagnostics.AddError("Failed to create RouteTable route", err.Error())
+			return
+		}
+
+		if createRouteRes.StatusCode() != 200 {
+			apiError := utils.HandleError(res.Body)
+			response.Diagnostics.AddError("Failed to create RouteTable route", apiError.Error())
+			return
+		}
+	}
+
+	readed := r.readRouteTable(ctx, *createdId, response.Diagnostics)
+	if readed == nil {
+		return
+	}
+
+	tf, diag := RouteTableFromHttpToTf(ctx, readed.JSON200)
 	if diag.HasError() {
 		response.Diagnostics.Append(diag...)
 		return
@@ -88,18 +122,8 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadRouteTablesByIdWithResponse(ctx, data.Id.ValueString())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to read RouteTable", apiError.Error())
+	res := r.readRouteTable(ctx, data.Id.ValueString(), response.Diagnostics)
+	if res == nil {
 		return
 	}
 
@@ -110,6 +134,23 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+}
+
+func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag diag.Diagnostics) *api.ReadRouteTablesByIdResponse {
+	res, err := r.client.ReadRouteTablesByIdWithResponse(ctx, id)
+	if err != nil {
+		diag.AddError("Failed to read RouteTable", err.Error())
+		return nil
+	}
+
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
+	if res.StatusCode() != expectedStatusCode {
+		apiError := utils.HandleError(res.Body)
+		diag.AddError("Failed to read RouteTable", apiError.Error())
+		return nil
+	}
+
+	return res
 }
 
 func (r *RouteTableResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {

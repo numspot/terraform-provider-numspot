@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -62,12 +63,14 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create Vm", err.Error())
+		return
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create Vm", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to create Vm", apiError.Error())
 		return
 	}
 
@@ -94,8 +97,8 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read Vm", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to read Vm", apiError.Error())
 		return
 	}
 
@@ -122,10 +125,11 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 		return
 	}
 
-	expectedStatusCode := 204 //FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete Vm", "My Custom Error")
+		// TODO: Handle NumSpot error`
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to delete Vm", apiError.Error())
 		return
 	}
 }

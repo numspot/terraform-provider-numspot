@@ -61,14 +61,12 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	body := InternetServiceFromTfToCreateRequest(data)
 	res, err := r.client.CreateInternetServiceWithResponse(ctx, body)
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create InternetService", err.Error())
 	}
 
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to create InternetService", apiError.Error())
+		response.Diagnostics.AddError("Failed to create InternetService", "My Custom Error")
 		return
 	}
 	//Update state
@@ -113,8 +111,9 @@ func (r *InternetServiceResource) Read(ctx context.Context, request resource.Rea
 
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to read InternetService", apiError.Error())
+		// TODO: Handle NumSpot error
+		response.Diagnostics.AddError("Failed to read InternetService",
+			fmt.Sprintf("calling HTTP API expected %d got %d", expectedStatusCode, res.StatusCode()))
 		return
 	}
 
@@ -144,8 +143,8 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 		}
 		expectedStatusCode := 200
 		if res.StatusCode() != expectedStatusCode {
-			apiError := utils.HandleError(res.Body)
-			response.Diagnostics.AddError("Failed to create InternetService", apiError.Error())
+			// TODO: Handle NumSpot error
+			response.Diagnostics.AddError("Failed to create InternetService", "My Custom Error")
 			return
 		}
 	}
@@ -159,8 +158,8 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to delete InternetService", apiError.Error())
+		// TODO: Handle NumSpot error
+		response.Diagnostics.AddError("Failed to delete InternetService", "My Custom Error")
 		return
 	}
 }
