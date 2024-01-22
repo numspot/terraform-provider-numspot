@@ -45,6 +45,8 @@ func (r *PublicIpResource) Configure(ctx context.Context, request resource.Confi
 }
 
 func (r *PublicIpResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+	var data resource_public_ip.PublicIpModel
+	response.State.Get(ctx, &data)
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
@@ -76,7 +78,19 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	}
 
 	tf := PublicIpFromHttpToTf(res.JSON200) // FIXME
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+
+	//Refresh from state
+	//response.Diagnostics.Append(response.State.Get(ctx, &data)...)
+
+	if tf.VmId.IsNull() && tf.NicId.IsNull() {
+		return
+	}
+
+	//Call Link publicIP
+	if err := invokeLinkPublicIP(ctx, r.client, tf); err != nil {
+		response.Diagnostics.AddError("Failed to link public IP", err.Error())
+	}
 }
 
 func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
@@ -99,12 +113,24 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 	}
 
 	tf := PublicIpFromHttpToTf(res.JSON200) // FIXME
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
-	panic("implement me")
+	var data resource_public_ip.PublicIpModel
+	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	if data.VmId.IsNull() && data.NicId.IsNull() {
+		return
+	}
+
+	//Call Link publicIP
+	if err := invokeLinkPublicIP(ctx, r.client, data); err != nil {
+		response.Diagnostics.AddError("Failed to link public IP", err.Error())
+	}
 }
 
 func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

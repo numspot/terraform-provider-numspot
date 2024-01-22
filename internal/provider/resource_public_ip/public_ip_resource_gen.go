@@ -23,7 +23,7 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The account ID of the owner of the NIC.",
 			},
 			"nic_id": schema.StringAttribute{
-				Computed:            true,
+				Optional:            true,
 				Description:         "The ID of the NIC the public IP is associated with (if any).",
 				MarkdownDescription: "The ID of the NIC the public IP is associated with (if any).",
 			},
@@ -38,7 +38,7 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The public IP.",
 			},
 			"vm_id": schema.StringAttribute{
-				Computed:            true,
+				Optional:            true,
 				Description:         "The ID of the VM the public IP is associated with (if any).",
 				MarkdownDescription: "The ID of the VM the public IP is associated with (if any).",
 			},

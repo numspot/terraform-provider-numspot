@@ -1,7 +1,9 @@
 package provider
 
 import (
+	"context"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
@@ -32,4 +34,29 @@ func PublicIpFromHttpToTf(http *api.PublicIpSchema) resource_public_ip.PublicIpM
 
 func PublicIpFromTfToCreateRequest(_ resource_public_ip.PublicIpModel) api.CreatePublicIpJSONRequestBody {
 	return api.CreatePublicIpJSONRequestBody{}
+}
+
+func invokeLinkPublicIP(ctx context.Context, client *api.ClientWithResponses, data resource_public_ip.PublicIpModel) error {
+	var payload = api.LinkPublicIpJSONRequestBody{}
+	if !data.VmId.IsNull() {
+		payload = api.LinkPublicIpJSONRequestBody{VmId: data.VmId.ValueStringPointer()}
+	} else {
+		payload = api.LinkPublicIpJSONRequestBody{
+			NicId:     data.NicId.ValueStringPointer(),
+			PrivateIp: data.PrivateIp.ValueStringPointer(),
+		}
+	}
+	if !data.PublicIp.IsNull() {
+		payload.PublicIp = data.PublicIp.ValueStringPointer()
+	}
+	res, err := client.LinkPublicIpWithResponse(ctx, data.Id.ValueString(), payload)
+	if err != nil {
+		return err
+	}
+	expectedStatusCode := 200
+	if res.StatusCode() != expectedStatusCode {
+		return utils.HandleError(res.Body)
+	}
+
+	return nil
 }
