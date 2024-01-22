@@ -2,7 +2,7 @@ package provider
 
 import (
 	"context"
-
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
@@ -22,16 +22,89 @@ func SecurityGroupFromTfToHttp(tf resource_security_group.SecurityGroupModel) *a
 	}
 }
 
-func SecurityGroupFromHttpToTf(http *api.SecurityGroupSchema) resource_security_group.SecurityGroupModel {
-	return resource_security_group.SecurityGroupModel{
+func InboundRuleFromHttpToTf(rules api.SecurityGroupRuleSchema) resource_security_group.InboundRulesValue {
+	fpr := utils.FromIntPtrToTfInt64(rules.FromPortRange)
+	tpr := utils.FromIntPtrToTfInt64(rules.ToPortRange)
+
+	ipRange := types.ListNull(types.StringType)
+	if rules.IpRanges != nil {
+		ipRange = utils.FromStringListToTfStringList(*rules.IpRanges)
+	}
+
+	services := types.ListNull(types.StringType)
+	if rules.ServiceIds != nil {
+		services = utils.FromStringListToTfStringList(*rules.ServiceIds)
+	}
+
+	members := types.ListNull(resource_security_group.SecurityGroupsMembersType{})
+
+	return resource_security_group.InboundRulesValue{
+		FromPortRange:         fpr,
+		ToPortRange:           tpr,
+		IpProtocol:            types.StringPointerValue(rules.IpProtocol),
+		IpRanges:              ipRange,
+		SecurityGroupsMembers: members,
+		ServiceIds:            services,
+	}
+}
+
+func OutboundRuleFromHttpToTf(ctx context.Context, rules api.SecurityGroupRuleSchema) resource_security_group.OutboundRulesValue {
+	fpr := utils.FromIntPtrToTfInt64(rules.FromPortRange)
+	tpr := utils.FromIntPtrToTfInt64(rules.ToPortRange)
+
+	ipRange := types.ListNull(types.StringType)
+	if rules.IpRanges != nil {
+		ipRange = utils.FromStringListToTfStringList(*rules.IpRanges)
+	}
+
+	services := types.ListNull(types.StringType)
+	if rules.ServiceIds != nil {
+		services = utils.FromStringListToTfStringList(*rules.ServiceIds)
+	}
+
+	// members := types.ListNull(resource_security_group.SecurityGroupsMembersType{})
+	return resource_security_group.OutboundRulesValue{
+		FromPortRange: fpr,
+		ToPortRange:   tpr,
+		IpProtocol:    types.StringPointerValue(rules.IpProtocol),
+		IpRanges:      ipRange,
+		ServiceIds:    services,
+	}
+}
+
+func SecurityGroupFromHttpToTf(ctx context.Context, http *api.SecurityGroupSchema) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
+	ibds := make([]resource_security_group.InboundRulesValue, len(*http.InboundRules))
+	for i, e := range *http.InboundRules {
+		ibds[i] = InboundRuleFromHttpToTf(e)
+	}
+
+	obds := make([]resource_security_group.OutboundRulesValue, len(*http.OutboundRules))
+	for i, e := range *http.OutboundRules {
+		obds[i] = OutboundRuleFromHttpToTf(ctx, e)
+	}
+
+	ibdsTf, diag := types.ListValueFrom(ctx, resource_security_group.InboundRulesValue{}.Type(ctx), ibds)
+	if diag.HasError() {
+		return nil, diag
+	}
+
+	obdsType := resource_security_group.OutboundRulesValue{}.Type(ctx)
+	obdsTf, diag := types.ListValueFrom(ctx, obdsType, obds)
+	if diag.HasError() {
+		return nil, diag
+	}
+
+	res := resource_security_group.SecurityGroupModel{
 		AccountId:     types.StringPointerValue(http.AccountId),
 		Description:   types.StringPointerValue(http.Description),
 		Id:            types.StringPointerValue(http.Id),
-		InboundRules:  types.List{},
 		Name:          types.StringPointerValue(http.Name),
 		NetId:         types.StringPointerValue(http.NetId),
-		OutboundRules: types.List{},
+		InboundRules:  ibdsTf,
+		OutboundRules: obdsTf,
 	}
+
+	return &res, nil
 }
 
 func SecurityGroupFromTfToCreateRequest(tf resource_security_group.SecurityGroupModel) api.CreateSecurityGroupJSONRequestBody {

@@ -3,6 +3,8 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -69,30 +71,46 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	expectedStatusCode := 200 // FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create SecurityGroup", "My Custom Error")
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to create SecurityGroup", apiError.Error())
 		return
 	}
+	createdId := res.JSON200.Id
 
 	// Inbound
-	inboundRulesCreationBody := CreateInboundRulesRequest(ctx, data, res)
-	createInboundRulesResponse, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, inboundRulesCreationBody)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
-		return
+	if len(data.InboundRules.Elements()) > 0 {
+		inboundRulesCreationBody := CreateInboundRulesRequest(ctx, data, res)
+		createInboundRulesResponse, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, inboundRulesCreationBody)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
+			return
+		}
+		fmt.Println(createInboundRulesResponse)
 	}
-	fmt.Println(createInboundRulesResponse)
 
 	// Outbound
-	outboundRulesCreationBody := CreateOutboundRulesRequest(ctx, data, res)
-	createOutboundRulesResponse, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, outboundRulesCreationBody)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
-		return
+	if len(data.OutboundRules.Elements()) > 0 {
+		outboundRulesCreationBody := CreateOutboundRulesRequest(ctx, data, res)
+		createOutboundRulesResponse, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, outboundRulesCreationBody)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
+			return
+		}
+		fmt.Println(createOutboundRulesResponse)
 	}
-	fmt.Println(createOutboundRulesResponse)
 
 	// Read before store
-	tf := SecurityGroupFromHttpToTf(res.JSON200)
+	read := r.readSecurityGroup(ctx, *createdId, response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	tf, diag := SecurityGroupFromHttpToTf(ctx, read.JSON200)
+	if diag.HasError() {
+		response.Diagnostics.Append(diag...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -101,21 +119,38 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement READ operation
-	res, err := r.client.ReadSecurityGroupsByIdWithResponse(ctx, data.Id.String())
+	res := r.readSecurityGroup(ctx, data.Id.ValueString(), response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	tf, diag := SecurityGroupFromHttpToTf(ctx, res.JSON200)
+	if diag.HasError() {
+		response.Diagnostics.Append(diag...)
+		return
+	} // FIXME
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+}
+
+func (r *SecurityGroupResource) readSecurityGroup(
+	ctx context.Context,
+	id string,
+	diag diag.Diagnostics,
+) *api.ReadSecurityGroupsByIdResponse {
+	res, err := r.client.ReadSecurityGroupsByIdWithResponse(ctx, id)
 	if err != nil {
 		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+		diag.AddError("Failed to read RouteTable", err.Error())
+		return nil
 	}
 
 	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read SecurityGroup", "My Custom Error")
-		return
+		diag.AddError("Failed to read SecurityGroup", "My Custom Error")
+		return nil
 	}
-
-	tf := SecurityGroupFromHttpToTf(res.JSON200) // FIXME
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	return res
 }
 
 func (r *SecurityGroupResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {

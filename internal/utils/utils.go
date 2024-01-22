@@ -1,6 +1,9 @@
 package utils
 
-import "github.com/hashicorp/terraform-plugin-framework/types"
+import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+)
 
 func FromTfInt64ToIntPtr(tfInt types.Int64) *int {
 	val := int(tfInt.ValueInt64())
@@ -18,4 +21,10 @@ func FromIntToTfInt64(val int) types.Int64 {
 
 func FromIntPtrToTfInt64(val *int) types.Int64 {
 	return FromIntToTfInt64(*val)
+}
+
+func FromStringListToTfStringList(arr []string) types.List {
+	ctx := context.Background()
+	listValue, _ := types.ListValueFrom(ctx, types.StringType, arr)
+	return listValue
 }
