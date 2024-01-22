@@ -77,26 +77,24 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	//Call Link Internet Service to VPC
 	netID := data.NetId
 	if !netID.IsNull() {
-		res, err := r.client.LinkInternetServiceWithResponse(
+		reslink, errlink := r.client.LinkInternetServiceWithResponse(
 			ctx,
-			data.Id.ValueString(),
+			tf.Id.ValueString(),
 			api.LinkInternetServiceJSONRequestBody{
 				NetId: data.NetId.ValueString(),
 			})
-		if err != nil {
+		if errlink != nil {
 			// TODO: Handle Error
 			response.Diagnostics.AddError("Failed to link InternetService to net", err.Error())
 		}
 		expectedStatusCode := 200
-		if res.StatusCode() != expectedStatusCode {
+		if reslink.StatusCode() != expectedStatusCode {
 			// TODO: Handle NumSpot error
-			response.Diagnostics.AddError("Failed to create InternetService", "My Custom Error")
+			response.Diagnostics.AddError("Failed to link InternetService to net", "My Custom Error")
 			return
 		}
-		//refresh data from state
-		response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
-		data.NetId = netID
 		//Update state
+		tf.NetId = data.NetId
 		response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 	}
 }
@@ -106,16 +104,17 @@ func (r *InternetServiceResource) Read(ctx context.Context, request resource.Rea
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	//TODO: Implement READ operation
-	res, err := r.client.ReadInternetServicesByIdWithResponse(ctx, data.Id.String())
+	res, err := r.client.ReadInternetServicesByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+		response.Diagnostics.AddError("Failed to read Internet service", err.Error())
 	}
 
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read InternetService", "My Custom Error")
+		response.Diagnostics.AddError("Failed to read InternetService",
+			fmt.Sprintf("calling HTTP API expected %d got %d", expectedStatusCode, res.StatusCode()))
 		return
 	}
 
@@ -151,14 +150,14 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 		}
 	}
 	//TODO: Implement DELETE operation
-	res, err := r.client.DeleteInternetServiceWithResponse(ctx, data.Id.String())
+	res, err := r.client.DeleteInternetServiceWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete InternetService", err.Error())
 		return
 	}
 
-	expectedStatusCode := 204 //FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to delete InternetService", "My Custom Error")

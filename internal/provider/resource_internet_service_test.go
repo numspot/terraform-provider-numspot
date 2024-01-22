@@ -10,7 +10,7 @@ import (
 
 func TestAccInternetServiceResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
-	netID := "vpc-123456"
+	netID := "vpc-087d645a"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
@@ -36,6 +36,6 @@ func TestAccInternetServiceResource(t *testing.T) {
 }
 func testInternetServiceConfig_Create(netID string) string {
 	return fmt.Sprintf(`resource "numspot_internet_service" "test" {
-			net_id=%s
+			net_id="%s"
   			}`, netID)
 }
