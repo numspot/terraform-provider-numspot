@@ -19,24 +19,19 @@ description: |-
 
 - `net_id` (String) The ID of the Net for which you want to create a route table.
 
+### Optional
+
+- `routes` (Attributes List) One or more routes in the route table. (see [below for nested schema](#nestedatt--routes))
+
 ### Read-Only
 
 - `id` (String) The ID of the route table.
 - `route_propagating_virtual_gateways` (Attributes List) Information about virtual gateways propagating routes. (see [below for nested schema](#nestedatt--route_propagating_virtual_gateways))
-- `routes` (Attributes List) One or more routes in the route table. (see [below for nested schema](#nestedatt--routes))
-
-<a id="nestedatt--route_propagating_virtual_gateways"></a>
-### Nested Schema for `route_propagating_virtual_gateways`
-
-Read-Only:
-
-- `virtual_gateway_id` (String) The ID of the virtual gateway.
-
 
 <a id="nestedatt--routes"></a>
 ### Nested Schema for `routes`
 
-Read-Only:
+Optional:
 
 - `creation_method` (String) The method used to create the route.
 - `destination_ip_range` (String) The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
@@ -49,3 +44,11 @@ Read-Only:
 - `state` (String) The state of a route in the route table (always `active`).
 - `vm_account_id` (String) The account ID of the owner of the VM.
 - `vm_id` (String) The ID of a VM specified in a route in the table.
+
+
+<a id="nestedatt--route_propagating_virtual_gateways"></a>
+### Nested Schema for `route_propagating_virtual_gateways`
+
+Read-Only:
+
+- `virtual_gateway_id` (String) The ID of the virtual gateway.

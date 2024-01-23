@@ -42,11 +42,11 @@ The IP range of the Subnet can be either the same as the Net one if you create o
 
 ### Optional
 
+- `map_public_ip_on_launch` (Boolean) If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.
 - `subregion_name` (String) The name of the Subregion in which you want to create the Subnet.
 
 ### Read-Only
 
 - `available_ips_count` (Number) The number of available IPs in the Subnets.
 - `id` (String) The ID of the Subnet.
-- `map_public_ip_on_launch` (Boolean) If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.
 - `state` (String) The state of the Subnet (`pending` \| `available` \| `deleted`).
