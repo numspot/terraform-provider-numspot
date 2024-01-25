@@ -2,8 +2,10 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -45,8 +47,6 @@ func (r *PublicIpResource) Configure(ctx context.Context, request resource.Confi
 }
 
 func (r *PublicIpResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
-	var data resource_public_ip.PublicIpModel
-	response.State.Get(ctx, &data)
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
@@ -97,23 +97,42 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 	var data resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadPublicIpsByIdWithResponse(ctx, data.PublicIp.ValueString())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
+	//Handle import state case if no public_ip is set
+	if data.PublicIp.IsNull() {
+		var resData map[string]any
+		var bodyBytes []byte
+		params := &api.ReadPublicIpsParams{PublicIpIds: &[]string{data.Id.ValueString()}}
+		res, err := r.client.ReadPublicIps(ctx, params)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to read public IP", err.Error())
+		}
+		res.Body.Read(bodyBytes)
+		if res.StatusCode != http.StatusOK {
+			apiError := utils.HandleError(bodyBytes)
+			response.Diagnostics.AddError("Failed to read PublicIp", apiError.Error())
+			return
+		}
+		json.Unmarshal(bodyBytes, &resData)
+		i := 0
+		i++
+	} else {
+		res, err := r.client.ReadPublicIpsByIdWithResponse(ctx, data.PublicIp.ValueString())
+		if err != nil {
+			// TODO: Handle Error
+			response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+		}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to read PublicIp", apiError.Error())
-		return
-	}
+		expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
+		if res.StatusCode() != expectedStatusCode {
+			// TODO: Handle NumSpot error
+			apiError := utils.HandleError(res.Body)
+			response.Diagnostics.AddError("Failed to read PublicIp", apiError.Error())
+			return
+		}
 
-	tf := PublicIpFromHttpToTf(res.JSON200) // FIXME
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+		tf := PublicIpFromHttpToTf(res.JSON200) // FIXME
+		response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+	}
 }
 
 func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
