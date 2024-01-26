@@ -12,13 +12,13 @@ func TestAccRouteTableResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	ipRange := "10.101.0.0/16"
+	netId := "vpc-6f82f006"
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testRouteTableConfig(ipRange),
+				Config: testRouteTableConfig(netId),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
@@ -35,7 +35,7 @@ func TestAccRouteTableResource(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testRouteTableConfig(ipRange),
+				Config: testRouteTableConfig(netId),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
@@ -47,23 +47,19 @@ func TestAccRouteTableResource(t *testing.T) {
 	})
 }
 
-func testRouteTableConfig(ipRange string) string {
+func testRouteTableConfig(netId string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "test" {
-	ip_range = %[1]q
-}
-
 resource "numspot_internet_service" "test" {
-	net_id = numspot_net.test.id
+	net_id = %[1]q
 }
 
 resource "numspot_route_table" "test" {
-	net_id = numspot_net.test.id
+	net_id =  %[1]q
 	routes = [
 		{
 			destination_ip_range 	= "0.0.0.0/0"
 			gateway_id 	 			= numspot_internet_service.test.id
 		}
 	]
-}`, ipRange)
+}`, netId)
 }

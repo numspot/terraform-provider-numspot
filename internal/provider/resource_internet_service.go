@@ -62,6 +62,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	res, err := r.client.CreateInternetServiceWithResponse(ctx, body)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create InternetService", err.Error())
+		return
 	}
 
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
@@ -105,15 +106,14 @@ func (r *InternetServiceResource) Read(ctx context.Context, request resource.Rea
 	//TODO: Implement READ operation
 	res, err := r.client.ReadInternetServicesByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read Internet service", err.Error())
+		return
 	}
 
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read InternetService",
-			fmt.Sprintf("calling HTTP API expected %d got %d", expectedStatusCode, res.StatusCode()))
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to read InternetService", apiError.Error())
 		return
 	}
 
@@ -144,7 +144,8 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 		expectedStatusCode := 200
 		if res.StatusCode() != expectedStatusCode {
 			// TODO: Handle NumSpot error
-			response.Diagnostics.AddError("Failed to create InternetService", "My Custom Error")
+			apiError := utils.HandleError(res.Body)
+			response.Diagnostics.AddError("Failed to create InternetService", apiError.Error())
 			return
 		}
 	}
