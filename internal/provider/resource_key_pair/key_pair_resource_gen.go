@@ -23,15 +23,10 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "ID for /keypairs",
 				MarkdownDescription: "ID for /keypairs",
 			},
-			"keypair_name": schema.StringAttribute{
+			"name": schema.StringAttribute{
 				Required:            true,
 				Description:         "A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
 				MarkdownDescription: "A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
-			},
-			"name": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The name of the keypair.",
-				MarkdownDescription: "The name of the keypair.",
 			},
 			"private_key": schema.StringAttribute{
 				Computed:            true,
@@ -51,7 +46,6 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 type KeyPairModel struct {
 	Fingerprint types.String `tfsdk:"fingerprint"`
 	Id          types.String `tfsdk:"id"`
-	KeypairName types.String `tfsdk:"keypair_name"`
 	Name        types.String `tfsdk:"name"`
 	PrivateKey  types.String `tfsdk:"private_key"`
 	PublicKey   types.String `tfsdk:"public_key"`

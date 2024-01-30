@@ -45,6 +45,7 @@ func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTableSchema, def
 		NetId:                           types.StringPointerValue(http.NetId),
 		RoutePropagatingVirtualGateways: types.ListNull(resource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(context.Background())),
 		Routes:                          tfRoutes,
+		SubnetId:                        types.StringNull(),
 	}
 
 	return &res, nil

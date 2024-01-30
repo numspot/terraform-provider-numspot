@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -10,14 +11,20 @@ import (
 
 func TestAccKeyPairResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
+
+	rand := rand.Intn(9999-1000) + 1000
+	name := fmt.Sprintf("key-pair-name-%d", rand)
+	updatedName := fmt.Sprintf("updated-key-pair-name-%d", rand)
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testKeyPairConfig_Create(),
+				Config: testKeyPairConfig(name),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_key_pair.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_key_pair.test", "field", func(v string) error {
+					resource.TestCheckResourceAttr("numspot_key_pair.test", "name", name),
+					resource.TestCheckResourceAttr("numspot_key_pair.test", "id", name),
+					resource.TestCheckResourceAttrWith("numspot_key_pair.test", "private_key", func(v string) error {
 						require.NotEmpty(t, v)
 						return nil
 					}),
@@ -32,10 +39,12 @@ func TestAccKeyPairResource(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testKeyPairConfig_Update(),
+				Config: testKeyPairConfig(updatedName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_key_pair.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_key_pair.test", "field", func(v string) error {
+					resource.TestCheckResourceAttr("numspot_key_pair.test", "name", updatedName),
+					resource.TestCheckResourceAttr("numspot_key_pair.test", "id", updatedName),
+					resource.TestCheckResourceAttrWith("numspot_key_pair.test", "private_key", func(v string) error {
+						require.NotEmpty(t, v)
 						return nil
 					}),
 				),
@@ -44,12 +53,9 @@ func TestAccKeyPairResource(t *testing.T) {
 	})
 }
 
-func testKeyPairConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_key_pair" "test" {
-  			}`)
-}
-
-func testKeyPairConfig_Update() string {
-	return `resource "numspot_key_pair" "test" {
-    			}`
+func testKeyPairConfig(name string) string {
+	return fmt.Sprintf(`
+resource "numspot_key_pair" "test" {
+	name = %[1]q
+}`, name)
 }

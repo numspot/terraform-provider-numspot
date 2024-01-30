@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -66,12 +67,11 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	body := SubnetFromTfToCreateRequest(data)
 	res, err := r.client.CreateSubnetWithResponse(ctx, body)
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create Subnet", err.Error())
+		return
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
+	if res.StatusCode() != http.StatusOK {
 		// TODO: Handle NumSpot error
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to create Subnet", apiError.Error())
@@ -86,11 +86,10 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 			res, err := r.client.ReadSubnetsByIdWithResponse(ctx, createdId)
 			if err != nil {
 				response.Diagnostics.AddError("Failed to read Subnet", err.Error())
+				return
 			}
 
-			expectedStatusCode := 200
-			if res.StatusCode() != expectedStatusCode {
-				// TODO: Handle NumSpot error
+			if res.StatusCode() != http.StatusOK {
 				apiError := utils.HandleError(res.Body)
 				response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
 				return
@@ -104,7 +103,6 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 
 	_, err = createStateConf.WaitForStateContext(ctx)
 	if err != nil {
-		// return fmt.Errorf("Error waiting for example instance (%s) to be created: %s", d.Id(), err)
 		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *res.JSON200.Id, err))
 		return
 	}
@@ -146,22 +144,20 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
 	res, err := r.client.ReadSubnetsByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+		response.Diagnostics.AddError("Failed to read Subnet", err.Error())
+		return
 	}
 
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
 		return
 	}
 
-	tf := SubnetFromHttpToTf(res.JSON200) // FIXME
+	tf := SubnetFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -174,17 +170,14 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
 	res, err := r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete Subnet", err.Error())
 		return
 	}
 
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200
 	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to delete Subnet", apiError.Error())
 		return
@@ -197,13 +190,13 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 			res, err := r.client.ReadSubnetsByIdWithResponse(ctx, data.Id.ValueString())
 			if err != nil {
 				response.Diagnostics.AddError("Failed to read Subnet on delete", err.Error())
+				return
 			}
 
 			expectedStatusCode := 200
 			if res.StatusCode() != expectedStatusCode {
-				// TODO: Handle NumSpot error
 				apiError := utils.HandleError(res.Body)
-				if apiError.Error() == "No Subnets found" {
+				if match, _ := regexp.MatchString("No .* found", apiError.Error()); match {
 					return data, "deleted", nil
 				}
 				response.Diagnostics.AddError("Failed to read Subnet on delete", apiError.Error())
@@ -218,7 +211,6 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 
 	_, err = deleteStateConf.WaitForStateContext(ctx)
 	if err != nil {
-		// return fmt.Errorf("Error waiting for example instance (%s) to be created: %s", d.Id(), err)
 		response.Diagnostics.AddError("Failed to delete Net", fmt.Sprintf("Error waiting for instance (%s) to be deleted: %s", data.Id.ValueString(), err))
 		return
 	}

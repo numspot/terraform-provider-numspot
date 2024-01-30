@@ -62,8 +62,8 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 	body := NicFromTfToCreateRequest(data)
 	res, err := r.client.CreateNicWithResponse(ctx, body)
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create Nic", err.Error())
+		return
 	}
 
 	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)

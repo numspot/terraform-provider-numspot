@@ -28,6 +28,11 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Net for which you want to create a route table.",
 				MarkdownDescription: "The ID of the Net for which you want to create a route table.",
 			},
+			"subnet_id": schema.StringAttribute{
+				Optional:            true,
+				Description:         "The ID of the SubNet for which you want to link the route table.",
+				MarkdownDescription: "The ID of the SubNet for which you want to link the route table.",
+			},
 			"route_propagating_virtual_gateways": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -124,6 +129,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 type RouteTableModel struct {
 	Id                              types.String 		`tfsdk:"id"`
 	NetId                           types.String 		`tfsdk:"net_id"`
+	SubnetId                        types.String 		`tfsdk:"subnet_id"`
 	RoutePropagatingVirtualGateways types.List   		`tfsdk:"route_propagating_virtual_gateways"`
 	Routes                          types.List   		`tfsdk:"routes"`
 }
