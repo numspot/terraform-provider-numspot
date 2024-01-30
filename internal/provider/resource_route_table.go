@@ -2,9 +2,11 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -22,6 +24,12 @@ var (
 type RouteTableResource struct {
 	client *api.ClientWithResponses
 }
+
+type PrivateState struct {
+	DefaultDestinationIp string `json:"defaultDestinationIp"`
+}
+
+var DestinationIPKey string = "key"
 
 func NewRouteTableResource() resource.Resource {
 	return &RouteTableResource{}
@@ -75,9 +83,20 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	createdId := res.JSON200.Id
+	jsonRes := *res.JSON200
+	createdId := jsonRes.Id
 
-	// Delete default
+	jsonRoutes := *jsonRes.Routes
+	defaultRoute := jsonRoutes[0]
+	privateState := PrivateState{DefaultDestinationIp: *defaultRoute.DestinationIpRange}
+
+	bytes, err := json.Marshal(privateState)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Route Table", "Failed to marshall private state")
+		return
+	}
+
+	response.Diagnostics.Append(response.Private.SetKey(ctx, DestinationIPKey, bytes)...)
 
 	routes := make([]resource_route_table.RoutesValue, 0, len(data.Routes.Elements()))
 	data.Routes.ElementsAs(ctx, &routes, false)
@@ -104,12 +123,27 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		}
 	}
 
+	if !data.SubnetId.IsNull() {
+		// Link the route table to the given subnet
+		linkRes, err := r.client.LinkRouteTable(ctx, *createdId, api.LinkRouteTableRequestSchema{SubnetId: data.SubnetId.ValueString()})
+		if linkRes != nil {
+			response.Diagnostics.AddError("Failed to link RouteTable", err.Error())
+			return
+		}
+
+		if linkRes.StatusCode != expectedStatusCode {
+			apiError := utils.HandleError(res.Body)
+			response.Diagnostics.AddError("Failed to link RouteTable", apiError.Error())
+			return
+		}
+	}
+
 	readed := r.readRouteTable(ctx, *createdId, response.Diagnostics)
 	if readed == nil {
 		return
 	}
 
-	tf, diag := RouteTableFromHttpToTf(ctx, readed.JSON200)
+	tf, diag := RouteTableFromHttpToTf(ctx, readed.JSON200, privateState.DefaultDestinationIp)
 	if diag.HasError() {
 		response.Diagnostics.Append(diag...)
 		return
@@ -127,7 +161,35 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 		return
 	}
 
-	tf, diag := RouteTableFromHttpToTf(ctx, res.JSON200) // FIXME
+	bytes, diag := request.Private.GetKey(ctx, DestinationIPKey)
+	if diag.HasError() {
+		response.Diagnostics.Append(diag...)
+		return
+	}
+	var privateState PrivateState
+	if bytes != nil {
+		err := json.Unmarshal(bytes, &privateState)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to read Route Table", err.Error())
+			return
+		}
+	} else {
+		readNetRes, err := r.client.ReadNetsByIdWithResponse(ctx, *res.JSON200.NetId)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to read associated Net", err.Error())
+			return
+		}
+
+		if readNetRes.StatusCode() != http.StatusOK {
+			apiError := utils.HandleError(readNetRes.Body)
+			response.Diagnostics.AddError("Failed to read associated Net", apiError.Error())
+			return
+		}
+
+		privateState.DefaultDestinationIp = *readNetRes.JSON200.IpRange
+	}
+
+	tf, diag := RouteTableFromHttpToTf(ctx, res.JSON200, privateState.DefaultDestinationIp)
 	if diag.HasError() {
 		response.Diagnostics.Append(diag...)
 		return
@@ -162,15 +224,13 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
 	res, err := r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete RouteTable", err.Error())
 		return
 	}
 
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
+	expectedStatusCode := 200
 	if res.StatusCode() != expectedStatusCode {
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to delete RouteTable", apiError.Error())

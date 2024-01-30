@@ -14,15 +14,22 @@ func KeyPairFromTfToHttp(tf resource_key_pair.KeyPairModel) *api.KeypairSchema {
 	}
 }
 
-func KeyPairFromHttpToTf(http *api.KeypairSchema) resource_key_pair.KeyPairModel {
-	return resource_key_pair.KeyPairModel{
+func KeyPairFromHttpToTf(http *api.KeypairSchema, publicKey, privateKey *string) resource_key_pair.KeyPairModel {
+	res := resource_key_pair.KeyPairModel{
 		Fingerprint: types.StringPointerValue(http.Fingerprint),
 		Id:          types.StringPointerValue(http.Name),
-		KeypairName: types.StringPointerValue(http.Name),
 		Name:        types.StringPointerValue(http.Name),
-		// PrivateKey:         types.StringPointerValue(htt.),
-		PublicKey: types.StringValue(""),
 	}
+
+	if publicKey != nil {
+		res.PublicKey = types.StringPointerValue(publicKey)
+	}
+
+	if privateKey != nil {
+		res.PrivateKey = types.StringPointerValue(privateKey)
+	}
+
+	return res
 }
 
 func KeyPairFromTfToCreateRequest(tf resource_key_pair.KeyPairModel) api.CreateKeypairJSONRequestBody {

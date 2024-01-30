@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -64,13 +65,11 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	body := SecurityGroupFromTfToCreateRequest(data)
 	res, err := r.client.CreateSecurityGroupWithResponse(ctx, body)
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
+		return
 	}
 
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
+	if res.StatusCode() != http.StatusOK {
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to create SecurityGroup", apiError.Error())
 		return
@@ -153,15 +152,13 @@ func (r *SecurityGroupResource) readSecurityGroup(
 ) *api.ReadSecurityGroupsByIdResponse {
 	res, err := r.client.ReadSecurityGroupsByIdWithResponse(ctx, id)
 	if err != nil {
-		// TODO: Handle Error
 		diag.AddError("Failed to read RouteTable", err.Error())
 		return nil
 	}
 
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		diag.AddError("Failed to read SecurityGroup", "My Custom Error")
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		diag.AddError("Failed to read SecurityGroup", apiError.Error())
 		return nil
 	}
 
@@ -169,7 +166,6 @@ func (r *SecurityGroupResource) readSecurityGroup(
 }
 
 func (r *SecurityGroupResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-
 	panic("implement me")
 }
 
@@ -177,18 +173,15 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
 	res, err := r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.ValueString(), api.DeleteSecurityGroupRequestSchema{})
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete SecurityGroup", err.Error())
 		return
 	}
 
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete SecurityGroup", "My Custom Error")
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to delete SecurityGroup", apiError.Error())
 		return
 	}
 }

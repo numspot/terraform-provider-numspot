@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -62,11 +63,12 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	res, err := r.client.CreateInternetServiceWithResponse(ctx, body)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create InternetService", err.Error())
+		return
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		response.Diagnostics.AddError("Failed to create InternetService", "My Custom Error")
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to create InternetService", apiError.Error())
 		return
 	}
 	//Update state
@@ -83,8 +85,8 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 				NetId: data.NetId.ValueString(),
 			})
 		if errlink != nil {
-			// TODO: Handle Error
 			response.Diagnostics.AddError("Failed to link InternetService to net", err.Error())
+			return
 		}
 		expectedStatusCode := 200
 		if reslink.StatusCode() != expectedStatusCode {
@@ -102,27 +104,23 @@ func (r *InternetServiceResource) Read(ctx context.Context, request resource.Rea
 	var data resource_internet_service.InternetServiceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
 	res, err := r.client.ReadInternetServicesByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read Internet service", err.Error())
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read InternetService",
-			fmt.Sprintf("calling HTTP API expected %d got %d", expectedStatusCode, res.StatusCode()))
 		return
 	}
 
-	tf := InternetServiceFromHttpToTf(res.JSON200) // FIXME
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to read InternetService", apiError.Error())
+		return
+	}
+
+	tf := InternetServiceFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *InternetServiceResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
 	panic("implement me")
 }
 
@@ -138,28 +136,26 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 				NetId: data.NetId.ValueString(),
 			})
 		if err != nil {
-			// TODO: Handle Error
 			response.Diagnostics.AddError("Failed to unlink InternetService from net", err.Error())
+			return
 		}
 		expectedStatusCode := 200
 		if res.StatusCode() != expectedStatusCode {
-			// TODO: Handle NumSpot error
-			response.Diagnostics.AddError("Failed to create InternetService", "My Custom Error")
+			apiError := utils.HandleError(res.Body)
+			response.Diagnostics.AddError("Failed to create InternetService", apiError.Error())
 			return
 		}
 	}
-	//TODO: Implement DELETE operation
+
 	res, err := r.client.DeleteInternetServiceWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete InternetService", err.Error())
 		return
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete InternetService", "My Custom Error")
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to delete InternetService", apiError.Error())
 		return
 	}
 }

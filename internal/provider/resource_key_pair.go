@@ -3,6 +3,8 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -62,45 +64,61 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 	body := KeyPairFromTfToCreateRequest(data)
 	res, err := r.client.CreateKeypairWithResponse(ctx, body)
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create KeyPair", err.Error())
-	}
-
-	expectedStatusCode := 201 // FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create KeyPair", "My Custom Error")
 		return
 	}
 
-	// tf := KeyPairFromHttpToTf(res.JSON200) // FIXME
-	response.Diagnostics.Append(response.State.Set(ctx, &data)...)
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to create KeyPair", apiError.Error())
+		return
+	}
+
+	readRes, err := r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.String())
+	if err != nil {
+		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+		return
+	}
+
+	if readRes.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to read KeyPair", apiError.Error())
+		return
+	}
+
+	tf := KeyPairFromHttpToTf(
+		readRes.JSON200,
+		data.PublicKey.ValueStringPointer(),
+		data.PrivateKey.ValueStringPointer(),
+	)
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement READ operation
 	res, err := r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.String())
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read KeyPair", "My Custom Error")
 		return
 	}
 
-	tf := KeyPairFromHttpToTf(res.JSON200) // FIXME
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to read KeyPair", apiError.Error())
+		return
+	}
+
+	tf := KeyPairFromHttpToTf(
+		res.JSON200,
+		data.PublicKey.ValueStringPointer(),
+		data.PrivateKey.ValueStringPointer(),
+	)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *KeyPairResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-
 	panic("implement me")
 }
 
@@ -108,18 +126,15 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
 	res, err := r.client.DeleteKeypairWithResponse(ctx, data.Id.String())
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete KeyPair", err.Error())
 		return
 	}
 
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete KeyPair", "My Custom Error")
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to delete KeyPair", apiError.Error())
 		return
 	}
 }

@@ -18,15 +18,18 @@ func RouteTableFromTfToHttp(tf resource_route_table.RouteTableModel) *api.RouteT
 	}
 }
 
-func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTableSchema) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
-	routes := make([]resource_route_table.RoutesValue, 0, len(*http.Routes))
-	for _, route := range *http.Routes {
-		nroutev, diag := routeTableRouteFromAPI(ctx, route)
-		if diag.HasError() {
-			return nil, diag
-		}
+func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTableSchema, defaultRouteDestination string) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
+	routes := []resource_route_table.RoutesValue{}
 
-		routes = append(routes, nroutev)
+	for _, route := range *http.Routes {
+		if *route.DestinationIpRange != defaultRouteDestination {
+			nroutev, diag := routeTableRouteFromAPI(ctx, route)
+			if diag.HasError() {
+				return nil, diag
+			}
+
+			routes = append(routes, nroutev)
+		}
 	}
 	tfRoutes, diag := types.ListValueFrom(
 		ctx,
@@ -42,6 +45,7 @@ func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTableSchema) (*r
 		NetId:                           types.StringPointerValue(http.NetId),
 		RoutePropagatingVirtualGateways: types.ListNull(resource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(context.Background())),
 		Routes:                          tfRoutes,
+		SubnetId:                        types.StringNull(),
 	}
 
 	return &res, nil

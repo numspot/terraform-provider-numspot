@@ -28,6 +28,11 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Net for which you want to create a route table.",
 				MarkdownDescription: "The ID of the Net for which you want to create a route table.",
 			},
+			"subnet_id": schema.StringAttribute{
+				Optional:            true,
+				Description:         "The ID of the SubNet for which you want to link the route table.",
+				MarkdownDescription: "The ID of the SubNet for which you want to link the route table.",
+			},
 			"route_propagating_virtual_gateways": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -52,66 +57,55 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 					Attributes: map[string]schema.Attribute{
 						"creation_method": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
 							Description:         "The method used to create the route.",
 							MarkdownDescription: "The method used to create the route.",
 						},
 						"destination_ip_range": schema.StringAttribute{
-							Computed:            true,
-							Optional:            true,
+							Required: true,
 							Description:         "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
 							MarkdownDescription: "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
 						},
 						"destination_service_id": schema.StringAttribute{
-							Computed:            true,
 							Optional:            true,
 							Description:         "The ID of the OUTSCALE service.",
 							MarkdownDescription: "The ID of the OUTSCALE service.",
 						},
 						"gateway_id": schema.StringAttribute{
-							Computed:            true,
 							Optional:            true,
 							Description:         "The ID of the Internet service or virtual gateway attached to the Net.",
 							MarkdownDescription: "The ID of the Internet service or virtual gateway attached to the Net.",
 						},
 						"nat_service_id": schema.StringAttribute{
-							Computed:            true,
 							Optional:            true,
 							Description:         "The ID of a NAT service attached to the Net.",
 							MarkdownDescription: "The ID of a NAT service attached to the Net.",
 						},
 						"net_access_point_id": schema.StringAttribute{
-							Computed:            true,
 							Optional:            true,
 							Description:         "The ID of the Net access point.",
 							MarkdownDescription: "The ID of the Net access point.",
 						},
 						"net_peering_id": schema.StringAttribute{
-							Computed:            true,
 							Optional:            true,
 							Description:         "The ID of the Net peering.",
 							MarkdownDescription: "The ID of the Net peering.",
 						},
 						"nic_id": schema.StringAttribute{
-							Computed:            true,
 							Optional:            true,
 							Description:         "The ID of the NIC.",
 							MarkdownDescription: "The ID of the NIC.",
 						},
 						"state": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
 							Description:         "The state of a route in the route table (always `active`). ",
 							MarkdownDescription: "The state of a route in the route table (always `active`). ",
 						},
 						"vm_account_id": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
 							Description:         "The account ID of the owner of the VM.",
 							MarkdownDescription: "The account ID of the owner of the VM.",
 						},
 						"vm_id": schema.StringAttribute{
-							Computed:            true,
 							Optional:            true,
 							Description:         "The ID of a VM specified in a route in the table.",
 							MarkdownDescription: "The ID of a VM specified in a route in the table.",
@@ -133,10 +127,11 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type RouteTableModel struct {
-	Id                              types.String `tfsdk:"id"`
-	NetId                           types.String `tfsdk:"net_id"`
-	RoutePropagatingVirtualGateways types.List   `tfsdk:"route_propagating_virtual_gateways"`
-	Routes                          types.List   `tfsdk:"routes"`
+	Id                              types.String 		`tfsdk:"id"`
+	NetId                           types.String 		`tfsdk:"net_id"`
+	SubnetId                        types.String 		`tfsdk:"subnet_id"`
+	RoutePropagatingVirtualGateways types.List   		`tfsdk:"route_propagating_virtual_gateways"`
+	Routes                          types.List   		`tfsdk:"routes"`
 }
 
 var _ basetypes.ObjectTypable = RoutePropagatingVirtualGatewaysType{}

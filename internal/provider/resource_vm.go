@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -64,14 +65,11 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	body := VmFromTfToCreateRequest(data)
 	res, err := r.client.CreateVmsWithResponse(ctx, body)
 	if err != nil {
-		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create Vm", err.Error())
 		return
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
+	if res.StatusCode() != http.StatusOK {
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to create Vm", apiError.Error())
 		return
