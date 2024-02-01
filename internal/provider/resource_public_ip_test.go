@@ -10,7 +10,7 @@ import (
 
 func TestAccPublicIpResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
-	vmid := "130116bd-2821-4ba5-819a-4089fe0b9506"
+	vmid := "i-93372752" //labeled test_tf_publicIP in OSC cockpit
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
@@ -35,7 +35,17 @@ func TestAccPublicIpResource(t *testing.T) {
 			{
 				Config: testPublicIpConfig_Update(vmid),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "linkPublicIpId", func(v string) error {
+					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "link_public_ip", func(v string) error {
+						require.NotEmpty(t, v)
+						return nil
+					}),
+				),
+			},
+			// Update testing
+			{
+				Config: testPublicIpConfig_UpdateUnlink(),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "link_public_ip", func(v string) error {
 						require.NotEmpty(t, v)
 						return nil
 					}),
@@ -55,4 +65,9 @@ func testPublicIpConfig_Update(vmid string) string {
 	return fmt.Sprintf(`resource "numspot_public_ip" "test" {
                         vm_id="%s"
                         }`, vmid)
+}
+
+func testPublicIpConfig_UpdateUnlink() string {
+	return fmt.Sprintf(`resource "numspot_public_ip" "test" {
+                        }`)
 }

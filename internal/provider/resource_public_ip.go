@@ -2,13 +2,11 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
-	"net/http"
-
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
@@ -59,10 +57,10 @@ func (r *PublicIpResource) Schema(ctx context.Context, request resource.SchemaRe
 }
 
 func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data resource_public_ip.PublicIpModel
-	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	var plan, state resource_public_ip.PublicIpModel
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
-	body := PublicIpFromTfToCreateRequest(data)
+	body := PublicIpFromTfToCreateRequest(plan)
 	res, err := r.client.CreatePublicIpWithResponse(ctx, body)
 	if err != nil {
 		// TODO: Handle Error
@@ -77,87 +75,121 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	tf := PublicIpFromHttpToTf(res.JSON200) // FIXME
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+	PublicIpFromHttpToTf(res.JSON200, &state) // FIXME
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 
-	//Refresh from state
-	//response.Diagnostics.Append(response.State.Get(ctx, &data)...)
-
-	if tf.VmId.IsNull() && tf.NicId.IsNull() {
+	if plan.VmId.IsNull() && plan.NicId.IsUnknown() {
 		return
 	}
 
+	state.VmId = plan.VmId
+	state.NicId = plan.NicId
+
 	//Call Link publicIP
-	if err := invokeLinkPublicIP(ctx, r.client, tf); err != nil {
+	linkPublicIP, err := invokeLinkPublicIP(ctx, r.client, state)
+	if err != nil {
 		response.Diagnostics.AddError("Failed to link public IP", err.Error())
 	}
+	state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
+
+	//Refresh state
+	data, err := refreshState(ctx, r.client, state)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
+	}
+	response.Diagnostics.Append(response.State.Set(ctx, *data)...)
 }
 
 func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//Handle import state case if no public_ip is set
-	if data.PublicIp.IsNull() {
-		var resData map[string]any
-		var bodyBytes []byte
-		params := &api.ReadPublicIpsParams{PublicIpIds: &[]string{data.Id.ValueString()}}
-		res, err := r.client.ReadPublicIps(ctx, params)
-		if err != nil {
-			response.Diagnostics.AddError("Failed to read public IP", err.Error())
-		}
-		res.Body.Read(bodyBytes)
-		if res.StatusCode != http.StatusOK {
-			apiError := utils.HandleError(bodyBytes)
-			response.Diagnostics.AddError("Failed to read PublicIp", apiError.Error())
-			return
-		}
-		json.Unmarshal(bodyBytes, &resData)
-		i := 0
-		i++
-	} else {
-		res, err := r.client.ReadPublicIpsByIdWithResponse(ctx, data.PublicIp.ValueString())
-		if err != nil {
-			// TODO: Handle Error
-			response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-		}
-
-		expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-		if res.StatusCode() != expectedStatusCode {
-			// TODO: Handle NumSpot error
-			apiError := utils.HandleError(res.Body)
-			response.Diagnostics.AddError("Failed to read PublicIp", apiError.Error())
-			return
-		}
-
-		tf := PublicIpFromHttpToTf(res.JSON200) // FIXME
-		response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+	res, err := r.client.ReadPublicIpsByIdWithResponse(ctx, data.Id.ValueString())
+	if err != nil {
+		// TODO: Handle Error
+		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
 	}
+
+	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
+	if res.StatusCode() != expectedStatusCode {
+		// TODO: Handle NumSpot error
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to read PublicIp", apiError.Error())
+		return
+	}
+
+	PublicIpFromHttpToTf(res.JSON200, &data) // FIXME
+	response.Diagnostics.Append(response.State.Set(ctx, data)...)
 }
 
 func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var data resource_public_ip.PublicIpModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var (
+		plan, state  resource_public_ip.PublicIpModel
+		linkPublicIP *string
+		err          error
+	)
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if data.VmId.IsNull() && data.NicId.IsNull() {
-		return
-	}
+	if plan.VmId != state.VmId || plan.NicId != state.NicId {
+		plan.Id = state.Id
 
-	//Call Link publicIP
-	if err := invokeLinkPublicIP(ctx, r.client, data); err != nil {
-		response.Diagnostics.AddError("Failed to link public IP", err.Error())
+		if !state.VmId.IsNull() {
+			if err := invokeUnlinkPublicIP(ctx, r.client, state); err != nil {
+				response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
+			}
+			state.LinkPublicIP = types.StringNull()
+			data, err := refreshState(ctx, r.client, state)
+			if err != nil {
+				response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
+			}
+			response.Diagnostics.Append(response.State.Set(ctx, *data)...)
+		}
+		if !plan.VmId.IsNull() {
+			linkPublicIP, err = invokeLinkPublicIP(ctx, r.client, plan)
+			if err != nil {
+				response.Diagnostics.AddError("Failed to link public IP", err.Error())
+			}
+
+		}
+		if !state.NicId.IsNull() {
+			if err := invokeUnlinkPublicIP(ctx, r.client, state); err != nil {
+				response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
+			}
+			state.LinkPublicIP = types.StringNull()
+			data, err := refreshState(ctx, r.client, state)
+			if err != nil {
+				response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
+			}
+			response.Diagnostics.Append(response.State.Set(ctx, *data)...)
+		}
+		if !plan.NicId.IsUnknown() {
+			linkPublicIP, err = invokeLinkPublicIP(ctx, r.client, plan)
+			if err != nil {
+				response.Diagnostics.AddError("Failed to link public IP", err.Error())
+			}
+		}
 	}
+	state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
+	data, err := refreshState(ctx, r.client, state)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
+	}
+	response.Diagnostics.Append(response.State.Set(ctx, *data)...)
 }
 
 func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data resource_public_ip.PublicIpModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state resource_public_ip.PublicIpModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeletePublicIpWithResponse(ctx, data.PublicIp.ValueString(), api.DeletePublicIpRequestSchema{})
+	res, err := r.client.DeletePublicIpWithResponse(ctx, state.Id.ValueString(), api.DeletePublicIpRequestSchema{})
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete PublicIp", err.Error())
@@ -166,7 +198,6 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 
 	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
 	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to delete PublicIp", apiError.Error())
 		return

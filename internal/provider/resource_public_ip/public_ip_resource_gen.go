@@ -10,6 +10,8 @@ import (
 )
 
 func PublicIpResourceSchema(ctx context.Context) schema.Schema {
+	//planmodifiers := make([]planmodifier.String, 1)
+	//planmodifiers = append(planmodifiers, stringplanmodifier.UseStateForUnknown())
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
@@ -23,6 +25,7 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The account ID of the owner of the NIC.",
 			},
 			"nic_id": schema.StringAttribute{
+				Computed:            true,
 				Optional:            true,
 				Description:         "The ID of the NIC the public IP is associated with (if any).",
 				MarkdownDescription: "The ID of the NIC the public IP is associated with (if any).",
@@ -42,6 +45,11 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the VM the public IP is associated with (if any).",
 				MarkdownDescription: "The ID of the VM the public IP is associated with (if any).",
 			},
+			"link_public_ip": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The ID of the association between the public IP and VM/NIC (if any).",
+				MarkdownDescription: "The ID of the association between the public IP and VM/NIC (if any).",
+			},
 		},
 	}
 }
@@ -53,4 +61,5 @@ type PublicIpModel struct {
 	PrivateIp    types.String `tfsdk:"private_ip"`
 	PublicIp     types.String `tfsdk:"public_ip"`
 	VmId         types.String `tfsdk:"vm_id"`
+	LinkPublicIP types.String `tfsdk:"link_public_ip"`
 }
