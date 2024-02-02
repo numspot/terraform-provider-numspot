@@ -11,9 +11,9 @@ import (
 )
 
 type PublicIPChangeSet struct {
-	Unlink    bool
-	LinkField string
-	Err       error
+	Unlink bool
+	Link   bool
+	Err    error
 }
 
 func ComputePublicIPChangeSet(plan, state resource_public_ip.PublicIpModel) PublicIPChangeSet {
@@ -23,13 +23,13 @@ func ComputePublicIPChangeSet(plan, state resource_public_ip.PublicIpModel) Publ
 
 	switch {
 	case plan.NicId.IsUnknown() && plan.VmId.IsNull():
-		c.LinkField = ""
+		c.Link = false
 	case !plan.NicId.IsUnknown() && !plan.VmId.IsNull():
 		c.Err = fmt.Errorf("couldn't have nicID and vmID at the same time")
 	case !plan.NicId.IsUnknown():
-		c.LinkField = "nicID"
+		c.Link = true
 	case !plan.VmId.IsNull():
-		c.LinkField = "vmID"
+		c.Link = true
 	}
 	return c
 }

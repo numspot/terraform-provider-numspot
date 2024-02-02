@@ -138,46 +138,31 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 		return
 	}
 
-	if plan.VmId != state.VmId || plan.NicId != state.NicId {
-		plan.Id = state.Id
+	chgSet := ComputePublicIPChangeSet(plan, state)
 
-		if !state.VmId.IsNull() {
-			if err := invokeUnlinkPublicIP(ctx, r.client, state); err != nil {
-				response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
-			}
-			state.LinkPublicIP = types.StringNull()
-			data, err := refreshState(ctx, r.client, state)
-			if err != nil {
-				response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
-			}
-			response.Diagnostics.Append(response.State.Set(ctx, *data)...)
-		}
-		if !plan.VmId.IsNull() {
-			linkPublicIP, err = invokeLinkPublicIP(ctx, r.client, plan)
-			if err != nil {
-				response.Diagnostics.AddError("Failed to link public IP", err.Error())
-			}
-
-		}
-		if !state.NicId.IsNull() {
-			if err := invokeUnlinkPublicIP(ctx, r.client, state); err != nil {
-				response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
-			}
-			state.LinkPublicIP = types.StringNull()
-			data, err := refreshState(ctx, r.client, state)
-			if err != nil {
-				response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
-			}
-			response.Diagnostics.Append(response.State.Set(ctx, *data)...)
-		}
-		if !plan.NicId.IsUnknown() {
-			linkPublicIP, err = invokeLinkPublicIP(ctx, r.client, plan)
-			if err != nil {
-				response.Diagnostics.AddError("Failed to link public IP", err.Error())
-			}
-		}
+	if chgSet.Err != nil {
+		response.Diagnostics.AddError("Failed to update public IP", err.Error())
 	}
-	state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
+
+	if chgSet.Unlink {
+		if err := invokeUnlinkPublicIP(ctx, r.client, state); err != nil {
+			response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
+		}
+		state.LinkPublicIP = types.StringNull()
+		data, err := refreshState(ctx, r.client, state)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
+		}
+		response.Diagnostics.Append(response.State.Set(ctx, *data)...)
+	}
+	if chgSet.Link {
+		plan.Id = state.Id
+		linkPublicIP, err = invokeLinkPublicIP(ctx, r.client, plan)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to link public IP", err.Error())
+		}
+		state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
+	}
 	data, err := refreshState(ctx, r.client, state)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())

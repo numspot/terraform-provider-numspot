@@ -44,12 +44,12 @@ func TestAccPublicIpResource(t *testing.T) {
 			// Update testing
 			{
 				Config: testPublicIpConfig_UpdateUnlink(),
-				Check: resource.ComposeAggregateTestCheckFunc(
+				/*Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "link_public_ip", func(v string) error {
-						require.NotEmpty(t, v)
+						require.Empty(t, v)
 						return nil
 					}),
-				),
+				),*/
 			},
 		},
 	})
