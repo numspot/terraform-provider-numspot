@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,8 +44,8 @@ func TestAccImageResource(t *testing.T) {
 }
 
 func testImageConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_image" "test" {
-  			}`)
+	return `resource "numspot_image" "test" {
+  			}`
 }
 
 func testImageConfig_Update() string {

@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,21 +62,15 @@ func (r *NatServiceResource) Create(ctx context.Context, request resource.Create
 	var data resource_nat_service.NatServiceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := NatServiceFromTfToCreateRequest(data)
-	res, err := r.client.CreateNatServiceWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create NatService", err.Error())
-	}
-
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create NatService", "My Custom Error")
+	res := utils.HandleResponse(func() (*api.CreateNatServiceResponse, error) {
+		body := NatServiceFromTfToCreateRequest(&data)
+		return r.client.CreateNatServiceWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := NatServiceFromHttpToTf(res.JSON200) // FIXME
+	tf := NatServiceFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -81,26 +78,19 @@ func (r *NatServiceResource) Read(ctx context.Context, request resource.ReadRequ
 	var data resource_nat_service.NatServiceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadNatServicesByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read NatService", "My Custom Error")
+	res := utils.HandleResponse(func() (*api.ReadNatServicesByIdResponse, error) {
+		return r.client.ReadNatServicesByIdWithResponse(ctx, data.Id.String())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := NatServiceFromHttpToTf(res.JSON200) // FIXME
+	tf := NatServiceFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *NatServiceResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
@@ -108,18 +98,7 @@ func (r *NatServiceResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_nat_service.NatServiceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteNatServiceWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete NatService", err.Error())
-		return
-	}
-
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete NatService", "My Custom Error")
-		return
-	}
+	_ = utils.HandleResponse(func() (*api.DeleteNatServiceResponse, error) {
+		return r.client.DeleteNatServiceWithResponse(ctx, data.Id.String())
+	}, http.StatusOK, &response.Diagnostics)
 }

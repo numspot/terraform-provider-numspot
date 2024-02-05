@@ -12,9 +12,10 @@ import (
 func TestAccKeyPairResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
-	rand := rand.Intn(9999-1000) + 1000
-	name := fmt.Sprintf("key-pair-name-%d", rand)
-	updatedName := fmt.Sprintf("updated-key-pair-name-%d", rand)
+	randName := rand.Intn(9999-1000) + 1000
+	name := fmt.Sprintf("key-pair-name-%d", randName)
+	updatedName := fmt.Sprintf("updated-key-pair-name-%d", randName)
+	privateKey := ""
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
@@ -26,6 +27,7 @@ func TestAccKeyPairResource(t *testing.T) {
 					resource.TestCheckResourceAttr("numspot_key_pair.test", "id", name),
 					resource.TestCheckResourceAttrWith("numspot_key_pair.test", "private_key", func(v string) error {
 						require.NotEmpty(t, v)
+						privateKey = v
 						return nil
 					}),
 				),
@@ -35,7 +37,7 @@ func TestAccKeyPairResource(t *testing.T) {
 				ResourceName:            "numspot_key_pair.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
+				ImportStateVerifyIgnore: []string{"private_key"},
 			},
 			// Update testing
 			{
@@ -45,6 +47,7 @@ func TestAccKeyPairResource(t *testing.T) {
 					resource.TestCheckResourceAttr("numspot_key_pair.test", "id", updatedName),
 					resource.TestCheckResourceAttrWith("numspot_key_pair.test", "private_key", func(v string) error {
 						require.NotEmpty(t, v)
+						require.NotEqual(t, v, privateKey)
 						return nil
 					}),
 				),

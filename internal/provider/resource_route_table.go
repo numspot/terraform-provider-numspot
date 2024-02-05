@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -26,10 +27,11 @@ type RouteTableResource struct {
 }
 
 type PrivateState struct {
-	DefaultDestinationIp string `json:"defaultDestinationIp"`
+	DefaultDestinationIp string  `json:"defaultDestinationIp"`
+	SubnetId             *string `json:"subnetId"`
 }
 
-var DestinationIPKey string = "key"
+var PrivateStateKey string = "private-state"
 
 func NewRouteTableResource() resource.Resource {
 	return &RouteTableResource{}
@@ -69,17 +71,11 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := RouteTableFromTfToCreateRequest(data)
-	res, err := r.client.CreateRouteTableWithResponse(ctx, body)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create RouteTable", err.Error())
-		return
-	}
-
-	expectedStatusCode := 200
-	if res.StatusCode() != expectedStatusCode {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to create RouteTable", apiError.Error())
+	res := utils.HandleResponse(func() (*api.CreateRouteTableResponse, error) {
+		body := RouteTableFromTfToCreateRequest(&data)
+		return r.client.CreateRouteTableWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
@@ -90,52 +86,35 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	defaultRoute := jsonRoutes[0]
 	privateState := PrivateState{DefaultDestinationIp: *defaultRoute.DestinationIpRange}
 
-	bytes, err := json.Marshal(privateState)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Route Table", "Failed to marshall private state")
-		return
-	}
-
-	response.Diagnostics.Append(response.Private.SetKey(ctx, DestinationIPKey, bytes)...)
-
 	routes := make([]resource_route_table.RoutesValue, 0, len(data.Routes.Elements()))
 	data.Routes.ElementsAs(ctx, &routes, false)
-	for _, route := range routes {
-		createRouteRes, err := r.client.CreateRouteWithResponse(ctx, api.CreateRouteJSONRequestBody{
-			DestinationIpRange: route.DestinationIpRange.ValueString(),
-			GatewayId:          route.GatewayId.ValueStringPointer(),
-			NatServiceId:       route.NatServiceId.ValueStringPointer(),
-			NetPeeringId:       route.NetPeeringId.ValueStringPointer(),
-			NicId:              route.NicId.ValueStringPointer(),
-			TableId:            createdId,
-			VmId:               route.VmId.ValueStringPointer(),
-		})
-
-		if err != nil {
-			response.Diagnostics.AddError("Failed to create RouteTable route", err.Error())
-			return
-		}
-
-		if createRouteRes.StatusCode() != 200 {
-			apiError := utils.HandleError(res.Body)
-			response.Diagnostics.AddError("Failed to create RouteTable route", apiError.Error())
+	for i := range routes {
+		route := &routes[i]
+		createdRoute := utils.HandleResponse(func() (*api.CreateRouteResponse, error) {
+			return r.client.CreateRouteWithResponse(ctx, api.CreateRouteJSONRequestBody{
+				DestinationIpRange: route.DestinationIpRange.ValueString(),
+				GatewayId:          route.GatewayId.ValueStringPointer(),
+				NatServiceId:       route.NatServiceId.ValueStringPointer(),
+				NetPeeringId:       route.NetPeeringId.ValueStringPointer(),
+				NicId:              route.NicId.ValueStringPointer(),
+				TableId:            *createdId,
+				VmId:               route.VmId.ValueStringPointer(),
+			})
+		}, http.StatusOK, &response.Diagnostics)
+		if createdRoute == nil {
 			return
 		}
 	}
 
 	if !data.SubnetId.IsNull() {
-		// Link the route table to the given subnet
-		linkRes, err := r.client.LinkRouteTable(ctx, *createdId, api.LinkRouteTableRequestSchema{SubnetId: data.SubnetId.ValueString()})
-		if linkRes != nil {
-			response.Diagnostics.AddError("Failed to link RouteTable", err.Error())
+		linkRes := utils.HandleResponse(func() (*api.LinkRouteTableResponse, error) {
+			return r.client.LinkRouteTableWithResponse(ctx, *createdId, api.LinkRouteTableRequestSchema{SubnetId: data.SubnetId.ValueString()})
+		}, http.StatusOK, &response.Diagnostics)
+		if linkRes == nil {
 			return
 		}
 
-		if linkRes.StatusCode != expectedStatusCode {
-			apiError := utils.HandleError(res.Body)
-			response.Diagnostics.AddError("Failed to link RouteTable", apiError.Error())
-			return
-		}
+		privateState.SubnetId = data.SubnetId.ValueStringPointer()
 	}
 
 	readed := r.readRouteTable(ctx, *createdId, response.Diagnostics)
@@ -143,13 +122,25 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf, diag := RouteTableFromHttpToTf(ctx, readed.JSON200, privateState.DefaultDestinationIp)
-	if diag.HasError() {
-		response.Diagnostics.Append(diag...)
+	tf, diagnostics := RouteTableFromHttpToTf(
+		ctx,
+		readed.JSON200,
+		privateState.DefaultDestinationIp,
+		privateState.SubnetId,
+	)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
+	bytes, err := json.Marshal(privateState)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Route Table", "Failed to marshall private state")
 		return
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.Private.SetKey(ctx, PrivateStateKey, bytes)...)
 }
 
 func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
@@ -161,9 +152,9 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 		return
 	}
 
-	bytes, diag := request.Private.GetKey(ctx, DestinationIPKey)
-	if diag.HasError() {
-		response.Diagnostics.Append(diag...)
+	bytes, diagnostics := request.Private.GetKey(ctx, PrivateStateKey)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
 		return
 	}
 	var privateState PrivateState
@@ -174,6 +165,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 			return
 		}
 	} else {
+		// Retrieve Default Destination IP Range
 		readNetRes, err := r.client.ReadNetsByIdWithResponse(ctx, *res.JSON200.NetId)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to read associated Net", err.Error())
@@ -189,9 +181,26 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 		privateState.DefaultDestinationIp = *readNetRes.JSON200.IpRange
 	}
 
-	tf, diag := RouteTableFromHttpToTf(ctx, res.JSON200, privateState.DefaultDestinationIp)
-	if diag.HasError() {
-		response.Diagnostics.Append(diag...)
+	// Retrieve Subnet ID if the Route Table is linked
+	var subnetId *string
+	if privateState.SubnetId != nil {
+		subnetId = privateState.SubnetId
+	} else {
+		jsonSubnet := res.JSON200
+		if jsonSubnet != nil && jsonSubnet.LinkRouteTables != nil && len(*jsonSubnet.LinkRouteTables) > 0 {
+			subnets := *jsonSubnet.LinkRouteTables
+			subnetId = subnets[0].SubnetId
+		}
+	}
+
+	tf, diagnostics := RouteTableFromHttpToTf(
+		ctx,
+		res.JSON200,
+		privateState.DefaultDestinationIp,
+		subnetId,
+	)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
 		return
 	}
 
@@ -205,8 +214,7 @@ func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag
 		return nil
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
+	if res.StatusCode() != http.StatusOK {
 		apiError := utils.HandleError(res.Body)
 		diag.AddError("Failed to read RouteTable", apiError.Error())
 		return nil
@@ -216,7 +224,6 @@ func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag
 }
 
 func (r *RouteTableResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
 	panic("implement me")
 }
 
@@ -224,14 +231,35 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
+	// Unlink route tables
+	links := make([]resource_route_table.LinkRouteTablesValue, 0, len(data.LinkRouteTables.Elements()))
+	diagnostics := data.LinkRouteTables.ElementsAs(ctx, &links, false)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
+	for _, link := range links {
+		unlinkRes, err := r.client.UnlinkRouteTableWithResponse(ctx, link.Id.ValueString())
+		if err != nil {
+			response.Diagnostics.AddError("Failed to delete RouteTable", err.Error())
+			return
+		}
+
+		if unlinkRes.StatusCode() != http.StatusOK {
+			apiError := utils.HandleError(unlinkRes.Body)
+			response.Diagnostics.AddError("Failed to delete RouteTable", apiError.Error())
+			return
+		}
+	}
+
 	res, err := r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete RouteTable", err.Error())
 		return
 	}
 
-	expectedStatusCode := 200
-	if res.StatusCode() != expectedStatusCode {
+	if res.StatusCode() != http.StatusOK {
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to delete RouteTable", apiError.Error())
 		return

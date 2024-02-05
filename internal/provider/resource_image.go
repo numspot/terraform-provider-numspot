@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,21 +62,12 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := ImageFromTfToCreateRequest(data)
-	res, err := r.client.CreateImageWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create Image", err.Error())
-	}
+	res := utils.HandleResponse(func() (*api.CreateImageResponse, error) {
+		body := ImageFromTfToCreateRequest(&data)
+		return r.client.CreateImageWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create Image", "My Custom Error")
-		return
-	}
-
-	tf := ImageFromHttpToTf(res.JSON200) // FIXME
+	tf := ImageFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -81,26 +75,16 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadImagesByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
+	res := utils.HandleResponse(func() (*api.ReadImagesByIdResponse, error) {
+		return r.client.ReadImagesByIdWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read Image", "My Custom Error")
-		return
-	}
-
-	tf := ImageFromHttpToTf(res.JSON200) // FIXME
+	tf := ImageFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *ImageResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
@@ -108,18 +92,7 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteImageWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete Image", err.Error())
-		return
-	}
-
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete Image", "My Custom Error")
-		return
-	}
+	utils.HandleResponse(func() (*api.DeleteImageResponse, error) {
+		return r.client.DeleteImageWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
 }

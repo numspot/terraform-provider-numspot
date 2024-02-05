@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,8 +44,7 @@ func TestAccListenerRuleResource(t *testing.T) {
 }
 
 func testListenerRuleConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_listener_rule" "test" {
-  			}`)
+	return `resource "numspot_listener_rule" "test" {}`
 }
 
 func testListenerRuleConfig_Update() string {

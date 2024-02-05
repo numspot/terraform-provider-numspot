@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,8 +44,7 @@ func TestAccDirectLinkInterfaceResource(t *testing.T) {
 }
 
 func testDirectLinkInterfaceConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_direct_link_interface" "test" {
-  			}`)
+	return `resource "numspot_direct_link_interface" "test" {}`
 }
 
 func testDirectLinkInterfaceConfig_Update() string {

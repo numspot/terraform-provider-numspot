@@ -23,6 +23,18 @@ import (
 
 var _ provider.Provider = (*numspotProvider)(nil)
 
+type Key string
+
+var (
+	clientIdKey     = Key("client_id")
+	clientSecretKey = Key("client_secret")
+)
+
+var (
+	errClientIdNotFound     = errors.New("can't find client_id")
+	errClientSecretNotFound = errors.New("can't find client_secret")
+)
+
 func New(version string, development bool) func() provider.Provider {
 	return func() provider.Provider {
 		return &numspotProvider{
@@ -67,9 +79,9 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 	}
 }
 
-func (p *numspotProvider) authenticateUser(ctx context.Context, data NumspotProviderModel) (error, *string) {
-	ctx = context.WithValue(ctx, "client_id", data.ClientId.ValueString())
-	ctx = context.WithValue(ctx, "client_secret", data.ClientSecret.ValueString())
+func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotProviderModel) (error, *string) {
+	ctx = context.WithValue(ctx, clientIdKey, data.ClientId.ValueString())
+	ctx = context.WithValue(ctx, clientSecretKey, data.ClientSecret.ValueString())
 
 	iamEndpoint := data.IAMHost.ValueString()
 	tmp := func(c *iam.Client) error {
@@ -105,21 +117,21 @@ func buildBasicAuth(username, password string) string {
 }
 
 func AddSecurityCredentialsToRequestHeaders(ctx context.Context, req *http.Request) error {
-	clientId, ok := ctx.Value("client_id").(string)
+	clientId, ok := ctx.Value(clientIdKey).(string)
 	if !ok {
-		return errors.New("Can't find client_id")
+		return errClientIdNotFound
 	}
 
-	clientSecret, ok := ctx.Value("client_secret").(string)
+	clientSecret, ok := ctx.Value(clientSecretKey).(string)
 	if !ok {
-		return errors.New("Can't find client_secret")
+		return errClientSecretNotFound
 	}
 
 	req.Header.Add("Authorization", buildBasicAuth(clientId, clientSecret))
 	return nil
 }
 
-func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag diag.Diagnostics, data NumspotProviderModel) *api.ClientWithResponses {
+func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag diag.Diagnostics, data *NumspotProviderModel) *api.ClientWithResponses {
 	err, accessToken := p.authenticateUser(ctx, data)
 	if err != nil {
 		diag.AddError("Failed to authenticate", err.Error())
@@ -147,7 +159,7 @@ func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag diag.Diagn
 	return numspotClient
 }
 
-func (p *numspotProvider) apiClientWithFakeAuth(data NumspotProviderModel, diag diag.Diagnostics) *api.ClientWithResponses {
+func (p *numspotProvider) apiClientWithFakeAuth(data *NumspotProviderModel, diag diag.Diagnostics) *api.ClientWithResponses {
 	numspotClient, err := api.NewClientWithResponses(data.Host.ValueString(), api.WithRequestEditorFn(faker))
 	if err != nil {
 		diag.AddError("Failed to create NumSpot api client", err.Error())
@@ -293,9 +305,9 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	// Create a new Numspot client using the configuration values
 	var client *api.ClientWithResponses
 	if p.development {
-		client = p.apiClientWithFakeAuth(config, resp.Diagnostics)
+		client = p.apiClientWithFakeAuth(&config, resp.Diagnostics)
 	} else {
-		client = p.apiClientWithAuth(ctx, resp.Diagnostics, config)
+		client = p.apiClientWithAuth(ctx, resp.Diagnostics, &config)
 	}
 
 	if resp.Diagnostics.HasError() {

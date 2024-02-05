@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,8 +44,7 @@ func TestAccNatServiceResource(t *testing.T) {
 }
 
 func testNatServiceConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_nat_service" "test" {
-  			}`)
+	return `resource "numspot_nat_service" "test" {}`
 }
 
 func testNatServiceConfig_Update() string {

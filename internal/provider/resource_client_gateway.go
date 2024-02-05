@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,22 +62,15 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := ClientGatewayFromTfToCreateRequest(data)
-	res, err := r.client.CreateClientGatewayWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create ClientGateway", err.Error())
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		fmt.Println(string(res.Body))
-		response.Diagnostics.AddError("Failed to create ClientGateway", string(res.Body))
+	res := utils.HandleResponse(func() (*api.CreateClientGatewayResponse, error) {
+		body := ClientGatewayFromTfToCreateRequest(&data)
+		return r.client.CreateClientGatewayWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := ClientGatewayFromHttpToTf(res.JSON200) // FIXME
+	tf := ClientGatewayFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
@@ -82,27 +78,19 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadClientGatewaysByIdWithResponse(ctx, data.Id.ValueString())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		fmt.Println(string(res.Body))
-		response.Diagnostics.AddError("Failed to read ClientGateway", string(res.Body))
+	res := utils.HandleResponse(func() (*api.ReadClientGatewaysByIdResponse, error) {
+		return r.client.ReadClientGatewaysByIdWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := ClientGatewayFromHttpToTf(res.JSON200) // FIXME
+	tf := ClientGatewayFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *ClientGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
@@ -110,19 +98,10 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteClientGatewayWithResponse(ctx, data.Id.ValueString())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete ClientGateway", err.Error())
-		return
-	}
-
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		fmt.Println()
-		response.Diagnostics.AddError("Failed to delete ClientGateway", string(res.Body))
+	res := utils.HandleResponse(func() (*api.DeleteClientGatewayResponse, error) {
+		return r.client.DeleteClientGatewayWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 }

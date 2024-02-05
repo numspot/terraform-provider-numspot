@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,21 +62,15 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	var data resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := SnapshotFromTfToCreateRequest(data)
-	res, err := r.client.CreateSnapshotWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create Snapshot", err.Error())
-	}
-
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create Snapshot", "My Custom Error")
+	res := utils.HandleResponse(func() (*api.CreateSnapshotResponse, error) {
+		body := SnapshotFromTfToCreateRequest(&data)
+		return r.client.CreateSnapshotWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := SnapshotFromHttpToTf(res.JSON200) // FIXME
+	tf := SnapshotFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -81,26 +78,18 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	var data resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadSnapshotsByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read Snapshot", "My Custom Error")
+	res := utils.HandleResponse(func() (*api.ReadSnapshotsByIdResponse, error) {
+		return r.client.ReadSnapshotsByIdWithResponse(ctx, data.Id.String())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := SnapshotFromHttpToTf(res.JSON200) // FIXME
+	tf := SnapshotFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
 	panic("implement me")
 }
 
@@ -108,18 +97,7 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	var data resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteSnapshotWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete Snapshot", err.Error())
-		return
-	}
-
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete Snapshot", "My Custom Error")
-		return
-	}
+	_ = utils.HandleResponse(func() (*api.DeleteSnapshotResponse, error) {
+		return r.client.DeleteSnapshotWithResponse(ctx, data.Id.String())
+	}, http.StatusOK, &response.Diagnostics)
 }

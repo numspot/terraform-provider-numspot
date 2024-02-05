@@ -34,6 +34,7 @@ func TestAccInternetServiceResource(t *testing.T) {
 		},
 	})
 }
+
 func testInternetServiceConfig_Create(netID string) string {
 	return fmt.Sprintf(`resource "numspot_internet_service" "test" {
 			net_id="%s"

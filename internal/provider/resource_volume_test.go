@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,8 +44,7 @@ func TestAccVolumeResource(t *testing.T) {
 }
 
 func testVolumeConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_volume" "test" {
-  			}`)
+	return `resource "numspot_volume" "test" {}`
 }
 
 func testVolumeConfig_Update() string {

@@ -4,6 +4,8 @@ package resource_key_pair
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -27,6 +29,9 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
 				MarkdownDescription: "A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"private_key": schema.StringAttribute{
 				Computed:            true,
@@ -38,6 +43,9 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The public key. It must be Base64-encoded.",
 				MarkdownDescription: "The public key. It must be Base64-encoded.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 		},
 	}

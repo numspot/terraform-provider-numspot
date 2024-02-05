@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,21 +62,12 @@ func (r *ListenerRuleResource) Create(ctx context.Context, request resource.Crea
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := ListenerRuleFromTfToCreateRequest(data)
-	res, err := r.client.CreateListenerRuleWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create ListenerRule", err.Error())
-	}
+	res := utils.HandleResponse(func() (*api.CreateListenerRuleResponse, error) {
+		body := ListenerRuleFromTfToCreateRequest(&data)
+		return r.client.CreateListenerRuleWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create ListenerRule", "My Custom Error")
-		return
-	}
-
-	tf := ListenerRuleFromHttpToTf(res.JSON200) // FIXME
+	tf := ListenerRuleFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -81,26 +75,15 @@ func (r *ListenerRuleResource) Read(ctx context.Context, request resource.ReadRe
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadListenerRulesByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
+	res := utils.HandleResponse(func() (*api.ReadListenerRulesByIdResponse, error) {
+		return r.client.ReadListenerRulesByIdWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()))
+	}, http.StatusOK, &response.Diagnostics)
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read ListenerRule", "My Custom Error")
-		return
-	}
-
-	tf := ListenerRuleFromHttpToTf(res.JSON200) // FIXME
+	tf := ListenerRuleFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *ListenerRuleResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
 	panic("implement me")
 }
 
@@ -108,18 +91,7 @@ func (r *ListenerRuleResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteListenerRuleWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete ListenerRule", err.Error())
-		return
-	}
-
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete ListenerRule", "My Custom Error")
-		return
-	}
+	utils.HandleResponse(func() (*api.DeleteListenerRuleResponse, error) {
+		return r.client.DeleteListenerRuleWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()))
+	}, http.StatusOK, &response.Diagnostics)
 }

@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,8 +44,7 @@ func TestAccVpnConnectionResource(t *testing.T) {
 }
 
 func testVpnConnectionConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_vpn_connection" "test" {
-  			}`)
+	return `resource "numspot_vpn_connection" "test" {}`
 }
 
 func testVpnConnectionConfig_Update() string {

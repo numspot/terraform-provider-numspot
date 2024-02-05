@@ -3,8 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -61,36 +62,22 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := KeyPairFromTfToCreateRequest(data)
-	res, err := r.client.CreateKeypairWithResponse(ctx, body)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create KeyPair", err.Error())
+	res := utils.HandleResponse(func() (*api.CreateKeypairResponse, error) {
+		body := KeyPairFromTfToCreateRequest(&data)
+		return r.client.CreateKeypairWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to create KeyPair", apiError.Error())
-		return
-	}
-
-	readRes, err := r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-		return
-	}
-
-	if readRes.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to read KeyPair", apiError.Error())
-		return
-	}
-
-	tf := KeyPairFromHttpToTf(
-		readRes.JSON200,
-		data.PublicKey.ValueStringPointer(),
-		data.PrivateKey.ValueStringPointer(),
+	tf := KeyPairFromCreateHttpToTf(
+		res.JSON200,
 	)
+
+	if !data.PublicKey.IsNull() && !data.PublicKey.IsUnknown() {
+		tf.PublicKey = data.PublicKey
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -98,23 +85,25 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res, err := r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+	res := utils.HandleResponse(func() (*api.ReadKeypairsByIdResponse, error) {
+		return r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.ValueString(), faker) // Use faker to inject token_200 status code
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to read KeyPair", apiError.Error())
-		return
-	}
-
-	tf := KeyPairFromHttpToTf(
+	tf := KeyPairFromReadHttpToTf(
 		res.JSON200,
-		data.PublicKey.ValueStringPointer(),
-		data.PrivateKey.ValueStringPointer(),
 	)
+
+	if !utils.IsTfValueNull(data.PublicKey) {
+		tf.PublicKey = data.PublicKey
+	}
+
+	if !utils.IsTfValueNull(data.PrivateKey) {
+		tf.PrivateKey = data.PrivateKey
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -126,15 +115,7 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res, err := r.client.DeleteKeypairWithResponse(ctx, data.Id.String())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete KeyPair", err.Error())
-		return
-	}
-
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to delete KeyPair", apiError.Error())
-		return
-	}
+	utils.HandleResponse(func() (*api.DeleteKeypairResponse, error) {
+		return r.client.DeleteKeypairWithResponse(ctx, data.Id.ValueString(), faker) // Use faker to inject token_200 status code
+	}, http.StatusOK, &response.Diagnostics)
 }

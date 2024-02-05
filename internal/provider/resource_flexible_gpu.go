@@ -3,6 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,48 +65,66 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := FlexibleGpuFromTfToCreateRequest(data)
-	res, err := r.client.CreateFlexibleGpuWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create FlexibleGpu", err.Error())
+	res := utils.HandleResponse(func() (*api.CreateFlexibleGpuResponse, error) {
+		body := FlexibleGpuFromTfToCreateRequest(&data)
+		return r.client.CreateFlexibleGpuWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+
+	createStateConf := &retry.StateChangeConf{
+		Pending: []string{"attaching", "detaching"},
+		Target:  []string{"allocated", "attached"},
+		Refresh: func() (result interface{}, state string, err error) {
+			readed := r.read(ctx, *res.JSON200.Id, response.Diagnostics)
+			if readed == nil {
+				return nil, "", nil
+			}
+
+			return *readed, *readed.State, nil
+		},
+		Timeout: 5 * time.Minute,
+		Delay:   5 * time.Second,
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create FlexibleGpu", "My Custom Error")
+	read, err := createStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", data.Id.ValueString(), err))
 		return
 	}
 
-	tf := FlexibleGpuFromHttpToTf(res.JSON200) // FIXME
+	tf := FlexibleGpuFromHttpToTf(read.(*api.FlexibleGpuSchema))
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+}
+
+func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *api.FlexibleGpuSchema {
+	res, err := r.client.ReadFlexibleGpusByIdWithResponse(ctx, id)
+	if err != nil {
+		diagnostics.AddError("Failed to read RouteTable", err.Error())
+		return nil
+	}
+
+	if res.StatusCode() != http.StatusOK {
+		apiError := utils.HandleError(res.Body)
+		diagnostics.AddError("Failed to read FlexibleGpu", apiError.Error())
+		return nil
+	}
+
+	return res.JSON200
 }
 
 func (r *FlexibleGpuResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadFlexibleGpusByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read FlexibleGpu", "My Custom Error")
+	gpu := r.read(ctx, data.Id.ValueString(), response.Diagnostics)
+	if gpu == nil {
 		return
 	}
 
-	tf := FlexibleGpuFromHttpToTf(res.JSON200) // FIXME
+	tf := FlexibleGpuFromHttpToTf(gpu)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
 	panic("implement me")
 }
 
@@ -108,18 +132,7 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteFlexibleGpuWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete FlexibleGpu", err.Error())
-		return
-	}
-
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete FlexibleGpu", "My Custom Error")
-		return
-	}
+	utils.HandleResponse(func() (*api.DeleteFlexibleGpuResponse, error) {
+		return r.client.DeleteFlexibleGpuWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
 }

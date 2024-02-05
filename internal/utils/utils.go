@@ -2,6 +2,8 @@ package utils
 
 import (
 	"context"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -22,6 +24,13 @@ func FromIntToTfInt64(val int) types.Int64 {
 
 func FromIntPtrToTfInt64(val *int) types.Int64 {
 	return FromIntToTfInt64(*val)
+}
+
+func IsTfValueNull(val attr.Value) bool {
+	if val.IsNull() || val.IsUnknown() {
+		return true
+	}
+	return false
 }
 
 func FromStringListToTfStringList(arr []string) (types.List, diag.Diagnostics) {

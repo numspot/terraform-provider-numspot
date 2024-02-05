@@ -23,15 +23,44 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the route table.",
 				MarkdownDescription: "The ID of the route table.",
 			},
+			"link_route_tables": schema.ListNestedAttribute{
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							Computed:            true,
+							Description:         "The ID of the association between the route table and the Subnet.",
+							MarkdownDescription: "The ID of the association between the route table and the Subnet.",
+						},
+						"main": schema.BoolAttribute{
+							Computed:            true,
+							Description:         "If true, the route table is the main one.",
+							MarkdownDescription: "If true, the route table is the main one.",
+						},
+						"route_table_id": schema.StringAttribute{
+							Computed:            true,
+							Description:         "The ID of the route table.",
+							MarkdownDescription: "The ID of the route table.",
+						},
+						"subnet_id": schema.StringAttribute{
+							Computed:            true,
+							Description:         "The ID of the Subnet.",
+							MarkdownDescription: "The ID of the Subnet.",
+						},
+					},
+					CustomType: LinkRouteTablesType{
+						ObjectType: types.ObjectType{
+							AttrTypes: LinkRouteTablesValue{}.AttributeTypes(ctx),
+						},
+					},
+				},
+				Computed:            true,
+				Description:         "One or more associations between the route table and Subnets.",
+				MarkdownDescription: "One or more associations between the route table and Subnets.",
+			},
 			"net_id": schema.StringAttribute{
 				Required:            true,
 				Description:         "The ID of the Net for which you want to create a route table.",
 				MarkdownDescription: "The ID of the Net for which you want to create a route table.",
-			},
-			"subnet_id": schema.StringAttribute{
-				Optional:            true,
-				Description:         "The ID of the SubNet for which you want to link the route table.",
-				MarkdownDescription: "The ID of the SubNet for which you want to link the route table.",
 			},
 			"route_propagating_virtual_gateways": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -61,7 +90,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The method used to create the route.",
 						},
 						"destination_ip_range": schema.StringAttribute{
-							Required: true,
+							Required:            true,
 							Description:         "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
 							MarkdownDescription: "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
 						},
@@ -101,7 +130,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The state of a route in the route table (always `active`). ",
 						},
 						"vm_account_id": schema.StringAttribute{
-							Computed:            true,
+							Optional:            true,
 							Description:         "The account ID of the owner of the VM.",
 							MarkdownDescription: "The account ID of the owner of the VM.",
 						},
@@ -117,21 +146,506 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Computed:            	true,
-				Optional: 				true,
-				Description:         	"One or more routes in the route table.",
-				MarkdownDescription: 	"One or more routes in the route table.",
+				Optional:            true,
+				Computed:            true,
+				Description:         "One or more routes in the route table.",
+				MarkdownDescription: "One or more routes in the route table.",
+			},
+			"subnet_id": schema.StringAttribute{
+				Optional:            true,
+				Description:         "The ID of the SubNet for which you want to link the route table.",
+				MarkdownDescription: "The ID of the SubNet for which you want to link the route table.",
 			},
 		},
 	}
 }
 
 type RouteTableModel struct {
-	Id                              types.String 		`tfsdk:"id"`
-	NetId                           types.String 		`tfsdk:"net_id"`
-	SubnetId                        types.String 		`tfsdk:"subnet_id"`
-	RoutePropagatingVirtualGateways types.List   		`tfsdk:"route_propagating_virtual_gateways"`
-	Routes                          types.List   		`tfsdk:"routes"`
+	Id                              types.String `tfsdk:"id"`
+	LinkRouteTables                 types.List   `tfsdk:"link_route_tables"`
+	NetId                           types.String `tfsdk:"net_id"`
+	RoutePropagatingVirtualGateways types.List   `tfsdk:"route_propagating_virtual_gateways"`
+	Routes                          types.List   `tfsdk:"routes"`
+	SubnetId                        types.String `tfsdk:"subnet_id"`
+}
+
+var _ basetypes.ObjectTypable = LinkRouteTablesType{}
+
+type LinkRouteTablesType struct {
+	basetypes.ObjectType
+}
+
+func (t LinkRouteTablesType) Equal(o attr.Type) bool {
+	other, ok := o.(LinkRouteTablesType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t LinkRouteTablesType) String() string {
+	return "LinkRouteTablesType"
+}
+
+func (t LinkRouteTablesType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	idAttribute, ok := attributes["id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`id is missing from object`)
+
+		return nil, diags
+	}
+
+	idVal, ok := idAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`id expected to be basetypes.StringValue, was: %T`, idAttribute))
+	}
+
+	mainAttribute, ok := attributes["main"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`main is missing from object`)
+
+		return nil, diags
+	}
+
+	mainVal, ok := mainAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`main expected to be basetypes.BoolValue, was: %T`, mainAttribute))
+	}
+
+	routeTableIdAttribute, ok := attributes["route_table_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`route_table_id is missing from object`)
+
+		return nil, diags
+	}
+
+	routeTableIdVal, ok := routeTableIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`route_table_id expected to be basetypes.StringValue, was: %T`, routeTableIdAttribute))
+	}
+
+	subnetIdAttribute, ok := attributes["subnet_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`subnet_id is missing from object`)
+
+		return nil, diags
+	}
+
+	subnetIdVal, ok := subnetIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`subnet_id expected to be basetypes.StringValue, was: %T`, subnetIdAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return LinkRouteTablesValue{
+		Id:           idVal,
+		Main:         mainVal,
+		RouteTableId: routeTableIdVal,
+		SubnetId:     subnetIdVal,
+		state:        attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkRouteTablesValueNull() LinkRouteTablesValue {
+	return LinkRouteTablesValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewLinkRouteTablesValueUnknown() LinkRouteTablesValue {
+	return LinkRouteTablesValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewLinkRouteTablesValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (LinkRouteTablesValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing LinkRouteTablesValue Attribute Value",
+				"While creating a LinkRouteTablesValue value, a missing attribute value was detected. "+
+					"A LinkRouteTablesValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkRouteTablesValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid LinkRouteTablesValue Attribute Type",
+				"While creating a LinkRouteTablesValue value, an invalid attribute value was detected. "+
+					"A LinkRouteTablesValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkRouteTablesValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("LinkRouteTablesValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra LinkRouteTablesValue Attribute Value",
+				"While creating a LinkRouteTablesValue value, an extra attribute value was detected. "+
+					"A LinkRouteTablesValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra LinkRouteTablesValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewLinkRouteTablesValueUnknown(), diags
+	}
+
+	idAttribute, ok := attributes["id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`id is missing from object`)
+
+		return NewLinkRouteTablesValueUnknown(), diags
+	}
+
+	idVal, ok := idAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`id expected to be basetypes.StringValue, was: %T`, idAttribute))
+	}
+
+	mainAttribute, ok := attributes["main"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`main is missing from object`)
+
+		return NewLinkRouteTablesValueUnknown(), diags
+	}
+
+	mainVal, ok := mainAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`main expected to be basetypes.BoolValue, was: %T`, mainAttribute))
+	}
+
+	routeTableIdAttribute, ok := attributes["route_table_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`route_table_id is missing from object`)
+
+		return NewLinkRouteTablesValueUnknown(), diags
+	}
+
+	routeTableIdVal, ok := routeTableIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`route_table_id expected to be basetypes.StringValue, was: %T`, routeTableIdAttribute))
+	}
+
+	subnetIdAttribute, ok := attributes["subnet_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`subnet_id is missing from object`)
+
+		return NewLinkRouteTablesValueUnknown(), diags
+	}
+
+	subnetIdVal, ok := subnetIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`subnet_id expected to be basetypes.StringValue, was: %T`, subnetIdAttribute))
+	}
+
+	if diags.HasError() {
+		return NewLinkRouteTablesValueUnknown(), diags
+	}
+
+	return LinkRouteTablesValue{
+		Id:           idVal,
+		Main:         mainVal,
+		RouteTableId: routeTableIdVal,
+		SubnetId:     subnetIdVal,
+		state:        attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkRouteTablesValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) LinkRouteTablesValue {
+	object, diags := NewLinkRouteTablesValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewLinkRouteTablesValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t LinkRouteTablesType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewLinkRouteTablesValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewLinkRouteTablesValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewLinkRouteTablesValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewLinkRouteTablesValueMust(LinkRouteTablesValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t LinkRouteTablesType) ValueType(ctx context.Context) attr.Value {
+	return LinkRouteTablesValue{}
+}
+
+var _ basetypes.ObjectValuable = LinkRouteTablesValue{}
+
+type LinkRouteTablesValue struct {
+	Id           basetypes.StringValue `tfsdk:"id"`
+	Main         basetypes.BoolValue   `tfsdk:"main"`
+	RouteTableId basetypes.StringValue `tfsdk:"route_table_id"`
+	SubnetId     basetypes.StringValue `tfsdk:"subnet_id"`
+	state        attr.ValueState
+}
+
+func (v LinkRouteTablesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 4)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["main"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["route_table_id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["subnet_id"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 4)
+
+		val, err = v.Id.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["id"] = val
+
+		val, err = v.Main.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["main"] = val
+
+		val, err = v.RouteTableId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["route_table_id"] = val
+
+		val, err = v.SubnetId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["subnet_id"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v LinkRouteTablesValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v LinkRouteTablesValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v LinkRouteTablesValue) String() string {
+	return "LinkRouteTablesValue"
+}
+
+func (v LinkRouteTablesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	objVal, diags := types.ObjectValue(
+		map[string]attr.Type{
+			"id":             basetypes.StringType{},
+			"main":           basetypes.BoolType{},
+			"route_table_id": basetypes.StringType{},
+			"subnet_id":      basetypes.StringType{},
+		},
+		map[string]attr.Value{
+			"id":             v.Id,
+			"main":           v.Main,
+			"route_table_id": v.RouteTableId,
+			"subnet_id":      v.SubnetId,
+		})
+
+	return objVal, diags
+}
+
+func (v LinkRouteTablesValue) Equal(o attr.Value) bool {
+	other, ok := o.(LinkRouteTablesValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Id.Equal(other.Id) {
+		return false
+	}
+
+	if !v.Main.Equal(other.Main) {
+		return false
+	}
+
+	if !v.RouteTableId.Equal(other.RouteTableId) {
+		return false
+	}
+
+	if !v.SubnetId.Equal(other.SubnetId) {
+		return false
+	}
+
+	return true
+}
+
+func (v LinkRouteTablesValue) Type(ctx context.Context) attr.Type {
+	return LinkRouteTablesType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v LinkRouteTablesValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"id":             basetypes.StringType{},
+		"main":           basetypes.BoolType{},
+		"route_table_id": basetypes.StringType{},
+		"subnet_id":      basetypes.StringType{},
+	}
 }
 
 var _ basetypes.ObjectTypable = RoutePropagatingVirtualGatewaysType{}

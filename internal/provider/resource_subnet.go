@@ -3,11 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"net/http"
 	"regexp"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -64,17 +65,11 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := SubnetFromTfToCreateRequest(data)
-	res, err := r.client.CreateSubnetWithResponse(ctx, body)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Subnet", err.Error())
-		return
-	}
-
-	if res.StatusCode() != http.StatusOK {
-		// TODO: Handle NumSpot error
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to create Subnet", apiError.Error())
+	res := utils.HandleResponse(func() (*api.CreateSubnetResponse, error) {
+		body := SubnetFromTfToCreateRequest(&data)
+		return r.client.CreateSubnetWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
@@ -101,42 +96,31 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		Delay:   3 * time.Second,
 	}
 
-	_, err = createStateConf.WaitForStateContext(ctx)
+	_, err := createStateConf.WaitForStateContext(ctx)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *res.JSON200.Id, err))
 		return
 	}
 
 	if data.MapPublicIpOnLaunch.ValueBool() {
-		updateRes, err := r.client.UpdateSubnetWithResponse(ctx, createdId, api.UpdateSubnetJSONRequestBody{
-			MapPublicIpOnLaunch: true,
-		})
-
-		if err != nil {
-			response.Diagnostics.AddError("Failed to read Subnet", err.Error())
-			return
-		}
-
-		if updateRes.StatusCode() != http.StatusOK {
-			apiError := utils.HandleError(res.Body)
-			response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
+		updateRes := utils.HandleResponse(func() (*api.UpdateSubnetResponse, error) {
+			return r.client.UpdateSubnetWithResponse(ctx, createdId, api.UpdateSubnetJSONRequestBody{
+				MapPublicIpOnLaunch: true,
+			})
+		}, http.StatusOK, &response.Diagnostics)
+		if updateRes == nil {
 			return
 		}
 	}
 
-	readRes, err := r.client.ReadSubnetsByIdWithResponse(ctx, createdId)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+	readRes := utils.HandleResponse(func() (*api.ReadSubnetsByIdResponse, error) {
+		return r.client.ReadSubnetsByIdWithResponse(ctx, createdId)
+	}, http.StatusOK, &response.Diagnostics)
+	if readRes == nil {
 		return
 	}
 
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(readRes.Body)
-		response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
-		return
-	}
-
-	tf := SubnetFromHttpToTf(readRes.JSON200) // FIXME
+	tf := SubnetFromHttpToTf(readRes.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -144,16 +128,10 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res, err := r.client.ReadSubnetsByIdWithResponse(ctx, data.Id.ValueString())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to read Subnet", err.Error())
-		return
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
+	res := utils.HandleResponse(func() (*api.ReadSubnetsByIdResponse, error) {
+		return r.client.ReadSubnetsByIdWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
@@ -162,7 +140,6 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 }
 
 func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
 	panic("implement me")
 }
 
@@ -170,16 +147,10 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res, err := r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete Subnet", err.Error())
-		return
-	}
-
-	expectedStatusCode := 200
-	if res.StatusCode() != expectedStatusCode {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to delete Subnet", apiError.Error())
+	res := utils.HandleResponse(func() (*api.DeleteSubnetResponse, error) {
+		return r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
@@ -209,7 +180,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 		Delay:   5 * time.Second,
 	}
 
-	_, err = deleteStateConf.WaitForStateContext(ctx)
+	_, err := deleteStateConf.WaitForStateContext(ctx)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Net", fmt.Sprintf("Error waiting for instance (%s) to be deleted: %s", data.Id.ValueString(), err))
 		return

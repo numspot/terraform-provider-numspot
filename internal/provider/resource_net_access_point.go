@@ -59,14 +59,14 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := NetAccessPointFromTfToCreateRequest(data)
+	body := NetAccessPointFromTfToCreateRequest(&data)
 	res, err := r.client.CreateNetAccessPointWithResponse(ctx, body)
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create NetAccessPoint", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 201 // FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to create NetAccessPoint", "My Custom Error")
@@ -81,14 +81,14 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
+	// TODO: Implement READ operation
 	res, err := r.client.ReadNetAccessPointsByIdWithResponse(ctx, data.Id.String())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to read NetAccessPoint", "My Custom Error")
@@ -100,7 +100,7 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 }
 
 func (r *NetAccessPointResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 

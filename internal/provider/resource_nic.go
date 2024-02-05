@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,21 +62,15 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := NicFromTfToCreateRequest(data)
-	res, err := r.client.CreateNicWithResponse(ctx, body)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Nic", err.Error())
+	res := utils.HandleResponse(func() (*api.CreateNicResponse, error) {
+		body := NicFromTfToCreateRequest(&data)
+		return r.client.CreateNicWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create Nic", "My Custom Error")
-		return
-	}
-
-	tf := NicFromHttpToTf(res.JSON200) // FIXME
+	tf := NicFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -81,26 +78,19 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadNicsByIdWithResponse(ctx, data.Id.ValueString())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read Nic", "My Custom Error")
+	res := utils.HandleResponse(func() (*api.ReadNicsByIdResponse, error) {
+		return r.client.ReadNicsByIdWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := NicFromHttpToTf(res.JSON200) // FIXME
+	tf := NicFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
@@ -108,18 +98,7 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteNicWithResponse(ctx, data.Id.ValueString())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete Nic", err.Error())
-		return
-	}
-
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete Nic", "My Custom Error")
-		return
-	}
+	_ = utils.HandleResponse(func() (*api.DeleteNicResponse, error) {
+		return r.client.DeleteNicWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
 }

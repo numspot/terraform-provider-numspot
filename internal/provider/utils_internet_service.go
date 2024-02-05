@@ -22,7 +22,3 @@ func InternetServiceFromHttpToTf(http *api.InternetServiceSchema) resource_inter
 		State: types.StringPointerValue(http.State),
 	}
 }
-
-func InternetServiceFromTfToCreateRequest(_ resource_internet_service.InternetServiceModel) api.CreateInternetServiceJSONRequestBody {
-	return api.CreateInternetServiceJSONRequestBody{}
-}

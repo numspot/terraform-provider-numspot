@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,8 +44,7 @@ func TestAccSnapshotResource(t *testing.T) {
 }
 
 func testSnapshotConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_snapshot" "test" {
-  			}`)
+	return `resource "numspot_snapshot" "test" {}`
 }
 
 func testSnapshotConfig_Update() string {

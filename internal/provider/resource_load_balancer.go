@@ -59,14 +59,14 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := LoadBalancerFromTfToCreateRequest(data)
+	body := LoadBalancerFromTfToCreateRequest(&data)
 	res, err := r.client.CreateLoadBalancerWithResponse(ctx, body)
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create LoadBalancer", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 201 // FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to create LoadBalancer", "My Custom Error")
@@ -81,14 +81,14 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
+	// TODO: Implement READ operation
 	res, err := r.client.ReadLoadBalancersByIdWithResponse(ctx, data.Id.String())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to read LoadBalancer", "My Custom Error")
@@ -100,7 +100,7 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 }
 
 func (r *LoadBalancerResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 

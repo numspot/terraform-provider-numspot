@@ -5,6 +5,9 @@ default: testacc
 testacc:
 	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 120m
 
+fmt:
+	gofumpt -l -w .
+
 lint-fix:
 	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.55.2 golangci-lint run --fix -v
 

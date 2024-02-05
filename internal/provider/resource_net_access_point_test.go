@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,8 +44,7 @@ func TestAccNetAccessPointResource(t *testing.T) {
 }
 
 func testNetAccessPointConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_net_access_point" "test" {
-  			}`)
+	return `resource "numspot_net_access_point" "test" {}`
 }
 
 func testNetAccessPointConfig_Update() string {

@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,21 +62,15 @@ func (r *DirectLinkInterfaceResource) Create(ctx context.Context, request resour
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := DirectLinkInterfaceFromTfToCreateRequest(data)
-	res, err := r.client.CreateDirectLinkInterfaceWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create DirectLinkInterface", err.Error())
-	}
-
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create DirectLinkInterface", "My Custom Error")
+	res := utils.HandleResponse(func() (*api.CreateDirectLinkInterfaceResponse, error) {
+		body := DirectLinkInterfaceFromTfToCreateRequest(&data)
+		return r.client.CreateDirectLinkInterfaceWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := DirectLinkInterfaceFromHttpToTf(res.JSON200) // FIXME
+	tf := DirectLinkInterfaceFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -81,26 +78,19 @@ func (r *DirectLinkInterfaceResource) Read(ctx context.Context, request resource
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadDirectLinkInterfacesByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read DirectLinkInterface", "My Custom Error")
+	res := utils.HandleResponse(func() (*api.ReadDirectLinkInterfacesByIdResponse, error) {
+		return r.client.ReadDirectLinkInterfacesByIdWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := DirectLinkInterfaceFromHttpToTf(res.JSON200) // FIXME
+	tf := DirectLinkInterfaceFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *DirectLinkInterfaceResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
@@ -108,18 +98,7 @@ func (r *DirectLinkInterfaceResource) Delete(ctx context.Context, request resour
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteDirectLinkInterfaceWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete DirectLinkInterface", err.Error())
-		return
-	}
-
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete DirectLinkInterface", "My Custom Error")
-		return
-	}
+	utils.HandleResponse(func() (*api.DeleteDirectLinkInterfaceResponse, error) {
+		return r.client.DeleteDirectLinkInterfaceWithResponse(ctx, data.Id.String())
+	}, http.StatusOK, &response.Diagnostics)
 }

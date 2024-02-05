@@ -3,9 +3,10 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -62,52 +63,63 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := SecurityGroupFromTfToCreateRequest(data)
-	res, err := r.client.CreateSecurityGroupWithResponse(ctx, body)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
+	res := utils.HandleResponse(func() (*api.CreateSecurityGroupResponse, error) {
+		body := SecurityGroupFromTfToCreateRequest(&data)
+		return r.client.CreateSecurityGroupWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to create SecurityGroup", apiError.Error())
-		return
-	}
 	createdId := res.JSON200.Id
 
 	// Inbound
 	if len(data.InboundRules.Elements()) > 0 {
 		inboundRules := make([]resource_security_group.InboundRulesValue, 0, len(data.InboundRules.Elements()))
 		data.InboundRules.ElementsAs(ctx, &inboundRules, false)
-		ibBody := CreateInboundRulesRequest(ctx, *createdId, inboundRules)
-		createIbRes, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, ibBody)
-		if err != nil {
-			response.Diagnostics.AddError("Failed to create SecurityGroup", err.Error())
-			return
-		}
 
-		if createIbRes.StatusCode() != 200 {
-			apiError := utils.HandleError(createIbRes.Body)
-			response.Diagnostics.AddError("Failed to create SecurityGroup", apiError.Error())
+		createdIbdRules := utils.HandleResponse(func() (*api.CreateSecurityGroupRuleResponse, error) {
+			body := CreateInboundRulesRequest(ctx, *createdId, inboundRules)
+			return r.client.CreateSecurityGroupRuleWithResponse(ctx, body)
+		}, http.StatusOK, &response.Diagnostics)
+		if createdIbdRules == nil {
 			return
 		}
 	}
 
 	// Outbound
 	if len(data.OutboundRules.Elements()) > 0 {
-		outboundRules := make([]resource_security_group.OutboundRulesValue, 0, len(data.OutboundRules.Elements()))
-		data.OutboundRules.ElementsAs(ctx, &outboundRules, false)
-		otbBody := CreateOutboundRulesRequest(ctx, *createdId, outboundRules)
-		createOtbRes, err := r.client.CreateSecurityGroupRuleWithResponse(ctx, otbBody)
-		if err != nil {
-			response.Diagnostics.AddError("Failed to create SecurityGroup outbound rule", err.Error())
-			return
+		// Delete default SG rule: (0.0.0.0/0 -1)
+		hRules := *res.JSON200.OutboundRules
+		rules := make([]api.SecurityGroupRuleSchema, 0, len(hRules))
+		for _, e := range hRules {
+			rules = append(rules, api.SecurityGroupRuleSchema{
+				FromPortRange:         e.FromPortRange,
+				IpProtocol:            e.IpProtocol,
+				IpRanges:              e.IpRanges,
+				SecurityGroupsMembers: e.SecurityGroupsMembers,
+				ServiceIds:            e.ServiceIds,
+				ToPortRange:           e.ToPortRange,
+			})
 		}
 
-		if createOtbRes.StatusCode() != 200 {
-			apiError := utils.HandleError(createOtbRes.Body)
-			response.Diagnostics.AddError("Failed to create SecurityGroup outbound rule", apiError.Error())
+		utils.HandleResponse(func() (*api.DeleteSecurityGroupRuleResponse, error) {
+			body := api.DeleteSecurityGroupRuleJSONRequestBody{
+				Flow:  "Outbound",
+				Rules: &rules,
+			}
+			return r.client.DeleteSecurityGroupRuleWithResponse(ctx, *createdId, body)
+		}, http.StatusOK, &response.Diagnostics)
+
+		// Create SG rules:
+		outboundRules := make([]resource_security_group.OutboundRulesValue, 0, len(data.OutboundRules.Elements()))
+		data.OutboundRules.ElementsAs(ctx, &outboundRules, false)
+
+		createdObdRules := utils.HandleResponse(func() (*api.CreateSecurityGroupRuleResponse, error) {
+			body := CreateOutboundRulesRequest(ctx, *createdId, outboundRules)
+			return r.client.CreateSecurityGroupRuleWithResponse(ctx, body)
+		}, http.StatusOK, &response.Diagnostics)
+		if createdObdRules == nil {
 			return
 		}
 	}
@@ -118,9 +130,9 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	tf, diag := SecurityGroupFromHttpToTf(ctx, read.JSON200)
-	if diag.HasError() {
-		response.Diagnostics.Append(diag...)
+	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, data, read.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
 		return
 	}
 
@@ -131,15 +143,14 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement READ operation
 	res := r.readSecurityGroup(ctx, data.Id.ValueString(), response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tf, diag := SecurityGroupFromHttpToTf(ctx, res.JSON200)
-	if diag.HasError() {
-		response.Diagnostics.Append(diag...)
+	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, data, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -148,17 +159,17 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 func (r *SecurityGroupResource) readSecurityGroup(
 	ctx context.Context,
 	id string,
-	diag diag.Diagnostics,
+	diagnostics diag.Diagnostics,
 ) *api.ReadSecurityGroupsByIdResponse {
 	res, err := r.client.ReadSecurityGroupsByIdWithResponse(ctx, id)
 	if err != nil {
-		diag.AddError("Failed to read RouteTable", err.Error())
+		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
 	}
 
 	if res.StatusCode() != http.StatusOK {
 		apiError := utils.HandleError(res.Body)
-		diag.AddError("Failed to read SecurityGroup", apiError.Error())
+		diagnostics.AddError("Failed to read SecurityGroup", apiError.Error())
 		return nil
 	}
 
@@ -173,15 +184,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res, err := r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.ValueString(), api.DeleteSecurityGroupRequestSchema{})
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete SecurityGroup", err.Error())
-		return
-	}
-
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to delete SecurityGroup", apiError.Error())
-		return
-	}
+	_ = utils.HandleResponse(func() (*api.DeleteSecurityGroupResponse, error) {
+		return r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.ValueString(), api.DeleteSecurityGroupRequestSchema{})
+	}, http.StatusOK, &response.Diagnostics)
 }

@@ -12,13 +12,14 @@ func TestAccRouteTableResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	netId := "vpc-6f82f006"
+	netIpRange := "10.101.0.0/16"
+	subnetIpRange := "10.101.1.0/24"
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testRouteTableConfig(netId),
+				Config: testRouteTableConfig(netIpRange, subnetIpRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
@@ -35,7 +36,7 @@ func TestAccRouteTableResource(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testRouteTableConfig(netId),
+				Config: testRouteTableConfig(netIpRange, subnetIpRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
@@ -47,19 +48,29 @@ func TestAccRouteTableResource(t *testing.T) {
 	})
 }
 
-func testRouteTableConfig(netId string) string {
+func testRouteTableConfig(netIpRange, subnetIpRange string) string {
 	return fmt.Sprintf(`
+resource "numspot_net" "net" {
+  ip_range = %[1]q
+}
+
+resource "numspot_subnet" "subnet" {
+  net_id                  = numspot_net.net.id
+  ip_range                = %[2]q
+}
+
 resource "numspot_internet_service" "test" {
-	net_id = %[1]q
+	net_id = numspot_net.net.id
 }
 
 resource "numspot_route_table" "test" {
-	net_id =  %[1]q
+	net_id =  numspot_net.net.id
+	subnet_id = numspot_subnet.subnet.id
 	routes = [
 		{
 			destination_ip_range 	= "0.0.0.0/0"
 			gateway_id 	 			= numspot_internet_service.test.id
 		}
 	]
-}`, netId)
+}`, netIpRange, subnetIpRange)
 }

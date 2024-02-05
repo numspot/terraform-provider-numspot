@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,8 +44,7 @@ func TestAccLoadBalancerResource(t *testing.T) {
 }
 
 func testLoadBalancerConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_load_balancer" "test" {
-  			}`)
+	return `resource "numspot_load_balancer" "test" {}`
 }
 
 func testLoadBalancerConfig_Update() string {

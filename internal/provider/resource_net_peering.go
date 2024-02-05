@@ -59,14 +59,14 @@ func (r *NetPeeringResource) Create(ctx context.Context, request resource.Create
 	var data resource_net_peering.NetPeeringModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := NetPeeringFromTfToCreateRequest(data)
+	body := NetPeeringFromTfToCreateRequest(&data)
 	res, err := r.client.CreateNetPeeringWithResponse(ctx, body)
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create NetPeering", err.Error())
 	}
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
+	expectedStatusCode := 201 // FIXME: Set expected status code (must be 201)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to create NetPeering", "My Custom Error")
@@ -81,14 +81,14 @@ func (r *NetPeeringResource) Read(ctx context.Context, request resource.ReadRequ
 	var data resource_net_peering.NetPeeringModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
+	// TODO: Implement READ operation
 	res, err := r.client.ReadNetPeeringsByIdWithResponse(ctx, data.Id.String())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
 	}
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
+	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
 	if res.StatusCode() != expectedStatusCode {
 		// TODO: Handle NumSpot error
 		response.Diagnostics.AddError("Failed to read NetPeering", "My Custom Error")
@@ -100,7 +100,7 @@ func (r *NetPeeringResource) Read(ctx context.Context, request resource.ReadRequ
 }
 
 func (r *NetPeeringResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 

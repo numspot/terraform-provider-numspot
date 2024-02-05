@@ -3,8 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -13,9 +14,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_internet_service"
 )
 
-var _ resource.Resource = &InternetServiceResource{}
-var _ resource.ResourceWithConfigure = &InternetServiceResource{}
-var _ resource.ResourceWithImportState = &InternetServiceResource{}
+var (
+	_ resource.Resource                = &InternetServiceResource{}
+	_ resource.ResourceWithConfigure   = &InternetServiceResource{}
+	_ resource.ResourceWithImportState = &InternetServiceResource{}
+)
 
 type InternetServiceResource struct {
 	client *api.ClientWithResponses
@@ -59,8 +62,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	var data resource_internet_service.InternetServiceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := InternetServiceFromTfToCreateRequest(data)
-	res, err := r.client.CreateInternetServiceWithResponse(ctx, body)
+	res, err := r.client.CreateInternetServiceWithResponse(ctx)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create InternetService", err.Error())
 		return
@@ -71,11 +73,11 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 		response.Diagnostics.AddError("Failed to create InternetService", apiError.Error())
 		return
 	}
-	//Update state
+	// Update state
 	tf := InternetServiceFromHttpToTf(res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 
-	//Call Link Internet Service to VPC
+	// Call Link Internet Service to VPC
 	netID := data.NetId
 	if !netID.IsNull() {
 		reslink, errlink := r.client.LinkInternetServiceWithResponse(
@@ -94,7 +96,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 			response.Diagnostics.AddError("Failed to link InternetService to net", apiError.Error())
 			return
 		}
-		//Update state
+		// Update state
 		tf.NetId = data.NetId
 		response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 	}
@@ -139,10 +141,10 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 			response.Diagnostics.AddError("Failed to unlink InternetService from net", err.Error())
 			return
 		}
-		expectedStatusCode := 200
-		if res.StatusCode() != expectedStatusCode {
+
+		if res.StatusCode() != http.StatusOK {
 			apiError := utils.HandleError(res.Body)
-			response.Diagnostics.AddError("Failed to create InternetService", apiError.Error())
+			response.Diagnostics.AddError("Failed to unlink InternetService from net", apiError.Error())
 			return
 		}
 	}

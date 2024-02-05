@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -10,7 +11,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func SecurityGroupFromTfToHttp(tf resource_security_group.SecurityGroupModel) *api.SecurityGroupSchema {
+func SecurityGroupFromTfToHttp(tf *resource_security_group.SecurityGroupModel) *api.SecurityGroupSchema {
 	return &api.SecurityGroupSchema{
 		Id:            tf.Id.ValueStringPointer(),
 		AccountId:     tf.AccountId.ValueStringPointer(),
@@ -84,35 +85,104 @@ func OutboundRuleFromHttpToTf(ctx context.Context, rules api.SecurityGroupRuleSc
 	)
 }
 
-func SecurityGroupFromHttpToTf(ctx context.Context, http *api.SecurityGroupSchema) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
-	ibds := make([]resource_security_group.InboundRulesValue, 0, len(*http.InboundRules))
+func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_group.SecurityGroupModel, http *api.SecurityGroupSchema) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
+	ibd := make([]resource_security_group.InboundRulesValue, 0, len(*http.InboundRules))
 	for _, e := range *http.InboundRules {
-		value, diag := InboundRuleFromHttpToTf(ctx, e)
-		if diag.HasError() {
-			return nil, diag
+		value, diagnostics := InboundRuleFromHttpToTf(ctx, e)
+		if diagnostics.HasError() {
+			return nil, diagnostics
 		}
 
-		ibds = append(ibds, value)
+		ibd = append(ibd, value)
 	}
 
-	obds := make([]resource_security_group.OutboundRulesValue, 0, len(*http.OutboundRules))
+	obd := make([]resource_security_group.OutboundRulesValue, 0, len(*http.OutboundRules))
 	for _, e := range *http.OutboundRules {
-		value, diag := OutboundRuleFromHttpToTf(ctx, e)
-		if diag.HasError() {
-			return nil, diag
+		value, diagnostics := OutboundRuleFromHttpToTf(ctx, e)
+		if diagnostics.HasError() {
+			return nil, diagnostics
 		}
 
-		obds = append(obds, value)
+		obd = append(obd, value)
 	}
 
-	ibdsTf, diag := types.ListValueFrom(ctx, resource_security_group.InboundRulesValue{}.Type(ctx), ibds)
-	if diag.HasError() {
-		return nil, diag
+	// Reordering rules, to match state because osc is reordering security group rules
+	if len(model.InboundRules.Elements()) > 0 {
+		modelIbd := make([]resource_security_group.InboundRulesValue, 0, len(model.InboundRules.Elements()))
+		if diagnostics := model.InboundRules.ElementsAs(ctx, &modelIbd, false); diagnostics.HasError() {
+			return nil, diagnostics
+		}
+
+		m := true
+		for m {
+			m = false
+
+			posA := -1
+			posB := -1
+
+			for i := range ibd {
+				eA := &ibd[i]
+				for j := range modelIbd {
+					eB := &modelIbd[j]
+					if eA.FromPortRange.Equal(eB.FromPortRange) &&
+						eA.ToPortRange.Equal(eB.ToPortRange) &&
+						eA.IpProtocol.Equal(eB.IpProtocol) &&
+						eA.IpRanges.Equal(eB.IpRanges) {
+						posA = i
+						posB = j
+					}
+				}
+			}
+
+			if posA != -1 && posA != posB {
+				ibd[posA], ibd[posB] = ibd[posB], ibd[posA]
+				m = true
+			}
+		}
 	}
 
-	obdsTf, diag := types.ListValueFrom(ctx, resource_security_group.OutboundRulesValue{}.Type(ctx), obds)
-	if diag.HasError() {
-		return nil, diag
+	if len(model.OutboundRules.Elements()) > 0 {
+		modelObd := make([]resource_security_group.OutboundRulesValue, 0, len(model.OutboundRules.Elements()))
+		if diagnostics := model.OutboundRules.ElementsAs(ctx, &modelObd, false); diagnostics.HasError() {
+			return nil, diagnostics
+		}
+
+		m := true
+		for m {
+			m = false
+
+			posA := -1
+			posB := -1
+
+			for i := range obd {
+				eA := &ibd[i]
+				for j := range modelObd {
+					eB := &modelObd[j]
+					if eA.FromPortRange.Equal(eB.FromPortRange) &&
+						eA.ToPortRange.Equal(eB.ToPortRange) &&
+						eA.IpProtocol.Equal(eB.IpProtocol) &&
+						eA.IpRanges.Equal(eB.IpRanges) {
+						posA = i
+						posB = j
+					}
+				}
+			}
+
+			if posA != -1 && posA != posB {
+				obd[posA], obd[posB] = obd[posB], obd[posA]
+				m = true
+			}
+		}
+	}
+
+	ibdsTf, diagnostics := types.ListValueFrom(ctx, resource_security_group.InboundRulesValue{}.Type(ctx), ibd)
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
+
+	obdsTf, diagnostics := types.ListValueFrom(ctx, resource_security_group.OutboundRulesValue{}.Type(ctx), obd)
+	if diagnostics.HasError() {
+		return nil, diagnostics
 	}
 
 	res := resource_security_group.SecurityGroupModel{
@@ -128,17 +198,18 @@ func SecurityGroupFromHttpToTf(ctx context.Context, http *api.SecurityGroupSchem
 	return &res, nil
 }
 
-func SecurityGroupFromTfToCreateRequest(tf resource_security_group.SecurityGroupModel) api.CreateSecurityGroupJSONRequestBody {
+func SecurityGroupFromTfToCreateRequest(tf *resource_security_group.SecurityGroupModel) api.CreateSecurityGroupJSONRequestBody {
 	return api.CreateSecurityGroupJSONRequestBody{
 		Description: tf.Description.ValueString(),
 		NetId:       tf.NetId.ValueStringPointer(),
-		Name:        tf.Name.ValueStringPointer(),
+		Name:        tf.Name.ValueString(),
 	}
 }
 
 func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource_security_group.InboundRulesValue) api.CreateSecurityGroupRuleJSONRequestBody {
 	rules := make([]api.SecurityGroupRuleSchema, 0, len(data))
-	for _, e := range data {
+	for i := range data {
+		e := &data[i]
 		fpr := int(e.FromPortRange.ValueInt64())
 		tpr := int(e.ToPortRange.ValueInt64())
 
@@ -170,7 +241,9 @@ func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource
 
 func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []resource_security_group.OutboundRulesValue) api.CreateSecurityGroupRuleJSONRequestBody {
 	rules := make([]api.SecurityGroupRuleSchema, 0, len(data))
-	for _, e := range data {
+	for i := range data {
+		e := &data[i]
+
 		fpr := int(e.FromPortRange.ValueInt64())
 		tpr := int(e.ToPortRange.ValueInt64())
 

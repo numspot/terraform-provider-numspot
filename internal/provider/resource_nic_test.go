@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,9 +44,7 @@ func TestAccNicResource(t *testing.T) {
 }
 
 func testNicConfig_Create() string {
-	return fmt.Sprintf(`
-resource "numspot_nic" "test" {
-}`)
+	return `resource "numspot_nic" "test" {}`
 }
 
 func testNicConfig_Update() string {

@@ -7,7 +7,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_net"
 )
 
-func NetFromTfToHttp(tf resource_net.NetModel) *api.NetSchema {
+func NetFromTfToHttp(tf *resource_net.NetModel) *api.NetSchema {
 	return &api.NetSchema{
 		DhcpOptionsSetId: tf.DhcpOptionsSetId.ValueStringPointer(),
 		Id:               tf.Id.ValueStringPointer(),
@@ -27,7 +27,7 @@ func NetFromHttpToTf(http *api.NetSchema) resource_net.NetModel {
 	}
 }
 
-func NetFromTfToCreateRequest(tf resource_net.NetModel) api.CreateNetJSONRequestBody {
+func NetFromTfToCreateRequest(tf *resource_net.NetModel) api.CreateNetJSONRequestBody {
 	return api.CreateNetJSONRequestBody{
 		IpRange: tf.IpRange.ValueString(),
 		Tenancy: tf.Tenancy.ValueStringPointer(),

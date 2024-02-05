@@ -3,6 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,21 +62,12 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := VolumeFromTfToCreateRequest(data)
-	res, err := r.client.CreateVolumeWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create Volume", err.Error())
-	}
+	res := utils.HandleResponse(func() (*api.CreateVolumeResponse, error) {
+		body := VolumeFromTfToCreateRequest(&data)
+		return r.client.CreateVolumeWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
 
-	expectedStatusCode := 201 //FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create Volume", "My Custom Error")
-		return
-	}
-
-	tf := VolumeFromHttpToTf(res.JSON200) // FIXME
+	tf := VolumeFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -81,26 +75,15 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	//TODO: Implement READ operation
-	res, err := r.client.ReadVolumesByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
+	res := utils.HandleResponse(func() (*api.ReadVolumesByIdResponse, error) {
+		return r.client.ReadVolumesByIdWithResponse(ctx, data.Id.String())
+	}, http.StatusOK, &response.Diagnostics)
 
-	expectedStatusCode := 200 //FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read Volume", "My Custom Error")
-		return
-	}
-
-	tf := VolumeFromHttpToTf(res.JSON200) // FIXME
+	tf := VolumeFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
 	panic("implement me")
 }
 
@@ -108,18 +91,7 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteVolumeWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete Volume", err.Error())
-		return
-	}
-
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete Volume", "My Custom Error")
-		return
-	}
+	utils.HandleResponse(func() (*api.DeleteVolumeResponse, error) {
+		return r.client.DeleteVolumeWithResponse(ctx, data.Id.String())
+	}, http.StatusOK, &response.Diagnostics)
 }

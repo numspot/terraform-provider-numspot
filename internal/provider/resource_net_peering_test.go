@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -45,11 +44,9 @@ func TestAccNetPeeringResource(t *testing.T) {
 }
 
 func testNetPeeringConfig_Create() string {
-	return fmt.Sprintf(`resource "numspot_net_peering" "test" {
-  			}`)
+	return `resource "numspot_net_peering" "test" {}`
 }
 
 func testNetPeeringConfig_Update() string {
-	return `resource "numspot_net_peering" "test" {
-    			}`
+	return `resource "numspot_net_peering" "test" {}`
 }

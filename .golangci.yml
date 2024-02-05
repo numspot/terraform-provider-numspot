@@ -33,7 +33,7 @@ linters:
     - "errchkjson"
     - "nilerr"
     - "nilnil"
-    - "wrapcheck"
+    # - "wrapcheck"
     # sql
     - "rowserrcheck"
     - "sqlclosecheck"

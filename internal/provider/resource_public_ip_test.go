@@ -10,7 +10,7 @@ import (
 
 func TestAccPublicIpResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
-	vmid := "i-93372752" //labeled test_tf_publicIP in OSC cockpit
+	vmid := "i-93372752" // labeled test_tf_publicIP in OSC cockpit
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
@@ -56,18 +56,15 @@ func TestAccPublicIpResource(t *testing.T) {
 }
 
 func testPublicIpConfig() string {
-	return fmt.Sprintf(`resource "numspot_public_ip" "test" {
-
-}`)
+	return `resource "numspot_public_ip" "test" {}`
 }
 
 func testPublicIpConfig_Update(vmid string) string {
 	return fmt.Sprintf(`resource "numspot_public_ip" "test" {
                         vm_id="%s"
-                        }`, vmid)
+}`, vmid)
 }
 
 func testPublicIpConfig_UpdateUnlink() string {
-	return fmt.Sprintf(`resource "numspot_public_ip" "test" {
-                        }`)
+	return `resource "numspot_public_ip" "test" {}`
 }
