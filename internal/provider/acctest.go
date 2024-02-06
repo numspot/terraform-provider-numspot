@@ -6,5 +6,5 @@ import (
 )
 
 var TestAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-	"numspot": providerserver.NewProtocol6WithError(New("0.1", false)()),
+	"numspot": providerserver.NewProtocol6WithError(New("0.1", true)()),
 }
