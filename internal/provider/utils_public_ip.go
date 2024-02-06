@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
@@ -10,13 +11,15 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
 )
 
+var errNicVmConflict = fmt.Errorf("couldn't have nicID and vmID at the same time")
+
 type PublicIPChangeSet struct {
 	Unlink bool
 	Link   bool
 	Err    error
 }
 
-func ComputePublicIPChangeSet(plan, state resource_public_ip.PublicIpModel) PublicIPChangeSet {
+func ComputePublicIPChangeSet(plan, state *resource_public_ip.PublicIpModel) PublicIPChangeSet {
 	c := PublicIPChangeSet{Err: nil}
 	c.Unlink = plan.VmId.IsNull() && !state.VmId.IsNull() ||
 		plan.NicId.IsUnknown() && !state.NicId.IsNull()
