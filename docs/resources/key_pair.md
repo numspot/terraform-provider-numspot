@@ -30,7 +30,7 @@ resource "numspot_key_pair" "import" {
 
 ### Required
 
-- `keypair_name` (String) A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
+- `name` (String) A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
 
 ### Optional
 
@@ -40,5 +40,4 @@ resource "numspot_key_pair" "import" {
 ### Read-Only
 
 - `fingerprint` (String) The MD5 public key fingerprint as specified in section 4 of RFC 4716.
-- `name` (String) The name of the keypair.
 - `private_key` (String) The private key. When saving the private key in a .rsa file, replace the `\n` escape sequences with line breaks.

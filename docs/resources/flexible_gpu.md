@@ -24,9 +24,9 @@ description: |-
 
 - `delete_on_vm_deletion` (Boolean) If true, the fGPU is deleted when the VM is terminated.
 - `generation` (String) The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU).
+- `vm_id` (String) The ID of the VM the fGPU is attached to, if any.
 
 ### Read-Only
 
 - `id` (String) The ID of the fGPU.
 - `state` (String) The state of the fGPU (`allocated` \| `attaching` \| `attached` \| `detaching`).
-- `vm_id` (String) The ID of the VM the fGPU is attached to, if any.
