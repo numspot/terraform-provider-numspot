@@ -66,6 +66,9 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		body := ImageFromTfToCreateRequest(&data)
 		return r.client.CreateImageWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
 
 	tf := ImageFromHttpToTf(res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)

@@ -13,12 +13,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
+type NSError struct {
+	Type    string `json:"Type"`
+	Details string `json:"Details"`
+	Code    string `json:"Code"`
+}
+
 type ApiError struct {
-	Errors []struct {
-		Type    string `json:"Type"`
-		Details string `json:"Details"`
-		Code    string `json:"Code"`
-	} `json:"Errors"`
+	Errors          []NSError `json:"Errors"`
 	ResponseContext struct {
 		RequestID string `json:"RequestId"`
 	} `json:"ResponseContext"`
@@ -39,7 +41,7 @@ func HandleError(httpResponseBody []byte) error {
 	apiError := ApiError{}
 	err := json.Unmarshal(httpResponseBody, &apiError)
 	if err != nil {
-		apiError.Errors[0].Details = string(httpResponseBody)
+		apiError.Errors = append(apiError.Errors, NSError{Details: string(httpResponseBody)})
 	}
 
 	return apiError

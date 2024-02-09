@@ -13,9 +13,9 @@ func TestAccNicResource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testNicConfig_Create(),
+				Config: testNicConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_nic.test", "field", "value"),
+					resource.TestCheckResourceAttr("numspot_nic.subnet_id", "field", "value"),
 					resource.TestCheckResourceAttrWith("numspot_nic.test", "field", func(v string) error {
 						require.NotEmpty(t, v)
 						return nil
@@ -31,7 +31,7 @@ func TestAccNicResource(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testNicConfig_Update(),
+				Config: testNicConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_nic.test", "field", "value"),
 					resource.TestCheckResourceAttrWith("numspot_nic.test", "field", func(v string) error {
@@ -43,11 +43,20 @@ func TestAccNicResource(t *testing.T) {
 	})
 }
 
-func testNicConfig_Create() string {
-	return `resource "numspot_nic" "test" {}`
+func testNicConfig() string {
+	return `
+resource "numspot_net" "net" {
+  ip_range = "10.101.0.0/16"
 }
 
-func testNicConfig_Update() string {
-	return `resource "numspot_nic" "test" {
-    			}`
+resource "numspot_subnet" "subnet" {
+	net_id 		= numspot_net.net.id
+	ip_range 	= "10.101.1.0/24"
+}
+
+
+resource "numspot_nic" "test" {
+	subnet_id = numspot_subnet.subnet.id
+}
+`
 }

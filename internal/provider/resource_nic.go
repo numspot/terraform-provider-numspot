@@ -63,14 +63,14 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.CreateNicResponse, error) {
-		body := NicFromTfToCreateRequest(&data)
+		body := NicFromTfToCreateRequest(ctx, &data)
 		return r.client.CreateNicWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf := NicFromHttpToTf(res.JSON200)
+	tf := NicFromHttpToTf(ctx, res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -85,7 +85,7 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 		return
 	}
 
-	tf := NicFromHttpToTf(res.JSON200)
+	tf := NicFromHttpToTf(ctx, res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

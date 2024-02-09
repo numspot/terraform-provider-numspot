@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -33,7 +32,28 @@ func IsTfValueNull(val attr.Value) bool {
 	return false
 }
 
-func FromStringListToTfStringList(arr []string) (types.List, diag.Diagnostics) {
-	ctx := context.Background()
+func FromStringListToTfStringList(ctx context.Context, arr []string) (types.List, diag.Diagnostics) {
 	return types.ListValueFrom(ctx, types.StringType, arr)
+}
+
+func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list types.List) []B {
+	tfList := make([]A, 0, len(list.Elements()))
+	res := make([]B, 0, len(list.Elements()))
+
+	list.ElementsAs(ctx, &tfList, false)
+	for _, e := range tfList {
+		res = append(res, fun(e))
+	}
+
+	return res
+}
+
+type generated_resource interface {
+	Type() attr.Type
+}
+
+func TfStringListToStringList(ctx context.Context, list types.List) []string {
+	return TfListToGenericList(func(a types.String) string {
+		return a.ValueString()
+	}, ctx, list)
 }

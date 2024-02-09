@@ -44,7 +44,10 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 }
 
 func testFlexibleGpuConfig_Create() string {
-	return `resource "numspot_flexible_gpu" "test" {}`
+	return `
+resource "numspot_flexible_gpu" "test" {
+	
+}`
 }
 
 func testFlexibleGpuConfig_Update() string {
