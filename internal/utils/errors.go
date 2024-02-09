@@ -59,7 +59,7 @@ func getCallerFunctionName() string {
 	return fn.Name()
 }
 
-func HandleResponse[A openapi3filter.StatusCoder](fun func() (*A, error), expectedStatusCode int, diagnostics *diag.Diagnostics) *A {
+func ExecuteRequest[A openapi3filter.StatusCoder](fun func() (*A, error), expectedStatusCode int, diagnostics *diag.Diagnostics) *A {
 	res, err := fun()
 	if err != nil {
 		diagnostics.AddError("Failed", err.Error())

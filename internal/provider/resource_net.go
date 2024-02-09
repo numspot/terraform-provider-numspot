@@ -64,7 +64,7 @@ func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest
 	var data resource_net.NetModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateNetResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateNetResponse, error) {
 		body := NetFromTfToCreateRequest(&data)
 		return r.client.CreateNetWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -77,7 +77,7 @@ func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest
 		Pending: []string{"pending"},
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
-			readRes := utils.HandleResponse(func() (*api.ReadNetsByIdResponse, error) {
+			readRes := utils.ExecuteRequest(func() (*api.ReadNetsByIdResponse, error) {
 				return r.client.ReadNetsByIdWithResponse(ctx, createdId)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
@@ -104,7 +104,7 @@ func (r *NetResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data resource_net.NetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadNetsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadNetsByIdResponse, error) {
 		return r.client.ReadNetsByIdWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -123,7 +123,7 @@ func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_net.NetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.DeleteNetResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.DeleteNetResponse, error) {
 		return r.client.DeleteNetWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -134,7 +134,7 @@ func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest
 		Pending: []string{"pending", "available", "deleting"},
 		Target:  []string{"deleted"},
 		Refresh: func() (result interface{}, state string, err error) {
-			// Do not use utils.HandleResponse to access error response to know if it's a 404 Not Found expected response
+			// Do not use utils.ExecuteRequest to access error response to know if it's a 404 Not Found expected response
 			readNetRes, err := r.client.ReadNetsByIdWithResponse(ctx, data.Id.ValueString())
 			if err != nil {
 				response.Diagnostics.AddError("Failed to read Net on delete", err.Error())

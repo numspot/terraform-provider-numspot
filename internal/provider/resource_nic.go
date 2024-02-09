@@ -62,7 +62,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateNicResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateNicResponse, error) {
 		body := NicFromTfToCreateRequest(&data)
 		return r.client.CreateNicWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -78,7 +78,7 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadNicsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadNicsByIdResponse, error) {
 		return r.client.ReadNicsByIdWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -98,7 +98,7 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.HandleResponse(func() (*api.DeleteNicResponse, error) {
+	_ = utils.ExecuteRequest(func() (*api.DeleteNicResponse, error) {
 		return r.client.DeleteNicWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

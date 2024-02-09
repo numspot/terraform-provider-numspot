@@ -63,7 +63,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateSecurityGroupResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateSecurityGroupResponse, error) {
 		body := SecurityGroupFromTfToCreateRequest(&data)
 		return r.client.CreateSecurityGroupWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -78,7 +78,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		inboundRules := make([]resource_security_group.InboundRulesValue, 0, len(data.InboundRules.Elements()))
 		data.InboundRules.ElementsAs(ctx, &inboundRules, false)
 
-		createdIbdRules := utils.HandleResponse(func() (*api.CreateSecurityGroupRuleResponse, error) {
+		createdIbdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateInboundRulesRequest(ctx, *createdId, inboundRules)
 			return r.client.CreateSecurityGroupRuleWithResponse(ctx, body)
 		}, http.StatusOK, &response.Diagnostics)
@@ -103,7 +103,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 			})
 		}
 
-		utils.HandleResponse(func() (*api.DeleteSecurityGroupRuleResponse, error) {
+		utils.ExecuteRequest(func() (*api.DeleteSecurityGroupRuleResponse, error) {
 			body := api.DeleteSecurityGroupRuleJSONRequestBody{
 				Flow:  "Outbound",
 				Rules: &rules,
@@ -115,7 +115,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		outboundRules := make([]resource_security_group.OutboundRulesValue, 0, len(data.OutboundRules.Elements()))
 		data.OutboundRules.ElementsAs(ctx, &outboundRules, false)
 
-		createdObdRules := utils.HandleResponse(func() (*api.CreateSecurityGroupRuleResponse, error) {
+		createdObdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateOutboundRulesRequest(ctx, *createdId, outboundRules)
 			return r.client.CreateSecurityGroupRuleWithResponse(ctx, body)
 		}, http.StatusOK, &response.Diagnostics)
@@ -184,7 +184,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.HandleResponse(func() (*api.DeleteSecurityGroupResponse, error) {
+	_ = utils.ExecuteRequest(func() (*api.DeleteSecurityGroupResponse, error) {
 		return r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.ValueString(), api.DeleteSecurityGroupRequestSchema{})
 	}, http.StatusOK, &response.Diagnostics)
 }

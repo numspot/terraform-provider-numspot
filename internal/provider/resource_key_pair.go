@@ -62,7 +62,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateKeypairResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateKeypairResponse, error) {
 		body := KeyPairFromTfToCreateRequest(&data)
 		return r.client.CreateKeypairWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -85,7 +85,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadKeypairsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadKeypairsByIdResponse, error) {
 		return r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -115,7 +115,7 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.HandleResponse(func() (*api.DeleteKeypairResponse, error) {
+	utils.ExecuteRequest(func() (*api.DeleteKeypairResponse, error) {
 		return r.client.DeleteKeypairWithResponse(ctx, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 }

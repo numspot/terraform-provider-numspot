@@ -62,7 +62,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateImageResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateImageResponse, error) {
 		body := ImageFromTfToCreateRequest(&data)
 		return r.client.CreateImageWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -75,7 +75,7 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadImagesByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadImagesByIdResponse, error) {
 		return r.client.ReadImagesByIdWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
@@ -92,7 +92,7 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.HandleResponse(func() (*api.DeleteImageResponse, error) {
+	utils.ExecuteRequest(func() (*api.DeleteImageResponse, error) {
 		return r.client.DeleteImageWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

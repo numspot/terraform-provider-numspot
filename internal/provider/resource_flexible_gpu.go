@@ -65,7 +65,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateFlexibleGpuResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateFlexibleGpuResponse, error) {
 		body := FlexibleGpuFromTfToCreateRequest(&data)
 		return r.client.CreateFlexibleGpuWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -132,7 +132,7 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.HandleResponse(func() (*api.DeleteFlexibleGpuResponse, error) {
+	utils.ExecuteRequest(func() (*api.DeleteFlexibleGpuResponse, error) {
 		return r.client.DeleteFlexibleGpuWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

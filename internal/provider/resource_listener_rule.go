@@ -62,7 +62,7 @@ func (r *ListenerRuleResource) Create(ctx context.Context, request resource.Crea
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateListenerRuleResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateListenerRuleResponse, error) {
 		body := ListenerRuleFromTfToCreateRequest(&data)
 		return r.client.CreateListenerRuleWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -75,7 +75,7 @@ func (r *ListenerRuleResource) Read(ctx context.Context, request resource.ReadRe
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadListenerRulesByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadListenerRulesByIdResponse, error) {
 		return r.client.ReadListenerRulesByIdWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()))
 	}, http.StatusOK, &response.Diagnostics)
 
@@ -91,7 +91,7 @@ func (r *ListenerRuleResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.HandleResponse(func() (*api.DeleteListenerRuleResponse, error) {
+	utils.ExecuteRequest(func() (*api.DeleteListenerRuleResponse, error) {
 		return r.client.DeleteListenerRuleWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()))
 	}, http.StatusOK, &response.Diagnostics)
 }

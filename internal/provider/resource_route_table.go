@@ -71,7 +71,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateRouteTableResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateRouteTableResponse, error) {
 		body := RouteTableFromTfToCreateRequest(&data)
 		return r.client.CreateRouteTableWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -90,7 +90,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	data.Routes.ElementsAs(ctx, &routes, false)
 	for i := range routes {
 		route := &routes[i]
-		createdRoute := utils.HandleResponse(func() (*api.CreateRouteResponse, error) {
+		createdRoute := utils.ExecuteRequest(func() (*api.CreateRouteResponse, error) {
 			return r.client.CreateRouteWithResponse(ctx, api.CreateRouteJSONRequestBody{
 				DestinationIpRange: route.DestinationIpRange.ValueString(),
 				GatewayId:          route.GatewayId.ValueStringPointer(),
@@ -107,7 +107,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	}
 
 	if !data.SubnetId.IsNull() {
-		linkRes := utils.HandleResponse(func() (*api.LinkRouteTableResponse, error) {
+		linkRes := utils.ExecuteRequest(func() (*api.LinkRouteTableResponse, error) {
 			return r.client.LinkRouteTableWithResponse(ctx, *createdId, api.LinkRouteTableRequestSchema{SubnetId: data.SubnetId.ValueString()})
 		}, http.StatusOK, &response.Diagnostics)
 		if linkRes == nil {

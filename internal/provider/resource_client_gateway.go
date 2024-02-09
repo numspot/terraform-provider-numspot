@@ -62,7 +62,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateClientGatewayResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateClientGatewayResponse, error) {
 		body := ClientGatewayFromTfToCreateRequest(&data)
 		return r.client.CreateClientGatewayWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -78,7 +78,7 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadClientGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadClientGatewaysByIdResponse, error) {
 		return r.client.ReadClientGatewaysByIdWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -98,7 +98,7 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.DeleteClientGatewayResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.DeleteClientGatewayResponse, error) {
 		return r.client.DeleteClientGatewayWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {

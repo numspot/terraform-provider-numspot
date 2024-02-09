@@ -62,7 +62,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateVpnConnectionResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateVpnConnectionResponse, error) {
 		body := VpnConnectionFromTfToCreateRequest(&data)
 		return r.client.CreateVpnConnectionWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -78,7 +78,7 @@ func (r *VpnConnectionResource) Read(ctx context.Context, request resource.ReadR
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadVpnConnectionsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadVpnConnectionsByIdResponse, error) {
 		return r.client.ReadVpnConnectionsByIdWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -98,7 +98,7 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.DeleteVpnConnectionResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.DeleteVpnConnectionResponse, error) {
 		return r.client.DeleteVpnConnectionWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {

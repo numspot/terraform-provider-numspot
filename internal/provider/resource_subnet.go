@@ -65,7 +65,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateSubnetResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateSubnetResponse, error) {
 		body := SubnetFromTfToCreateRequest(&data)
 		return r.client.CreateSubnetWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -103,7 +103,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	}
 
 	if data.MapPublicIpOnLaunch.ValueBool() {
-		updateRes := utils.HandleResponse(func() (*api.UpdateSubnetResponse, error) {
+		updateRes := utils.ExecuteRequest(func() (*api.UpdateSubnetResponse, error) {
 			return r.client.UpdateSubnetWithResponse(ctx, createdId, api.UpdateSubnetJSONRequestBody{
 				MapPublicIpOnLaunch: true,
 			})
@@ -113,7 +113,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		}
 	}
 
-	readRes := utils.HandleResponse(func() (*api.ReadSubnetsByIdResponse, error) {
+	readRes := utils.ExecuteRequest(func() (*api.ReadSubnetsByIdResponse, error) {
 		return r.client.ReadSubnetsByIdWithResponse(ctx, createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
@@ -128,7 +128,7 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadSubnetsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadSubnetsByIdResponse, error) {
 		return r.client.ReadSubnetsByIdWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -147,7 +147,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.DeleteSubnetResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.DeleteSubnetResponse, error) {
 		return r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {

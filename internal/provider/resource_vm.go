@@ -65,7 +65,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateVmsResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateVmsResponse, error) {
 		body := VmFromTfToCreateRequest(ctx, &data)
 		return r.client.CreateVmsWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -124,7 +124,7 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadVmsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadVmsByIdResponse, error) {
 		id := data.Id.ValueStringPointer()
 		return r.client.ReadVmsByIdWithResponse(ctx, *id)
 	}, http.StatusOK, &response.Diagnostics)
@@ -144,7 +144,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.DeleteVmsResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.DeleteVmsResponse, error) {
 		idsSlice := make([]interface{}, 1)
 		idsSlice[0] = data.Id.ValueString()
 		return r.client.DeleteVmsWithResponse(ctx, idsSlice)

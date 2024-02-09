@@ -62,7 +62,7 @@ func (r *DirectLinkInterfaceResource) Create(ctx context.Context, request resour
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.CreateDirectLinkInterfaceResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateDirectLinkInterfaceResponse, error) {
 		body := DirectLinkInterfaceFromTfToCreateRequest(&data)
 		return r.client.CreateDirectLinkInterfaceWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -78,7 +78,7 @@ func (r *DirectLinkInterfaceResource) Read(ctx context.Context, request resource
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.HandleResponse(func() (*api.ReadDirectLinkInterfacesByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.ReadDirectLinkInterfacesByIdResponse, error) {
 		return r.client.ReadDirectLinkInterfacesByIdWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -98,7 +98,7 @@ func (r *DirectLinkInterfaceResource) Delete(ctx context.Context, request resour
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.HandleResponse(func() (*api.DeleteDirectLinkInterfaceResponse, error) {
+	utils.ExecuteRequest(func() (*api.DeleteDirectLinkInterfaceResponse, error) {
 		return r.client.DeleteDirectLinkInterfaceWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }
