@@ -3,6 +3,8 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,21 +61,19 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := NetAccessPointFromTfToCreateRequest(&data)
-	res, err := r.client.CreateNetAccessPointWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create NetAccessPoint", err.Error())
-	}
-
-	expectedStatusCode := 201 // FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create NetAccessPoint", "My Custom Error")
+	res := utils.ExecuteRequest(func() (*api.CreateNetAccessPointResponse, error) {
+		body := NetAccessPointFromTfToCreateRequest(ctx, &data)
+		return r.client.CreateNetAccessPointWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := NetAccessPointFromHttpToTf(res.JSON200) // FIXME
+	tf := NetAccessPointFromHttpToTf(ctx, res.JSON200, response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -81,26 +81,22 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement READ operation
-	res, err := r.client.ReadNetAccessPointsByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read NetAccessPoint", "My Custom Error")
+	res := utils.ExecuteRequest(func() (*api.ReadNetAccessPointsByIdResponse, error) {
+		return r.client.ReadNetAccessPointsByIdWithResponse(ctx, data.Id.String())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
-	tf := NetAccessPointFromHttpToTf(res.JSON200) // FIXME
+	tf := NetAccessPointFromHttpToTf(ctx, res.JSON200, response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *NetAccessPointResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	// TODO implement me
 	panic("implement me")
 }
 
@@ -108,18 +104,7 @@ func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.De
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteNetAccessPointWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete NetAccessPoint", err.Error())
-		return
-	}
-
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete NetAccessPoint", "My Custom Error")
-		return
-	}
+	_ = utils.ExecuteRequest(func() (*api.DeleteNetAccessPointResponse, error) {
+		return r.client.DeleteNetAccessPointWithResponse(ctx, data.Id.String())
+	}, http.StatusOK, &response.Diagnostics)
 }

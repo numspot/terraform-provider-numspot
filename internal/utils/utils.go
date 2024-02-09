@@ -49,10 +49,6 @@ func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list type
 	return res
 }
 
-type generated_resource interface {
-	Type() attr.Type
-}
-
 func TfStringListToStringList(ctx context.Context, list types.List) []string {
 	return TfListToGenericList(func(a types.String) string {
 		return a.ValueString()

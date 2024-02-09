@@ -1,18 +1,36 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_net_access_point"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func NetAccessPointFromTfToHttp(tf *resource_net_access_point.NetAccessPointModel) *api.NetAccessPointSchema {
-	return &api.NetAccessPointSchema{}
+func NetAccessPointFromHttpToTf(ctx context.Context, http *api.NetAccessPointSchema, diagnostics diag.Diagnostics) *resource_net_access_point.NetAccessPointModel {
+	routeTablesId, diags := types.ListValueFrom(ctx, types.StringType, http.RouteTableIds)
+	if diags.HasError() {
+		diagnostics.Append(diags...)
+		return nil
+	}
+
+	return &resource_net_access_point.NetAccessPointModel{
+		Id:            types.StringPointerValue(http.Id),
+		NetId:         types.StringPointerValue(http.NetId),
+		RouteTableIds: routeTablesId,
+		ServiceName:   types.StringPointerValue(http.ServiceName),
+		State:         types.StringPointerValue(http.State),
+	}
 }
 
-func NetAccessPointFromHttpToTf(http *api.NetAccessPointSchema) resource_net_access_point.NetAccessPointModel {
-	return resource_net_access_point.NetAccessPointModel{}
-}
+func NetAccessPointFromTfToCreateRequest(ctx context.Context, tf *resource_net_access_point.NetAccessPointModel) api.CreateNetAccessPointJSONRequestBody {
+	routeTableIds := utils.TfStringListToStringList(ctx, tf.RouteTableIds)
 
-func NetAccessPointFromTfToCreateRequest(tf *resource_net_access_point.NetAccessPointModel) api.CreateNetAccessPointJSONRequestBody {
-	return api.CreateNetAccessPointJSONRequestBody{}
+	return api.CreateNetAccessPointJSONRequestBody{
+		NetId:         tf.NetId.ValueString(),
+		RouteTableIds: &routeTableIds,
+		ServiceName:   tf.ServiceName.ValueString(),
+	}
 }
