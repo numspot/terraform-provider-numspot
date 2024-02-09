@@ -86,7 +86,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.HandleResponse(func() (*api.ReadKeypairsByIdResponse, error) {
-		return r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.ValueString(), faker) // Use faker to inject token_200 status code
+		return r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -116,6 +116,6 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.HandleResponse(func() (*api.DeleteKeypairResponse, error) {
-		return r.client.DeleteKeypairWithResponse(ctx, data.Id.ValueString(), faker) // Use faker to inject token_200 status code
+		return r.client.DeleteKeypairWithResponse(ctx, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 }

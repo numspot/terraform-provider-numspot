@@ -170,6 +170,11 @@ func (p *numspotProvider) apiClientWithFakeAuth(data *NumspotProviderModel, diag
 }
 
 func faker(_ context.Context, req *http.Request) error {
+	if _, ok := req.Header["Authorization"]; ok {
+		// Si le header existe, le supprimer
+		delete(req.Header, "Authorization")
+	}
+
 	req.Header.Add("Authorization", "Bearer token_200")
 	return nil
 }
