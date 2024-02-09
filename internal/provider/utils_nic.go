@@ -9,7 +9,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func NicFromHttpToTf(ctx context.Context, http *api.NicSchema) resource_nic.NicModel {
+func NicFromHttpToTf(_ context.Context, http *api.NicSchema) resource_nic.NicModel {
 	return resource_nic.NicModel{
 		AccountId:           types.StringPointerValue(http.AccountId),
 		Description:         types.StringPointerValue(http.AccountId),

@@ -3,8 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
