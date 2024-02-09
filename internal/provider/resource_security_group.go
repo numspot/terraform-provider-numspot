@@ -144,7 +144,7 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := r.readSecurityGroup(ctx, data.Id.ValueString(), response.Diagnostics)
-	if response.Diagnostics.HasError() {
+	if response.Diagnostics.HasError() || res == nil {
 		return
 	}
 

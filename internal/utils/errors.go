@@ -39,7 +39,7 @@ func HandleError(httpResponseBody []byte) error {
 	apiError := ApiError{}
 	err := json.Unmarshal(httpResponseBody, &apiError)
 	if err != nil {
-		return fmt.Errorf("Failed to unmarshall: %w", err)
+		apiError.Errors[0].Details = string(httpResponseBody)
 	}
 
 	return apiError
