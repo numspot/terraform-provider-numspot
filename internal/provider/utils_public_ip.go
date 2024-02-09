@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -72,8 +73,7 @@ func invokeLinkPublicIP(ctx context.Context, client *api.ClientWithResponses, da
 	if err != nil {
 		return nil, err
 	}
-	expectedStatusCode := 200
-	if res.StatusCode() != expectedStatusCode {
+	if res.StatusCode() != http.StatusOK {
 		return nil, utils.HandleError(res.Body)
 	}
 
@@ -86,8 +86,7 @@ func invokeUnlinkPublicIP(ctx context.Context, client *api.ClientWithResponses, 
 	if err != nil {
 		return err
 	}
-	expectedStatusCode := 200
-	if res.StatusCode() != expectedStatusCode {
+	if res.StatusCode() != http.StatusOK {
 		return utils.HandleError(res.Body)
 	}
 
@@ -101,8 +100,7 @@ func refreshState(ctx context.Context, client *api.ClientWithResponses, data *re
 		return nil, err
 	}
 
-	expectedStatusCode := 200
-	if res.StatusCode() != expectedStatusCode {
+	if res.StatusCode() != http.StatusOK {
 		apiError := utils.HandleError(res.Body)
 		return nil, apiError
 	}

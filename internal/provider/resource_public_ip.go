@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
-	"net/http"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
@@ -63,19 +62,14 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	var plan, state resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
-	res, err := r.client.CreatePublicIpWithResponse(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create PublicIp", err.Error())
-		return // This is an error, we should return
-	}
-
-	if res.StatusCode() != http.StatusOK { // Use http status code instead of int
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to create PublicIp", apiError.Error())
+	createRes := utils.ExecuteRequest(func() (*api.CreatePublicIpResponse, error) {
+		return r.client.CreatePublicIpWithResponse(ctx)
+	}, http.StatusOK, &response.Diagnostics)
+	if createRes == nil {
 		return
 	}
 
-	PublicIpFromHttpToTf(res.JSON200, &state)
+	PublicIpFromHttpToTf(createRes.JSON200, &state)
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 
 	if plan.VmId.IsNull() && plan.NicId.IsUnknown() {
@@ -104,19 +98,14 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 	var data resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res, err := r.client.ReadPublicIpsByIdWithResponse(ctx, data.Id.ValueString())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
+	readRes := utils.ExecuteRequest(func() (*api.ReadPublicIpsByIdResponse, error) {
+		return r.client.ReadPublicIpsByIdWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if readRes == nil {
 		return
 	}
 
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to read PublicIp", apiError.Error())
-		return
-	}
-
-	PublicIpFromHttpToTf(res.JSON200, &data)
+	PublicIpFromHttpToTf(readRes.JSON200, &data)
 	response.Diagnostics.Append(response.State.Set(ctx, data)...)
 }
 
@@ -146,13 +135,13 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 	if chgSet.Unlink {
 		if err := invokeUnlinkPublicIP(ctx, r.client, &state); err != nil {
 			response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
-			// Return ?
+			return
 		}
 		state.LinkPublicIP = types.StringNull()
 		data, err := refreshState(ctx, r.client, &state)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
-			// Return ?
+			return
 		}
 		response.Diagnostics.Append(response.State.Set(ctx, *data)...)
 	}
@@ -161,14 +150,14 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 		linkPublicIP, err = invokeLinkPublicIP(ctx, r.client, &plan)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to link public IP", err.Error())
-			// Err ?
+			return
 		}
 		state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
 	}
 	data, err := refreshState(ctx, r.client, &state)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
-		// Err ?
+		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, *data)...)
 }
@@ -177,22 +166,13 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 	var state resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
-	if !state.LinkPublicIP.IsNull() || !state.LinkPublicIP.IsUnknown() {
+	if !state.LinkPublicIP.IsNull() {
 		if err := invokeUnlinkPublicIP(ctx, r.client, &state); err != nil {
 			response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
 			return
 		}
 	}
-
-	res, err := r.client.DeletePublicIpWithResponse(ctx, state.Id.ValueString())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete PublicIp", err.Error())
-		return
-	}
-
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to delete PublicIp", apiError.Error())
-		return
-	}
+	utils.ExecuteRequest(func() (*api.DeletePublicIpResponse, error) {
+		return r.client.DeletePublicIpWithResponse(ctx, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
 }

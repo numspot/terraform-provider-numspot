@@ -160,7 +160,12 @@ func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag diag.Diagn
 }
 
 func (p *numspotProvider) apiClientWithFakeAuth(data *NumspotProviderModel, diag diag.Diagnostics) *api.ClientWithResponses {
-	numspotClient, err := api.NewClientWithResponses(data.Host.ValueString(), api.WithRequestEditorFn(faker))
+	numspotClient, err := api.NewClientWithResponses(data.Host.ValueString(), api.WithRequestEditorFn(faker),
+		api.WithHTTPClient(&http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		}))
 	if err != nil {
 		diag.AddError("Failed to create NumSpot api client", err.Error())
 		return nil
