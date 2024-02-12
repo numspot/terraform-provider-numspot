@@ -98,7 +98,12 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	}
 
 	vmSchema := read.(api.VmSchema)
-	tf := VmFromHttpToTf(ctx, &vmSchema)
+	tf, diagnostics := VmFromHttpToTf(ctx, &vmSchema)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
 	tf.Id = types.StringPointerValue(createdId)
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -132,7 +137,12 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 		return
 	}
 
-	tf := VmFromHttpToTf(ctx, res.JSON200)
+	tf, diagnostics := VmFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

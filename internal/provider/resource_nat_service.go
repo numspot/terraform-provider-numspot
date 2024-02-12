@@ -28,7 +28,7 @@ func NewNatServiceResource() resource.Resource {
 	return &NatServiceResource{}
 }
 
-func (r *NatServiceResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *NatServiceResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -50,11 +50,11 @@ func (r *NatServiceResource) ImportState(ctx context.Context, request resource.I
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *NatServiceResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *NatServiceResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_nat_service"
 }
 
-func (r *NatServiceResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *NatServiceResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_nat_service.NatServiceResourceSchema(ctx)
 }
 
@@ -70,7 +70,17 @@ func (r *NatServiceResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf := NatServiceFromHttpToTf(res.JSON200)
+	tf, diagnostics := NatServiceFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
+	// Set Public Ip ID
+	if !data.PublicIpId.IsNull() || !data.PublicIpId.IsUnknown() {
+		tf.PublicIpId = data.PublicIpId
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -85,11 +95,21 @@ func (r *NatServiceResource) Read(ctx context.Context, request resource.ReadRequ
 		return
 	}
 
-	tf := NatServiceFromHttpToTf(res.JSON200)
+	tf, diagnostics := NatServiceFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
+	// Set Public Ip ID
+	if !data.PublicIpId.IsNull() || !data.PublicIpId.IsUnknown() {
+		tf.PublicIpId = data.PublicIpId
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *NatServiceResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *NatServiceResource) Update(_ context.Context, _ resource.UpdateRequest, _ *resource.UpdateResponse) {
 	// TODO implement me
 	panic("implement me")
 }

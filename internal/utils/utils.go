@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -33,6 +34,7 @@ func FromIntPtrToTfInt64(val *int) types.Int64 {
 func PointerOf[T any](v T) *T {
 	return &v
 }
+
 func IsTfValueNull(val attr.Value) bool {
 	return val.IsNull() || val.IsUnknown()
 }
@@ -64,21 +66,29 @@ type ITFValue interface {
 }
 
 func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.ListValue, diag.Diagnostics) {
-	diagnostics := diag.Diagnostics{}
 	if len(from) == 0 {
-		return types.List{}, diagnostics
+		return types.List{}, diag.Diagnostics{}
 	}
 
 	to := make([]A, 0, len(from))
 	for i := range from {
 		res, diags := fn(ctx, from[i])
 		if diags.HasError() {
-			diagnostics.Append(diags...)
-			return types.List{}, diagnostics
+			return types.List{}, diags
 		}
 
 		to = append(to, res)
 	}
 
 	return types.ListValueFrom(ctx, to[0].Type(ctx), to)
+}
+
+func StringListToTfListValue(ctx context.Context, from []string) (types.List, diag.Diagnostics) {
+	return GenericListToTfListValue(
+		ctx,
+		func(_ context.Context, from string) (types.String, diag.Diagnostics) {
+			return types.StringValue(from), nil
+		},
+		from,
+	)
 }

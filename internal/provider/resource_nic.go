@@ -70,7 +70,12 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	tf := NicFromHttpToTf(ctx, res.JSON200)
+	tf, diagnostics := NicFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -85,7 +90,12 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 		return
 	}
 
-	tf := NicFromHttpToTf(ctx, res.JSON200)
+	tf, diagnostics := NicFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

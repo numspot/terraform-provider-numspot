@@ -3,30 +3,112 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vm"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func VmFromTfToHttp(tf *resource_vm.VmModel) *api.VmSchema {
-	return &api.VmSchema{}
+func vmSecurityGroupLightFromApi(ctx context.Context, elt api.SecurityGroupLightSchema) (resource_vm.SecurityGroupsValue, diag.Diagnostics) {
+	return resource_vm.NewSecurityGroupsValue(
+		resource_vm.SecurityGroupsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"security_group_id":   types.StringPointerValue(elt.SecurityGroupId),
+			"security_group_name": types.StringPointerValue(elt.SecurityGroupName),
+		},
+	)
 }
 
-func VmFromHttpToTf(ctx context.Context, http *api.VmSchema) resource_vm.VmModel {
-	vmsCount := utils.FromIntToTfInt64(-1)
+func vmBsuFromApi(ctx context.Context, elt api.BsuCreatedSchema) (resource_vm.BsuValue, diag.Diagnostics) {
+	return resource_vm.NewBsuValue(
+		resource_vm.BsuValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"delete_on_vm_deletion": types.BoolPointerValue(elt.DeleteOnVmDeletion),
+			"iops":                  types.Int64Null(), // FIXME Not set
+			"link_date":             types.StringValue(elt.LinkDate.String()),
+			"snapshot_id":           types.StringNull(), // FIXME Not set
+			"state":                 types.StringNull(), // FIXME Not set
+			"volume_id":             types.StringPointerValue(elt.VolumeId),
+			"volume_size":           types.StringNull(), // FIXME Not set
+			"volume_type":           types.StringNull(), // FIXME Not set
+		},
+	)
+}
 
-	privateIps, _ := types.ListValueFrom(ctx, types.StringType, []string{*http.PrivateIp})
-	productCodes, _ := types.ListValueFrom(ctx, types.StringType, http.ProductCodes)
+func vmBlockDeviceMappingFromApi(ctx context.Context, elt api.BlockDeviceMappingCreatedSchema) (resource_vm.BlockDeviceMappingsValue, diag.Diagnostics) {
+	// Bsu
+	bsuTf, diagnostics := vmBsuFromApi(ctx, *elt.Bsu)
+	if diagnostics.HasError() {
+		return resource_vm.BlockDeviceMappingsValue{}, diagnostics
+	}
+
+	return resource_vm.NewBlockDeviceMappingsValue(
+		resource_vm.BlockDeviceMappingsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"bsu":                 bsuTf,
+			"device_name":         types.StringPointerValue(elt.DeviceName),
+			"no_device":           types.StringNull(),
+			"virtual_device_name": types.StringNull(),
+		},
+	)
+}
+
+func VmFromHttpToTf(ctx context.Context, http *api.VmSchema) (*resource_vm.VmModel, diag.Diagnostics) {
+	vmsCount := utils.FromIntToTfInt64(1)
+
+	// Private Ips
+	privateIpsTf, diagnostics := utils.StringListToTfListValue(ctx, []string{*http.PrivateIp})
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
+
+	// Product Code
+	productCodesTf, diagnostics := utils.StringListToTfListValue(ctx, *http.ProductCodes)
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
+
+	// Security Group Ids
+	securityGroupIds := make([]string, 0, len(*http.SecurityGroups))
+	for _, e := range *http.SecurityGroups {
+		securityGroupIds = append(securityGroupIds, *e.SecurityGroupId)
+	}
+
+	securityGroupIdsTf, diagnostics := utils.StringListToTfListValue(ctx, securityGroupIds)
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
+
+	// Security Group
+	securityGroupsTf, diagnostics := utils.GenericListToTfListValue(
+		ctx,
+		vmSecurityGroupLightFromApi,
+		*http.SecurityGroups,
+	)
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
+
+	// Block Device Mapping
+	blockDeviceMappingTf, diagnostics := utils.GenericListToTfListValue(
+		ctx,
+		vmBlockDeviceMappingFromApi,
+		*http.BlockDeviceMappings,
+	)
+	if diagnostics.HasError() {
+		return nil, diagnostics
+	}
 
 	r := resource_vm.VmModel{
 		//
 		Architecture:        types.StringPointerValue(http.Architecture),
-		BlockDeviceMappings: types.ListNull(resource_vm.BlockDeviceMappingsValue{}.Type(ctx)),
-		BootOnCreation:      types.BoolValue(true),
+		BlockDeviceMappings: blockDeviceMappingTf,
+		BootOnCreation:      types.BoolValue(true), // FIXME Set value
 		BsuOptimized:        types.BoolPointerValue(http.BsuOptimized),
 		ClientToken:         types.StringPointerValue(http.ClientToken),
-		CreationDate:        types.StringValue(""),
+		CreationDate:        types.StringValue(http.CreationDate.String()),
 		//
 		DeletionProtection:        types.BoolPointerValue(http.DeletionProtection),
 		Hypervisor:                types.StringPointerValue(http.Hypervisor),
@@ -38,22 +120,22 @@ func VmFromHttpToTf(ctx context.Context, http *api.VmSchema) resource_vm.VmModel
 		//
 		NestedVirtualization: types.BoolPointerValue(http.NestedVirtualization),
 		NetId:                types.StringPointerValue(http.NetId),
-		Nics:                 types.ListNull(resource_vm.NicsValue{}.Type(ctx)),
+		Nics:                 types.ListNull(resource_vm.NicsValue{}.Type(ctx)), // FIXME Set value
 		OsFamily:             types.StringPointerValue(http.OsFamily),
 		Performance:          types.StringPointerValue(http.Performance),
-		Placement:            resource_vm.PlacementValue{},
+		Placement:            resource_vm.PlacementValue{}, // FIXME Set value
 		PrivateDnsName:       types.StringPointerValue(http.PrivateDnsName),
 		PrivateIp:            types.StringPointerValue(http.PrivateIp),
 		//
-		PrivateIps:                  privateIps,
-		ProductCodes:                productCodes,
+		PrivateIps:                  privateIpsTf,
+		ProductCodes:                productCodesTf,
 		PublicDnsName:               types.StringPointerValue(http.PublicDnsName),
 		PublicIp:                    types.StringPointerValue(http.PublicIp),
 		ReservationId:               types.StringPointerValue(http.ReservationId),
 		RootDeviceName:              types.StringPointerValue(http.RootDeviceName),
 		RootDeviceType:              types.StringPointerValue(http.RootDeviceType),
-		SecurityGroupIds:            types.ListNull(types.StringType),
-		SecurityGroups:              types.ListNull(types.StringType),
+		SecurityGroupIds:            securityGroupIdsTf,
+		SecurityGroups:              securityGroupsTf,
 		State:                       types.StringPointerValue(http.State),
 		StateReason:                 types.StringPointerValue(http.StateReason),
 		SubnetId:                    types.StringPointerValue(http.SubnetId),
@@ -78,7 +160,7 @@ func VmFromHttpToTf(ctx context.Context, http *api.VmSchema) resource_vm.VmModel
 		r.SecurityGroupIds = listValue
 	}
 
-	return r
+	return &r, nil
 }
 
 func VmFromTfToCreateRequest(ctx context.Context, tf *resource_vm.VmModel) api.CreateVmsJSONRequestBody {

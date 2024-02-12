@@ -38,25 +38,13 @@ func ComputePublicIPChangeSet(plan, state *resource_public_ip.PublicIpModel) Pub
 	return c
 }
 
-func PublicIpFromTfToHttp(tf *resource_public_ip.PublicIpModel) *api.PublicIpSchema {
-	return &api.PublicIpSchema{
-		Id:           nil,
-		NicAccountId: nil,
-		NicId:        nil,
-		PrivateIp:    nil,
-		PublicIp:     nil,
-		Tags:         nil,
-		VmId:         nil,
-	}
-}
-
-func PublicIpFromHttpToTf(http *api.PublicIpSchema, model *resource_public_ip.PublicIpModel) {
-	model.Id = types.StringPointerValue(http.Id)
-	model.NicAccountId = types.StringPointerValue(http.NicAccountId)
-	model.NicId = types.StringPointerValue(http.NicId)
-	model.PrivateIp = types.StringPointerValue(http.PrivateIp)
-	model.PublicIp = types.StringPointerValue(http.PublicIp)
-	model.VmId = types.StringPointerValue(http.VmId)
+func PublicIpFromHttpToTf(elt *api.PublicIpSchema, model *resource_public_ip.PublicIpModel) {
+	model.Id = types.StringPointerValue(elt.Id)
+	model.NicAccountId = types.StringPointerValue(elt.NicAccountId)
+	model.NicId = types.StringPointerValue(elt.NicId)
+	model.PrivateIp = types.StringPointerValue(elt.PrivateIp)
+	model.PublicIp = types.StringPointerValue(elt.PublicIp)
+	model.VmId = types.StringPointerValue(elt.VmId)
 }
 
 func invokeLinkPublicIP(ctx context.Context, client *api.ClientWithResponses, data *resource_public_ip.PublicIpModel) (*string, error) {
