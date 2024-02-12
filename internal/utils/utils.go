@@ -10,8 +10,11 @@ import (
 )
 
 func FromTfInt64ToIntPtr(tfInt types.Int64) *int {
-	val := int(tfInt.ValueInt64())
-	return &val
+	if tfInt.ValueInt64Pointer() != nil {
+		val := int(tfInt.ValueInt64())
+		return &val
+	}
+	return nil
 }
 
 func FromTfInt64ToInt(tfInt types.Int64) int {
@@ -28,10 +31,7 @@ func FromIntPtrToTfInt64(val *int) types.Int64 {
 }
 
 func IsTfValueNull(val attr.Value) bool {
-	if val.IsNull() || val.IsUnknown() {
-		return true
-	}
-	return false
+	return val.IsNull() || val.IsUnknown()
 }
 
 func FromStringListToTfStringList(ctx context.Context, arr []string) (types.List, diag.Diagnostics) {
