@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -10,52 +11,28 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_route_table"
 )
 
-func RouteTableFromTfToHttp(tf *resource_route_table.RouteTableModel) *api.RouteTableSchema {
-	return &api.RouteTableSchema{
-		Id:                              tf.Id.ValueStringPointer(),
-		NetId:                           tf.NetId.ValueStringPointer(),
-		RoutePropagatingVirtualGateways: nil,
-		Routes:                          nil,
-	}
-}
-
 func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTableSchema, defaultRouteDestination string, subnetId *string) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
 	// Routes
-	routes := []resource_route_table.RoutesValue{}
-	for _, route := range *http.Routes {
-		if *route.DestinationIpRange != defaultRouteDestination {
-			nroutev, diagnostics := routeTableRouteFromAPI(ctx, &route)
-			if diagnostics.HasError() {
-				return nil, diagnostics
+	var routes []api.RouteSchema
+	if len(*http.Routes) > 0 {
+		// Remove "defaulted" route to prevent inconsistent state
+		routes = make([]api.RouteSchema, 0, len(*http.Routes)-1)
+		for _, e := range *http.Routes {
+			if *e.DestinationIpRange != defaultRouteDestination {
+				routes = append(routes, e)
 			}
-
-			routes = append(routes, nroutev)
 		}
+	} else {
+		routes = *http.Routes
 	}
-	tfRoutes, diagnostics := types.ListValueFrom(
-		ctx,
-		resource_route_table.RoutesValue{}.Type(ctx),
-		routes,
-	)
+
+	tfRoutes, diagnostics := utils.GenericListToTfListValue(ctx, routeTableRouteFromAPI, routes)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
 
 	// Links
-	links := make([]resource_route_table.LinkRouteTablesValue, 0, len(*http.LinkRouteTables))
-	for _, link := range *http.LinkRouteTables {
-		nlink, diagnostics := routeTableLinkFromAPI(ctx, link)
-		if diagnostics.HasError() {
-			return nil, diagnostics
-		}
-		links = append(links, nlink)
-	}
-	tfLinks, nDiag := types.ListValueFrom(
-		ctx,
-		resource_route_table.LinkRouteTablesValue{}.Type(ctx),
-		links,
-	)
-	diagnostics.Append(nDiag...)
+	tfLinks, diagnostics := utils.GenericListToTfListValue(ctx, routeTableLinkFromAPI, *http.LinkRouteTables)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
@@ -84,7 +61,7 @@ func routeTableLinkFromAPI(ctx context.Context, link api.LinkRouteTableSchema) (
 	)
 }
 
-func routeTableRouteFromAPI(ctx context.Context, route *api.RouteSchema) (resource_route_table.RoutesValue, diag.Diagnostics) {
+func routeTableRouteFromAPI(ctx context.Context, route api.RouteSchema) (resource_route_table.RoutesValue, diag.Diagnostics) {
 	return resource_route_table.NewRoutesValue(
 		resource_route_table.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{

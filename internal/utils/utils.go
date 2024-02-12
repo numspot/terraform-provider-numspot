@@ -63,14 +63,21 @@ type ITFValue interface {
 	Type(ctx context.Context) attr.Type
 }
 
-func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, diagnostics diag.Diagnostics, fn func(from B) A, from []B) (basetypes.ListValue, diag.Diagnostics) {
+func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.ListValue, diag.Diagnostics) {
+	diagnostics := diag.Diagnostics{}
 	if len(from) == 0 {
 		return types.List{}, diagnostics
 	}
 
 	to := make([]A, 0, len(from))
 	for i := range from {
-		to = append(to, fn(from[i]))
+		res, diags := fn(ctx, from[i])
+		if diags.HasError() {
+			diagnostics.Append(diags...)
+			return types.List{}, diagnostics
+		}
+
+		to = append(to, res)
 	}
 
 	return types.ListValueFrom(ctx, to[0].Type(ctx), to)
