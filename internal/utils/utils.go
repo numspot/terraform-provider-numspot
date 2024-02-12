@@ -30,6 +30,9 @@ func FromIntPtrToTfInt64(val *int) types.Int64 {
 	return FromIntToTfInt64(*val)
 }
 
+func PointerOf[T any](v T) *T {
+	return &v
+}
 func IsTfValueNull(val attr.Value) bool {
 	return val.IsNull() || val.IsUnknown()
 }
