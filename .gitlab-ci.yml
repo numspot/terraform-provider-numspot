@@ -1,6 +1,5 @@
 stages:
   - test
-  - release
 
 test:
   image: golang:1.20.10
@@ -11,8 +10,8 @@ test:
     TF_ACC: "1"
     NUMSPOT_API_HOST: "https://numspot-services.integration.numspot.dev"
     NUMSPOT_IAM_HOST: "https://numspot-iaas.integration.numspot.dev"
-    NUMSPOT_CLIENT_ID: "XX"
-    NUMSPOT_CLIENT_SECRET: "XX"
+    NUMSPOT_CLIENT_ID: $CLIENT_ID
+    NUMSPOT_CLIENT_SECRET: $CLIENT_SECRET
   script:
     - go test ./...
 
