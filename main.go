@@ -39,7 +39,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "numspot.cloud/dev/numspot",
+		Address: "numspot/numspot",
 		Debug:   debug,
 	}
 
