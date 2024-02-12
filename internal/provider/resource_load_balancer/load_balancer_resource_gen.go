@@ -158,21 +158,10 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "One or more listeners to create.",
 				MarkdownDescription: "One or more listeners to create.",
 			},
-			"load_balancer_name": schema.StringAttribute{
+			"name": schema.StringAttribute{
 				Required:            true,
 				Description:         "The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).",
 				MarkdownDescription: "The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).",
-			},
-			"load_balancer_type": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.",
-				MarkdownDescription: "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.",
-			},
-			"name": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The name of the load balancer.",
-				MarkdownDescription: "The name of the load balancer.",
 			},
 			"net_id": schema.StringAttribute{
 				Computed:            true,
@@ -273,8 +262,6 @@ type LoadBalancerModel struct {
 	HealthCheck                     HealthCheckValue         `tfsdk:"health_check"`
 	Id                              types.String             `tfsdk:"id"`
 	Listeners                       types.List               `tfsdk:"listeners"`
-	LoadBalancerName                types.String             `tfsdk:"load_balancer_name"`
-	LoadBalancerType                types.String             `tfsdk:"load_balancer_type"`
 	Name                            types.String             `tfsdk:"name"`
 	NetId                           types.String             `tfsdk:"net_id"`
 	PublicIp                        types.String             `tfsdk:"public_ip"`
