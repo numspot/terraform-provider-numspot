@@ -10,6 +10,7 @@ import (
 )
 
 func NicFromHttpToTf(_ context.Context, http *api.NicSchema) resource_nic.NicModel {
+
 	return resource_nic.NicModel{
 		AccountId:           types.StringPointerValue(http.AccountId),
 		Description:         types.StringPointerValue(http.AccountId),

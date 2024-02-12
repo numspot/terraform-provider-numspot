@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -53,4 +54,21 @@ func TfStringListToStringList(ctx context.Context, list types.List) []string {
 	return TfListToGenericList(func(a types.String) string {
 		return a.ValueString()
 	}, ctx, list)
+}
+
+type ITFValue interface {
+	Type(ctx context.Context) attr.Type
+}
+
+func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, diagnostics diag.Diagnostics, fn func(from B) A, from []B) (basetypes.ListValue, diag.Diagnostics) {
+	if len(from) == 0 {
+		return types.List{}, diagnostics
+	}
+
+	to := make([]A, 0, len(from))
+	for i := range from {
+		to = append(to, fn(from[i]))
+	}
+
+	return types.ListValueFrom(ctx, to[0].Type(ctx), to)
 }
