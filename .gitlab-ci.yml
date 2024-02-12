@@ -9,7 +9,10 @@ test:
     - go mod download
   variables:
     TF_ACC: "1"
-    NUMSPOT_ENDPOINT: "https://numspot-services.staging.numspot.dev"
+    NUMSPOT_API_HOST: "https://numspot-services.integration.numspot.dev"
+    NUMSPOT_IAM_HOST: "https://numspot-iaas.integration.numspot.dev"
+    NUMSPOT_CLIENT_ID: "XX"
+    NUMSPOT_CLIENT_SECRET: "XX"
   script:
     - go test ./...
 
@@ -28,19 +31,3 @@ lint:
       codequality: gl-code-quality-report.json
     paths:
       - gl-code-quality-report.json
-
-release:
-  stage: release
-  image:
-    name: goreleaser/goreleaser
-    entrypoint: ['']
-  only:
-    - tags
-  variables:
-    # Disable shallow cloning so that goreleaser can diff between tags to
-    # generate a changelog.
-    GIT_DEPTH: 0
-    GITLAB_TOKEN: $CI_JOB_TOKEN
-  script:
-    # - cat $COSIGN_KEY
-    - goreleaser --debug release --clean
