@@ -107,8 +107,11 @@ func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotPro
 		return err, nil
 	}
 
-	accessToken := response.JSON200.AccessToken
-	return err, accessToken
+	if response.JSON200 != nil {
+		return nil, response.JSON200.AccessToken
+	}
+
+	return err, nil
 }
 
 func buildBasicAuth(username, password string) string {
