@@ -51,7 +51,7 @@ func (r *KeyPairResource) ImportState(ctx context.Context, request resource.Impo
 }
 
 func (r *KeyPairResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
-	response.TypeName = request.ProviderTypeName + "_key_pair"
+	response.TypeName = request.ProviderTypeName + "_keypair"
 }
 
 func (r *KeyPairResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {

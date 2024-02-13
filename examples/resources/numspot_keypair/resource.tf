@@ -1,10 +1,10 @@
 # Create key pair
-resource "numspot_key_pair" "create" {
+resource "numspot_kepair" "create" {
   name = "keypair-example"
 }
 
 # Import key pair
-resource "numspot_key_pair" "import" {
+resource "numspot_keypair" "import" {
   name       = "keypair-example"
   public_key = "ssh-rsa ..."
 }

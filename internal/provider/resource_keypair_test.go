@@ -23,9 +23,9 @@ func TestAccKeyPairResource(t *testing.T) {
 			{
 				Config: testKeyPairConfig(name),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_key_pair.test", "name", name),
-					resource.TestCheckResourceAttr("numspot_key_pair.test", "id", name),
-					resource.TestCheckResourceAttrWith("numspot_key_pair.test", "private_key", func(v string) error {
+					resource.TestCheckResourceAttr("numspot_keypair.test", "name", name),
+					resource.TestCheckResourceAttr("numspot_keypair.test", "id", name),
+					resource.TestCheckResourceAttrWith("numspot_keypair.test", "private_key", func(v string) error {
 						require.NotEmpty(t, v)
 						privateKey = v
 						return nil
@@ -34,7 +34,7 @@ func TestAccKeyPairResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_key_pair.test",
+				ResourceName:            "numspot_keypair.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"private_key"},
@@ -43,9 +43,9 @@ func TestAccKeyPairResource(t *testing.T) {
 			{
 				Config: testKeyPairConfig(updatedName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_key_pair.test", "name", updatedName),
-					resource.TestCheckResourceAttr("numspot_key_pair.test", "id", updatedName),
-					resource.TestCheckResourceAttrWith("numspot_key_pair.test", "private_key", func(v string) error {
+					resource.TestCheckResourceAttr("numspot_keypair.test", "name", updatedName),
+					resource.TestCheckResourceAttr("numspot_keypair.test", "id", updatedName),
+					resource.TestCheckResourceAttrWith("numspot_keypair.test", "private_key", func(v string) error {
 						require.NotEmpty(t, v)
 						require.NotEqual(t, v, privateKey)
 						return nil
@@ -58,7 +58,7 @@ func TestAccKeyPairResource(t *testing.T) {
 
 func testKeyPairConfig(name string) string {
 	return fmt.Sprintf(`
-resource "numspot_key_pair" "test" {
+resource "numspot_keypair" "test" {
 	name = %[1]q
 }`, name)
 }
