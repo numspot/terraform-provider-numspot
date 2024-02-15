@@ -3,6 +3,8 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -59,21 +61,15 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := LoadBalancerFromTfToCreateRequest(&data)
-	res, err := r.client.CreateLoadBalancerWithResponse(ctx, body)
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to create LoadBalancer", err.Error())
-	}
-
-	expectedStatusCode := 201 // FIXME: Set expected status code (must be 201)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to create LoadBalancer", "My Custom Error")
+	body := LoadBalancerFromTfToCreateRequest(ctx, &data)
+	createRes := utils.ExecuteRequest(func() (*api.CreateLoadBalancerResponse, error) {
+		return r.client.CreateLoadBalancerWithResponse(ctx, body)
+	}, http.StatusOK, &response.Diagnostics)
+	if createRes == nil {
 		return
 	}
 
-	tf := LoadBalancerFromHttpToTf(res.JSON200) // FIXME
+	tf := LoadBalancerFromHttpToTf(ctx, createRes.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -95,7 +91,7 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 		return
 	}
 
-	tf := LoadBalancerFromHttpToTf(res.JSON200) // FIXME
+	tf := LoadBalancerFromHttpToTf(ctx, res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

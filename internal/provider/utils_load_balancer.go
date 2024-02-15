@@ -2,39 +2,87 @@ package provider
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
+func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt api.ApplicationStickyCookiePolicySchema) (resource_load_balancer.ApplicationStickyCookiePoliciesValue, diag.Diagnostics) {
+	return resource_load_balancer.NewApplicationStickyCookiePoliciesValue(
+		resource_load_balancer.ApplicationStickyCookiePoliciesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"cookie_name": types.StringPointerValue(elt.CookieName),
+			"policy_name": types.StringPointerValue(elt.PolicyName),
+		})
+}
+
+func listenersFromHTTP(ctx context.Context, elt api.ListenerSchema) (resource_load_balancer.ListenersValue, diag.Diagnostics) {
+	tfPolicyNames, diags := utils.FromStringListPointerToTfStringList(ctx, elt.PolicyNames)
+	if diags.HasError() {
+		return resource_load_balancer.ListenersValue{}, diags
+	}
+	return resource_load_balancer.NewListenersValue(
+		resource_load_balancer.ListenersValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"backend_port":           utils.FromIntPtrToTfInt64(elt.BackendPort),
+			"backend_protocol":       types.StringPointerValue(elt.BackendProtocol),
+			"load_balancer_port":     utils.FromIntPtrToTfInt64(elt.LoadBalancerPort),
+			"load_balancer_protocol": types.StringPointerValue(elt.BackendProtocol),
+			"policy_names":           tfPolicyNames,
+			"server_certificate_id":  types.StringPointerValue(elt.BackendProtocol),
+		})
+}
+
+func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStickyCookiePolicySchema) (resource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
+	return resource_load_balancer.NewStickyCookiePoliciesValue(
+		resource_load_balancer.StickyCookiePoliciesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"cookie_expiration_period": utils.FromIntPtrToTfInt64(elt.CookieExpirationPeriod),
+			"policy_name":              types.StringPointerValue(elt.PolicyName),
+		})
+}
 func LoadBalancerFromTfToHttp(tf *resource_load_balancer.LoadBalancerModel) *api.LoadBalancerSchema {
 	return &api.LoadBalancerSchema{}
 }
 
 func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancerSchema) resource_load_balancer.LoadBalancerModel {
-	//TODO: handle returned diags instead of surpassing it => x, diags := types.ListValueFrom()
-	applicationStickyCookiePoliciestypes, _ := types.ListValueFrom(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesType{}, http.ApplicationStickyCookiePolicies)
-	backendIps, _ := utils.FromStringListToTfStringList(ctx, *http.BackendIps)
-	backendVmIds, _ := utils.FromStringListToTfStringList(ctx, *http.BackendVmIds)
+	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
+	if diags.HasError() {
+		return resource_load_balancer.LoadBalancerModel{}
+	}
+
+	listeners, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ListenersValue{}, listenersFromHTTP, *http.Listeners)
+	if diags.HasError() {
+		return resource_load_balancer.LoadBalancerModel{}
+	}
+
+	stickyCookiePolicies, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies)
+	if diags.HasError() {
+		return resource_load_balancer.LoadBalancerModel{}
+	}
+
+	backendIps, _ := utils.FromStringListPointerToTfStringList(ctx, http.BackendIps)
+	backendVmIds, _ := utils.FromStringListPointerToTfStringList(ctx, http.BackendVmIds)
 	healthCheck := resource_load_balancer.HealthCheckValue{
 		CheckInterval:      utils.FromIntToTfInt64(http.HealthCheck.CheckInterval),
 		HealthyThreshold:   utils.FromIntToTfInt64(http.HealthCheck.HealthyThreshold),
-		Path:               types.StringValue(*http.HealthCheck.Path),
+		Path:               types.StringPointerValue(http.HealthCheck.Path),
 		Port:               utils.FromIntToTfInt64(http.HealthCheck.Port),
 		Protocol:           types.StringValue(http.HealthCheck.Protocol),
 		Timeout:            utils.FromIntToTfInt64(http.HealthCheck.Timeout),
 		UnhealthyThreshold: utils.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
 	}
-	listeners, _ := types.ListValueFrom(ctx, resource_load_balancer.ListenersType{}, http.Listeners)
-	securityGroups, _ := types.ListValueFrom(ctx, resource_load_balancer.SourceSecurityGroupType{}, http.SecurityGroups)
+	//httpListeners := *http.Listeners
+	securityGroups, _ := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
 	sourceSecurityGroup := resource_load_balancer.SourceSecurityGroupValue{
 		SecurityGroupAccountId: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupAccountId),
 		SecurityGroupName:      types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
 	}
-	stickyCookiePolicies, _ := types.ListValueFrom(ctx, resource_load_balancer.StickyCookiePoliciesType{}, http.StickyCookiePolicies)
-	subnets, _ := utils.FromStringListToTfStringList(ctx, *http.Subnets)
-	subregionNames, _ := utils.FromStringListToTfStringList(ctx, *http.SubregionNames)
+	subnets, _ := utils.FromStringListPointerToTfStringList(ctx, http.Subnets)
+	subregionNames, _ := utils.FromStringListPointerToTfStringList(ctx, http.SubregionNames)
 
 	return resource_load_balancer.LoadBalancerModel{
 		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciestypes,

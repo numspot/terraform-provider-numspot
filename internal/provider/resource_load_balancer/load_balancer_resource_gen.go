@@ -241,11 +241,13 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"subregion_names": schema.ListAttribute{
 				ElementType:         types.StringType,
+				Optional:            true,
 				Computed:            true,
 				Description:         "The ID of the Subregion in which the load balancer was created.",
 				MarkdownDescription: "The ID of the Subregion in which the load balancer was created.",
 			},
 			"type": schema.StringAttribute{
+				Optional:            true,
 				Computed:            true,
 				Description:         "The type of load balancer. Valid only for load balancers in a Net.<br />\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.",
 				MarkdownDescription: "The type of load balancer. Valid only for load balancers in a Net.<br />\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.",
