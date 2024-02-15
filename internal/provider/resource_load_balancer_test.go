@@ -27,12 +27,12 @@ func TestAccLoadBalancerResource(t *testing.T) {
 					createBackendPort,
 					createLbPort),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", createLbName),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", createLbName),
 				),
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_load_balancer.test",
+				ResourceName:            "numspot_load_balancer.testlb",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
@@ -52,7 +52,7 @@ func TestAccLoadBalancerResource(t *testing.T) {
 }
 
 func testLoadBalancerConfig_Create(lbName, subnetID, lbProtocol, lbtype string, backendPort, lbPort int) string {
-	return fmt.Sprintf(`resource "numspot_load_balancer" "load_balancer" {
+	return fmt.Sprintf(`resource "numspot_load_balancer" "testlb" {
 			name = "%s"
 			listeners = [
 				{

@@ -77,17 +77,10 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement READ operation
-	res, err := r.client.ReadLoadBalancersByIdWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
-	}
-
-	expectedStatusCode := 200 // FIXME: Set expected status code (must be 200)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to read LoadBalancer", "My Custom Error")
+	res := utils.ExecuteRequest(func() (*api.ReadLoadBalancersByIdResponse, error) {
+		return r.client.ReadLoadBalancersByIdWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 
@@ -104,18 +97,10 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteLoadBalancerWithResponse(ctx, data.Id.String())
-	if err != nil {
-		// TODO: Handle Error
-		response.Diagnostics.AddError("Failed to delete LoadBalancer", err.Error())
-		return
-	}
-
-	expectedStatusCode := 204 // FIXME: Set expected status code (must be 204)
-	if res.StatusCode() != expectedStatusCode {
-		// TODO: Handle NumSpot error
-		response.Diagnostics.AddError("Failed to delete LoadBalancer", "My Custom Error")
+	res := utils.ExecuteRequest(func() (*api.DeleteLoadBalancerResponse, error) {
+		return r.client.DeleteLoadBalancerWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
 		return
 	}
 }
