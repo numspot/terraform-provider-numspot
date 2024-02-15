@@ -27,13 +27,13 @@ func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTableSchema, def
 		routes = *http.Routes
 	}
 
-	tfRoutes, diagnostics := utils.GenericListToTfListValue(ctx, routeTableRouteFromAPI, routes)
+	tfRoutes, diagnostics := utils.GenericListToTfListValue(ctx, resource_route_table.RoutesValue{}, routeTableRouteFromAPI, routes)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
 
 	// Links
-	tfLinks, diagnostics := utils.GenericListToTfListValue(ctx, routeTableLinkFromAPI, *http.LinkRouteTables)
+	tfLinks, diagnostics := utils.GenericListToTfListValue(ctx, resource_route_table.LinkRouteTablesValue{}, routeTableLinkFromAPI, *http.LinkRouteTables)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}

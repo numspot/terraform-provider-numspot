@@ -53,7 +53,7 @@ func linkPublicIpFromApi(ctx context.Context, elt api.LinkPublicIpSchema) (resou
 
 func NicFromHttpToTf(ctx context.Context, http *api.NicSchema) (*resource_nic.NicModel, diag.Diagnostics) {
 	// Private IPs
-	privateIps, diagnostics := utils.GenericListToTfListValue(ctx, privatesIpFromApi, *http.PrivateIps)
+	privateIps, diagnostics := utils.GenericListToTfListValue(ctx, resource_nic.PrivateIpsValue{}, privatesIpFromApi, *http.PrivateIps)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
@@ -71,7 +71,7 @@ func NicFromHttpToTf(ctx context.Context, http *api.NicSchema) (*resource_nic.Ni
 	}
 
 	// Security Groups
-	securityGroupsTf, diagnostics := utils.GenericListToTfListValue(ctx, securityGroupLightFromApi, *http.SecurityGroups)
+	securityGroupsTf, diagnostics := utils.GenericListToTfListValue(ctx, resource_nic.SecurityGroupsValue{}, securityGroupLightFromApi, *http.SecurityGroups)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}

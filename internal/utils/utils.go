@@ -3,11 +3,10 @@ package utils
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 func FromTfInt64ToIntPtr(tfInt types.Int64) *int {
@@ -40,7 +39,17 @@ func IsTfValueNull(val attr.Value) bool {
 }
 
 func FromStringListToTfStringList(ctx context.Context, arr []string) (types.List, diag.Diagnostics) {
+	if arr == nil {
+		arr = make([]string, 0)
+	}
 	return types.ListValueFrom(ctx, types.StringType, arr)
+}
+
+func FromStringListPointerToTfStringList(ctx context.Context, arr *[]string) (types.List, diag.Diagnostics) {
+	if arr == nil {
+		return types.ListValueFrom(ctx, types.StringType, []string{})
+	}
+	return types.ListValueFrom(ctx, types.StringType, *arr)
 }
 
 func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list types.List) []B {
@@ -65,9 +74,9 @@ type ITFValue interface {
 	Type(ctx context.Context) attr.Type
 }
 
-func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.ListValue, diag.Diagnostics) {
+func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, tfListInnerObjType A, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.ListValue, diag.Diagnostics) {
 	if len(from) == 0 {
-		return types.List{}, diag.Diagnostics{}
+		return types.ListNull(tfListInnerObjType.Type(ctx)), diag.Diagnostics{}
 	}
 
 	to := make([]A, 0, len(from))
@@ -86,6 +95,7 @@ func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, fn func(ct
 func StringListToTfListValue(ctx context.Context, from []string) (types.List, diag.Diagnostics) {
 	return GenericListToTfListValue(
 		ctx,
+		basetypes.StringValue{},
 		func(_ context.Context, from string) (types.String, diag.Diagnostics) {
 			return types.StringValue(from), nil
 		},

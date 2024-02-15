@@ -25,6 +25,7 @@ func NatServiceFromHttpToTf(ctx context.Context, http *api.NatServiceSchema) (*r
 	// Public Ips
 	publicIpsTf, diagnostics := utils.GenericListToTfListValue(
 		ctx,
+		resource_nat_service.PublicIpsValue{},
 		publicIpFromApi,
 		*http.PublicIps,
 	)

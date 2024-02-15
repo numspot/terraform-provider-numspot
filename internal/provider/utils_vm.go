@@ -84,6 +84,7 @@ func VmFromHttpToTf(ctx context.Context, http *api.VmSchema) (*resource_vm.VmMod
 	// Security Group
 	securityGroupsTf, diagnostics := utils.GenericListToTfListValue(
 		ctx,
+		resource_vm.SecurityGroupsValue{},
 		vmSecurityGroupLightFromApi,
 		*http.SecurityGroups,
 	)
@@ -94,6 +95,7 @@ func VmFromHttpToTf(ctx context.Context, http *api.VmSchema) (*resource_vm.VmMod
 	// Block Device Mapping
 	blockDeviceMappingTf, diagnostics := utils.GenericListToTfListValue(
 		ctx,
+		resource_vm.BlockDeviceMappingsValue{},
 		vmBlockDeviceMappingFromApi,
 		*http.BlockDeviceMappings,
 	)
