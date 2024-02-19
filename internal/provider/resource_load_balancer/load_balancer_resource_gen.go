@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -63,36 +65,43 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Attributes: map[string]schema.Attribute{
 					"check_interval": schema.Int64Attribute{
 						Computed:            true,
+						Optional:            true,
 						Description:         "The number of seconds between two pings (between `5` and `600` both included).",
 						MarkdownDescription: "The number of seconds between two pings (between `5` and `600` both included).",
 					},
 					"healthy_threshold": schema.Int64Attribute{
 						Computed:            true,
+						Optional:            true,
 						Description:         "The number of consecutive successful pings before considering the VM as healthy (between `2` and `10` both included).",
 						MarkdownDescription: "The number of consecutive successful pings before considering the VM as healthy (between `2` and `10` both included).",
 					},
 					"path": schema.StringAttribute{
 						Computed:            true,
+						Optional:            true,
 						Description:         "If you use the HTTP or HTTPS protocols, the ping path.",
 						MarkdownDescription: "If you use the HTTP or HTTPS protocols, the ping path.",
 					},
 					"port": schema.Int64Attribute{
 						Computed:            true,
+						Optional:            true,
 						Description:         "The port number (between `1` and `65535`, both included).",
 						MarkdownDescription: "The port number (between `1` and `65535`, both included).",
 					},
 					"protocol": schema.StringAttribute{
 						Computed:            true,
+						Optional:            true,
 						Description:         "The protocol for the URL of the VM (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`).",
 						MarkdownDescription: "The protocol for the URL of the VM (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`).",
 					},
 					"timeout": schema.Int64Attribute{
 						Computed:            true,
+						Optional:            true,
 						Description:         "The maximum waiting time for a response before considering the VM as unhealthy, in seconds (between `2` and `60` both included).",
 						MarkdownDescription: "The maximum waiting time for a response before considering the VM as unhealthy, in seconds (between `2` and `60` both included).",
 					},
 					"unhealthy_threshold": schema.Int64Attribute{
 						Computed:            true,
+						Optional:            true,
 						Description:         "The number of consecutive failed pings before considering the VM as unhealthy (between `2` and `10` both included).",
 						MarkdownDescription: "The number of consecutive failed pings before considering the VM as unhealthy (between `2` and `10` both included).",
 					},
@@ -103,6 +112,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
+				Optional:            true,
 				Description:         "Information about the health check configuration.",
 				MarkdownDescription: "Information about the health check configuration.",
 			},
@@ -162,6 +172,9 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).",
 				MarkdownDescription: "The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"net_id": schema.StringAttribute{
 				Computed:            true,

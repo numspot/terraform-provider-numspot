@@ -36,6 +36,18 @@ func listenersFromHTTP(ctx context.Context, elt api.ListenerSchema) (resource_lo
 		})
 }
 
+func listenersFromTF(ctx context.Context, elt resource_load_balancer.ListenersValue) api.ListenerSchema {
+	policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames)
+	return api.ListenerSchema{
+		BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
+		BackendProtocol:      elt.BackendProtocol.ValueStringPointer(),
+		LoadBalancerPort:     utils.FromTfInt64ToIntPtr(elt.LoadBalancerPort),
+		LoadBalancerProtocol: elt.BackendProtocol.ValueStringPointer(),
+		PolicyNames:          &policyNames,
+		ServerCertificateId:  elt.ServerCertificateId.ValueStringPointer(),
+	}
+}
+
 func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStickyCookiePolicySchema) (resource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
 	return resource_load_balancer.NewStickyCookiePoliciesValue(
 		resource_load_balancer.StickyCookiePoliciesValue{}.AttributeTypes(ctx),
@@ -66,14 +78,18 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancerSchema)
 
 	backendIps, _ := utils.FromStringListPointerToTfStringList(ctx, http.BackendIps)
 	backendVmIds, _ := utils.FromStringListPointerToTfStringList(ctx, http.BackendVmIds)
-	healthCheck := resource_load_balancer.HealthCheckValue{
-		CheckInterval:      utils.FromIntToTfInt64(http.HealthCheck.CheckInterval),
-		HealthyThreshold:   utils.FromIntToTfInt64(http.HealthCheck.HealthyThreshold),
-		Path:               types.StringPointerValue(http.HealthCheck.Path),
-		Port:               utils.FromIntToTfInt64(http.HealthCheck.Port),
-		Protocol:           types.StringValue(http.HealthCheck.Protocol),
-		Timeout:            utils.FromIntToTfInt64(http.HealthCheck.Timeout),
-		UnhealthyThreshold: utils.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
+	healthCheck, err := resource_load_balancer.NewHealthCheckValue(resource_load_balancer.HealthCheckValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"check_interval":      utils.FromIntToTfInt64(http.HealthCheck.CheckInterval),
+			"healthy_threshold":   utils.FromIntToTfInt64(http.HealthCheck.HealthyThreshold),
+			"path":                types.StringPointerValue(http.HealthCheck.Path),
+			"port":                utils.FromIntToTfInt64(http.HealthCheck.Port),
+			"protocol":            types.StringValue(http.HealthCheck.Protocol),
+			"timeout":             utils.FromIntToTfInt64(http.HealthCheck.Timeout),
+			"unhealthy_threshold": utils.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
+		})
+	if err != nil {
+		return resource_load_balancer.LoadBalancerModel{}
 	}
 	//httpListeners := *http.Listeners
 	securityGroups, _ := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
@@ -126,5 +142,60 @@ func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_ba
 		Subnets:        &subnets,
 		//Tags:           nil,
 		Type: tf.Type.ValueStringPointer(),
+	}
+}
+
+func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) api.UpdateLoadBalancerJSONRequestBody {
+
+	var (
+		loadBalancerPort *int                   = nil
+		policyNames      *[]string              = nil
+		hc               *api.HealthCheckSchema = nil
+		publicIp         *string                = nil
+		securedCookies   *bool                  = nil
+	)
+
+	if !tf.HealthCheck.IsUnknown() {
+		hc = &api.HealthCheckSchema{
+			CheckInterval:      utils.FromTfInt64ToInt(tf.HealthCheck.CheckInterval),
+			HealthyThreshold:   utils.FromTfInt64ToInt(tf.HealthCheck.HealthyThreshold),
+			Path:               tf.HealthCheck.Path.ValueStringPointer(),
+			Port:               utils.FromTfInt64ToInt(tf.HealthCheck.Port),
+			Protocol:           tf.HealthCheck.Protocol.ValueString(),
+			Timeout:            utils.FromTfInt64ToInt(tf.HealthCheck.Timeout),
+			UnhealthyThreshold: utils.FromTfInt64ToInt(tf.HealthCheck.UnhealthyThreshold),
+		}
+	}
+	if !tf.PublicIp.IsUnknown() {
+		publicIp = tf.PublicIp.ValueStringPointer()
+	}
+	if !tf.SecuredCookies.IsUnknown() {
+		securedCookies = tf.SecuredCookies.ValueBoolPointer()
+	}
+	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
+	listeners := utils.TfListToGenericList(func(elt resource_load_balancer.ListenersValue) api.ListenerSchema {
+		policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames)
+		return api.ListenerSchema{
+			BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
+			BackendProtocol:      elt.BackendProtocol.ValueStringPointer(),
+			LoadBalancerPort:     utils.FromTfInt64ToIntPtr(elt.LoadBalancerPort),
+			LoadBalancerProtocol: elt.BackendProtocol.ValueStringPointer(),
+			PolicyNames:          &policyNames,
+			ServerCertificateId:  elt.ServerCertificateId.ValueStringPointer(),
+		}
+	}, ctx, tf.Listeners)
+
+	if len(listeners) == 1 {
+		loadBalancerPort = listeners[0].LoadBalancerPort
+		policyNames = listeners[0].PolicyNames
+	}
+
+	return api.UpdateLoadBalancerJSONRequestBody{
+		HealthCheck:      hc,
+		LoadBalancerPort: loadBalancerPort,
+		PolicyNames:      policyNames,
+		PublicIp:         publicIp,
+		SecuredCookies:   securedCookies,
+		SecurityGroups:   &securityGroups,
 	}
 }

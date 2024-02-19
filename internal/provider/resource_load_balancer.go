@@ -2,9 +2,11 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"net/http"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -89,8 +91,22 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 }
 
 func (r *LoadBalancerResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	// TODO implement me
-	panic("implement me")
+	var plan resource_load_balancer.LoadBalancerModel
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	payload := LoadBalancerFromTfToUpdateRequest(ctx, &plan)
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		response.Diagnostics.AddError("call update load balancer http call failed", "failed to marshal request payload")
+		return
+	}
+	res := utils.ExecuteRequest(func() (*api.UpdateLoadBalancerResponse, error) {
+		return r.client.UpdateLoadBalancerWithBodyWithResponse(ctx, plan.Name.ValueString(), "application/json; charset=utf-8", strings.NewReader(string(payloadBytes)))
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+	tf := LoadBalancerFromHttpToTf(ctx, res.JSON200.LoadBalancer)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
