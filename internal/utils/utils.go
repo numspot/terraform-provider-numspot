@@ -53,6 +53,10 @@ func FromStringListPointerToTfStringList(ctx context.Context, arr *[]string) (ty
 }
 
 func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list types.List) []B {
+	if len(list.Elements()) == 0 {
+		return nil
+	}
+
 	tfList := make([]A, 0, len(list.Elements()))
 	res := make([]B, 0, len(list.Elements()))
 
