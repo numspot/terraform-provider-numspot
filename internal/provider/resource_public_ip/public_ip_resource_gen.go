@@ -10,8 +10,6 @@ import (
 )
 
 func PublicIpResourceSchema(ctx context.Context) schema.Schema {
-	//planmodifiers := make([]planmodifier.String, 1)
-	//planmodifiers = append(planmodifiers, stringplanmodifier.UseStateForUnknown())
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
