@@ -92,6 +92,6 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteVolumeResponse, error) {
-		return r.client.DeleteVolumeWithResponse(ctx, data.Id.String())
+		return r.client.DeleteVolumeWithResponse(ctx, data.Id.String(), api.DeleteVolumeJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 }

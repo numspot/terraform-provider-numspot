@@ -148,7 +148,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteSubnetResponse, error) {
-		return r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString(), api.DeleteSubnetJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -96,6 +96,6 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteImageResponse, error) {
-		return r.client.DeleteImageWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteImageWithResponse(ctx, data.Id.ValueString(), api.DeleteImageJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 }

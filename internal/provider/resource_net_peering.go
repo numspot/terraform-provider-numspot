@@ -109,7 +109,7 @@ func (r *NetPeeringResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteNetPeeringWithResponse(ctx, data.Id.String())
+	res, err := r.client.DeleteNetPeeringWithResponse(ctx, data.Id.String(), api.DeleteNetPeeringJSONRequestBody{})
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete NetPeering", err.Error())

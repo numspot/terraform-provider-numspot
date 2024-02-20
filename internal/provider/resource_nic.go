@@ -109,6 +109,6 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteNicResponse, error) {
-		return r.client.DeleteNicWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteNicWithResponse(ctx, data.Id.ValueString(), api.DeleteNicJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 }

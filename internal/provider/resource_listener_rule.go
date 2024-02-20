@@ -92,6 +92,6 @@ func (r *ListenerRuleResource) Delete(ctx context.Context, request resource.Dele
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteListenerRuleResponse, error) {
-		return r.client.DeleteListenerRuleWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()))
+		return r.client.DeleteListenerRuleWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()), api.DeleteListenerRuleJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 }

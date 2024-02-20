@@ -98,7 +98,7 @@ func (r *DirectLinkResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteDirectLinkResponse, error) {
-		return r.client.DeleteDirectLinkWithResponse(ctx, data.Id.String())
+		return r.client.DeleteDirectLinkWithResponse(ctx, data.Id.String(), api.DeleteDirectLinkJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

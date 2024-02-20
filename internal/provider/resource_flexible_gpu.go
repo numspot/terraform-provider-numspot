@@ -133,6 +133,6 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteFlexibleGpuResponse, error) {
-		return r.client.DeleteFlexibleGpuWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteFlexibleGpuWithResponse(ctx, data.Id.ValueString(), api.DeleteFlexibleGpuJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 }

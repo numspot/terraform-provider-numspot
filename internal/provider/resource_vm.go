@@ -157,7 +157,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	res := utils.ExecuteRequest(func() (*api.DeleteVmsResponse, error) {
 		idsSlice := make([]interface{}, 1)
 		idsSlice[0] = data.Id.ValueString()
-		return r.client.DeleteVmsWithResponse(ctx, idsSlice)
+		return r.client.DeleteVmsWithResponse(ctx, idsSlice, api.DeleteVmsJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

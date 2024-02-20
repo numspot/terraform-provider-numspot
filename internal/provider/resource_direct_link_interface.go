@@ -99,6 +99,6 @@ func (r *DirectLinkInterfaceResource) Delete(ctx context.Context, request resour
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteDirectLinkInterfaceResponse, error) {
-		return r.client.DeleteDirectLinkInterfaceWithResponse(ctx, data.Id.String())
+		return r.client.DeleteDirectLinkInterfaceWithResponse(ctx, data.Id.String(), api.DeleteDirectLinkInterfaceJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 }

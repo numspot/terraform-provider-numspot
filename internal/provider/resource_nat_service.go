@@ -119,6 +119,6 @@ func (r *NatServiceResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteNatServiceResponse, error) {
-		return r.client.DeleteNatServiceWithResponse(ctx, data.Id.String())
+		return r.client.DeleteNatServiceWithResponse(ctx, data.Id.String(), api.DeleteNatServiceJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 }

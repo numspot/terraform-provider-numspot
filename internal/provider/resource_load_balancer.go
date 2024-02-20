@@ -60,18 +60,24 @@ func (r *LoadBalancerResource) Schema(ctx context.Context, request resource.Sche
 }
 
 func (r *LoadBalancerResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data resource_load_balancer.LoadBalancerModel
+	var (
+		data     resource_load_balancer.LoadBalancerModel
+		resModel api.LoadBalancerSchema
+	)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	body := LoadBalancerFromTfToCreateRequest(ctx, &data)
-	createRes := utils.ExecuteRequest(func() (*api.CreateLoadBalancerResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateLoadBalancerResponse, error) {
 		return r.client.CreateLoadBalancerWithResponse(ctx, body)
-	}, http.StatusOK, &response.Diagnostics)
-	if createRes == nil {
+	}, http.StatusCreated, &response.Diagnostics)
+	if res == nil {
 		return
 	}
+	if err := json.Unmarshal(res.Body, &resModel); err != nil {
+		response.Diagnostics.AddError("HTTP Response error", "Failed to unmarshal http response")
+	}
 
-	tf := LoadBalancerFromHttpToTf(ctx, createRes.JSON200) // FIXME
+	tf := LoadBalancerFromHttpToTf(ctx, &resModel) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -114,8 +120,8 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteLoadBalancerResponse, error) {
-		return r.client.DeleteLoadBalancerWithResponse(ctx, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+		return r.client.DeleteLoadBalancerWithResponse(ctx, data.Id.ValueString(), api.DeleteLoadBalancerJSONRequestBody{})
+	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
 	}

@@ -99,7 +99,7 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVpnConnectionResponse, error) {
-		return r.client.DeleteVpnConnectionWithResponse(ctx, data.Id.String())
+		return r.client.DeleteVpnConnectionWithResponse(ctx, data.Id.String(), api.DeleteVpnConnectionJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

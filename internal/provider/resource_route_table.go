@@ -240,7 +240,7 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 	}
 
 	for _, link := range links {
-		unlinkRes, err := r.client.UnlinkRouteTableWithResponse(ctx, link.Id.ValueString())
+		unlinkRes, err := r.client.UnlinkRouteTableWithResponse(ctx, link.Id.ValueString(), api.UnlinkRouteTableJSONRequestBody{})
 		if err != nil {
 			response.Diagnostics.AddError("Failed to delete RouteTable", err.Error())
 			return
@@ -253,7 +253,7 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 		}
 	}
 
-	res, err := r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString())
+	res, err := r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString(), api.DeleteRouteTableJSONRequestBody{})
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete RouteTable", err.Error())
 		return

@@ -106,6 +106,6 @@ func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.De
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteNetAccessPointResponse, error) {
-		return r.client.DeleteNetAccessPointWithResponse(ctx, data.Id.String())
+		return r.client.DeleteNetAccessPointWithResponse(ctx, data.Id.String(), api.DeleteNetAccessPointJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 }

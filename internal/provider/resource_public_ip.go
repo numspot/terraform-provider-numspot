@@ -63,7 +63,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
 	createRes := utils.ExecuteRequest(func() (*api.CreatePublicIpResponse, error) {
-		return r.client.CreatePublicIpWithResponse(ctx)
+		return r.client.CreatePublicIpWithResponse(ctx, api.CreatePublicIpJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 	if createRes == nil {
 		return
@@ -173,6 +173,6 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 		}
 	}
 	utils.ExecuteRequest(func() (*api.DeletePublicIpResponse, error) {
-		return r.client.DeletePublicIpWithResponse(ctx, state.Id.ValueString())
+		return r.client.DeletePublicIpWithResponse(ctx, state.Id.ValueString(), api.DeletePublicIpJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 }

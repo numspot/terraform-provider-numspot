@@ -62,7 +62,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	var data resource_internet_service.InternetServiceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res, err := r.client.CreateInternetServiceWithResponse(ctx)
+	res, err := r.client.CreateInternetServiceWithResponse(ctx, api.CreateInternetServiceJSONRequestBody{})
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create InternetService", err.Error())
 		return
@@ -149,7 +149,7 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 		}
 	}
 
-	res, err := r.client.DeleteInternetServiceWithResponse(ctx, data.Id.ValueString())
+	res, err := r.client.DeleteInternetServiceWithResponse(ctx, data.Id.ValueString(), api.DeleteInternetServiceJSONRequestBody{})
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete InternetService", err.Error())
 		return

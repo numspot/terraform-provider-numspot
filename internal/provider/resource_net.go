@@ -124,7 +124,7 @@ func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteNetResponse, error) {
-		return r.client.DeleteNetWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteNetWithResponse(ctx, data.Id.ValueString(), api.DeleteNetJSONRequestBody{})
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
