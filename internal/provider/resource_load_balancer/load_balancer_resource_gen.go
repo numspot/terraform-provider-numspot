@@ -262,8 +262,8 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 			"type": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The type of load balancer. Valid only for load balancers in a Net.<br />\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.",
-				MarkdownDescription: "The type of load balancer. Valid only for load balancers in a Net.<br />\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.",
+				Description:         "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.",
+				MarkdownDescription: "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.",
 			},
 		},
 	}
