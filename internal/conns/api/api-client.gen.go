@@ -304,6 +304,9 @@ type CreateImageRequestSchema struct {
 	VmId *string `json:"vmId,omitempty"`
 }
 
+// CreateInternetServiceRequestSchema defines model for CreateInternetServiceRequestSchema.
+type CreateInternetServiceRequestSchema = map[string]interface{}
+
 // CreateKeypairRequestSchema defines model for CreateKeypairRequestSchema.
 type CreateKeypairRequestSchema struct {
 	// Name A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
@@ -441,6 +444,9 @@ type CreateNicRequestSchema struct {
 	// SubnetId The ID of the Subnet in which you want to create the NIC.
 	SubnetId string `json:"subnetId"`
 }
+
+// CreatePublicIpRequestSchema defines model for CreatePublicIpRequestSchema.
+type CreatePublicIpRequestSchema = map[string]interface{}
 
 // CreateRouteRequestSchema defines model for CreateRouteRequestSchema.
 type CreateRouteRequestSchema struct {
@@ -669,6 +675,33 @@ type CreateVpnConnectionRouteRequestSchema struct {
 	VpnConnectionId string `json:"vpnConnectionId"`
 }
 
+// DeleteClientGatewayRequestSchema defines model for DeleteClientGatewayRequestSchema.
+type DeleteClientGatewayRequestSchema = map[string]interface{}
+
+// DeleteDhcpOptionsRequestSchema defines model for DeleteDhcpOptionsRequestSchema.
+type DeleteDhcpOptionsRequestSchema = map[string]interface{}
+
+// DeleteDirectLinkInterfaceRequestSchema defines model for DeleteDirectLinkInterfaceRequestSchema.
+type DeleteDirectLinkInterfaceRequestSchema = map[string]interface{}
+
+// DeleteDirectLinkRequestSchema defines model for DeleteDirectLinkRequestSchema.
+type DeleteDirectLinkRequestSchema = map[string]interface{}
+
+// DeleteFlexibleGpuRequestSchema defines model for DeleteFlexibleGpuRequestSchema.
+type DeleteFlexibleGpuRequestSchema = map[string]interface{}
+
+// DeleteImageRequestSchema defines model for DeleteImageRequestSchema.
+type DeleteImageRequestSchema = map[string]interface{}
+
+// DeleteInternetServiceRequestSchema defines model for DeleteInternetServiceRequestSchema.
+type DeleteInternetServiceRequestSchema = map[string]interface{}
+
+// DeleteKeypairRequestSchema defines model for DeleteKeypairRequestSchema.
+type DeleteKeypairRequestSchema = map[string]interface{}
+
+// DeleteListenerRuleRequestSchema defines model for DeleteListenerRuleRequestSchema.
+type DeleteListenerRuleRequestSchema = map[string]interface{}
+
 // DeleteLoadBalancerListenersRequestSchema defines model for DeleteLoadBalancerListenersRequestSchema.
 type DeleteLoadBalancerListenersRequestSchema struct {
 	// LoadBalancerPorts One or more port numbers of the listeners you want to delete.
@@ -693,11 +726,32 @@ type DeleteLoadBalancerPolicyResponseSchema struct {
 	LoadBalancer *LoadBalancerSchema `json:"loadBalancer,omitempty"`
 }
 
+// DeleteLoadBalancerRequestSchema defines model for DeleteLoadBalancerRequestSchema.
+type DeleteLoadBalancerRequestSchema = map[string]interface{}
+
 // DeleteLoadBalancerTagsRequestSchema defines model for DeleteLoadBalancerTagsRequestSchema.
 type DeleteLoadBalancerTagsRequestSchema struct {
 	// Tags One or more tags to delete from the load balancers.
 	Tags []ResourceLoadBalancerTagSchema `json:"tags"`
 }
+
+// DeleteNatServiceRequestSchema defines model for DeleteNatServiceRequestSchema.
+type DeleteNatServiceRequestSchema = map[string]interface{}
+
+// DeleteNetAccessPointRequestSchema defines model for DeleteNetAccessPointRequestSchema.
+type DeleteNetAccessPointRequestSchema = map[string]interface{}
+
+// DeleteNetPeeringRequestSchema defines model for DeleteNetPeeringRequestSchema.
+type DeleteNetPeeringRequestSchema = map[string]interface{}
+
+// DeleteNetRequestSchema defines model for DeleteNetRequestSchema.
+type DeleteNetRequestSchema = map[string]interface{}
+
+// DeleteNicRequestSchema defines model for DeleteNicRequestSchema.
+type DeleteNicRequestSchema = map[string]interface{}
+
+// DeletePublicIpRequestSchema defines model for DeletePublicIpRequestSchema.
+type DeletePublicIpRequestSchema = map[string]interface{}
 
 // DeleteRouteRequestSchema defines model for DeleteRouteRequestSchema.
 type DeleteRouteRequestSchema struct {
@@ -710,6 +764,9 @@ type DeleteRouteResponseSchema struct {
 	// RouteTable Information about the route table.
 	RouteTable *RouteTableSchema `json:"routeTable,omitempty"`
 }
+
+// DeleteRouteTableRequestSchema defines model for DeleteRouteTableRequestSchema.
+type DeleteRouteTableRequestSchema = map[string]interface{}
 
 // DeleteSecurityGroupRequestSchema defines model for DeleteSecurityGroupRequestSchema.
 type DeleteSecurityGroupRequestSchema struct {
@@ -750,17 +807,35 @@ type DeleteSecurityGroupRuleResponseSchema struct {
 	SecurityGroup *SecurityGroupSchema `json:"securityGroup,omitempty"`
 }
 
+// DeleteSnapshotRequestSchema defines model for DeleteSnapshotRequestSchema.
+type DeleteSnapshotRequestSchema = map[string]interface{}
+
+// DeleteSubnetRequestSchema defines model for DeleteSubnetRequestSchema.
+type DeleteSubnetRequestSchema = map[string]interface{}
+
 // DeleteTagsRequestSchema defines model for DeleteTagsRequestSchema.
 type DeleteTagsRequestSchema struct {
 	// Tags One or more tags to delete (if you set a tag value, only the tags matching exactly this value are deleted).
 	Tags []ResourceTagSchema `json:"tags"`
 }
 
+// DeleteVirtualGatewayRequestSchema defines model for DeleteVirtualGatewayRequestSchema.
+type DeleteVirtualGatewayRequestSchema = map[string]interface{}
+
+// DeleteVmsRequestSchema defines model for DeleteVmsRequestSchema.
+type DeleteVmsRequestSchema = map[string]interface{}
+
 // DeleteVmsResponseSchema defines model for DeleteVmsResponseSchema.
 type DeleteVmsResponseSchema struct {
 	// Vms Information about one or more terminated VMs.
 	Vms *[]VmStateSchema `json:"vms,omitempty"`
 }
+
+// DeleteVolumeRequestSchema defines model for DeleteVolumeRequestSchema.
+type DeleteVolumeRequestSchema = map[string]interface{}
+
+// DeleteVpnConnectionRequestSchema defines model for DeleteVpnConnectionRequestSchema.
+type DeleteVpnConnectionRequestSchema = map[string]interface{}
 
 // DeleteVpnConnectionRouteRequestSchema defines model for DeleteVpnConnectionRouteRequestSchema.
 type DeleteVpnConnectionRouteRequestSchema struct {
@@ -1886,6 +1961,9 @@ type ReadDirectLinksResponseSchema struct {
 	DirectLinks *[]DirectLinkSchema `json:"directLinks,omitempty"`
 }
 
+// ReadFlexibleGpuCatalogRequestSchema defines model for ReadFlexibleGpuCatalogRequestSchema.
+type ReadFlexibleGpuCatalogRequestSchema = map[string]interface{}
+
 // ReadFlexibleGpuCatalogResponseSchema defines model for ReadFlexibleGpuCatalogResponseSchema.
 type ReadFlexibleGpuCatalogResponseSchema struct {
 	// FlexibleGpuCatalog Information about one or more fGPUs available in the public catalog.
@@ -1940,6 +2018,9 @@ type ReadLoadBalancersResponseSchema struct {
 	LoadBalancers *[]LoadBalancerSchema `json:"loadBalancers,omitempty"`
 }
 
+// ReadLocationsRequestSchema defines model for ReadLocationsRequestSchema.
+type ReadLocationsRequestSchema = map[string]interface{}
+
 // ReadLocationsResponseSchema defines model for ReadLocationsResponseSchema.
 type ReadLocationsResponseSchema struct {
 	// Locations Information about one or more locations.
@@ -1981,6 +2062,9 @@ type ReadProductTypesResponseSchema struct {
 	// ProductTypes Information about one or more product types.
 	ProductTypes *[]ProductTypeSchema `json:"productTypes,omitempty"`
 }
+
+// ReadPublicIpRangesRequestSchema defines model for ReadPublicIpRangesRequestSchema.
+type ReadPublicIpRangesRequestSchema = map[string]interface{}
 
 // ReadPublicIpRangesResponseSchema defines model for ReadPublicIpRangesResponseSchema.
 type ReadPublicIpRangesResponseSchema struct {
@@ -2373,6 +2457,9 @@ type TagSchema struct {
 	Value *string `json:"value,omitempty"`
 }
 
+// UnlinkFlexibleGpuRequestSchema defines model for UnlinkFlexibleGpuRequestSchema.
+type UnlinkFlexibleGpuRequestSchema = map[string]interface{}
+
 // UnlinkInternetServiceRequestSchema defines model for UnlinkInternetServiceRequestSchema.
 type UnlinkInternetServiceRequestSchema struct {
 	// NetId The ID of the Net from which you want to detach the Internet service.
@@ -2388,6 +2475,9 @@ type UnlinkLoadBalancerBackendMachinesRequestSchema struct {
 	BackendVmIds *[]string `json:"backendVmIds,omitempty"`
 }
 
+// UnlinkNicRequestSchema defines model for UnlinkNicRequestSchema.
+type UnlinkNicRequestSchema = map[string]interface{}
+
 // UnlinkPrivateIpsRequestSchema defines model for UnlinkPrivateIpsRequestSchema.
 type UnlinkPrivateIpsRequestSchema struct {
 	// PrivateIps One or more secondary private IPs you want to unassign from the NIC.
@@ -2399,6 +2489,9 @@ type UnlinkPublicIpRequestSchema struct {
 	// PublicIp The public IP. This parameter is required unless you use the `LinkPublicIpId` parameter.
 	PublicIp *string `json:"publicIp,omitempty"`
 }
+
+// UnlinkRouteTableRequestSchema defines model for UnlinkRouteTableRequestSchema.
+type UnlinkRouteTableRequestSchema = map[string]interface{}
 
 // UnlinkVirtualGatewayRequestSchema defines model for UnlinkVirtualGatewayRequestSchema.
 type UnlinkVirtualGatewayRequestSchema struct {
@@ -3731,14 +3824,23 @@ type ReadAdminPasswordJSONRequestBody = ReadAdminPasswordRequestSchema
 // CreateClientGatewayJSONRequestBody defines body for CreateClientGateway for application/json ContentType.
 type CreateClientGatewayJSONRequestBody = CreateClientGatewayRequestSchema
 
+// DeleteClientGatewayJSONRequestBody defines body for DeleteClientGateway for application/json ContentType.
+type DeleteClientGatewayJSONRequestBody = DeleteClientGatewayRequestSchema
+
 // ReadConsoleOutputJSONRequestBody defines body for ReadConsoleOutput for application/json ContentType.
 type ReadConsoleOutputJSONRequestBody = ReadConsoleOutputRequestSchema
 
 // CreateDhcpOptionsJSONRequestBody defines body for CreateDhcpOptions for application/json ContentType.
 type CreateDhcpOptionsJSONRequestBody = CreateDhcpOptionsRequestSchema
 
+// DeleteDhcpOptionsJSONRequestBody defines body for DeleteDhcpOptions for application/json ContentType.
+type DeleteDhcpOptionsJSONRequestBody = DeleteDhcpOptionsRequestSchema
+
 // CreateDirectLinkInterfaceJSONRequestBody defines body for CreateDirectLinkInterface for application/json ContentType.
 type CreateDirectLinkInterfaceJSONRequestBody = CreateDirectLinkInterfaceRequestSchema
+
+// DeleteDirectLinkInterfaceJSONRequestBody defines body for DeleteDirectLinkInterface for application/json ContentType.
+type DeleteDirectLinkInterfaceJSONRequestBody = DeleteDirectLinkInterfaceRequestSchema
 
 // UpdateDirectLinkInterfaceJSONRequestBody defines body for UpdateDirectLinkInterface for application/json ContentType.
 type UpdateDirectLinkInterfaceJSONRequestBody = UpdateDirectLinkInterfaceRequestSchema
@@ -3746,8 +3848,17 @@ type UpdateDirectLinkInterfaceJSONRequestBody = UpdateDirectLinkInterfaceRequest
 // CreateDirectLinkJSONRequestBody defines body for CreateDirectLink for application/json ContentType.
 type CreateDirectLinkJSONRequestBody = CreateDirectLinkRequestSchema
 
+// DeleteDirectLinkJSONRequestBody defines body for DeleteDirectLink for application/json ContentType.
+type DeleteDirectLinkJSONRequestBody = DeleteDirectLinkRequestSchema
+
+// ReadFlexibleGpuCatalogJSONRequestBody defines body for ReadFlexibleGpuCatalog for application/json ContentType.
+type ReadFlexibleGpuCatalogJSONRequestBody = ReadFlexibleGpuCatalogRequestSchema
+
 // CreateFlexibleGpuJSONRequestBody defines body for CreateFlexibleGpu for application/json ContentType.
 type CreateFlexibleGpuJSONRequestBody = CreateFlexibleGpuRequestSchema
+
+// DeleteFlexibleGpuJSONRequestBody defines body for DeleteFlexibleGpu for application/json ContentType.
+type DeleteFlexibleGpuJSONRequestBody = DeleteFlexibleGpuRequestSchema
 
 // UpdateFlexibleGpuJSONRequestBody defines body for UpdateFlexibleGpu for application/json ContentType.
 type UpdateFlexibleGpuJSONRequestBody = UpdateFlexibleGpuRequestSchema
@@ -3755,11 +3866,23 @@ type UpdateFlexibleGpuJSONRequestBody = UpdateFlexibleGpuRequestSchema
 // LinkFlexibleGpuJSONRequestBody defines body for LinkFlexibleGpu for application/json ContentType.
 type LinkFlexibleGpuJSONRequestBody = LinkFlexibleGpuRequestSchema
 
+// UnlinkFlexibleGpuJSONRequestBody defines body for UnlinkFlexibleGpu for application/json ContentType.
+type UnlinkFlexibleGpuJSONRequestBody = UnlinkFlexibleGpuRequestSchema
+
 // CreateImageJSONRequestBody defines body for CreateImage for application/json ContentType.
 type CreateImageJSONRequestBody = CreateImageRequestSchema
 
+// DeleteImageJSONRequestBody defines body for DeleteImage for application/json ContentType.
+type DeleteImageJSONRequestBody = DeleteImageRequestSchema
+
 // UpdateImageJSONRequestBody defines body for UpdateImage for application/json ContentType.
 type UpdateImageJSONRequestBody = UpdateImageRequestSchema
+
+// CreateInternetServiceJSONRequestBody defines body for CreateInternetService for application/json ContentType.
+type CreateInternetServiceJSONRequestBody = CreateInternetServiceRequestSchema
+
+// DeleteInternetServiceJSONRequestBody defines body for DeleteInternetService for application/json ContentType.
+type DeleteInternetServiceJSONRequestBody = DeleteInternetServiceRequestSchema
 
 // LinkInternetServiceJSONRequestBody defines body for LinkInternetService for application/json ContentType.
 type LinkInternetServiceJSONRequestBody = LinkInternetServiceRequestSchema
@@ -3770,8 +3893,14 @@ type UnlinkInternetServiceJSONRequestBody = UnlinkInternetServiceRequestSchema
 // CreateKeypairJSONRequestBody defines body for CreateKeypair for application/json ContentType.
 type CreateKeypairJSONRequestBody = CreateKeypairRequestSchema
 
+// DeleteKeypairJSONRequestBody defines body for DeleteKeypair for application/json ContentType.
+type DeleteKeypairJSONRequestBody = DeleteKeypairRequestSchema
+
 // CreateListenerRuleJSONRequestBody defines body for CreateListenerRule for application/json ContentType.
 type CreateListenerRuleJSONRequestBody = CreateListenerRuleRequestSchema
+
+// DeleteListenerRuleJSONRequestBody defines body for DeleteListenerRule for application/json ContentType.
+type DeleteListenerRuleJSONRequestBody = DeleteListenerRuleRequestSchema
 
 // UpdateListenerRuleJSONRequestBody defines body for UpdateListenerRule for application/json ContentType.
 type UpdateListenerRuleJSONRequestBody = UpdateListenerRuleRequestSchema
@@ -3806,14 +3935,26 @@ type DeleteLoadBalancerTagsJSONRequestBody = DeleteLoadBalancerTagsRequestSchema
 // CreateLoadBalancerJSONRequestBody defines body for CreateLoadBalancer for application/json ContentType.
 type CreateLoadBalancerJSONRequestBody = CreateLoadBalancerRequestSchema
 
+// DeleteLoadBalancerJSONRequestBody defines body for DeleteLoadBalancer for application/json ContentType.
+type DeleteLoadBalancerJSONRequestBody = DeleteLoadBalancerRequestSchema
+
 // UpdateLoadBalancerJSONRequestBody defines body for UpdateLoadBalancer for application/json ContentType.
 type UpdateLoadBalancerJSONRequestBody = UpdateLoadBalancerRequestSchema
+
+// ReadLocationsJSONRequestBody defines body for ReadLocations for application/json ContentType.
+type ReadLocationsJSONRequestBody = ReadLocationsRequestSchema
 
 // CreateNatServiceJSONRequestBody defines body for CreateNatService for application/json ContentType.
 type CreateNatServiceJSONRequestBody = CreateNatServiceRequestSchema
 
+// DeleteNatServiceJSONRequestBody defines body for DeleteNatService for application/json ContentType.
+type DeleteNatServiceJSONRequestBody = DeleteNatServiceRequestSchema
+
 // CreateNetAccessPointJSONRequestBody defines body for CreateNetAccessPoint for application/json ContentType.
 type CreateNetAccessPointJSONRequestBody = CreateNetAccessPointRequestSchema
+
+// DeleteNetAccessPointJSONRequestBody defines body for DeleteNetAccessPoint for application/json ContentType.
+type DeleteNetAccessPointJSONRequestBody = DeleteNetAccessPointRequestSchema
 
 // UpdateNetAccessPointJSONRequestBody defines body for UpdateNetAccessPoint for application/json ContentType.
 type UpdateNetAccessPointJSONRequestBody = UpdateNetAccessPointRequestSchema
@@ -3821,8 +3962,14 @@ type UpdateNetAccessPointJSONRequestBody = UpdateNetAccessPointRequestSchema
 // CreateNetPeeringJSONRequestBody defines body for CreateNetPeering for application/json ContentType.
 type CreateNetPeeringJSONRequestBody = CreateNetPeeringRequestSchema
 
+// DeleteNetPeeringJSONRequestBody defines body for DeleteNetPeering for application/json ContentType.
+type DeleteNetPeeringJSONRequestBody = DeleteNetPeeringRequestSchema
+
 // CreateNetJSONRequestBody defines body for CreateNet for application/json ContentType.
 type CreateNetJSONRequestBody = CreateNetRequestSchema
+
+// DeleteNetJSONRequestBody defines body for DeleteNet for application/json ContentType.
+type DeleteNetJSONRequestBody = DeleteNetRequestSchema
 
 // UpdateNetJSONRequestBody defines body for UpdateNet for application/json ContentType.
 type UpdateNetJSONRequestBody = UpdateNetRequestSchema
@@ -3830,17 +3977,32 @@ type UpdateNetJSONRequestBody = UpdateNetRequestSchema
 // CreateNicJSONRequestBody defines body for CreateNic for application/json ContentType.
 type CreateNicJSONRequestBody = CreateNicRequestSchema
 
+// DeleteNicJSONRequestBody defines body for DeleteNic for application/json ContentType.
+type DeleteNicJSONRequestBody = DeleteNicRequestSchema
+
 // UpdateNicJSONRequestBody defines body for UpdateNic for application/json ContentType.
 type UpdateNicJSONRequestBody = UpdateNicRequestSchema
 
 // LinkNicJSONRequestBody defines body for LinkNic for application/json ContentType.
 type LinkNicJSONRequestBody = LinkNicRequestSchema
 
+// UnlinkNicJSONRequestBody defines body for UnlinkNic for application/json ContentType.
+type UnlinkNicJSONRequestBody = UnlinkNicRequestSchema
+
 // LinkPrivateIpsJSONRequestBody defines body for LinkPrivateIps for application/json ContentType.
 type LinkPrivateIpsJSONRequestBody = LinkPrivateIpsRequestSchema
 
 // UnlinkPrivateIpsJSONRequestBody defines body for UnlinkPrivateIps for application/json ContentType.
 type UnlinkPrivateIpsJSONRequestBody = UnlinkPrivateIpsRequestSchema
+
+// ReadPublicIpRangesJSONRequestBody defines body for ReadPublicIpRanges for application/json ContentType.
+type ReadPublicIpRangesJSONRequestBody = ReadPublicIpRangesRequestSchema
+
+// CreatePublicIpJSONRequestBody defines body for CreatePublicIp for application/json ContentType.
+type CreatePublicIpJSONRequestBody = CreatePublicIpRequestSchema
+
+// DeletePublicIpJSONRequestBody defines body for DeletePublicIp for application/json ContentType.
+type DeletePublicIpJSONRequestBody = DeletePublicIpRequestSchema
 
 // LinkPublicIpJSONRequestBody defines body for LinkPublicIp for application/json ContentType.
 type LinkPublicIpJSONRequestBody = LinkPublicIpRequestSchema
@@ -3860,8 +4022,14 @@ type UpdateRoutePropagationJSONRequestBody = UpdateRoutePropagationRequestSchema
 // CreateRouteTableJSONRequestBody defines body for CreateRouteTable for application/json ContentType.
 type CreateRouteTableJSONRequestBody = CreateRouteTableRequestSchema
 
+// DeleteRouteTableJSONRequestBody defines body for DeleteRouteTable for application/json ContentType.
+type DeleteRouteTableJSONRequestBody = DeleteRouteTableRequestSchema
+
 // LinkRouteTableJSONRequestBody defines body for LinkRouteTable for application/json ContentType.
 type LinkRouteTableJSONRequestBody = LinkRouteTableRequestSchema
+
+// UnlinkRouteTableJSONRequestBody defines body for UnlinkRouteTable for application/json ContentType.
+type UnlinkRouteTableJSONRequestBody = UnlinkRouteTableRequestSchema
 
 // CreateRouteJSONRequestBody defines body for CreateRoute for application/json ContentType.
 type CreateRouteJSONRequestBody = CreateRouteRequestSchema
@@ -3887,6 +4055,9 @@ type DeleteSecurityGroupJSONRequestBody = DeleteSecurityGroupRequestSchema
 // CreateSnapshotJSONRequestBody defines body for CreateSnapshot for application/json ContentType.
 type CreateSnapshotJSONRequestBody = CreateSnapshotRequestSchema
 
+// DeleteSnapshotJSONRequestBody defines body for DeleteSnapshot for application/json ContentType.
+type DeleteSnapshotJSONRequestBody = DeleteSnapshotRequestSchema
+
 // StartVmsJSONRequestBody defines body for StartVms for application/json ContentType.
 type StartVmsJSONRequestBody = StartVmsRequestSchema
 
@@ -3895,6 +4066,9 @@ type StopVmsJSONRequestBody = StopVmsRequestSchema
 
 // CreateSubnetJSONRequestBody defines body for CreateSubnet for application/json ContentType.
 type CreateSubnetJSONRequestBody = CreateSubnetRequestSchema
+
+// DeleteSubnetJSONRequestBody defines body for DeleteSubnet for application/json ContentType.
+type DeleteSubnetJSONRequestBody = DeleteSubnetRequestSchema
 
 // UpdateSubnetJSONRequestBody defines body for UpdateSubnet for application/json ContentType.
 type UpdateSubnetJSONRequestBody = UpdateSubnetRequestSchema
@@ -3908,6 +4082,9 @@ type DeleteTagsJSONRequestBody = DeleteTagsRequestSchema
 // CreateVirtualGatewayJSONRequestBody defines body for CreateVirtualGateway for application/json ContentType.
 type CreateVirtualGatewayJSONRequestBody = CreateVirtualGatewayRequestSchema
 
+// DeleteVirtualGatewayJSONRequestBody defines body for DeleteVirtualGateway for application/json ContentType.
+type DeleteVirtualGatewayJSONRequestBody = DeleteVirtualGatewayRequestSchema
+
 // LinkVirtualGatewayJSONRequestBody defines body for LinkVirtualGateway for application/json ContentType.
 type LinkVirtualGatewayJSONRequestBody = LinkVirtualGatewayRequestSchema
 
@@ -3917,6 +4094,9 @@ type UnlinkVirtualGatewayJSONRequestBody = UnlinkVirtualGatewayRequestSchema
 // CreateVmsJSONRequestBody defines body for CreateVms for application/json ContentType.
 type CreateVmsJSONRequestBody = CreateVmsRequestSchema
 
+// DeleteVmsJSONRequestBody defines body for DeleteVms for application/json ContentType.
+type DeleteVmsJSONRequestBody = DeleteVmsRequestSchema
+
 // UpdateVmJSONRequestBody defines body for UpdateVm for application/json ContentType.
 type UpdateVmJSONRequestBody = UpdateVmRequestSchema
 
@@ -3925,6 +4105,9 @@ type ReadVmsHealthJSONRequestBody = ReadVmsHealthRequestSchema
 
 // CreateVolumeJSONRequestBody defines body for CreateVolume for application/json ContentType.
 type CreateVolumeJSONRequestBody = CreateVolumeRequestSchema
+
+// DeleteVolumeJSONRequestBody defines body for DeleteVolume for application/json ContentType.
+type DeleteVolumeJSONRequestBody = DeleteVolumeRequestSchema
 
 // UpdateVolumeJSONRequestBody defines body for UpdateVolume for application/json ContentType.
 type UpdateVolumeJSONRequestBody = UpdateVolumeRequestSchema
@@ -3943,6 +4126,9 @@ type DeleteVpnConnectionRouteJSONRequestBody = DeleteVpnConnectionRouteRequestSc
 
 // CreateVpnConnectionJSONRequestBody defines body for CreateVpnConnection for application/json ContentType.
 type CreateVpnConnectionJSONRequestBody = CreateVpnConnectionRequestSchema
+
+// DeleteVpnConnectionJSONRequestBody defines body for DeleteVpnConnection for application/json ContentType.
+type DeleteVpnConnectionJSONRequestBody = DeleteVpnConnectionRequestSchema
 
 // UpdateVpnConnectionJSONRequestBody defines body for UpdateVpnConnection for application/json ContentType.
 type UpdateVpnConnectionJSONRequestBody = UpdateVpnConnectionRequestSchema
@@ -4041,8 +4227,10 @@ type ClientInterface interface {
 
 	CreateClientGateway(ctx context.Context, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteClientGateway request
-	DeleteClientGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteClientGatewayWithBody request with any body
+	DeleteClientGatewayWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteClientGateway(ctx context.Context, id string, body DeleteClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadClientGatewaysById request
 	ReadClientGatewaysById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4063,8 +4251,10 @@ type ClientInterface interface {
 
 	CreateDhcpOptions(ctx context.Context, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteDhcpOptions request
-	DeleteDhcpOptions(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteDhcpOptionsWithBody request with any body
+	DeleteDhcpOptionsWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteDhcpOptions(ctx context.Context, id string, body DeleteDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadDhcpOptionsById request
 	ReadDhcpOptionsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4077,8 +4267,10 @@ type ClientInterface interface {
 
 	CreateDirectLinkInterface(ctx context.Context, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteDirectLinkInterface request
-	DeleteDirectLinkInterface(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteDirectLinkInterfaceWithBody request with any body
+	DeleteDirectLinkInterfaceWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteDirectLinkInterface(ctx context.Context, id string, body DeleteDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadDirectLinkInterfacesById request
 	ReadDirectLinkInterfacesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4096,14 +4288,18 @@ type ClientInterface interface {
 
 	CreateDirectLink(ctx context.Context, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteDirectLink request
-	DeleteDirectLink(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteDirectLinkWithBody request with any body
+	DeleteDirectLinkWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteDirectLink(ctx context.Context, id string, body DeleteDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadDirectLinksById request
 	ReadDirectLinksById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ReadFlexibleGpuCatalog request
-	ReadFlexibleGpuCatalog(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ReadFlexibleGpuCatalogWithBody request with any body
+	ReadFlexibleGpuCatalogWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReadFlexibleGpuCatalog(ctx context.Context, body ReadFlexibleGpuCatalogJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadFlexibleGpuCatalogById request
 	ReadFlexibleGpuCatalogById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4116,8 +4312,10 @@ type ClientInterface interface {
 
 	CreateFlexibleGpu(ctx context.Context, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteFlexibleGpu request
-	DeleteFlexibleGpu(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteFlexibleGpuWithBody request with any body
+	DeleteFlexibleGpuWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteFlexibleGpu(ctx context.Context, id string, body DeleteFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadFlexibleGpusById request
 	ReadFlexibleGpusById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4132,8 +4330,10 @@ type ClientInterface interface {
 
 	LinkFlexibleGpu(ctx context.Context, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// UnlinkFlexibleGpu request
-	UnlinkFlexibleGpu(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// UnlinkFlexibleGpuWithBody request with any body
+	UnlinkFlexibleGpuWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UnlinkFlexibleGpu(ctx context.Context, id string, body UnlinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadImages request
 	ReadImages(ctx context.Context, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4143,8 +4343,10 @@ type ClientInterface interface {
 
 	CreateImage(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteImage request
-	DeleteImage(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteImageWithBody request with any body
+	DeleteImageWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteImage(ctx context.Context, id string, body DeleteImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadImagesById request
 	ReadImagesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4157,11 +4359,15 @@ type ClientInterface interface {
 	// ReadInternetServices request
 	ReadInternetServices(ctx context.Context, params *ReadInternetServicesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateInternetService request
-	CreateInternetService(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateInternetServiceWithBody request with any body
+	CreateInternetServiceWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteInternetService request
-	DeleteInternetService(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateInternetService(ctx context.Context, body CreateInternetServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteInternetServiceWithBody request with any body
+	DeleteInternetServiceWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteInternetService(ctx context.Context, id string, body DeleteInternetServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadInternetServicesById request
 	ReadInternetServicesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4184,8 +4390,10 @@ type ClientInterface interface {
 
 	CreateKeypair(ctx context.Context, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteKeypair request
-	DeleteKeypair(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteKeypairWithBody request with any body
+	DeleteKeypairWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteKeypair(ctx context.Context, id string, body DeleteKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadKeypairsById request
 	ReadKeypairsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4198,8 +4406,10 @@ type ClientInterface interface {
 
 	CreateListenerRule(ctx context.Context, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteListenerRule request
-	DeleteListenerRule(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteListenerRuleWithBody request with any body
+	DeleteListenerRuleWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteListenerRule(ctx context.Context, id string, body DeleteListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadListenerRulesById request
 	ReadListenerRulesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4265,8 +4475,10 @@ type ClientInterface interface {
 
 	CreateLoadBalancer(ctx context.Context, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteLoadBalancer request
-	DeleteLoadBalancer(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteLoadBalancerWithBody request with any body
+	DeleteLoadBalancerWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteLoadBalancer(ctx context.Context, id string, body DeleteLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadLoadBalancersById request
 	ReadLoadBalancersById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4276,8 +4488,10 @@ type ClientInterface interface {
 
 	UpdateLoadBalancer(ctx context.Context, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ReadLocations request
-	ReadLocations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ReadLocationsWithBody request with any body
+	ReadLocationsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReadLocations(ctx context.Context, body ReadLocationsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadLocationsById request
 	ReadLocationsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4290,8 +4504,10 @@ type ClientInterface interface {
 
 	CreateNatService(ctx context.Context, body CreateNatServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteNatService request
-	DeleteNatService(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteNatServiceWithBody request with any body
+	DeleteNatServiceWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteNatService(ctx context.Context, id string, body DeleteNatServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadNatServicesById request
 	ReadNatServicesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4304,8 +4520,10 @@ type ClientInterface interface {
 
 	CreateNetAccessPoint(ctx context.Context, body CreateNetAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteNetAccessPoint request
-	DeleteNetAccessPoint(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteNetAccessPointWithBody request with any body
+	DeleteNetAccessPointWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteNetAccessPoint(ctx context.Context, id string, body DeleteNetAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadNetAccessPointsById request
 	ReadNetAccessPointsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4323,8 +4541,10 @@ type ClientInterface interface {
 
 	CreateNetPeering(ctx context.Context, body CreateNetPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteNetPeering request
-	DeleteNetPeering(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteNetPeeringWithBody request with any body
+	DeleteNetPeeringWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteNetPeering(ctx context.Context, id string, body DeleteNetPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadNetPeeringsById request
 	ReadNetPeeringsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4337,8 +4557,10 @@ type ClientInterface interface {
 
 	CreateNet(ctx context.Context, body CreateNetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteNet request
-	DeleteNet(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteNetWithBody request with any body
+	DeleteNetWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteNet(ctx context.Context, id string, body DeleteNetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadNetsById request
 	ReadNetsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4356,8 +4578,10 @@ type ClientInterface interface {
 
 	CreateNic(ctx context.Context, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteNic request
-	DeleteNic(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteNicWithBody request with any body
+	DeleteNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteNic(ctx context.Context, id string, body DeleteNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadNicsById request
 	ReadNicsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4372,8 +4596,10 @@ type ClientInterface interface {
 
 	LinkNic(ctx context.Context, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// UnlinkNic request
-	UnlinkNic(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// UnlinkNicWithBody request with any body
+	UnlinkNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UnlinkNic(ctx context.Context, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkPrivateIpsWithBody request with any body
 	LinkPrivateIpsWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4391,8 +4617,10 @@ type ClientInterface interface {
 	// ReadProductTypesById request
 	ReadProductTypesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ReadPublicIpRanges request
-	ReadPublicIpRanges(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ReadPublicIpRangesWithBody request with any body
+	ReadPublicIpRangesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReadPublicIpRanges(ctx context.Context, body ReadPublicIpRangesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadPublicIpRangesById request
 	ReadPublicIpRangesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4400,11 +4628,15 @@ type ClientInterface interface {
 	// ReadPublicIps request
 	ReadPublicIps(ctx context.Context, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreatePublicIp request
-	CreatePublicIp(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreatePublicIpWithBody request with any body
+	CreatePublicIpWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeletePublicIp request
-	DeletePublicIp(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreatePublicIp(ctx context.Context, body CreatePublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeletePublicIpWithBody request with any body
+	DeletePublicIpWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeletePublicIp(ctx context.Context, id string, body DeletePublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadPublicIpsById request
 	ReadPublicIpsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4442,8 +4674,10 @@ type ClientInterface interface {
 
 	CreateRouteTable(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteRouteTable request
-	DeleteRouteTable(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteRouteTableWithBody request with any body
+	DeleteRouteTableWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteRouteTable(ctx context.Context, id string, body DeleteRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadRouteTablesById request
 	ReadRouteTablesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4453,8 +4687,10 @@ type ClientInterface interface {
 
 	LinkRouteTable(ctx context.Context, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// UnlinkRouteTable request
-	UnlinkRouteTable(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// UnlinkRouteTableWithBody request with any body
+	UnlinkRouteTableWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UnlinkRouteTable(ctx context.Context, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateRouteWithBody request with any body
 	CreateRouteWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4505,8 +4741,10 @@ type ClientInterface interface {
 
 	CreateSnapshot(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteSnapshot request
-	DeleteSnapshot(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteSnapshotWithBody request with any body
+	DeleteSnapshotWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteSnapshot(ctx context.Context, id string, body DeleteSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSnapshotsById request
 	ReadSnapshotsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4529,8 +4767,10 @@ type ClientInterface interface {
 
 	CreateSubnet(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteSubnet request
-	DeleteSubnet(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteSubnetWithBody request with any body
+	DeleteSubnetWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteSubnet(ctx context.Context, id string, body DeleteSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSubnetsById request
 	ReadSubnetsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4564,8 +4804,10 @@ type ClientInterface interface {
 
 	CreateVirtualGateway(ctx context.Context, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteVirtualGateway request
-	DeleteVirtualGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteVirtualGatewayWithBody request with any body
+	DeleteVirtualGatewayWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteVirtualGateway(ctx context.Context, id string, body DeleteVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVirtualGatewaysById request
 	ReadVirtualGatewaysById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4588,8 +4830,10 @@ type ClientInterface interface {
 
 	CreateVms(ctx context.Context, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteVms request
-	DeleteVms(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteVmsWithBody request with any body
+	DeleteVmsWithBody(ctx context.Context, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteVms(ctx context.Context, id []interface{}, body DeleteVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVmsById request
 	ReadVmsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4621,8 +4865,10 @@ type ClientInterface interface {
 
 	CreateVolume(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteVolume request
-	DeleteVolume(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteVolumeWithBody request with any body
+	DeleteVolumeWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteVolume(ctx context.Context, id string, body DeleteVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVolumesById request
 	ReadVolumesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4660,8 +4906,10 @@ type ClientInterface interface {
 
 	CreateVpnConnection(ctx context.Context, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteVpnConnection request
-	DeleteVpnConnection(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteVpnConnectionWithBody request with any body
+	DeleteVpnConnectionWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteVpnConnection(ctx context.Context, id string, body DeleteVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVpnConnectionsById request
 	ReadVpnConnectionsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -4768,8 +5016,20 @@ func (c *Client) CreateClientGateway(ctx context.Context, body CreateClientGatew
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteClientGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteClientGatewayRequest(c.Server, id)
+func (c *Client) DeleteClientGatewayWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteClientGatewayRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteClientGateway(ctx context.Context, id string, body DeleteClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteClientGatewayRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -4864,8 +5124,20 @@ func (c *Client) CreateDhcpOptions(ctx context.Context, body CreateDhcpOptionsJS
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteDhcpOptions(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteDhcpOptionsRequest(c.Server, id)
+func (c *Client) DeleteDhcpOptionsWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDhcpOptionsRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteDhcpOptions(ctx context.Context, id string, body DeleteDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDhcpOptionsRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -4924,8 +5196,20 @@ func (c *Client) CreateDirectLinkInterface(ctx context.Context, body CreateDirec
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteDirectLinkInterface(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteDirectLinkInterfaceRequest(c.Server, id)
+func (c *Client) DeleteDirectLinkInterfaceWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDirectLinkInterfaceRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteDirectLinkInterface(ctx context.Context, id string, body DeleteDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDirectLinkInterfaceRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5008,8 +5292,20 @@ func (c *Client) CreateDirectLink(ctx context.Context, body CreateDirectLinkJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteDirectLink(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteDirectLinkRequest(c.Server, id)
+func (c *Client) DeleteDirectLinkWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDirectLinkRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteDirectLink(ctx context.Context, id string, body DeleteDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDirectLinkRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5032,8 +5328,20 @@ func (c *Client) ReadDirectLinksById(ctx context.Context, id string, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadFlexibleGpuCatalog(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadFlexibleGpuCatalogRequest(c.Server)
+func (c *Client) ReadFlexibleGpuCatalogWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadFlexibleGpuCatalogRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReadFlexibleGpuCatalog(ctx context.Context, body ReadFlexibleGpuCatalogJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadFlexibleGpuCatalogRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5092,8 +5400,20 @@ func (c *Client) CreateFlexibleGpu(ctx context.Context, body CreateFlexibleGpuJS
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteFlexibleGpu(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteFlexibleGpuRequest(c.Server, id)
+func (c *Client) DeleteFlexibleGpuWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteFlexibleGpuRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteFlexibleGpu(ctx context.Context, id string, body DeleteFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteFlexibleGpuRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5164,8 +5484,20 @@ func (c *Client) LinkFlexibleGpu(ctx context.Context, id string, body LinkFlexib
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkFlexibleGpu(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkFlexibleGpuRequest(c.Server, id)
+func (c *Client) UnlinkFlexibleGpuWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkFlexibleGpuRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UnlinkFlexibleGpu(ctx context.Context, id string, body UnlinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkFlexibleGpuRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5212,8 +5544,20 @@ func (c *Client) CreateImage(ctx context.Context, body CreateImageJSONRequestBod
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteImage(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteImageRequest(c.Server, id)
+func (c *Client) DeleteImageWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteImageRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteImage(ctx context.Context, id string, body DeleteImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteImageRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5272,8 +5616,8 @@ func (c *Client) ReadInternetServices(ctx context.Context, params *ReadInternetS
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateInternetService(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateInternetServiceRequest(c.Server)
+func (c *Client) CreateInternetServiceWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateInternetServiceRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5284,8 +5628,32 @@ func (c *Client) CreateInternetService(ctx context.Context, reqEditors ...Reques
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteInternetService(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteInternetServiceRequest(c.Server, id)
+func (c *Client) CreateInternetService(ctx context.Context, body CreateInternetServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateInternetServiceRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteInternetServiceWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteInternetServiceRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteInternetService(ctx context.Context, id string, body DeleteInternetServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteInternetServiceRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5392,8 +5760,20 @@ func (c *Client) CreateKeypair(ctx context.Context, body CreateKeypairJSONReques
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteKeypair(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteKeypairRequest(c.Server, id)
+func (c *Client) DeleteKeypairWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteKeypairRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteKeypair(ctx context.Context, id string, body DeleteKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteKeypairRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5452,8 +5832,20 @@ func (c *Client) CreateListenerRule(ctx context.Context, body CreateListenerRule
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteListenerRule(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteListenerRuleRequest(c.Server, id)
+func (c *Client) DeleteListenerRuleWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteListenerRuleRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteListenerRule(ctx context.Context, id string, body DeleteListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteListenerRuleRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5764,8 +6156,20 @@ func (c *Client) CreateLoadBalancer(ctx context.Context, body CreateLoadBalancer
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteLoadBalancer(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteLoadBalancerRequest(c.Server, id)
+func (c *Client) DeleteLoadBalancerWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteLoadBalancerRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteLoadBalancer(ctx context.Context, id string, body DeleteLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteLoadBalancerRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5812,8 +6216,20 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body UpdateL
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadLocations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadLocationsRequest(c.Server)
+func (c *Client) ReadLocationsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadLocationsRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReadLocations(ctx context.Context, body ReadLocationsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadLocationsRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5872,8 +6288,20 @@ func (c *Client) CreateNatService(ctx context.Context, body CreateNatServiceJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteNatService(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteNatServiceRequest(c.Server, id)
+func (c *Client) DeleteNatServiceWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNatServiceRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteNatService(ctx context.Context, id string, body DeleteNatServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNatServiceRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5932,8 +6360,20 @@ func (c *Client) CreateNetAccessPoint(ctx context.Context, body CreateNetAccessP
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteNetAccessPoint(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteNetAccessPointRequest(c.Server, id)
+func (c *Client) DeleteNetAccessPointWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNetAccessPointRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteNetAccessPoint(ctx context.Context, id string, body DeleteNetAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNetAccessPointRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6016,8 +6456,20 @@ func (c *Client) CreateNetPeering(ctx context.Context, body CreateNetPeeringJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteNetPeering(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteNetPeeringRequest(c.Server, id)
+func (c *Client) DeleteNetPeeringWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNetPeeringRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteNetPeering(ctx context.Context, id string, body DeleteNetPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNetPeeringRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6076,8 +6528,20 @@ func (c *Client) CreateNet(ctx context.Context, body CreateNetJSONRequestBody, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteNet(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteNetRequest(c.Server, id)
+func (c *Client) DeleteNetWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNetRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteNet(ctx context.Context, id string, body DeleteNetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNetRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6160,8 +6624,20 @@ func (c *Client) CreateNic(ctx context.Context, body CreateNicJSONRequestBody, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteNic(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteNicRequest(c.Server, id)
+func (c *Client) DeleteNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNicRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteNic(ctx context.Context, id string, body DeleteNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNicRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6232,8 +6708,20 @@ func (c *Client) LinkNic(ctx context.Context, id string, body LinkNicJSONRequest
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkNic(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkNicRequest(c.Server, id)
+func (c *Client) UnlinkNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkNicRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UnlinkNic(ctx context.Context, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkNicRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6316,8 +6804,20 @@ func (c *Client) ReadProductTypesById(ctx context.Context, id string, reqEditors
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadPublicIpRanges(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadPublicIpRangesRequest(c.Server)
+func (c *Client) ReadPublicIpRangesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadPublicIpRangesRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReadPublicIpRanges(ctx context.Context, body ReadPublicIpRangesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadPublicIpRangesRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6352,8 +6852,8 @@ func (c *Client) ReadPublicIps(ctx context.Context, params *ReadPublicIpsParams,
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreatePublicIp(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreatePublicIpRequest(c.Server)
+func (c *Client) CreatePublicIpWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreatePublicIpRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6364,8 +6864,32 @@ func (c *Client) CreatePublicIp(ctx context.Context, reqEditors ...RequestEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeletePublicIp(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeletePublicIpRequest(c.Server, id)
+func (c *Client) CreatePublicIp(ctx context.Context, body CreatePublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreatePublicIpRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeletePublicIpWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeletePublicIpRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeletePublicIp(ctx context.Context, id string, body DeletePublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeletePublicIpRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6544,8 +7068,20 @@ func (c *Client) CreateRouteTable(ctx context.Context, body CreateRouteTableJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteRouteTable(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteRouteTableRequest(c.Server, id)
+func (c *Client) DeleteRouteTableWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRouteTableRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteRouteTable(ctx context.Context, id string, body DeleteRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRouteTableRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6592,8 +7128,20 @@ func (c *Client) LinkRouteTable(ctx context.Context, id string, body LinkRouteTa
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkRouteTable(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkRouteTableRequest(c.Server, id)
+func (c *Client) UnlinkRouteTableWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkRouteTableRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UnlinkRouteTable(ctx context.Context, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkRouteTableRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6832,8 +7380,20 @@ func (c *Client) CreateSnapshot(ctx context.Context, body CreateSnapshotJSONRequ
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSnapshot(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSnapshotRequest(c.Server, id)
+func (c *Client) DeleteSnapshotWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSnapshotRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSnapshot(ctx context.Context, id string, body DeleteSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSnapshotRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6940,8 +7500,20 @@ func (c *Client) CreateSubnet(ctx context.Context, body CreateSubnetJSONRequestB
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSubnet(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSubnetRequest(c.Server, id)
+func (c *Client) DeleteSubnetWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSubnetRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSubnet(ctx context.Context, id string, body DeleteSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSubnetRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7096,8 +7668,20 @@ func (c *Client) CreateVirtualGateway(ctx context.Context, body CreateVirtualGat
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVirtualGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVirtualGatewayRequest(c.Server, id)
+func (c *Client) DeleteVirtualGatewayWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVirtualGatewayRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteVirtualGateway(ctx context.Context, id string, body DeleteVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVirtualGatewayRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7204,8 +7788,20 @@ func (c *Client) CreateVms(ctx context.Context, body CreateVmsJSONRequestBody, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVms(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVmsRequest(c.Server, id)
+func (c *Client) DeleteVmsWithBody(ctx context.Context, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVmsRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteVms(ctx context.Context, id []interface{}, body DeleteVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVmsRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7348,8 +7944,20 @@ func (c *Client) CreateVolume(ctx context.Context, body CreateVolumeJSONRequestB
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVolume(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVolumeRequest(c.Server, id)
+func (c *Client) DeleteVolumeWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVolumeRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteVolume(ctx context.Context, id string, body DeleteVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVolumeRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7528,8 +8136,20 @@ func (c *Client) CreateVpnConnection(ctx context.Context, body CreateVpnConnecti
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVpnConnection(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVpnConnectionRequest(c.Server, id)
+func (c *Client) DeleteVpnConnectionWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVpnConnectionRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteVpnConnection(ctx context.Context, id string, body DeleteVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVpnConnectionRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7891,8 +8511,19 @@ func NewCreateClientGatewayRequestWithBody(server string, contentType string, bo
 	return req, nil
 }
 
-// NewDeleteClientGatewayRequest generates requests for DeleteClientGateway
-func NewDeleteClientGatewayRequest(server string, id string) (*http.Request, error) {
+// NewDeleteClientGatewayRequest calls the generic DeleteClientGateway builder with application/json body
+func NewDeleteClientGatewayRequest(server string, id string, body DeleteClientGatewayJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteClientGatewayRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteClientGatewayRequestWithBody generates requests for DeleteClientGateway with any type of body
+func NewDeleteClientGatewayRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -7917,10 +8548,12 @@ func NewDeleteClientGatewayRequest(server string, id string) (*http.Request, err
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -8250,8 +8883,19 @@ func NewCreateDhcpOptionsRequestWithBody(server string, contentType string, body
 	return req, nil
 }
 
-// NewDeleteDhcpOptionsRequest generates requests for DeleteDhcpOptions
-func NewDeleteDhcpOptionsRequest(server string, id string) (*http.Request, error) {
+// NewDeleteDhcpOptionsRequest calls the generic DeleteDhcpOptions builder with application/json body
+func NewDeleteDhcpOptionsRequest(server string, id string, body DeleteDhcpOptionsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteDhcpOptionsRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteDhcpOptionsRequestWithBody generates requests for DeleteDhcpOptions with any type of body
+func NewDeleteDhcpOptionsRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -8276,10 +8920,12 @@ func NewDeleteDhcpOptionsRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -8423,8 +9069,19 @@ func NewCreateDirectLinkInterfaceRequestWithBody(server string, contentType stri
 	return req, nil
 }
 
-// NewDeleteDirectLinkInterfaceRequest generates requests for DeleteDirectLinkInterface
-func NewDeleteDirectLinkInterfaceRequest(server string, id string) (*http.Request, error) {
+// NewDeleteDirectLinkInterfaceRequest calls the generic DeleteDirectLinkInterface builder with application/json body
+func NewDeleteDirectLinkInterfaceRequest(server string, id string, body DeleteDirectLinkInterfaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteDirectLinkInterfaceRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteDirectLinkInterfaceRequestWithBody generates requests for DeleteDirectLinkInterface with any type of body
+func NewDeleteDirectLinkInterfaceRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -8449,10 +9106,12 @@ func NewDeleteDirectLinkInterfaceRequest(server string, id string) (*http.Reques
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -8627,8 +9286,19 @@ func NewCreateDirectLinkRequestWithBody(server string, contentType string, body 
 	return req, nil
 }
 
-// NewDeleteDirectLinkRequest generates requests for DeleteDirectLink
-func NewDeleteDirectLinkRequest(server string, id string) (*http.Request, error) {
+// NewDeleteDirectLinkRequest calls the generic DeleteDirectLink builder with application/json body
+func NewDeleteDirectLinkRequest(server string, id string, body DeleteDirectLinkJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteDirectLinkRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteDirectLinkRequestWithBody generates requests for DeleteDirectLink with any type of body
+func NewDeleteDirectLinkRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -8653,10 +9323,12 @@ func NewDeleteDirectLinkRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -8695,8 +9367,19 @@ func NewReadDirectLinksByIdRequest(server string, id string) (*http.Request, err
 	return req, nil
 }
 
-// NewReadFlexibleGpuCatalogRequest generates requests for ReadFlexibleGpuCatalog
-func NewReadFlexibleGpuCatalogRequest(server string) (*http.Request, error) {
+// NewReadFlexibleGpuCatalogRequest calls the generic ReadFlexibleGpuCatalog builder with application/json body
+func NewReadFlexibleGpuCatalogRequest(server string, body ReadFlexibleGpuCatalogJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReadFlexibleGpuCatalogRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewReadFlexibleGpuCatalogRequestWithBody generates requests for ReadFlexibleGpuCatalog with any type of body
+func NewReadFlexibleGpuCatalogRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -8714,10 +9397,12 @@ func NewReadFlexibleGpuCatalogRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("GET", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -8941,8 +9626,19 @@ func NewCreateFlexibleGpuRequestWithBody(server string, contentType string, body
 	return req, nil
 }
 
-// NewDeleteFlexibleGpuRequest generates requests for DeleteFlexibleGpu
-func NewDeleteFlexibleGpuRequest(server string, id string) (*http.Request, error) {
+// NewDeleteFlexibleGpuRequest calls the generic DeleteFlexibleGpu builder with application/json body
+func NewDeleteFlexibleGpuRequest(server string, id string, body DeleteFlexibleGpuJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteFlexibleGpuRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteFlexibleGpuRequestWithBody generates requests for DeleteFlexibleGpu with any type of body
+func NewDeleteFlexibleGpuRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -8967,10 +9663,12 @@ func NewDeleteFlexibleGpuRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -9103,8 +9801,19 @@ func NewLinkFlexibleGpuRequestWithBody(server string, id string, contentType str
 	return req, nil
 }
 
-// NewUnlinkFlexibleGpuRequest generates requests for UnlinkFlexibleGpu
-func NewUnlinkFlexibleGpuRequest(server string, id string) (*http.Request, error) {
+// NewUnlinkFlexibleGpuRequest calls the generic UnlinkFlexibleGpu builder with application/json body
+func NewUnlinkFlexibleGpuRequest(server string, id string, body UnlinkFlexibleGpuJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUnlinkFlexibleGpuRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewUnlinkFlexibleGpuRequestWithBody generates requests for UnlinkFlexibleGpu with any type of body
+func NewUnlinkFlexibleGpuRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -9129,10 +9838,12 @@ func NewUnlinkFlexibleGpuRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", queryURL.String(), nil)
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -9578,8 +10289,19 @@ func NewCreateImageRequestWithBody(server string, contentType string, body io.Re
 	return req, nil
 }
 
-// NewDeleteImageRequest generates requests for DeleteImage
-func NewDeleteImageRequest(server string, id string) (*http.Request, error) {
+// NewDeleteImageRequest calls the generic DeleteImage builder with application/json body
+func NewDeleteImageRequest(server string, id string, body DeleteImageJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteImageRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteImageRequestWithBody generates requests for DeleteImage with any type of body
+func NewDeleteImageRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -9604,10 +10326,12 @@ func NewDeleteImageRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -9822,8 +10546,19 @@ func NewReadInternetServicesRequest(server string, params *ReadInternetServicesP
 	return req, nil
 }
 
-// NewCreateInternetServiceRequest generates requests for CreateInternetService
-func NewCreateInternetServiceRequest(server string) (*http.Request, error) {
+// NewCreateInternetServiceRequest calls the generic CreateInternetService builder with application/json body
+func NewCreateInternetServiceRequest(server string, body CreateInternetServiceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateInternetServiceRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateInternetServiceRequestWithBody generates requests for CreateInternetService with any type of body
+func NewCreateInternetServiceRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -9841,16 +10576,29 @@ func NewCreateInternetServiceRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
 
+	req.Header.Add("Content-Type", contentType)
+
 	return req, nil
 }
 
-// NewDeleteInternetServiceRequest generates requests for DeleteInternetService
-func NewDeleteInternetServiceRequest(server string, id string) (*http.Request, error) {
+// NewDeleteInternetServiceRequest calls the generic DeleteInternetService builder with application/json body
+func NewDeleteInternetServiceRequest(server string, id string, body DeleteInternetServiceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteInternetServiceRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteInternetServiceRequestWithBody generates requests for DeleteInternetService with any type of body
+func NewDeleteInternetServiceRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -9875,10 +10623,12 @@ func NewDeleteInternetServiceRequest(server string, id string) (*http.Request, e
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -10116,8 +10866,19 @@ func NewCreateKeypairRequestWithBody(server string, contentType string, body io.
 	return req, nil
 }
 
-// NewDeleteKeypairRequest generates requests for DeleteKeypair
-func NewDeleteKeypairRequest(server string, id string) (*http.Request, error) {
+// NewDeleteKeypairRequest calls the generic DeleteKeypair builder with application/json body
+func NewDeleteKeypairRequest(server string, id string, body DeleteKeypairJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteKeypairRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteKeypairRequestWithBody generates requests for DeleteKeypair with any type of body
+func NewDeleteKeypairRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -10142,10 +10903,12 @@ func NewDeleteKeypairRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -10273,8 +11036,19 @@ func NewCreateListenerRuleRequestWithBody(server string, contentType string, bod
 	return req, nil
 }
 
-// NewDeleteListenerRuleRequest generates requests for DeleteListenerRule
-func NewDeleteListenerRuleRequest(server string, id string) (*http.Request, error) {
+// NewDeleteListenerRuleRequest calls the generic DeleteListenerRule builder with application/json body
+func NewDeleteListenerRuleRequest(server string, id string, body DeleteListenerRuleJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteListenerRuleRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteListenerRuleRequestWithBody generates requests for DeleteListenerRule with any type of body
+func NewDeleteListenerRuleRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -10299,10 +11073,12 @@ func NewDeleteListenerRuleRequest(server string, id string) (*http.Request, erro
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -10906,8 +11682,19 @@ func NewCreateLoadBalancerRequestWithBody(server string, contentType string, bod
 	return req, nil
 }
 
-// NewDeleteLoadBalancerRequest generates requests for DeleteLoadBalancer
-func NewDeleteLoadBalancerRequest(server string, id string) (*http.Request, error) {
+// NewDeleteLoadBalancerRequest calls the generic DeleteLoadBalancer builder with application/json body
+func NewDeleteLoadBalancerRequest(server string, id string, body DeleteLoadBalancerJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteLoadBalancerRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteLoadBalancerRequestWithBody generates requests for DeleteLoadBalancer with any type of body
+func NewDeleteLoadBalancerRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -10932,10 +11719,12 @@ func NewDeleteLoadBalancerRequest(server string, id string) (*http.Request, erro
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -11021,8 +11810,19 @@ func NewUpdateLoadBalancerRequestWithBody(server string, id string, contentType 
 	return req, nil
 }
 
-// NewReadLocationsRequest generates requests for ReadLocations
-func NewReadLocationsRequest(server string) (*http.Request, error) {
+// NewReadLocationsRequest calls the generic ReadLocations builder with application/json body
+func NewReadLocationsRequest(server string, body ReadLocationsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReadLocationsRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewReadLocationsRequestWithBody generates requests for ReadLocations with any type of body
+func NewReadLocationsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -11040,10 +11840,12 @@ func NewReadLocationsRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("GET", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -11267,8 +12069,19 @@ func NewCreateNatServiceRequestWithBody(server string, contentType string, body 
 	return req, nil
 }
 
-// NewDeleteNatServiceRequest generates requests for DeleteNatService
-func NewDeleteNatServiceRequest(server string, id string) (*http.Request, error) {
+// NewDeleteNatServiceRequest calls the generic DeleteNatService builder with application/json body
+func NewDeleteNatServiceRequest(server string, id string, body DeleteNatServiceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteNatServiceRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteNatServiceRequestWithBody generates requests for DeleteNatService with any type of body
+func NewDeleteNatServiceRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -11293,10 +12106,12 @@ func NewDeleteNatServiceRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -11520,8 +12335,19 @@ func NewCreateNetAccessPointRequestWithBody(server string, contentType string, b
 	return req, nil
 }
 
-// NewDeleteNetAccessPointRequest generates requests for DeleteNetAccessPoint
-func NewDeleteNetAccessPointRequest(server string, id string) (*http.Request, error) {
+// NewDeleteNetAccessPointRequest calls the generic DeleteNetAccessPoint builder with application/json body
+func NewDeleteNetAccessPointRequest(server string, id string, body DeleteNetAccessPointJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteNetAccessPointRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteNetAccessPointRequestWithBody generates requests for DeleteNetAccessPoint with any type of body
+func NewDeleteNetAccessPointRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -11546,10 +12372,12 @@ func NewDeleteNetAccessPointRequest(server string, id string) (*http.Request, er
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -11900,8 +12728,19 @@ func NewCreateNetPeeringRequestWithBody(server string, contentType string, body 
 	return req, nil
 }
 
-// NewDeleteNetPeeringRequest generates requests for DeleteNetPeering
-func NewDeleteNetPeeringRequest(server string, id string) (*http.Request, error) {
+// NewDeleteNetPeeringRequest calls the generic DeleteNetPeering builder with application/json body
+func NewDeleteNetPeeringRequest(server string, id string, body DeleteNetPeeringJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteNetPeeringRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteNetPeeringRequestWithBody generates requests for DeleteNetPeering with any type of body
+func NewDeleteNetPeeringRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -11926,10 +12765,12 @@ func NewDeleteNetPeeringRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -12169,8 +13010,19 @@ func NewCreateNetRequestWithBody(server string, contentType string, body io.Read
 	return req, nil
 }
 
-// NewDeleteNetRequest generates requests for DeleteNet
-func NewDeleteNetRequest(server string, id string) (*http.Request, error) {
+// NewDeleteNetRequest calls the generic DeleteNet builder with application/json body
+func NewDeleteNetRequest(server string, id string, body DeleteNetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteNetRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteNetRequestWithBody generates requests for DeleteNet with any type of body
+func NewDeleteNetRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -12195,10 +13047,12 @@ func NewDeleteNetRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -12789,8 +13643,19 @@ func NewCreateNicRequestWithBody(server string, contentType string, body io.Read
 	return req, nil
 }
 
-// NewDeleteNicRequest generates requests for DeleteNic
-func NewDeleteNicRequest(server string, id string) (*http.Request, error) {
+// NewDeleteNicRequest calls the generic DeleteNic builder with application/json body
+func NewDeleteNicRequest(server string, id string, body DeleteNicJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteNicRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteNicRequestWithBody generates requests for DeleteNic with any type of body
+func NewDeleteNicRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -12815,10 +13680,12 @@ func NewDeleteNicRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -12951,8 +13818,19 @@ func NewLinkNicRequestWithBody(server string, id string, contentType string, bod
 	return req, nil
 }
 
-// NewUnlinkNicRequest generates requests for UnlinkNic
-func NewUnlinkNicRequest(server string, id string) (*http.Request, error) {
+// NewUnlinkNicRequest calls the generic UnlinkNic builder with application/json body
+func NewUnlinkNicRequest(server string, id string, body UnlinkNicJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUnlinkNicRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewUnlinkNicRequestWithBody generates requests for UnlinkNic with any type of body
+func NewUnlinkNicRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -12977,10 +13855,12 @@ func NewUnlinkNicRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", queryURL.String(), nil)
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -13162,8 +14042,19 @@ func NewReadProductTypesByIdRequest(server string, id string) (*http.Request, er
 	return req, nil
 }
 
-// NewReadPublicIpRangesRequest generates requests for ReadPublicIpRanges
-func NewReadPublicIpRangesRequest(server string) (*http.Request, error) {
+// NewReadPublicIpRangesRequest calls the generic ReadPublicIpRanges builder with application/json body
+func NewReadPublicIpRangesRequest(server string, body ReadPublicIpRangesJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReadPublicIpRangesRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewReadPublicIpRangesRequestWithBody generates requests for ReadPublicIpRanges with any type of body
+func NewReadPublicIpRangesRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -13181,10 +14072,12 @@ func NewReadPublicIpRangesRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("GET", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -13384,8 +14277,19 @@ func NewReadPublicIpsRequest(server string, params *ReadPublicIpsParams) (*http.
 	return req, nil
 }
 
-// NewCreatePublicIpRequest generates requests for CreatePublicIp
-func NewCreatePublicIpRequest(server string) (*http.Request, error) {
+// NewCreatePublicIpRequest calls the generic CreatePublicIp builder with application/json body
+func NewCreatePublicIpRequest(server string, body CreatePublicIpJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreatePublicIpRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreatePublicIpRequestWithBody generates requests for CreatePublicIp with any type of body
+func NewCreatePublicIpRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -13403,16 +14307,29 @@ func NewCreatePublicIpRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
 
+	req.Header.Add("Content-Type", contentType)
+
 	return req, nil
 }
 
-// NewDeletePublicIpRequest generates requests for DeletePublicIp
-func NewDeletePublicIpRequest(server string, id string) (*http.Request, error) {
+// NewDeletePublicIpRequest calls the generic DeletePublicIp builder with application/json body
+func NewDeletePublicIpRequest(server string, id string, body DeletePublicIpJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeletePublicIpRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeletePublicIpRequestWithBody generates requests for DeletePublicIp with any type of body
+func NewDeletePublicIpRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -13437,10 +14354,12 @@ func NewDeletePublicIpRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -14045,8 +14964,19 @@ func NewCreateRouteTableRequestWithBody(server string, contentType string, body 
 	return req, nil
 }
 
-// NewDeleteRouteTableRequest generates requests for DeleteRouteTable
-func NewDeleteRouteTableRequest(server string, id string) (*http.Request, error) {
+// NewDeleteRouteTableRequest calls the generic DeleteRouteTable builder with application/json body
+func NewDeleteRouteTableRequest(server string, id string, body DeleteRouteTableJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteRouteTableRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteRouteTableRequestWithBody generates requests for DeleteRouteTable with any type of body
+func NewDeleteRouteTableRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -14071,10 +15001,12 @@ func NewDeleteRouteTableRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -14160,8 +15092,19 @@ func NewLinkRouteTableRequestWithBody(server string, id string, contentType stri
 	return req, nil
 }
 
-// NewUnlinkRouteTableRequest generates requests for UnlinkRouteTable
-func NewUnlinkRouteTableRequest(server string, id string) (*http.Request, error) {
+// NewUnlinkRouteTableRequest calls the generic UnlinkRouteTable builder with application/json body
+func NewUnlinkRouteTableRequest(server string, id string, body UnlinkRouteTableJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUnlinkRouteTableRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewUnlinkRouteTableRequestWithBody generates requests for UnlinkRouteTable with any type of body
+func NewUnlinkRouteTableRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -14186,10 +15129,12 @@ func NewUnlinkRouteTableRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", queryURL.String(), nil)
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -15170,8 +16115,19 @@ func NewCreateSnapshotRequestWithBody(server string, contentType string, body io
 	return req, nil
 }
 
-// NewDeleteSnapshotRequest generates requests for DeleteSnapshot
-func NewDeleteSnapshotRequest(server string, id string) (*http.Request, error) {
+// NewDeleteSnapshotRequest calls the generic DeleteSnapshot builder with application/json body
+func NewDeleteSnapshotRequest(server string, id string, body DeleteSnapshotJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteSnapshotRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteSnapshotRequestWithBody generates requests for DeleteSnapshot with any type of body
+func NewDeleteSnapshotRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -15196,10 +16152,12 @@ func NewDeleteSnapshotRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -15535,8 +16493,19 @@ func NewCreateSubnetRequestWithBody(server string, contentType string, body io.R
 	return req, nil
 }
 
-// NewDeleteSubnetRequest generates requests for DeleteSubnet
-func NewDeleteSubnetRequest(server string, id string) (*http.Request, error) {
+// NewDeleteSubnetRequest calls the generic DeleteSubnet builder with application/json body
+func NewDeleteSubnetRequest(server string, id string, body DeleteSubnetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteSubnetRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteSubnetRequestWithBody generates requests for DeleteSubnet with any type of body
+func NewDeleteSubnetRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -15561,10 +16530,12 @@ func NewDeleteSubnetRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -16069,8 +17040,19 @@ func NewCreateVirtualGatewayRequestWithBody(server string, contentType string, b
 	return req, nil
 }
 
-// NewDeleteVirtualGatewayRequest generates requests for DeleteVirtualGateway
-func NewDeleteVirtualGatewayRequest(server string, id string) (*http.Request, error) {
+// NewDeleteVirtualGatewayRequest calls the generic DeleteVirtualGateway builder with application/json body
+func NewDeleteVirtualGatewayRequest(server string, id string, body DeleteVirtualGatewayJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteVirtualGatewayRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteVirtualGatewayRequestWithBody generates requests for DeleteVirtualGateway with any type of body
+func NewDeleteVirtualGatewayRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -16095,10 +17077,12 @@ func NewDeleteVirtualGatewayRequest(server string, id string) (*http.Request, er
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -16368,8 +17352,19 @@ func NewCreateVmsRequestWithBody(server string, contentType string, body io.Read
 	return req, nil
 }
 
-// NewDeleteVmsRequest generates requests for DeleteVms
-func NewDeleteVmsRequest(server string, id []interface{}) (*http.Request, error) {
+// NewDeleteVmsRequest calls the generic DeleteVms builder with application/json body
+func NewDeleteVmsRequest(server string, id []interface{}, body DeleteVmsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteVmsRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteVmsRequestWithBody generates requests for DeleteVms with any type of body
+func NewDeleteVmsRequestWithBody(server string, id []interface{}, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -16394,10 +17389,12 @@ func NewDeleteVmsRequest(server string, id []interface{}) (*http.Request, error)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -17049,8 +18046,19 @@ func NewCreateVolumeRequestWithBody(server string, contentType string, body io.R
 	return req, nil
 }
 
-// NewDeleteVolumeRequest generates requests for DeleteVolume
-func NewDeleteVolumeRequest(server string, id string) (*http.Request, error) {
+// NewDeleteVolumeRequest calls the generic DeleteVolume builder with application/json body
+func NewDeleteVolumeRequest(server string, id string, body DeleteVolumeJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteVolumeRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteVolumeRequestWithBody generates requests for DeleteVolume with any type of body
+func NewDeleteVolumeRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -17075,10 +18083,12 @@ func NewDeleteVolumeRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -17594,8 +18604,19 @@ func NewCreateVpnConnectionRequestWithBody(server string, contentType string, bo
 	return req, nil
 }
 
-// NewDeleteVpnConnectionRequest generates requests for DeleteVpnConnection
-func NewDeleteVpnConnectionRequest(server string, id string) (*http.Request, error) {
+// NewDeleteVpnConnectionRequest calls the generic DeleteVpnConnection builder with application/json body
+func NewDeleteVpnConnectionRequest(server string, id string, body DeleteVpnConnectionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteVpnConnectionRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewDeleteVpnConnectionRequestWithBody generates requests for DeleteVpnConnection with any type of body
+func NewDeleteVpnConnectionRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -17620,10 +18641,12 @@ func NewDeleteVpnConnectionRequest(server string, id string) (*http.Request, err
 		return nil, err
 	}
 
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -17773,8 +18796,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateClientGatewayWithResponse(ctx context.Context, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateClientGatewayResponse, error)
 
-	// DeleteClientGatewayWithResponse request
-	DeleteClientGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error)
+	// DeleteClientGatewayWithBodyWithResponse request with any body
+	DeleteClientGatewayWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error)
+
+	DeleteClientGatewayWithResponse(ctx context.Context, id string, body DeleteClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error)
 
 	// ReadClientGatewaysByIdWithResponse request
 	ReadClientGatewaysByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadClientGatewaysByIdResponse, error)
@@ -17795,8 +18820,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateDhcpOptionsWithResponse(ctx context.Context, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsResponse, error)
 
-	// DeleteDhcpOptionsWithResponse request
-	DeleteDhcpOptionsWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error)
+	// DeleteDhcpOptionsWithBodyWithResponse request with any body
+	DeleteDhcpOptionsWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error)
+
+	DeleteDhcpOptionsWithResponse(ctx context.Context, id string, body DeleteDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error)
 
 	// ReadDhcpOptionsByIdWithResponse request
 	ReadDhcpOptionsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadDhcpOptionsByIdResponse, error)
@@ -17809,8 +18836,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateDirectLinkInterfaceWithResponse(ctx context.Context, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkInterfaceResponse, error)
 
-	// DeleteDirectLinkInterfaceWithResponse request
-	DeleteDirectLinkInterfaceWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error)
+	// DeleteDirectLinkInterfaceWithBodyWithResponse request with any body
+	DeleteDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error)
+
+	DeleteDirectLinkInterfaceWithResponse(ctx context.Context, id string, body DeleteDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error)
 
 	// ReadDirectLinkInterfacesByIdWithResponse request
 	ReadDirectLinkInterfacesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinkInterfacesByIdResponse, error)
@@ -17828,14 +18857,18 @@ type ClientWithResponsesInterface interface {
 
 	CreateDirectLinkWithResponse(ctx context.Context, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkResponse, error)
 
-	// DeleteDirectLinkWithResponse request
-	DeleteDirectLinkWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error)
+	// DeleteDirectLinkWithBodyWithResponse request with any body
+	DeleteDirectLinkWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error)
+
+	DeleteDirectLinkWithResponse(ctx context.Context, id string, body DeleteDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error)
 
 	// ReadDirectLinksByIdWithResponse request
 	ReadDirectLinksByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinksByIdResponse, error)
 
-	// ReadFlexibleGpuCatalogWithResponse request
-	ReadFlexibleGpuCatalogWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error)
+	// ReadFlexibleGpuCatalogWithBodyWithResponse request with any body
+	ReadFlexibleGpuCatalogWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error)
+
+	ReadFlexibleGpuCatalogWithResponse(ctx context.Context, body ReadFlexibleGpuCatalogJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error)
 
 	// ReadFlexibleGpuCatalogByIdWithResponse request
 	ReadFlexibleGpuCatalogByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogByIdResponse, error)
@@ -17848,8 +18881,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateFlexibleGpuWithResponse(ctx context.Context, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFlexibleGpuResponse, error)
 
-	// DeleteFlexibleGpuWithResponse request
-	DeleteFlexibleGpuWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error)
+	// DeleteFlexibleGpuWithBodyWithResponse request with any body
+	DeleteFlexibleGpuWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error)
+
+	DeleteFlexibleGpuWithResponse(ctx context.Context, id string, body DeleteFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error)
 
 	// ReadFlexibleGpusByIdWithResponse request
 	ReadFlexibleGpusByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadFlexibleGpusByIdResponse, error)
@@ -17864,8 +18899,10 @@ type ClientWithResponsesInterface interface {
 
 	LinkFlexibleGpuWithResponse(ctx context.Context, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkFlexibleGpuResponse, error)
 
-	// UnlinkFlexibleGpuWithResponse request
-	UnlinkFlexibleGpuWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error)
+	// UnlinkFlexibleGpuWithBodyWithResponse request with any body
+	UnlinkFlexibleGpuWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error)
+
+	UnlinkFlexibleGpuWithResponse(ctx context.Context, id string, body UnlinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error)
 
 	// ReadImagesWithResponse request
 	ReadImagesWithResponse(ctx context.Context, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*ReadImagesResponse, error)
@@ -17875,8 +18912,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateImageWithResponse(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateImageResponse, error)
 
-	// DeleteImageWithResponse request
-	DeleteImageWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error)
+	// DeleteImageWithBodyWithResponse request with any body
+	DeleteImageWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error)
+
+	DeleteImageWithResponse(ctx context.Context, id string, body DeleteImageJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error)
 
 	// ReadImagesByIdWithResponse request
 	ReadImagesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadImagesByIdResponse, error)
@@ -17889,11 +18928,15 @@ type ClientWithResponsesInterface interface {
 	// ReadInternetServicesWithResponse request
 	ReadInternetServicesWithResponse(ctx context.Context, params *ReadInternetServicesParams, reqEditors ...RequestEditorFn) (*ReadInternetServicesResponse, error)
 
-	// CreateInternetServiceWithResponse request
-	CreateInternetServiceWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreateInternetServiceResponse, error)
+	// CreateInternetServiceWithBodyWithResponse request with any body
+	CreateInternetServiceWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateInternetServiceResponse, error)
 
-	// DeleteInternetServiceWithResponse request
-	DeleteInternetServiceWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteInternetServiceResponse, error)
+	CreateInternetServiceWithResponse(ctx context.Context, body CreateInternetServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateInternetServiceResponse, error)
+
+	// DeleteInternetServiceWithBodyWithResponse request with any body
+	DeleteInternetServiceWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteInternetServiceResponse, error)
+
+	DeleteInternetServiceWithResponse(ctx context.Context, id string, body DeleteInternetServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteInternetServiceResponse, error)
 
 	// ReadInternetServicesByIdWithResponse request
 	ReadInternetServicesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadInternetServicesByIdResponse, error)
@@ -17916,8 +18959,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateKeypairWithResponse(ctx context.Context, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKeypairResponse, error)
 
-	// DeleteKeypairWithResponse request
-	DeleteKeypairWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error)
+	// DeleteKeypairWithBodyWithResponse request with any body
+	DeleteKeypairWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error)
+
+	DeleteKeypairWithResponse(ctx context.Context, id string, body DeleteKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error)
 
 	// ReadKeypairsByIdWithResponse request
 	ReadKeypairsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadKeypairsByIdResponse, error)
@@ -17930,8 +18975,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateListenerRuleWithResponse(ctx context.Context, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateListenerRuleResponse, error)
 
-	// DeleteListenerRuleWithResponse request
-	DeleteListenerRuleWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error)
+	// DeleteListenerRuleWithBodyWithResponse request with any body
+	DeleteListenerRuleWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error)
+
+	DeleteListenerRuleWithResponse(ctx context.Context, id string, body DeleteListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error)
 
 	// ReadListenerRulesByIdWithResponse request
 	ReadListenerRulesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadListenerRulesByIdResponse, error)
@@ -17997,8 +19044,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateLoadBalancerWithResponse(ctx context.Context, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerResponse, error)
 
-	// DeleteLoadBalancerWithResponse request
-	DeleteLoadBalancerWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error)
+	// DeleteLoadBalancerWithBodyWithResponse request with any body
+	DeleteLoadBalancerWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error)
+
+	DeleteLoadBalancerWithResponse(ctx context.Context, id string, body DeleteLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error)
 
 	// ReadLoadBalancersByIdWithResponse request
 	ReadLoadBalancersByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadLoadBalancersByIdResponse, error)
@@ -18008,8 +19057,10 @@ type ClientWithResponsesInterface interface {
 
 	UpdateLoadBalancerWithResponse(ctx context.Context, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateLoadBalancerResponse, error)
 
-	// ReadLocationsWithResponse request
-	ReadLocationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error)
+	// ReadLocationsWithBodyWithResponse request with any body
+	ReadLocationsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error)
+
+	ReadLocationsWithResponse(ctx context.Context, body ReadLocationsJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error)
 
 	// ReadLocationsByIdWithResponse request
 	ReadLocationsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadLocationsByIdResponse, error)
@@ -18022,8 +19073,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateNatServiceWithResponse(ctx context.Context, body CreateNatServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNatServiceResponse, error)
 
-	// DeleteNatServiceWithResponse request
-	DeleteNatServiceWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNatServiceResponse, error)
+	// DeleteNatServiceWithBodyWithResponse request with any body
+	DeleteNatServiceWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNatServiceResponse, error)
+
+	DeleteNatServiceWithResponse(ctx context.Context, id string, body DeleteNatServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNatServiceResponse, error)
 
 	// ReadNatServicesByIdWithResponse request
 	ReadNatServicesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadNatServicesByIdResponse, error)
@@ -18036,8 +19089,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateNetAccessPointWithResponse(ctx context.Context, body CreateNetAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNetAccessPointResponse, error)
 
-	// DeleteNetAccessPointWithResponse request
-	DeleteNetAccessPointWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNetAccessPointResponse, error)
+	// DeleteNetAccessPointWithBodyWithResponse request with any body
+	DeleteNetAccessPointWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNetAccessPointResponse, error)
+
+	DeleteNetAccessPointWithResponse(ctx context.Context, id string, body DeleteNetAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNetAccessPointResponse, error)
 
 	// ReadNetAccessPointsByIdWithResponse request
 	ReadNetAccessPointsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadNetAccessPointsByIdResponse, error)
@@ -18055,8 +19110,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateNetPeeringWithResponse(ctx context.Context, body CreateNetPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNetPeeringResponse, error)
 
-	// DeleteNetPeeringWithResponse request
-	DeleteNetPeeringWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNetPeeringResponse, error)
+	// DeleteNetPeeringWithBodyWithResponse request with any body
+	DeleteNetPeeringWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNetPeeringResponse, error)
+
+	DeleteNetPeeringWithResponse(ctx context.Context, id string, body DeleteNetPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNetPeeringResponse, error)
 
 	// ReadNetPeeringsByIdWithResponse request
 	ReadNetPeeringsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadNetPeeringsByIdResponse, error)
@@ -18069,8 +19126,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateNetWithResponse(ctx context.Context, body CreateNetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNetResponse, error)
 
-	// DeleteNetWithResponse request
-	DeleteNetWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNetResponse, error)
+	// DeleteNetWithBodyWithResponse request with any body
+	DeleteNetWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNetResponse, error)
+
+	DeleteNetWithResponse(ctx context.Context, id string, body DeleteNetJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNetResponse, error)
 
 	// ReadNetsByIdWithResponse request
 	ReadNetsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadNetsByIdResponse, error)
@@ -18088,8 +19147,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateNicWithResponse(ctx context.Context, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNicResponse, error)
 
-	// DeleteNicWithResponse request
-	DeleteNicWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error)
+	// DeleteNicWithBodyWithResponse request with any body
+	DeleteNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error)
+
+	DeleteNicWithResponse(ctx context.Context, id string, body DeleteNicJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error)
 
 	// ReadNicsByIdWithResponse request
 	ReadNicsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadNicsByIdResponse, error)
@@ -18104,8 +19165,10 @@ type ClientWithResponsesInterface interface {
 
 	LinkNicWithResponse(ctx context.Context, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkNicResponse, error)
 
-	// UnlinkNicWithResponse request
-	UnlinkNicWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error)
+	// UnlinkNicWithBodyWithResponse request with any body
+	UnlinkNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error)
+
+	UnlinkNicWithResponse(ctx context.Context, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error)
 
 	// LinkPrivateIpsWithBodyWithResponse request with any body
 	LinkPrivateIpsWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkPrivateIpsResponse, error)
@@ -18123,8 +19186,10 @@ type ClientWithResponsesInterface interface {
 	// ReadProductTypesByIdWithResponse request
 	ReadProductTypesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadProductTypesByIdResponse, error)
 
-	// ReadPublicIpRangesWithResponse request
-	ReadPublicIpRangesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error)
+	// ReadPublicIpRangesWithBodyWithResponse request with any body
+	ReadPublicIpRangesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error)
+
+	ReadPublicIpRangesWithResponse(ctx context.Context, body ReadPublicIpRangesJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error)
 
 	// ReadPublicIpRangesByIdWithResponse request
 	ReadPublicIpRangesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesByIdResponse, error)
@@ -18132,11 +19197,15 @@ type ClientWithResponsesInterface interface {
 	// ReadPublicIpsWithResponse request
 	ReadPublicIpsWithResponse(ctx context.Context, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*ReadPublicIpsResponse, error)
 
-	// CreatePublicIpWithResponse request
-	CreatePublicIpWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error)
+	// CreatePublicIpWithBodyWithResponse request with any body
+	CreatePublicIpWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error)
 
-	// DeletePublicIpWithResponse request
-	DeletePublicIpWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error)
+	CreatePublicIpWithResponse(ctx context.Context, body CreatePublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error)
+
+	// DeletePublicIpWithBodyWithResponse request with any body
+	DeletePublicIpWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error)
+
+	DeletePublicIpWithResponse(ctx context.Context, id string, body DeletePublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error)
 
 	// ReadPublicIpsByIdWithResponse request
 	ReadPublicIpsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadPublicIpsByIdResponse, error)
@@ -18174,8 +19243,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateRouteTableWithResponse(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error)
 
-	// DeleteRouteTableWithResponse request
-	DeleteRouteTableWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error)
+	// DeleteRouteTableWithBodyWithResponse request with any body
+	DeleteRouteTableWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error)
+
+	DeleteRouteTableWithResponse(ctx context.Context, id string, body DeleteRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error)
 
 	// ReadRouteTablesByIdWithResponse request
 	ReadRouteTablesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadRouteTablesByIdResponse, error)
@@ -18185,8 +19256,10 @@ type ClientWithResponsesInterface interface {
 
 	LinkRouteTableWithResponse(ctx context.Context, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkRouteTableResponse, error)
 
-	// UnlinkRouteTableWithResponse request
-	UnlinkRouteTableWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error)
+	// UnlinkRouteTableWithBodyWithResponse request with any body
+	UnlinkRouteTableWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error)
+
+	UnlinkRouteTableWithResponse(ctx context.Context, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error)
 
 	// CreateRouteWithBodyWithResponse request with any body
 	CreateRouteWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteResponse, error)
@@ -18237,8 +19310,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateSnapshotWithResponse(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error)
 
-	// DeleteSnapshotWithResponse request
-	DeleteSnapshotWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error)
+	// DeleteSnapshotWithBodyWithResponse request with any body
+	DeleteSnapshotWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error)
+
+	DeleteSnapshotWithResponse(ctx context.Context, id string, body DeleteSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error)
 
 	// ReadSnapshotsByIdWithResponse request
 	ReadSnapshotsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadSnapshotsByIdResponse, error)
@@ -18261,8 +19336,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateSubnetWithResponse(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error)
 
-	// DeleteSubnetWithResponse request
-	DeleteSubnetWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error)
+	// DeleteSubnetWithBodyWithResponse request with any body
+	DeleteSubnetWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error)
+
+	DeleteSubnetWithResponse(ctx context.Context, id string, body DeleteSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error)
 
 	// ReadSubnetsByIdWithResponse request
 	ReadSubnetsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadSubnetsByIdResponse, error)
@@ -18296,8 +19373,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateVirtualGatewayWithResponse(ctx context.Context, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVirtualGatewayResponse, error)
 
-	// DeleteVirtualGatewayWithResponse request
-	DeleteVirtualGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error)
+	// DeleteVirtualGatewayWithBodyWithResponse request with any body
+	DeleteVirtualGatewayWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error)
+
+	DeleteVirtualGatewayWithResponse(ctx context.Context, id string, body DeleteVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error)
 
 	// ReadVirtualGatewaysByIdWithResponse request
 	ReadVirtualGatewaysByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVirtualGatewaysByIdResponse, error)
@@ -18320,8 +19399,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateVmsWithResponse(ctx context.Context, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVmsResponse, error)
 
-	// DeleteVmsWithResponse request
-	DeleteVmsWithResponse(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error)
+	// DeleteVmsWithBodyWithResponse request with any body
+	DeleteVmsWithBodyWithResponse(ctx context.Context, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error)
+
+	DeleteVmsWithResponse(ctx context.Context, id []interface{}, body DeleteVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error)
 
 	// ReadVmsByIdWithResponse request
 	ReadVmsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVmsByIdResponse, error)
@@ -18353,8 +19434,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateVolumeWithResponse(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error)
 
-	// DeleteVolumeWithResponse request
-	DeleteVolumeWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error)
+	// DeleteVolumeWithBodyWithResponse request with any body
+	DeleteVolumeWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error)
+
+	DeleteVolumeWithResponse(ctx context.Context, id string, body DeleteVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error)
 
 	// ReadVolumesByIdWithResponse request
 	ReadVolumesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVolumesByIdResponse, error)
@@ -18392,8 +19475,10 @@ type ClientWithResponsesInterface interface {
 
 	CreateVpnConnectionWithResponse(ctx context.Context, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpnConnectionResponse, error)
 
-	// DeleteVpnConnectionWithResponse request
-	DeleteVpnConnectionWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error)
+	// DeleteVpnConnectionWithBodyWithResponse request with any body
+	DeleteVpnConnectionWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error)
+
+	DeleteVpnConnectionWithResponse(ctx context.Context, id string, body DeleteVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error)
 
 	// ReadVpnConnectionsByIdWithResponse request
 	ReadVpnConnectionsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVpnConnectionsByIdResponse, error)
@@ -22393,9 +23478,17 @@ func (c *ClientWithResponses) CreateClientGatewayWithResponse(ctx context.Contex
 	return ParseCreateClientGatewayResponse(rsp)
 }
 
-// DeleteClientGatewayWithResponse request returning *DeleteClientGatewayResponse
-func (c *ClientWithResponses) DeleteClientGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error) {
-	rsp, err := c.DeleteClientGateway(ctx, id, reqEditors...)
+// DeleteClientGatewayWithBodyWithResponse request with arbitrary body returning *DeleteClientGatewayResponse
+func (c *ClientWithResponses) DeleteClientGatewayWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error) {
+	rsp, err := c.DeleteClientGatewayWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteClientGatewayResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteClientGatewayWithResponse(ctx context.Context, id string, body DeleteClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error) {
+	rsp, err := c.DeleteClientGateway(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22463,9 +23556,17 @@ func (c *ClientWithResponses) CreateDhcpOptionsWithResponse(ctx context.Context,
 	return ParseCreateDhcpOptionsResponse(rsp)
 }
 
-// DeleteDhcpOptionsWithResponse request returning *DeleteDhcpOptionsResponse
-func (c *ClientWithResponses) DeleteDhcpOptionsWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error) {
-	rsp, err := c.DeleteDhcpOptions(ctx, id, reqEditors...)
+// DeleteDhcpOptionsWithBodyWithResponse request with arbitrary body returning *DeleteDhcpOptionsResponse
+func (c *ClientWithResponses) DeleteDhcpOptionsWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error) {
+	rsp, err := c.DeleteDhcpOptionsWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteDhcpOptionsResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteDhcpOptionsWithResponse(ctx context.Context, id string, body DeleteDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error) {
+	rsp, err := c.DeleteDhcpOptions(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22507,9 +23608,17 @@ func (c *ClientWithResponses) CreateDirectLinkInterfaceWithResponse(ctx context.
 	return ParseCreateDirectLinkInterfaceResponse(rsp)
 }
 
-// DeleteDirectLinkInterfaceWithResponse request returning *DeleteDirectLinkInterfaceResponse
-func (c *ClientWithResponses) DeleteDirectLinkInterfaceWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error) {
-	rsp, err := c.DeleteDirectLinkInterface(ctx, id, reqEditors...)
+// DeleteDirectLinkInterfaceWithBodyWithResponse request with arbitrary body returning *DeleteDirectLinkInterfaceResponse
+func (c *ClientWithResponses) DeleteDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error) {
+	rsp, err := c.DeleteDirectLinkInterfaceWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteDirectLinkInterfaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteDirectLinkInterfaceWithResponse(ctx context.Context, id string, body DeleteDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error) {
+	rsp, err := c.DeleteDirectLinkInterface(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22568,9 +23677,17 @@ func (c *ClientWithResponses) CreateDirectLinkWithResponse(ctx context.Context, 
 	return ParseCreateDirectLinkResponse(rsp)
 }
 
-// DeleteDirectLinkWithResponse request returning *DeleteDirectLinkResponse
-func (c *ClientWithResponses) DeleteDirectLinkWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error) {
-	rsp, err := c.DeleteDirectLink(ctx, id, reqEditors...)
+// DeleteDirectLinkWithBodyWithResponse request with arbitrary body returning *DeleteDirectLinkResponse
+func (c *ClientWithResponses) DeleteDirectLinkWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error) {
+	rsp, err := c.DeleteDirectLinkWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteDirectLinkResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteDirectLinkWithResponse(ctx context.Context, id string, body DeleteDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error) {
+	rsp, err := c.DeleteDirectLink(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22586,9 +23703,17 @@ func (c *ClientWithResponses) ReadDirectLinksByIdWithResponse(ctx context.Contex
 	return ParseReadDirectLinksByIdResponse(rsp)
 }
 
-// ReadFlexibleGpuCatalogWithResponse request returning *ReadFlexibleGpuCatalogResponse
-func (c *ClientWithResponses) ReadFlexibleGpuCatalogWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error) {
-	rsp, err := c.ReadFlexibleGpuCatalog(ctx, reqEditors...)
+// ReadFlexibleGpuCatalogWithBodyWithResponse request with arbitrary body returning *ReadFlexibleGpuCatalogResponse
+func (c *ClientWithResponses) ReadFlexibleGpuCatalogWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error) {
+	rsp, err := c.ReadFlexibleGpuCatalogWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReadFlexibleGpuCatalogResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReadFlexibleGpuCatalogWithResponse(ctx context.Context, body ReadFlexibleGpuCatalogJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error) {
+	rsp, err := c.ReadFlexibleGpuCatalog(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22630,9 +23755,17 @@ func (c *ClientWithResponses) CreateFlexibleGpuWithResponse(ctx context.Context,
 	return ParseCreateFlexibleGpuResponse(rsp)
 }
 
-// DeleteFlexibleGpuWithResponse request returning *DeleteFlexibleGpuResponse
-func (c *ClientWithResponses) DeleteFlexibleGpuWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error) {
-	rsp, err := c.DeleteFlexibleGpu(ctx, id, reqEditors...)
+// DeleteFlexibleGpuWithBodyWithResponse request with arbitrary body returning *DeleteFlexibleGpuResponse
+func (c *ClientWithResponses) DeleteFlexibleGpuWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error) {
+	rsp, err := c.DeleteFlexibleGpuWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteFlexibleGpuResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteFlexibleGpuWithResponse(ctx context.Context, id string, body DeleteFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error) {
+	rsp, err := c.DeleteFlexibleGpu(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22682,9 +23815,17 @@ func (c *ClientWithResponses) LinkFlexibleGpuWithResponse(ctx context.Context, i
 	return ParseLinkFlexibleGpuResponse(rsp)
 }
 
-// UnlinkFlexibleGpuWithResponse request returning *UnlinkFlexibleGpuResponse
-func (c *ClientWithResponses) UnlinkFlexibleGpuWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error) {
-	rsp, err := c.UnlinkFlexibleGpu(ctx, id, reqEditors...)
+// UnlinkFlexibleGpuWithBodyWithResponse request with arbitrary body returning *UnlinkFlexibleGpuResponse
+func (c *ClientWithResponses) UnlinkFlexibleGpuWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error) {
+	rsp, err := c.UnlinkFlexibleGpuWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUnlinkFlexibleGpuResponse(rsp)
+}
+
+func (c *ClientWithResponses) UnlinkFlexibleGpuWithResponse(ctx context.Context, id string, body UnlinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error) {
+	rsp, err := c.UnlinkFlexibleGpu(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22717,9 +23858,17 @@ func (c *ClientWithResponses) CreateImageWithResponse(ctx context.Context, body 
 	return ParseCreateImageResponse(rsp)
 }
 
-// DeleteImageWithResponse request returning *DeleteImageResponse
-func (c *ClientWithResponses) DeleteImageWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error) {
-	rsp, err := c.DeleteImage(ctx, id, reqEditors...)
+// DeleteImageWithBodyWithResponse request with arbitrary body returning *DeleteImageResponse
+func (c *ClientWithResponses) DeleteImageWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error) {
+	rsp, err := c.DeleteImageWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteImageResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteImageWithResponse(ctx context.Context, id string, body DeleteImageJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error) {
+	rsp, err := c.DeleteImage(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22761,18 +23910,34 @@ func (c *ClientWithResponses) ReadInternetServicesWithResponse(ctx context.Conte
 	return ParseReadInternetServicesResponse(rsp)
 }
 
-// CreateInternetServiceWithResponse request returning *CreateInternetServiceResponse
-func (c *ClientWithResponses) CreateInternetServiceWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreateInternetServiceResponse, error) {
-	rsp, err := c.CreateInternetService(ctx, reqEditors...)
+// CreateInternetServiceWithBodyWithResponse request with arbitrary body returning *CreateInternetServiceResponse
+func (c *ClientWithResponses) CreateInternetServiceWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateInternetServiceResponse, error) {
+	rsp, err := c.CreateInternetServiceWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateInternetServiceResponse(rsp)
 }
 
-// DeleteInternetServiceWithResponse request returning *DeleteInternetServiceResponse
-func (c *ClientWithResponses) DeleteInternetServiceWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteInternetServiceResponse, error) {
-	rsp, err := c.DeleteInternetService(ctx, id, reqEditors...)
+func (c *ClientWithResponses) CreateInternetServiceWithResponse(ctx context.Context, body CreateInternetServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateInternetServiceResponse, error) {
+	rsp, err := c.CreateInternetService(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateInternetServiceResponse(rsp)
+}
+
+// DeleteInternetServiceWithBodyWithResponse request with arbitrary body returning *DeleteInternetServiceResponse
+func (c *ClientWithResponses) DeleteInternetServiceWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteInternetServiceResponse, error) {
+	rsp, err := c.DeleteInternetServiceWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteInternetServiceResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteInternetServiceWithResponse(ctx context.Context, id string, body DeleteInternetServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteInternetServiceResponse, error) {
+	rsp, err := c.DeleteInternetService(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22848,9 +24013,17 @@ func (c *ClientWithResponses) CreateKeypairWithResponse(ctx context.Context, bod
 	return ParseCreateKeypairResponse(rsp)
 }
 
-// DeleteKeypairWithResponse request returning *DeleteKeypairResponse
-func (c *ClientWithResponses) DeleteKeypairWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error) {
-	rsp, err := c.DeleteKeypair(ctx, id, reqEditors...)
+// DeleteKeypairWithBodyWithResponse request with arbitrary body returning *DeleteKeypairResponse
+func (c *ClientWithResponses) DeleteKeypairWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error) {
+	rsp, err := c.DeleteKeypairWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteKeypairResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteKeypairWithResponse(ctx context.Context, id string, body DeleteKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error) {
+	rsp, err := c.DeleteKeypair(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -22892,9 +24065,17 @@ func (c *ClientWithResponses) CreateListenerRuleWithResponse(ctx context.Context
 	return ParseCreateListenerRuleResponse(rsp)
 }
 
-// DeleteListenerRuleWithResponse request returning *DeleteListenerRuleResponse
-func (c *ClientWithResponses) DeleteListenerRuleWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error) {
-	rsp, err := c.DeleteListenerRule(ctx, id, reqEditors...)
+// DeleteListenerRuleWithBodyWithResponse request with arbitrary body returning *DeleteListenerRuleResponse
+func (c *ClientWithResponses) DeleteListenerRuleWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error) {
+	rsp, err := c.DeleteListenerRuleWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteListenerRuleResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteListenerRuleWithResponse(ctx context.Context, id string, body DeleteListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error) {
+	rsp, err := c.DeleteListenerRule(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23115,9 +24296,17 @@ func (c *ClientWithResponses) CreateLoadBalancerWithResponse(ctx context.Context
 	return ParseCreateLoadBalancerResponse(rsp)
 }
 
-// DeleteLoadBalancerWithResponse request returning *DeleteLoadBalancerResponse
-func (c *ClientWithResponses) DeleteLoadBalancerWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error) {
-	rsp, err := c.DeleteLoadBalancer(ctx, id, reqEditors...)
+// DeleteLoadBalancerWithBodyWithResponse request with arbitrary body returning *DeleteLoadBalancerResponse
+func (c *ClientWithResponses) DeleteLoadBalancerWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error) {
+	rsp, err := c.DeleteLoadBalancerWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteLoadBalancerResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteLoadBalancerWithResponse(ctx context.Context, id string, body DeleteLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error) {
+	rsp, err := c.DeleteLoadBalancer(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23150,9 +24339,17 @@ func (c *ClientWithResponses) UpdateLoadBalancerWithResponse(ctx context.Context
 	return ParseUpdateLoadBalancerResponse(rsp)
 }
 
-// ReadLocationsWithResponse request returning *ReadLocationsResponse
-func (c *ClientWithResponses) ReadLocationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error) {
-	rsp, err := c.ReadLocations(ctx, reqEditors...)
+// ReadLocationsWithBodyWithResponse request with arbitrary body returning *ReadLocationsResponse
+func (c *ClientWithResponses) ReadLocationsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error) {
+	rsp, err := c.ReadLocationsWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReadLocationsResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReadLocationsWithResponse(ctx context.Context, body ReadLocationsJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error) {
+	rsp, err := c.ReadLocations(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23194,9 +24391,17 @@ func (c *ClientWithResponses) CreateNatServiceWithResponse(ctx context.Context, 
 	return ParseCreateNatServiceResponse(rsp)
 }
 
-// DeleteNatServiceWithResponse request returning *DeleteNatServiceResponse
-func (c *ClientWithResponses) DeleteNatServiceWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNatServiceResponse, error) {
-	rsp, err := c.DeleteNatService(ctx, id, reqEditors...)
+// DeleteNatServiceWithBodyWithResponse request with arbitrary body returning *DeleteNatServiceResponse
+func (c *ClientWithResponses) DeleteNatServiceWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNatServiceResponse, error) {
+	rsp, err := c.DeleteNatServiceWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteNatServiceResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteNatServiceWithResponse(ctx context.Context, id string, body DeleteNatServiceJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNatServiceResponse, error) {
+	rsp, err := c.DeleteNatService(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23238,9 +24443,17 @@ func (c *ClientWithResponses) CreateNetAccessPointWithResponse(ctx context.Conte
 	return ParseCreateNetAccessPointResponse(rsp)
 }
 
-// DeleteNetAccessPointWithResponse request returning *DeleteNetAccessPointResponse
-func (c *ClientWithResponses) DeleteNetAccessPointWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNetAccessPointResponse, error) {
-	rsp, err := c.DeleteNetAccessPoint(ctx, id, reqEditors...)
+// DeleteNetAccessPointWithBodyWithResponse request with arbitrary body returning *DeleteNetAccessPointResponse
+func (c *ClientWithResponses) DeleteNetAccessPointWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNetAccessPointResponse, error) {
+	rsp, err := c.DeleteNetAccessPointWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteNetAccessPointResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteNetAccessPointWithResponse(ctx context.Context, id string, body DeleteNetAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNetAccessPointResponse, error) {
+	rsp, err := c.DeleteNetAccessPoint(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23299,9 +24512,17 @@ func (c *ClientWithResponses) CreateNetPeeringWithResponse(ctx context.Context, 
 	return ParseCreateNetPeeringResponse(rsp)
 }
 
-// DeleteNetPeeringWithResponse request returning *DeleteNetPeeringResponse
-func (c *ClientWithResponses) DeleteNetPeeringWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNetPeeringResponse, error) {
-	rsp, err := c.DeleteNetPeering(ctx, id, reqEditors...)
+// DeleteNetPeeringWithBodyWithResponse request with arbitrary body returning *DeleteNetPeeringResponse
+func (c *ClientWithResponses) DeleteNetPeeringWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNetPeeringResponse, error) {
+	rsp, err := c.DeleteNetPeeringWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteNetPeeringResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteNetPeeringWithResponse(ctx context.Context, id string, body DeleteNetPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNetPeeringResponse, error) {
+	rsp, err := c.DeleteNetPeering(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23343,9 +24564,17 @@ func (c *ClientWithResponses) CreateNetWithResponse(ctx context.Context, body Cr
 	return ParseCreateNetResponse(rsp)
 }
 
-// DeleteNetWithResponse request returning *DeleteNetResponse
-func (c *ClientWithResponses) DeleteNetWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNetResponse, error) {
-	rsp, err := c.DeleteNet(ctx, id, reqEditors...)
+// DeleteNetWithBodyWithResponse request with arbitrary body returning *DeleteNetResponse
+func (c *ClientWithResponses) DeleteNetWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNetResponse, error) {
+	rsp, err := c.DeleteNetWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteNetResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteNetWithResponse(ctx context.Context, id string, body DeleteNetJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNetResponse, error) {
+	rsp, err := c.DeleteNet(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23404,9 +24633,17 @@ func (c *ClientWithResponses) CreateNicWithResponse(ctx context.Context, body Cr
 	return ParseCreateNicResponse(rsp)
 }
 
-// DeleteNicWithResponse request returning *DeleteNicResponse
-func (c *ClientWithResponses) DeleteNicWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error) {
-	rsp, err := c.DeleteNic(ctx, id, reqEditors...)
+// DeleteNicWithBodyWithResponse request with arbitrary body returning *DeleteNicResponse
+func (c *ClientWithResponses) DeleteNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error) {
+	rsp, err := c.DeleteNicWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteNicResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteNicWithResponse(ctx context.Context, id string, body DeleteNicJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error) {
+	rsp, err := c.DeleteNic(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23456,9 +24693,17 @@ func (c *ClientWithResponses) LinkNicWithResponse(ctx context.Context, id string
 	return ParseLinkNicResponse(rsp)
 }
 
-// UnlinkNicWithResponse request returning *UnlinkNicResponse
-func (c *ClientWithResponses) UnlinkNicWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error) {
-	rsp, err := c.UnlinkNic(ctx, id, reqEditors...)
+// UnlinkNicWithBodyWithResponse request with arbitrary body returning *UnlinkNicResponse
+func (c *ClientWithResponses) UnlinkNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error) {
+	rsp, err := c.UnlinkNicWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUnlinkNicResponse(rsp)
+}
+
+func (c *ClientWithResponses) UnlinkNicWithResponse(ctx context.Context, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error) {
+	rsp, err := c.UnlinkNic(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23517,9 +24762,17 @@ func (c *ClientWithResponses) ReadProductTypesByIdWithResponse(ctx context.Conte
 	return ParseReadProductTypesByIdResponse(rsp)
 }
 
-// ReadPublicIpRangesWithResponse request returning *ReadPublicIpRangesResponse
-func (c *ClientWithResponses) ReadPublicIpRangesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error) {
-	rsp, err := c.ReadPublicIpRanges(ctx, reqEditors...)
+// ReadPublicIpRangesWithBodyWithResponse request with arbitrary body returning *ReadPublicIpRangesResponse
+func (c *ClientWithResponses) ReadPublicIpRangesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error) {
+	rsp, err := c.ReadPublicIpRangesWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReadPublicIpRangesResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReadPublicIpRangesWithResponse(ctx context.Context, body ReadPublicIpRangesJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error) {
+	rsp, err := c.ReadPublicIpRanges(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23544,18 +24797,34 @@ func (c *ClientWithResponses) ReadPublicIpsWithResponse(ctx context.Context, par
 	return ParseReadPublicIpsResponse(rsp)
 }
 
-// CreatePublicIpWithResponse request returning *CreatePublicIpResponse
-func (c *ClientWithResponses) CreatePublicIpWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error) {
-	rsp, err := c.CreatePublicIp(ctx, reqEditors...)
+// CreatePublicIpWithBodyWithResponse request with arbitrary body returning *CreatePublicIpResponse
+func (c *ClientWithResponses) CreatePublicIpWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error) {
+	rsp, err := c.CreatePublicIpWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreatePublicIpResponse(rsp)
 }
 
-// DeletePublicIpWithResponse request returning *DeletePublicIpResponse
-func (c *ClientWithResponses) DeletePublicIpWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error) {
-	rsp, err := c.DeletePublicIp(ctx, id, reqEditors...)
+func (c *ClientWithResponses) CreatePublicIpWithResponse(ctx context.Context, body CreatePublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error) {
+	rsp, err := c.CreatePublicIp(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreatePublicIpResponse(rsp)
+}
+
+// DeletePublicIpWithBodyWithResponse request with arbitrary body returning *DeletePublicIpResponse
+func (c *ClientWithResponses) DeletePublicIpWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error) {
+	rsp, err := c.DeletePublicIpWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeletePublicIpResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeletePublicIpWithResponse(ctx context.Context, id string, body DeletePublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error) {
+	rsp, err := c.DeletePublicIp(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23682,9 +24951,17 @@ func (c *ClientWithResponses) CreateRouteTableWithResponse(ctx context.Context, 
 	return ParseCreateRouteTableResponse(rsp)
 }
 
-// DeleteRouteTableWithResponse request returning *DeleteRouteTableResponse
-func (c *ClientWithResponses) DeleteRouteTableWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error) {
-	rsp, err := c.DeleteRouteTable(ctx, id, reqEditors...)
+// DeleteRouteTableWithBodyWithResponse request with arbitrary body returning *DeleteRouteTableResponse
+func (c *ClientWithResponses) DeleteRouteTableWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error) {
+	rsp, err := c.DeleteRouteTableWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteRouteTableResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteRouteTableWithResponse(ctx context.Context, id string, body DeleteRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error) {
+	rsp, err := c.DeleteRouteTable(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23717,9 +24994,17 @@ func (c *ClientWithResponses) LinkRouteTableWithResponse(ctx context.Context, id
 	return ParseLinkRouteTableResponse(rsp)
 }
 
-// UnlinkRouteTableWithResponse request returning *UnlinkRouteTableResponse
-func (c *ClientWithResponses) UnlinkRouteTableWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error) {
-	rsp, err := c.UnlinkRouteTable(ctx, id, reqEditors...)
+// UnlinkRouteTableWithBodyWithResponse request with arbitrary body returning *UnlinkRouteTableResponse
+func (c *ClientWithResponses) UnlinkRouteTableWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error) {
+	rsp, err := c.UnlinkRouteTableWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUnlinkRouteTableResponse(rsp)
+}
+
+func (c *ClientWithResponses) UnlinkRouteTableWithResponse(ctx context.Context, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error) {
+	rsp, err := c.UnlinkRouteTable(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23889,9 +25174,17 @@ func (c *ClientWithResponses) CreateSnapshotWithResponse(ctx context.Context, bo
 	return ParseCreateSnapshotResponse(rsp)
 }
 
-// DeleteSnapshotWithResponse request returning *DeleteSnapshotResponse
-func (c *ClientWithResponses) DeleteSnapshotWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error) {
-	rsp, err := c.DeleteSnapshot(ctx, id, reqEditors...)
+// DeleteSnapshotWithBodyWithResponse request with arbitrary body returning *DeleteSnapshotResponse
+func (c *ClientWithResponses) DeleteSnapshotWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error) {
+	rsp, err := c.DeleteSnapshotWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSnapshotResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteSnapshotWithResponse(ctx context.Context, id string, body DeleteSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error) {
+	rsp, err := c.DeleteSnapshot(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23967,9 +25260,17 @@ func (c *ClientWithResponses) CreateSubnetWithResponse(ctx context.Context, body
 	return ParseCreateSubnetResponse(rsp)
 }
 
-// DeleteSubnetWithResponse request returning *DeleteSubnetResponse
-func (c *ClientWithResponses) DeleteSubnetWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error) {
-	rsp, err := c.DeleteSubnet(ctx, id, reqEditors...)
+// DeleteSubnetWithBodyWithResponse request with arbitrary body returning *DeleteSubnetResponse
+func (c *ClientWithResponses) DeleteSubnetWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error) {
+	rsp, err := c.DeleteSubnetWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSubnetResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteSubnetWithResponse(ctx context.Context, id string, body DeleteSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error) {
+	rsp, err := c.DeleteSubnet(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24080,9 +25381,17 @@ func (c *ClientWithResponses) CreateVirtualGatewayWithResponse(ctx context.Conte
 	return ParseCreateVirtualGatewayResponse(rsp)
 }
 
-// DeleteVirtualGatewayWithResponse request returning *DeleteVirtualGatewayResponse
-func (c *ClientWithResponses) DeleteVirtualGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error) {
-	rsp, err := c.DeleteVirtualGateway(ctx, id, reqEditors...)
+// DeleteVirtualGatewayWithBodyWithResponse request with arbitrary body returning *DeleteVirtualGatewayResponse
+func (c *ClientWithResponses) DeleteVirtualGatewayWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error) {
+	rsp, err := c.DeleteVirtualGatewayWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteVirtualGatewayResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteVirtualGatewayWithResponse(ctx context.Context, id string, body DeleteVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error) {
+	rsp, err := c.DeleteVirtualGateway(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24158,9 +25467,17 @@ func (c *ClientWithResponses) CreateVmsWithResponse(ctx context.Context, body Cr
 	return ParseCreateVmsResponse(rsp)
 }
 
-// DeleteVmsWithResponse request returning *DeleteVmsResponse
-func (c *ClientWithResponses) DeleteVmsWithResponse(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error) {
-	rsp, err := c.DeleteVms(ctx, id, reqEditors...)
+// DeleteVmsWithBodyWithResponse request with arbitrary body returning *DeleteVmsResponse
+func (c *ClientWithResponses) DeleteVmsWithBodyWithResponse(ctx context.Context, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error) {
+	rsp, err := c.DeleteVmsWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteVmsResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteVmsWithResponse(ctx context.Context, id []interface{}, body DeleteVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error) {
+	rsp, err := c.DeleteVms(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24263,9 +25580,17 @@ func (c *ClientWithResponses) CreateVolumeWithResponse(ctx context.Context, body
 	return ParseCreateVolumeResponse(rsp)
 }
 
-// DeleteVolumeWithResponse request returning *DeleteVolumeResponse
-func (c *ClientWithResponses) DeleteVolumeWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error) {
-	rsp, err := c.DeleteVolume(ctx, id, reqEditors...)
+// DeleteVolumeWithBodyWithResponse request with arbitrary body returning *DeleteVolumeResponse
+func (c *ClientWithResponses) DeleteVolumeWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error) {
+	rsp, err := c.DeleteVolumeWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteVolumeResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteVolumeWithResponse(ctx context.Context, id string, body DeleteVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error) {
+	rsp, err := c.DeleteVolume(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24392,9 +25717,17 @@ func (c *ClientWithResponses) CreateVpnConnectionWithResponse(ctx context.Contex
 	return ParseCreateVpnConnectionResponse(rsp)
 }
 
-// DeleteVpnConnectionWithResponse request returning *DeleteVpnConnectionResponse
-func (c *ClientWithResponses) DeleteVpnConnectionWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error) {
-	rsp, err := c.DeleteVpnConnection(ctx, id, reqEditors...)
+// DeleteVpnConnectionWithBodyWithResponse request with arbitrary body returning *DeleteVpnConnectionResponse
+func (c *ClientWithResponses) DeleteVpnConnectionWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error) {
+	rsp, err := c.DeleteVpnConnectionWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteVpnConnectionResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteVpnConnectionWithResponse(ctx context.Context, id string, body DeleteVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error) {
+	rsp, err := c.DeleteVpnConnection(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
