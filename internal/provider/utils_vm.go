@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -11,18 +12,8 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func vmSecurityGroupLightFromApi(ctx context.Context, elt api.SecurityGroupLightSchema) (resource_vm.SecurityGroupsValue, diag.Diagnostics) {
-	return resource_vm.NewSecurityGroupsValue(
-		resource_vm.SecurityGroupsValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"security_group_id":   types.StringPointerValue(elt.SecurityGroupId),
-			"security_group_name": types.StringPointerValue(elt.SecurityGroupName),
-		},
-	)
-}
-
-func vmBsuFromApi(ctx context.Context, elt api.BsuCreatedSchema) (resource_vm.BsuValue, diag.Diagnostics) {
-	return resource_vm.NewBsuValue(
+func vmBsuFromApi(ctx context.Context, elt api.BsuCreatedSchema) (basetypes.ObjectValue, diag.Diagnostics) {
+	obj, diags := resource_vm.NewBsuValue(
 		resource_vm.BsuValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(elt.DeleteOnVmDeletion),
@@ -31,10 +22,15 @@ func vmBsuFromApi(ctx context.Context, elt api.BsuCreatedSchema) (resource_vm.Bs
 			"snapshot_id":           types.StringNull(), // FIXME Not set
 			"state":                 types.StringNull(), // FIXME Not set
 			"volume_id":             types.StringPointerValue(elt.VolumeId),
-			"volume_size":           types.StringNull(), // FIXME Not set
+			"volume_size":           types.Int64Null(),  // FIXME Not set
 			"volume_type":           types.StringNull(), // FIXME Not set
 		},
 	)
+	if diags != nil {
+		return basetypes.ObjectValue{}, diags
+	}
+	return obj.ToObjectValue(ctx)
+
 }
 
 func vmBlockDeviceMappingFromApi(ctx context.Context, elt api.BlockDeviceMappingCreatedSchema) (resource_vm.BlockDeviceMappingsValue, diag.Diagnostics) {
@@ -81,13 +77,13 @@ func VmFromHttpToTf(ctx context.Context, http *api.VmSchema) (*resource_vm.VmMod
 		return nil, diagnostics
 	}
 
-	// Security Group
-	securityGroupsTf, diagnostics := utils.GenericListToTfListValue(
-		ctx,
-		resource_vm.SecurityGroupsValue{},
-		vmSecurityGroupLightFromApi,
-		*http.SecurityGroups,
-	)
+	// Security Groups names
+	securityGroupNames := make([]string, 0, len(*http.SecurityGroups))
+	for _, e := range *http.SecurityGroups {
+		securityGroupNames = append(securityGroupNames, *e.SecurityGroupName)
+	}
+
+	securityGroupsTf, diagnostics := utils.StringListToTfListValue(ctx, securityGroupNames)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
