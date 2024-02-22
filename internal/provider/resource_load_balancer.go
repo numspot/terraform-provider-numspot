@@ -2,17 +2,13 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
-	"net/http"
-	"strings"
-
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"net/http"
 )
 
 var (
@@ -60,24 +56,18 @@ func (r *LoadBalancerResource) Schema(ctx context.Context, request resource.Sche
 }
 
 func (r *LoadBalancerResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var (
-		data     resource_load_balancer.LoadBalancerModel
-		resModel api.LoadBalancerSchema
-	)
+	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	body := LoadBalancerFromTfToCreateRequest(ctx, &data)
 	res := utils.ExecuteRequest(func() (*api.CreateLoadBalancerResponse, error) {
 		return r.client.CreateLoadBalancerWithResponse(ctx, body)
-	}, http.StatusCreated, &response.Diagnostics)
+	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
-	if err := json.Unmarshal(res.Body, &resModel); err != nil {
-		response.Diagnostics.AddError("HTTP Response error", "Failed to unmarshal http response")
-	}
 
-	tf := LoadBalancerFromHttpToTf(ctx, &resModel) // FIXME
+	tf := LoadBalancerFromHttpToTf(ctx, res.JSON200) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -99,14 +89,22 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 func (r *LoadBalancerResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var plan resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
-	payload := LoadBalancerFromTfToUpdateRequest(ctx, &plan)
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		response.Diagnostics.AddError("call update load balancer http call failed", "failed to marshal request payload")
+
+	if !plan.BackendIps.IsUnknown() || !plan.BackendVmIds.IsUnknown() {
+		r.LinkBackendMachines(ctx, request, response)
 		return
 	}
+	r.UpdateLoadBalancer(ctx, request, response)
+}
+
+func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+	var plan resource_load_balancer.LoadBalancerModel
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	payload := LoadBalancerFromTfToUpdateRequest(ctx, &plan)
+
 	res := utils.ExecuteRequest(func() (*api.UpdateLoadBalancerResponse, error) {
-		return r.client.UpdateLoadBalancerWithBodyWithResponse(ctx, plan.Name.ValueString(), "application/json; charset=utf-8", strings.NewReader(string(payloadBytes)))
+		return r.client.UpdateLoadBalancerWithResponse(ctx, plan.Name.ValueString(), payload)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -114,14 +112,44 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 	tf := LoadBalancerFromHttpToTf(ctx, res.JSON200.LoadBalancer)
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
+func (r *LoadBalancerResource) LinkBackendMachines(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+	var plan, state resource_load_balancer.LoadBalancerModel
 
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+
+	payload := api.LinkLoadBalancerBackendMachinesJSONRequestBody{}
+	if !plan.BackendIps.IsUnknown() {
+		payload.BackendIps = utils.TfStringListToStringPtrList(ctx, plan.BackendIps)
+	}
+	if !plan.BackendVmIds.IsUnknown() {
+		payload.BackendVmIds = utils.TfStringListToStringPtrList(ctx, plan.BackendVmIds)
+	}
+
+	res := utils.ExecuteRequest(func() (*api.LinkLoadBalancerBackendMachinesResponse, error) {
+		return r.client.LinkLoadBalancerBackendMachinesWithResponse(ctx, plan.Name.ValueString(), payload)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	resRead := utils.ExecuteRequest(func() (*api.ReadLoadBalancersByIdResponse, error) {
+		return r.client.ReadLoadBalancersByIdWithResponse(ctx, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if resRead == nil {
+		return
+	}
+
+	tf := LoadBalancerFromHttpToTf(ctx, resRead.JSON200)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+}
 func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteLoadBalancerResponse, error) {
 		return r.client.DeleteLoadBalancerWithResponse(ctx, data.Id.ValueString(), api.DeleteLoadBalancerJSONRequestBody{})
-	}, http.StatusNoContent, &response.Diagnostics)
+	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}

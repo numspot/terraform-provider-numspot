@@ -47,12 +47,14 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 			"backend_ips": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Computed:            true,
+				Optional:            true,
 				Description:         "One or more public IPs of back-end VMs.",
 				MarkdownDescription: "One or more public IPs of back-end VMs.",
 			},
 			"backend_vm_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Computed:            true,
+				Optional:            true,
 				Description:         "One or more IDs of back-end VMs for the load balancer.",
 				MarkdownDescription: "One or more IDs of back-end VMs for the load balancer.",
 			},

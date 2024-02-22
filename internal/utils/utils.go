@@ -74,6 +74,13 @@ func TfStringListToStringList(ctx context.Context, list types.List) []string {
 	}, ctx, list)
 }
 
+func TfStringListToStringPtrList(ctx context.Context, list types.List) *[]string {
+	slice := TfListToGenericList(func(a types.String) string {
+		return a.ValueString()
+	}, ctx, list)
+	return &slice
+}
+
 type ITFValue interface {
 	Type(ctx context.Context) attr.Type
 }

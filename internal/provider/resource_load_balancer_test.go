@@ -2,60 +2,25 @@ package provider
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-type CreateLBTestData struct {
-	name        string
-	subnetID    string
-	backendPort int
-	lbPort      int
-	lbProtocol  string
-	lbType      string
-}
-type UpdateLBTestData struct {
-	name                 string
-	subnetID             string
-	backendPort          int
-	lbPort               int
-	lbProtocol           string
-	lbType               string
-	hcCheckInterval      int
-	hcHealthyThreshold   int
-	hcPath               string
-	hcPort               int
-	hcProtocol           string
-	hcTimeout            int
-	hcUnhealthyThreshold int
-}
-
 func TestAccLoadBalancerResource(t *testing.T) {
-	createLbData := CreateLBTestData{
-		name:        "elb-test",
-		subnetID:    "subnet-3709dfbf",
-		backendPort: 80,
-		lbPort:      80,
-		lbProtocol:  "TCP",
-		lbType:      "internal",
-	}
-
-	updateLbData := UpdateLBTestData{
-		name:                 "elb-test",
-		subnetID:             "subnet-3709dfbf",
-		backendPort:          80,
-		lbPort:               80,
-		lbProtocol:           "TCP",
-		lbType:               "internal",
-		hcCheckInterval:      30,
-		hcHealthyThreshold:   10,
-		hcPath:               "/index.html",
-		hcPort:               8080,
-		hcProtocol:           "HTTPS",
-		hcTimeout:            5,
-		hcUnhealthyThreshold: 5,
+	lbName := "elb-test"
+	hc := api.HealthCheckSchema{
+		CheckInterval:      30,
+		HealthyThreshold:   10,
+		Path:               utils.PointerOf("/index.html"),
+		Port:               8080,
+		Protocol:           "HTTPS",
+		Timeout:            5,
+		UnhealthyThreshold: 5,
 	}
 
 	pr := TestAccProtoV6ProviderFactories
@@ -63,9 +28,9 @@ func TestAccLoadBalancerResource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testLoadBalancerConfig_Create(createLbData),
+				Config: createLbConfig(lbName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", createLbData.name),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
 				),
 			},
 			// ImportState testing
@@ -77,78 +42,167 @@ func TestAccLoadBalancerResource(t *testing.T) {
 			},
 			//Update testing
 			{
-				Config: testLoadBalancerConfig_Update(updateLbData),
+				Config: updateLbConfig(hc),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.check_interval", strconv.Itoa(updateLbData.hcCheckInterval)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.healthy_threshold", strconv.Itoa(updateLbData.hcHealthyThreshold)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.path", updateLbData.hcPath),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.port", strconv.Itoa(updateLbData.hcPort)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.protocol", updateLbData.hcProtocol),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.timeout", strconv.Itoa(updateLbData.hcTimeout)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.unhealthy_threshold", strconv.Itoa(updateLbData.hcUnhealthyThreshold)),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.check_interval", strconv.Itoa(hc.CheckInterval)),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.healthy_threshold", strconv.Itoa(hc.HealthyThreshold)),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.path", *hc.Path),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.port", strconv.Itoa(hc.Port)),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.protocol", hc.Protocol),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.timeout", strconv.Itoa(hc.Timeout)),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "health_check.unhealthy_threshold", strconv.Itoa(hc.UnhealthyThreshold)),
 					//resource.TestCheckResourceAttrWith("numspot_load_balancer.testlb", "field", func(v string) error {
 					//	return nil
 					//}),
+				),
+			},
+			{
+				Config: linkBackendMachinesToLbConfig(),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_load_balancer.testlb", "backend_vm_ids", func(v string) error {
+						if assert.Empty(t, v) {
+							return fmt.Errorf("backend_vm_ids attr empty after link to backend machines call")
+						}
+						return nil
+					}),
 				),
 			},
 		},
 	})
 }
 
-func testLoadBalancerConfig_Create(createLbData CreateLBTestData) string {
-	return fmt.Sprintf(`resource "numspot_load_balancer" "testlb" {
-			name = "%s"
-			listeners = [
-				{
-					backend_port = %d
-					load_balancer_port = %d
-					load_balancer_protocol = "%s"
-					
-				}
-			]
-			subnets = ["%s"]
-			type = "%s"
-}`, createLbData.name,
-		createLbData.backendPort,
-		createLbData.lbPort,
-		createLbData.lbProtocol,
-		createLbData.subnetID,
-		createLbData.lbType)
+func createLbConfig(name string) string {
+	return fmt.Sprintf(`
+resource "numspot_net" "net" {
+  ip_range = "10.101.0.0/16"
 }
 
-func testLoadBalancerConfig_Update(updateLbData UpdateLBTestData) string {
-	return fmt.Sprintf(`resource "numspot_load_balancer" "testlb" {
-			name = "%s"
-			listeners = [
-				{
-					backend_port = %d
-					load_balancer_port = %d
-					load_balancer_protocol = "%s"
+resource "numspot_subnet" "subnet" {
+	net_id 		= numspot_net.net.id
+	ip_range 	= "10.101.1.0/24"
+}
+
+resource "numspot_load_balancer" "testlb" {
+	name = "%s"
+	listeners = [
+		{
+			backend_port = 80
+			load_balancer_port = 80
+			load_balancer_protocol = "TCP"
 					
-				}
-			]
-			subnets = ["%s"]
-			type = "%s"
-			health_check = {
-				check_interval = %d
-				healthy_threshold = %d
-				path = "%s"
-				port = %d
-				protocol = "%s"
-				timeout = %d
-				unhealthy_threshold = %d
-			}
-}`, updateLbData.name,
-		updateLbData.backendPort,
-		updateLbData.lbPort,
-		updateLbData.lbProtocol,
-		updateLbData.subnetID,
-		updateLbData.lbType,
-		updateLbData.hcCheckInterval,
-		updateLbData.hcHealthyThreshold,
-		updateLbData.hcPath,
-		updateLbData.hcPort,
-		updateLbData.hcProtocol,
-		updateLbData.hcTimeout,
-		updateLbData.hcUnhealthyThreshold)
+		}
+	]
+	subnets = [numspot_subnet.subnet.id]
+	type = "internal"
+}`, name)
+}
+
+func updateLbConfig(hc api.HealthCheckSchema) string {
+	return fmt.Sprintf(`
+resource "numspot_net" "net" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "subnet" {
+	net_id 		= numspot_net.net.id
+	ip_range 	= "10.101.1.0/24"
+}
+
+resource "numspot_load_balancer" "testlb" {
+	name = "elb-test"
+	listeners = [
+		{
+			backend_port = 80
+			load_balancer_port = 80
+			load_balancer_protocol = "TCP"
+					
+		}
+	]
+	subnets = [numspot_subnet.subnet.id]
+	type = "internal"
+	health_check = {
+		check_interval = %d
+		healthy_threshold = %d
+		path = "%s"
+		port = %d
+		protocol = "%s"
+		timeout = %d
+		unhealthy_threshold = %d
+	}
+}`, hc.CheckInterval, hc.HealthyThreshold, *hc.Path, hc.Port, hc.Protocol, hc.Timeout, hc.UnhealthyThreshold)
+}
+
+func linkBackendMachinesToLbConfig() string {
+	return fmt.Sprintf(`
+resource "numspot_net" "net" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "subnet" {
+	net_id 		= numspot_net.net.id
+	ip_range 	= "10.101.1.0/24"
+}
+
+resource "numspot_security_group" "sg" {
+	net_id 		= numspot_net.net.id
+	name 		= "terraform-vm-tests-sg-name"
+	description = "terraform-vm-tests-sg-description"
+
+	inbound_rules = [
+		{
+			from_port_range = 80
+			to_port_range = 80
+			ip_ranges = ["0.0.0.0/0"]
+			ip_protocol = "tcp"
+		}
+	]
+}
+
+resource "numspot_internet_service" "is" {
+  net_id = numspot_net.net.id
+}
+
+resource "numspot_route_table" "rt" {
+  net_id    = numspot_net.net.id
+  subnet_id = numspot_subnet.subnet.id
+
+  routes = [
+    {
+      destination_ip_range = "0.0.0.0/0"
+      gateway_id           = numspot_internet_service.is.id
+    }
+  ]
+}
+
+resource "numspot_vm" "test" {
+	image_id 			= "ami-00b0c39a"
+	vm_type 			= "t2.small"
+	subnet_id			= numspot_subnet.subnet.id
+	security_group_ids 	= [ numspot_security_group.sg.id ]
+	depends_on 			= [ numspot_security_group.sg ]
+}
+
+resource "numspot_load_balancer" "testlb" {
+	name = "elb-test"
+	listeners = [
+		{
+			backend_port = 80
+			load_balancer_port = 80
+			load_balancer_protocol = "TCP"
+					
+		}
+	]
+	subnets = [numspot_subnet.subnet.id]
+	type = "internal"
+	health_check = {
+		check_interval = 30
+		healthy_threshold = 10
+		path = "/index.html"
+		port = 8080
+		protocol = "HTTPS"
+		timeout = 5
+		unhealthy_threshold = 5
+	}
+	backend_vm_ids = [numspot_vm.test.id]
+}`)
 }
