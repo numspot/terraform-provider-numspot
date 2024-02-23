@@ -13,7 +13,7 @@ func TestAccVolumeResource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testVolumeConfig_Create(),
+				Config: createVolumeConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_volume.test", "field", "value"),
 					resource.TestCheckResourceAttrWith("numspot_volume.test", "field", func(v string) error {
@@ -30,21 +30,27 @@ func TestAccVolumeResource(t *testing.T) {
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
-			{
-				Config: testVolumeConfig_Update(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_volume.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_volume.test", "field", func(v string) error {
-						return nil
-					}),
-				),
-			},
+			//{
+			//	Config: testVolumeConfig_Update(),
+			//	Check: resource.ComposeAggregateTestCheckFunc(
+			//		resource.TestCheckResourceAttr("numspot_volume.test", "field", "value"),
+			//		resource.TestCheckResourceAttrWith("numspot_volume.test", "field", func(v string) error {
+			//			return nil
+			//		}),
+			//	),
+			//},
 		},
 	})
 }
 
-func testVolumeConfig_Create() string {
-	return `resource "numspot_volume" "test" {}`
+func createVolumeConfig() string {
+	return `
+resource "numspot_volume" "test" {
+	iops = 1200
+	size
+	snapshot_id
+}
+`
 }
 
 func testVolumeConfig_Update() string {

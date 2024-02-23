@@ -67,7 +67,11 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return r.client.CreateVolumeWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
 
-	tf := VolumeFromHttpToTf(res.JSON200)
+	tf, diags := VolumeFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -79,7 +83,11 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 		return r.client.ReadVolumesByIdWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 
-	tf := VolumeFromHttpToTf(res.JSON200)
+	tf, diags := VolumeFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

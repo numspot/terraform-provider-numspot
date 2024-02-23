@@ -61,12 +61,6 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The type of the volume (`standard` \\| `gp2` \\| `io1`).",
 				MarkdownDescription: "The type of the volume (`standard` \\| `gp2` \\| `io1`).",
 			},
-			"volume_type": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />\n For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).",
-				MarkdownDescription: "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />\n For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).",
-			},
 			"volumes": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -119,7 +113,6 @@ type VolumeModel struct {
 	State         types.String `tfsdk:"state"`
 	SubregionName types.String `tfsdk:"subregion_name"`
 	Type          types.String `tfsdk:"type"`
-	VolumeType    types.String `tfsdk:"volume_type"`
 	Volumes       types.List   `tfsdk:"volumes"`
 }
 
