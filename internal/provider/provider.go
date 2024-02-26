@@ -339,7 +339,9 @@ func (p *numspotProvider) Metadata(ctx context.Context, req provider.MetadataReq
 }
 
 func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+		NewLoadBalancersDataSource,
+	}
 }
 
 func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resource {
