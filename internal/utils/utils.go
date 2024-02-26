@@ -52,6 +52,13 @@ func FromStringListPointerToTfStringList(ctx context.Context, arr *[]string) (ty
 	return types.ListValueFrom(ctx, types.StringType, *arr)
 }
 
+func FromIntListPointerToTfInt64List(ctx context.Context, arr *[]int) (types.List, diag.Diagnostics) {
+	if arr == nil {
+		return types.ListValueFrom(ctx, types.Int64Type, []int{})
+	}
+	return types.ListValueFrom(ctx, types.Int64Type, *arr)
+}
+
 func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list types.List) []B {
 	if len(list.Elements()) == 0 {
 		return nil
