@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpn_connection"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"net/http"
@@ -303,12 +302,12 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 	if res == nil {
 		return
 	}
-	if res.JSON200.VpnConnections == nil {
+	if res.Items == nil {
 		response.Diagnostics.AddError("HTTP call failed", "got empty load balancers list")
 	}
 
-	for _, item := range *res.JSON200.VpnConnections {
-		tf := provider.VpnConnectionFromHttpToTf(ctx, &item)
+	for _, item := range *res.Items {
+		tf := VpnConnectionFromHttpToTf(ctx, &item)
 		state.VPNConnections = append(state.VPNConnections, tf)
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)

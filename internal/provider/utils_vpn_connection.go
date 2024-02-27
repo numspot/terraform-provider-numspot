@@ -10,11 +10,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func VpnConnectionFromTfToHttp(tf *resource_vpn_connection.VpnConnectionModel) *api.VpnConnectionSchema {
-	return &api.VpnConnectionSchema{}
+func VpnConnectionFromTfToHttp(tf *resource_vpn_connection.VpnConnectionModel) *api.VpnConnection {
+	return &api.VpnConnection{}
 }
 
-func routeFromHTTP(ctx context.Context, elt api.RouteLightSchema) (resource_vpn_connection.RoutesValue, diag.Diagnostics) {
+func routeFromHTTP(ctx context.Context, elt api.RouteLight) (resource_vpn_connection.RoutesValue, diag.Diagnostics) {
 	return resource_vpn_connection.NewRoutesValue(
 		resource_vpn_connection.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -24,7 +24,7 @@ func routeFromHTTP(ctx context.Context, elt api.RouteLightSchema) (resource_vpn_
 		})
 }
 
-func phase1OptionsFromHTTP(ctx context.Context, elt *api.Phase1OptionsSchema) (resource_vpn_connection.Phase1optionsValue, diag.Diagnostics) {
+func phase1OptionsFromHTTP(ctx context.Context, elt *api.Phase1Options) (resource_vpn_connection.Phase1optionsValue, diag.Diagnostics) {
 	phase1IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase1optionsValue{}, diags
@@ -57,7 +57,7 @@ func phase1OptionsFromHTTP(ctx context.Context, elt *api.Phase1OptionsSchema) (r
 		})
 }
 
-func phase2OptionsFromHTTP(ctx context.Context, elt *api.Phase2OptionsSchema) (resource_vpn_connection.Phase2optionsValue, diag.Diagnostics) {
+func phase2OptionsFromHTTP(ctx context.Context, elt *api.Phase2Options) (resource_vpn_connection.Phase2optionsValue, diag.Diagnostics) {
 	phase2IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase2optionsValue{}, diags
@@ -82,7 +82,7 @@ func phase2OptionsFromHTTP(ctx context.Context, elt *api.Phase2OptionsSchema) (r
 		})
 }
 
-func vpnOptionsFromHTTP(ctx context.Context, elt *api.VpnOptionsSchema) (resource_vpn_connection.VpnOptionsValue, diag.Diagnostics) {
+func vpnOptionsFromHTTP(ctx context.Context, elt *api.VpnOptions) (resource_vpn_connection.VpnOptionsValue, diag.Diagnostics) {
 
 	if elt == nil {
 		return resource_vpn_connection.VpnOptionsValue{}, diag.Diagnostics{}
@@ -114,7 +114,7 @@ func vpnOptionsFromHTTP(ctx context.Context, elt *api.VpnOptionsSchema) (resourc
 	return vpnOptions, diags
 }
 
-func VGWTelemetryFromHTTPToTF(ctx context.Context, http api.VgwTelemetrySchema) (resource_vpn_connection.VgwTelemetriesValue, diag.Diagnostics) {
+func VGWTelemetryFromHTTPToTF(ctx context.Context, http api.VgwTelemetry) (resource_vpn_connection.VgwTelemetriesValue, diag.Diagnostics) {
 	var lastStateChangeDate string
 	if http.LastStateChangeDate != nil {
 		lastStateChangeDate = http.LastStateChangeDate.String()
@@ -132,7 +132,7 @@ func VGWTelemetryFromHTTPToTF(ctx context.Context, http api.VgwTelemetrySchema) 
 		})
 }
 
-func VpnConnectionFromHttpToTf(ctx context.Context, http *api.VpnConnectionSchema) resource_vpn_connection.VpnConnectionModel {
+func VpnConnectionFromHttpToTf(ctx context.Context, http *api.VpnConnection) resource_vpn_connection.VpnConnectionModel {
 
 	vpnOptions, diags := vpnOptionsFromHTTP(ctx, http.VpnOptions)
 	if diags.HasError() {
