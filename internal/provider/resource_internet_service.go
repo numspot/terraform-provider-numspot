@@ -68,7 +68,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 		return
 	}
 
-	if res.StatusCode() != http.StatusOK {
+	if res.StatusCode() != http.StatusCreated {
 		apiError := utils.HandleError(res.Body)
 		response.Diagnostics.AddError("Failed to create InternetService", apiError.Error())
 		return
@@ -90,7 +90,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 			response.Diagnostics.AddError("Failed to link InternetService to net", err.Error())
 			return
 		}
-		expectedStatusCode := 200
+		expectedStatusCode := http.StatusNoContent
 		if reslink.StatusCode() != expectedStatusCode {
 			apiError := utils.HandleError(res.Body)
 			response.Diagnostics.AddError("Failed to link InternetService to net", apiError.Error())

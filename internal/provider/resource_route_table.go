@@ -74,7 +74,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	res := utils.ExecuteRequest(func() (*api.CreateRouteTableResponse, error) {
 		body := RouteTableFromTfToCreateRequest(&data)
 		return r.client.CreateRouteTableWithResponse(ctx, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}
@@ -99,7 +99,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 				NicId:              route.NicId.ValueStringPointer(),
 				VmId:               route.VmId.ValueStringPointer(),
 			})
-		}, http.StatusOK, &response.Diagnostics)
+		}, http.StatusCreated, &response.Diagnostics)
 		if createdRoute == nil {
 			return
 		}

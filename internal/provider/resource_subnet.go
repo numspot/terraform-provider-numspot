@@ -68,7 +68,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	res := utils.ExecuteRequest(func() (*api.CreateSubnetResponse, error) {
 		body := SubnetFromTfToCreateRequest(&data)
 		return r.client.CreateSubnetWithResponse(ctx, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}

@@ -13,8 +13,8 @@ import (
 )
 
 type loadBalancersDataSourceModel struct {
-	LoadBalancers []resource_load_balancer.LoadBalancerModel `tfsdk:"load_balancers"`
-	ID            types.String                               `tfsdk:"id"`
+	LoadBalancers     []resource_load_balancer.LoadBalancerModel `tfsdk:"load_balancers"`
+	LoadBalancerNames types.List                                 `tfsdk:"load_balancer_names"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -293,17 +293,29 @@ func (d *loadBalancersDataSource) Schema(ctx context.Context, _ datasource.Schem
 					},
 				},
 			},
+			"load_balancer_names": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "One or more load balancer names to filter with.",
+				MarkdownDescription: "One or more load balancer names to filter with.",
+			},
 		},
 	}
 }
 
 // Read refreshes the Terraform state with the latest data.
 func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	var state loadBalancersDataSourceModel
-	state.ID = types.StringValue("placeholder")
+	var state, plan loadBalancersDataSourceModel
+	request.Config.Get(ctx, &plan)
 
+	params := api.ReadLoadBalancersParams{}
+	if !plan.LoadBalancerNames.IsNull() {
+		lbNames := utils.TfStringListToStringList(ctx, plan.LoadBalancerNames)
+		params.LoadBalancerNames = &lbNames
+	}
 	res := utils.ExecuteRequest(func() (*api.ReadLoadBalancersResponse, error) {
-		return d.client.ReadLoadBalancersWithResponse(ctx, &api.ReadLoadBalancersParams{})
+		return d.client.ReadLoadBalancersWithResponse(ctx, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -316,5 +328,6 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 		tf := LoadBalancerFromHttpToTf(ctx, &item)
 		state.LoadBalancers = append(state.LoadBalancers, tf)
 	}
+	state.LoadBalancerNames = plan.LoadBalancerNames
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

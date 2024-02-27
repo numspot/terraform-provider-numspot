@@ -66,7 +66,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	res := utils.ExecuteRequest(func() (*api.CreateSecurityGroupResponse, error) {
 		body := SecurityGroupFromTfToCreateRequest(&data)
 		return r.client.CreateSecurityGroupWithResponse(ctx, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}
@@ -81,7 +81,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		createdIbdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateInboundRulesRequest(ctx, *createdId, inboundRules)
 			return r.client.CreateSecurityGroupRuleWithResponse(ctx, *createdId, body)
-		}, http.StatusOK, &response.Diagnostics)
+		}, http.StatusCreated, &response.Diagnostics)
 		if createdIbdRules == nil {
 			return
 		}
@@ -109,7 +109,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 				Rules: &rules,
 			}
 			return r.client.DeleteSecurityGroupRuleWithResponse(ctx, *createdId, body)
-		}, http.StatusOK, &response.Diagnostics)
+		}, http.StatusNoContent, &response.Diagnostics)
 
 		// Create SG rules:
 		outboundRules := make([]resource_security_group.OutboundRulesValue, 0, len(data.OutboundRules.Elements()))
@@ -118,7 +118,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		createdObdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateOutboundRulesRequest(ctx, *createdId, outboundRules)
 			return r.client.CreateSecurityGroupRuleWithResponse(ctx, *createdId, body)
-		}, http.StatusOK, &response.Diagnostics)
+		}, http.StatusCreated, &response.Diagnostics)
 		if createdObdRules == nil {
 			return
 		}

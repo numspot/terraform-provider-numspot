@@ -62,7 +62,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	body := LoadBalancerFromTfToCreateRequest(ctx, &data)
 	res := utils.ExecuteRequest(func() (*api.CreateLoadBalancerResponse, error) {
 		return r.client.CreateLoadBalancerWithResponse(ctx, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}

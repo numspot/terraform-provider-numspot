@@ -67,7 +67,7 @@ func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest
 	res := utils.ExecuteRequest(func() (*api.CreateVpcResponse, error) {
 		body := NetFromTfToCreateRequest(&data)
 		return r.client.CreateVpcWithResponse(ctx, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}
