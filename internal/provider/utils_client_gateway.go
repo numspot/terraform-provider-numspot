@@ -8,8 +8,8 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *api.ClientGatewaySchema {
-	return &api.ClientGatewaySchema{
+func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *api.ClientGateway {
+	return &api.ClientGateway{
 		BgpAsn:         utils.FromTfInt64ToIntPtr(tf.BgpAsn),
 		ConnectionType: tf.ConnectionType.ValueStringPointer(),
 		Id:             tf.Id.ValueStringPointer(),
@@ -18,7 +18,7 @@ func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *
 	}
 }
 
-func ClientGatewayFromHttpToTf(http *api.ClientGatewaySchema) resource_client_gateway.ClientGatewayModel {
+func ClientGatewayFromHttpToTf(http *api.ClientGateway) resource_client_gateway.ClientGatewayModel {
 	tmp := resource_client_gateway.ClientGatewayModel{
 		BgpAsn:         utils.FromIntPtrToTfInt64(http.BgpAsn),
 		ConnectionType: types.StringPointerValue(http.ConnectionType),

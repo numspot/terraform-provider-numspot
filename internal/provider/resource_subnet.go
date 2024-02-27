@@ -73,7 +73,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	createdId := *res.JSON200.Id
+	createdId := *res.JSON201.Id
 	createStateConf := &retry.StateChangeConf{
 		Pending: []string{"pending"},
 		Target:  []string{"available"},
@@ -98,7 +98,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 
 	_, err := createStateConf.WaitForStateContext(ctx)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *res.JSON200.Id, err))
+		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *res.JSON201.Id, err))
 		return
 	}
 
@@ -148,7 +148,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteSubnetResponse, error) {
-		return r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString(), api.DeleteSubnetJSONRequestBody{})
+		return r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -302,11 +302,11 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 	if res == nil {
 		return
 	}
-	if res.Items == nil {
+	if res.JSON200 == nil {
 		response.Diagnostics.AddError("HTTP call failed", "got empty load balancers list")
 	}
 
-	for _, item := range *res.Items {
+	for _, item := range *res.JSON200.Items {
 		tf := VpnConnectionFromHttpToTf(ctx, &item)
 		state.VPNConnections = append(state.VPNConnections, tf)
 	}

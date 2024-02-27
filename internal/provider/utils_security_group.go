@@ -11,19 +11,19 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func SecurityGroupFromTfToHttp(tf *resource_security_group.SecurityGroupModel) *api.SecurityGroupSchema {
-	return &api.SecurityGroupSchema{
+func SecurityGroupFromTfToHttp(tf *resource_security_group.SecurityGroupModel) *api.SecurityGroup {
+	return &api.SecurityGroup{
 		Id:            tf.Id.ValueStringPointer(),
 		AccountId:     tf.AccountId.ValueStringPointer(),
 		Description:   tf.Description.ValueStringPointer(),
 		Name:          tf.Name.ValueStringPointer(),
-		NetId:         tf.NetId.ValueStringPointer(),
+		VpcId:         tf.NetId.ValueStringPointer(),
 		InboundRules:  nil,
 		OutboundRules: nil,
 	}
 }
 
-func InboundRuleFromHttpToTf(ctx context.Context, rules api.SecurityGroupRuleSchema) (resource_security_group.InboundRulesValue, diag.Diagnostics) {
+func InboundRuleFromHttpToTf(ctx context.Context, rules api.SecurityGroupRule) (resource_security_group.InboundRulesValue, diag.Diagnostics) {
 	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
 	if diags.HasError() {
 		return resource_security_group.InboundRulesValue{}, diags
@@ -54,7 +54,7 @@ func InboundRuleFromHttpToTf(ctx context.Context, rules api.SecurityGroupRuleSch
 	)
 }
 
-func OutboundRuleFromHttpToTf(ctx context.Context, rules api.SecurityGroupRuleSchema) (resource_security_group.OutboundRulesValue, diag.Diagnostics) {
+func OutboundRuleFromHttpToTf(ctx context.Context, rules api.SecurityGroupRule) (resource_security_group.OutboundRulesValue, diag.Diagnostics) {
 	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
 	if diags.HasError() {
 		return resource_security_group.OutboundRulesValue{}, diags
@@ -85,7 +85,7 @@ func OutboundRuleFromHttpToTf(ctx context.Context, rules api.SecurityGroupRuleSc
 	)
 }
 
-func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_group.SecurityGroupModel, http *api.SecurityGroupSchema) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
+func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_group.SecurityGroupModel, http *api.SecurityGroup) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
 	ibd := make([]resource_security_group.InboundRulesValue, 0, len(*http.InboundRules))
 	for _, e := range *http.InboundRules {
 		value, diagnostics := InboundRuleFromHttpToTf(ctx, e)
@@ -190,7 +190,7 @@ func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_grou
 		Description:   types.StringPointerValue(http.Description),
 		Id:            types.StringPointerValue(http.Id),
 		Name:          types.StringPointerValue(http.Name),
-		NetId:         types.StringPointerValue(http.NetId),
+		NetId:         types.StringPointerValue(http.VpcId),
 		InboundRules:  ibdsTf,
 		OutboundRules: obdsTf,
 	}
@@ -201,13 +201,13 @@ func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_grou
 func SecurityGroupFromTfToCreateRequest(tf *resource_security_group.SecurityGroupModel) api.CreateSecurityGroupJSONRequestBody {
 	return api.CreateSecurityGroupJSONRequestBody{
 		Description: tf.Description.ValueString(),
-		NetId:       tf.NetId.ValueStringPointer(),
+		VpcId:       tf.NetId.ValueStringPointer(),
 		Name:        tf.Name.ValueString(),
 	}
 }
 
 func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource_security_group.InboundRulesValue) api.CreateSecurityGroupRuleJSONRequestBody {
-	rules := make([]api.SecurityGroupRuleSchema, 0, len(data))
+	rules := make([]api.SecurityGroupRule, 0, len(data))
 	for i := range data {
 		e := &data[i]
 		fpr := int(e.FromPortRange.ValueInt64())
@@ -220,7 +220,7 @@ func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource
 			ipRanges = append(ipRanges, ip.ValueString())
 		}
 
-		rules = append(rules, api.SecurityGroupRuleSchema{
+		rules = append(rules, api.SecurityGroupRule{
 			FromPortRange: &fpr,
 			IpProtocol:    e.IpProtocol.ValueStringPointer(),
 			IpRanges:      &ipRanges,
@@ -229,18 +229,17 @@ func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource
 	}
 	tt := 22
 	inboundRulesCreationBody := api.CreateSecurityGroupRuleJSONRequestBody{
-		Flow:            "Inbound",
-		SecurityGroupId: sgId,
-		Rules:           &rules,
-		FromPortRange:   &tt,
-		ToPortRange:     &tt,
+		Flow:          "Inbound",
+		Rules:         &rules,
+		FromPortRange: &tt,
+		ToPortRange:   &tt,
 	}
 
 	return inboundRulesCreationBody
 }
 
 func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []resource_security_group.OutboundRulesValue) api.CreateSecurityGroupRuleJSONRequestBody {
-	rules := make([]api.SecurityGroupRuleSchema, 0, len(data))
+	rules := make([]api.SecurityGroupRule, 0, len(data))
 	for i := range data {
 		e := &data[i]
 
@@ -254,7 +253,7 @@ func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []resourc
 			ipRanges = append(ipRanges, ip.ValueString())
 		}
 
-		rules = append(rules, api.SecurityGroupRuleSchema{
+		rules = append(rules, api.SecurityGroupRule{
 			FromPortRange: &fpr,
 			IpProtocol:    e.IpProtocol.ValueStringPointer(),
 			IpRanges:      &ipRanges,
@@ -263,9 +262,8 @@ func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []resourc
 	}
 
 	outboundRulesCreationBody := api.CreateSecurityGroupRuleJSONRequestBody{
-		Flow:            "Outbound",
-		SecurityGroupId: sgId,
-		Rules:           &rules,
+		Flow:  "Outbound",
+		Rules: &rules,
 	}
 
 	return outboundRulesCreationBody

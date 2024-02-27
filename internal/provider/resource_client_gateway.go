@@ -70,7 +70,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	tf := ClientGatewayFromHttpToTf(res.JSON200)
+	tf := ClientGatewayFromHttpToTf(res.JSON201)
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
@@ -99,7 +99,7 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteClientGatewayResponse, error) {
-		return r.client.DeleteClientGatewayWithResponse(ctx, data.Id.ValueString(), api.DeleteClientGatewayJSONRequestBody{})
+		return r.client.DeleteClientGatewayWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

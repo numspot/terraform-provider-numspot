@@ -62,15 +62,15 @@ func (r *NatServiceResource) Create(ctx context.Context, request resource.Create
 	var data resource_nat_service.NatServiceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateNatServiceResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateNatGatewayResponse, error) {
 		body := NatServiceFromTfToCreateRequest(&data)
-		return r.client.CreateNatServiceWithResponse(ctx, body)
+		return r.client.CreateNatGatewayWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diagnostics := NatServiceFromHttpToTf(ctx, res.JSON200)
+	tf, diagnostics := NatServiceFromHttpToTf(ctx, res.JSON201)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -88,8 +88,8 @@ func (r *NatServiceResource) Read(ctx context.Context, request resource.ReadRequ
 	var data resource_nat_service.NatServiceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadNatServicesByIdResponse, error) {
-		return r.client.ReadNatServicesByIdWithResponse(ctx, data.Id.String())
+	res := utils.ExecuteRequest(func() (*api.ReadNatGatewayByIdResponse, error) {
+		return r.client.ReadNatGatewayByIdWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -118,7 +118,7 @@ func (r *NatServiceResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_nat_service.NatServiceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.ExecuteRequest(func() (*api.DeleteNatServiceResponse, error) {
-		return r.client.DeleteNatServiceWithResponse(ctx, data.Id.String(), api.DeleteNatServiceJSONRequestBody{})
+	_ = utils.ExecuteRequest(func() (*api.DeleteNatGatewayResponse, error) {
+		return r.client.DeleteNatGatewayWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

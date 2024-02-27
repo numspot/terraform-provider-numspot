@@ -22,23 +22,23 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
-// Defines values for UpdateDirectLinkInterfaceJSONBodyMtu.
+// Defines values for CreateVmsPerformance.
 const (
-	N1500 UpdateDirectLinkInterfaceJSONBodyMtu = 1500
+	CreateVmsPerformanceHigh    CreateVmsPerformance = "high"
+	CreateVmsPerformanceHighest CreateVmsPerformance = "highest"
+	CreateVmsPerformanceMedium  CreateVmsPerformance = "medium"
 )
 
-// Defines values for CreateVmsJSONBodyPerformance.
+// Defines values for UpdateDirectLinkInterfaceMtu.
 const (
-	CreateVmsJSONBodyPerformanceHigh    CreateVmsJSONBodyPerformance = "high"
-	CreateVmsJSONBodyPerformanceHighest CreateVmsJSONBodyPerformance = "highest"
-	CreateVmsJSONBodyPerformanceMedium  CreateVmsJSONBodyPerformance = "medium"
+	N1500 UpdateDirectLinkInterfaceMtu = 1500
 )
 
-// Defines values for UpdateVmJSONBodyPerformance.
+// Defines values for UpdateVmPerformance.
 const (
-	UpdateVmJSONBodyPerformanceHigh    UpdateVmJSONBodyPerformance = "high"
-	UpdateVmJSONBodyPerformanceHighest UpdateVmJSONBodyPerformance = "highest"
-	UpdateVmJSONBodyPerformanceMedium  UpdateVmJSONBodyPerformance = "medium"
+	UpdateVmPerformanceHigh    UpdateVmPerformance = "high"
+	UpdateVmPerformanceHighest UpdateVmPerformance = "highest"
+	UpdateVmPerformanceMedium  UpdateVmPerformance = "medium"
 )
 
 // AcceptVpcPeering defines model for AcceptVpcPeering.
@@ -416,33 +416,6 @@ type CreateProductType struct {
 	Vendor *string `json:"vendor,omitempty"`
 }
 
-// CreatePublicIp Information about the public IP.
-type CreatePublicIp struct {
-	// Id The allocation ID of the public IP.
-	Id *string `json:"id,omitempty"`
-
-	// LinkPublicIpId (Required in a Net) The ID representing the association of the public IP with the VM or the NIC.
-	LinkPublicIpId *string `json:"linkPublicIpId,omitempty"`
-
-	// NicAccountId The account ID of the owner of the NIC.
-	NicAccountId *string `json:"nicAccountId,omitempty"`
-
-	// NicId The ID of the NIC the public IP is associated with (if any).
-	NicId *string `json:"nicId,omitempty"`
-
-	// PrivateIp The private IP associated with the public IP.
-	PrivateIp *string `json:"privateIp,omitempty"`
-
-	// PublicIp The public IP.
-	PublicIp *string `json:"publicIp,omitempty"`
-
-	// Tags One or more tags associated with the public IP.
-	Tags *[]ResourceTag `json:"tags,omitempty"`
-
-	// VmId The ID of the VM the public IP is associated with (if any).
-	VmId *string `json:"vmId,omitempty"`
-}
-
 // CreateRoute defines model for CreateRoute.
 type CreateRoute struct {
 	// DestinationIpRange The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
@@ -549,161 +522,95 @@ type CreateTags struct {
 	Tags []ResourceTag `json:"tags"`
 }
 
-// CreateVirtualGateway Information about the virtual gateway.
+// CreateVirtualGateway defines model for CreateVirtualGateway.
 type CreateVirtualGateway struct {
 	// ConnectionType The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).
-	ConnectionType *string `json:"connectionType,omitempty"`
-
-	// Id The ID of the virtual gateway.
-	Id *string `json:"id,omitempty"`
-
-	// NetToVirtualGatewayLinks The Net to which the virtual gateway is attached.
-	NetToVirtualGatewayLinks *[]VpcToVirtualGatewayLink `json:"netToVirtualGatewayLinks,omitempty"`
-
-	// State The state of the virtual gateway (`pending` \| `available` \| `deleting` \| `deleted`).
-	State *string `json:"state,omitempty"`
-
-	// Tags One or more tags associated with the virtual gateway.
-	Tags *[]ResourceTag `json:"tags,omitempty"`
+	ConnectionType string `json:"connectionType"`
 }
 
-// CreateVms Information about the VM.
+// CreateVms defines model for CreateVms.
 type CreateVms struct {
-	// Architecture The architecture of the VM (`i386` \| `x86_64`).
-	Architecture *string `json:"architecture,omitempty"`
+	// BlockDeviceMappings One or more block device mappings.
+	BlockDeviceMappings *[]BlockDeviceMappingVmCreation `json:"blockDeviceMappings,omitempty"`
 
-	// BlockDeviceMappings The block device mapping of the VM.
-	BlockDeviceMappings *[]BlockDeviceMappingCreated `json:"blockDeviceMappings,omitempty"`
+	// BootOnCreation By default or if true, the VM is started on creation. If false, the VM is stopped on creation.
+	BootOnCreation *bool `json:"bootOnCreation,omitempty"`
 
 	// BsuOptimized This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
 	BsuOptimized *bool `json:"bsuOptimized,omitempty"`
 
-	// ClientToken The idempotency token provided when launching the VM.
+	// ClientToken A unique identifier which enables you to manage the idempotency.
 	ClientToken *string `json:"clientToken,omitempty"`
-
-	// CreationDate The date and time of creation of the VM.
-	CreationDate *time.Time `json:"creationDate,omitempty"`
 
 	// DeletionProtection If true, you cannot delete the VM unless you change this parameter back to false.
 	DeletionProtection *bool `json:"deletionProtection,omitempty"`
 
-	// Hypervisor The hypervisor type of the VMs (`ovm` \| `xen`).
-	Hypervisor *string `json:"hypervisor,omitempty"`
+	// ImageId The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.
+	ImageId string `json:"imageId"`
 
-	// Id The ID of the VM.
-	Id *string `json:"id,omitempty"`
-
-	// ImageId The ID of the OMI used to create the VM.
-	ImageId *string `json:"imageId,omitempty"`
-
-	// InitiatedShutdownBehavior The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted.
-	InitiatedShutdownBehavior *string `json:"initiatedShutdownBehavior,omitempty"`
-
-	// IsSourceDestChecked (Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.
-	IsSourceDestChecked *bool `json:"isSourceDestChecked,omitempty"`
-
-	// KeypairName The name of the keypair used when launching the VM.
+	// KeypairName The name of the keypair.
 	KeypairName *string `json:"keypairName,omitempty"`
 
-	// LaunchNumber The number for the VM when launching a group of several VMs (for example, `0`, `1`, `2`, and so on).
-	LaunchNumber *int `json:"launchNumber,omitempty"`
+	// MaxVmsCount The maximum number of VMs you want to create. If all the VMs cannot be created, the largest possible number of VMs above MinVmsCount is created.
+	MaxVmsCount *int `json:"maxVmsCount,omitempty"`
 
-	// NestedVirtualization If true, nested virtualization is enabled. If false, it is disabled.
+	// MinVmsCount The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.
+	MinVmsCount *int `json:"minVmsCount,omitempty"`
+
+	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
 	NestedVirtualization *bool `json:"nestedVirtualization,omitempty"`
 
-	// Nics (Net only) The network interface cards (NICs) the VMs are attached to.
-	Nics *[]NicLight `json:"nics,omitempty"`
+	// Nics One or more NICs. If you specify this parameter, you must not specify the `SubnetId` and `SubregionName` parameters. You also must define one NIC as the primary network interface of the VM with `0` as its device number.
+	Nics *[]NicForVmCreation `json:"nics,omitempty"`
 
-	// OsFamily Indicates the operating system (OS) of the VM.
-	OsFamily *string `json:"osFamily,omitempty"`
-
-	// Performance The performance of the VM (`medium` \| `high` \|  `highest`).
-	Performance *string `json:"performance,omitempty"`
+	// Performance The performance of the VM (`medium` \| `high` \|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `VmType` parameter.
+	Performance *CreateVmsPerformance `json:"performance,omitempty"`
 
 	// Placement Information about the placement of the VM.
 	Placement *Placement `json:"placement,omitempty"`
 
-	// PrivateDnsName The name of the private DNS.
-	PrivateDnsName *string `json:"privateDnsName,omitempty"`
+	// PrivateIps One or more private IPs of the VM.
+	PrivateIps *[]string `json:"privateIps,omitempty"`
 
-	// PrivateIp The primary private IP of the VM.
-	PrivateIp *string `json:"privateIp,omitempty"`
+	// SecurityGroupIds One or more IDs of security group for the VMs.
+	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
 
-	// ProductCodes The product codes associated with the OMI used to create the VM.
-	ProductCodes *[]string `json:"productCodes,omitempty"`
+	// SecurityGroups One or more names of security groups for the VMs.
+	SecurityGroups *[]string `json:"securityGroups,omitempty"`
 
-	// PublicDnsName The name of the public DNS.
-	PublicDnsName *string `json:"publicDnsName,omitempty"`
-
-	// PublicIp The public IP of the VM.
-	PublicIp *string `json:"publicIp,omitempty"`
-
-	// ReservationId The reservation ID of the VM.
-	ReservationId *string `json:"reservationId,omitempty"`
-
-	// RootDeviceName The name of the root device for the VM (for example, `/dev/sda1`).
-	RootDeviceName *string `json:"rootDeviceName,omitempty"`
-
-	// RootDeviceType The type of root device used by the VM (always `bsu`).
-	RootDeviceType *string `json:"rootDeviceType,omitempty"`
-
-	// SecurityGroups One or more security groups associated with the VM.
-	SecurityGroups *[]SecurityGroupLight `json:"securityGroups,omitempty"`
-
-	// State The state of the VM (`pending` \| `running` \| `stopping` \| `stopped` \| `shutting-down` \| `terminated` \| `quarantine`).
-	State *string `json:"state,omitempty"`
-
-	// StateReason The reason explaining the current state of the VM.
-	StateReason *string `json:"stateReason,omitempty"`
-
-	// SubnetId The ID of the Subnet for the VM.
+	// SubnetId The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.
 	SubnetId *string `json:"subnetId,omitempty"`
 
-	// Tags One or more tags associated with the VM.
-	Tags *[]ResourceTag `json:"tags,omitempty"`
-
-	// Type The type of VM. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
-	Type *string `json:"type,omitempty"`
-
-	// UserData The Base64-encoded MIME user data.
+	// UserData Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
 	UserData *string `json:"userData,omitempty"`
 
-	// VpcId The ID of the Net in which the VM is running.
-	VpcId *string `json:"vpcId,omitempty"`
+	// VmInitiatedShutdownBehavior The VM behavior when you stop it. By default or if set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.
+	VmInitiatedShutdownBehavior *string `json:"vmInitiatedShutdownBehavior,omitempty"`
+
+	// VmType The type of VM. You can specify a TINA type (in the `tinavW.cXrYpZ` or `tinavW.cXrY` format), or an AWS type (for example, `t2.small`, which is the default value).<br />
+	// If you specify an AWS type, it is converted in the background to its corresponding TINA type, but the AWS type is still returned. If the specified or converted TINA type includes a performance flag, this performance flag is applied regardless of the value you may have provided in the `Performance` parameter. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+	VmType *string `json:"vmType,omitempty"`
 }
 
-// CreateVolume Information about the volume.
+// CreateVmsPerformance The performance of the VM (`medium` \| `high` \|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `VmType` parameter.
+type CreateVmsPerformance string
+
+// CreateVolume defines model for CreateVolume.
 type CreateVolume struct {
-	// AvailabilityZoneName The Subregion in which the volume was created.
-	AvailabilityZoneName *string `json:"availabilityZoneName,omitempty"`
+	// AvailabilityZoneName The Subregion in which you want to create the volume.
+	AvailabilityZoneName string `json:"availabilityZoneName"`
 
-	// CreationDate The date and time of creation of the volume.
-	CreationDate *time.Time `json:"creationDate,omitempty"`
-
-	// Id The ID of the volume.
-	Id *string `json:"id,omitempty"`
-
-	// Iops The number of I/O operations per second (IOPS):<br />
-	// - For `io1` volumes, the number of provisioned IOPS<br />
-	// - For `gp2` volumes, the baseline performance of the volume
+	// Iops The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
 	Iops *int `json:"iops,omitempty"`
 
-	// LinkedVolumes Information about your volume attachment.
-	LinkedVolumes *[]LinkedVolume `json:"linkedVolumes,omitempty"`
-
-	// Size The size of the volume, in gibibytes (GiB).
+	// Size The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified).
 	Size *int `json:"size,omitempty"`
 
-	// SnapshotId The snapshot from which the volume was created.
+	// SnapshotId The ID of the snapshot from which you want to create the volume.
 	SnapshotId *string `json:"snapshotId,omitempty"`
 
-	// State The state of the volume (`creating` \| `available` \| `in-use` \| `updating` \| `deleting` \| `error`).
-	State *string `json:"state,omitempty"`
-
-	// Tags One or more tags associated with the volume.
-	Tags *[]ResourceTag `json:"tags,omitempty"`
-
-	// Type The type of the volume (`standard` \| `gp2` \| `io1`).
+	// Type The type of volume you want to create (`io1` \| `gp2` \ | `standard`). If not specified, a `standard` volume is created.<br />
+	//  For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
 	Type *string `json:"type,omitempty"`
 }
 
@@ -740,40 +647,19 @@ type CreateVpcPeering struct {
 	SourceVpcId string `json:"sourceVpcId"`
 }
 
-// CreateVpnConnection Information about a VPN connection.
+// CreateVpnConnection defines model for CreateVpnConnection.
 type CreateVpnConnection struct {
-	// ClientGatewayConfiguration Example configuration for the client gateway.
-	ClientGatewayConfiguration *string `json:"clientGatewayConfiguration,omitempty"`
+	// ClientGatewayId The ID of the client gateway.
+	ClientGatewayId string `json:"clientGatewayId"`
 
-	// ClientGatewayId The ID of the client gateway used on the client end of the connection.
-	ClientGatewayId *string `json:"clientGatewayId,omitempty"`
+	// ConnectionType The type of VPN connection (only `ipsec.1` is supported).
+	ConnectionType string `json:"connectionType"`
 
-	// ConnectionType The type of VPN connection (always `ipsec.1`).
-	ConnectionType *string `json:"connectionType,omitempty"`
-
-	// Id The ID of the VPN connection.
-	Id *string `json:"id,omitempty"`
-
-	// Routes Information about one or more static routes associated with the VPN connection, if any.
-	Routes *[]RouteLight `json:"routes,omitempty"`
-
-	// State The state of the VPN connection (`pending` \| `available` \| `deleting` \| `deleted`).
-	State *string `json:"state,omitempty"`
-
-	// StaticRoutesOnly If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).
+	// StaticRoutesOnly By default or if false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).
 	StaticRoutesOnly *bool `json:"staticRoutesOnly,omitempty"`
 
-	// Tags One or more tags associated with the VPN connection.
-	Tags *[]ResourceTag `json:"tags,omitempty"`
-
-	// VgwTelemetries Information about the current state of one or more of the VPN tunnels.
-	VgwTelemetries *[]VgwTelemetry `json:"vgwTelemetries,omitempty"`
-
-	// VirtualGatewayId The ID of the virtual gateway used on the OUTSCALE end of the connection.
-	VirtualGatewayId *string `json:"virtualGatewayId,omitempty"`
-
-	// VpnOptions Information about the VPN options.
-	VpnOptions *VpnOptions `json:"vpnOptions,omitempty"`
+	// VirtualGatewayId The ID of the virtual gateway.
+	VirtualGatewayId string `json:"virtualGatewayId"`
 }
 
 // CreateVpnConnectionRoute defines model for CreateVpnConnectionRoute.
@@ -1809,9 +1695,6 @@ type ReadConsoleOutput struct {
 type ReadDhcpOptions struct {
 	// Items Information about one or more DHCP options sets.
 	Items *[]DhcpOptionsSet `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
 }
 
 // ReadDirectLinkInterfaces defines model for ReadDirectLinkInterfaces.
@@ -1842,9 +1725,6 @@ type ReadFlexibleGpus struct {
 type ReadImages struct {
 	// Items Information about one or more OMIs.
 	Items *[]Image `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
 }
 
 // ReadInternetGateways defines model for ReadInternetGateways.
@@ -1899,9 +1779,6 @@ type ReadLocations struct {
 type ReadNatGateway struct {
 	// Items Information about one or more NAT services.
 	Items *[]NatGateway `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
 }
 
 // ReadNics defines model for ReadNics.
@@ -1922,22 +1799,16 @@ type ReadPublicIpRanges struct {
 	Items *[]string `json:"items,omitempty"`
 }
 
-// ReadPublicIpsResponse defines model for ReadPublicIpsResponse.
-type ReadPublicIpsResponse struct {
+// ReadPublicIps defines model for ReadPublicIps.
+type ReadPublicIps struct {
 	// Items Information about one or more public IPs.
 	Items *[]PublicIp `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
 }
 
-// ReadRouteTablesResponse defines model for ReadRouteTablesResponse.
-type ReadRouteTablesResponse struct {
+// ReadRouteTables defines model for ReadRouteTables.
+type ReadRouteTables struct {
 	// Items Information about one or more route tables.
 	Items *[]RouteTable `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
 }
 
 // ReadSecurityGroups defines model for ReadSecurityGroups.
@@ -1964,13 +1835,16 @@ type ReadTags struct {
 	Items *[]Tag `json:"items,omitempty"`
 }
 
-// ReadVirtualGatewaysResponse defines model for ReadVirtualGatewaysResponse.
-type ReadVirtualGatewaysResponse struct {
+// ReadVirtualGateways defines model for ReadVirtualGateways.
+type ReadVirtualGateways struct {
 	// Items Information about one or more virtual gateways.
 	Items *[]VirtualGateway `json:"items,omitempty"`
+}
 
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
+// ReadVms defines model for ReadVms.
+type ReadVms struct {
+	// Items Information about one or more VMs.
+	Items *[]Vm `json:"items,omitempty"`
 }
 
 // ReadVmsHealth defines model for ReadVmsHealth.
@@ -1979,46 +1853,28 @@ type ReadVmsHealth struct {
 	BackendVmHealth *[]BackendVmHealth `json:"backendVmHealth,omitempty"`
 }
 
-// ReadVmsResponse defines model for ReadVmsResponse.
-type ReadVmsResponse struct {
-	// Items Information about one or more VMs.
-	Items *[]Vm `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
-}
-
 // ReadVmsState defines model for ReadVmsState.
 type ReadVmsState struct {
 	// Items Information about one or more VM states.
 	Items *[]VmStates `json:"items,omitempty"`
 }
 
-// ReadVolumesResponse defines model for ReadVolumesResponse.
-type ReadVolumesResponse struct {
+// ReadVolumes defines model for ReadVolumes.
+type ReadVolumes struct {
 	// Items Information about one or more volumes.
 	Items *[]Volume `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
 }
 
 // ReadVpcAccessPoints defines model for ReadVpcAccessPoints.
 type ReadVpcAccessPoints struct {
 	// Items One or more Net access points.
 	Items *[]VpcAccessPoint `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
 }
 
 // ReadVpcPeerings defines model for ReadVpcPeerings.
 type ReadVpcPeerings struct {
 	// Items Information about one or more Net peerings.
 	Items *[]VpcPeering `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
 }
 
 // ReadVpcs defines model for ReadVpcs.
@@ -2027,13 +1883,10 @@ type ReadVpcs struct {
 	Items *[]Vpc `json:"items,omitempty"`
 }
 
-// ReadVpnConnectionsResponse defines model for ReadVpnConnectionsResponse.
-type ReadVpnConnectionsResponse struct {
+// ReadVpnConnections defines model for ReadVpnConnections.
+type ReadVpnConnections struct {
 	// Items Information about one or more VPN connections.
 	Items *[]VpnConnection `json:"items,omitempty"`
-
-	// NextPageToken The token to request the next page of results. Each token refers to a specific page.
-	NextPageToken *[]byte `json:"nextPageToken,omitempty"`
 }
 
 // ResourceLoadBalancerTag Information about the tag.
@@ -2366,86 +2219,186 @@ type UnlinkVolume struct {
 
 // UpdateDirectLinkInterface defines model for UpdateDirectLinkInterface.
 type UpdateDirectLinkInterface struct {
-	// DirectLinkInterface Information about the DirectLink interfaces.
-	DirectLinkInterface *DirectLinkInterfaces `json:"directLinkInterface,omitempty"`
+	// Mtu The maximum transmission unit (MTU) of the DirectLink interface, in bytes (always `1500`).
+	Mtu UpdateDirectLinkInterfaceMtu `json:"mtu"`
 }
+
+// UpdateDirectLinkInterfaceMtu The maximum transmission unit (MTU) of the DirectLink interface, in bytes (always `1500`).
+type UpdateDirectLinkInterfaceMtu int
 
 // UpdateFlexibleGpu defines model for UpdateFlexibleGpu.
 type UpdateFlexibleGpu struct {
-	// FlexibleGpu Information about the flexible GPU (fGPU).
-	FlexibleGpu *FlexibleGpu `json:"flexibleGpu,omitempty"`
+	// DeleteOnVmDeletion If true, the fGPU is deleted when the VM is terminated.
+	DeleteOnVmDeletion *bool `json:"deleteOnVmDeletion,omitempty"`
 }
 
 // UpdateImage defines model for UpdateImage.
 type UpdateImage struct {
-	// Image Information about the OMI.
-	Image *Image `json:"image,omitempty"`
+	// PermissionsToLaunch Information about the permissions for the resource.<br />
+	// Specify either the `Additions` or the `Removals` parameter.
+	PermissionsToLaunch PermissionsOnResourceCreation `json:"permissionsToLaunch"`
 }
 
 // UpdateListenerRule defines model for UpdateListenerRule.
 type UpdateListenerRule struct {
-	// ListenerRule Information about the listener rule.
-	ListenerRule *ListenerRule `json:"listenerRule,omitempty"`
+	// HostPattern A host-name pattern for the rule, with a maximum length of 128 characters. This host-name pattern supports maximum three wildcards, and must not contain any special characters except [-.?].
+	HostPattern *string `json:"hostPattern"`
+
+	// PathPattern A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~&quot;'@:+?].
+	PathPattern *string `json:"pathPattern"`
 }
 
 // UpdateLoadBalancer defines model for UpdateLoadBalancer.
 type UpdateLoadBalancer struct {
-	// LoadBalancer Information about the load balancer.
-	LoadBalancer *LoadBalancer `json:"loadBalancer,omitempty"`
+	// HealthCheck Information about the health check configuration.
+	HealthCheck *HealthCheck `json:"healthCheck,omitempty"`
+
+	// LoadBalancerPort The port on which the load balancer is listening (between `1` and `65535`, both included). This parameter is required if you want to update the server certificate.
+	LoadBalancerPort *int `json:"loadBalancerPort,omitempty"`
+
+	// PolicyNames The name of the policy you want to enable for the listener.
+	PolicyNames *[]string `json:"policyNames,omitempty"`
+
+	// PublicIp (internet-facing only) The public IP you want to associate with the load balancer. The former public IP of the load balancer is then disassociated. If you specify an empty string and the former public IP belonged to you, it is disassociated and replaced by a public IP owned by 3DS OUTSCALE.
+	PublicIp *string `json:"publicIp,omitempty"`
+
+	// SecuredCookies If true, secure cookies are enabled for the load balancer.
+	SecuredCookies *bool `json:"securedCookies,omitempty"`
+
+	// SecurityGroups (Net only) One or more IDs of security groups you want to assign to the load balancer. You need to specify the already assigned security groups that you want to keep along with the new ones you are assigning. If the list is empty, the default security group of the Net is assigned to the load balancer.
+	SecurityGroups *[]string `json:"securityGroups,omitempty"`
 }
 
 // UpdateNic defines model for UpdateNic.
 type UpdateNic struct {
-	// Nic Information about the NIC.
-	Nic *Nic `json:"nic,omitempty"`
+	// Description A new description for the NIC.
+	Description *string `json:"description,omitempty"`
+
+	// LinkNic Information about the NIC attachment. If you are modifying the `DeleteOnVmDeletion` attribute, you must specify the ID of the NIC attachment.
+	LinkNic *LinkNicToUpdate `json:"linkNic,omitempty"`
+
+	// SecurityGroupIds One or more IDs of security groups for the NIC.<br />
+	// You must specify at least one group, even if you use the default security group in the Net.
+	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
 }
 
 // UpdateRoute defines model for UpdateRoute.
 type UpdateRoute struct {
-	// RouteTable Information about the route table.
-	RouteTable *RouteTable `json:"routeTable,omitempty"`
+	// DestinationIpRange The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
+	DestinationIpRange string `json:"destinationIpRange"`
+
+	// GatewayId The ID of an Internet service or virtual gateway attached to your Net.
+	GatewayId *string `json:"gatewayId,omitempty"`
+
+	// NatGatewayId The ID of a NAT service.
+	NatGatewayId *string `json:"natGatewayId,omitempty"`
+
+	// NicId The ID of a network interface card (NIC).
+	NicId *string `json:"nicId,omitempty"`
+
+	// VmId The ID of a NAT VM in your Net.
+	VmId *string `json:"vmId,omitempty"`
+
+	// VpcPeeringId The ID of a Net peering.
+	VpcPeeringId *string `json:"vpcPeeringId,omitempty"`
 }
 
 // UpdateRouteTableRoutePropagation defines model for UpdateRouteTableRoutePropagation.
 type UpdateRouteTableRoutePropagation struct {
-	// RouteTable Information about the route table.
-	RouteTable *RouteTable `json:"routeTable,omitempty"`
+	// Enable If true, a virtual gateway can propagate routes to a specified route table of a Net. If false, the propagation is disabled.
+	Enable bool `json:"enable"`
+
+	// VirtualGatewayId The ID of the virtual gateway.
+	VirtualGatewayId string `json:"virtualGatewayId"`
 }
 
 // UpdateSubnet defines model for UpdateSubnet.
 type UpdateSubnet struct {
-	// Subnet Information about the Subnet.
-	Subnet *Subnet `json:"subnet,omitempty"`
+	// MapPublicIpOnLaunch If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.
+	MapPublicIpOnLaunch bool `json:"mapPublicIpOnLaunch"`
 }
 
 // UpdateVm defines model for UpdateVm.
 type UpdateVm struct {
-	// Vm Information about the VM.
-	Vm *Vm `json:"vm,omitempty"`
+	// BlockDeviceMappings One or more block device mappings of the VM.
+	BlockDeviceMappings *[]BlockDeviceMappingVmUpdate `json:"blockDeviceMappings,omitempty"`
+
+	// BsuOptimized This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
+	BsuOptimized *bool `json:"bsuOptimized,omitempty"`
+
+	// DeletionProtection If true, you cannot delete the VM unless you change this parameter back to false.
+	DeletionProtection *bool `json:"deletionProtection,omitempty"`
+
+	// IsSourceDestChecked (Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.
+	IsSourceDestChecked *bool `json:"isSourceDestChecked,omitempty"`
+
+	// KeypairName The name of a keypair you want to associate with the VM.<br />
+	// When you replace the keypair of a VM with another one, the metadata of the VM is modified to reflect the new public key, but the replacement is still not effective in the operating system of the VM. To complete the replacement and effectively apply the new keypair, you need to perform other actions inside the VM. For more information, see [Modifying the Keypair of a VM](https://docs.outscale.com/en/userguide/Modifying-the-Keypair-of-a-VM.html).
+	KeypairName *string `json:"keypairName,omitempty"`
+
+	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
+	NestedVirtualization *bool `json:"nestedVirtualization,omitempty"`
+
+	// Performance The performance of the VM (`medium` \| `high` \|  `highest`).
+	Performance *UpdateVmPerformance `json:"performance,omitempty"`
+
+	// SecurityGroupIds One or more IDs of security groups for the VM.
+	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
+
+	// UserData The Base64-encoded MIME user data, limited to 500 kibibytes (KiB).
+	UserData *string `json:"userData,omitempty"`
+
+	// VmInitiatedShutdownBehavior The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.
+	VmInitiatedShutdownBehavior *string `json:"vmInitiatedShutdownBehavior,omitempty"`
+
+	// VmType The type of VM. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+	VmType *string `json:"vmType,omitempty"`
 }
+
+// UpdateVmPerformance The performance of the VM (`medium` \| `high` \|  `highest`).
+type UpdateVmPerformance string
 
 // UpdateVolume defines model for UpdateVolume.
 type UpdateVolume struct {
-	// Volume Information about the volume.
-	Volume *Volume `json:"volume,omitempty"`
+	// Iops **Cold volume**: the new number of I/O operations per second (IOPS). This parameter can be specified only if you update an `io1` volume or if you change the type of the volume for an `io1`. This modification is instantaneous. <br />
+	// **Hot volume**: the new number of I/O operations per second (IOPS). This parameter can be specified only if you update an `io1` volume. This modification is not instantaneous. <br /><br />
+	//  The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
+	Iops *int `json:"iops,omitempty"`
+
+	// Size **Cold volume**: the new size of the volume, in gibibytes (GiB). This value must be equal to or greater than the current size of the volume. This modification is not instantaneous. <br />
+	// **Hot volume**: you cannot change the size of a hot volume.
+	Size *int `json:"size,omitempty"`
+
+	// VolumeType **Cold volume**: the new type of the volume (`standard` \ | `io1` \| `gp2`). This modification is instantaneous. If you update to an `io1` volume, you must also specify the `Iops` parameter.<br />
+	//  **Hot volume**: you cannot change the type of a hot volume.
+	VolumeType *string `json:"volumeType,omitempty"`
 }
 
 // UpdateVpc defines model for UpdateVpc.
 type UpdateVpc struct {
-	// Vpc Information about the Net.
-	Vpc *Vpc `json:"vpc,omitempty"`
+	// DhcpOptionsSetId The ID of the DHCP options set (or `default` if you want to associate the default one).
+	DhcpOptionsSetId string `json:"dhcpOptionsSetId"`
 }
 
 // UpdateVpcAccessPoint defines model for UpdateVpcAccessPoint.
 type UpdateVpcAccessPoint struct {
-	// VpcAccessPoint Information about the Net access point.
-	VpcAccessPoint *VpcAccessPoint `json:"vpcAccessPoint,omitempty"`
+	// AddRouteTableIds One or more IDs of route tables to associate with the specified Net access point.
+	AddRouteTableIds *[]string `json:"addRouteTableIds,omitempty"`
+
+	// RemoveRouteTableIds One or more IDs of route tables to disassociate from the specified Net access point.
+	RemoveRouteTableIds *[]string `json:"removeRouteTableIds,omitempty"`
 }
 
 // UpdateVpnConnection defines model for UpdateVpnConnection.
 type UpdateVpnConnection struct {
-	// VpnConnection Information about a VPN connection.
-	VpnConnection *VpnConnection `json:"vpnConnection,omitempty"`
+	// ClientGatewayId The ID of the client gateway.
+	ClientGatewayId *string `json:"clientGatewayId,omitempty"`
+
+	// VirtualGatewayId The ID of the virtual gateway.
+	VirtualGatewayId *string `json:"virtualGatewayId,omitempty"`
+
+	// VpnOptions Information about the VPN options.
+	VpnOptions *VpnOptionsToUpdate `json:"vpnOptions,omitempty"`
 }
 
 // VgwTelemetry Information about the current state of a VPN tunnel.
@@ -2838,7 +2791,7 @@ type CreateNicResponseSchema = Nic
 type CreateProductTypeResponseSchema = ProductType
 
 // CreatePublicIpResponseSchema Information about the public IP.
-type CreatePublicIpResponseSchema = CreatePublicIp
+type CreatePublicIpResponseSchema = PublicIp
 
 // CreateRouteResponseSchema Information about the route table.
 type CreateRouteResponseSchema = RouteTable
@@ -2859,13 +2812,13 @@ type CreateSnapshotResponseSchema = Snapshot
 type CreateSubnetResponseSchema = Subnet
 
 // CreateVirtualGatewayResponseSchema Information about the virtual gateway.
-type CreateVirtualGatewayResponseSchema = CreateVirtualGateway
+type CreateVirtualGatewayResponseSchema = VirtualGateway
 
 // CreateVmsResponseSchema Information about the VM.
-type CreateVmsResponseSchema = CreateVms
+type CreateVmsResponseSchema = Vm
 
 // CreateVolumeResponseSchema Information about the volume.
-type CreateVolumeResponseSchema = CreateVolume
+type CreateVolumeResponseSchema = Volume
 
 // CreateVpcAccessPointResponseSchema Information about the Net access point.
 type CreateVpcAccessPointResponseSchema = VpcAccessPoint
@@ -2877,7 +2830,7 @@ type CreateVpcPeeringResponseSchema = VpcPeering
 type CreateVpcResponseSchema = Vpc
 
 // CreateVpnConnectionResponseSchema Information about a VPN connection.
-type CreateVpnConnectionResponseSchema = CreateVpnConnection
+type CreateVpnConnectionResponseSchema = VpnConnection
 
 // LinkNicResponseSchema defines model for LinkNicResponse.
 type LinkNicResponseSchema struct {
@@ -2996,17 +2949,17 @@ type ReadProductTypesResponseSchema = ReadProductTypes
 // ReadPublicIpRangesResponseSchema defines model for ReadPublicIpRangesResponse.
 type ReadPublicIpRangesResponseSchema = ReadPublicIpRanges
 
-// ReadPublicIpsByIdResponseSchema defines model for ReadPublicIpsByIdResponse.
-type ReadPublicIpsByIdResponseSchema = ReadPublicIpsResponse
+// ReadPublicIpsByIdResponseSchema Information about the public IP.
+type ReadPublicIpsByIdResponseSchema = PublicIp
 
 // ReadPublicIpsResponseSchema defines model for ReadPublicIpsResponse.
-type ReadPublicIpsResponseSchema = ReadPublicIpsResponse
+type ReadPublicIpsResponseSchema = ReadPublicIps
 
-// ReadRouteTablesByIdResponseSchema defines model for ReadRouteTablesByIdResponse.
-type ReadRouteTablesByIdResponseSchema = ReadRouteTablesResponse
+// ReadRouteTablesByIdResponseSchema Information about the route table.
+type ReadRouteTablesByIdResponseSchema = RouteTable
 
 // ReadRouteTablesResponseSchema defines model for ReadRouteTablesResponse.
-type ReadRouteTablesResponseSchema = ReadRouteTablesResponse
+type ReadRouteTablesResponseSchema = ReadRouteTables
 
 // ReadSecurityGroupsByIdResponseSchema Information about the security group.
 type ReadSecurityGroupsByIdResponseSchema = SecurityGroup
@@ -3029,29 +2982,29 @@ type ReadSubnetsResponseSchema = ReadSubnets
 // ReadTagsResponseSchema defines model for ReadTagsResponse.
 type ReadTagsResponseSchema = ReadTags
 
-// ReadVirtualGatewaysByIdResponseSchema defines model for ReadVirtualGatewaysByIdResponse.
-type ReadVirtualGatewaysByIdResponseSchema = ReadVirtualGatewaysResponse
+// ReadVirtualGatewaysByIdResponseSchema Information about the virtual gateway.
+type ReadVirtualGatewaysByIdResponseSchema = VirtualGateway
 
 // ReadVirtualGatewaysResponseSchema defines model for ReadVirtualGatewaysResponse.
-type ReadVirtualGatewaysResponseSchema = ReadVirtualGatewaysResponse
+type ReadVirtualGatewaysResponseSchema = ReadVirtualGateways
 
-// ReadVmsByIdResponseSchema defines model for ReadVmsByIdResponse.
-type ReadVmsByIdResponseSchema = ReadVmsResponse
+// ReadVmsByIdResponseSchema Information about the VM.
+type ReadVmsByIdResponseSchema = Vm
 
 // ReadVmsHealthResponseSchema defines model for ReadVmsHealthResponse.
 type ReadVmsHealthResponseSchema = ReadVmsHealth
 
 // ReadVmsResponseSchema defines model for ReadVmsResponse.
-type ReadVmsResponseSchema = ReadVmsResponse
+type ReadVmsResponseSchema = ReadVms
 
 // ReadVmsStateResponseSchema defines model for ReadVmsStateResponse.
 type ReadVmsStateResponseSchema = ReadVmsState
 
-// ReadVolumesByIdResponseSchema defines model for ReadVolumesByIdResponse.
-type ReadVolumesByIdResponseSchema = ReadVolumesResponse
+// ReadVolumesByIdResponseSchema Information about the volume.
+type ReadVolumesByIdResponseSchema = Volume
 
 // ReadVolumesResponseSchema defines model for ReadVolumesResponse.
-type ReadVolumesResponseSchema = ReadVolumesResponse
+type ReadVolumesResponseSchema = ReadVolumes
 
 // ReadVpcAccessPointsByIdResponseSchema Information about the Net access point.
 type ReadVpcAccessPointsByIdResponseSchema = VpcAccessPoint
@@ -3071,11 +3024,11 @@ type ReadVpcsByIdResponseSchema = Vpc
 // ReadVpcsResponseSchema defines model for ReadVpcsResponse.
 type ReadVpcsResponseSchema = ReadVpcs
 
-// ReadVpnConnectionsByIdResponseSchema defines model for ReadVpnConnectionsByIdResponse.
-type ReadVpnConnectionsByIdResponseSchema = ReadVpnConnectionsResponse
+// ReadVpnConnectionsByIdResponseSchema Information about a VPN connection.
+type ReadVpnConnectionsByIdResponseSchema = VpnConnection
 
 // ReadVpnConnectionsResponseSchema defines model for ReadVpnConnectionsResponse.
-type ReadVpnConnectionsResponseSchema = ReadVpnConnectionsResponse
+type ReadVpnConnectionsResponseSchema = ReadVpnConnections
 
 // StartVmsResponseSchema defines model for StartVmsResponse.
 type StartVmsResponseSchema = StartVms
@@ -3083,47 +3036,47 @@ type StartVmsResponseSchema = StartVms
 // StopVmsResponseSchema defines model for StopVmsResponse.
 type StopVmsResponseSchema = StopVms
 
-// UpdateDirectLinkInterfaceResponseSchema defines model for UpdateDirectLinkInterfaceResponse.
-type UpdateDirectLinkInterfaceResponseSchema = UpdateDirectLinkInterface
+// UpdateDirectLinkInterfaceResponseSchema Information about the DirectLink interfaces.
+type UpdateDirectLinkInterfaceResponseSchema = DirectLinkInterfaces
 
-// UpdateFlexibleGpuResponseSchema defines model for UpdateFlexibleGpuResponse.
-type UpdateFlexibleGpuResponseSchema = UpdateFlexibleGpu
+// UpdateFlexibleGpuResponseSchema Information about the flexible GPU (fGPU).
+type UpdateFlexibleGpuResponseSchema = FlexibleGpu
 
-// UpdateImageResponseSchema defines model for UpdateImageResponse.
-type UpdateImageResponseSchema = UpdateImage
+// UpdateImageResponseSchema Information about the OMI.
+type UpdateImageResponseSchema = Image
 
-// UpdateListenerRuleResponseSchema defines model for UpdateListenerRuleResponse.
-type UpdateListenerRuleResponseSchema = UpdateListenerRule
+// UpdateListenerRuleResponseSchema Information about the listener rule.
+type UpdateListenerRuleResponseSchema = ListenerRule
 
-// UpdateLoadBalancerResponseSchema defines model for UpdateLoadBalancerResponse.
-type UpdateLoadBalancerResponseSchema = UpdateLoadBalancer
+// UpdateLoadBalancerResponseSchema Information about the load balancer.
+type UpdateLoadBalancerResponseSchema = LoadBalancer
 
-// UpdateNicResponseSchema defines model for UpdateNicResponse.
-type UpdateNicResponseSchema = UpdateNic
+// UpdateNicResponseSchema Information about the NIC.
+type UpdateNicResponseSchema = Nic
 
-// UpdateRouteResponseSchema defines model for UpdateRouteResponse.
-type UpdateRouteResponseSchema = UpdateRoute
+// UpdateRouteResponseSchema Information about the route table.
+type UpdateRouteResponseSchema = RouteTable
 
-// UpdateRouteTableRoutePropagationResponseSchema defines model for UpdateRouteTableRoutePropagationResponse.
-type UpdateRouteTableRoutePropagationResponseSchema = UpdateRouteTableRoutePropagation
+// UpdateRouteTableRoutePropagationResponseSchema Information about the route table.
+type UpdateRouteTableRoutePropagationResponseSchema = RouteTable
 
-// UpdateSubnetResponseSchema defines model for UpdateSubnetResponse.
-type UpdateSubnetResponseSchema = UpdateSubnet
+// UpdateSubnetResponseSchema Information about the Subnet.
+type UpdateSubnetResponseSchema = Subnet
 
-// UpdateVmResponseSchema defines model for UpdateVmResponse.
-type UpdateVmResponseSchema = UpdateVm
+// UpdateVmResponseSchema Information about the VM.
+type UpdateVmResponseSchema = Vm
 
-// UpdateVolumeResponseSchema defines model for UpdateVolumeResponse.
-type UpdateVolumeResponseSchema = UpdateVolume
+// UpdateVolumeResponseSchema Information about the volume.
+type UpdateVolumeResponseSchema = Volume
 
-// UpdateVpcAccessPointResponseSchema defines model for UpdateVpcAccessPointResponse.
-type UpdateVpcAccessPointResponseSchema = UpdateVpcAccessPoint
+// UpdateVpcAccessPointResponseSchema Information about the Net access point.
+type UpdateVpcAccessPointResponseSchema = VpcAccessPoint
 
-// UpdateVpcResponseSchema defines model for UpdateVpcResponse.
-type UpdateVpcResponseSchema = UpdateVpc
+// UpdateVpcResponseSchema Information about the Net.
+type UpdateVpcResponseSchema = Vpc
 
-// UpdateVpnConnectionResponseSchema defines model for UpdateVpnConnectionResponse.
-type UpdateVpnConnectionResponseSchema = UpdateVpnConnection
+// UpdateVpnConnectionResponseSchema Information about a VPN connection.
+type UpdateVpnConnectionResponseSchema = VpnConnection
 
 // CreateClientGatewayRequest defines model for CreateClientGatewayRequest.
 type CreateClientGatewayRequest = CreateClientGateway
@@ -3198,93 +3151,13 @@ type CreateSubnetRequest = CreateSubnet
 type CreateTagsRequest = CreateTags
 
 // CreateVirtualGatewayRequest defines model for CreateVirtualGatewayRequest.
-type CreateVirtualGatewayRequest struct {
-	// ConnectionType The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).
-	ConnectionType string `json:"connectionType"`
-}
+type CreateVirtualGatewayRequest = CreateVirtualGateway
 
 // CreateVmsRequest defines model for CreateVmsRequest.
-type CreateVmsRequest struct {
-	// BlockDeviceMappings One or more block device mappings.
-	BlockDeviceMappings *[]BlockDeviceMappingVmCreation `json:"blockDeviceMappings,omitempty"`
-
-	// BootOnCreation By default or if true, the VM is started on creation. If false, the VM is stopped on creation.
-	BootOnCreation *bool `json:"bootOnCreation,omitempty"`
-
-	// BsuOptimized This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
-	BsuOptimized *bool `json:"bsuOptimized,omitempty"`
-
-	// ClientToken A unique identifier which enables you to manage the idempotency.
-	ClientToken *string `json:"clientToken,omitempty"`
-
-	// DeletionProtection If true, you cannot delete the VM unless you change this parameter back to false.
-	DeletionProtection *bool `json:"deletionProtection,omitempty"`
-
-	// ImageId The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.
-	ImageId string `json:"imageId"`
-
-	// KeypairName The name of the keypair.
-	KeypairName *string `json:"keypairName,omitempty"`
-
-	// MaxVmsCount The maximum number of VMs you want to create. If all the VMs cannot be created, the largest possible number of VMs above MinVmsCount is created.
-	MaxVmsCount *int `json:"maxVmsCount,omitempty"`
-
-	// MinVmsCount The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.
-	MinVmsCount *int `json:"minVmsCount,omitempty"`
-
-	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
-	NestedVirtualization *bool `json:"nestedVirtualization,omitempty"`
-
-	// Nics One or more NICs. If you specify this parameter, you must not specify the `SubnetId` and `SubregionName` parameters. You also must define one NIC as the primary network interface of the VM with `0` as its device number.
-	Nics *[]NicForVmCreation `json:"nics,omitempty"`
-
-	// Performance The performance of the VM (`medium` \| `high` \|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `VmType` parameter.
-	Performance *CreateVmsRequestPerformance `json:"performance,omitempty"`
-
-	// Placement Information about the placement of the VM.
-	Placement *Placement `json:"placement,omitempty"`
-
-	// PrivateIps One or more private IPs of the VM.
-	PrivateIps *[]string `json:"privateIps,omitempty"`
-
-	// SecurityGroupIds One or more IDs of security group for the VMs.
-	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
-
-	// SecurityGroups One or more names of security groups for the VMs.
-	SecurityGroups *[]string `json:"securityGroups,omitempty"`
-
-	// SubnetId The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.
-	SubnetId *string `json:"subnetId,omitempty"`
-
-	// UserData Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
-	UserData *string `json:"userData,omitempty"`
-
-	// VmInitiatedShutdownBehavior The VM behavior when you stop it. By default or if set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.
-	VmInitiatedShutdownBehavior *string `json:"vmInitiatedShutdownBehavior,omitempty"`
-
-	// VmType The type of VM. You can specify a TINA type (in the `tinavW.cXrYpZ` or `tinavW.cXrY` format), or an AWS type (for example, `t2.small`, which is the default value).<br />
-	// If you specify an AWS type, it is converted in the background to its corresponding TINA type, but the AWS type is still returned. If the specified or converted TINA type includes a performance flag, this performance flag is applied regardless of the value you may have provided in the `Performance` parameter. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
-	VmType *string `json:"vmType,omitempty"`
-}
+type CreateVmsRequest = CreateVms
 
 // CreateVolumeRequest defines model for CreateVolumeRequest.
-type CreateVolumeRequest struct {
-	// AvailabilityZoneName The Subregion in which you want to create the volume.
-	AvailabilityZoneName string `json:"availabilityZoneName"`
-
-	// Iops The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
-	Iops *int `json:"iops,omitempty"`
-
-	// Size The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified).
-	Size *int `json:"size,omitempty"`
-
-	// SnapshotId The ID of the snapshot from which you want to create the volume.
-	SnapshotId *string `json:"snapshotId,omitempty"`
-
-	// Type The type of volume you want to create (`io1` \| `gp2` \| `standard`). If not specified, a `standard` volume is created.<br />
-	// For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
-	Type *string `json:"type,omitempty"`
-}
+type CreateVolumeRequest = CreateVolume
 
 // CreateVpcAccessPointRequest defines model for CreateVpcAccessPointRequest.
 type CreateVpcAccessPointRequest = CreateVpcAccessPoint
@@ -3296,19 +3169,7 @@ type CreateVpcPeeringRequest = CreateVpcPeering
 type CreateVpcRequest = CreateVpc
 
 // CreateVpnConnectionRequest defines model for CreateVpnConnectionRequest.
-type CreateVpnConnectionRequest struct {
-	// ClientGatewayId The ID of the client gateway.
-	ClientGatewayId string `json:"clientGatewayId"`
-
-	// ConnectionType The type of VPN connection (only `ipsec.1` is supported).
-	ConnectionType string `json:"connectionType"`
-
-	// StaticRoutesOnly By default or if false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).
-	StaticRoutesOnly *bool `json:"staticRoutesOnly,omitempty"`
-
-	// VirtualGatewayId The ID of the virtual gateway.
-	VirtualGatewayId string `json:"virtualGatewayId"`
-}
+type CreateVpnConnectionRequest = CreateVpnConnection
 
 // CreateVpnConnectionRouteRequest defines model for CreateVpnConnectionRouteRequest.
 type CreateVpnConnectionRouteRequest = CreateVpnConnectionRoute
@@ -3430,182 +3291,46 @@ type UnlinkVirtualGatewayToVpcRequest = UnlinkVirtualGatewayToVpc
 type UnlinkVolumeRequest = UnlinkVolume
 
 // UpdateDirectLinkInterfaceRequest defines model for UpdateDirectLinkInterfaceRequest.
-type UpdateDirectLinkInterfaceRequest struct {
-	// Mtu The maximum transmission unit (MTU) of the DirectLink interface, in bytes (always `1500`).
-	Mtu UpdateDirectLinkInterfaceRequestMtu `json:"mtu"`
-}
+type UpdateDirectLinkInterfaceRequest = UpdateDirectLinkInterface
 
 // UpdateFlexibleGpuRequest defines model for UpdateFlexibleGpuRequest.
-type UpdateFlexibleGpuRequest struct {
-	// DeleteOnVmDeletion If true, the fGPU is deleted when the VM is terminated.
-	DeleteOnVmDeletion *bool `json:"deleteOnVmDeletion,omitempty"`
-}
+type UpdateFlexibleGpuRequest = UpdateFlexibleGpu
 
 // UpdateImageRequest defines model for UpdateImageRequest.
-type UpdateImageRequest struct {
-	// PermissionsToLaunch Information about the permissions for the resource.<br />
-	// Specify either the `Additions` or the `Removals` parameter.
-	PermissionsToLaunch PermissionsOnResourceCreation `json:"permissionsToLaunch"`
-}
+type UpdateImageRequest = UpdateImage
 
 // UpdateListenerRuleRequest defines model for UpdateListenerRuleRequest.
-type UpdateListenerRuleRequest struct {
-	// HostPattern A host-name pattern for the rule, with a maximum length of 128 characters. This host-name pattern supports maximum three wildcards, and must not contain any special characters except [-.?].
-	HostPattern *string `json:"hostPattern"`
-
-	// PathPattern A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~&quot;'@:+?].
-	PathPattern *string `json:"pathPattern"`
-}
+type UpdateListenerRuleRequest = UpdateListenerRule
 
 // UpdateLoadBalancerRequest defines model for UpdateLoadBalancerRequest.
-type UpdateLoadBalancerRequest struct {
-	// HealthCheck Information about the health check configuration.
-	HealthCheck *HealthCheck `json:"healthCheck,omitempty"`
-
-	// LoadBalancerPort The port on which the load balancer is listening (between `1` and `65535`, both included). This parameter is required if you want to update the server certificate.
-	LoadBalancerPort *int `json:"loadBalancerPort,omitempty"`
-
-	// PolicyNames The name of the policy you want to enable for the listener.
-	PolicyNames *[]string `json:"policyNames,omitempty"`
-
-	// PublicIp (internet-facing only) The public IP you want to associate with the load balancer. The former public IP of the load balancer is then disassociated. If you specify an empty string and the former public IP belonged to you, it is disassociated and replaced by a public IP owned by 3DS OUTSCALE.
-	PublicIp *string `json:"publicIp,omitempty"`
-
-	// SecuredCookies If true, secure cookies are enabled for the load balancer.
-	SecuredCookies *bool `json:"securedCookies,omitempty"`
-
-	// SecurityGroups (Net only) One or more IDs of security groups you want to assign to the load balancer. You need to specify the already assigned security groups that you want to keep along with the new ones you are assigning. If the list is empty, the default security group of the Net is assigned to the load balancer.
-	SecurityGroups *[]string `json:"securityGroups,omitempty"`
-}
+type UpdateLoadBalancerRequest = UpdateLoadBalancer
 
 // UpdateNicRequest defines model for UpdateNicRequest.
-type UpdateNicRequest struct {
-	// Description A new description for the NIC.
-	Description *string `json:"description,omitempty"`
-
-	// LinkNic Information about the NIC attachment. If you are modifying the `DeleteOnVmDeletion` attribute, you must specify the ID of the NIC attachment.
-	LinkNic *LinkNicToUpdate `json:"linkNic,omitempty"`
-
-	// SecurityGroupIds One or more IDs of security groups for the NIC.<br />
-	//  You must specify at least one group, even if you use the default security group in the Net.
-	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
-}
+type UpdateNicRequest = UpdateNic
 
 // UpdateRouteRequest defines model for UpdateRouteRequest.
-type UpdateRouteRequest struct {
-	// DestinationIpRange The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
-	DestinationIpRange string `json:"destinationIpRange"`
-
-	// GatewayId The ID of an Internet service or virtual gateway attached to your Net.
-	GatewayId *string `json:"gatewayId,omitempty"`
-
-	// NatGatewayId The ID of a NAT service.
-	NatGatewayId *string `json:"natGatewayId,omitempty"`
-
-	// NicId The ID of a network interface card (NIC).
-	NicId *string `json:"nicId,omitempty"`
-
-	// VmId The ID of a NAT VM in your Net.
-	VmId *string `json:"vmId,omitempty"`
-
-	// VpcPeeringId The ID of a Net peering.
-	VpcPeeringId *string `json:"vpcPeeringId,omitempty"`
-}
+type UpdateRouteRequest = UpdateRoute
 
 // UpdateRouteTableRoutePropagationRequest defines model for UpdateRouteTableRoutePropagationRequest.
-type UpdateRouteTableRoutePropagationRequest struct {
-	// Enable If true, a virtual gateway can propagate routes to a specified route table of a Net. If false, the propagation is disabled.
-	Enable bool `json:"enable"`
-
-	// VirtualGatewayId The ID of the virtual gateway.
-	VirtualGatewayId string `json:"virtualGatewayId"`
-}
+type UpdateRouteTableRoutePropagationRequest = UpdateRouteTableRoutePropagation
 
 // UpdateSubnetRequest defines model for UpdateSubnetRequest.
-type UpdateSubnetRequest struct {
-	// MapPublicIpOnLaunch If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.
-	MapPublicIpOnLaunch bool `json:"mapPublicIpOnLaunch"`
-}
+type UpdateSubnetRequest = UpdateSubnet
 
 // UpdateVmRequest defines model for UpdateVmRequest.
-type UpdateVmRequest struct {
-	// BlockDeviceMappings One or more block device mappings of the VM.
-	BlockDeviceMappings *[]BlockDeviceMappingVmUpdate `json:"blockDeviceMappings,omitempty"`
-
-	// BsuOptimized This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
-	BsuOptimized *bool `json:"bsuOptimized,omitempty"`
-
-	// DeletionProtection If true, you cannot delete the VM unless you change this parameter back to false.
-	DeletionProtection *bool `json:"deletionProtection,omitempty"`
-
-	// IsSourceDestChecked (Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.
-	IsSourceDestChecked *bool `json:"isSourceDestChecked,omitempty"`
-
-	// KeypairName The name of a keypair you want to associate with the VM.<br />
-	// When you replace the keypair of a VM with another one, the metadata of the VM is modified to reflect the new public key, but the replacement is still not effective in the operating system of the VM. To complete the replacement and effectively apply the new keypair, you need to perform other actions inside the VM. For more information, see [Modifying the Keypair of a VM](https://docs.outscale.com/en/userguide/Modifying-the-Keypair-of-a-VM.html).
-	KeypairName *string `json:"keypairName,omitempty"`
-
-	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
-	NestedVirtualization *bool `json:"nestedVirtualization,omitempty"`
-
-	// Performance The performance of the VM (`medium` \| `high` \|  `highest`).
-	Performance *UpdateVmRequestPerformance `json:"performance,omitempty"`
-
-	// SecurityGroupIds One or more IDs of security groups for the VM.
-	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
-
-	// UserData The Base64-encoded MIME user data, limited to 500 kibibytes (KiB).
-	UserData *string `json:"userData,omitempty"`
-
-	// VmInitiatedShutdownBehavior The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.
-	VmInitiatedShutdownBehavior *string `json:"vmInitiatedShutdownBehavior,omitempty"`
-
-	// VmType The type of VM. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
-	VmType *string `json:"vmType,omitempty"`
-}
+type UpdateVmRequest = UpdateVm
 
 // UpdateVolumeRequest defines model for UpdateVolumeRequest.
-type UpdateVolumeRequest struct {
-	// Iops **Cold volume**: the new number of I/O operations per second (IOPS). This parameter can be specified only if you update an `io1` volume or if you change the type of the volume for an `io1`. This modification is instantaneous. <br />
-	// **Hot volume**: the new number of I/O operations per second (IOPS). This parameter can be specified only if you update an `io1` volume. This modification is not instantaneous. <br /><br />
-	// The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
-	Iops *int `json:"iops,omitempty"`
-
-	// Size **Cold volume**: the new size of the volume, in gibibytes (GiB). This value must be equal to or greater than the current size of the volume. This modification is not instantaneous. <br />
-	//  **Hot volume**: you cannot change the size of a hot volume.
-	Size *int `json:"size,omitempty"`
-
-	// VolumeType **Cold volume**: the new type of the volume (`standard` \| `io1` \| `gp2`). This modification is instantaneous. If you update to an `io1` volume, you must also specify the `Iops` parameter.<br />
-	// **Hot volume**: you cannot change the type of a hot volume.
-	VolumeType *string `json:"volumeType,omitempty"`
-}
+type UpdateVolumeRequest = UpdateVolume
 
 // UpdateVpcAccessPointRequest defines model for UpdateVpcAccessPointRequest.
-type UpdateVpcAccessPointRequest struct {
-	// AddRouteTableIds One or more IDs of route tables to associate with the specified Net access point.
-	AddRouteTableIds *[]string `json:"addRouteTableIds,omitempty"`
-
-	// RemoveRouteTableIds One or more IDs of route tables to disassociate from the specified Net access point.
-	RemoveRouteTableIds *[]string `json:"removeRouteTableIds,omitempty"`
-}
+type UpdateVpcAccessPointRequest = UpdateVpcAccessPoint
 
 // UpdateVpcRequest defines model for UpdateVpcRequest.
-type UpdateVpcRequest struct {
-	// DhcpOptionsSetId The ID of the DHCP options set (or `default` if you want to associate the default one).
-	DhcpOptionsSetId string `json:"dhcpOptionsSetId"`
-}
+type UpdateVpcRequest = UpdateVpc
 
 // UpdateVpnConnectionRequest defines model for UpdateVpnConnectionRequest.
-type UpdateVpnConnectionRequest struct {
-	// ClientGatewayId The ID of the client gateway.
-	ClientGatewayId *string `json:"clientGatewayId,omitempty"`
-
-	// VirtualGatewayId The ID of the virtual gateway.
-	VirtualGatewayId *string `json:"virtualGatewayId,omitempty"`
-
-	// VpnOptions Information about the VPN options.
-	VpnOptions *VpnOptionsToUpdate `json:"vpnOptions,omitempty"`
-}
+type UpdateVpnConnectionRequest = UpdateVpnConnection
 
 // ReadClientGatewaysParams defines parameters for ReadClientGateways.
 type ReadClientGatewaysParams struct {
@@ -3673,15 +3398,6 @@ type ReadDirectLinkInterfacesParams struct {
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
 
-// UpdateDirectLinkInterfaceJSONBody defines parameters for UpdateDirectLinkInterface.
-type UpdateDirectLinkInterfaceJSONBody struct {
-	// Mtu The maximum transmission unit (MTU) of the DirectLink interface, in bytes (always `1500`).
-	Mtu UpdateDirectLinkInterfaceJSONBodyMtu `json:"mtu"`
-}
-
-// UpdateDirectLinkInterfaceJSONBodyMtu defines parameters for UpdateDirectLinkInterface.
-type UpdateDirectLinkInterfaceJSONBodyMtu int
-
 // ReadDirectLinksParams defines parameters for ReadDirectLinks.
 type ReadDirectLinksParams struct {
 	// Ids The IDs of the DirectLinks.
@@ -3710,12 +3426,6 @@ type ReadFlexibleGpusParams struct {
 
 	// Ids One or more IDs of fGPUs.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
-}
-
-// UpdateFlexibleGpuJSONBody defines parameters for UpdateFlexibleGpu.
-type UpdateFlexibleGpuJSONBody struct {
-	// DeleteOnVmDeletion If true, the fGPU is deleted when the VM is terminated.
-	DeleteOnVmDeletion *bool `json:"deleteOnVmDeletion,omitempty"`
 }
 
 // ReadImagesParams defines parameters for ReadImages.
@@ -3793,13 +3503,6 @@ type ReadImagesParams struct {
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
 
-// UpdateImageJSONBody defines parameters for UpdateImage.
-type UpdateImageJSONBody struct {
-	// PermissionsToLaunch Information about the permissions for the resource.<br />
-	// Specify either the `Additions` or the `Removals` parameter.
-	PermissionsToLaunch PermissionsOnResourceCreation `json:"permissionsToLaunch"`
-}
-
 // ReadInternetGatewaysParams defines parameters for ReadInternetGateways.
 type ReadInternetGatewaysParams struct {
 	// LinkStates The current states of the attachments between the Internet services and the Nets (only `available`, if the Internet gateway is attached to a Net).
@@ -3848,40 +3551,10 @@ type ReadListenerRulesParams struct {
 	ListenerRuleNames *[]string `form:"listenerRuleNames,omitempty" json:"listenerRuleNames,omitempty"`
 }
 
-// UpdateListenerRuleJSONBody defines parameters for UpdateListenerRule.
-type UpdateListenerRuleJSONBody struct {
-	// HostPattern A host-name pattern for the rule, with a maximum length of 128 characters. This host-name pattern supports maximum three wildcards, and must not contain any special characters except [-.?].
-	HostPattern *string `json:"hostPattern"`
-
-	// PathPattern A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~&quot;'@:+?].
-	PathPattern *string `json:"pathPattern"`
-}
-
 // ReadLoadBalancersParams defines parameters for ReadLoadBalancers.
 type ReadLoadBalancersParams struct {
 	// LoadBalancerNames The names of the load balancers.
 	LoadBalancerNames *[]string `form:"loadBalancerNames,omitempty" json:"loadBalancerNames,omitempty"`
-}
-
-// UpdateLoadBalancerJSONBody defines parameters for UpdateLoadBalancer.
-type UpdateLoadBalancerJSONBody struct {
-	// HealthCheck Information about the health check configuration.
-	HealthCheck *HealthCheck `json:"healthCheck,omitempty"`
-
-	// LoadBalancerPort The port on which the load balancer is listening (between `1` and `65535`, both included). This parameter is required if you want to update the server certificate.
-	LoadBalancerPort *int `json:"loadBalancerPort,omitempty"`
-
-	// PolicyNames The name of the policy you want to enable for the listener.
-	PolicyNames *[]string `json:"policyNames,omitempty"`
-
-	// PublicIp (internet-facing only) The public IP you want to associate with the load balancer. The former public IP of the load balancer is then disassociated. If you specify an empty string and the former public IP belonged to you, it is disassociated and replaced by a public IP owned by 3DS OUTSCALE.
-	PublicIp *string `json:"publicIp,omitempty"`
-
-	// SecuredCookies If true, secure cookies are enabled for the load balancer.
-	SecuredCookies *bool `json:"securedCookies,omitempty"`
-
-	// SecurityGroups (Net only) One or more IDs of security groups you want to assign to the load balancer. You need to specify the already assigned security groups that you want to keep along with the new ones you are assigning. If the list is empty, the default security group of the Net is assigned to the load balancer.
-	SecurityGroups *[]string `json:"securityGroups,omitempty"`
 }
 
 // ReadVmsHealthJSONBody defines parameters for ReadVmsHealth.
@@ -4004,19 +3677,6 @@ type ReadNicsParams struct {
 	AvailabilityZoneNames *[]string `form:"availabilityZoneNames,omitempty" json:"availabilityZoneNames,omitempty"`
 }
 
-// UpdateNicJSONBody defines parameters for UpdateNic.
-type UpdateNicJSONBody struct {
-	// Description A new description for the NIC.
-	Description *string `json:"description,omitempty"`
-
-	// LinkNic Information about the NIC attachment. If you are modifying the `DeleteOnVmDeletion` attribute, you must specify the ID of the NIC attachment.
-	LinkNic *LinkNicToUpdate `json:"linkNic,omitempty"`
-
-	// SecurityGroupIds One or more IDs of security groups for the NIC.<br />
-	//  You must specify at least one group, even if you use the default security group in the Net.
-	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
-}
-
 // LinkNicJSONBody defines parameters for LinkNic.
 type LinkNicJSONBody struct {
 	// DeviceNumber The index of the VM device for the NIC attachment (between `1` and `7`, both included).
@@ -4130,40 +3790,10 @@ type ReadRouteTablesParams struct {
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
 
-// UpdateRouteJSONBody defines parameters for UpdateRoute.
-type UpdateRouteJSONBody struct {
-	// DestinationIpRange The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
-	DestinationIpRange string `json:"destinationIpRange"`
-
-	// GatewayId The ID of an Internet service or virtual gateway attached to your Net.
-	GatewayId *string `json:"gatewayId,omitempty"`
-
-	// NatGatewayId The ID of a NAT service.
-	NatGatewayId *string `json:"natGatewayId,omitempty"`
-
-	// NicId The ID of a network interface card (NIC).
-	NicId *string `json:"nicId,omitempty"`
-
-	// VmId The ID of a NAT VM in your Net.
-	VmId *string `json:"vmId,omitempty"`
-
-	// VpcPeeringId The ID of a Net peering.
-	VpcPeeringId *string `json:"vpcPeeringId,omitempty"`
-}
-
 // LinkRouteTableJSONBody defines parameters for LinkRouteTable.
 type LinkRouteTableJSONBody struct {
 	// SubnetId The ID of the Subnet.
 	SubnetId string `json:"subnetId"`
-}
-
-// UpdateRouteTableRoutePropagationJSONBody defines parameters for UpdateRouteTableRoutePropagation.
-type UpdateRouteTableRoutePropagationJSONBody struct {
-	// Enable If true, a virtual gateway can propagate routes to a specified route table of a Net. If false, the propagation is disabled.
-	Enable bool `json:"enable"`
-
-	// VirtualGatewayId The ID of the virtual gateway.
-	VirtualGatewayId string `json:"virtualGatewayId"`
 }
 
 // ReadSecurityGroupsParams defines parameters for ReadSecurityGroups.
@@ -4301,12 +3931,6 @@ type ReadSubnetsParams struct {
 	AvailabilityZoneNames *[]string `form:"availabilityZoneNames,omitempty" json:"availabilityZoneNames,omitempty"`
 }
 
-// UpdateSubnetJSONBody defines parameters for UpdateSubnet.
-type UpdateSubnetJSONBody struct {
-	// MapPublicIpOnLaunch If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.
-	MapPublicIpOnLaunch bool `json:"mapPublicIpOnLaunch"`
-}
-
 // ReadTagsParams defines parameters for ReadTags.
 type ReadTagsParams struct {
 	// Keys The keys of the tags that are assigned to the resources. You can use this filter alongside the `Values` filter. In that case, you filter the resources corresponding to each tag, regardless of the other filter.
@@ -4347,12 +3971,6 @@ type ReadVirtualGatewaysParams struct {
 
 	// Ids The IDs of the virtual gateways.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
-}
-
-// CreateVirtualGatewayJSONBody defines parameters for CreateVirtualGateway.
-type CreateVirtualGatewayJSONBody struct {
-	// ConnectionType The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).
-	ConnectionType string `json:"connectionType"`
 }
 
 // LinkVirtualGatewayToVpcJSONBody defines parameters for LinkVirtualGatewayToVpc.
@@ -4589,73 +4207,6 @@ type ReadVmsParams_NicLinkNicLinkNicDates_Item struct {
 	union json.RawMessage
 }
 
-// CreateVmsJSONBody defines parameters for CreateVms.
-type CreateVmsJSONBody struct {
-	// BlockDeviceMappings One or more block device mappings.
-	BlockDeviceMappings *[]BlockDeviceMappingVmCreation `json:"blockDeviceMappings,omitempty"`
-
-	// BootOnCreation By default or if true, the VM is started on creation. If false, the VM is stopped on creation.
-	BootOnCreation *bool `json:"bootOnCreation,omitempty"`
-
-	// BsuOptimized This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
-	BsuOptimized *bool `json:"bsuOptimized,omitempty"`
-
-	// ClientToken A unique identifier which enables you to manage the idempotency.
-	ClientToken *string `json:"clientToken,omitempty"`
-
-	// DeletionProtection If true, you cannot delete the VM unless you change this parameter back to false.
-	DeletionProtection *bool `json:"deletionProtection,omitempty"`
-
-	// ImageId The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.
-	ImageId string `json:"imageId"`
-
-	// KeypairName The name of the keypair.
-	KeypairName *string `json:"keypairName,omitempty"`
-
-	// MaxVmsCount The maximum number of VMs you want to create. If all the VMs cannot be created, the largest possible number of VMs above MinVmsCount is created.
-	MaxVmsCount *int `json:"maxVmsCount,omitempty"`
-
-	// MinVmsCount The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.
-	MinVmsCount *int `json:"minVmsCount,omitempty"`
-
-	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
-	NestedVirtualization *bool `json:"nestedVirtualization,omitempty"`
-
-	// Nics One or more NICs. If you specify this parameter, you must not specify the `SubnetId` and `SubregionName` parameters. You also must define one NIC as the primary network interface of the VM with `0` as its device number.
-	Nics *[]NicForVmCreation `json:"nics,omitempty"`
-
-	// Performance The performance of the VM (`medium` \| `high` \|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `VmType` parameter.
-	Performance *CreateVmsJSONBodyPerformance `json:"performance,omitempty"`
-
-	// Placement Information about the placement of the VM.
-	Placement *Placement `json:"placement,omitempty"`
-
-	// PrivateIps One or more private IPs of the VM.
-	PrivateIps *[]string `json:"privateIps,omitempty"`
-
-	// SecurityGroupIds One or more IDs of security group for the VMs.
-	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
-
-	// SecurityGroups One or more names of security groups for the VMs.
-	SecurityGroups *[]string `json:"securityGroups,omitempty"`
-
-	// SubnetId The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.
-	SubnetId *string `json:"subnetId,omitempty"`
-
-	// UserData Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
-	UserData *string `json:"userData,omitempty"`
-
-	// VmInitiatedShutdownBehavior The VM behavior when you stop it. By default or if set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.
-	VmInitiatedShutdownBehavior *string `json:"vmInitiatedShutdownBehavior,omitempty"`
-
-	// VmType The type of VM. You can specify a TINA type (in the `tinavW.cXrYpZ` or `tinavW.cXrY` format), or an AWS type (for example, `t2.small`, which is the default value).<br />
-	// If you specify an AWS type, it is converted in the background to its corresponding TINA type, but the AWS type is still returned. If the specified or converted TINA type includes a performance flag, this performance flag is applied regardless of the value you may have provided in the `Performance` parameter. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
-	VmType *string `json:"vmType,omitempty"`
-}
-
-// CreateVmsJSONBodyPerformance defines parameters for CreateVms.
-type CreateVmsJSONBodyPerformance string
-
 // ReadVmsStateParams defines parameters for ReadVmsState.
 type ReadVmsStateParams struct {
 	// MaintenanceEventCodes The code for the scheduled event (`system-reboot` \| `system-maintenance`).
@@ -4679,46 +4230,6 @@ type ReadVmsStateParams struct {
 	// Ids One or more IDs of VMs.
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
-
-// UpdateVmJSONBody defines parameters for UpdateVm.
-type UpdateVmJSONBody struct {
-	// BlockDeviceMappings One or more block device mappings of the VM.
-	BlockDeviceMappings *[]BlockDeviceMappingVmUpdate `json:"blockDeviceMappings,omitempty"`
-
-	// BsuOptimized This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
-	BsuOptimized *bool `json:"bsuOptimized,omitempty"`
-
-	// DeletionProtection If true, you cannot delete the VM unless you change this parameter back to false.
-	DeletionProtection *bool `json:"deletionProtection,omitempty"`
-
-	// IsSourceDestChecked (Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.
-	IsSourceDestChecked *bool `json:"isSourceDestChecked,omitempty"`
-
-	// KeypairName The name of a keypair you want to associate with the VM.<br />
-	// When you replace the keypair of a VM with another one, the metadata of the VM is modified to reflect the new public key, but the replacement is still not effective in the operating system of the VM. To complete the replacement and effectively apply the new keypair, you need to perform other actions inside the VM. For more information, see [Modifying the Keypair of a VM](https://docs.outscale.com/en/userguide/Modifying-the-Keypair-of-a-VM.html).
-	KeypairName *string `json:"keypairName,omitempty"`
-
-	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
-	NestedVirtualization *bool `json:"nestedVirtualization,omitempty"`
-
-	// Performance The performance of the VM (`medium` \| `high` \|  `highest`).
-	Performance *UpdateVmJSONBodyPerformance `json:"performance,omitempty"`
-
-	// SecurityGroupIds One or more IDs of security groups for the VM.
-	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
-
-	// UserData The Base64-encoded MIME user data, limited to 500 kibibytes (KiB).
-	UserData *string `json:"userData,omitempty"`
-
-	// VmInitiatedShutdownBehavior The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.
-	VmInitiatedShutdownBehavior *string `json:"vmInitiatedShutdownBehavior,omitempty"`
-
-	// VmType The type of VM. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
-	VmType *string `json:"vmType,omitempty"`
-}
-
-// UpdateVmJSONBodyPerformance defines parameters for UpdateVm.
-type UpdateVmJSONBodyPerformance string
 
 // StopVmsJSONBody defines parameters for StopVms.
 type StopVmsJSONBody struct {
@@ -4774,41 +4285,6 @@ type ReadVolumesParams struct {
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
 
-// CreateVolumeJSONBody defines parameters for CreateVolume.
-type CreateVolumeJSONBody struct {
-	// AvailabilityZoneName The Subregion in which you want to create the volume.
-	AvailabilityZoneName string `json:"availabilityZoneName"`
-
-	// Iops The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
-	Iops *int `json:"iops,omitempty"`
-
-	// Size The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified).
-	Size *int `json:"size,omitempty"`
-
-	// SnapshotId The ID of the snapshot from which you want to create the volume.
-	SnapshotId *string `json:"snapshotId,omitempty"`
-
-	// Type The type of volume you want to create (`io1` \| `gp2` \| `standard`). If not specified, a `standard` volume is created.<br />
-	// For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
-	Type *string `json:"type,omitempty"`
-}
-
-// UpdateVolumeJSONBody defines parameters for UpdateVolume.
-type UpdateVolumeJSONBody struct {
-	// Iops **Cold volume**: the new number of I/O operations per second (IOPS). This parameter can be specified only if you update an `io1` volume or if you change the type of the volume for an `io1`. This modification is instantaneous. <br />
-	// **Hot volume**: the new number of I/O operations per second (IOPS). This parameter can be specified only if you update an `io1` volume. This modification is not instantaneous. <br /><br />
-	// The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
-	Iops *int `json:"iops,omitempty"`
-
-	// Size **Cold volume**: the new size of the volume, in gibibytes (GiB). This value must be equal to or greater than the current size of the volume. This modification is not instantaneous. <br />
-	//  **Hot volume**: you cannot change the size of a hot volume.
-	Size *int `json:"size,omitempty"`
-
-	// VolumeType **Cold volume**: the new type of the volume (`standard` \| `io1` \| `gp2`). This modification is instantaneous. If you update to an `io1` volume, you must also specify the `Iops` parameter.<br />
-	// **Hot volume**: you cannot change the type of a hot volume.
-	VolumeType *string `json:"volumeType,omitempty"`
-}
-
 // ReadVpcAccessPointsParams defines parameters for ReadVpcAccessPoints.
 type ReadVpcAccessPointsParams struct {
 	// ServiceNames The names of the services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).
@@ -4831,15 +4307,6 @@ type ReadVpcAccessPointsParams struct {
 
 	// VpcIds The IDs of the Nets.
 	VpcIds *[]string `form:"vpcIds,omitempty" json:"vpcIds,omitempty"`
-}
-
-// UpdateVpcAccessPointJSONBody defines parameters for UpdateVpcAccessPoint.
-type UpdateVpcAccessPointJSONBody struct {
-	// AddRouteTableIds One or more IDs of route tables to associate with the specified Net access point.
-	AddRouteTableIds *[]string `json:"addRouteTableIds,omitempty"`
-
-	// RemoveRouteTableIds One or more IDs of route tables to disassociate from the specified Net access point.
-	RemoveRouteTableIds *[]string `json:"removeRouteTableIds,omitempty"`
 }
 
 // ReadVpcPeeringsParams defines parameters for ReadVpcPeerings.
@@ -4911,12 +4378,6 @@ type ReadVpcsParams struct {
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
 
-// UpdateVpcJSONBody defines parameters for UpdateVpc.
-type UpdateVpcJSONBody struct {
-	// DhcpOptionsSetId The ID of the DHCP options set (or `default` if you want to associate the default one).
-	DhcpOptionsSetId string `json:"dhcpOptionsSetId"`
-}
-
 // ReadVpnConnectionsParams defines parameters for ReadVpnConnections.
 type ReadVpnConnectionsParams struct {
 	// BgpAsns The Border Gateway Protocol (BGP) Autonomous System Numbers (ASNs) of the connections.
@@ -4953,33 +4414,6 @@ type ReadVpnConnectionsParams struct {
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
 
-// CreateVpnConnectionJSONBody defines parameters for CreateVpnConnection.
-type CreateVpnConnectionJSONBody struct {
-	// ClientGatewayId The ID of the client gateway.
-	ClientGatewayId string `json:"clientGatewayId"`
-
-	// ConnectionType The type of VPN connection (only `ipsec.1` is supported).
-	ConnectionType string `json:"connectionType"`
-
-	// StaticRoutesOnly By default or if false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).
-	StaticRoutesOnly *bool `json:"staticRoutesOnly,omitempty"`
-
-	// VirtualGatewayId The ID of the virtual gateway.
-	VirtualGatewayId string `json:"virtualGatewayId"`
-}
-
-// UpdateVpnConnectionJSONBody defines parameters for UpdateVpnConnection.
-type UpdateVpnConnectionJSONBody struct {
-	// ClientGatewayId The ID of the client gateway.
-	ClientGatewayId *string `json:"clientGatewayId,omitempty"`
-
-	// VirtualGatewayId The ID of the virtual gateway.
-	VirtualGatewayId *string `json:"virtualGatewayId,omitempty"`
-
-	// VpnOptions Information about the VPN options.
-	VpnOptions *VpnOptionsToUpdate `json:"vpnOptions,omitempty"`
-}
-
 // DeleteLoadBalancerTagsJSONRequestBody defines body for DeleteLoadBalancerTags for application/json ContentType.
 type DeleteLoadBalancerTagsJSONRequestBody = DeleteLoadBalancerTags
 
@@ -5002,7 +4436,7 @@ type CreateDhcpOptionsJSONRequestBody = CreateDhcpOptions
 type CreateDirectLinkInterfaceJSONRequestBody = CreateDirectLinkInterface
 
 // UpdateDirectLinkInterfaceJSONRequestBody defines body for UpdateDirectLinkInterface for application/json ContentType.
-type UpdateDirectLinkInterfaceJSONRequestBody UpdateDirectLinkInterfaceJSONBody
+type UpdateDirectLinkInterfaceJSONRequestBody = UpdateDirectLinkInterface
 
 // CreateDirectLinkJSONRequestBody defines body for CreateDirectLink for application/json ContentType.
 type CreateDirectLinkJSONRequestBody = CreateDirectLink
@@ -5011,7 +4445,7 @@ type CreateDirectLinkJSONRequestBody = CreateDirectLink
 type CreateFlexibleGpuJSONRequestBody = CreateFlexibleGpu
 
 // UpdateFlexibleGpuJSONRequestBody defines body for UpdateFlexibleGpu for application/json ContentType.
-type UpdateFlexibleGpuJSONRequestBody UpdateFlexibleGpuJSONBody
+type UpdateFlexibleGpuJSONRequestBody = UpdateFlexibleGpu
 
 // LinkFlexibleGpuJSONRequestBody defines body for LinkFlexibleGpu for application/json ContentType.
 type LinkFlexibleGpuJSONRequestBody = LinkFlexibleGpu
@@ -5020,7 +4454,7 @@ type LinkFlexibleGpuJSONRequestBody = LinkFlexibleGpu
 type CreateImageJSONRequestBody = CreateImage
 
 // UpdateImageJSONRequestBody defines body for UpdateImage for application/json ContentType.
-type UpdateImageJSONRequestBody UpdateImageJSONBody
+type UpdateImageJSONRequestBody = UpdateImage
 
 // LinkInternetGatewayJSONRequestBody defines body for LinkInternetGateway for application/json ContentType.
 type LinkInternetGatewayJSONRequestBody = LinkInternetGateway
@@ -5035,13 +4469,13 @@ type CreateKeypairJSONRequestBody CreateKeypairJSONBody
 type CreateListenerRuleJSONRequestBody = CreateListenerRule
 
 // UpdateListenerRuleJSONRequestBody defines body for UpdateListenerRule for application/json ContentType.
-type UpdateListenerRuleJSONRequestBody UpdateListenerRuleJSONBody
+type UpdateListenerRuleJSONRequestBody = UpdateListenerRule
 
 // CreateLoadBalancerJSONRequestBody defines body for CreateLoadBalancer for application/json ContentType.
 type CreateLoadBalancerJSONRequestBody = CreateLoadBalancer
 
 // UpdateLoadBalancerJSONRequestBody defines body for UpdateLoadBalancer for application/json ContentType.
-type UpdateLoadBalancerJSONRequestBody UpdateLoadBalancerJSONBody
+type UpdateLoadBalancerJSONRequestBody = UpdateLoadBalancer
 
 // LinkLoadBalancerBackendMachinesJSONRequestBody defines body for LinkLoadBalancerBackendMachines for application/json ContentType.
 type LinkLoadBalancerBackendMachinesJSONRequestBody = LinkLoadBalancerBackendMachines
@@ -5074,7 +4508,7 @@ type CreateNatGatewayJSONRequestBody = CreateNatGateway
 type CreateNicJSONRequestBody = CreateNic
 
 // UpdateNicJSONRequestBody defines body for UpdateNic for application/json ContentType.
-type UpdateNicJSONRequestBody UpdateNicJSONBody
+type UpdateNicJSONRequestBody = UpdateNic
 
 // LinkPrivateIpsJSONRequestBody defines body for LinkPrivateIps for application/json ContentType.
 type LinkPrivateIpsJSONRequestBody = LinkPrivateIps
@@ -5107,7 +4541,7 @@ type DeleteRouteJSONRequestBody = DeleteRoute
 type CreateRouteJSONRequestBody = CreateRoute
 
 // UpdateRouteJSONRequestBody defines body for UpdateRoute for application/json ContentType.
-type UpdateRouteJSONRequestBody UpdateRouteJSONBody
+type UpdateRouteJSONRequestBody = UpdateRoute
 
 // LinkRouteTableJSONRequestBody defines body for LinkRouteTable for application/json ContentType.
 type LinkRouteTableJSONRequestBody LinkRouteTableJSONBody
@@ -5116,7 +4550,7 @@ type LinkRouteTableJSONRequestBody LinkRouteTableJSONBody
 type UnlinkRouteTableJSONRequestBody = UnlinkRouteTable
 
 // UpdateRouteTableRoutePropagationJSONRequestBody defines body for UpdateRouteTableRoutePropagation for application/json ContentType.
-type UpdateRouteTableRoutePropagationJSONRequestBody UpdateRouteTableRoutePropagationJSONBody
+type UpdateRouteTableRoutePropagationJSONRequestBody = UpdateRouteTableRoutePropagation
 
 // CreateSecurityGroupJSONRequestBody defines body for CreateSecurityGroup for application/json ContentType.
 type CreateSecurityGroupJSONRequestBody = CreateSecurityGroup
@@ -5134,10 +4568,10 @@ type CreateSnapshotJSONRequestBody = CreateSnapshot
 type CreateSubnetJSONRequestBody = CreateSubnet
 
 // UpdateSubnetJSONRequestBody defines body for UpdateSubnet for application/json ContentType.
-type UpdateSubnetJSONRequestBody UpdateSubnetJSONBody
+type UpdateSubnetJSONRequestBody = UpdateSubnet
 
 // CreateVirtualGatewayJSONRequestBody defines body for CreateVirtualGateway for application/json ContentType.
-type CreateVirtualGatewayJSONRequestBody CreateVirtualGatewayJSONBody
+type CreateVirtualGatewayJSONRequestBody = CreateVirtualGateway
 
 // LinkVirtualGatewayToVpcJSONRequestBody defines body for LinkVirtualGatewayToVpc for application/json ContentType.
 type LinkVirtualGatewayToVpcJSONRequestBody LinkVirtualGatewayToVpcJSONBody
@@ -5146,19 +4580,19 @@ type LinkVirtualGatewayToVpcJSONRequestBody LinkVirtualGatewayToVpcJSONBody
 type UnlinkVirtualGatewayToVpcJSONRequestBody = UnlinkVirtualGatewayToVpc
 
 // CreateVmsJSONRequestBody defines body for CreateVms for application/json ContentType.
-type CreateVmsJSONRequestBody CreateVmsJSONBody
+type CreateVmsJSONRequestBody = CreateVms
 
 // UpdateVmJSONRequestBody defines body for UpdateVm for application/json ContentType.
-type UpdateVmJSONRequestBody UpdateVmJSONBody
+type UpdateVmJSONRequestBody = UpdateVm
 
 // StopVmsJSONRequestBody defines body for StopVms for application/json ContentType.
 type StopVmsJSONRequestBody StopVmsJSONBody
 
 // CreateVolumeJSONRequestBody defines body for CreateVolume for application/json ContentType.
-type CreateVolumeJSONRequestBody CreateVolumeJSONBody
+type CreateVolumeJSONRequestBody = CreateVolume
 
 // UpdateVolumeJSONRequestBody defines body for UpdateVolume for application/json ContentType.
-type UpdateVolumeJSONRequestBody UpdateVolumeJSONBody
+type UpdateVolumeJSONRequestBody = UpdateVolume
 
 // LinkVolumeJSONRequestBody defines body for LinkVolume for application/json ContentType.
 type LinkVolumeJSONRequestBody = LinkVolume
@@ -5170,7 +4604,7 @@ type UnlinkVolumeJSONRequestBody = UnlinkVolume
 type CreateVpcAccessPointJSONRequestBody = CreateVpcAccessPoint
 
 // UpdateVpcAccessPointJSONRequestBody defines body for UpdateVpcAccessPoint for application/json ContentType.
-type UpdateVpcAccessPointJSONRequestBody UpdateVpcAccessPointJSONBody
+type UpdateVpcAccessPointJSONRequestBody = UpdateVpcAccessPoint
 
 // CreateVpcPeeringJSONRequestBody defines body for CreateVpcPeering for application/json ContentType.
 type CreateVpcPeeringJSONRequestBody = CreateVpcPeering
@@ -5179,13 +4613,13 @@ type CreateVpcPeeringJSONRequestBody = CreateVpcPeering
 type CreateVpcJSONRequestBody = CreateVpc
 
 // UpdateVpcJSONRequestBody defines body for UpdateVpc for application/json ContentType.
-type UpdateVpcJSONRequestBody UpdateVpcJSONBody
+type UpdateVpcJSONRequestBody = UpdateVpc
 
 // CreateVpnConnectionJSONRequestBody defines body for CreateVpnConnection for application/json ContentType.
-type CreateVpnConnectionJSONRequestBody CreateVpnConnectionJSONBody
+type CreateVpnConnectionJSONRequestBody = CreateVpnConnection
 
 // UpdateVpnConnectionJSONRequestBody defines body for UpdateVpnConnection for application/json ContentType.
-type UpdateVpnConnectionJSONRequestBody UpdateVpnConnectionJSONBody
+type UpdateVpnConnectionJSONRequestBody = UpdateVpnConnection
 
 // DeleteVpnConnectionRouteJSONRequestBody defines body for DeleteVpnConnectionRoute for application/json ContentType.
 type DeleteVpnConnectionRouteJSONRequestBody = DeleteVpnConnectionRoute

@@ -67,7 +67,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 		return
 	}
 
-	tf := LoadBalancerFromHttpToTf(ctx, res.JSON200) // FIXME
+	tf := LoadBalancerFromHttpToTf(ctx, res.JSON201) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -109,7 +109,7 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 	if res == nil {
 		return
 	}
-	tf := LoadBalancerFromHttpToTf(ctx, res.JSON200.LoadBalancer)
+	tf := LoadBalancerFromHttpToTf(ctx, res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 func (r *LoadBalancerResource) LinkBackendMachines(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
@@ -148,7 +148,7 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteLoadBalancerResponse, error) {
-		return r.client.DeleteLoadBalancerWithResponse(ctx, data.Id.ValueString(), api.DeleteLoadBalancerJSONRequestBody{})
+		return r.client.DeleteLoadBalancerWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

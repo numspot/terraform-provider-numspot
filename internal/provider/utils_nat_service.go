@@ -11,7 +11,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func publicIpFromApi(ctx context.Context, elt api.PublicIpLightSchema) (resource_nat_service.PublicIpsValue, diag.Diagnostics) {
+func publicIpFromApi(ctx context.Context, elt api.PublicIpLight) (resource_nat_service.PublicIpsValue, diag.Diagnostics) {
 	return resource_nat_service.NewPublicIpsValue(
 		resource_nat_service.PublicIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -21,7 +21,7 @@ func publicIpFromApi(ctx context.Context, elt api.PublicIpLightSchema) (resource
 	)
 }
 
-func NatServiceFromHttpToTf(ctx context.Context, http *api.NatServiceSchema) (*resource_nat_service.NatServiceModel, diag.Diagnostics) {
+func NatServiceFromHttpToTf(ctx context.Context, http *api.NatGateway) (*resource_nat_service.NatServiceModel, diag.Diagnostics) {
 	// Public Ips
 	publicIpsTf, diagnostics := utils.GenericListToTfListValue(
 		ctx,
@@ -35,15 +35,15 @@ func NatServiceFromHttpToTf(ctx context.Context, http *api.NatServiceSchema) (*r
 
 	return &resource_nat_service.NatServiceModel{
 		Id:        types.StringPointerValue(http.Id),
-		NetId:     types.StringPointerValue(http.NetId),
+		NetId:     types.StringPointerValue(http.VpcId),
 		PublicIps: publicIpsTf,
 		State:     types.StringPointerValue(http.State),
 		SubnetId:  types.StringPointerValue(http.SubnetId),
 	}, nil
 }
 
-func NatServiceFromTfToCreateRequest(tf *resource_nat_service.NatServiceModel) api.CreateNatServiceJSONRequestBody {
-	return api.CreateNatServiceJSONRequestBody{
+func NatServiceFromTfToCreateRequest(tf *resource_nat_service.NatServiceModel) api.CreateNatGatewayJSONRequestBody {
+	return api.CreateNatGatewayJSONRequestBody{
 		PublicIpId: tf.PublicIpId.ValueString(),
 		SubnetId:   tf.SubnetId.ValueString(),
 	}

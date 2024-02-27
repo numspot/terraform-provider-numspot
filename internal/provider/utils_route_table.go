@@ -12,12 +12,12 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_route_table"
 )
 
-func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTableSchema, defaultRouteDestination string, subnetId *string) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
+func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTable, defaultRouteDestination string, subnetId *string) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
 	// Routes
-	var routes []api.RouteSchema
+	var routes []api.Route
 	if len(*http.Routes) > 0 {
 		// Remove "defaulted" route to prevent inconsistent state
-		routes = make([]api.RouteSchema, 0, len(*http.Routes)-1)
+		routes = make([]api.Route, 0, len(*http.Routes)-1)
 		for _, e := range *http.Routes {
 			if *e.DestinationIpRange != defaultRouteDestination {
 				routes = append(routes, e)
@@ -41,7 +41,7 @@ func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTableSchema, def
 	res := resource_route_table.RouteTableModel{
 		Id:                              types.StringPointerValue(http.Id),
 		LinkRouteTables:                 tfLinks,
-		NetId:                           types.StringPointerValue(http.NetId),
+		NetId:                           types.StringPointerValue(http.VpcId),
 		RoutePropagatingVirtualGateways: types.ListNull(resource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(ctx)),
 		Routes:                          tfRoutes,
 		SubnetId:                        types.StringPointerValue(subnetId),
@@ -50,11 +50,11 @@ func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTableSchema, def
 	return &res, nil
 }
 
-func routeTableLinkFromAPI(ctx context.Context, link api.LinkRouteTableSchema) (resource_route_table.LinkRouteTablesValue, diag.Diagnostics) {
+func routeTableLinkFromAPI(ctx context.Context, link api.LinkRouteTable) (resource_route_table.LinkRouteTablesValue, diag.Diagnostics) {
 	return resource_route_table.NewLinkRouteTablesValue(
 		resource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"id":             types.StringPointerValue(link.Id),
+			"id":             types.StringPointerValue(link.LinkRouteTableId),
 			"main":           types.BoolPointerValue(link.Main),
 			"route_table_id": types.StringPointerValue(link.RouteTableId),
 			"subnet_id":      types.StringPointerValue(link.SubnetId),
@@ -62,7 +62,7 @@ func routeTableLinkFromAPI(ctx context.Context, link api.LinkRouteTableSchema) (
 	)
 }
 
-func routeTableRouteFromAPI(ctx context.Context, route api.RouteSchema) (resource_route_table.RoutesValue, diag.Diagnostics) {
+func routeTableRouteFromAPI(ctx context.Context, route api.Route) (resource_route_table.RoutesValue, diag.Diagnostics) {
 	return resource_route_table.NewRoutesValue(
 		resource_route_table.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -83,6 +83,6 @@ func routeTableRouteFromAPI(ctx context.Context, route api.RouteSchema) (resourc
 
 func RouteTableFromTfToCreateRequest(tf *resource_route_table.RouteTableModel) api.CreateRouteTableJSONRequestBody {
 	return api.CreateRouteTableJSONRequestBody{
-		NetId: tf.NetId.ValueString(),
+		VpcId: tf.NetId.ValueString(),
 	}
 }

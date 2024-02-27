@@ -64,21 +64,21 @@ func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest
 	var data resource_net.NetModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateNetResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateVpcResponse, error) {
 		body := NetFromTfToCreateRequest(&data)
-		return r.client.CreateNetWithResponse(ctx, body)
+		return r.client.CreateVpcWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	createdId := *res.JSON200.Id
+	createdId := *res.JSON201.Id
 	createStateConf := &retry.StateChangeConf{
 		Pending: []string{"pending"},
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
-			readRes := utils.ExecuteRequest(func() (*api.ReadNetsByIdResponse, error) {
-				return r.client.ReadNetsByIdWithResponse(ctx, createdId)
+			readRes := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
+				return r.client.ReadVpcsByIdWithResponse(ctx, createdId)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
 				return
@@ -96,7 +96,7 @@ func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	tf := NetFromHttpToTf(res.JSON200)
+	tf := NetFromHttpToTf(res.JSON201)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -104,8 +104,8 @@ func (r *NetResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data resource_net.NetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadNetsByIdResponse, error) {
-		return r.client.ReadNetsByIdWithResponse(ctx, data.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
+		return r.client.ReadVpcsByIdWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -123,8 +123,8 @@ func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_net.NetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteNetResponse, error) {
-		return r.client.DeleteNetWithResponse(ctx, data.Id.ValueString(), api.DeleteNetJSONRequestBody{})
+	res := utils.ExecuteRequest(func() (*api.DeleteVpcResponse, error) {
+		return r.client.DeleteVpcWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -135,7 +135,7 @@ func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest
 		Target:  []string{"deleted"},
 		Refresh: func() (result interface{}, state string, err error) {
 			// Do not use utils.ExecuteRequest to access error response to know if it's a 404 Not Found expected response
-			readNetRes, err := r.client.ReadNetsByIdWithResponse(ctx, data.Id.ValueString())
+			readNetRes, err := r.client.ReadVpcsByIdWithResponse(ctx, data.Id.ValueString())
 			if err != nil {
 				response.Diagnostics.AddError("Failed to read Net on delete", err.Error())
 				return

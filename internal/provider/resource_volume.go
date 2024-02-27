@@ -67,7 +67,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return r.client.CreateVolumeWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
 
-	tf, diags := VolumeFromHttpToTf(ctx, res.JSON200)
+	tf, diags := VolumeFromHttpToTf(ctx, res.JSON201)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -100,6 +100,6 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteVolumeResponse, error) {
-		return r.client.DeleteVolumeWithResponse(ctx, data.Id.String(), api.DeleteVolumeJSONRequestBody{})
+		return r.client.DeleteVolumeWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

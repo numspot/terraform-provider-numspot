@@ -67,7 +67,7 @@ func (r *ListenerRuleResource) Create(ctx context.Context, request resource.Crea
 		return r.client.CreateListenerRuleWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
 
-	tf := ListenerRuleFromHttpToTf(res.JSON200)
+	tf := ListenerRuleFromHttpToTf(res.JSON201)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -92,6 +92,6 @@ func (r *ListenerRuleResource) Delete(ctx context.Context, request resource.Dele
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteListenerRuleResponse, error) {
-		return r.client.DeleteListenerRuleWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()), api.DeleteListenerRuleJSONRequestBody{})
+		return r.client.DeleteListenerRuleWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()))
 	}, http.StatusOK, &response.Diagnostics)
 }

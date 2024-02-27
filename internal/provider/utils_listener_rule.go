@@ -5,11 +5,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_listener_rule"
 )
 
-func ListenerRuleFromTfToHttp(tf *resource_listener_rule.ListenerRuleModel) *api.ListenerRuleSchema {
-	return &api.ListenerRuleSchema{}
+func ListenerRuleFromTfToHttp(tf *resource_listener_rule.ListenerRuleModel) *api.ListenerRule {
+	return &api.ListenerRule{}
 }
 
-func ListenerRuleFromHttpToTf(http *api.ListenerRuleSchema) resource_listener_rule.ListenerRuleModel {
+func ListenerRuleFromHttpToTf(http *api.ListenerRule) resource_listener_rule.ListenerRuleModel {
 	return resource_listener_rule.ListenerRuleModel{}
 }
 

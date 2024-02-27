@@ -79,7 +79,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	jsonRes := *res.JSON200
+	jsonRes := *res.JSON201
 	createdId := jsonRes.Id
 
 	jsonRoutes := *jsonRes.Routes
@@ -91,13 +91,12 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	for i := range routes {
 		route := &routes[i]
 		createdRoute := utils.ExecuteRequest(func() (*api.CreateRouteResponse, error) {
-			return r.client.CreateRouteWithResponse(ctx, api.CreateRouteJSONRequestBody{
+			return r.client.CreateRouteWithResponse(ctx, *createdId, api.CreateRouteJSONRequestBody{
 				DestinationIpRange: route.DestinationIpRange.ValueString(),
 				GatewayId:          route.GatewayId.ValueStringPointer(),
-				NatServiceId:       route.NatServiceId.ValueStringPointer(),
-				NetPeeringId:       route.NetPeeringId.ValueStringPointer(),
+				NatGatewayId:       route.NatServiceId.ValueStringPointer(),
+				VpcPeeringId:       route.NetPeeringId.ValueStringPointer(),
 				NicId:              route.NicId.ValueStringPointer(),
-				TableId:            *createdId,
 				VmId:               route.VmId.ValueStringPointer(),
 			})
 		}, http.StatusOK, &response.Diagnostics)
@@ -108,7 +107,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 
 	if !data.SubnetId.IsNull() {
 		linkRes := utils.ExecuteRequest(func() (*api.LinkRouteTableResponse, error) {
-			return r.client.LinkRouteTableWithResponse(ctx, *createdId, api.LinkRouteTableRequestSchema{SubnetId: data.SubnetId.ValueString()})
+			return r.client.LinkRouteTableWithResponse(ctx, *createdId, api.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
 		}, http.StatusOK, &response.Diagnostics)
 		if linkRes == nil {
 			return
@@ -166,7 +165,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 		}
 	} else {
 		// Retrieve Default Destination IP Range
-		readNetRes, err := r.client.ReadNetsByIdWithResponse(ctx, *res.JSON200.NetId)
+		readNetRes, err := r.client.ReadVpcsByIdWithResponse(ctx, *res.JSON200.VpcId)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to read associated Net", err.Error())
 			return
@@ -253,7 +252,7 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 		}
 	}
 
-	res, err := r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString(), api.DeleteRouteTableJSONRequestBody{})
+	res, err := r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete RouteTable", err.Error())
 		return

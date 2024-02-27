@@ -73,7 +73,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	vm := *res.JSON200
+	vm := *res.JSON201
 	createdId := vm.Id
 
 	createStateConf := &retry.StateChangeConf{
@@ -97,7 +97,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	vmSchema := read.(api.VmSchema)
+	vmSchema := read.(api.Vm)
 	tf, diagnostics := VmFromHttpToTf(ctx, &vmSchema)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
@@ -109,7 +109,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *VmResource) readVmById(ctx context.Context, id *string, diagnostics diag.Diagnostics) *api.VmSchema {
+func (r *VmResource) readVmById(ctx context.Context, id *string, diagnostics diag.Diagnostics) *api.Vm {
 	res, err := r.client.ReadVmsByIdWithResponse(ctx, *id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -157,7 +157,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	res := utils.ExecuteRequest(func() (*api.DeleteVmsResponse, error) {
 		idsSlice := make([]interface{}, 1)
 		idsSlice[0] = data.Id.ValueString()
-		return r.client.DeleteVmsWithResponse(ctx, idsSlice, api.DeleteVmsJSONRequestBody{})
+		return r.client.DeleteVmsWithResponse(ctx, idsSlice)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

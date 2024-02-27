@@ -5,11 +5,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_image"
 )
 
-func ImageFromTfToHttp(tf *resource_image.ImageModel) *api.ImageSchema {
-	return &api.ImageSchema{}
+func ImageFromTfToHttp(tf *resource_image.ImageModel) *api.Image {
+	return &api.Image{}
 }
 
-func ImageFromHttpToTf(http *api.ImageSchema) resource_image.ImageModel {
+func ImageFromHttpToTf(http *api.Image) resource_image.ImageModel {
 	return resource_image.ImageModel{}
 }
 

@@ -62,15 +62,15 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateNetAccessPointResponse, error) {
+	res := utils.ExecuteRequest(func() (*api.CreateVpcAccessPointResponse, error) {
 		body := NetAccessPointFromTfToCreateRequest(ctx, &data)
-		return r.client.CreateNetAccessPointWithResponse(ctx, body)
+		return r.client.CreateVpcAccessPointWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf := NetAccessPointFromHttpToTf(ctx, res.JSON200, response.Diagnostics)
+	tf := NetAccessPointFromHttpToTf(ctx, res.JSON201, response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -82,8 +82,8 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadNetAccessPointsByIdResponse, error) {
-		return r.client.ReadNetAccessPointsByIdWithResponse(ctx, data.Id.String())
+	res := utils.ExecuteRequest(func() (*api.ReadVpcAccessPointsByIdResponse, error) {
+		return r.client.ReadVpcAccessPointsByIdWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -105,7 +105,7 @@ func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.De
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.ExecuteRequest(func() (*api.DeleteNetAccessPointResponse, error) {
-		return r.client.DeleteNetAccessPointWithResponse(ctx, data.Id.String(), api.DeleteNetAccessPointJSONRequestBody{})
+	_ = utils.ExecuteRequest(func() (*api.DeleteVpcAccessPointResponse, error) {
+		return r.client.DeleteVpcAccessPointWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

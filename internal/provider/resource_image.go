@@ -70,7 +70,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 
-	tf := ImageFromHttpToTf(res.JSON200)
+	tf := ImageFromHttpToTf(res.JSON201)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -96,6 +96,6 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteImageResponse, error) {
-		return r.client.DeleteImageWithResponse(ctx, data.Id.ValueString(), api.DeleteImageJSONRequestBody{})
+		return r.client.DeleteImageWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

@@ -5,11 +5,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_snapshot"
 )
 
-func SnapshotFromTfToHttp(tf *resource_snapshot.SnapshotModel) *api.SnapshotSchema {
-	return &api.SnapshotSchema{}
+func SnapshotFromTfToHttp(tf *resource_snapshot.SnapshotModel) *api.Snapshot {
+	return &api.Snapshot{}
 }
 
-func SnapshotFromHttpToTf(http *api.SnapshotSchema) resource_snapshot.SnapshotModel {
+func SnapshotFromHttpToTf(http *api.Snapshot) resource_snapshot.SnapshotModel {
 	return resource_snapshot.SnapshotModel{}
 }
 

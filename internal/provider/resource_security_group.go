@@ -71,7 +71,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	createdId := res.JSON200.Id
+	createdId := res.JSON201.Id
 
 	// Inbound
 	if len(data.InboundRules.Elements()) > 0 {
@@ -80,7 +80,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 		createdIbdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateInboundRulesRequest(ctx, *createdId, inboundRules)
-			return r.client.CreateSecurityGroupRuleWithResponse(ctx, body)
+			return r.client.CreateSecurityGroupRuleWithResponse(ctx, *createdId, body)
 		}, http.StatusOK, &response.Diagnostics)
 		if createdIbdRules == nil {
 			return
@@ -90,10 +90,10 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	// Outbound
 	if len(data.OutboundRules.Elements()) > 0 {
 		// Delete default SG rule: (0.0.0.0/0 -1)
-		hRules := *res.JSON200.OutboundRules
-		rules := make([]api.SecurityGroupRuleSchema, 0, len(hRules))
+		hRules := *res.JSON201.OutboundRules
+		rules := make([]api.SecurityGroupRule, 0, len(hRules))
 		for _, e := range hRules {
-			rules = append(rules, api.SecurityGroupRuleSchema{
+			rules = append(rules, api.SecurityGroupRule{
 				FromPortRange:         e.FromPortRange,
 				IpProtocol:            e.IpProtocol,
 				IpRanges:              e.IpRanges,
@@ -117,7 +117,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 		createdObdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateOutboundRulesRequest(ctx, *createdId, outboundRules)
-			return r.client.CreateSecurityGroupRuleWithResponse(ctx, body)
+			return r.client.CreateSecurityGroupRuleWithResponse(ctx, *createdId, body)
 		}, http.StatusOK, &response.Diagnostics)
 		if createdObdRules == nil {
 			return
@@ -185,6 +185,6 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSecurityGroupResponse, error) {
-		return r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.ValueString(), api.DeleteSecurityGroupRequestSchema{})
+		return r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

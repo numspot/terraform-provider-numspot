@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt api.ApplicationStickyCookiePolicySchema) (resource_load_balancer.ApplicationStickyCookiePoliciesValue, diag.Diagnostics) {
+func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt api.ApplicationStickyCookiePolicy) (resource_load_balancer.ApplicationStickyCookiePoliciesValue, diag.Diagnostics) {
 	return resource_load_balancer.NewApplicationStickyCookiePoliciesValue(
 		resource_load_balancer.ApplicationStickyCookiePoliciesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -19,7 +19,7 @@ func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt api.Applic
 		})
 }
 
-func listenersFromHTTP(ctx context.Context, elt api.ListenerSchema) (resource_load_balancer.ListenersValue, diag.Diagnostics) {
+func listenersFromHTTP(ctx context.Context, elt api.Listener) (resource_load_balancer.ListenersValue, diag.Diagnostics) {
 	tfPolicyNames, diags := utils.FromStringListPointerToTfStringList(ctx, elt.PolicyNames)
 	if diags.HasError() {
 		return resource_load_balancer.ListenersValue{}, diags
@@ -36,9 +36,9 @@ func listenersFromHTTP(ctx context.Context, elt api.ListenerSchema) (resource_lo
 		})
 }
 
-func listenersFromTF(ctx context.Context, elt resource_load_balancer.ListenersValue) api.ListenerSchema {
+func listenersFromTF(ctx context.Context, elt resource_load_balancer.ListenersValue) api.Listener {
 	policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames)
-	return api.ListenerSchema{
+	return api.Listener{
 		BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
 		BackendProtocol:      elt.BackendProtocol.ValueStringPointer(),
 		LoadBalancerPort:     utils.FromTfInt64ToIntPtr(elt.LoadBalancerPort),
@@ -48,7 +48,7 @@ func listenersFromTF(ctx context.Context, elt resource_load_balancer.ListenersVa
 	}
 }
 
-func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStickyCookiePolicySchema) (resource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
+func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStickyCookiePolicy) (resource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
 	return resource_load_balancer.NewStickyCookiePoliciesValue(
 		resource_load_balancer.StickyCookiePoliciesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -56,11 +56,11 @@ func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStick
 			"policy_name":              types.StringPointerValue(elt.PolicyName),
 		})
 }
-func LoadBalancerFromTfToHttp(tf *resource_load_balancer.LoadBalancerModel) *api.LoadBalancerSchema {
-	return &api.LoadBalancerSchema{}
+func LoadBalancerFromTfToHttp(tf *resource_load_balancer.LoadBalancerModel) *api.LoadBalancer {
+	return &api.LoadBalancer{}
 }
 
-func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancerSchema) resource_load_balancer.LoadBalancerModel {
+func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancer) resource_load_balancer.LoadBalancerModel {
 	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
 		return resource_load_balancer.LoadBalancerModel{}
@@ -98,7 +98,7 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancerSchema)
 		SecurityGroupName:      types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
 	}
 	subnets, _ := utils.FromStringListPointerToTfStringList(ctx, http.Subnets)
-	subregionNames, _ := utils.FromStringListPointerToTfStringList(ctx, http.SubregionNames)
+	azNames, _ := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames)
 
 	return resource_load_balancer.LoadBalancerModel{
 		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciestypes,
@@ -109,14 +109,14 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancerSchema)
 		Id:                              types.StringPointerValue(http.Name),
 		Listeners:                       listeners,
 		Name:                            types.StringPointerValue(http.Name),
-		NetId:                           types.StringPointerValue(http.NetId),
+		NetId:                           types.StringPointerValue(http.VpcId),
 		PublicIp:                        types.StringPointerValue(http.PublicIp),
 		SecuredCookies:                  types.BoolPointerValue(http.SecuredCookies),
 		SecurityGroups:                  securityGroups,
 		SourceSecurityGroup:             sourceSecurityGroup,
 		StickyCookiePolicies:            stickyCookiePolicies,
 		Subnets:                         subnets,
-		SubregionNames:                  subregionNames,
+		SubregionNames:                  azNames,
 		Type:                            types.StringPointerValue(http.Type),
 	}
 }
@@ -125,8 +125,8 @@ func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_ba
 
 	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
 	subnets := utils.TfStringListToStringList(ctx, tf.Subnets)
-	listeners := utils.TfListToGenericList(func(a resource_load_balancer.ListenersValue) api.ListenerForCreationSchema {
-		return api.ListenerForCreationSchema{
+	listeners := utils.TfListToGenericList(func(a resource_load_balancer.ListenersValue) api.ListenerForCreation {
+		return api.ListenerForCreation{
 			BackendPort:          utils.FromTfInt64ToInt(a.BackendPort),
 			BackendProtocol:      a.BackendProtocol.ValueStringPointer(),
 			LoadBalancerPort:     utils.FromTfInt64ToInt(a.LoadBalancerPort),
@@ -148,15 +148,15 @@ func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_ba
 func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) api.UpdateLoadBalancerJSONRequestBody {
 
 	var (
-		loadBalancerPort *int                   = nil
-		policyNames      *[]string              = nil
-		hc               *api.HealthCheckSchema = nil
-		publicIp         *string                = nil
-		securedCookies   *bool                  = nil
+		loadBalancerPort *int             = nil
+		policyNames      *[]string        = nil
+		hc               *api.HealthCheck = nil
+		publicIp         *string          = nil
+		securedCookies   *bool            = nil
 	)
 
 	if !tf.HealthCheck.IsUnknown() {
-		hc = &api.HealthCheckSchema{
+		hc = &api.HealthCheck{
 			CheckInterval:      utils.FromTfInt64ToInt(tf.HealthCheck.CheckInterval),
 			HealthyThreshold:   utils.FromTfInt64ToInt(tf.HealthCheck.HealthyThreshold),
 			Path:               tf.HealthCheck.Path.ValueStringPointer(),
@@ -173,9 +173,9 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_ba
 		securedCookies = tf.SecuredCookies.ValueBoolPointer()
 	}
 	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
-	listeners := utils.TfListToGenericList(func(elt resource_load_balancer.ListenersValue) api.ListenerSchema {
+	listeners := utils.TfListToGenericList(func(elt resource_load_balancer.ListenersValue) api.Listener {
 		policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames)
-		return api.ListenerSchema{
+		return api.Listener{
 			BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
 			BackendProtocol:      elt.BackendProtocol.ValueStringPointer(),
 			LoadBalancerPort:     utils.FromTfInt64ToIntPtr(elt.LoadBalancerPort),

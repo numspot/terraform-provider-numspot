@@ -71,7 +71,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 	}
 
 	tf := KeyPairFromCreateHttpToTf(
-		res.JSON200,
+		res.JSON201,
 	)
 
 	if !data.PublicKey.IsNull() && !data.PublicKey.IsUnknown() {
@@ -116,6 +116,6 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteKeypairResponse, error) {
-		return r.client.DeleteKeypairWithResponse(ctx, data.Id.ValueString(), api.DeleteKeypairJSONRequestBody{}) // Use faker to inject token_200 status code
+		return r.client.DeleteKeypairWithResponse(ctx, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 }

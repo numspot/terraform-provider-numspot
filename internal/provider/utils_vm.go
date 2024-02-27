@@ -12,7 +12,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func vmBsuFromApi(ctx context.Context, elt api.BsuCreatedSchema) (basetypes.ObjectValue, diag.Diagnostics) {
+func vmBsuFromApi(ctx context.Context, elt api.BsuCreated) (basetypes.ObjectValue, diag.Diagnostics) {
 	obj, diags := resource_vm.NewBsuValue(
 		resource_vm.BsuValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -33,7 +33,7 @@ func vmBsuFromApi(ctx context.Context, elt api.BsuCreatedSchema) (basetypes.Obje
 
 }
 
-func vmBlockDeviceMappingFromApi(ctx context.Context, elt api.BlockDeviceMappingCreatedSchema) (resource_vm.BlockDeviceMappingsValue, diag.Diagnostics) {
+func vmBlockDeviceMappingFromApi(ctx context.Context, elt api.BlockDeviceMappingCreated) (resource_vm.BlockDeviceMappingsValue, diag.Diagnostics) {
 	// Bsu
 	bsuTf, diagnostics := vmBsuFromApi(ctx, *elt.Bsu)
 	if diagnostics.HasError() {
@@ -51,7 +51,7 @@ func vmBlockDeviceMappingFromApi(ctx context.Context, elt api.BlockDeviceMapping
 	)
 }
 
-func VmFromHttpToTf(ctx context.Context, http *api.VmSchema) (*resource_vm.VmModel, diag.Diagnostics) {
+func VmFromHttpToTf(ctx context.Context, http *api.Vm) (*resource_vm.VmModel, diag.Diagnostics) {
 	vmsCount := utils.FromIntToTfInt64(1)
 
 	// Private Ips
@@ -117,7 +117,7 @@ func VmFromHttpToTf(ctx context.Context, http *api.VmSchema) (*resource_vm.VmMod
 		KeypairName:               types.StringPointerValue(http.KeypairName),
 		//
 		NestedVirtualization: types.BoolPointerValue(http.NestedVirtualization),
-		NetId:                types.StringPointerValue(http.NetId),
+		NetId:                types.StringPointerValue(http.VpcId),
 		Nics:                 types.ListNull(resource_vm.NicsValue{}.Type(ctx)), // FIXME Set value
 		OsFamily:             types.StringPointerValue(http.OsFamily),
 		Performance:          types.StringPointerValue(http.Performance),

@@ -11,7 +11,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func privatesIpFromApi(ctx context.Context, elt api.PrivateIpSchema) (resource_nic.PrivateIpsValue, diag.Diagnostics) {
+func privatesIpFromApi(ctx context.Context, elt api.PrivateIp) (resource_nic.PrivateIpsValue, diag.Diagnostics) {
 	linkPublicIpTf, diagnostics := linkPublicIpFromApi(ctx, *elt.LinkPublicIp)
 	if diagnostics.HasError() {
 		return resource_nic.PrivateIpsValue{}, diagnostics
@@ -28,7 +28,7 @@ func privatesIpFromApi(ctx context.Context, elt api.PrivateIpSchema) (resource_n
 	)
 }
 
-func securityGroupLightFromApi(ctx context.Context, elt api.SecurityGroupLightSchema) (resource_nic.SecurityGroupsValue, diag.Diagnostics) {
+func securityGroupLightFromApi(ctx context.Context, elt api.SecurityGroupLight) (resource_nic.SecurityGroupsValue, diag.Diagnostics) {
 	return resource_nic.NewSecurityGroupsValue(
 		resource_nic.SecurityGroupsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -38,7 +38,7 @@ func securityGroupLightFromApi(ctx context.Context, elt api.SecurityGroupLightSc
 	)
 }
 
-func linkPublicIpFromApi(ctx context.Context, elt api.LinkPublicIpSchema) (resource_nic.LinkPublicIpValue, diag.Diagnostics) {
+func linkPublicIpFromApi(ctx context.Context, elt api.LinkPublicIp) (resource_nic.LinkPublicIpValue, diag.Diagnostics) {
 	return resource_nic.NewLinkPublicIpValue(
 		resource_nic.LinkPublicIpValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -51,7 +51,7 @@ func linkPublicIpFromApi(ctx context.Context, elt api.LinkPublicIpSchema) (resou
 	)
 }
 
-func NicFromHttpToTf(ctx context.Context, http *api.NicSchema) (*resource_nic.NicModel, diag.Diagnostics) {
+func NicFromHttpToTf(ctx context.Context, http *api.Nic) (*resource_nic.NicModel, diag.Diagnostics) {
 	// Private IPs
 	privateIps, diagnostics := utils.GenericListToTfListValue(ctx, resource_nic.PrivateIpsValue{}, privatesIpFromApi, *http.PrivateIps)
 	if diagnostics.HasError() {
@@ -89,20 +89,20 @@ func NicFromHttpToTf(ctx context.Context, http *api.NicSchema) (*resource_nic.Ni
 		IsSourceDestChecked: types.BoolPointerValue(http.IsSourceDestChecked),
 		LinkPublicIp:        linkPublicIpTf,
 		MacAddress:          types.StringPointerValue(http.MacAddress),
-		NetId:               types.StringPointerValue(http.NetId),
+		NetId:               types.StringPointerValue(http.VpcId),
 		PrivateDnsName:      types.StringPointerValue(http.PrivateDnsName),
 		PrivateIps:          privateIps,
 		SecurityGroupIds:    securityGroupsIdTf,
 		SecurityGroups:      securityGroupsTf,
 		State:               types.StringPointerValue(http.State),
 		SubnetId:            types.StringPointerValue(http.SubnetId),
-		SubregionName:       types.StringPointerValue(http.SubregionName),
+		SubregionName:       types.StringPointerValue(http.AvailabilityZoneName),
 	}, nil
 }
 
 func NicFromTfToCreateRequest(ctx context.Context, tf *resource_nic.NicModel) api.CreateNicJSONRequestBody {
-	privateIps := utils.TfListToGenericList(func(a resource_nic.PrivateIpsValue) api.PrivateIpLightSchema {
-		return api.PrivateIpLightSchema{
+	privateIps := utils.TfListToGenericList(func(a resource_nic.PrivateIpsValue) api.PrivateIpLight {
+		return api.PrivateIpLight{
 			IsPrimary: a.IsPrimary.ValueBoolPointer(),
 			PrivateIp: a.PrivateIp.ValueStringPointer(),
 		}

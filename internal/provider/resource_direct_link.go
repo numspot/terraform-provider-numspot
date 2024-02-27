@@ -70,7 +70,7 @@ func (r *DirectLinkResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf := DirectLinkFromHttpToTf(res.JSON200)
+	tf := DirectLinkFromHttpToTf(res.JSON201)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -98,7 +98,7 @@ func (r *DirectLinkResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteDirectLinkResponse, error) {
-		return r.client.DeleteDirectLinkWithResponse(ctx, data.Id.String(), api.DeleteDirectLinkJSONRequestBody{})
+		return r.client.DeleteDirectLinkWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

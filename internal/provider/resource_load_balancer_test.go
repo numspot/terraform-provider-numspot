@@ -13,7 +13,7 @@ import (
 
 func TestAccLoadBalancerResource(t *testing.T) {
 	lbName := "elb-test"
-	hc := api.HealthCheckSchema{
+	hc := api.HealthCheck{
 		CheckInterval:      30,
 		HealthyThreshold:   10,
 		Path:               utils.PointerOf("/index.html"),
@@ -97,7 +97,7 @@ resource "numspot_load_balancer" "testlb" {
 }`, name)
 }
 
-func updateLbConfig(hc api.HealthCheckSchema) string {
+func updateLbConfig(hc api.HealthCheck) string {
 	return fmt.Sprintf(`
 resource "numspot_net" "net" {
   ip_range = "10.101.0.0/16"

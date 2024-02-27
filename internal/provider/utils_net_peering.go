@@ -5,14 +5,14 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_net_peering"
 )
 
-func NetPeeringFromTfToHttp(tf *resource_net_peering.NetPeeringModel) *api.NetPeeringSchema {
-	return &api.NetPeeringSchema{}
+func NetPeeringFromTfToHttp(tf *resource_net_peering.NetPeeringModel) *api.VpcPeering {
+	return &api.VpcPeering{}
 }
 
-func NetPeeringFromHttpToTf(http *api.NetPeeringSchema) resource_net_peering.NetPeeringModel {
+func NetPeeringFromHttpToTf(http *api.VpcPeering) resource_net_peering.NetPeeringModel {
 	return resource_net_peering.NetPeeringModel{}
 }
 
-func NetPeeringFromTfToCreateRequest(tf *resource_net_peering.NetPeeringModel) api.CreateNetPeeringJSONRequestBody {
-	return api.CreateNetPeeringJSONRequestBody{}
+func NetPeeringFromTfToCreateRequest(tf *resource_net_peering.NetPeeringModel) api.CreateVpcPeeringJSONRequestBody {
+	return api.CreateVpcPeeringJSONRequestBody{}
 }

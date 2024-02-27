@@ -8,8 +8,8 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func DirectLinkInterfaceFromTfToHttp(tf *resource_direct_link_interface.DirectLinkInterfaceModel) *api.DirectLinkInterfacesSchema {
-	return &api.DirectLinkInterfacesSchema{
+func DirectLinkInterfaceFromTfToHttp(tf *resource_direct_link_interface.DirectLinkInterfaceModel) *api.DirectLinkInterfaces {
+	return &api.DirectLinkInterfaces{
 		BgpAsn:                  utils.FromTfInt64ToIntPtr(tf.BgpAsn),
 		BgpKey:                  tf.BgpKey.ValueStringPointer(),
 		ClientPrivateIp:         tf.ClientPrivateIp.ValueStringPointer(),
@@ -26,7 +26,7 @@ func DirectLinkInterfaceFromTfToHttp(tf *resource_direct_link_interface.DirectLi
 	}
 }
 
-func DirectLinkInterfaceFromHttpToTf(http *api.DirectLinkInterfacesSchema) resource_direct_link_interface.DirectLinkInterfaceModel {
+func DirectLinkInterfaceFromHttpToTf(http *api.DirectLinkInterfaces) resource_direct_link_interface.DirectLinkInterfaceModel {
 	return resource_direct_link_interface.DirectLinkInterfaceModel{
 		BgpAsn:                  utils.FromIntPtrToTfInt64(http.BgpAsn),
 		BgpKey:                  types.StringPointerValue(http.BgpKey),
@@ -48,6 +48,6 @@ func DirectLinkInterfaceFromHttpToTf(http *api.DirectLinkInterfacesSchema) resou
 func DirectLinkInterfaceFromTfToCreateRequest(tf *resource_direct_link_interface.DirectLinkInterfaceModel) api.CreateDirectLinkInterfaceJSONRequestBody {
 	return api.CreateDirectLinkInterfaceJSONRequestBody{
 		DirectLinkId:        tf.DirectLinkId.ValueString(),
-		DirectLinkInterface: api.DirectLinkInterfaceSchema{},
+		DirectLinkInterface: api.DirectLinkInterface{},
 	}
 }

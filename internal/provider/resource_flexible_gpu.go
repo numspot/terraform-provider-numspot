@@ -74,7 +74,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 		Pending: []string{"attaching", "detaching"},
 		Target:  []string{"allocated", "attached"},
 		Refresh: func() (result interface{}, state string, err error) {
-			readed := r.read(ctx, *res.JSON200.Id, response.Diagnostics)
+			readed := r.read(ctx, *res.JSON201.Id, response.Diagnostics)
 			if readed == nil {
 				return nil, "", nil
 			}
@@ -91,11 +91,11 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 		return
 	}
 
-	tf := FlexibleGpuFromHttpToTf(read.(*api.FlexibleGpuSchema))
+	tf := FlexibleGpuFromHttpToTf(read.(*api.FlexibleGpu))
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *api.FlexibleGpuSchema {
+func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *api.FlexibleGpu {
 	res, err := r.client.ReadFlexibleGpusByIdWithResponse(ctx, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -133,6 +133,6 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteFlexibleGpuResponse, error) {
-		return r.client.DeleteFlexibleGpuWithResponse(ctx, data.Id.ValueString(), api.DeleteFlexibleGpuJSONRequestBody{})
+		return r.client.DeleteFlexibleGpuWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

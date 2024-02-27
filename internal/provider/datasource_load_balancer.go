@@ -308,11 +308,11 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 	if res == nil {
 		return
 	}
-	if res.JSON200.LoadBalancers == nil {
+	if res.JSON200.Items == nil {
 		response.Diagnostics.AddError("HTTP call failed", "got empty load balancers list")
 	}
 
-	for _, item := range *res.JSON200.LoadBalancers {
+	for _, item := range *res.JSON200.Items {
 		tf := LoadBalancerFromHttpToTf(ctx, &item)
 		state.LoadBalancers = append(state.LoadBalancers, tf)
 	}

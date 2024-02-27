@@ -70,7 +70,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	tf := VpnConnectionFromHttpToTf(res.JSON200)
+	tf := VpnConnectionFromHttpToTf(ctx, res.JSON201)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -85,7 +85,7 @@ func (r *VpnConnectionResource) Read(ctx context.Context, request resource.ReadR
 		return
 	}
 
-	tf := VpnConnectionFromHttpToTf(res.JSON200)
+	tf := VpnConnectionFromHttpToTf(ctx, res.JSON200)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -99,7 +99,7 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVpnConnectionResponse, error) {
-		return r.client.DeleteVpnConnectionWithResponse(ctx, data.Id.String(), api.DeleteVpnConnectionJSONRequestBody{})
+		return r.client.DeleteVpnConnectionWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

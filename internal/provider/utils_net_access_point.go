@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func NetAccessPointFromHttpToTf(ctx context.Context, http *api.NetAccessPointSchema, diagnostics diag.Diagnostics) *resource_net_access_point.NetAccessPointModel {
+func NetAccessPointFromHttpToTf(ctx context.Context, http *api.VpcAccessPoint, diagnostics diag.Diagnostics) *resource_net_access_point.NetAccessPointModel {
 	routeTablesId, diags := types.ListValueFrom(ctx, types.StringType, http.RouteTableIds)
 	if diags.HasError() {
 		diagnostics.Append(diags...)
@@ -19,18 +19,18 @@ func NetAccessPointFromHttpToTf(ctx context.Context, http *api.NetAccessPointSch
 
 	return &resource_net_access_point.NetAccessPointModel{
 		Id:            types.StringPointerValue(http.Id),
-		NetId:         types.StringPointerValue(http.NetId),
+		NetId:         types.StringPointerValue(http.VpcId),
 		RouteTableIds: routeTablesId,
 		ServiceName:   types.StringPointerValue(http.ServiceName),
 		State:         types.StringPointerValue(http.State),
 	}
 }
 
-func NetAccessPointFromTfToCreateRequest(ctx context.Context, tf *resource_net_access_point.NetAccessPointModel) api.CreateNetAccessPointJSONRequestBody {
+func NetAccessPointFromTfToCreateRequest(ctx context.Context, tf *resource_net_access_point.NetAccessPointModel) api.CreateVpcAccessPointJSONRequestBody {
 	routeTableIds := utils.TfStringListToStringList(ctx, tf.RouteTableIds)
 
-	return api.CreateNetAccessPointJSONRequestBody{
-		NetId:         tf.NetId.ValueString(),
+	return api.CreateVpcAccessPointJSONRequestBody{
+		VpcId:         tf.NetId.ValueString(),
 		RouteTableIds: &routeTableIds,
 		ServiceName:   tf.ServiceName.ValueString(),
 	}

@@ -38,7 +38,7 @@ func ComputePublicIPChangeSet(plan, state *resource_public_ip.PublicIpModel) Pub
 	return c
 }
 
-func PublicIpFromHttpToTf(elt *api.PublicIpSchema, model *resource_public_ip.PublicIpModel) {
+func PublicIpFromHttpToTf(elt *api.PublicIp, model *resource_public_ip.PublicIpModel) {
 	model.Id = types.StringPointerValue(elt.Id)
 	model.NicAccountId = types.StringPointerValue(elt.NicAccountId)
 	model.NicId = types.StringPointerValue(elt.NicId)

@@ -62,7 +62,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	var data resource_internet_service.InternetServiceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res, err := r.client.CreateInternetServiceWithResponse(ctx, api.CreateInternetServiceJSONRequestBody{})
+	res, err := r.client.CreateInternetGatewayWithResponse(ctx)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create InternetService", err.Error())
 		return
@@ -74,17 +74,17 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 		return
 	}
 	// Update state
-	tf := InternetServiceFromHttpToTf(res.JSON200) // FIXME
+	tf := InternetServiceFromHttpToTf(res.JSON201) // FIXME
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 
 	// Call Link Internet Service to VPC
 	netID := data.NetId
 	if !netID.IsNull() {
-		reslink, errlink := r.client.LinkInternetServiceWithResponse(
+		reslink, errlink := r.client.LinkInternetGatewayWithResponse(
 			ctx,
 			tf.Id.ValueString(),
-			api.LinkInternetServiceJSONRequestBody{
-				NetId: data.NetId.ValueString(),
+			api.LinkInternetGatewayJSONRequestBody{
+				VpcId: data.NetId.ValueString(),
 			})
 		if errlink != nil {
 			response.Diagnostics.AddError("Failed to link InternetService to net", err.Error())
@@ -106,7 +106,7 @@ func (r *InternetServiceResource) Read(ctx context.Context, request resource.Rea
 	var data resource_internet_service.InternetServiceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res, err := r.client.ReadInternetServicesByIdWithResponse(ctx, data.Id.ValueString())
+	res, err := r.client.ReadInternetGatewaysByIdWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Failed to read Internet service", err.Error())
 		return
@@ -131,11 +131,11 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	if !data.NetId.IsNull() {
-		res, err := r.client.UnlinkInternetServiceWithResponse(
+		res, err := r.client.UnlinkInternetGatewayWithResponse(
 			ctx,
 			data.Id.ValueString(),
-			api.UnlinkInternetServiceJSONRequestBody{
-				NetId: data.NetId.ValueString(),
+			api.UnlinkInternetGatewayJSONRequestBody{
+				VpcId: data.NetId.ValueString(),
 			})
 		if err != nil {
 			response.Diagnostics.AddError("Failed to unlink InternetService from net", err.Error())
@@ -149,7 +149,7 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 		}
 	}
 
-	res, err := r.client.DeleteInternetServiceWithResponse(ctx, data.Id.ValueString(), api.DeleteInternetServiceJSONRequestBody{})
+	res, err := r.client.DeleteInternetGatewayWithResponse(ctx, data.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete InternetService", err.Error())
 		return

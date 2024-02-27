@@ -10,11 +10,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func VolumeFromTfToHttp(tf *resource_volume.VolumeModel) *api.VolumeSchema {
-	return &api.VolumeSchema{}
+func VolumeFromTfToHttp(tf *resource_volume.VolumeModel) *api.Volume {
+	return &api.Volume{}
 }
 
-func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http api.LinkedVolumeSchema) (resource_volume.VolumesValue, diag.Diagnostics) {
+func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http api.LinkedVolume) (resource_volume.VolumesValue, diag.Diagnostics) {
 	return resource_volume.NewVolumesValue(
 		resource_volume.VolumesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -26,7 +26,7 @@ func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http api.LinkedV
 		})
 }
 
-func VolumeFromHttpToTf(ctx context.Context, http *api.VolumeSchema) (resource_volume.VolumeModel, diag.Diagnostics) {
+func VolumeFromHttpToTf(ctx context.Context, http *api.Volume) (resource_volume.VolumeModel, diag.Diagnostics) {
 	volumes, diags := utils.GenericListToTfListValue(ctx, resource_volume.VolumesValue{}, fromLinkedVolumeSchemaToTFVolumesList, *http.LinkedVolumes)
 	if diags.HasError() {
 		return resource_volume.VolumeModel{}, diags
@@ -38,7 +38,7 @@ func VolumeFromHttpToTf(ctx context.Context, http *api.VolumeSchema) (resource_v
 		Size:          utils.FromIntPtrToTfInt64(http.Size),
 		SnapshotId:    types.StringPointerValue(http.SnapshotId),
 		State:         types.StringPointerValue(http.State),
-		SubregionName: types.StringPointerValue(http.SubregionName),
+		SubregionName: types.StringPointerValue(http.AvailabilityZoneName),
 		Type:          types.StringPointerValue(http.Type),
 		Volumes:       volumes,
 	}, diags
@@ -46,10 +46,10 @@ func VolumeFromHttpToTf(ctx context.Context, http *api.VolumeSchema) (resource_v
 
 func VolumeFromTfToCreateRequest(tf *resource_volume.VolumeModel) api.CreateVolumeJSONRequestBody {
 	return api.CreateVolumeJSONRequestBody{
-		Iops:          utils.FromTfInt64ToIntPtr(tf.Iops),
-		Size:          utils.FromTfInt64ToIntPtr(tf.Size),
-		SnapshotId:    tf.SnapshotId.ValueStringPointer(),
-		SubregionName: tf.SubregionName.ValueString(),
-		Type:          tf.Type.ValueStringPointer(),
+		Iops:                 utils.FromTfInt64ToIntPtr(tf.Iops),
+		Size:                 utils.FromTfInt64ToIntPtr(tf.Size),
+		SnapshotId:           tf.SnapshotId.ValueStringPointer(),
+		AvailabilityZoneName: tf.SubregionName.ValueString(),
+		Type:                 tf.Type.ValueStringPointer(),
 	}
 }

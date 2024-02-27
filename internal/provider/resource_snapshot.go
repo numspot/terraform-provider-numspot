@@ -70,7 +70,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	tf := SnapshotFromHttpToTf(res.JSON200)
+	tf := SnapshotFromHttpToTf(res.JSON201)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -98,6 +98,6 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSnapshotResponse, error) {
-		return r.client.DeleteSnapshotWithResponse(ctx, data.Id.String(), api.DeleteSnapshotJSONRequestBody{})
+		return r.client.DeleteSnapshotWithResponse(ctx, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

@@ -70,7 +70,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	tf, diagnostics := NicFromHttpToTf(ctx, res.JSON200)
+	tf, diagnostics := NicFromHttpToTf(ctx, res.JSON201)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -109,6 +109,6 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteNicResponse, error) {
-		return r.client.DeleteNicWithResponse(ctx, data.Id.ValueString(), api.DeleteNicJSONRequestBody{})
+		return r.client.DeleteNicWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

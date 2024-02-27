@@ -7,14 +7,14 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_key_pair"
 )
 
-func KeyPairFromTfToHttp(tf *resource_key_pair.KeyPairModel) *api.KeypairSchema {
-	return &api.KeypairSchema{
+func KeyPairFromTfToHttp(tf *resource_key_pair.KeyPairModel) *api.Keypair {
+	return &api.Keypair{
 		Fingerprint: tf.Fingerprint.ValueStringPointer(),
 		Name:        tf.Name.ValueStringPointer(),
 	}
 }
 
-func KeyPairFromCreateHttpToTf(http *api.KeypairCreatedSchema) resource_key_pair.KeyPairModel {
+func KeyPairFromCreateHttpToTf(http *api.CreateKeypairResponseSchema) resource_key_pair.KeyPairModel {
 	res := resource_key_pair.KeyPairModel{
 		Fingerprint: types.StringPointerValue(http.Fingerprint),
 		Id:          types.StringPointerValue(http.Name),
@@ -25,7 +25,7 @@ func KeyPairFromCreateHttpToTf(http *api.KeypairCreatedSchema) resource_key_pair
 	return res
 }
 
-func KeyPairFromReadHttpToTf(http *api.KeypairSchema) resource_key_pair.KeyPairModel {
+func KeyPairFromReadHttpToTf(http *api.ReadKeypairsByIdResponseSchema) resource_key_pair.KeyPairModel {
 	res := resource_key_pair.KeyPairModel{
 		Fingerprint: types.StringPointerValue(http.Fingerprint),
 		Id:          types.StringPointerValue(http.Name),
@@ -35,7 +35,7 @@ func KeyPairFromReadHttpToTf(http *api.KeypairSchema) resource_key_pair.KeyPairM
 	return res
 }
 
-func KeyPairFromImportHttpToTf(http *api.KeypairCreatedSchema) resource_key_pair.KeyPairModel {
+func KeyPairFromImportHttpToTf(http *api.CreateKeypairResponseSchema) resource_key_pair.KeyPairModel {
 	res := resource_key_pair.KeyPairModel{
 		Fingerprint: types.StringPointerValue(http.Fingerprint),
 		Id:          types.StringPointerValue(http.Name),
