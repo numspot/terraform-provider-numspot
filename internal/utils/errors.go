@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"net/http"
 	"reflect"
 	"regexp"
@@ -19,29 +20,11 @@ type NSError struct {
 	Code    string `json:"Code"`
 }
 
-type ApiError struct {
-	Errors          []NSError `json:"Errors"`
-	ResponseContext struct {
-		RequestID string `json:"RequestId"`
-	} `json:"ResponseContext"`
-}
-
-func (a ApiError) Type() string {
-	return a.Errors[0].Type
-}
-
-func (a ApiError) Error() string {
-	if len(a.Errors) > 0 {
-		return a.Errors[0].Details
-	}
-	return ""
-}
-
 func HandleError(httpResponseBody []byte) error {
-	apiError := ApiError{}
+	var apiError api.ErrorResponse
 	err := json.Unmarshal(httpResponseBody, &apiError)
 	if err != nil {
-		apiError.Errors = append(apiError.Errors, NSError{Details: string(httpResponseBody)})
+		return err
 	}
 
 	return apiError

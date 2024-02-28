@@ -125,7 +125,7 @@ func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVpcResponse, error) {
 		return r.client.DeleteVpcWithResponse(ctx, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
 	}

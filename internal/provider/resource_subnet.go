@@ -149,7 +149,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 
 	res := utils.ExecuteRequest(func() (*api.DeleteSubnetResponse, error) {
 		return r.client.DeleteSubnetWithResponse(ctx, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
 	}

@@ -29,6 +29,29 @@ const (
 	CreateVmsPerformanceMedium  CreateVmsPerformance = "medium"
 )
 
+// Defines values for ErrorDocumentationUrl.
+const (
+	HttpsdocsNumspotClouddocsdomainsclouderrorsAmbiguousGranularPermissionElements ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#ambiguous_granular_permission_elements"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsAmbiguousPermissionElements         ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#ambiguous_permission_elements"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsAmbiguousRoleElements               ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#ambiguous_role_elements"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsDuplicateResource                   ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#duplicate_resource"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsDuplicateRole                       ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#duplicate_role"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsForbidden                           ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#forbidden"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsForbiddenAccess                     ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#forbidden_access"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsIdentityNotFound                    ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#identity_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsInactiveToken                       ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#inactive_token"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsInternalServerError                 ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#internal_server_error"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsInvalidParameter                    ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsMissingRoles                        ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#missing_roles"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsNamespaceNotFound                   ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#namespace_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsNotInTenantRoles                    ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#not_in_tenant_roles"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsPermissionNotFound                  ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#permission_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsResourceNotFound                    ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#resource_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsRoleNotFound                        ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#role_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsUnauthenticatedAccess               ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#unauthenticated_access"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsUnexpectedTokenUsage                ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#unexpected_token_usage"
+)
+
 // Defines values for UpdateDirectLinkInterfaceMtu.
 const (
 	N1500 UpdateDirectLinkInterfaceMtu = 1500
@@ -853,22 +876,20 @@ type DirectLinkInterfaces struct {
 	Vlan *int `json:"vlan,omitempty"`
 }
 
-// ErrorResponse defines model for ErrorResponse.
+// ErrorDocumentationUrl Documentation URL for the domain error
+type ErrorDocumentationUrl string
+
+// ErrorResponse For HTTP errors, we implement the https://datatracker.ietf.org/doc/html/rfc9457
 type ErrorResponse struct {
-	// Errors One or more errors.
-	Errors *[]Errors `json:"errors,omitempty"`
-}
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail   *string `json:"detail,omitempty"`
+	Instance *Url    `json:"instance,omitempty"`
 
-// Errors Information about the errors.
-type Errors struct {
-	// Code The code of the error.
-	Code *string `json:"code,omitempty"`
+	// Title Human-readable summary of the problem type.
+	Title string `json:"title"`
 
-	// Details The details of the error.
-	Details *string `json:"details,omitempty"`
-
-	// Type The type of the error.
-	Type *string `json:"type,omitempty"`
+	// Type Documentation URL for the domain error
+	Type ErrorDocumentationUrl `json:"type"`
 }
 
 // FlexibleGpu Information about the flexible GPU (fGPU).
@@ -2401,6 +2422,9 @@ type UpdateVpnConnection struct {
 	VpnOptions *VpnOptionsToUpdate `json:"vpnOptions,omitempty"`
 }
 
+// Url defines model for Url.
+type Url = string
+
 // VgwTelemetry Information about the current state of a VPN tunnel.
 type VgwTelemetry struct {
 	// AcceptedRouteCount The number of routes accepted through BGP (Border Gateway Protocol) route exchanges.
@@ -2840,14 +2864,14 @@ type LinkNicResponseSchema struct {
 
 // LinkPublicIpResponseSchema defines model for LinkPublicIpResponse.
 type LinkPublicIpResponseSchema struct {
-	// Id (Net only) The ID representing the association of the public IP with the VM or the NIC.
-	Id *string `json:"id,omitempty"`
+	// LinkPublicIpId (Net only) The ID representing the association of the public IP with the VM or the NIC.
+	LinkPublicIpId *string `json:"linkPublicIpId,omitempty"`
 }
 
 // LinkRouteTableResponseSchema defines model for LinkRouteTableResponse.
 type LinkRouteTableResponseSchema struct {
-	// Id The ID of the association between the route table and the Subnet.
-	Id *string `json:"id,omitempty"`
+	// LinkRouteTableId The ID of the association between the route table and the Subnet.
+	LinkRouteTableId *string `json:"linkRouteTableId,omitempty"`
 }
 
 // LinkVirtualGatewayToVpcResponseSchema defines model for LinkVirtualGatewayToVpcResponse.
@@ -4338,8 +4362,8 @@ type ReadVpcPeeringsParams struct {
 	// AccepterVpcVpcIds The IDs of the peer Nets.
 	AccepterVpcVpcIds *[]string `form:"accepterVpcVpcIds,omitempty" json:"accepterVpcVpcIds,omitempty"`
 
-	// VpcPeeringIds The IDs of the Net peerings.
-	VpcPeeringIds *[]string `form:"vpcPeeringIds,omitempty" json:"vpcPeeringIds,omitempty"`
+	// Ids The IDs of the Net peerings.
+	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 
 	// SourceVpcAccountIds The account IDs of the owners of the peer Nets.
 	SourceVpcAccountIds *[]string `form:"sourceVpcAccountIds,omitempty" json:"sourceVpcAccountIds,omitempty"`
@@ -17942,9 +17966,9 @@ func NewReadVpcPeeringsRequest(server string, params *ReadVpcPeeringsParams) (*h
 
 		}
 
-		if params.VpcPeeringIds != nil {
+		if params.Ids != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "vpcPeeringIds", runtime.ParamLocationQuery, *params.VpcPeeringIds); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ids", runtime.ParamLocationQuery, *params.Ids); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err

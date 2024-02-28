@@ -354,7 +354,7 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewInternetServiceResource,
 		NewListenerRuleResource,
 		NewLoadBalancerResource,
-		NewNatServiceResource,
+		NewNatGatewayResource,
 		NewNetResource,
 		NewNetAccessPointResource,
 		NewNicResource,

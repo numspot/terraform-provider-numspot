@@ -65,7 +65,7 @@ func invokeLinkPublicIP(ctx context.Context, client *api.ClientWithResponses, da
 		return nil, utils.HandleError(res.Body)
 	}
 
-	return res.JSON200.Id, nil
+	return res.JSON200.LinkPublicIpId, nil
 }
 
 func invokeUnlinkPublicIP(ctx context.Context, client *api.ClientWithResponses, data *resource_public_ip.PublicIpModel) error {

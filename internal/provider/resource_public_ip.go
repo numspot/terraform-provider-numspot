@@ -64,7 +64,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 
 	createRes := utils.ExecuteRequest(func() (*api.CreatePublicIpResponse, error) {
 		return r.client.CreatePublicIpWithResponse(ctx)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if createRes == nil {
 		return
 	}
@@ -174,5 +174,5 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 	}
 	utils.ExecuteRequest(func() (*api.DeletePublicIpResponse, error) {
 		return r.client.DeletePublicIpWithResponse(ctx, state.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 }
