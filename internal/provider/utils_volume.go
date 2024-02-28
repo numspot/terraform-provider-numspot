@@ -14,9 +14,9 @@ func VolumeFromTfToHttp(tf *resource_volume.VolumeModel) *api.Volume {
 	return &api.Volume{}
 }
 
-func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http api.LinkedVolume) (resource_volume.VolumesValue, diag.Diagnostics) {
-	return resource_volume.NewVolumesValue(
-		resource_volume.VolumesValue{}.AttributeTypes(ctx),
+func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http api.LinkedVolume) (resource_volume.LinkedVolumesValue, diag.Diagnostics) {
+	return resource_volume.NewLinkedVolumesValue(
+		resource_volume.LinkedVolumesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(http.DeleteOnVmDeletion),
 			"device_name":           types.StringPointerValue(http.DeviceName),
@@ -27,20 +27,26 @@ func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http api.LinkedV
 }
 
 func VolumeFromHttpToTf(ctx context.Context, http *api.Volume) (resource_volume.VolumeModel, diag.Diagnostics) {
-	volumes, diags := utils.GenericListToTfListValue(ctx, resource_volume.VolumesValue{}, fromLinkedVolumeSchemaToTFVolumesList, *http.LinkedVolumes)
+	volumes, diags := utils.GenericListToTfListValue(
+		ctx,
+		resource_volume.LinkedVolumesValue{},
+		fromLinkedVolumeSchemaToTFVolumesList,
+		*http.LinkedVolumes,
+	)
 	if diags.HasError() {
 		return resource_volume.VolumeModel{}, diags
 	}
+
 	return resource_volume.VolumeModel{
-		CreationDate:  types.StringValue(http.CreationDate.String()),
-		Id:            types.StringPointerValue(http.Id),
-		Iops:          utils.FromIntPtrToTfInt64(http.Iops),
-		Size:          utils.FromIntPtrToTfInt64(http.Size),
-		SnapshotId:    types.StringPointerValue(http.SnapshotId),
-		State:         types.StringPointerValue(http.State),
-		SubregionName: types.StringPointerValue(http.AvailabilityZoneName),
-		Type:          types.StringPointerValue(http.Type),
-		Volumes:       volumes,
+		CreationDate:         types.StringValue(http.CreationDate.String()),
+		Id:                   types.StringPointerValue(http.Id),
+		Iops:                 utils.FromIntPtrToTfInt64(http.Iops),
+		Size:                 utils.FromIntPtrToTfInt64(http.Size),
+		SnapshotId:           types.StringPointerValue(http.SnapshotId),
+		State:                types.StringPointerValue(http.State),
+		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
+		Type:                 types.StringPointerValue(http.Type),
+		LinkedVolumes:        volumes,
 	}, diags
 }
 
@@ -49,7 +55,7 @@ func VolumeFromTfToCreateRequest(tf *resource_volume.VolumeModel) api.CreateVolu
 		Iops:                 utils.FromTfInt64ToIntPtr(tf.Iops),
 		Size:                 utils.FromTfInt64ToIntPtr(tf.Size),
 		SnapshotId:           tf.SnapshotId.ValueStringPointer(),
-		AvailabilityZoneName: tf.SubregionName.ValueString(),
+		AvailabilityZoneName: tf.AvailabilityZoneName.ValueString(),
 		Type:                 tf.Type.ValueStringPointer(),
 	}
 }

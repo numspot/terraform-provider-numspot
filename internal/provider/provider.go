@@ -134,7 +134,7 @@ func AddSecurityCredentialsToRequestHeaders(ctx context.Context, req *http.Reque
 	return nil
 }
 
-func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag diag.Diagnostics, data *NumspotProviderModel) *api.ClientWithResponses {
+func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag *diag.Diagnostics, data *NumspotProviderModel) *api.ClientWithResponses {
 	err, accessToken := p.authenticateUser(ctx, data)
 	if err != nil {
 		diag.AddError("Failed to authenticate", err.Error())
@@ -320,7 +320,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	if p.development {
 		client = p.apiClientWithFakeAuth(&config, resp.Diagnostics)
 	} else {
-		client = p.apiClientWithAuth(ctx, resp.Diagnostics, &config)
+		client = p.apiClientWithAuth(ctx, &resp.Diagnostics, &config)
 	}
 
 	if resp.Diagnostics.HasError() {

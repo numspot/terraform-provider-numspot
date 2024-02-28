@@ -66,6 +66,9 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		body := VolumeFromTfToCreateRequest(&data)
 		return r.client.CreateVolumeWithResponse(ctx, body)
 	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
 
 	tf, diags := VolumeFromHttpToTf(ctx, res.JSON201)
 	if diags.HasError() {

@@ -47,13 +47,12 @@ func createVolumeConfig() string {
 	return `
 resource "numspot_volume" "test" {
 	iops = 1200
-	size
-	snapshot_id
+	availability_zone_name = "eu-west-2a"
 }
 `
 }
 
 func testVolumeConfig_Update() string {
 	return `resource "numspot_volume" "test" {
-    			}`
+}`
 }

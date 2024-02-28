@@ -18,6 +18,11 @@ import (
 func VolumeResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"availability_zone_name": schema.StringAttribute{
+				Required:            true,
+				Description:         "The Subregion in which you want to create the volume.",
+				MarkdownDescription: "The Subregion in which you want to create the volume.",
+			},
 			"creation_date": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The date and time of creation of the volume.",
@@ -34,34 +39,7 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
 				MarkdownDescription: "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
 			},
-			"size": schema.Int64Attribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
-				MarkdownDescription: "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
-			},
-			"snapshot_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The ID of the snapshot from which you want to create the volume.",
-				MarkdownDescription: "The ID of the snapshot from which you want to create the volume.",
-			},
-			"state": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
-				MarkdownDescription: "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
-			},
-			"subregion_name": schema.StringAttribute{
-				Required:            true,
-				Description:         "The Subregion in which you want to create the volume.",
-				MarkdownDescription: "The Subregion in which you want to create the volume.",
-			},
-			"type": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The type of the volume (`standard` \\| `gp2` \\| `io1`).",
-				MarkdownDescription: "The type of the volume (`standard` \\| `gp2` \\| `io1`).",
-			},
-			"volumes": schema.ListNestedAttribute{
+			"linked_volumes": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"delete_on_vm_deletion": schema.BoolAttribute{
@@ -90,9 +68,9 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The ID of the volume.",
 						},
 					},
-					CustomType: VolumesType{
+					CustomType: LinkedVolumesType{
 						ObjectType: types.ObjectType{
-							AttrTypes: VolumesValue{}.AttributeTypes(ctx),
+							AttrTypes: LinkedVolumesValue{}.AttributeTypes(ctx),
 						},
 					},
 				},
@@ -100,30 +78,53 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about your volume attachment.",
 				MarkdownDescription: "Information about your volume attachment.",
 			},
+			"size": schema.Int64Attribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
+				MarkdownDescription: "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
+			},
+			"snapshot_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "The ID of the snapshot from which you want to create the volume.",
+				MarkdownDescription: "The ID of the snapshot from which you want to create the volume.",
+			},
+			"state": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
+				MarkdownDescription: "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
+			},
+			"type": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />\n For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).",
+				MarkdownDescription: "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />\n For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).",
+			},
 		},
 	}
 }
 
 type VolumeModel struct {
-	CreationDate  types.String `tfsdk:"creation_date"`
-	Id            types.String `tfsdk:"id"`
-	Iops          types.Int64  `tfsdk:"iops"`
-	Size          types.Int64  `tfsdk:"size"`
-	SnapshotId    types.String `tfsdk:"snapshot_id"`
-	State         types.String `tfsdk:"state"`
-	SubregionName types.String `tfsdk:"subregion_name"`
-	Type          types.String `tfsdk:"type"`
-	Volumes       types.List   `tfsdk:"volumes"`
+	AvailabilityZoneName types.String `tfsdk:"availability_zone_name"`
+	CreationDate         types.String `tfsdk:"creation_date"`
+	Id                   types.String `tfsdk:"id"`
+	Iops                 types.Int64  `tfsdk:"iops"`
+	LinkedVolumes        types.List   `tfsdk:"linked_volumes"`
+	Size                 types.Int64  `tfsdk:"size"`
+	SnapshotId           types.String `tfsdk:"snapshot_id"`
+	State                types.String `tfsdk:"state"`
+	Type                 types.String `tfsdk:"type"`
 }
 
-var _ basetypes.ObjectTypable = VolumesType{}
+var _ basetypes.ObjectTypable = LinkedVolumesType{}
 
-type VolumesType struct {
+type LinkedVolumesType struct {
 	basetypes.ObjectType
 }
 
-func (t VolumesType) Equal(o attr.Type) bool {
-	other, ok := o.(VolumesType)
+func (t LinkedVolumesType) Equal(o attr.Type) bool {
+	other, ok := o.(LinkedVolumesType)
 
 	if !ok {
 		return false
@@ -132,11 +133,11 @@ func (t VolumesType) Equal(o attr.Type) bool {
 	return t.ObjectType.Equal(other.ObjectType)
 }
 
-func (t VolumesType) String() string {
-	return "VolumesType"
+func (t LinkedVolumesType) String() string {
+	return "LinkedVolumesType"
 }
 
-func (t VolumesType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+func (t LinkedVolumesType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	attributes := in.Attributes()
@@ -235,7 +236,7 @@ func (t VolumesType) ValueFromObject(ctx context.Context, in basetypes.ObjectVal
 		return nil, diags
 	}
 
-	return VolumesValue{
+	return LinkedVolumesValue{
 		DeleteOnVmDeletion: deleteOnVmDeletionVal,
 		DeviceName:         deviceNameVal,
 		State:              stateVal,
@@ -245,19 +246,19 @@ func (t VolumesType) ValueFromObject(ctx context.Context, in basetypes.ObjectVal
 	}, diags
 }
 
-func NewVolumesValueNull() VolumesValue {
-	return VolumesValue{
+func NewLinkedVolumesValueNull() LinkedVolumesValue {
+	return LinkedVolumesValue{
 		state: attr.ValueStateNull,
 	}
 }
 
-func NewVolumesValueUnknown() VolumesValue {
-	return VolumesValue{
+func NewLinkedVolumesValueUnknown() LinkedVolumesValue {
+	return LinkedVolumesValue{
 		state: attr.ValueStateUnknown,
 	}
 }
 
-func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (VolumesValue, diag.Diagnostics) {
+func NewLinkedVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (LinkedVolumesValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
@@ -268,11 +269,11 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 
 		if !ok {
 			diags.AddError(
-				"Missing VolumesValue Attribute Value",
-				"While creating a VolumesValue value, a missing attribute value was detected. "+
-					"A VolumesValue must contain values for all attributes, even if null or unknown. "+
+				"Missing LinkedVolumesValue Attribute Value",
+				"While creating a LinkedVolumesValue value, a missing attribute value was detected. "+
+					"A LinkedVolumesValue must contain values for all attributes, even if null or unknown. "+
 					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("VolumesValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+					fmt.Sprintf("LinkedVolumesValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
 			)
 
 			continue
@@ -280,12 +281,12 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 
 		if !attributeType.Equal(attribute.Type(ctx)) {
 			diags.AddError(
-				"Invalid VolumesValue Attribute Type",
-				"While creating a VolumesValue value, an invalid attribute value was detected. "+
-					"A VolumesValue must use a matching attribute type for the value. "+
+				"Invalid LinkedVolumesValue Attribute Type",
+				"While creating a LinkedVolumesValue value, an invalid attribute value was detected. "+
+					"A LinkedVolumesValue must use a matching attribute type for the value. "+
 					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("VolumesValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
-					fmt.Sprintf("VolumesValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+					fmt.Sprintf("LinkedVolumesValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("LinkedVolumesValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
 			)
 		}
 	}
@@ -295,17 +296,17 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 
 		if !ok {
 			diags.AddError(
-				"Extra VolumesValue Attribute Value",
-				"While creating a VolumesValue value, an extra attribute value was detected. "+
-					"A VolumesValue must not contain values beyond the expected attribute types. "+
+				"Extra LinkedVolumesValue Attribute Value",
+				"While creating a LinkedVolumesValue value, an extra attribute value was detected. "+
+					"A LinkedVolumesValue must not contain values beyond the expected attribute types. "+
 					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("Extra VolumesValue Attribute Name: %s", name),
+					fmt.Sprintf("Extra LinkedVolumesValue Attribute Name: %s", name),
 			)
 		}
 	}
 
 	if diags.HasError() {
-		return NewVolumesValueUnknown(), diags
+		return NewLinkedVolumesValueUnknown(), diags
 	}
 
 	deleteOnVmDeletionAttribute, ok := attributes["delete_on_vm_deletion"]
@@ -315,7 +316,7 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 			"Attribute Missing",
 			`delete_on_vm_deletion is missing from object`)
 
-		return NewVolumesValueUnknown(), diags
+		return NewLinkedVolumesValueUnknown(), diags
 	}
 
 	deleteOnVmDeletionVal, ok := deleteOnVmDeletionAttribute.(basetypes.BoolValue)
@@ -333,7 +334,7 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 			"Attribute Missing",
 			`device_name is missing from object`)
 
-		return NewVolumesValueUnknown(), diags
+		return NewLinkedVolumesValueUnknown(), diags
 	}
 
 	deviceNameVal, ok := deviceNameAttribute.(basetypes.StringValue)
@@ -351,7 +352,7 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 			"Attribute Missing",
 			`state is missing from object`)
 
-		return NewVolumesValueUnknown(), diags
+		return NewLinkedVolumesValueUnknown(), diags
 	}
 
 	stateVal, ok := stateAttribute.(basetypes.StringValue)
@@ -369,7 +370,7 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 			"Attribute Missing",
 			`vm_id is missing from object`)
 
-		return NewVolumesValueUnknown(), diags
+		return NewLinkedVolumesValueUnknown(), diags
 	}
 
 	vmIdVal, ok := vmIdAttribute.(basetypes.StringValue)
@@ -387,7 +388,7 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 			"Attribute Missing",
 			`volume_id is missing from object`)
 
-		return NewVolumesValueUnknown(), diags
+		return NewLinkedVolumesValueUnknown(), diags
 	}
 
 	volumeIdVal, ok := volumeIdAttribute.(basetypes.StringValue)
@@ -399,10 +400,10 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 	}
 
 	if diags.HasError() {
-		return NewVolumesValueUnknown(), diags
+		return NewLinkedVolumesValueUnknown(), diags
 	}
 
-	return VolumesValue{
+	return LinkedVolumesValue{
 		DeleteOnVmDeletion: deleteOnVmDeletionVal,
 		DeviceName:         deviceNameVal,
 		State:              stateVal,
@@ -412,8 +413,8 @@ func NewVolumesValue(attributeTypes map[string]attr.Type, attributes map[string]
 	}, diags
 }
 
-func NewVolumesValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) VolumesValue {
-	object, diags := NewVolumesValue(attributeTypes, attributes)
+func NewLinkedVolumesValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) LinkedVolumesValue {
+	object, diags := NewLinkedVolumesValue(attributeTypes, attributes)
 
 	if diags.HasError() {
 		// This could potentially be added to the diag package.
@@ -427,15 +428,15 @@ func NewVolumesValueMust(attributeTypes map[string]attr.Type, attributes map[str
 				diagnostic.Detail()))
 		}
 
-		panic("NewVolumesValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+		panic("NewLinkedVolumesValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
 	}
 
 	return object
 }
 
-func (t VolumesType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+func (t LinkedVolumesType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
 	if in.Type() == nil {
-		return NewVolumesValueNull(), nil
+		return NewLinkedVolumesValueNull(), nil
 	}
 
 	if !in.Type().Equal(t.TerraformType(ctx)) {
@@ -443,11 +444,11 @@ func (t VolumesType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (
 	}
 
 	if !in.IsKnown() {
-		return NewVolumesValueUnknown(), nil
+		return NewLinkedVolumesValueUnknown(), nil
 	}
 
 	if in.IsNull() {
-		return NewVolumesValueNull(), nil
+		return NewLinkedVolumesValueNull(), nil
 	}
 
 	attributes := map[string]attr.Value{}
@@ -470,16 +471,16 @@ func (t VolumesType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (
 		attributes[k] = a
 	}
 
-	return NewVolumesValueMust(VolumesValue{}.AttributeTypes(ctx), attributes), nil
+	return NewLinkedVolumesValueMust(LinkedVolumesValue{}.AttributeTypes(ctx), attributes), nil
 }
 
-func (t VolumesType) ValueType(ctx context.Context) attr.Value {
-	return VolumesValue{}
+func (t LinkedVolumesType) ValueType(ctx context.Context) attr.Value {
+	return LinkedVolumesValue{}
 }
 
-var _ basetypes.ObjectValuable = VolumesValue{}
+var _ basetypes.ObjectValuable = LinkedVolumesValue{}
 
-type VolumesValue struct {
+type LinkedVolumesValue struct {
 	DeleteOnVmDeletion basetypes.BoolValue   `tfsdk:"delete_on_vm_deletion"`
 	DeviceName         basetypes.StringValue `tfsdk:"device_name"`
 	State              basetypes.StringValue `tfsdk:"state"`
@@ -488,7 +489,7 @@ type VolumesValue struct {
 	state              attr.ValueState
 }
 
-func (v VolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+func (v LinkedVolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
 	attrTypes := make(map[string]tftypes.Type, 5)
 
 	var val tftypes.Value
@@ -560,19 +561,19 @@ func (v VolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, erro
 	}
 }
 
-func (v VolumesValue) IsNull() bool {
+func (v LinkedVolumesValue) IsNull() bool {
 	return v.state == attr.ValueStateNull
 }
 
-func (v VolumesValue) IsUnknown() bool {
+func (v LinkedVolumesValue) IsUnknown() bool {
 	return v.state == attr.ValueStateUnknown
 }
 
-func (v VolumesValue) String() string {
-	return "VolumesValue"
+func (v LinkedVolumesValue) String() string {
+	return "LinkedVolumesValue"
 }
 
-func (v VolumesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+func (v LinkedVolumesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	objVal, diags := types.ObjectValue(
@@ -594,8 +595,8 @@ func (v VolumesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue,
 	return objVal, diags
 }
 
-func (v VolumesValue) Equal(o attr.Value) bool {
-	other, ok := o.(VolumesValue)
+func (v LinkedVolumesValue) Equal(o attr.Value) bool {
+	other, ok := o.(LinkedVolumesValue)
 
 	if !ok {
 		return false
@@ -632,15 +633,15 @@ func (v VolumesValue) Equal(o attr.Value) bool {
 	return true
 }
 
-func (v VolumesValue) Type(ctx context.Context) attr.Type {
-	return VolumesType{
+func (v LinkedVolumesValue) Type(ctx context.Context) attr.Type {
+	return LinkedVolumesType{
 		basetypes.ObjectType{
 			AttrTypes: v.AttributeTypes(ctx),
 		},
 	}
 }
 
-func (v VolumesValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+func (v LinkedVolumesValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
 		"delete_on_vm_deletion": basetypes.BoolType{},
 		"device_name":           basetypes.StringType{},
