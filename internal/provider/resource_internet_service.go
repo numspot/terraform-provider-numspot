@@ -69,7 +69,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 		return
 	}
 
-	createdId := res.JSON201.InternetGatewayId
+	createdId := res.JSON201.Id
 
 	// Call Link Internet Service to VPC
 	netID := data.NetId

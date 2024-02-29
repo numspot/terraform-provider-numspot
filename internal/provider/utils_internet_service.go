@@ -9,15 +9,15 @@ import (
 
 func InternetServiceFromTfToHttp(tf resource_internet_service.InternetServiceModel) *api.InternetService {
 	return &api.InternetService{
-		InternetGatewayId: tf.Id.ValueStringPointer(),
-		VpcId:             tf.NetId.ValueStringPointer(),
-		State:             tf.State.ValueStringPointer(),
+		Id:    tf.Id.ValueStringPointer(),
+		VpcId: tf.NetId.ValueStringPointer(),
+		State: tf.State.ValueStringPointer(),
 	}
 }
 
 func InternetServiceFromHttpToTf(http *api.InternetService) resource_internet_service.InternetServiceModel {
 	return resource_internet_service.InternetServiceModel{
-		Id:    types.StringPointerValue(http.InternetGatewayId),
+		Id:    types.StringPointerValue(http.Id),
 		NetId: types.StringPointerValue(http.VpcId),
 		State: types.StringPointerValue(http.State),
 	}

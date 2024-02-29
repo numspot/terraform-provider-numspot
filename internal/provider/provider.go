@@ -367,5 +367,6 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewVpnConnectionResource,
 		NewVmResource,
 		NewKeyPairResource,
+		NewDhcpOptionsResource,
 	}
 }

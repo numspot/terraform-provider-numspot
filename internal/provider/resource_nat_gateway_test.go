@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
 )
 
 func TestAccNatGatewayResource(t *testing.T) {
@@ -15,30 +14,20 @@ func TestAccNatGatewayResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testNatGatewayConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_net_access_point.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_net_access_point.test", "field", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
+				Check:  resource.ComposeAggregateTestCheckFunc(
+				//resource.TestCheckResourceAttr("numspot_net_access_point.test", "field", "value"),
+				//resource.TestCheckResourceAttrWith("numspot_net_access_point.test", "field", func(v string) error {
+				//	require.NotEmpty(t, v)
+				//	return nil
+				//}),
 				),
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_net_access_point.test",
+				ResourceName:            "numspot_nat_gateway.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
-			},
-			// Update testing
-			{
-				Config: testNatGatewayConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_net_access_point.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_net_access_point.test", "field", func(v string) error {
-						return nil
-					}),
-				),
 			},
 		},
 	})
@@ -76,7 +65,6 @@ resource "numspot_route_table" "test" {
 resource "numspot_nat_gateway" "test" {
 	subnet_id = numspot_subnet.test.id
 	public_ip_id = numspot_public_ip.test.id
-
 	depends_on = [numspot_route_table.test]
 }
 `

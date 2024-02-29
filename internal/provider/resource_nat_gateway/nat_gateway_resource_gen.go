@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -35,11 +37,17 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "The public IP associated with the NAT service.",
 							MarkdownDescription: "The public IP associated with the NAT service.",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplace(),
+							},
 						},
 						"public_ip_id": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The allocation ID of the public IP associated with the NAT service.",
 							MarkdownDescription: "The allocation ID of the public IP associated with the NAT service.",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplace(),
+							},
 						},
 					},
 					CustomType: PublicIpsType{

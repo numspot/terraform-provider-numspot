@@ -1002,8 +1002,8 @@ type Image struct {
 
 // InternetService Information about the Internet service.
 type InternetService struct {
-	// InternetGatewayId The ID of the Internet service.
-	InternetGatewayId *string `json:"internetGatewayId,omitempty"`
+	// Id The ID of the Internet service.
+	Id *string `json:"id,omitempty"`
 
 	// State The state of the attachment of the Internet service to the Net (always `available`).
 	State *string `json:"state,omitempty"`
@@ -1137,20 +1137,20 @@ type LinkPublicIpLightForVm struct {
 
 // LinkRouteTable One or more associations between the route table and the Subnets.
 type LinkRouteTable struct {
-	// LinkRouteTableId The ID of the association between the route table and the Subnet.
-	LinkRouteTableId *string `json:"linkRouteTableId,omitempty"`
+	// Id The ID of the association between the route table and the Subnet.
+	Id *string `json:"id,omitempty"`
 
 	// Main If true, the route table is the main one.
 	Main *bool `json:"main,omitempty"`
-
-	// NetId The ID of the Net.
-	NetId *string `json:"netId,omitempty"`
 
 	// RouteTableId The ID of the route table.
 	RouteTableId *string `json:"routeTableId,omitempty"`
 
 	// SubnetId The ID of the Subnet.
 	SubnetId *string `json:"subnetId,omitempty"`
+
+	// VpcId The ID of the Net.
+	VpcId *string `json:"vpcId,omitempty"`
 }
 
 // LinkVirtualGatewayToVpc defines model for LinkVirtualGatewayToVpc.
@@ -1176,14 +1176,14 @@ type LinkedVolume struct {
 	// DeviceName The name of the device.
 	DeviceName *string `json:"deviceName,omitempty"`
 
+	// Id The ID of the volume.
+	Id *string `json:"id,omitempty"`
+
 	// State The state of the attachment of the volume (`attaching` \| `detaching` \| `attached` \| `detached`).
 	State *string `json:"state,omitempty"`
 
 	// VmId The ID of the VM.
 	VmId *string `json:"vmId,omitempty"`
-
-	// VolumeId The ID of the volume.
-	VolumeId *string `json:"volumeId,omitempty"`
 }
 
 // Listener Information about the listener.
@@ -1495,9 +1495,6 @@ type NicLight struct {
 	// MacAddress The Media Access Control (MAC) address of the NIC.
 	MacAddress *string `json:"macAddress,omitempty"`
 
-	// NetId The ID of the Net for the NIC.
-	NetId *string `json:"netId,omitempty"`
-
 	// NicId The ID of the NIC.
 	NicId *string `json:"nicId,omitempty"`
 
@@ -1515,6 +1512,9 @@ type NicLight struct {
 
 	// SubnetId The ID of the Subnet for the NIC.
 	SubnetId *string `json:"subnetId,omitempty"`
+
+	// VpcId The ID of the Net for the NIC.
+	VpcId *string `json:"vpcId,omitempty"`
 }
 
 // PermissionsOnResource Permissions for the resource.
@@ -1939,14 +1939,8 @@ type Route struct {
 	// GatewayId The ID of the Internet service or virtual gateway attached to the Net.
 	GatewayId *string `json:"gatewayId,omitempty"`
 
-	// NatServiceId The ID of a NAT service attached to the Net.
-	NatServiceId *string `json:"natServiceId,omitempty"`
-
-	// NetAccessPointId The ID of the Net access point.
-	NetAccessPointId *string `json:"netAccessPointId,omitempty"`
-
-	// NetPeeringId The ID of the Net peering.
-	NetPeeringId *string `json:"netPeeringId,omitempty"`
+	// NatGatewayId The ID of a NAT service attached to the Net.
+	NatGatewayId *string `json:"natGatewayId,omitempty"`
 
 	// NicId The ID of the NIC.
 	NicId *string `json:"nicId,omitempty"`
@@ -1959,6 +1953,12 @@ type Route struct {
 
 	// VmId The ID of a VM specified in a route in the table.
 	VmId *string `json:"vmId,omitempty"`
+
+	// VpcAccessPointId The ID of the Net access point.
+	VpcAccessPointId *string `json:"vpcAccessPointId,omitempty"`
+
+	// VpcPeeringId The ID of the Net peering.
+	VpcPeeringId *string `json:"vpcPeeringId,omitempty"`
 }
 
 // RouteLight Information about the route.

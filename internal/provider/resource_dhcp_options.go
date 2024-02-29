@@ -62,7 +62,7 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 	res := utils.ExecuteRequest(func() (*api.CreateDhcpOptionsResponse, error) {
 		body := DhcpOptionsFromTfToCreateRequest(ctx, data)
 		return r.client.CreateDhcpOptionsWithResponse(ctx, body)
-	}, http.StatusNoContent, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}

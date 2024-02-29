@@ -22,7 +22,7 @@ func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http api.LinkedV
 			"device_name":           types.StringPointerValue(http.DeviceName),
 			"state":                 types.StringPointerValue(http.State),
 			"vm_id":                 types.StringPointerValue(http.VmId),
-			"volume_id":             types.StringPointerValue(http.VolumeId),
+			"volume_id":             types.StringPointerValue(http.Id),
 		})
 }
 

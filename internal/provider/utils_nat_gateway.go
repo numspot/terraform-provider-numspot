@@ -33,7 +33,7 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *api.NatGateway) (*resourc
 	}
 
 	// PublicIpId must be the id of the first public io
-	publicIpId := (*http.PublicIps)[0].PublicIp
+	publicIpId := (*http.PublicIps)[0].PublicIpId
 
 	return &resource_nat_gateway.NatGatewayModel{
 		Id:         types.StringPointerValue(http.Id),

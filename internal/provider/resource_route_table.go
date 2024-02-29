@@ -239,34 +239,21 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 	}
 
 	for _, link := range links {
-		var unlinkRes, err = r.client.UnlinkRouteTableWithResponse(
-			ctx,
-			data.Id.ValueString(),
-			api.UnlinkRouteTableJSONRequestBody{
-				LinkRouteTableId: link.Id.ValueString(),
-			},
-		)
-		if err != nil {
-			response.Diagnostics.AddError("Failed to delete RouteTable", err.Error())
-			return
-		}
-
-		if unlinkRes.StatusCode() != http.StatusOK {
-			apiError := utils.HandleError(unlinkRes.Body)
-			response.Diagnostics.AddError("Failed to delete RouteTable", apiError.Error())
+		unlinkRes := utils.ExecuteRequest(func() (*api.UnlinkRouteTableResponse, error) {
+			return r.client.UnlinkRouteTableWithResponse(
+				ctx,
+				data.Id.ValueString(),
+				api.UnlinkRouteTableJSONRequestBody{
+					LinkRouteTableId: link.Id.ValueString(),
+				},
+			)
+		}, http.StatusNoContent, &response.Diagnostics)
+		if unlinkRes == nil {
 			return
 		}
 	}
 
-	res, err := r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete RouteTable", err.Error())
-		return
-	}
-
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to delete RouteTable", apiError.Error())
-		return
-	}
+	utils.ExecuteRequest(func() (*api.DeleteRouteTableResponse, error) {
+		return r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusNoContent, &response.Diagnostics)
 }

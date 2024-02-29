@@ -54,7 +54,7 @@ func routeTableLinkFromAPI(ctx context.Context, link api.LinkRouteTable) (resour
 	return resource_route_table.NewLinkRouteTablesValue(
 		resource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"id":             types.StringPointerValue(link.LinkRouteTableId),
+			"id":             types.StringPointerValue(link.Id),
 			"main":           types.BoolPointerValue(link.Main),
 			"route_table_id": types.StringPointerValue(link.RouteTableId),
 			"subnet_id":      types.StringPointerValue(link.SubnetId),
@@ -70,9 +70,9 @@ func routeTableRouteFromAPI(ctx context.Context, route api.Route) (resource_rout
 			"destination_ip_range":   types.StringPointerValue(route.DestinationIpRange),
 			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
 			"gateway_id":             types.StringPointerValue(route.GatewayId),
-			"nat_service_id":         types.StringPointerValue(route.NatServiceId),
-			"net_access_point_id":    types.StringPointerValue(route.NetAccessPointId),
-			"net_peering_id":         types.StringPointerValue(route.NetPeeringId),
+			"nat_service_id":         types.StringPointerValue(route.NatGatewayId),
+			"net_access_point_id":    types.StringPointerValue(route.VpcAccessPointId),
+			"net_peering_id":         types.StringPointerValue(route.VpcPeeringId),
 			"nic_id":                 types.StringPointerValue(route.NicId),
 			"state":                  types.StringPointerValue(route.State),
 			"vm_account_id":          types.StringPointerValue(route.VmAccountId),
