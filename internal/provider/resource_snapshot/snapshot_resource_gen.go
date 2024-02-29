@@ -75,14 +75,14 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 			"source_region_name": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "(When copying) The name of the source Region, which must be the same as the Region of your account.",
-				MarkdownDescription: "(When copying) The name of the source Region, which must be the same as the Region of your account.",
+				Description:         "**(when copying a snapshot)** The name of the source Region, which must be the same as the Region of your account.",
+				MarkdownDescription: "**(when copying a snapshot)** The name of the source Region, which must be the same as the Region of your account.",
 			},
 			"source_snapshot_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "(When copying) The ID of the snapshot you want to copy.",
-				MarkdownDescription: "(When copying) The ID of the snapshot you want to copy.",
+				Description:         "**(when copying a snapshot)** The ID of the snapshot you want to copy.",
+				MarkdownDescription: "**(when copying a snapshot)** The ID of the snapshot you want to copy.",
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,
@@ -92,8 +92,8 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 			"volume_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "(When creating) The ID of the volume you want to create a snapshot of.",
-				MarkdownDescription: "(When creating) The ID of the volume you want to create a snapshot of.",
+				Description:         "**(when creating from a volume)** The ID of the volume you want to create a snapshot of.",
+				MarkdownDescription: "**(when creating from a volume)** The ID of the volume you want to create a snapshot of.",
 			},
 			"volume_size": schema.Int64Attribute{
 				Computed:            true,

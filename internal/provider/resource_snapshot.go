@@ -65,7 +65,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	res := utils.ExecuteRequest(func() (*api.CreateSnapshotResponse, error) {
 		body := SnapshotFromTfToCreateRequest(&data)
 		return r.client.CreateSnapshotWithResponse(ctx, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}
@@ -99,5 +99,5 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSnapshotResponse, error) {
 		return r.client.DeleteSnapshotWithResponse(ctx, data.Id.String())
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 }
