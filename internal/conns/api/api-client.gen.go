@@ -2068,12 +2068,6 @@ type SecurityGroupsMember struct {
 
 // Snapshot Information about the snapshot.
 type Snapshot struct {
-	// AccountAlias The account alias of the owner of the snapshot.
-	AccountAlias *string `json:"accountAlias,omitempty"`
-
-	// AccountId The account ID of the owner of the snapshot.
-	AccountId *string `json:"accountId,omitempty"`
-
 	// CreationDate The date and time of creation of the snapshot.
 	CreationDate *time.Time `json:"creationDate,omitempty"`
 
@@ -2082,9 +2076,6 @@ type Snapshot struct {
 
 	// Id The ID of the snapshot.
 	Id *string `json:"id,omitempty"`
-
-	// PermissionsToCreateVolume Permissions for the resource.
-	PermissionsToCreateVolume *PermissionsOnResource `json:"permissionsToCreateVolume,omitempty"`
 
 	// Progress The progress of the snapshot, as a percentage.
 	Progress *int `json:"progress,omitempty"`
