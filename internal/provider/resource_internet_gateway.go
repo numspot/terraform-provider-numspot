@@ -11,24 +11,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_internet_service"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_internet_gateway"
 )
 
 var (
-	_ resource.Resource                = &InternetServiceResource{}
-	_ resource.ResourceWithConfigure   = &InternetServiceResource{}
-	_ resource.ResourceWithImportState = &InternetServiceResource{}
+	_ resource.Resource                = &InternetGatewayResource{}
+	_ resource.ResourceWithConfigure   = &InternetGatewayResource{}
+	_ resource.ResourceWithImportState = &InternetGatewayResource{}
 )
 
-type InternetServiceResource struct {
+type InternetGatewayResource struct {
 	client *api.ClientWithResponses
 }
 
-func NewInternetServiceResource() resource.Resource {
-	return &InternetServiceResource{}
+func NewInternetGatewayResource() resource.Resource {
+	return &InternetGatewayResource{}
 }
 
-func (r *InternetServiceResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *InternetGatewayResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -46,20 +46,20 @@ func (r *InternetServiceResource) Configure(ctx context.Context, request resourc
 	r.client = client
 }
 
-func (r *InternetServiceResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *InternetGatewayResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *InternetServiceResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
-	response.TypeName = request.ProviderTypeName + "_internet_service"
+func (r *InternetGatewayResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+	response.TypeName = request.ProviderTypeName + "_internet_gateway"
 }
 
-func (r *InternetServiceResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = resource_internet_service.InternetServiceResourceSchema(ctx)
+func (r *InternetGatewayResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+	response.Schema = resource_internet_gateway.InternetGatewayResourceSchema(ctx)
 }
 
-func (r *InternetServiceResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data resource_internet_service.InternetServiceModel
+func (r *InternetGatewayResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+	var data resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.CreateInternetGatewayResponse, error) {
@@ -72,14 +72,14 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	createdId := res.JSON201.Id
 
 	// Call Link Internet Service to VPC
-	netID := data.NetId
-	if !netID.IsNull() {
+	vpcId := data.VpcIp
+	if !vpcId.IsNull() {
 		linRes := utils.ExecuteRequest(func() (*api.LinkInternetGatewayResponse, error) {
 			return r.client.LinkInternetGatewayWithResponse(
 				ctx,
 				*createdId,
 				api.LinkInternetGatewayJSONRequestBody{
-					VpcId: data.NetId.ValueString(),
+					VpcId: data.VpcIp.ValueString(),
 				},
 			)
 		}, http.StatusNoContent, &response.Diagnostics)
@@ -89,13 +89,20 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	}
 
 	// Update state
-	tf := InternetServiceFromHttpToTf(res.JSON201)
-	tf.NetId = data.NetId
+	readRes := utils.ExecuteRequest(func() (*api.ReadInternetGatewaysByIdResponse, error) {
+		return r.client.ReadInternetGatewaysByIdWithResponse(ctx, *createdId)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf := InternetServiceFromHttpToTf(readRes.JSON200)
+	tf.VpcIp = data.VpcIp
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *InternetServiceResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var data resource_internet_service.InternetServiceModel
+func (r *InternetGatewayResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+	var data resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadInternetGatewaysByIdResponse, error) {
@@ -109,21 +116,21 @@ func (r *InternetServiceResource) Read(ctx context.Context, request resource.Rea
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *InternetServiceResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *InternetGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	panic("implement me")
 }
 
-func (r *InternetServiceResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data resource_internet_service.InternetServiceModel
+func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+	var data resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	if !data.NetId.IsNull() {
+	if !data.VpcIp.IsNull() {
 		res := utils.ExecuteRequest(func() (*api.UnlinkInternetGatewayResponse, error) {
 			return r.client.UnlinkInternetGatewayWithResponse(
 				ctx,
 				data.Id.ValueString(),
 				api.UnlinkInternetGatewayJSONRequestBody{
-					VpcId: data.NetId.ValueString(),
+					VpcId: data.VpcIp.ValueString(),
 				})
 		}, http.StatusNoContent, &response.Diagnostics)
 		if res == nil {
