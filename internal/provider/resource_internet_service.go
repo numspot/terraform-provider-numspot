@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -69,10 +68,8 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	if res == nil || res.JSON201 == nil {
 		return
 	}
-	//TODO: remove this tmp fix when OAS/API alignment fix is done and use res.JSON201.Id
-	var resBody map[string]string
-	json.Unmarshal(res.Body, &resBody)
-	createdId := resBody["internetGatewayId"]
+
+	createdId := res.JSON201.Id
 
 	// Call Link Internet Service to VPC
 	netID := data.NetId
@@ -81,7 +78,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 			return r.client.LinkInternetGatewayWithResponse(
 				ctx,
 				spaceID,
-				createdId,
+				*createdId,
 				api.LinkInternetGatewayJSONRequestBody{
 					VpcId: data.NetId.ValueString(),
 				},
