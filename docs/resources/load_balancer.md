@@ -18,33 +18,29 @@ description: |-
 ### Required
 
 - `listeners` (Attributes List) One or more listeners to create. (see [below for nested schema](#nestedatt--listeners))
-- `load_balancer_name` (String) The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).
+- `name` (String) The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).
 
 ### Optional
 
+- `backend_ips` (List of String) One or more public IPs of back-end VMs.
+- `backend_vm_ids` (List of String) One or more IDs of back-end VMs for the load balancer.
+- `health_check` (Attributes) Information about the health check configuration. (see [below for nested schema](#nestedatt--health_check))
 - `id` (String) ID for /loadBalancers
-- `load_balancer_type` (String) The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.
 - `public_ip` (String) (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by 3DS OUTSCALE is associated.
 - `security_groups` (List of String) (Net only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Net is assigned to the load balancer.
 - `subnets` (List of String) (Net only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Net.
+- `subregion_names` (List of String) The ID of the Subregion in which the load balancer was created.
+- `type` (String) The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.
 
 ### Read-Only
 
 - `application_sticky_cookie_policies` (Attributes List) The stickiness policies defined for the load balancer. (see [below for nested schema](#nestedatt--application_sticky_cookie_policies))
-- `backend_ips` (List of String) One or more public IPs of back-end VMs.
-- `backend_vm_ids` (List of String) One or more IDs of back-end VMs for the load balancer.
 - `dns_name` (String) The DNS name of the load balancer.
-- `health_check` (Attributes) Information about the health check configuration. (see [below for nested schema](#nestedatt--health_check))
-- `name` (String) The name of the load balancer.
 - `net_id` (String) The ID of the Net for the load balancer.
 - `secured_cookies` (Boolean) Whether secure cookies are enabled for the load balancer.
 - `source_security_group` (Attributes) Information about the source security group of the load balancer, which you can use as part of your inbound rules for your registered VMs.<br />
 To only allow traffic from load balancers, add a security group rule that specifies this source security group as the inbound source. (see [below for nested schema](#nestedatt--source_security_group))
 - `sticky_cookie_policies` (Attributes List) The policies defined for the load balancer. (see [below for nested schema](#nestedatt--sticky_cookie_policies))
-- `subregion_names` (List of String) The ID of the Subregion in which the load balancer was created.
-- `type` (String) The type of load balancer. Valid only for load balancers in a Net.<br />
-If `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />
-If `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.
 
 <a id="nestedatt--listeners"></a>
 ### Nested Schema for `listeners`
@@ -65,19 +61,10 @@ Read-Only:
 - `server_certificate_id` (String) The OUTSCALE Resource Name (ORN) of the server certificate. For more information, see [Resource Identifiers > OUTSCALE Resource Names (ORNs)](https://docs.outscale.com/en/userguide/Resource-Identifiers.html#_outscale_resource_names_orns).
 
 
-<a id="nestedatt--application_sticky_cookie_policies"></a>
-### Nested Schema for `application_sticky_cookie_policies`
-
-Read-Only:
-
-- `cookie_name` (String) The name of the application cookie used for stickiness.
-- `policy_name` (String) The mnemonic name for the policy being created. The name must be unique within a set of policies for this load balancer.
-
-
 <a id="nestedatt--health_check"></a>
 ### Nested Schema for `health_check`
 
-Read-Only:
+Optional:
 
 - `check_interval` (Number) The number of seconds between two pings (between `5` and `600` both included).
 - `healthy_threshold` (Number) The number of consecutive successful pings before considering the VM as healthy (between `2` and `10` both included).
@@ -86,6 +73,15 @@ Read-Only:
 - `protocol` (String) The protocol for the URL of the VM (`HTTP` \| `HTTPS` \| `TCP` \| `SSL`).
 - `timeout` (Number) The maximum waiting time for a response before considering the VM as unhealthy, in seconds (between `2` and `60` both included).
 - `unhealthy_threshold` (Number) The number of consecutive failed pings before considering the VM as unhealthy (between `2` and `10` both included).
+
+
+<a id="nestedatt--application_sticky_cookie_policies"></a>
+### Nested Schema for `application_sticky_cookie_policies`
+
+Read-Only:
+
+- `cookie_name` (String) The name of the application cookie used for stickiness.
+- `policy_name` (String) The mnemonic name for the policy being created. The name must be unique within a set of policies for this load balancer.
 
 
 <a id="nestedatt--source_security_group"></a>
