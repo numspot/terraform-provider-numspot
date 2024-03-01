@@ -65,7 +65,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	res := utils.ExecuteRequest(func() (*api.CreateVolumeResponse, error) {
 		body := VolumeFromTfToCreateRequest(&data)
 		return r.client.CreateVolumeWithResponse(ctx, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}

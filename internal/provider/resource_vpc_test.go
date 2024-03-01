@@ -21,8 +21,8 @@ func TestAccNetResource(t *testing.T) {
 			{
 				Config: testNetConfig(ipRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_net.test", "ip_range", ipRange),
-					resource.TestCheckResourceAttrWith("numspot_net.test", "id", func(v string) error {
+					resource.TestCheckResourceAttr("numspot_vpc.test", "ip_range", ipRange),
+					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
 						previousId = v
 						return nil
@@ -31,7 +31,7 @@ func TestAccNetResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_net.test",
+				ResourceName:            "numspot_vpc.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
@@ -40,8 +40,8 @@ func TestAccNetResource(t *testing.T) {
 			{
 				Config: testNetConfig(ipRangeUpdated),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_net.test", "ip_range", ipRangeUpdated),
-					resource.TestCheckResourceAttrWith("numspot_net.test", "id", func(v string) error {
+					resource.TestCheckResourceAttr("numspot_vpc.test", "ip_range", ipRangeUpdated),
+					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
 						require.NotEqual(t, previousId, v)
 						return nil
 					}),
@@ -53,7 +53,7 @@ func TestAccNetResource(t *testing.T) {
 
 func testNetConfig(ipRange string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "test" {
+resource "numspot_vpc" "test" {
 	ip_range=%[1]q
 }`, ipRange)
 }

@@ -54,7 +54,7 @@ func VolumeFromTfToCreateRequest(tf *resource_volume.VolumeModel) api.CreateVolu
 	return api.CreateVolumeJSONRequestBody{
 		Iops:                 utils.FromTfInt64ToIntPtr(tf.Iops),
 		Size:                 utils.FromTfInt64ToIntPtr(tf.Size),
-		SnapshotId:           tf.SnapshotId.ValueStringPointer(),
+		SnapshotId:           nil,
 		AvailabilityZoneName: tf.AvailabilityZoneName.ValueString(),
 		Type:                 tf.Type.ValueStringPointer(),
 	}

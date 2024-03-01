@@ -71,6 +71,10 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	}
 
 	tf := SnapshotFromHttpToTf(res.JSON201)
+
+	tf.SourceSnapshotId = data.SourceSnapshotId
+	tf.SourceRegionName = data.SourceRegionName
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -86,6 +90,10 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	}
 
 	tf := SnapshotFromHttpToTf(res.JSON200)
+
+	tf.SourceSnapshotId = data.SourceSnapshotId
+	tf.SourceRegionName = data.SourceRegionName
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

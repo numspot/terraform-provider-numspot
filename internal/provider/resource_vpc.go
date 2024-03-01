@@ -13,24 +13,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_net"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
 )
 
 var (
-	_ resource.Resource                = &NetResource{}
-	_ resource.ResourceWithConfigure   = &NetResource{}
-	_ resource.ResourceWithImportState = &NetResource{}
+	_ resource.Resource                = &VpcResource{}
+	_ resource.ResourceWithConfigure   = &VpcResource{}
+	_ resource.ResourceWithImportState = &VpcResource{}
 )
 
-type NetResource struct {
+type VpcResource struct {
 	client *api.ClientWithResponses
 }
 
 func NewNetResource() resource.Resource {
-	return &NetResource{}
+	return &VpcResource{}
 }
 
-func (r *NetResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *VpcResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -48,20 +48,20 @@ func (r *NetResource) Configure(ctx context.Context, request resource.ConfigureR
 	r.client = client
 }
 
-func (r *NetResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *VpcResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *NetResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
-	response.TypeName = request.ProviderTypeName + "_net"
+func (r *VpcResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+	response.TypeName = request.ProviderTypeName + "_vpc"
 }
 
-func (r *NetResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = resource_net.NetResourceSchema(ctx)
+func (r *VpcResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+	response.Schema = resource_vpc.VpcResourceSchema(ctx)
 }
 
-func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data resource_net.NetModel
+func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.CreateVpcResponse, error) {
@@ -100,8 +100,8 @@ func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *NetResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var data resource_net.NetModel
+func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
@@ -115,12 +115,12 @@ func (r *NetResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *NetResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	panic("implement me")
 }
 
-func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data resource_net.NetModel
+func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVpcResponse, error) {

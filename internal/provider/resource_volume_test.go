@@ -51,8 +51,3 @@ resource "numspot_volume" "test" {
 }
 `
 }
-
-func testVolumeConfig_Update() string {
-	return `resource "numspot_volume" "test" {
-}`
-}
