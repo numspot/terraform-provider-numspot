@@ -3,7 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"net/http"
+	"time"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
@@ -70,11 +72,36 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	tf, diags := VolumeFromHttpToTf(ctx, res.JSON201)
+	createStateConf := &retry.StateChangeConf{
+		Pending: []string{"creating"},
+		Target:  []string{"available"},
+		Refresh: func() (result interface{}, state string, err error) {
+			readRes := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
+				return r.client.ReadVolumesByIdWithResponse(ctx, *res.JSON201.Id)
+			}, http.StatusOK, &response.Diagnostics)
+			if readRes == nil {
+				return
+			}
+
+			return readRes.JSON200, *readRes.JSON200.State, nil
+		},
+		Timeout: 5 * time.Minute,
+		Delay:   3 * time.Second,
+	}
+
+	read, err := createStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", *res.JSON201.Id, err))
+		return
+	}
+
+	rr := read.(*api.Volume)
+	tf, diags := VolumeFromHttpToTf(ctx, rr)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
 	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -83,8 +110,11 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
-		return r.client.ReadVolumesByIdWithResponse(ctx, data.Id.String())
+		return r.client.ReadVolumesByIdWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
 
 	tf, diags := VolumeFromHttpToTf(ctx, res.JSON200)
 	if diags.HasError() {
@@ -95,7 +125,51 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 }
 
 func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var state, plan resource_volume.VolumeModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	updatedRes := utils.ExecuteRequest(func() (*api.UpdateVolumeResponse, error) {
+		body := ValueFromTfToUpdaterequest(&plan)
+		return r.client.UpdateVolumeWithResponse(ctx, state.Id.ValueString(), body)
+	}, http.StatusOK, &response.Diagnostics)
+	if updatedRes == nil {
+		return
+	}
+
+	volumeId := state.Id.ValueString()
+	updateStateConf := &retry.StateChangeConf{
+		Pending: []string{"creating", "updating"},
+		Target:  []string{"available"},
+		Refresh: func() (result interface{}, state string, err error) {
+			readRes := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
+				return r.client.ReadVolumesByIdWithResponse(ctx, volumeId)
+			}, http.StatusOK, &response.Diagnostics)
+			if readRes == nil {
+				return
+			}
+
+			return readRes.JSON200, *readRes.JSON200.State, nil
+		},
+		Timeout: 5 * time.Minute,
+		Delay:   3 * time.Second,
+	}
+
+	read, err := updateStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
+		return
+	}
+
+	rr := read.(*api.Volume)
+	tf, diags := VolumeFromHttpToTf(ctx, rr)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
@@ -103,6 +177,6 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteVolumeResponse, error) {
-		return r.client.DeleteVolumeWithResponse(ctx, data.Id.String())
-	}, http.StatusOK, &response.Diagnostics)
+		return r.client.DeleteVolumeWithResponse(ctx, data.Id.ValueString())
+	}, http.StatusNoContent, &response.Diagnostics)
 }

@@ -51,11 +51,29 @@ func VolumeFromHttpToTf(ctx context.Context, http *api.Volume) (resource_volume.
 }
 
 func VolumeFromTfToCreateRequest(tf *resource_volume.VolumeModel) api.CreateVolumeJSONRequestBody {
+	var httpIops *int
+	if !tf.Iops.IsUnknown() && !tf.Iops.IsNull() {
+		httpIops = utils.FromTfInt64ToIntPtr(tf.Iops)
+	}
+
 	return api.CreateVolumeJSONRequestBody{
-		Iops:                 utils.FromTfInt64ToIntPtr(tf.Iops),
+		Iops:                 httpIops,
 		Size:                 utils.FromTfInt64ToIntPtr(tf.Size),
-		SnapshotId:           nil,
+		SnapshotId:           tf.SnapshotId.ValueString(),
 		AvailabilityZoneName: tf.AvailabilityZoneName.ValueString(),
 		Type:                 tf.Type.ValueStringPointer(),
+	}
+}
+
+func ValueFromTfToUpdaterequest(tf *resource_volume.VolumeModel) api.UpdateVolumeJSONRequestBody {
+	var httpIops *int
+	if !tf.Iops.IsUnknown() && !tf.Iops.IsNull() {
+		httpIops = utils.FromTfInt64ToIntPtr(tf.Iops)
+	}
+
+	return api.UpdateVolumeJSONRequestBody{
+		Iops:       httpIops,
+		Size:       utils.FromTfInt64ToIntPtr(tf.Size),
+		VolumeType: tf.Type.ValueStringPointer(),
 	}
 }
