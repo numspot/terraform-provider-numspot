@@ -57,12 +57,12 @@ func TestAccSubnetResource(t *testing.T) {
 
 func testSubnetConfig(netIpRange, subnetIpRange string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "main" {
+resource "numspot_vpc" "main" {
 	ip_range = %[1]q
 }
 
 resource "numspot_subnet" "test" {
-	net_id 		= numspot_net.main.id
+	vpc_id 		= numspot_vpc.main.id
 	ip_range 	= %[2]q
 }`, netIpRange, subnetIpRange)
 }
@@ -116,12 +116,12 @@ func TestAccSubnetResource_MapPublicIp(t *testing.T) {
 
 func testSubnetConfig_MapPublicIp(netIpRange, subnetIpRange string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "main" {
+resource "numspot_vpc" "main" {
 	ip_range = %[1]q
 }
 
 resource "numspot_subnet" "test" {
-	net_id 		= numspot_net.main.id
+	vpc_id 		= numspot_vpc.main.id
 	ip_range 	= %[2]q
 	map_public_ip_on_launch = true
 }`, netIpRange, subnetIpRange)

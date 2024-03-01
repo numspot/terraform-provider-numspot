@@ -14,6 +14,15 @@ import (
 func SubnetResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"availability_zone_name": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "The name of the Subregion in which you want to create the Subnet.",
+				MarkdownDescription: "The name of the Subregion in which you want to create the Subnet.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
 			"available_ips_count": schema.Int64Attribute{
 				Computed:            true,
 				Description:         "The number of available IPs in the Subnets.",
@@ -26,44 +35,41 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"ip_range": schema.StringAttribute{
 				Required:            true,
-				Description:         "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About VPCs](https://docs.outscale.com/en/userguide/About-VPCs.html).",
-				MarkdownDescription: "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About VPCs](https://docs.outscale.com/en/userguide/About-VPCs.html).",
+				Description:         "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About Nets](https://docs.outscale.com/en/userguide/About-Nets.html).",
+				MarkdownDescription: "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About Nets](https://docs.outscale.com/en/userguide/About-Nets.html).",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"map_public_ip_on_launch": schema.BoolAttribute{
 				Computed:            true,
-				Optional:            true,
+				Optional: 			 true,
 				Description:         "If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.",
 				MarkdownDescription: "If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.",
-			},
-			"net_id": schema.StringAttribute{
-				Required:            true,
-				Description:         "The ID of the Net for which you want to create a Subnet.",
-				MarkdownDescription: "The ID of the Net for which you want to create a Subnet.",
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The state of the Subnet (`pending` \\| `available` \\| `deleted`).",
 				MarkdownDescription: "The state of the Subnet (`pending` \\| `available` \\| `deleted`).",
 			},
-			"subregion_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The name of the Subregion in which you want to create the Subnet.",
-				MarkdownDescription: "The name of the Subregion in which you want to create the Subnet.",
+			"vpc_id": schema.StringAttribute{
+				Required:            true,
+				Description:         "The ID of the Net for which you want to create a Subnet.",
+				MarkdownDescription: "The ID of the Net for which you want to create a Subnet.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 		},
 	}
 }
 
 type SubnetModel struct {
-	AvailableIpsCount   types.Int64  `tfsdk:"available_ips_count"`
-	Id                  types.String `tfsdk:"id"`
-	IpRange             types.String `tfsdk:"ip_range"`
-	MapPublicIpOnLaunch types.Bool   `tfsdk:"map_public_ip_on_launch"`
-	NetId               types.String `tfsdk:"net_id"`
-	State               types.String `tfsdk:"state"`
-	SubregionName       types.String `tfsdk:"subregion_name"`
+	AvailabilityZoneName types.String `tfsdk:"availability_zone_name"`
+	AvailableIpsCount    types.Int64  `tfsdk:"available_ips_count"`
+	Id                   types.String `tfsdk:"id"`
+	IpRange              types.String `tfsdk:"ip_range"`
+	MapPublicIpOnLaunch  types.Bool   `tfsdk:"map_public_ip_on_launch"`
+	State                types.String `tfsdk:"state"`
+	VpcId                types.String `tfsdk:"vpc_id"`
 }

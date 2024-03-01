@@ -10,20 +10,20 @@ import (
 
 func SubnetFromHttpToTf(http *api.Subnet) resource_subnet.SubnetModel {
 	return resource_subnet.SubnetModel{
-		AvailableIpsCount:   utils.FromIntPtrToTfInt64(http.AvailableIpsCount),
-		Id:                  types.StringPointerValue(http.Id),
-		IpRange:             types.StringPointerValue(http.IpRange),
-		MapPublicIpOnLaunch: types.BoolPointerValue(http.MapPublicIpOnLaunch),
-		NetId:               types.StringPointerValue(http.VpcId),
-		State:               types.StringPointerValue(http.State),
-		SubregionName:       types.StringPointerValue(http.AvailabilityZoneName),
+		AvailableIpsCount:    utils.FromIntPtrToTfInt64(http.AvailableIpsCount),
+		Id:                   types.StringPointerValue(http.Id),
+		IpRange:              types.StringPointerValue(http.IpRange),
+		MapPublicIpOnLaunch:  types.BoolPointerValue(http.MapPublicIpOnLaunch),
+		VpcId:                types.StringPointerValue(http.VpcId),
+		State:                types.StringPointerValue(http.State),
+		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 	}
 }
 
 func SubnetFromTfToCreateRequest(tf *resource_subnet.SubnetModel) api.CreateSubnetJSONRequestBody {
 	return api.CreateSubnetJSONRequestBody{
 		IpRange:              tf.IpRange.ValueString(),
-		VpcId:                tf.NetId.ValueString(),
-		AvailabilityZoneName: tf.SubregionName.ValueStringPointer(),
+		VpcId:                tf.VpcId.ValueString(),
+		AvailabilityZoneName: tf.AvailabilityZoneName.ValueStringPointer(),
 	}
 }
