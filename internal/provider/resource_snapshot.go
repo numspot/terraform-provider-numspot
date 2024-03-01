@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"net/http"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -71,9 +72,17 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	}
 
 	tf := SnapshotFromHttpToTf(res.JSON201)
+	if !data.SourceRegionName.IsUnknown() {
+		tf.SourceRegionName = data.SourceRegionName
+	} else {
+		tf.SourceRegionName = types.StringNull()
+	}
 
-	tf.SourceSnapshotId = data.SourceSnapshotId
-	tf.SourceRegionName = data.SourceRegionName
+	if !data.SourceSnapshotId.IsUnknown() {
+		tf.SourceSnapshotId = data.SourceSnapshotId
+	} else {
+		tf.SourceSnapshotId = types.StringNull()
+	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
@@ -83,16 +92,24 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadSnapshotsByIdResponse, error) {
-		return r.client.ReadSnapshotsByIdWithResponse(ctx, data.Id.String())
+		return r.client.ReadSnapshotsByIdWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
 	tf := SnapshotFromHttpToTf(res.JSON200)
+	if !data.SourceRegionName.IsUnknown() {
+		tf.SourceRegionName = data.SourceRegionName
+	} else {
+		tf.SourceRegionName = types.StringNull()
+	}
 
-	tf.SourceSnapshotId = data.SourceSnapshotId
-	tf.SourceRegionName = data.SourceRegionName
+	if !data.SourceSnapshotId.IsUnknown() {
+		tf.SourceSnapshotId = data.SourceSnapshotId
+	} else {
+		tf.SourceSnapshotId = types.StringNull()
+	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
@@ -106,6 +123,6 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSnapshotResponse, error) {
-		return r.client.DeleteSnapshotWithResponse(ctx, data.Id.String())
+		return r.client.DeleteSnapshotWithResponse(ctx, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }
