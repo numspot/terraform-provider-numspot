@@ -91,7 +91,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 
 	// Update state
 	readRes := utils.ExecuteRequest(func() (*api.ReadInternetGatewaysByIdResponse, error) {
-		return r.client.ReadInternetGatewaysByIdWithResponse(ctx, *createdId)
+		return r.client.ReadInternetGatewaysByIdWithResponse(ctx, spaceID, *createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

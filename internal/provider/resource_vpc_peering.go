@@ -55,7 +55,7 @@ func (r *VpcPeeringResource) Create(ctx context.Context, request resource.Create
 
 	res := utils.ExecuteRequest(func() (*api.CreateVpcPeeringResponse, error) {
 		body := VpcPeeringFromTfToCreateRequest(data)
-		return r.client.CreateVpcPeeringWithResponse(ctx, body)
+		return r.client.CreateVpcPeeringWithResponse(ctx, spaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -75,7 +75,7 @@ func (r *VpcPeeringResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpcPeeringsByIdResponse, error) {
-		return r.client.ReadVpcPeeringsByIdWithResponse(ctx, data.Id.ValueString())
+		return r.client.ReadVpcPeeringsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -107,7 +107,7 @@ func (r *VpcPeeringResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVpcPeeringResponse, error) {
-		return r.client.DeleteVpcPeeringWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteVpcPeeringWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

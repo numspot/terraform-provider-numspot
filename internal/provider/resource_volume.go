@@ -77,7 +77,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
 			readRes := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
-				return r.client.ReadVolumesByIdWithResponse(ctx, *res.JSON201.Id)
+				return r.client.ReadVolumesByIdWithResponse(ctx, spaceID, *res.JSON201.Id)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
 				return
@@ -143,7 +143,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
 			readRes := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
-				return r.client.ReadVolumesByIdWithResponse(ctx, volumeId)
+				return r.client.ReadVolumesByIdWithResponse(ctx, spaceID, volumeId)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
 				return
