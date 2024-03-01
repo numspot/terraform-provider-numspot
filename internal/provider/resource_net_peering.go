@@ -60,7 +60,7 @@ func (r *NetPeeringResource) Create(ctx context.Context, request resource.Create
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	body := NetPeeringFromTfToCreateRequest(&data)
-	res, err := r.client.CreateVpcPeeringWithResponse(ctx, body)
+	res, err := r.client.CreateVpcPeeringWithResponse(ctx, spaceID, body)
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to create NetPeering", err.Error())
@@ -82,7 +82,7 @@ func (r *NetPeeringResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement READ operation
-	res, err := r.client.ReadVpcPeeringsByIdWithResponse(ctx, data.Id.String())
+	res, err := r.client.ReadVpcPeeringsByIdWithResponse(ctx, spaceID, data.Id.String())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -109,7 +109,7 @@ func (r *NetPeeringResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	// TODO: Implement DELETE operation
-	res, err := r.client.DeleteVpcPeeringWithResponse(ctx, data.Id.String())
+	res, err := r.client.DeleteVpcPeeringWithResponse(ctx, spaceID, data.Id.String())
 	if err != nil {
 		// TODO: Handle Error
 		response.Diagnostics.AddError("Failed to delete NetPeering", err.Error())

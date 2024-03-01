@@ -2757,6 +2757,9 @@ type VpnOptionsToUpdate struct {
 	TunnelInsideIpRange *string `json:"tunnelInsideIpRange,omitempty"`
 }
 
+// SpaceId defines model for SpaceId.
+type SpaceId = openapi_types.UUID
+
 // AcceptVpcPeeringResponseSchema defines model for AcceptVpcPeeringResponse.
 type AcceptVpcPeeringResponseSchema = AcceptVpcPeering
 
@@ -4716,627 +4719,627 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 // The interface specification for the client above.
 type ClientInterface interface {
 	// DeleteLoadBalancerTagsWithBody request with any body
-	DeleteLoadBalancerTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteLoadBalancerTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	DeleteLoadBalancerTags(ctx context.Context, body DeleteLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteLoadBalancerTags(ctx context.Context, spaceId SpaceId, body DeleteLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateLoadBalancerTagsWithBody request with any body
-	CreateLoadBalancerTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateLoadBalancerTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateLoadBalancerTags(ctx context.Context, body CreateLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateLoadBalancerTags(ctx context.Context, spaceId SpaceId, body CreateLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteTagsWithBody request with any body
-	DeleteTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	DeleteTags(ctx context.Context, body DeleteTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteTags(ctx context.Context, spaceId SpaceId, body DeleteTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateTagsWithBody request with any body
-	CreateTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateTags(ctx context.Context, body CreateTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateTags(ctx context.Context, spaceId SpaceId, body CreateTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadClientGateways request
-	ReadClientGateways(ctx context.Context, params *ReadClientGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadClientGateways(ctx context.Context, spaceId SpaceId, params *ReadClientGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateClientGatewayWithBody request with any body
-	CreateClientGatewayWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateClientGatewayWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateClientGateway(ctx context.Context, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateClientGateway(ctx context.Context, spaceId SpaceId, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteClientGateway request
-	DeleteClientGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteClientGateway(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadClientGatewaysById request
-	ReadClientGatewaysById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadClientGatewaysById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadDhcpOptions request
-	ReadDhcpOptions(ctx context.Context, params *ReadDhcpOptionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadDhcpOptions(ctx context.Context, spaceId SpaceId, params *ReadDhcpOptionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateDhcpOptionsWithBody request with any body
-	CreateDhcpOptionsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateDhcpOptionsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateDhcpOptions(ctx context.Context, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateDhcpOptions(ctx context.Context, spaceId SpaceId, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteDhcpOptions request
-	DeleteDhcpOptions(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteDhcpOptions(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadDhcpOptionsById request
-	ReadDhcpOptionsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadDhcpOptionsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadDirectLinkInterfaces request
-	ReadDirectLinkInterfaces(ctx context.Context, params *ReadDirectLinkInterfacesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadDirectLinkInterfaces(ctx context.Context, spaceId SpaceId, params *ReadDirectLinkInterfacesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateDirectLinkInterfaceWithBody request with any body
-	CreateDirectLinkInterfaceWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateDirectLinkInterfaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateDirectLinkInterface(ctx context.Context, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateDirectLinkInterface(ctx context.Context, spaceId SpaceId, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteDirectLinkInterface request
-	DeleteDirectLinkInterface(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteDirectLinkInterface(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadDirectLinkInterfacesById request
-	ReadDirectLinkInterfacesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadDirectLinkInterfacesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateDirectLinkInterfaceWithBody request with any body
-	UpdateDirectLinkInterfaceWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateDirectLinkInterfaceWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateDirectLinkInterface(ctx context.Context, id string, body UpdateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateDirectLinkInterface(ctx context.Context, spaceId SpaceId, id string, body UpdateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadDirectLinks request
-	ReadDirectLinks(ctx context.Context, params *ReadDirectLinksParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadDirectLinks(ctx context.Context, spaceId SpaceId, params *ReadDirectLinksParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateDirectLinkWithBody request with any body
-	CreateDirectLinkWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateDirectLinkWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateDirectLink(ctx context.Context, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateDirectLink(ctx context.Context, spaceId SpaceId, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteDirectLink request
-	DeleteDirectLink(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteDirectLink(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadDirectLinksById request
-	ReadDirectLinksById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadDirectLinksById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadFlexibleGpuCatalog request
-	ReadFlexibleGpuCatalog(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadFlexibleGpuCatalog(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadFlexibleGpus request
-	ReadFlexibleGpus(ctx context.Context, params *ReadFlexibleGpusParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadFlexibleGpus(ctx context.Context, spaceId SpaceId, params *ReadFlexibleGpusParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateFlexibleGpuWithBody request with any body
-	CreateFlexibleGpuWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateFlexibleGpuWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateFlexibleGpu(ctx context.Context, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateFlexibleGpu(ctx context.Context, spaceId SpaceId, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteFlexibleGpu request
-	DeleteFlexibleGpu(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteFlexibleGpu(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadFlexibleGpusById request
-	ReadFlexibleGpusById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadFlexibleGpusById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateFlexibleGpuWithBody request with any body
-	UpdateFlexibleGpuWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateFlexibleGpuWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateFlexibleGpu(ctx context.Context, id string, body UpdateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateFlexibleGpu(ctx context.Context, spaceId SpaceId, id string, body UpdateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkFlexibleGpuWithBody request with any body
-	LinkFlexibleGpuWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkFlexibleGpuWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	LinkFlexibleGpu(ctx context.Context, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkFlexibleGpu(ctx context.Context, spaceId SpaceId, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkFlexibleGpu request
-	UnlinkFlexibleGpu(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkFlexibleGpu(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadImages request
-	ReadImages(ctx context.Context, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadImages(ctx context.Context, spaceId SpaceId, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateImageWithBody request with any body
-	CreateImageWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateImageWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateImage(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateImage(ctx context.Context, spaceId SpaceId, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteImage request
-	DeleteImage(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteImage(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadImagesById request
-	ReadImagesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadImagesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateImageWithBody request with any body
-	UpdateImageWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateImageWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateImage(ctx context.Context, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateImage(ctx context.Context, spaceId SpaceId, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadInternetGateways request
-	ReadInternetGateways(ctx context.Context, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadInternetGateways(ctx context.Context, spaceId SpaceId, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateInternetGateway request
-	CreateInternetGateway(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateInternetGateway(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteInternetGateway request
-	DeleteInternetGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteInternetGateway(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadInternetGatewaysById request
-	ReadInternetGatewaysById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadInternetGatewaysById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkInternetGatewayWithBody request with any body
-	LinkInternetGatewayWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkInternetGatewayWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	LinkInternetGateway(ctx context.Context, id string, body LinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkInternetGateway(ctx context.Context, spaceId SpaceId, id string, body LinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkInternetGatewayWithBody request with any body
-	UnlinkInternetGatewayWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkInternetGatewayWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UnlinkInternetGateway(ctx context.Context, id string, body UnlinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkInternetGateway(ctx context.Context, spaceId SpaceId, id string, body UnlinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadKeypairs request
-	ReadKeypairs(ctx context.Context, params *ReadKeypairsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadKeypairs(ctx context.Context, spaceId SpaceId, params *ReadKeypairsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateKeypairWithBody request with any body
-	CreateKeypairWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateKeypairWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateKeypair(ctx context.Context, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateKeypair(ctx context.Context, spaceId SpaceId, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteKeypair request
-	DeleteKeypair(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteKeypair(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadKeypairsById request
-	ReadKeypairsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadKeypairsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadListenerRules request
-	ReadListenerRules(ctx context.Context, params *ReadListenerRulesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadListenerRules(ctx context.Context, spaceId SpaceId, params *ReadListenerRulesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateListenerRuleWithBody request with any body
-	CreateListenerRuleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateListenerRuleWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateListenerRule(ctx context.Context, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateListenerRule(ctx context.Context, spaceId SpaceId, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteListenerRule request
-	DeleteListenerRule(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteListenerRule(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadListenerRulesById request
-	ReadListenerRulesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadListenerRulesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateListenerRuleWithBody request with any body
-	UpdateListenerRuleWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateListenerRuleWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateListenerRule(ctx context.Context, id string, body UpdateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateListenerRule(ctx context.Context, spaceId SpaceId, id string, body UpdateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadLoadBalancers request
-	ReadLoadBalancers(ctx context.Context, params *ReadLoadBalancersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadLoadBalancers(ctx context.Context, spaceId SpaceId, params *ReadLoadBalancersParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateLoadBalancerWithBody request with any body
-	CreateLoadBalancerWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateLoadBalancerWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateLoadBalancer(ctx context.Context, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateLoadBalancer(ctx context.Context, spaceId SpaceId, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteLoadBalancer request
-	DeleteLoadBalancer(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteLoadBalancer(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadLoadBalancersById request
-	ReadLoadBalancersById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadLoadBalancersById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateLoadBalancerWithBody request with any body
-	UpdateLoadBalancerWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateLoadBalancerWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateLoadBalancer(ctx context.Context, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateLoadBalancer(ctx context.Context, spaceId SpaceId, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkLoadBalancerBackendMachinesWithBody request with any body
-	LinkLoadBalancerBackendMachinesWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkLoadBalancerBackendMachinesWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	LinkLoadBalancerBackendMachines(ctx context.Context, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkLoadBalancerBackendMachines(ctx context.Context, spaceId SpaceId, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkLoadBalancerBackendMachinesWithBody request with any body
-	UnlinkLoadBalancerBackendMachinesWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkLoadBalancerBackendMachinesWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UnlinkLoadBalancerBackendMachines(ctx context.Context, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkLoadBalancerBackendMachines(ctx context.Context, spaceId SpaceId, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteLoadBalancerListenersWithBody request with any body
-	DeleteLoadBalancerListenersWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteLoadBalancerListenersWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	DeleteLoadBalancerListeners(ctx context.Context, id string, body DeleteLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteLoadBalancerListeners(ctx context.Context, spaceId SpaceId, id string, body DeleteLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateLoadBalancerListenersWithBody request with any body
-	CreateLoadBalancerListenersWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateLoadBalancerListenersWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateLoadBalancerListeners(ctx context.Context, id string, body CreateLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateLoadBalancerListeners(ctx context.Context, spaceId SpaceId, id string, body CreateLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteLoadBalancerPolicyWithBody request with any body
-	DeleteLoadBalancerPolicyWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteLoadBalancerPolicyWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	DeleteLoadBalancerPolicy(ctx context.Context, id string, body DeleteLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteLoadBalancerPolicy(ctx context.Context, spaceId SpaceId, id string, body DeleteLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateLoadBalancerPolicyWithBody request with any body
-	CreateLoadBalancerPolicyWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateLoadBalancerPolicyWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateLoadBalancerPolicy(ctx context.Context, id string, body CreateLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateLoadBalancerPolicy(ctx context.Context, spaceId SpaceId, id string, body CreateLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVmsHealthWithBody request with any body
-	ReadVmsHealthWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVmsHealthWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	ReadVmsHealth(ctx context.Context, id string, body ReadVmsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVmsHealth(ctx context.Context, spaceId SpaceId, id string, body ReadVmsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadLoadBalancerTagsWithBody request with any body
-	ReadLoadBalancerTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadLoadBalancerTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	ReadLoadBalancerTags(ctx context.Context, body ReadLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadLoadBalancerTags(ctx context.Context, spaceId SpaceId, body ReadLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadLocations request
-	ReadLocations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadLocations(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadNatGateway request
-	ReadNatGateway(ctx context.Context, params *ReadNatGatewayParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadNatGateway(ctx context.Context, spaceId SpaceId, params *ReadNatGatewayParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateNatGatewayWithBody request with any body
-	CreateNatGatewayWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateNatGatewayWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateNatGateway(ctx context.Context, body CreateNatGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateNatGateway(ctx context.Context, spaceId SpaceId, body CreateNatGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteNatGateway request
-	DeleteNatGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteNatGateway(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadNatGatewayById request
-	ReadNatGatewayById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadNatGatewayById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadNics request
-	ReadNics(ctx context.Context, params *ReadNicsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadNics(ctx context.Context, spaceId SpaceId, params *ReadNicsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateNicWithBody request with any body
-	CreateNicWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateNicWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateNic(ctx context.Context, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateNic(ctx context.Context, spaceId SpaceId, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteNic request
-	DeleteNic(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteNic(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadNicsById request
-	ReadNicsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadNicsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateNicWithBody request with any body
-	UpdateNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateNicWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateNic(ctx context.Context, id string, body UpdateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateNic(ctx context.Context, spaceId SpaceId, id string, body UpdateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkPrivateIpsWithBody request with any body
-	LinkPrivateIpsWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkPrivateIpsWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	LinkPrivateIps(ctx context.Context, id string, body LinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkPrivateIps(ctx context.Context, spaceId SpaceId, id string, body LinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkPrivateIpsWithBody request with any body
-	UnlinkPrivateIpsWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkPrivateIpsWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UnlinkPrivateIps(ctx context.Context, id string, body UnlinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkPrivateIps(ctx context.Context, spaceId SpaceId, id string, body UnlinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkNicWithBody request with any body
-	LinkNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkNicWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	LinkNic(ctx context.Context, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkNic(ctx context.Context, spaceId SpaceId, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkNicWithBody request with any body
-	UnlinkNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkNicWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UnlinkNic(ctx context.Context, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkNic(ctx context.Context, spaceId SpaceId, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadProductTypes request
-	ReadProductTypes(ctx context.Context, params *ReadProductTypesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadProductTypes(ctx context.Context, spaceId SpaceId, params *ReadProductTypesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateProductTypeWithBody request with any body
-	CreateProductTypeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateProductTypeWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateProductType(ctx context.Context, body CreateProductTypeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateProductType(ctx context.Context, spaceId SpaceId, body CreateProductTypeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadProductTypesById request
-	ReadProductTypesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadProductTypesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadPublicIpRanges request
-	ReadPublicIpRanges(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadPublicIpRanges(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadPublicIps request
-	ReadPublicIps(ctx context.Context, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadPublicIps(ctx context.Context, spaceId SpaceId, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreatePublicIp request
-	CreatePublicIp(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreatePublicIp(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeletePublicIp request
-	DeletePublicIp(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeletePublicIp(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadPublicIpsById request
-	ReadPublicIpsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadPublicIpsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkPublicIpWithBody request with any body
-	LinkPublicIpWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkPublicIpWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	LinkPublicIp(ctx context.Context, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkPublicIp(ctx context.Context, spaceId SpaceId, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkPublicIpWithBody request with any body
-	UnlinkPublicIpWithBody(ctx context.Context, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkPublicIpWithBody(ctx context.Context, spaceId SpaceId, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UnlinkPublicIp(ctx context.Context, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkPublicIp(ctx context.Context, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadRouteTables request
-	ReadRouteTables(ctx context.Context, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadRouteTables(ctx context.Context, spaceId SpaceId, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateRouteTableWithBody request with any body
-	CreateRouteTableWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateRouteTableWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateRouteTable(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateRouteTable(ctx context.Context, spaceId SpaceId, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteRouteTable request
-	DeleteRouteTable(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteRouteTable(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadRouteTablesById request
-	ReadRouteTablesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadRouteTablesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteRouteWithBody request with any body
-	DeleteRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	DeleteRoute(ctx context.Context, id string, body DeleteRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteRoute(ctx context.Context, spaceId SpaceId, id string, body DeleteRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateRouteWithBody request with any body
-	CreateRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateRoute(ctx context.Context, id string, body CreateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateRoute(ctx context.Context, spaceId SpaceId, id string, body CreateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateRouteWithBody request with any body
-	UpdateRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateRoute(ctx context.Context, id string, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateRoute(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkRouteTableWithBody request with any body
-	LinkRouteTableWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkRouteTableWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	LinkRouteTable(ctx context.Context, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkRouteTable(ctx context.Context, spaceId SpaceId, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkRouteTableWithBody request with any body
-	UnlinkRouteTableWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkRouteTableWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UnlinkRouteTable(ctx context.Context, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkRouteTable(ctx context.Context, spaceId SpaceId, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateRouteTableRoutePropagationWithBody request with any body
-	UpdateRouteTableRoutePropagationWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateRouteTableRoutePropagationWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateRouteTableRoutePropagation(ctx context.Context, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateRouteTableRoutePropagation(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSecurityGroups request
-	ReadSecurityGroups(ctx context.Context, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadSecurityGroups(ctx context.Context, spaceId SpaceId, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateSecurityGroupWithBody request with any body
-	CreateSecurityGroupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateSecurityGroupWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateSecurityGroup(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateSecurityGroup(ctx context.Context, spaceId SpaceId, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteSecurityGroup request
-	DeleteSecurityGroup(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteSecurityGroup(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSecurityGroupsById request
-	ReadSecurityGroupsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadSecurityGroupsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteSecurityGroupRuleWithBody request with any body
-	DeleteSecurityGroupRuleWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteSecurityGroupRuleWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	DeleteSecurityGroupRule(ctx context.Context, id string, body DeleteSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteSecurityGroupRule(ctx context.Context, spaceId SpaceId, id string, body DeleteSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateSecurityGroupRuleWithBody request with any body
-	CreateSecurityGroupRuleWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateSecurityGroupRuleWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateSecurityGroupRule(ctx context.Context, id string, body CreateSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateSecurityGroupRule(ctx context.Context, spaceId SpaceId, id string, body CreateSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSnapshots request
-	ReadSnapshots(ctx context.Context, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadSnapshots(ctx context.Context, spaceId SpaceId, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateSnapshotWithBody request with any body
-	CreateSnapshotWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateSnapshotWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateSnapshot(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateSnapshot(ctx context.Context, spaceId SpaceId, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteSnapshot request
-	DeleteSnapshot(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteSnapshot(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSnapshotsById request
-	ReadSnapshotsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadSnapshotsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSubnets request
-	ReadSubnets(ctx context.Context, params *ReadSubnetsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadSubnets(ctx context.Context, spaceId SpaceId, params *ReadSubnetsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateSubnetWithBody request with any body
-	CreateSubnetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateSubnetWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateSubnet(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateSubnet(ctx context.Context, spaceId SpaceId, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteSubnet request
-	DeleteSubnet(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteSubnet(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSubnetsById request
-	ReadSubnetsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadSubnetsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateSubnetWithBody request with any body
-	UpdateSubnetWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateSubnetWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateSubnet(ctx context.Context, id string, body UpdateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateSubnet(ctx context.Context, spaceId SpaceId, id string, body UpdateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadTags request
-	ReadTags(ctx context.Context, params *ReadTagsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadTags(ctx context.Context, spaceId SpaceId, params *ReadTagsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVirtualGateways request
-	ReadVirtualGateways(ctx context.Context, params *ReadVirtualGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVirtualGateways(ctx context.Context, spaceId SpaceId, params *ReadVirtualGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateVirtualGatewayWithBody request with any body
-	CreateVirtualGatewayWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVirtualGatewayWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateVirtualGateway(ctx context.Context, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVirtualGateway(ctx context.Context, spaceId SpaceId, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVirtualGateway request
-	DeleteVirtualGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVirtualGateway(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVirtualGatewaysById request
-	ReadVirtualGatewaysById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVirtualGatewaysById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkVirtualGatewayToVpcWithBody request with any body
-	LinkVirtualGatewayToVpcWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkVirtualGatewayToVpcWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	LinkVirtualGatewayToVpc(ctx context.Context, id string, body LinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkVirtualGatewayToVpc(ctx context.Context, spaceId SpaceId, id string, body LinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkVirtualGatewayToVpcWithBody request with any body
-	UnlinkVirtualGatewayToVpcWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkVirtualGatewayToVpcWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UnlinkVirtualGatewayToVpc(ctx context.Context, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkVirtualGatewayToVpc(ctx context.Context, spaceId SpaceId, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVms request
-	ReadVms(ctx context.Context, params *ReadVmsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVms(ctx context.Context, spaceId SpaceId, params *ReadVmsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateVmsWithBody request with any body
-	CreateVmsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVmsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateVms(ctx context.Context, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVms(ctx context.Context, spaceId SpaceId, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVmsState request
-	ReadVmsState(ctx context.Context, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVmsState(ctx context.Context, spaceId SpaceId, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVms request
-	DeleteVms(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVmsById request
-	ReadVmsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVmsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateVmWithBody request with any body
-	UpdateVmWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVmWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateVm(ctx context.Context, id string, body UpdateVmJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVm(ctx context.Context, spaceId SpaceId, id string, body UpdateVmJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadAdminPassword request
-	ReadAdminPassword(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadAdminPassword(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadConsoleOutput request
-	ReadConsoleOutput(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadConsoleOutput(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RebootVms request
-	RebootVms(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RebootVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// StartVms request
-	StartVms(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
+	StartVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// StopVmsWithBody request with any body
-	StopVmsWithBody(ctx context.Context, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	StopVmsWithBody(ctx context.Context, spaceId SpaceId, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	StopVms(ctx context.Context, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	StopVms(ctx context.Context, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVolumes request
-	ReadVolumes(ctx context.Context, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVolumes(ctx context.Context, spaceId SpaceId, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateVolumeWithBody request with any body
-	CreateVolumeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVolumeWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateVolume(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVolume(ctx context.Context, spaceId SpaceId, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVolume request
-	DeleteVolume(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVolume(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVolumesById request
-	ReadVolumesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVolumesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateVolumeWithBody request with any body
-	UpdateVolumeWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVolumeWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateVolume(ctx context.Context, id string, body UpdateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVolume(ctx context.Context, spaceId SpaceId, id string, body UpdateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// LinkVolumeWithBody request with any body
-	LinkVolumeWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkVolumeWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	LinkVolume(ctx context.Context, id string, body LinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	LinkVolume(ctx context.Context, spaceId SpaceId, id string, body LinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkVolumeWithBody request with any body
-	UnlinkVolumeWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkVolumeWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UnlinkVolume(ctx context.Context, id string, body UnlinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkVolume(ctx context.Context, spaceId SpaceId, id string, body UnlinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVpcAccessPoints request
-	ReadVpcAccessPoints(ctx context.Context, params *ReadVpcAccessPointsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVpcAccessPoints(ctx context.Context, spaceId SpaceId, params *ReadVpcAccessPointsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateVpcAccessPointWithBody request with any body
-	CreateVpcAccessPointWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpcAccessPointWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateVpcAccessPoint(ctx context.Context, body CreateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpcAccessPoint(ctx context.Context, spaceId SpaceId, body CreateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVpcAccessPoint request
-	DeleteVpcAccessPoint(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVpcAccessPoint(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVpcAccessPointsById request
-	ReadVpcAccessPointsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVpcAccessPointsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateVpcAccessPointWithBody request with any body
-	UpdateVpcAccessPointWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVpcAccessPointWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateVpcAccessPoint(ctx context.Context, id string, body UpdateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVpcAccessPoint(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVpcPeerings request
-	ReadVpcPeerings(ctx context.Context, params *ReadVpcPeeringsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVpcPeerings(ctx context.Context, spaceId SpaceId, params *ReadVpcPeeringsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateVpcPeeringWithBody request with any body
-	CreateVpcPeeringWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpcPeeringWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateVpcPeering(ctx context.Context, body CreateVpcPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpcPeering(ctx context.Context, spaceId SpaceId, body CreateVpcPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVpcPeering request
-	DeleteVpcPeering(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVpcPeering(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVpcPeeringsById request
-	ReadVpcPeeringsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVpcPeeringsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AcceptVpcPeering request
-	AcceptVpcPeering(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AcceptVpcPeering(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RejectVpcPeering request
-	RejectVpcPeering(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RejectVpcPeering(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVpcs request
-	ReadVpcs(ctx context.Context, params *ReadVpcsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVpcs(ctx context.Context, spaceId SpaceId, params *ReadVpcsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateVpcWithBody request with any body
-	CreateVpcWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpcWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateVpc(ctx context.Context, body CreateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpc(ctx context.Context, spaceId SpaceId, body CreateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVpc request
-	DeleteVpc(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVpc(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVpcsById request
-	ReadVpcsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVpcsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateVpcWithBody request with any body
-	UpdateVpcWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVpcWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateVpc(ctx context.Context, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVpc(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVpnConnections request
-	ReadVpnConnections(ctx context.Context, params *ReadVpnConnectionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVpnConnections(ctx context.Context, spaceId SpaceId, params *ReadVpnConnectionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateVpnConnectionWithBody request with any body
-	CreateVpnConnectionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpnConnectionWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateVpnConnection(ctx context.Context, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpnConnection(ctx context.Context, spaceId SpaceId, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVpnConnection request
-	DeleteVpnConnection(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVpnConnection(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVpnConnectionsById request
-	ReadVpnConnectionsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReadVpnConnectionsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpdateVpnConnectionWithBody request with any body
-	UpdateVpnConnectionWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVpnConnectionWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateVpnConnection(ctx context.Context, id string, body UpdateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateVpnConnection(ctx context.Context, spaceId SpaceId, id string, body UpdateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVpnConnectionRouteWithBody request with any body
-	DeleteVpnConnectionRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVpnConnectionRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	DeleteVpnConnectionRoute(ctx context.Context, id string, body DeleteVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVpnConnectionRoute(ctx context.Context, spaceId SpaceId, id string, body DeleteVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateVpnConnectionRouteWithBody request with any body
-	CreateVpnConnectionRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpnConnectionRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateVpnConnectionRoute(ctx context.Context, id string, body CreateVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateVpnConnectionRoute(ctx context.Context, spaceId SpaceId, id string, body CreateVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) DeleteLoadBalancerTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteLoadBalancerTagsRequestWithBody(c.Server, contentType, body)
+func (c *Client) DeleteLoadBalancerTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteLoadBalancerTagsRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5347,8 +5350,8 @@ func (c *Client) DeleteLoadBalancerTagsWithBody(ctx context.Context, contentType
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteLoadBalancerTags(ctx context.Context, body DeleteLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteLoadBalancerTagsRequest(c.Server, body)
+func (c *Client) DeleteLoadBalancerTags(ctx context.Context, spaceId SpaceId, body DeleteLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteLoadBalancerTagsRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5359,8 +5362,8 @@ func (c *Client) DeleteLoadBalancerTags(ctx context.Context, body DeleteLoadBala
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateLoadBalancerTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateLoadBalancerTagsRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateLoadBalancerTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateLoadBalancerTagsRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5371,8 +5374,8 @@ func (c *Client) CreateLoadBalancerTagsWithBody(ctx context.Context, contentType
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateLoadBalancerTags(ctx context.Context, body CreateLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateLoadBalancerTagsRequest(c.Server, body)
+func (c *Client) CreateLoadBalancerTags(ctx context.Context, spaceId SpaceId, body CreateLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateLoadBalancerTagsRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5383,8 +5386,8 @@ func (c *Client) CreateLoadBalancerTags(ctx context.Context, body CreateLoadBala
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteTagsRequestWithBody(c.Server, contentType, body)
+func (c *Client) DeleteTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteTagsRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5395,8 +5398,8 @@ func (c *Client) DeleteTagsWithBody(ctx context.Context, contentType string, bod
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteTags(ctx context.Context, body DeleteTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteTagsRequest(c.Server, body)
+func (c *Client) DeleteTags(ctx context.Context, spaceId SpaceId, body DeleteTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteTagsRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5407,8 +5410,8 @@ func (c *Client) DeleteTags(ctx context.Context, body DeleteTagsJSONRequestBody,
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateTagsRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateTagsRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5419,8 +5422,8 @@ func (c *Client) CreateTagsWithBody(ctx context.Context, contentType string, bod
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateTags(ctx context.Context, body CreateTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateTagsRequest(c.Server, body)
+func (c *Client) CreateTags(ctx context.Context, spaceId SpaceId, body CreateTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateTagsRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5431,8 +5434,8 @@ func (c *Client) CreateTags(ctx context.Context, body CreateTagsJSONRequestBody,
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadClientGateways(ctx context.Context, params *ReadClientGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadClientGatewaysRequest(c.Server, params)
+func (c *Client) ReadClientGateways(ctx context.Context, spaceId SpaceId, params *ReadClientGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadClientGatewaysRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -5443,8 +5446,8 @@ func (c *Client) ReadClientGateways(ctx context.Context, params *ReadClientGatew
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateClientGatewayWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateClientGatewayRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateClientGatewayWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateClientGatewayRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5455,8 +5458,8 @@ func (c *Client) CreateClientGatewayWithBody(ctx context.Context, contentType st
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateClientGateway(ctx context.Context, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateClientGatewayRequest(c.Server, body)
+func (c *Client) CreateClientGateway(ctx context.Context, spaceId SpaceId, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateClientGatewayRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5467,8 +5470,8 @@ func (c *Client) CreateClientGateway(ctx context.Context, body CreateClientGatew
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteClientGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteClientGatewayRequest(c.Server, id)
+func (c *Client) DeleteClientGateway(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteClientGatewayRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5479,8 +5482,8 @@ func (c *Client) DeleteClientGateway(ctx context.Context, id string, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadClientGatewaysById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadClientGatewaysByIdRequest(c.Server, id)
+func (c *Client) ReadClientGatewaysById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadClientGatewaysByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5491,8 +5494,8 @@ func (c *Client) ReadClientGatewaysById(ctx context.Context, id string, reqEdito
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadDhcpOptions(ctx context.Context, params *ReadDhcpOptionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadDhcpOptionsRequest(c.Server, params)
+func (c *Client) ReadDhcpOptions(ctx context.Context, spaceId SpaceId, params *ReadDhcpOptionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadDhcpOptionsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -5503,8 +5506,8 @@ func (c *Client) ReadDhcpOptions(ctx context.Context, params *ReadDhcpOptionsPar
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateDhcpOptionsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateDhcpOptionsRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateDhcpOptionsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDhcpOptionsRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5515,8 +5518,8 @@ func (c *Client) CreateDhcpOptionsWithBody(ctx context.Context, contentType stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateDhcpOptions(ctx context.Context, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateDhcpOptionsRequest(c.Server, body)
+func (c *Client) CreateDhcpOptions(ctx context.Context, spaceId SpaceId, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDhcpOptionsRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5527,8 +5530,8 @@ func (c *Client) CreateDhcpOptions(ctx context.Context, body CreateDhcpOptionsJS
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteDhcpOptions(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteDhcpOptionsRequest(c.Server, id)
+func (c *Client) DeleteDhcpOptions(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDhcpOptionsRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5539,8 +5542,8 @@ func (c *Client) DeleteDhcpOptions(ctx context.Context, id string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadDhcpOptionsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadDhcpOptionsByIdRequest(c.Server, id)
+func (c *Client) ReadDhcpOptionsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadDhcpOptionsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5551,8 +5554,8 @@ func (c *Client) ReadDhcpOptionsById(ctx context.Context, id string, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadDirectLinkInterfaces(ctx context.Context, params *ReadDirectLinkInterfacesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadDirectLinkInterfacesRequest(c.Server, params)
+func (c *Client) ReadDirectLinkInterfaces(ctx context.Context, spaceId SpaceId, params *ReadDirectLinkInterfacesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadDirectLinkInterfacesRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -5563,8 +5566,8 @@ func (c *Client) ReadDirectLinkInterfaces(ctx context.Context, params *ReadDirec
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateDirectLinkInterfaceWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateDirectLinkInterfaceRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateDirectLinkInterfaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDirectLinkInterfaceRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5575,8 +5578,8 @@ func (c *Client) CreateDirectLinkInterfaceWithBody(ctx context.Context, contentT
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateDirectLinkInterface(ctx context.Context, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateDirectLinkInterfaceRequest(c.Server, body)
+func (c *Client) CreateDirectLinkInterface(ctx context.Context, spaceId SpaceId, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDirectLinkInterfaceRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5587,8 +5590,8 @@ func (c *Client) CreateDirectLinkInterface(ctx context.Context, body CreateDirec
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteDirectLinkInterface(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteDirectLinkInterfaceRequest(c.Server, id)
+func (c *Client) DeleteDirectLinkInterface(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDirectLinkInterfaceRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5599,8 +5602,8 @@ func (c *Client) DeleteDirectLinkInterface(ctx context.Context, id string, reqEd
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadDirectLinkInterfacesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadDirectLinkInterfacesByIdRequest(c.Server, id)
+func (c *Client) ReadDirectLinkInterfacesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadDirectLinkInterfacesByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5611,8 +5614,8 @@ func (c *Client) ReadDirectLinkInterfacesById(ctx context.Context, id string, re
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateDirectLinkInterfaceWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateDirectLinkInterfaceRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateDirectLinkInterfaceWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateDirectLinkInterfaceRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5623,8 +5626,8 @@ func (c *Client) UpdateDirectLinkInterfaceWithBody(ctx context.Context, id strin
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateDirectLinkInterface(ctx context.Context, id string, body UpdateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateDirectLinkInterfaceRequest(c.Server, id, body)
+func (c *Client) UpdateDirectLinkInterface(ctx context.Context, spaceId SpaceId, id string, body UpdateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateDirectLinkInterfaceRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5635,8 +5638,8 @@ func (c *Client) UpdateDirectLinkInterface(ctx context.Context, id string, body 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadDirectLinks(ctx context.Context, params *ReadDirectLinksParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadDirectLinksRequest(c.Server, params)
+func (c *Client) ReadDirectLinks(ctx context.Context, spaceId SpaceId, params *ReadDirectLinksParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadDirectLinksRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -5647,8 +5650,8 @@ func (c *Client) ReadDirectLinks(ctx context.Context, params *ReadDirectLinksPar
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateDirectLinkWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateDirectLinkRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateDirectLinkWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDirectLinkRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5659,8 +5662,8 @@ func (c *Client) CreateDirectLinkWithBody(ctx context.Context, contentType strin
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateDirectLink(ctx context.Context, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateDirectLinkRequest(c.Server, body)
+func (c *Client) CreateDirectLink(ctx context.Context, spaceId SpaceId, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDirectLinkRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5671,8 +5674,8 @@ func (c *Client) CreateDirectLink(ctx context.Context, body CreateDirectLinkJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteDirectLink(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteDirectLinkRequest(c.Server, id)
+func (c *Client) DeleteDirectLink(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDirectLinkRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5683,8 +5686,8 @@ func (c *Client) DeleteDirectLink(ctx context.Context, id string, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadDirectLinksById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadDirectLinksByIdRequest(c.Server, id)
+func (c *Client) ReadDirectLinksById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadDirectLinksByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5695,8 +5698,8 @@ func (c *Client) ReadDirectLinksById(ctx context.Context, id string, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadFlexibleGpuCatalog(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadFlexibleGpuCatalogRequest(c.Server)
+func (c *Client) ReadFlexibleGpuCatalog(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadFlexibleGpuCatalogRequest(c.Server, spaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -5707,8 +5710,8 @@ func (c *Client) ReadFlexibleGpuCatalog(ctx context.Context, reqEditors ...Reque
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadFlexibleGpus(ctx context.Context, params *ReadFlexibleGpusParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadFlexibleGpusRequest(c.Server, params)
+func (c *Client) ReadFlexibleGpus(ctx context.Context, spaceId SpaceId, params *ReadFlexibleGpusParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadFlexibleGpusRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -5719,8 +5722,8 @@ func (c *Client) ReadFlexibleGpus(ctx context.Context, params *ReadFlexibleGpusP
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateFlexibleGpuWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateFlexibleGpuRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateFlexibleGpuWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateFlexibleGpuRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5731,8 +5734,8 @@ func (c *Client) CreateFlexibleGpuWithBody(ctx context.Context, contentType stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateFlexibleGpu(ctx context.Context, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateFlexibleGpuRequest(c.Server, body)
+func (c *Client) CreateFlexibleGpu(ctx context.Context, spaceId SpaceId, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateFlexibleGpuRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5743,8 +5746,8 @@ func (c *Client) CreateFlexibleGpu(ctx context.Context, body CreateFlexibleGpuJS
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteFlexibleGpu(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteFlexibleGpuRequest(c.Server, id)
+func (c *Client) DeleteFlexibleGpu(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteFlexibleGpuRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5755,8 +5758,8 @@ func (c *Client) DeleteFlexibleGpu(ctx context.Context, id string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadFlexibleGpusById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadFlexibleGpusByIdRequest(c.Server, id)
+func (c *Client) ReadFlexibleGpusById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadFlexibleGpusByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5767,8 +5770,8 @@ func (c *Client) ReadFlexibleGpusById(ctx context.Context, id string, reqEditors
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateFlexibleGpuWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateFlexibleGpuRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateFlexibleGpuWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateFlexibleGpuRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5779,8 +5782,8 @@ func (c *Client) UpdateFlexibleGpuWithBody(ctx context.Context, id string, conte
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateFlexibleGpu(ctx context.Context, id string, body UpdateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateFlexibleGpuRequest(c.Server, id, body)
+func (c *Client) UpdateFlexibleGpu(ctx context.Context, spaceId SpaceId, id string, body UpdateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateFlexibleGpuRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5791,8 +5794,8 @@ func (c *Client) UpdateFlexibleGpu(ctx context.Context, id string, body UpdateFl
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkFlexibleGpuWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkFlexibleGpuRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) LinkFlexibleGpuWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkFlexibleGpuRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5803,8 +5806,8 @@ func (c *Client) LinkFlexibleGpuWithBody(ctx context.Context, id string, content
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkFlexibleGpu(ctx context.Context, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkFlexibleGpuRequest(c.Server, id, body)
+func (c *Client) LinkFlexibleGpu(ctx context.Context, spaceId SpaceId, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkFlexibleGpuRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5815,8 +5818,8 @@ func (c *Client) LinkFlexibleGpu(ctx context.Context, id string, body LinkFlexib
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkFlexibleGpu(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkFlexibleGpuRequest(c.Server, id)
+func (c *Client) UnlinkFlexibleGpu(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkFlexibleGpuRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5827,8 +5830,8 @@ func (c *Client) UnlinkFlexibleGpu(ctx context.Context, id string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadImages(ctx context.Context, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadImagesRequest(c.Server, params)
+func (c *Client) ReadImages(ctx context.Context, spaceId SpaceId, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadImagesRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -5839,8 +5842,8 @@ func (c *Client) ReadImages(ctx context.Context, params *ReadImagesParams, reqEd
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateImageWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateImageRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateImageWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateImageRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5851,8 +5854,8 @@ func (c *Client) CreateImageWithBody(ctx context.Context, contentType string, bo
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateImage(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateImageRequest(c.Server, body)
+func (c *Client) CreateImage(ctx context.Context, spaceId SpaceId, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateImageRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5863,8 +5866,8 @@ func (c *Client) CreateImage(ctx context.Context, body CreateImageJSONRequestBod
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteImage(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteImageRequest(c.Server, id)
+func (c *Client) DeleteImage(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteImageRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5875,8 +5878,8 @@ func (c *Client) DeleteImage(ctx context.Context, id string, reqEditors ...Reque
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadImagesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadImagesByIdRequest(c.Server, id)
+func (c *Client) ReadImagesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadImagesByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5887,8 +5890,8 @@ func (c *Client) ReadImagesById(ctx context.Context, id string, reqEditors ...Re
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateImageWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateImageRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateImageWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateImageRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5899,8 +5902,8 @@ func (c *Client) UpdateImageWithBody(ctx context.Context, id string, contentType
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateImage(ctx context.Context, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateImageRequest(c.Server, id, body)
+func (c *Client) UpdateImage(ctx context.Context, spaceId SpaceId, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateImageRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5911,8 +5914,8 @@ func (c *Client) UpdateImage(ctx context.Context, id string, body UpdateImageJSO
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadInternetGateways(ctx context.Context, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadInternetGatewaysRequest(c.Server, params)
+func (c *Client) ReadInternetGateways(ctx context.Context, spaceId SpaceId, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadInternetGatewaysRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -5923,8 +5926,8 @@ func (c *Client) ReadInternetGateways(ctx context.Context, params *ReadInternetG
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateInternetGateway(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateInternetGatewayRequest(c.Server)
+func (c *Client) CreateInternetGateway(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateInternetGatewayRequest(c.Server, spaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -5935,8 +5938,8 @@ func (c *Client) CreateInternetGateway(ctx context.Context, reqEditors ...Reques
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteInternetGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteInternetGatewayRequest(c.Server, id)
+func (c *Client) DeleteInternetGateway(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteInternetGatewayRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5947,8 +5950,8 @@ func (c *Client) DeleteInternetGateway(ctx context.Context, id string, reqEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadInternetGatewaysById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadInternetGatewaysByIdRequest(c.Server, id)
+func (c *Client) ReadInternetGatewaysById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadInternetGatewaysByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -5959,8 +5962,8 @@ func (c *Client) ReadInternetGatewaysById(ctx context.Context, id string, reqEdi
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkInternetGatewayWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkInternetGatewayRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) LinkInternetGatewayWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkInternetGatewayRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5971,8 +5974,8 @@ func (c *Client) LinkInternetGatewayWithBody(ctx context.Context, id string, con
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkInternetGateway(ctx context.Context, id string, body LinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkInternetGatewayRequest(c.Server, id, body)
+func (c *Client) LinkInternetGateway(ctx context.Context, spaceId SpaceId, id string, body LinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkInternetGatewayRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5983,8 +5986,8 @@ func (c *Client) LinkInternetGateway(ctx context.Context, id string, body LinkIn
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkInternetGatewayWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkInternetGatewayRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UnlinkInternetGatewayWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkInternetGatewayRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5995,8 +5998,8 @@ func (c *Client) UnlinkInternetGatewayWithBody(ctx context.Context, id string, c
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkInternetGateway(ctx context.Context, id string, body UnlinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkInternetGatewayRequest(c.Server, id, body)
+func (c *Client) UnlinkInternetGateway(ctx context.Context, spaceId SpaceId, id string, body UnlinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkInternetGatewayRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6007,8 +6010,8 @@ func (c *Client) UnlinkInternetGateway(ctx context.Context, id string, body Unli
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadKeypairs(ctx context.Context, params *ReadKeypairsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadKeypairsRequest(c.Server, params)
+func (c *Client) ReadKeypairs(ctx context.Context, spaceId SpaceId, params *ReadKeypairsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadKeypairsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -6019,8 +6022,8 @@ func (c *Client) ReadKeypairs(ctx context.Context, params *ReadKeypairsParams, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateKeypairWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateKeypairRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateKeypairWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateKeypairRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6031,8 +6034,8 @@ func (c *Client) CreateKeypairWithBody(ctx context.Context, contentType string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateKeypair(ctx context.Context, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateKeypairRequest(c.Server, body)
+func (c *Client) CreateKeypair(ctx context.Context, spaceId SpaceId, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateKeypairRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6043,8 +6046,8 @@ func (c *Client) CreateKeypair(ctx context.Context, body CreateKeypairJSONReques
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteKeypair(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteKeypairRequest(c.Server, id)
+func (c *Client) DeleteKeypair(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteKeypairRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6055,8 +6058,8 @@ func (c *Client) DeleteKeypair(ctx context.Context, id string, reqEditors ...Req
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadKeypairsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadKeypairsByIdRequest(c.Server, id)
+func (c *Client) ReadKeypairsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadKeypairsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6067,8 +6070,8 @@ func (c *Client) ReadKeypairsById(ctx context.Context, id string, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadListenerRules(ctx context.Context, params *ReadListenerRulesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadListenerRulesRequest(c.Server, params)
+func (c *Client) ReadListenerRules(ctx context.Context, spaceId SpaceId, params *ReadListenerRulesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadListenerRulesRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -6079,8 +6082,8 @@ func (c *Client) ReadListenerRules(ctx context.Context, params *ReadListenerRule
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateListenerRuleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateListenerRuleRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateListenerRuleWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateListenerRuleRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6091,8 +6094,8 @@ func (c *Client) CreateListenerRuleWithBody(ctx context.Context, contentType str
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateListenerRule(ctx context.Context, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateListenerRuleRequest(c.Server, body)
+func (c *Client) CreateListenerRule(ctx context.Context, spaceId SpaceId, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateListenerRuleRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6103,8 +6106,8 @@ func (c *Client) CreateListenerRule(ctx context.Context, body CreateListenerRule
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteListenerRule(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteListenerRuleRequest(c.Server, id)
+func (c *Client) DeleteListenerRule(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteListenerRuleRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6115,8 +6118,8 @@ func (c *Client) DeleteListenerRule(ctx context.Context, id string, reqEditors .
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadListenerRulesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadListenerRulesByIdRequest(c.Server, id)
+func (c *Client) ReadListenerRulesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadListenerRulesByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6127,8 +6130,8 @@ func (c *Client) ReadListenerRulesById(ctx context.Context, id string, reqEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateListenerRuleWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateListenerRuleRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateListenerRuleWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateListenerRuleRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6139,8 +6142,8 @@ func (c *Client) UpdateListenerRuleWithBody(ctx context.Context, id string, cont
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateListenerRule(ctx context.Context, id string, body UpdateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateListenerRuleRequest(c.Server, id, body)
+func (c *Client) UpdateListenerRule(ctx context.Context, spaceId SpaceId, id string, body UpdateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateListenerRuleRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6151,8 +6154,8 @@ func (c *Client) UpdateListenerRule(ctx context.Context, id string, body UpdateL
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadLoadBalancers(ctx context.Context, params *ReadLoadBalancersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadLoadBalancersRequest(c.Server, params)
+func (c *Client) ReadLoadBalancers(ctx context.Context, spaceId SpaceId, params *ReadLoadBalancersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadLoadBalancersRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -6163,8 +6166,8 @@ func (c *Client) ReadLoadBalancers(ctx context.Context, params *ReadLoadBalancer
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateLoadBalancerWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateLoadBalancerRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateLoadBalancerWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateLoadBalancerRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6175,8 +6178,8 @@ func (c *Client) CreateLoadBalancerWithBody(ctx context.Context, contentType str
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateLoadBalancer(ctx context.Context, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateLoadBalancerRequest(c.Server, body)
+func (c *Client) CreateLoadBalancer(ctx context.Context, spaceId SpaceId, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateLoadBalancerRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6187,8 +6190,8 @@ func (c *Client) CreateLoadBalancer(ctx context.Context, body CreateLoadBalancer
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteLoadBalancer(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteLoadBalancerRequest(c.Server, id)
+func (c *Client) DeleteLoadBalancer(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteLoadBalancerRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6199,8 +6202,8 @@ func (c *Client) DeleteLoadBalancer(ctx context.Context, id string, reqEditors .
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadLoadBalancersById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadLoadBalancersByIdRequest(c.Server, id)
+func (c *Client) ReadLoadBalancersById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadLoadBalancersByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6211,8 +6214,8 @@ func (c *Client) ReadLoadBalancersById(ctx context.Context, id string, reqEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateLoadBalancerWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateLoadBalancerRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateLoadBalancerWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateLoadBalancerRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6223,8 +6226,8 @@ func (c *Client) UpdateLoadBalancerWithBody(ctx context.Context, id string, cont
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateLoadBalancerRequest(c.Server, id, body)
+func (c *Client) UpdateLoadBalancer(ctx context.Context, spaceId SpaceId, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateLoadBalancerRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6235,8 +6238,8 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, body UpdateL
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkLoadBalancerBackendMachinesWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkLoadBalancerBackendMachinesRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) LinkLoadBalancerBackendMachinesWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkLoadBalancerBackendMachinesRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6247,8 +6250,8 @@ func (c *Client) LinkLoadBalancerBackendMachinesWithBody(ctx context.Context, id
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkLoadBalancerBackendMachines(ctx context.Context, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkLoadBalancerBackendMachinesRequest(c.Server, id, body)
+func (c *Client) LinkLoadBalancerBackendMachines(ctx context.Context, spaceId SpaceId, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkLoadBalancerBackendMachinesRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6259,8 +6262,8 @@ func (c *Client) LinkLoadBalancerBackendMachines(ctx context.Context, id string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkLoadBalancerBackendMachinesWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkLoadBalancerBackendMachinesRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UnlinkLoadBalancerBackendMachinesWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkLoadBalancerBackendMachinesRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6271,8 +6274,8 @@ func (c *Client) UnlinkLoadBalancerBackendMachinesWithBody(ctx context.Context, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkLoadBalancerBackendMachines(ctx context.Context, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkLoadBalancerBackendMachinesRequest(c.Server, id, body)
+func (c *Client) UnlinkLoadBalancerBackendMachines(ctx context.Context, spaceId SpaceId, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkLoadBalancerBackendMachinesRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6283,8 +6286,8 @@ func (c *Client) UnlinkLoadBalancerBackendMachines(ctx context.Context, id strin
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteLoadBalancerListenersWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteLoadBalancerListenersRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) DeleteLoadBalancerListenersWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteLoadBalancerListenersRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6295,8 +6298,8 @@ func (c *Client) DeleteLoadBalancerListenersWithBody(ctx context.Context, id str
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteLoadBalancerListeners(ctx context.Context, id string, body DeleteLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteLoadBalancerListenersRequest(c.Server, id, body)
+func (c *Client) DeleteLoadBalancerListeners(ctx context.Context, spaceId SpaceId, id string, body DeleteLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteLoadBalancerListenersRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6307,8 +6310,8 @@ func (c *Client) DeleteLoadBalancerListeners(ctx context.Context, id string, bod
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateLoadBalancerListenersWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateLoadBalancerListenersRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) CreateLoadBalancerListenersWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateLoadBalancerListenersRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6319,8 +6322,8 @@ func (c *Client) CreateLoadBalancerListenersWithBody(ctx context.Context, id str
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateLoadBalancerListeners(ctx context.Context, id string, body CreateLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateLoadBalancerListenersRequest(c.Server, id, body)
+func (c *Client) CreateLoadBalancerListeners(ctx context.Context, spaceId SpaceId, id string, body CreateLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateLoadBalancerListenersRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6331,8 +6334,8 @@ func (c *Client) CreateLoadBalancerListeners(ctx context.Context, id string, bod
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteLoadBalancerPolicyWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteLoadBalancerPolicyRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) DeleteLoadBalancerPolicyWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteLoadBalancerPolicyRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6343,8 +6346,8 @@ func (c *Client) DeleteLoadBalancerPolicyWithBody(ctx context.Context, id string
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteLoadBalancerPolicy(ctx context.Context, id string, body DeleteLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteLoadBalancerPolicyRequest(c.Server, id, body)
+func (c *Client) DeleteLoadBalancerPolicy(ctx context.Context, spaceId SpaceId, id string, body DeleteLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteLoadBalancerPolicyRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6355,8 +6358,8 @@ func (c *Client) DeleteLoadBalancerPolicy(ctx context.Context, id string, body D
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateLoadBalancerPolicyWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateLoadBalancerPolicyRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) CreateLoadBalancerPolicyWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateLoadBalancerPolicyRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6367,8 +6370,8 @@ func (c *Client) CreateLoadBalancerPolicyWithBody(ctx context.Context, id string
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateLoadBalancerPolicy(ctx context.Context, id string, body CreateLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateLoadBalancerPolicyRequest(c.Server, id, body)
+func (c *Client) CreateLoadBalancerPolicy(ctx context.Context, spaceId SpaceId, id string, body CreateLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateLoadBalancerPolicyRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6379,8 +6382,8 @@ func (c *Client) CreateLoadBalancerPolicy(ctx context.Context, id string, body C
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVmsHealthWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVmsHealthRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) ReadVmsHealthWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVmsHealthRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6391,8 +6394,8 @@ func (c *Client) ReadVmsHealthWithBody(ctx context.Context, id string, contentTy
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVmsHealth(ctx context.Context, id string, body ReadVmsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVmsHealthRequest(c.Server, id, body)
+func (c *Client) ReadVmsHealth(ctx context.Context, spaceId SpaceId, id string, body ReadVmsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVmsHealthRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6403,8 +6406,8 @@ func (c *Client) ReadVmsHealth(ctx context.Context, id string, body ReadVmsHealt
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadLoadBalancerTagsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadLoadBalancerTagsRequestWithBody(c.Server, contentType, body)
+func (c *Client) ReadLoadBalancerTagsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadLoadBalancerTagsRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6415,8 +6418,8 @@ func (c *Client) ReadLoadBalancerTagsWithBody(ctx context.Context, contentType s
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadLoadBalancerTags(ctx context.Context, body ReadLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadLoadBalancerTagsRequest(c.Server, body)
+func (c *Client) ReadLoadBalancerTags(ctx context.Context, spaceId SpaceId, body ReadLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadLoadBalancerTagsRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6427,8 +6430,8 @@ func (c *Client) ReadLoadBalancerTags(ctx context.Context, body ReadLoadBalancer
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadLocations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadLocationsRequest(c.Server)
+func (c *Client) ReadLocations(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadLocationsRequest(c.Server, spaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -6439,8 +6442,8 @@ func (c *Client) ReadLocations(ctx context.Context, reqEditors ...RequestEditorF
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadNatGateway(ctx context.Context, params *ReadNatGatewayParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadNatGatewayRequest(c.Server, params)
+func (c *Client) ReadNatGateway(ctx context.Context, spaceId SpaceId, params *ReadNatGatewayParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadNatGatewayRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -6451,8 +6454,8 @@ func (c *Client) ReadNatGateway(ctx context.Context, params *ReadNatGatewayParam
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateNatGatewayWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateNatGatewayRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateNatGatewayWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNatGatewayRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6463,8 +6466,8 @@ func (c *Client) CreateNatGatewayWithBody(ctx context.Context, contentType strin
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateNatGateway(ctx context.Context, body CreateNatGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateNatGatewayRequest(c.Server, body)
+func (c *Client) CreateNatGateway(ctx context.Context, spaceId SpaceId, body CreateNatGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNatGatewayRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6475,8 +6478,8 @@ func (c *Client) CreateNatGateway(ctx context.Context, body CreateNatGatewayJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteNatGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteNatGatewayRequest(c.Server, id)
+func (c *Client) DeleteNatGateway(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNatGatewayRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6487,8 +6490,8 @@ func (c *Client) DeleteNatGateway(ctx context.Context, id string, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadNatGatewayById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadNatGatewayByIdRequest(c.Server, id)
+func (c *Client) ReadNatGatewayById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadNatGatewayByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6499,8 +6502,8 @@ func (c *Client) ReadNatGatewayById(ctx context.Context, id string, reqEditors .
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadNics(ctx context.Context, params *ReadNicsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadNicsRequest(c.Server, params)
+func (c *Client) ReadNics(ctx context.Context, spaceId SpaceId, params *ReadNicsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadNicsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -6511,8 +6514,8 @@ func (c *Client) ReadNics(ctx context.Context, params *ReadNicsParams, reqEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateNicWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateNicRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateNicWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNicRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6523,8 +6526,8 @@ func (c *Client) CreateNicWithBody(ctx context.Context, contentType string, body
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateNic(ctx context.Context, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateNicRequest(c.Server, body)
+func (c *Client) CreateNic(ctx context.Context, spaceId SpaceId, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNicRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6535,8 +6538,8 @@ func (c *Client) CreateNic(ctx context.Context, body CreateNicJSONRequestBody, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteNic(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteNicRequest(c.Server, id)
+func (c *Client) DeleteNic(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteNicRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6547,8 +6550,8 @@ func (c *Client) DeleteNic(ctx context.Context, id string, reqEditors ...Request
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadNicsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadNicsByIdRequest(c.Server, id)
+func (c *Client) ReadNicsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadNicsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6559,8 +6562,8 @@ func (c *Client) ReadNicsById(ctx context.Context, id string, reqEditors ...Requ
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateNicRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateNicWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateNicRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6571,8 +6574,8 @@ func (c *Client) UpdateNicWithBody(ctx context.Context, id string, contentType s
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateNic(ctx context.Context, id string, body UpdateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateNicRequest(c.Server, id, body)
+func (c *Client) UpdateNic(ctx context.Context, spaceId SpaceId, id string, body UpdateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateNicRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6583,8 +6586,8 @@ func (c *Client) UpdateNic(ctx context.Context, id string, body UpdateNicJSONReq
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkPrivateIpsWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkPrivateIpsRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) LinkPrivateIpsWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkPrivateIpsRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6595,8 +6598,8 @@ func (c *Client) LinkPrivateIpsWithBody(ctx context.Context, id string, contentT
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkPrivateIps(ctx context.Context, id string, body LinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkPrivateIpsRequest(c.Server, id, body)
+func (c *Client) LinkPrivateIps(ctx context.Context, spaceId SpaceId, id string, body LinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkPrivateIpsRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6607,8 +6610,8 @@ func (c *Client) LinkPrivateIps(ctx context.Context, id string, body LinkPrivate
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkPrivateIpsWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkPrivateIpsRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UnlinkPrivateIpsWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkPrivateIpsRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6619,8 +6622,8 @@ func (c *Client) UnlinkPrivateIpsWithBody(ctx context.Context, id string, conten
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkPrivateIps(ctx context.Context, id string, body UnlinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkPrivateIpsRequest(c.Server, id, body)
+func (c *Client) UnlinkPrivateIps(ctx context.Context, spaceId SpaceId, id string, body UnlinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkPrivateIpsRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6631,8 +6634,8 @@ func (c *Client) UnlinkPrivateIps(ctx context.Context, id string, body UnlinkPri
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkNicRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) LinkNicWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkNicRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6643,8 +6646,8 @@ func (c *Client) LinkNicWithBody(ctx context.Context, id string, contentType str
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkNic(ctx context.Context, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkNicRequest(c.Server, id, body)
+func (c *Client) LinkNic(ctx context.Context, spaceId SpaceId, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkNicRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6655,8 +6658,8 @@ func (c *Client) LinkNic(ctx context.Context, id string, body LinkNicJSONRequest
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkNicWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkNicRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UnlinkNicWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkNicRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6667,8 +6670,8 @@ func (c *Client) UnlinkNicWithBody(ctx context.Context, id string, contentType s
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkNic(ctx context.Context, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkNicRequest(c.Server, id, body)
+func (c *Client) UnlinkNic(ctx context.Context, spaceId SpaceId, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkNicRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6679,8 +6682,8 @@ func (c *Client) UnlinkNic(ctx context.Context, id string, body UnlinkNicJSONReq
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadProductTypes(ctx context.Context, params *ReadProductTypesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadProductTypesRequest(c.Server, params)
+func (c *Client) ReadProductTypes(ctx context.Context, spaceId SpaceId, params *ReadProductTypesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadProductTypesRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -6691,8 +6694,8 @@ func (c *Client) ReadProductTypes(ctx context.Context, params *ReadProductTypesP
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateProductTypeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateProductTypeRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateProductTypeWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateProductTypeRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6703,8 +6706,8 @@ func (c *Client) CreateProductTypeWithBody(ctx context.Context, contentType stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateProductType(ctx context.Context, body CreateProductTypeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateProductTypeRequest(c.Server, body)
+func (c *Client) CreateProductType(ctx context.Context, spaceId SpaceId, body CreateProductTypeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateProductTypeRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6715,8 +6718,8 @@ func (c *Client) CreateProductType(ctx context.Context, body CreateProductTypeJS
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadProductTypesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadProductTypesByIdRequest(c.Server, id)
+func (c *Client) ReadProductTypesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadProductTypesByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6727,8 +6730,8 @@ func (c *Client) ReadProductTypesById(ctx context.Context, id string, reqEditors
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadPublicIpRanges(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadPublicIpRangesRequest(c.Server)
+func (c *Client) ReadPublicIpRanges(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadPublicIpRangesRequest(c.Server, spaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -6739,8 +6742,8 @@ func (c *Client) ReadPublicIpRanges(ctx context.Context, reqEditors ...RequestEd
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadPublicIps(ctx context.Context, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadPublicIpsRequest(c.Server, params)
+func (c *Client) ReadPublicIps(ctx context.Context, spaceId SpaceId, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadPublicIpsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -6751,8 +6754,8 @@ func (c *Client) ReadPublicIps(ctx context.Context, params *ReadPublicIpsParams,
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreatePublicIp(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreatePublicIpRequest(c.Server)
+func (c *Client) CreatePublicIp(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreatePublicIpRequest(c.Server, spaceId)
 	if err != nil {
 		return nil, err
 	}
@@ -6763,8 +6766,8 @@ func (c *Client) CreatePublicIp(ctx context.Context, reqEditors ...RequestEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeletePublicIp(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeletePublicIpRequest(c.Server, id)
+func (c *Client) DeletePublicIp(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeletePublicIpRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6775,8 +6778,8 @@ func (c *Client) DeletePublicIp(ctx context.Context, id string, reqEditors ...Re
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadPublicIpsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadPublicIpsByIdRequest(c.Server, id)
+func (c *Client) ReadPublicIpsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadPublicIpsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6787,8 +6790,8 @@ func (c *Client) ReadPublicIpsById(ctx context.Context, id string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkPublicIpWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkPublicIpRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) LinkPublicIpWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkPublicIpRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6799,8 +6802,8 @@ func (c *Client) LinkPublicIpWithBody(ctx context.Context, id string, contentTyp
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkPublicIp(ctx context.Context, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkPublicIpRequest(c.Server, id, body)
+func (c *Client) LinkPublicIp(ctx context.Context, spaceId SpaceId, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkPublicIpRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6811,8 +6814,8 @@ func (c *Client) LinkPublicIp(ctx context.Context, id string, body LinkPublicIpJ
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkPublicIpWithBody(ctx context.Context, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkPublicIpRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UnlinkPublicIpWithBody(ctx context.Context, spaceId SpaceId, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkPublicIpRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6823,8 +6826,8 @@ func (c *Client) UnlinkPublicIpWithBody(ctx context.Context, id interface{}, con
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkPublicIp(ctx context.Context, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkPublicIpRequest(c.Server, id, body)
+func (c *Client) UnlinkPublicIp(ctx context.Context, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkPublicIpRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6835,8 +6838,8 @@ func (c *Client) UnlinkPublicIp(ctx context.Context, id interface{}, body Unlink
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadRouteTables(ctx context.Context, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadRouteTablesRequest(c.Server, params)
+func (c *Client) ReadRouteTables(ctx context.Context, spaceId SpaceId, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadRouteTablesRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -6847,8 +6850,8 @@ func (c *Client) ReadRouteTables(ctx context.Context, params *ReadRouteTablesPar
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateRouteTableWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRouteTableRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateRouteTableWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRouteTableRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6859,8 +6862,8 @@ func (c *Client) CreateRouteTableWithBody(ctx context.Context, contentType strin
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateRouteTable(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRouteTableRequest(c.Server, body)
+func (c *Client) CreateRouteTable(ctx context.Context, spaceId SpaceId, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRouteTableRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6871,8 +6874,8 @@ func (c *Client) CreateRouteTable(ctx context.Context, body CreateRouteTableJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteRouteTable(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteRouteTableRequest(c.Server, id)
+func (c *Client) DeleteRouteTable(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRouteTableRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6883,8 +6886,8 @@ func (c *Client) DeleteRouteTable(ctx context.Context, id string, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadRouteTablesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadRouteTablesByIdRequest(c.Server, id)
+func (c *Client) ReadRouteTablesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadRouteTablesByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -6895,8 +6898,8 @@ func (c *Client) ReadRouteTablesById(ctx context.Context, id string, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteRouteRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) DeleteRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRouteRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6907,8 +6910,8 @@ func (c *Client) DeleteRouteWithBody(ctx context.Context, id string, contentType
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteRoute(ctx context.Context, id string, body DeleteRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteRouteRequest(c.Server, id, body)
+func (c *Client) DeleteRoute(ctx context.Context, spaceId SpaceId, id string, body DeleteRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRouteRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6919,8 +6922,8 @@ func (c *Client) DeleteRoute(ctx context.Context, id string, body DeleteRouteJSO
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRouteRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) CreateRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRouteRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6931,8 +6934,8 @@ func (c *Client) CreateRouteWithBody(ctx context.Context, id string, contentType
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateRoute(ctx context.Context, id string, body CreateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRouteRequest(c.Server, id, body)
+func (c *Client) CreateRoute(ctx context.Context, spaceId SpaceId, id string, body CreateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRouteRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6943,8 +6946,8 @@ func (c *Client) CreateRoute(ctx context.Context, id string, body CreateRouteJSO
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRouteRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRouteRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6955,8 +6958,8 @@ func (c *Client) UpdateRouteWithBody(ctx context.Context, id string, contentType
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateRoute(ctx context.Context, id string, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRouteRequest(c.Server, id, body)
+func (c *Client) UpdateRoute(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRouteRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6967,8 +6970,8 @@ func (c *Client) UpdateRoute(ctx context.Context, id string, body UpdateRouteJSO
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkRouteTableWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkRouteTableRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) LinkRouteTableWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkRouteTableRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6979,8 +6982,8 @@ func (c *Client) LinkRouteTableWithBody(ctx context.Context, id string, contentT
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkRouteTable(ctx context.Context, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkRouteTableRequest(c.Server, id, body)
+func (c *Client) LinkRouteTable(ctx context.Context, spaceId SpaceId, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkRouteTableRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -6991,8 +6994,8 @@ func (c *Client) LinkRouteTable(ctx context.Context, id string, body LinkRouteTa
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkRouteTableWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkRouteTableRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UnlinkRouteTableWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkRouteTableRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7003,8 +7006,8 @@ func (c *Client) UnlinkRouteTableWithBody(ctx context.Context, id string, conten
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkRouteTable(ctx context.Context, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkRouteTableRequest(c.Server, id, body)
+func (c *Client) UnlinkRouteTable(ctx context.Context, spaceId SpaceId, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkRouteTableRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7015,8 +7018,8 @@ func (c *Client) UnlinkRouteTable(ctx context.Context, id string, body UnlinkRou
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateRouteTableRoutePropagationWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRouteTableRoutePropagationRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateRouteTableRoutePropagationWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRouteTableRoutePropagationRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7027,8 +7030,8 @@ func (c *Client) UpdateRouteTableRoutePropagationWithBody(ctx context.Context, i
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateRouteTableRoutePropagation(ctx context.Context, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRouteTableRoutePropagationRequest(c.Server, id, body)
+func (c *Client) UpdateRouteTableRoutePropagation(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRouteTableRoutePropagationRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7039,8 +7042,8 @@ func (c *Client) UpdateRouteTableRoutePropagation(ctx context.Context, id string
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadSecurityGroups(ctx context.Context, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadSecurityGroupsRequest(c.Server, params)
+func (c *Client) ReadSecurityGroups(ctx context.Context, spaceId SpaceId, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadSecurityGroupsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7051,8 +7054,8 @@ func (c *Client) ReadSecurityGroups(ctx context.Context, params *ReadSecurityGro
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSecurityGroupWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSecurityGroupRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateSecurityGroupWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSecurityGroupRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7063,8 +7066,8 @@ func (c *Client) CreateSecurityGroupWithBody(ctx context.Context, contentType st
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSecurityGroup(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSecurityGroupRequest(c.Server, body)
+func (c *Client) CreateSecurityGroup(ctx context.Context, spaceId SpaceId, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSecurityGroupRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7075,8 +7078,8 @@ func (c *Client) CreateSecurityGroup(ctx context.Context, body CreateSecurityGro
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSecurityGroup(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSecurityGroupRequest(c.Server, id)
+func (c *Client) DeleteSecurityGroup(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecurityGroupRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7087,8 +7090,8 @@ func (c *Client) DeleteSecurityGroup(ctx context.Context, id string, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadSecurityGroupsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadSecurityGroupsByIdRequest(c.Server, id)
+func (c *Client) ReadSecurityGroupsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadSecurityGroupsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7099,8 +7102,8 @@ func (c *Client) ReadSecurityGroupsById(ctx context.Context, id string, reqEdito
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSecurityGroupRuleWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSecurityGroupRuleRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) DeleteSecurityGroupRuleWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecurityGroupRuleRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7111,8 +7114,8 @@ func (c *Client) DeleteSecurityGroupRuleWithBody(ctx context.Context, id string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSecurityGroupRule(ctx context.Context, id string, body DeleteSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSecurityGroupRuleRequest(c.Server, id, body)
+func (c *Client) DeleteSecurityGroupRule(ctx context.Context, spaceId SpaceId, id string, body DeleteSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSecurityGroupRuleRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7123,8 +7126,8 @@ func (c *Client) DeleteSecurityGroupRule(ctx context.Context, id string, body De
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSecurityGroupRuleWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSecurityGroupRuleRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) CreateSecurityGroupRuleWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSecurityGroupRuleRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7135,8 +7138,8 @@ func (c *Client) CreateSecurityGroupRuleWithBody(ctx context.Context, id string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSecurityGroupRule(ctx context.Context, id string, body CreateSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSecurityGroupRuleRequest(c.Server, id, body)
+func (c *Client) CreateSecurityGroupRule(ctx context.Context, spaceId SpaceId, id string, body CreateSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSecurityGroupRuleRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7147,8 +7150,8 @@ func (c *Client) CreateSecurityGroupRule(ctx context.Context, id string, body Cr
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadSnapshots(ctx context.Context, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadSnapshotsRequest(c.Server, params)
+func (c *Client) ReadSnapshots(ctx context.Context, spaceId SpaceId, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadSnapshotsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7159,8 +7162,8 @@ func (c *Client) ReadSnapshots(ctx context.Context, params *ReadSnapshotsParams,
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSnapshotWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSnapshotRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateSnapshotWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSnapshotRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7171,8 +7174,8 @@ func (c *Client) CreateSnapshotWithBody(ctx context.Context, contentType string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSnapshot(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSnapshotRequest(c.Server, body)
+func (c *Client) CreateSnapshot(ctx context.Context, spaceId SpaceId, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSnapshotRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7183,8 +7186,8 @@ func (c *Client) CreateSnapshot(ctx context.Context, body CreateSnapshotJSONRequ
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSnapshot(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSnapshotRequest(c.Server, id)
+func (c *Client) DeleteSnapshot(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSnapshotRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7195,8 +7198,8 @@ func (c *Client) DeleteSnapshot(ctx context.Context, id string, reqEditors ...Re
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadSnapshotsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadSnapshotsByIdRequest(c.Server, id)
+func (c *Client) ReadSnapshotsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadSnapshotsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7207,8 +7210,8 @@ func (c *Client) ReadSnapshotsById(ctx context.Context, id string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadSubnets(ctx context.Context, params *ReadSubnetsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadSubnetsRequest(c.Server, params)
+func (c *Client) ReadSubnets(ctx context.Context, spaceId SpaceId, params *ReadSubnetsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadSubnetsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7219,8 +7222,8 @@ func (c *Client) ReadSubnets(ctx context.Context, params *ReadSubnetsParams, req
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSubnetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSubnetRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateSubnetWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSubnetRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7231,8 +7234,8 @@ func (c *Client) CreateSubnetWithBody(ctx context.Context, contentType string, b
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSubnet(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSubnetRequest(c.Server, body)
+func (c *Client) CreateSubnet(ctx context.Context, spaceId SpaceId, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSubnetRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7243,8 +7246,8 @@ func (c *Client) CreateSubnet(ctx context.Context, body CreateSubnetJSONRequestB
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSubnet(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSubnetRequest(c.Server, id)
+func (c *Client) DeleteSubnet(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSubnetRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7255,8 +7258,8 @@ func (c *Client) DeleteSubnet(ctx context.Context, id string, reqEditors ...Requ
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadSubnetsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadSubnetsByIdRequest(c.Server, id)
+func (c *Client) ReadSubnetsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadSubnetsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7267,8 +7270,8 @@ func (c *Client) ReadSubnetsById(ctx context.Context, id string, reqEditors ...R
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateSubnetWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateSubnetRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateSubnetWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateSubnetRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7279,8 +7282,8 @@ func (c *Client) UpdateSubnetWithBody(ctx context.Context, id string, contentTyp
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateSubnet(ctx context.Context, id string, body UpdateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateSubnetRequest(c.Server, id, body)
+func (c *Client) UpdateSubnet(ctx context.Context, spaceId SpaceId, id string, body UpdateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateSubnetRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7291,8 +7294,8 @@ func (c *Client) UpdateSubnet(ctx context.Context, id string, body UpdateSubnetJ
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadTags(ctx context.Context, params *ReadTagsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadTagsRequest(c.Server, params)
+func (c *Client) ReadTags(ctx context.Context, spaceId SpaceId, params *ReadTagsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadTagsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7303,8 +7306,8 @@ func (c *Client) ReadTags(ctx context.Context, params *ReadTagsParams, reqEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVirtualGateways(ctx context.Context, params *ReadVirtualGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVirtualGatewaysRequest(c.Server, params)
+func (c *Client) ReadVirtualGateways(ctx context.Context, spaceId SpaceId, params *ReadVirtualGatewaysParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVirtualGatewaysRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7315,8 +7318,8 @@ func (c *Client) ReadVirtualGateways(ctx context.Context, params *ReadVirtualGat
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVirtualGatewayWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVirtualGatewayRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateVirtualGatewayWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVirtualGatewayRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7327,8 +7330,8 @@ func (c *Client) CreateVirtualGatewayWithBody(ctx context.Context, contentType s
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVirtualGateway(ctx context.Context, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVirtualGatewayRequest(c.Server, body)
+func (c *Client) CreateVirtualGateway(ctx context.Context, spaceId SpaceId, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVirtualGatewayRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7339,8 +7342,8 @@ func (c *Client) CreateVirtualGateway(ctx context.Context, body CreateVirtualGat
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVirtualGateway(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVirtualGatewayRequest(c.Server, id)
+func (c *Client) DeleteVirtualGateway(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVirtualGatewayRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7351,8 +7354,8 @@ func (c *Client) DeleteVirtualGateway(ctx context.Context, id string, reqEditors
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVirtualGatewaysById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVirtualGatewaysByIdRequest(c.Server, id)
+func (c *Client) ReadVirtualGatewaysById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVirtualGatewaysByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7363,8 +7366,8 @@ func (c *Client) ReadVirtualGatewaysById(ctx context.Context, id string, reqEdit
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkVirtualGatewayToVpcWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkVirtualGatewayToVpcRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) LinkVirtualGatewayToVpcWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkVirtualGatewayToVpcRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7375,8 +7378,8 @@ func (c *Client) LinkVirtualGatewayToVpcWithBody(ctx context.Context, id string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkVirtualGatewayToVpc(ctx context.Context, id string, body LinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkVirtualGatewayToVpcRequest(c.Server, id, body)
+func (c *Client) LinkVirtualGatewayToVpc(ctx context.Context, spaceId SpaceId, id string, body LinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkVirtualGatewayToVpcRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7387,8 +7390,8 @@ func (c *Client) LinkVirtualGatewayToVpc(ctx context.Context, id string, body Li
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkVirtualGatewayToVpcWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkVirtualGatewayToVpcRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UnlinkVirtualGatewayToVpcWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkVirtualGatewayToVpcRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7399,8 +7402,8 @@ func (c *Client) UnlinkVirtualGatewayToVpcWithBody(ctx context.Context, id strin
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkVirtualGatewayToVpc(ctx context.Context, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkVirtualGatewayToVpcRequest(c.Server, id, body)
+func (c *Client) UnlinkVirtualGatewayToVpc(ctx context.Context, spaceId SpaceId, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkVirtualGatewayToVpcRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7411,8 +7414,8 @@ func (c *Client) UnlinkVirtualGatewayToVpc(ctx context.Context, id string, body 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVms(ctx context.Context, params *ReadVmsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVmsRequest(c.Server, params)
+func (c *Client) ReadVms(ctx context.Context, spaceId SpaceId, params *ReadVmsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVmsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7423,8 +7426,8 @@ func (c *Client) ReadVms(ctx context.Context, params *ReadVmsParams, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVmsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVmsRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateVmsWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVmsRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7435,8 +7438,8 @@ func (c *Client) CreateVmsWithBody(ctx context.Context, contentType string, body
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVms(ctx context.Context, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVmsRequest(c.Server, body)
+func (c *Client) CreateVms(ctx context.Context, spaceId SpaceId, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVmsRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7447,8 +7450,8 @@ func (c *Client) CreateVms(ctx context.Context, body CreateVmsJSONRequestBody, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVmsState(ctx context.Context, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVmsStateRequest(c.Server, params)
+func (c *Client) ReadVmsState(ctx context.Context, spaceId SpaceId, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVmsStateRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7459,8 +7462,8 @@ func (c *Client) ReadVmsState(ctx context.Context, params *ReadVmsStateParams, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVms(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVmsRequest(c.Server, id)
+func (c *Client) DeleteVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVmsRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7471,8 +7474,8 @@ func (c *Client) DeleteVms(ctx context.Context, id []interface{}, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVmsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVmsByIdRequest(c.Server, id)
+func (c *Client) ReadVmsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVmsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7483,8 +7486,8 @@ func (c *Client) ReadVmsById(ctx context.Context, id string, reqEditors ...Reque
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVmWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVmRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateVmWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVmRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7495,8 +7498,8 @@ func (c *Client) UpdateVmWithBody(ctx context.Context, id string, contentType st
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVm(ctx context.Context, id string, body UpdateVmJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVmRequest(c.Server, id, body)
+func (c *Client) UpdateVm(ctx context.Context, spaceId SpaceId, id string, body UpdateVmJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVmRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7507,8 +7510,8 @@ func (c *Client) UpdateVm(ctx context.Context, id string, body UpdateVmJSONReque
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadAdminPassword(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadAdminPasswordRequest(c.Server, id)
+func (c *Client) ReadAdminPassword(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadAdminPasswordRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7519,8 +7522,8 @@ func (c *Client) ReadAdminPassword(ctx context.Context, id string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadConsoleOutput(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadConsoleOutputRequest(c.Server, id)
+func (c *Client) ReadConsoleOutput(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadConsoleOutputRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7531,8 +7534,8 @@ func (c *Client) ReadConsoleOutput(ctx context.Context, id string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client) RebootVms(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRebootVmsRequest(c.Server, id)
+func (c *Client) RebootVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRebootVmsRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7543,8 +7546,8 @@ func (c *Client) RebootVms(ctx context.Context, id []interface{}, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client) StartVms(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewStartVmsRequest(c.Server, id)
+func (c *Client) StartVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewStartVmsRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7555,8 +7558,8 @@ func (c *Client) StartVms(ctx context.Context, id []interface{}, reqEditors ...R
 	return c.Client.Do(req)
 }
 
-func (c *Client) StopVmsWithBody(ctx context.Context, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewStopVmsRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) StopVmsWithBody(ctx context.Context, spaceId SpaceId, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewStopVmsRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7567,8 +7570,8 @@ func (c *Client) StopVmsWithBody(ctx context.Context, id []interface{}, contentT
 	return c.Client.Do(req)
 }
 
-func (c *Client) StopVms(ctx context.Context, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewStopVmsRequest(c.Server, id, body)
+func (c *Client) StopVms(ctx context.Context, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewStopVmsRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7579,8 +7582,8 @@ func (c *Client) StopVms(ctx context.Context, id []interface{}, body StopVmsJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVolumes(ctx context.Context, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVolumesRequest(c.Server, params)
+func (c *Client) ReadVolumes(ctx context.Context, spaceId SpaceId, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVolumesRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7591,8 +7594,8 @@ func (c *Client) ReadVolumes(ctx context.Context, params *ReadVolumesParams, req
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVolumeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVolumeRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateVolumeWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVolumeRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7603,8 +7606,8 @@ func (c *Client) CreateVolumeWithBody(ctx context.Context, contentType string, b
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVolume(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVolumeRequest(c.Server, body)
+func (c *Client) CreateVolume(ctx context.Context, spaceId SpaceId, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVolumeRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7615,8 +7618,8 @@ func (c *Client) CreateVolume(ctx context.Context, body CreateVolumeJSONRequestB
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVolume(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVolumeRequest(c.Server, id)
+func (c *Client) DeleteVolume(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVolumeRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7627,8 +7630,8 @@ func (c *Client) DeleteVolume(ctx context.Context, id string, reqEditors ...Requ
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVolumesById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVolumesByIdRequest(c.Server, id)
+func (c *Client) ReadVolumesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVolumesByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7639,8 +7642,8 @@ func (c *Client) ReadVolumesById(ctx context.Context, id string, reqEditors ...R
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVolumeWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVolumeRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateVolumeWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVolumeRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7651,8 +7654,8 @@ func (c *Client) UpdateVolumeWithBody(ctx context.Context, id string, contentTyp
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVolume(ctx context.Context, id string, body UpdateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVolumeRequest(c.Server, id, body)
+func (c *Client) UpdateVolume(ctx context.Context, spaceId SpaceId, id string, body UpdateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVolumeRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7663,8 +7666,8 @@ func (c *Client) UpdateVolume(ctx context.Context, id string, body UpdateVolumeJ
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkVolumeWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkVolumeRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) LinkVolumeWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkVolumeRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7675,8 +7678,8 @@ func (c *Client) LinkVolumeWithBody(ctx context.Context, id string, contentType 
 	return c.Client.Do(req)
 }
 
-func (c *Client) LinkVolume(ctx context.Context, id string, body LinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewLinkVolumeRequest(c.Server, id, body)
+func (c *Client) LinkVolume(ctx context.Context, spaceId SpaceId, id string, body LinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLinkVolumeRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7687,8 +7690,8 @@ func (c *Client) LinkVolume(ctx context.Context, id string, body LinkVolumeJSONR
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkVolumeWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkVolumeRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UnlinkVolumeWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkVolumeRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7699,8 +7702,8 @@ func (c *Client) UnlinkVolumeWithBody(ctx context.Context, id string, contentTyp
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkVolume(ctx context.Context, id string, body UnlinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUnlinkVolumeRequest(c.Server, id, body)
+func (c *Client) UnlinkVolume(ctx context.Context, spaceId SpaceId, id string, body UnlinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUnlinkVolumeRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7711,8 +7714,8 @@ func (c *Client) UnlinkVolume(ctx context.Context, id string, body UnlinkVolumeJ
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVpcAccessPoints(ctx context.Context, params *ReadVpcAccessPointsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVpcAccessPointsRequest(c.Server, params)
+func (c *Client) ReadVpcAccessPoints(ctx context.Context, spaceId SpaceId, params *ReadVpcAccessPointsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVpcAccessPointsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7723,8 +7726,8 @@ func (c *Client) ReadVpcAccessPoints(ctx context.Context, params *ReadVpcAccessP
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpcAccessPointWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpcAccessPointRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateVpcAccessPointWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpcAccessPointRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7735,8 +7738,8 @@ func (c *Client) CreateVpcAccessPointWithBody(ctx context.Context, contentType s
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpcAccessPoint(ctx context.Context, body CreateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpcAccessPointRequest(c.Server, body)
+func (c *Client) CreateVpcAccessPoint(ctx context.Context, spaceId SpaceId, body CreateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpcAccessPointRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7747,8 +7750,8 @@ func (c *Client) CreateVpcAccessPoint(ctx context.Context, body CreateVpcAccessP
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVpcAccessPoint(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVpcAccessPointRequest(c.Server, id)
+func (c *Client) DeleteVpcAccessPoint(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVpcAccessPointRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7759,8 +7762,8 @@ func (c *Client) DeleteVpcAccessPoint(ctx context.Context, id string, reqEditors
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVpcAccessPointsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVpcAccessPointsByIdRequest(c.Server, id)
+func (c *Client) ReadVpcAccessPointsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVpcAccessPointsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7771,8 +7774,8 @@ func (c *Client) ReadVpcAccessPointsById(ctx context.Context, id string, reqEdit
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVpcAccessPointWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVpcAccessPointRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateVpcAccessPointWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVpcAccessPointRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7783,8 +7786,8 @@ func (c *Client) UpdateVpcAccessPointWithBody(ctx context.Context, id string, co
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVpcAccessPoint(ctx context.Context, id string, body UpdateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVpcAccessPointRequest(c.Server, id, body)
+func (c *Client) UpdateVpcAccessPoint(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVpcAccessPointRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7795,8 +7798,8 @@ func (c *Client) UpdateVpcAccessPoint(ctx context.Context, id string, body Updat
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVpcPeerings(ctx context.Context, params *ReadVpcPeeringsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVpcPeeringsRequest(c.Server, params)
+func (c *Client) ReadVpcPeerings(ctx context.Context, spaceId SpaceId, params *ReadVpcPeeringsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVpcPeeringsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7807,8 +7810,8 @@ func (c *Client) ReadVpcPeerings(ctx context.Context, params *ReadVpcPeeringsPar
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpcPeeringWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpcPeeringRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateVpcPeeringWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpcPeeringRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7819,8 +7822,8 @@ func (c *Client) CreateVpcPeeringWithBody(ctx context.Context, contentType strin
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpcPeering(ctx context.Context, body CreateVpcPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpcPeeringRequest(c.Server, body)
+func (c *Client) CreateVpcPeering(ctx context.Context, spaceId SpaceId, body CreateVpcPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpcPeeringRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7831,8 +7834,8 @@ func (c *Client) CreateVpcPeering(ctx context.Context, body CreateVpcPeeringJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVpcPeering(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVpcPeeringRequest(c.Server, id)
+func (c *Client) DeleteVpcPeering(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVpcPeeringRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7843,8 +7846,8 @@ func (c *Client) DeleteVpcPeering(ctx context.Context, id string, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVpcPeeringsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVpcPeeringsByIdRequest(c.Server, id)
+func (c *Client) ReadVpcPeeringsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVpcPeeringsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7855,8 +7858,8 @@ func (c *Client) ReadVpcPeeringsById(ctx context.Context, id string, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) AcceptVpcPeering(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAcceptVpcPeeringRequest(c.Server, id)
+func (c *Client) AcceptVpcPeering(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAcceptVpcPeeringRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7867,8 +7870,8 @@ func (c *Client) AcceptVpcPeering(ctx context.Context, id string, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client) RejectVpcPeering(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRejectVpcPeeringRequest(c.Server, id)
+func (c *Client) RejectVpcPeering(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRejectVpcPeeringRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7879,8 +7882,8 @@ func (c *Client) RejectVpcPeering(ctx context.Context, id string, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVpcs(ctx context.Context, params *ReadVpcsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVpcsRequest(c.Server, params)
+func (c *Client) ReadVpcs(ctx context.Context, spaceId SpaceId, params *ReadVpcsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVpcsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7891,8 +7894,8 @@ func (c *Client) ReadVpcs(ctx context.Context, params *ReadVpcsParams, reqEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpcWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpcRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateVpcWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpcRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7903,8 +7906,8 @@ func (c *Client) CreateVpcWithBody(ctx context.Context, contentType string, body
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpc(ctx context.Context, body CreateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpcRequest(c.Server, body)
+func (c *Client) CreateVpc(ctx context.Context, spaceId SpaceId, body CreateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpcRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7915,8 +7918,8 @@ func (c *Client) CreateVpc(ctx context.Context, body CreateVpcJSONRequestBody, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVpc(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVpcRequest(c.Server, id)
+func (c *Client) DeleteVpc(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVpcRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7927,8 +7930,8 @@ func (c *Client) DeleteVpc(ctx context.Context, id string, reqEditors ...Request
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVpcsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVpcsByIdRequest(c.Server, id)
+func (c *Client) ReadVpcsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVpcsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -7939,8 +7942,8 @@ func (c *Client) ReadVpcsById(ctx context.Context, id string, reqEditors ...Requ
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVpcWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVpcRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateVpcWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVpcRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7951,8 +7954,8 @@ func (c *Client) UpdateVpcWithBody(ctx context.Context, id string, contentType s
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVpc(ctx context.Context, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVpcRequest(c.Server, id, body)
+func (c *Client) UpdateVpc(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVpcRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7963,8 +7966,8 @@ func (c *Client) UpdateVpc(ctx context.Context, id string, body UpdateVpcJSONReq
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVpnConnections(ctx context.Context, params *ReadVpnConnectionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVpnConnectionsRequest(c.Server, params)
+func (c *Client) ReadVpnConnections(ctx context.Context, spaceId SpaceId, params *ReadVpnConnectionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVpnConnectionsRequest(c.Server, spaceId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -7975,8 +7978,8 @@ func (c *Client) ReadVpnConnections(ctx context.Context, params *ReadVpnConnecti
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpnConnectionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpnConnectionRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateVpnConnectionWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpnConnectionRequestWithBody(c.Server, spaceId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7987,8 +7990,8 @@ func (c *Client) CreateVpnConnectionWithBody(ctx context.Context, contentType st
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpnConnection(ctx context.Context, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpnConnectionRequest(c.Server, body)
+func (c *Client) CreateVpnConnection(ctx context.Context, spaceId SpaceId, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpnConnectionRequest(c.Server, spaceId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -7999,8 +8002,8 @@ func (c *Client) CreateVpnConnection(ctx context.Context, body CreateVpnConnecti
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVpnConnection(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVpnConnectionRequest(c.Server, id)
+func (c *Client) DeleteVpnConnection(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVpnConnectionRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -8011,8 +8014,8 @@ func (c *Client) DeleteVpnConnection(ctx context.Context, id string, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReadVpnConnectionsById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadVpnConnectionsByIdRequest(c.Server, id)
+func (c *Client) ReadVpnConnectionsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadVpnConnectionsByIdRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
 	}
@@ -8023,8 +8026,8 @@ func (c *Client) ReadVpnConnectionsById(ctx context.Context, id string, reqEdito
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVpnConnectionWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVpnConnectionRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateVpnConnectionWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVpnConnectionRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -8035,8 +8038,8 @@ func (c *Client) UpdateVpnConnectionWithBody(ctx context.Context, id string, con
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateVpnConnection(ctx context.Context, id string, body UpdateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateVpnConnectionRequest(c.Server, id, body)
+func (c *Client) UpdateVpnConnection(ctx context.Context, spaceId SpaceId, id string, body UpdateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVpnConnectionRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -8047,8 +8050,8 @@ func (c *Client) UpdateVpnConnection(ctx context.Context, id string, body Update
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVpnConnectionRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVpnConnectionRouteRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) DeleteVpnConnectionRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVpnConnectionRouteRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -8059,8 +8062,8 @@ func (c *Client) DeleteVpnConnectionRouteWithBody(ctx context.Context, id string
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVpnConnectionRoute(ctx context.Context, id string, body DeleteVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVpnConnectionRouteRequest(c.Server, id, body)
+func (c *Client) DeleteVpnConnectionRoute(ctx context.Context, spaceId SpaceId, id string, body DeleteVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVpnConnectionRouteRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -8071,8 +8074,8 @@ func (c *Client) DeleteVpnConnectionRoute(ctx context.Context, id string, body D
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpnConnectionRouteWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpnConnectionRouteRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) CreateVpnConnectionRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpnConnectionRouteRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -8083,8 +8086,8 @@ func (c *Client) CreateVpnConnectionRouteWithBody(ctx context.Context, id string
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateVpnConnectionRoute(ctx context.Context, id string, body CreateVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateVpnConnectionRouteRequest(c.Server, id, body)
+func (c *Client) CreateVpnConnectionRoute(ctx context.Context, spaceId SpaceId, id string, body CreateVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateVpnConnectionRouteRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -8096,26 +8099,33 @@ func (c *Client) CreateVpnConnectionRoute(ctx context.Context, id string, body C
 }
 
 // NewDeleteLoadBalancerTagsRequest calls the generic DeleteLoadBalancerTags builder with application/json body
-func NewDeleteLoadBalancerTagsRequest(server string, body DeleteLoadBalancerTagsJSONRequestBody) (*http.Request, error) {
+func NewDeleteLoadBalancerTagsRequest(server string, spaceId SpaceId, body DeleteLoadBalancerTagsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewDeleteLoadBalancerTagsRequestWithBody(server, "application/json", bodyReader)
+	return NewDeleteLoadBalancerTagsRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewDeleteLoadBalancerTagsRequestWithBody generates requests for DeleteLoadBalancerTags with any type of body
-func NewDeleteLoadBalancerTagsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewDeleteLoadBalancerTagsRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/bulk/loadBalancersTags")
+	operationPath := fmt.Sprintf("/spaces/%s/bulk/loadBalancersTags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8136,26 +8146,33 @@ func NewDeleteLoadBalancerTagsRequestWithBody(server string, contentType string,
 }
 
 // NewCreateLoadBalancerTagsRequest calls the generic CreateLoadBalancerTags builder with application/json body
-func NewCreateLoadBalancerTagsRequest(server string, body CreateLoadBalancerTagsJSONRequestBody) (*http.Request, error) {
+func NewCreateLoadBalancerTagsRequest(server string, spaceId SpaceId, body CreateLoadBalancerTagsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateLoadBalancerTagsRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateLoadBalancerTagsRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateLoadBalancerTagsRequestWithBody generates requests for CreateLoadBalancerTags with any type of body
-func NewCreateLoadBalancerTagsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateLoadBalancerTagsRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/bulk/loadBalancersTags")
+	operationPath := fmt.Sprintf("/spaces/%s/bulk/loadBalancersTags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8176,26 +8193,33 @@ func NewCreateLoadBalancerTagsRequestWithBody(server string, contentType string,
 }
 
 // NewDeleteTagsRequest calls the generic DeleteTags builder with application/json body
-func NewDeleteTagsRequest(server string, body DeleteTagsJSONRequestBody) (*http.Request, error) {
+func NewDeleteTagsRequest(server string, spaceId SpaceId, body DeleteTagsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewDeleteTagsRequestWithBody(server, "application/json", bodyReader)
+	return NewDeleteTagsRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewDeleteTagsRequestWithBody generates requests for DeleteTags with any type of body
-func NewDeleteTagsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewDeleteTagsRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/bulk/tags")
+	operationPath := fmt.Sprintf("/spaces/%s/bulk/tags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8216,26 +8240,33 @@ func NewDeleteTagsRequestWithBody(server string, contentType string, body io.Rea
 }
 
 // NewCreateTagsRequest calls the generic CreateTags builder with application/json body
-func NewCreateTagsRequest(server string, body CreateTagsJSONRequestBody) (*http.Request, error) {
+func NewCreateTagsRequest(server string, spaceId SpaceId, body CreateTagsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateTagsRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateTagsRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateTagsRequestWithBody generates requests for CreateTags with any type of body
-func NewCreateTagsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateTagsRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/bulk/tags")
+	operationPath := fmt.Sprintf("/spaces/%s/bulk/tags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8256,15 +8287,22 @@ func NewCreateTagsRequestWithBody(server string, contentType string, body io.Rea
 }
 
 // NewReadClientGatewaysRequest generates requests for ReadClientGateways
-func NewReadClientGatewaysRequest(server string, params *ReadClientGatewaysParams) (*http.Request, error) {
+func NewReadClientGatewaysRequest(server string, spaceId SpaceId, params *ReadClientGatewaysParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/clientGateways")
+	operationPath := fmt.Sprintf("/spaces/%s/clientGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8417,26 +8455,33 @@ func NewReadClientGatewaysRequest(server string, params *ReadClientGatewaysParam
 }
 
 // NewCreateClientGatewayRequest calls the generic CreateClientGateway builder with application/json body
-func NewCreateClientGatewayRequest(server string, body CreateClientGatewayJSONRequestBody) (*http.Request, error) {
+func NewCreateClientGatewayRequest(server string, spaceId SpaceId, body CreateClientGatewayJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateClientGatewayRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateClientGatewayRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateClientGatewayRequestWithBody generates requests for CreateClientGateway with any type of body
-func NewCreateClientGatewayRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateClientGatewayRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/clientGateways")
+	operationPath := fmt.Sprintf("/spaces/%s/clientGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8457,12 +8502,19 @@ func NewCreateClientGatewayRequestWithBody(server string, contentType string, bo
 }
 
 // NewDeleteClientGatewayRequest generates requests for DeleteClientGateway
-func NewDeleteClientGatewayRequest(server string, id string) (*http.Request, error) {
+func NewDeleteClientGatewayRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -8472,7 +8524,7 @@ func NewDeleteClientGatewayRequest(server string, id string) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/clientGateways/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/clientGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8491,12 +8543,19 @@ func NewDeleteClientGatewayRequest(server string, id string) (*http.Request, err
 }
 
 // NewReadClientGatewaysByIdRequest generates requests for ReadClientGatewaysById
-func NewReadClientGatewaysByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadClientGatewaysByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -8506,7 +8565,7 @@ func NewReadClientGatewaysByIdRequest(server string, id string) (*http.Request, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/clientGateways/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/clientGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8525,15 +8584,22 @@ func NewReadClientGatewaysByIdRequest(server string, id string) (*http.Request, 
 }
 
 // NewReadDhcpOptionsRequest generates requests for ReadDhcpOptions
-func NewReadDhcpOptionsRequest(server string, params *ReadDhcpOptionsParams) (*http.Request, error) {
+func NewReadDhcpOptionsRequest(server string, spaceId SpaceId, params *ReadDhcpOptionsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/dhcpOptions")
+	operationPath := fmt.Sprintf("/spaces/%s/dhcpOptions", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8702,26 +8768,33 @@ func NewReadDhcpOptionsRequest(server string, params *ReadDhcpOptionsParams) (*h
 }
 
 // NewCreateDhcpOptionsRequest calls the generic CreateDhcpOptions builder with application/json body
-func NewCreateDhcpOptionsRequest(server string, body CreateDhcpOptionsJSONRequestBody) (*http.Request, error) {
+func NewCreateDhcpOptionsRequest(server string, spaceId SpaceId, body CreateDhcpOptionsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateDhcpOptionsRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateDhcpOptionsRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateDhcpOptionsRequestWithBody generates requests for CreateDhcpOptions with any type of body
-func NewCreateDhcpOptionsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateDhcpOptionsRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/dhcpOptions")
+	operationPath := fmt.Sprintf("/spaces/%s/dhcpOptions", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8742,12 +8815,19 @@ func NewCreateDhcpOptionsRequestWithBody(server string, contentType string, body
 }
 
 // NewDeleteDhcpOptionsRequest generates requests for DeleteDhcpOptions
-func NewDeleteDhcpOptionsRequest(server string, id string) (*http.Request, error) {
+func NewDeleteDhcpOptionsRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -8757,7 +8837,7 @@ func NewDeleteDhcpOptionsRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/dhcpOptions/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/dhcpOptions/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8776,12 +8856,19 @@ func NewDeleteDhcpOptionsRequest(server string, id string) (*http.Request, error
 }
 
 // NewReadDhcpOptionsByIdRequest generates requests for ReadDhcpOptionsById
-func NewReadDhcpOptionsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadDhcpOptionsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -8791,7 +8878,7 @@ func NewReadDhcpOptionsByIdRequest(server string, id string) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/dhcpOptions/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/dhcpOptions/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8810,15 +8897,22 @@ func NewReadDhcpOptionsByIdRequest(server string, id string) (*http.Request, err
 }
 
 // NewReadDirectLinkInterfacesRequest generates requests for ReadDirectLinkInterfaces
-func NewReadDirectLinkInterfacesRequest(server string, params *ReadDirectLinkInterfacesParams) (*http.Request, error) {
+func NewReadDirectLinkInterfacesRequest(server string, spaceId SpaceId, params *ReadDirectLinkInterfacesParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/directLinkInterfaces")
+	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8875,26 +8969,33 @@ func NewReadDirectLinkInterfacesRequest(server string, params *ReadDirectLinkInt
 }
 
 // NewCreateDirectLinkInterfaceRequest calls the generic CreateDirectLinkInterface builder with application/json body
-func NewCreateDirectLinkInterfaceRequest(server string, body CreateDirectLinkInterfaceJSONRequestBody) (*http.Request, error) {
+func NewCreateDirectLinkInterfaceRequest(server string, spaceId SpaceId, body CreateDirectLinkInterfaceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateDirectLinkInterfaceRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateDirectLinkInterfaceRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateDirectLinkInterfaceRequestWithBody generates requests for CreateDirectLinkInterface with any type of body
-func NewCreateDirectLinkInterfaceRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateDirectLinkInterfaceRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/directLinkInterfaces")
+	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8915,12 +9016,19 @@ func NewCreateDirectLinkInterfaceRequestWithBody(server string, contentType stri
 }
 
 // NewDeleteDirectLinkInterfaceRequest generates requests for DeleteDirectLinkInterface
-func NewDeleteDirectLinkInterfaceRequest(server string, id string) (*http.Request, error) {
+func NewDeleteDirectLinkInterfaceRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -8930,7 +9038,7 @@ func NewDeleteDirectLinkInterfaceRequest(server string, id string) (*http.Reques
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/directLinkInterfaces/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8949,12 +9057,19 @@ func NewDeleteDirectLinkInterfaceRequest(server string, id string) (*http.Reques
 }
 
 // NewReadDirectLinkInterfacesByIdRequest generates requests for ReadDirectLinkInterfacesById
-func NewReadDirectLinkInterfacesByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadDirectLinkInterfacesByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -8964,7 +9079,7 @@ func NewReadDirectLinkInterfacesByIdRequest(server string, id string) (*http.Req
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/directLinkInterfaces/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8983,23 +9098,30 @@ func NewReadDirectLinkInterfacesByIdRequest(server string, id string) (*http.Req
 }
 
 // NewUpdateDirectLinkInterfaceRequest calls the generic UpdateDirectLinkInterface builder with application/json body
-func NewUpdateDirectLinkInterfaceRequest(server string, id string, body UpdateDirectLinkInterfaceJSONRequestBody) (*http.Request, error) {
+func NewUpdateDirectLinkInterfaceRequest(server string, spaceId SpaceId, id string, body UpdateDirectLinkInterfaceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateDirectLinkInterfaceRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateDirectLinkInterfaceRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateDirectLinkInterfaceRequestWithBody generates requests for UpdateDirectLinkInterface with any type of body
-func NewUpdateDirectLinkInterfaceRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateDirectLinkInterfaceRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -9009,7 +9131,7 @@ func NewUpdateDirectLinkInterfaceRequestWithBody(server string, id string, conte
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/directLinkInterfaces/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9030,15 +9152,22 @@ func NewUpdateDirectLinkInterfaceRequestWithBody(server string, id string, conte
 }
 
 // NewReadDirectLinksRequest generates requests for ReadDirectLinks
-func NewReadDirectLinksRequest(server string, params *ReadDirectLinksParams) (*http.Request, error) {
+func NewReadDirectLinksRequest(server string, spaceId SpaceId, params *ReadDirectLinksParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/directLinks")
+	operationPath := fmt.Sprintf("/spaces/%s/directLinks", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9079,26 +9208,33 @@ func NewReadDirectLinksRequest(server string, params *ReadDirectLinksParams) (*h
 }
 
 // NewCreateDirectLinkRequest calls the generic CreateDirectLink builder with application/json body
-func NewCreateDirectLinkRequest(server string, body CreateDirectLinkJSONRequestBody) (*http.Request, error) {
+func NewCreateDirectLinkRequest(server string, spaceId SpaceId, body CreateDirectLinkJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateDirectLinkRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateDirectLinkRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateDirectLinkRequestWithBody generates requests for CreateDirectLink with any type of body
-func NewCreateDirectLinkRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateDirectLinkRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/directLinks")
+	operationPath := fmt.Sprintf("/spaces/%s/directLinks", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9119,12 +9255,19 @@ func NewCreateDirectLinkRequestWithBody(server string, contentType string, body 
 }
 
 // NewDeleteDirectLinkRequest generates requests for DeleteDirectLink
-func NewDeleteDirectLinkRequest(server string, id string) (*http.Request, error) {
+func NewDeleteDirectLinkRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -9134,7 +9277,7 @@ func NewDeleteDirectLinkRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/directLinks/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/directLinks/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9153,12 +9296,19 @@ func NewDeleteDirectLinkRequest(server string, id string) (*http.Request, error)
 }
 
 // NewReadDirectLinksByIdRequest generates requests for ReadDirectLinksById
-func NewReadDirectLinksByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadDirectLinksByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -9168,7 +9318,7 @@ func NewReadDirectLinksByIdRequest(server string, id string) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/directLinks/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/directLinks/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9187,15 +9337,22 @@ func NewReadDirectLinksByIdRequest(server string, id string) (*http.Request, err
 }
 
 // NewReadFlexibleGpuCatalogRequest generates requests for ReadFlexibleGpuCatalog
-func NewReadFlexibleGpuCatalogRequest(server string) (*http.Request, error) {
+func NewReadFlexibleGpuCatalogRequest(server string, spaceId SpaceId) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/flexibleGpuCatalogs")
+	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpuCatalogs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9214,15 +9371,22 @@ func NewReadFlexibleGpuCatalogRequest(server string) (*http.Request, error) {
 }
 
 // NewReadFlexibleGpusRequest generates requests for ReadFlexibleGpus
-func NewReadFlexibleGpusRequest(server string, params *ReadFlexibleGpusParams) (*http.Request, error) {
+func NewReadFlexibleGpusRequest(server string, spaceId SpaceId, params *ReadFlexibleGpusParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/flexibleGpus")
+	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9359,26 +9523,33 @@ func NewReadFlexibleGpusRequest(server string, params *ReadFlexibleGpusParams) (
 }
 
 // NewCreateFlexibleGpuRequest calls the generic CreateFlexibleGpu builder with application/json body
-func NewCreateFlexibleGpuRequest(server string, body CreateFlexibleGpuJSONRequestBody) (*http.Request, error) {
+func NewCreateFlexibleGpuRequest(server string, spaceId SpaceId, body CreateFlexibleGpuJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateFlexibleGpuRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateFlexibleGpuRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateFlexibleGpuRequestWithBody generates requests for CreateFlexibleGpu with any type of body
-func NewCreateFlexibleGpuRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateFlexibleGpuRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/flexibleGpus")
+	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9399,12 +9570,19 @@ func NewCreateFlexibleGpuRequestWithBody(server string, contentType string, body
 }
 
 // NewDeleteFlexibleGpuRequest generates requests for DeleteFlexibleGpu
-func NewDeleteFlexibleGpuRequest(server string, id string) (*http.Request, error) {
+func NewDeleteFlexibleGpuRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -9414,7 +9592,7 @@ func NewDeleteFlexibleGpuRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/flexibleGpus/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9433,12 +9611,19 @@ func NewDeleteFlexibleGpuRequest(server string, id string) (*http.Request, error
 }
 
 // NewReadFlexibleGpusByIdRequest generates requests for ReadFlexibleGpusById
-func NewReadFlexibleGpusByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadFlexibleGpusByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -9448,7 +9633,7 @@ func NewReadFlexibleGpusByIdRequest(server string, id string) (*http.Request, er
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/flexibleGpus/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9467,23 +9652,30 @@ func NewReadFlexibleGpusByIdRequest(server string, id string) (*http.Request, er
 }
 
 // NewUpdateFlexibleGpuRequest calls the generic UpdateFlexibleGpu builder with application/json body
-func NewUpdateFlexibleGpuRequest(server string, id string, body UpdateFlexibleGpuJSONRequestBody) (*http.Request, error) {
+func NewUpdateFlexibleGpuRequest(server string, spaceId SpaceId, id string, body UpdateFlexibleGpuJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateFlexibleGpuRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateFlexibleGpuRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateFlexibleGpuRequestWithBody generates requests for UpdateFlexibleGpu with any type of body
-func NewUpdateFlexibleGpuRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateFlexibleGpuRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -9493,7 +9685,7 @@ func NewUpdateFlexibleGpuRequestWithBody(server string, id string, contentType s
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/flexibleGpus/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9514,23 +9706,30 @@ func NewUpdateFlexibleGpuRequestWithBody(server string, id string, contentType s
 }
 
 // NewLinkFlexibleGpuRequest calls the generic LinkFlexibleGpu builder with application/json body
-func NewLinkFlexibleGpuRequest(server string, id string, body LinkFlexibleGpuJSONRequestBody) (*http.Request, error) {
+func NewLinkFlexibleGpuRequest(server string, spaceId SpaceId, id string, body LinkFlexibleGpuJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLinkFlexibleGpuRequestWithBody(server, id, "application/json", bodyReader)
+	return NewLinkFlexibleGpuRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewLinkFlexibleGpuRequestWithBody generates requests for LinkFlexibleGpu with any type of body
-func NewLinkFlexibleGpuRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewLinkFlexibleGpuRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -9540,7 +9739,7 @@ func NewLinkFlexibleGpuRequestWithBody(server string, id string, contentType str
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/flexibleGpus/%s/vms/link", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s/vms/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9561,12 +9760,19 @@ func NewLinkFlexibleGpuRequestWithBody(server string, id string, contentType str
 }
 
 // NewUnlinkFlexibleGpuRequest generates requests for UnlinkFlexibleGpu
-func NewUnlinkFlexibleGpuRequest(server string, id string) (*http.Request, error) {
+func NewUnlinkFlexibleGpuRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -9576,7 +9782,7 @@ func NewUnlinkFlexibleGpuRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/flexibleGpus/%s/vms/unlink", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s/vms/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9595,15 +9801,22 @@ func NewUnlinkFlexibleGpuRequest(server string, id string) (*http.Request, error
 }
 
 // NewReadImagesRequest generates requests for ReadImages
-func NewReadImagesRequest(server string, params *ReadImagesParams) (*http.Request, error) {
+func NewReadImagesRequest(server string, spaceId SpaceId, params *ReadImagesParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/images")
+	operationPath := fmt.Sprintf("/spaces/%s/images", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10012,26 +10225,33 @@ func NewReadImagesRequest(server string, params *ReadImagesParams) (*http.Reques
 }
 
 // NewCreateImageRequest calls the generic CreateImage builder with application/json body
-func NewCreateImageRequest(server string, body CreateImageJSONRequestBody) (*http.Request, error) {
+func NewCreateImageRequest(server string, spaceId SpaceId, body CreateImageJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateImageRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateImageRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateImageRequestWithBody generates requests for CreateImage with any type of body
-func NewCreateImageRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateImageRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/images")
+	operationPath := fmt.Sprintf("/spaces/%s/images", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10052,12 +10272,19 @@ func NewCreateImageRequestWithBody(server string, contentType string, body io.Re
 }
 
 // NewDeleteImageRequest generates requests for DeleteImage
-func NewDeleteImageRequest(server string, id string) (*http.Request, error) {
+func NewDeleteImageRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10067,7 +10294,7 @@ func NewDeleteImageRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/images/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/images/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10086,12 +10313,19 @@ func NewDeleteImageRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewReadImagesByIdRequest generates requests for ReadImagesById
-func NewReadImagesByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadImagesByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10101,7 +10335,7 @@ func NewReadImagesByIdRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/images/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/images/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10120,23 +10354,30 @@ func NewReadImagesByIdRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewUpdateImageRequest calls the generic UpdateImage builder with application/json body
-func NewUpdateImageRequest(server string, id string, body UpdateImageJSONRequestBody) (*http.Request, error) {
+func NewUpdateImageRequest(server string, spaceId SpaceId, id string, body UpdateImageJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateImageRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateImageRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateImageRequestWithBody generates requests for UpdateImage with any type of body
-func NewUpdateImageRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateImageRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10146,7 +10387,7 @@ func NewUpdateImageRequestWithBody(server string, id string, contentType string,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/images/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/images/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10167,15 +10408,22 @@ func NewUpdateImageRequestWithBody(server string, id string, contentType string,
 }
 
 // NewReadInternetGatewaysRequest generates requests for ReadInternetGateways
-func NewReadInternetGatewaysRequest(server string, params *ReadInternetGatewaysParams) (*http.Request, error) {
+func NewReadInternetGatewaysRequest(server string, spaceId SpaceId, params *ReadInternetGatewaysParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/internetGateways")
+	operationPath := fmt.Sprintf("/spaces/%s/internetGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10296,15 +10544,22 @@ func NewReadInternetGatewaysRequest(server string, params *ReadInternetGatewaysP
 }
 
 // NewCreateInternetGatewayRequest generates requests for CreateInternetGateway
-func NewCreateInternetGatewayRequest(server string) (*http.Request, error) {
+func NewCreateInternetGatewayRequest(server string, spaceId SpaceId) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/internetGateways")
+	operationPath := fmt.Sprintf("/spaces/%s/internetGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10323,12 +10578,19 @@ func NewCreateInternetGatewayRequest(server string) (*http.Request, error) {
 }
 
 // NewDeleteInternetGatewayRequest generates requests for DeleteInternetGateway
-func NewDeleteInternetGatewayRequest(server string, id string) (*http.Request, error) {
+func NewDeleteInternetGatewayRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10338,7 +10600,7 @@ func NewDeleteInternetGatewayRequest(server string, id string) (*http.Request, e
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/internetGateways/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/internetGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10357,12 +10619,19 @@ func NewDeleteInternetGatewayRequest(server string, id string) (*http.Request, e
 }
 
 // NewReadInternetGatewaysByIdRequest generates requests for ReadInternetGatewaysById
-func NewReadInternetGatewaysByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadInternetGatewaysByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10372,7 +10641,7 @@ func NewReadInternetGatewaysByIdRequest(server string, id string) (*http.Request
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/internetGateways/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/internetGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10391,23 +10660,30 @@ func NewReadInternetGatewaysByIdRequest(server string, id string) (*http.Request
 }
 
 // NewLinkInternetGatewayRequest calls the generic LinkInternetGateway builder with application/json body
-func NewLinkInternetGatewayRequest(server string, id string, body LinkInternetGatewayJSONRequestBody) (*http.Request, error) {
+func NewLinkInternetGatewayRequest(server string, spaceId SpaceId, id string, body LinkInternetGatewayJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLinkInternetGatewayRequestWithBody(server, id, "application/json", bodyReader)
+	return NewLinkInternetGatewayRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewLinkInternetGatewayRequestWithBody generates requests for LinkInternetGateway with any type of body
-func NewLinkInternetGatewayRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewLinkInternetGatewayRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10417,7 +10693,7 @@ func NewLinkInternetGatewayRequestWithBody(server string, id string, contentType
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/internetGateways/%s/vpcs/link", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/internetGateways/%s/vpcs/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10438,23 +10714,30 @@ func NewLinkInternetGatewayRequestWithBody(server string, id string, contentType
 }
 
 // NewUnlinkInternetGatewayRequest calls the generic UnlinkInternetGateway builder with application/json body
-func NewUnlinkInternetGatewayRequest(server string, id string, body UnlinkInternetGatewayJSONRequestBody) (*http.Request, error) {
+func NewUnlinkInternetGatewayRequest(server string, spaceId SpaceId, id string, body UnlinkInternetGatewayJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUnlinkInternetGatewayRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUnlinkInternetGatewayRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUnlinkInternetGatewayRequestWithBody generates requests for UnlinkInternetGateway with any type of body
-func NewUnlinkInternetGatewayRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUnlinkInternetGatewayRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10464,7 +10747,7 @@ func NewUnlinkInternetGatewayRequestWithBody(server string, id string, contentTy
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/internetGateways/%s/vpcs/unlink", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/internetGateways/%s/vpcs/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10485,15 +10768,22 @@ func NewUnlinkInternetGatewayRequestWithBody(server string, id string, contentTy
 }
 
 // NewReadKeypairsRequest generates requests for ReadKeypairs
-func NewReadKeypairsRequest(server string, params *ReadKeypairsParams) (*http.Request, error) {
+func NewReadKeypairsRequest(server string, spaceId SpaceId, params *ReadKeypairsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/keypairs")
+	operationPath := fmt.Sprintf("/spaces/%s/keypairs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10566,26 +10856,33 @@ func NewReadKeypairsRequest(server string, params *ReadKeypairsParams) (*http.Re
 }
 
 // NewCreateKeypairRequest calls the generic CreateKeypair builder with application/json body
-func NewCreateKeypairRequest(server string, body CreateKeypairJSONRequestBody) (*http.Request, error) {
+func NewCreateKeypairRequest(server string, spaceId SpaceId, body CreateKeypairJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateKeypairRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateKeypairRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateKeypairRequestWithBody generates requests for CreateKeypair with any type of body
-func NewCreateKeypairRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateKeypairRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/keypairs")
+	operationPath := fmt.Sprintf("/spaces/%s/keypairs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10606,12 +10903,19 @@ func NewCreateKeypairRequestWithBody(server string, contentType string, body io.
 }
 
 // NewDeleteKeypairRequest generates requests for DeleteKeypair
-func NewDeleteKeypairRequest(server string, id string) (*http.Request, error) {
+func NewDeleteKeypairRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10621,7 +10925,7 @@ func NewDeleteKeypairRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/keypairs/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/keypairs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10640,12 +10944,19 @@ func NewDeleteKeypairRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewReadKeypairsByIdRequest generates requests for ReadKeypairsById
-func NewReadKeypairsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadKeypairsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10655,7 +10966,7 @@ func NewReadKeypairsByIdRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/keypairs/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/keypairs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10674,15 +10985,22 @@ func NewReadKeypairsByIdRequest(server string, id string) (*http.Request, error)
 }
 
 // NewReadListenerRulesRequest generates requests for ReadListenerRules
-func NewReadListenerRulesRequest(server string, params *ReadListenerRulesParams) (*http.Request, error) {
+func NewReadListenerRulesRequest(server string, spaceId SpaceId, params *ReadListenerRulesParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/listenerRules")
+	operationPath := fmt.Sprintf("/spaces/%s/listenerRules", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10723,26 +11041,33 @@ func NewReadListenerRulesRequest(server string, params *ReadListenerRulesParams)
 }
 
 // NewCreateListenerRuleRequest calls the generic CreateListenerRule builder with application/json body
-func NewCreateListenerRuleRequest(server string, body CreateListenerRuleJSONRequestBody) (*http.Request, error) {
+func NewCreateListenerRuleRequest(server string, spaceId SpaceId, body CreateListenerRuleJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateListenerRuleRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateListenerRuleRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateListenerRuleRequestWithBody generates requests for CreateListenerRule with any type of body
-func NewCreateListenerRuleRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateListenerRuleRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/listenerRules")
+	operationPath := fmt.Sprintf("/spaces/%s/listenerRules", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10763,12 +11088,19 @@ func NewCreateListenerRuleRequestWithBody(server string, contentType string, bod
 }
 
 // NewDeleteListenerRuleRequest generates requests for DeleteListenerRule
-func NewDeleteListenerRuleRequest(server string, id string) (*http.Request, error) {
+func NewDeleteListenerRuleRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10778,7 +11110,7 @@ func NewDeleteListenerRuleRequest(server string, id string) (*http.Request, erro
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/listenerRules/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/listenerRules/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10797,12 +11129,19 @@ func NewDeleteListenerRuleRequest(server string, id string) (*http.Request, erro
 }
 
 // NewReadListenerRulesByIdRequest generates requests for ReadListenerRulesById
-func NewReadListenerRulesByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadListenerRulesByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10812,7 +11151,7 @@ func NewReadListenerRulesByIdRequest(server string, id string) (*http.Request, e
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/listenerRules/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/listenerRules/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10831,23 +11170,30 @@ func NewReadListenerRulesByIdRequest(server string, id string) (*http.Request, e
 }
 
 // NewUpdateListenerRuleRequest calls the generic UpdateListenerRule builder with application/json body
-func NewUpdateListenerRuleRequest(server string, id string, body UpdateListenerRuleJSONRequestBody) (*http.Request, error) {
+func NewUpdateListenerRuleRequest(server string, spaceId SpaceId, id string, body UpdateListenerRuleJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateListenerRuleRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateListenerRuleRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateListenerRuleRequestWithBody generates requests for UpdateListenerRule with any type of body
-func NewUpdateListenerRuleRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateListenerRuleRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10857,7 +11203,7 @@ func NewUpdateListenerRuleRequestWithBody(server string, id string, contentType 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/listenerRules/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/listenerRules/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10878,15 +11224,22 @@ func NewUpdateListenerRuleRequestWithBody(server string, id string, contentType 
 }
 
 // NewReadLoadBalancersRequest generates requests for ReadLoadBalancers
-func NewReadLoadBalancersRequest(server string, params *ReadLoadBalancersParams) (*http.Request, error) {
+func NewReadLoadBalancersRequest(server string, spaceId SpaceId, params *ReadLoadBalancersParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers")
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10927,26 +11280,33 @@ func NewReadLoadBalancersRequest(server string, params *ReadLoadBalancersParams)
 }
 
 // NewCreateLoadBalancerRequest calls the generic CreateLoadBalancer builder with application/json body
-func NewCreateLoadBalancerRequest(server string, body CreateLoadBalancerJSONRequestBody) (*http.Request, error) {
+func NewCreateLoadBalancerRequest(server string, spaceId SpaceId, body CreateLoadBalancerJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateLoadBalancerRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateLoadBalancerRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateLoadBalancerRequestWithBody generates requests for CreateLoadBalancer with any type of body
-func NewCreateLoadBalancerRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateLoadBalancerRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers")
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10967,12 +11327,19 @@ func NewCreateLoadBalancerRequestWithBody(server string, contentType string, bod
 }
 
 // NewDeleteLoadBalancerRequest generates requests for DeleteLoadBalancer
-func NewDeleteLoadBalancerRequest(server string, id string) (*http.Request, error) {
+func NewDeleteLoadBalancerRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -10982,7 +11349,7 @@ func NewDeleteLoadBalancerRequest(server string, id string) (*http.Request, erro
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11001,12 +11368,19 @@ func NewDeleteLoadBalancerRequest(server string, id string) (*http.Request, erro
 }
 
 // NewReadLoadBalancersByIdRequest generates requests for ReadLoadBalancersById
-func NewReadLoadBalancersByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadLoadBalancersByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11016,7 +11390,7 @@ func NewReadLoadBalancersByIdRequest(server string, id string) (*http.Request, e
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11035,23 +11409,30 @@ func NewReadLoadBalancersByIdRequest(server string, id string) (*http.Request, e
 }
 
 // NewUpdateLoadBalancerRequest calls the generic UpdateLoadBalancer builder with application/json body
-func NewUpdateLoadBalancerRequest(server string, id string, body UpdateLoadBalancerJSONRequestBody) (*http.Request, error) {
+func NewUpdateLoadBalancerRequest(server string, spaceId SpaceId, id string, body UpdateLoadBalancerJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateLoadBalancerRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateLoadBalancerRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateLoadBalancerRequestWithBody generates requests for UpdateLoadBalancer with any type of body
-func NewUpdateLoadBalancerRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateLoadBalancerRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11061,7 +11442,7 @@ func NewUpdateLoadBalancerRequestWithBody(server string, id string, contentType 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11082,23 +11463,30 @@ func NewUpdateLoadBalancerRequestWithBody(server string, id string, contentType 
 }
 
 // NewLinkLoadBalancerBackendMachinesRequest calls the generic LinkLoadBalancerBackendMachines builder with application/json body
-func NewLinkLoadBalancerBackendMachinesRequest(server string, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody) (*http.Request, error) {
+func NewLinkLoadBalancerBackendMachinesRequest(server string, spaceId SpaceId, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLinkLoadBalancerBackendMachinesRequestWithBody(server, id, "application/json", bodyReader)
+	return NewLinkLoadBalancerBackendMachinesRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewLinkLoadBalancerBackendMachinesRequestWithBody generates requests for LinkLoadBalancerBackendMachines with any type of body
-func NewLinkLoadBalancerBackendMachinesRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewLinkLoadBalancerBackendMachinesRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11108,7 +11496,7 @@ func NewLinkLoadBalancerBackendMachinesRequestWithBody(server string, id string,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s/backendMachines/link", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/backendMachines/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11129,23 +11517,30 @@ func NewLinkLoadBalancerBackendMachinesRequestWithBody(server string, id string,
 }
 
 // NewUnlinkLoadBalancerBackendMachinesRequest calls the generic UnlinkLoadBalancerBackendMachines builder with application/json body
-func NewUnlinkLoadBalancerBackendMachinesRequest(server string, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody) (*http.Request, error) {
+func NewUnlinkLoadBalancerBackendMachinesRequest(server string, spaceId SpaceId, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUnlinkLoadBalancerBackendMachinesRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUnlinkLoadBalancerBackendMachinesRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUnlinkLoadBalancerBackendMachinesRequestWithBody generates requests for UnlinkLoadBalancerBackendMachines with any type of body
-func NewUnlinkLoadBalancerBackendMachinesRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUnlinkLoadBalancerBackendMachinesRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11155,7 +11550,7 @@ func NewUnlinkLoadBalancerBackendMachinesRequestWithBody(server string, id strin
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s/backendMachines/unlink", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/backendMachines/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11176,23 +11571,30 @@ func NewUnlinkLoadBalancerBackendMachinesRequestWithBody(server string, id strin
 }
 
 // NewDeleteLoadBalancerListenersRequest calls the generic DeleteLoadBalancerListeners builder with application/json body
-func NewDeleteLoadBalancerListenersRequest(server string, id string, body DeleteLoadBalancerListenersJSONRequestBody) (*http.Request, error) {
+func NewDeleteLoadBalancerListenersRequest(server string, spaceId SpaceId, id string, body DeleteLoadBalancerListenersJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewDeleteLoadBalancerListenersRequestWithBody(server, id, "application/json", bodyReader)
+	return NewDeleteLoadBalancerListenersRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewDeleteLoadBalancerListenersRequestWithBody generates requests for DeleteLoadBalancerListeners with any type of body
-func NewDeleteLoadBalancerListenersRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewDeleteLoadBalancerListenersRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11202,7 +11604,7 @@ func NewDeleteLoadBalancerListenersRequestWithBody(server string, id string, con
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s/listeners", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/listeners", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11223,23 +11625,30 @@ func NewDeleteLoadBalancerListenersRequestWithBody(server string, id string, con
 }
 
 // NewCreateLoadBalancerListenersRequest calls the generic CreateLoadBalancerListeners builder with application/json body
-func NewCreateLoadBalancerListenersRequest(server string, id string, body CreateLoadBalancerListenersJSONRequestBody) (*http.Request, error) {
+func NewCreateLoadBalancerListenersRequest(server string, spaceId SpaceId, id string, body CreateLoadBalancerListenersJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateLoadBalancerListenersRequestWithBody(server, id, "application/json", bodyReader)
+	return NewCreateLoadBalancerListenersRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewCreateLoadBalancerListenersRequestWithBody generates requests for CreateLoadBalancerListeners with any type of body
-func NewCreateLoadBalancerListenersRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateLoadBalancerListenersRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11249,7 +11658,7 @@ func NewCreateLoadBalancerListenersRequestWithBody(server string, id string, con
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s/listeners", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/listeners", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11270,23 +11679,30 @@ func NewCreateLoadBalancerListenersRequestWithBody(server string, id string, con
 }
 
 // NewDeleteLoadBalancerPolicyRequest calls the generic DeleteLoadBalancerPolicy builder with application/json body
-func NewDeleteLoadBalancerPolicyRequest(server string, id string, body DeleteLoadBalancerPolicyJSONRequestBody) (*http.Request, error) {
+func NewDeleteLoadBalancerPolicyRequest(server string, spaceId SpaceId, id string, body DeleteLoadBalancerPolicyJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewDeleteLoadBalancerPolicyRequestWithBody(server, id, "application/json", bodyReader)
+	return NewDeleteLoadBalancerPolicyRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewDeleteLoadBalancerPolicyRequestWithBody generates requests for DeleteLoadBalancerPolicy with any type of body
-func NewDeleteLoadBalancerPolicyRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewDeleteLoadBalancerPolicyRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11296,7 +11712,7 @@ func NewDeleteLoadBalancerPolicyRequestWithBody(server string, id string, conten
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s/policies", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/policies", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11317,23 +11733,30 @@ func NewDeleteLoadBalancerPolicyRequestWithBody(server string, id string, conten
 }
 
 // NewCreateLoadBalancerPolicyRequest calls the generic CreateLoadBalancerPolicy builder with application/json body
-func NewCreateLoadBalancerPolicyRequest(server string, id string, body CreateLoadBalancerPolicyJSONRequestBody) (*http.Request, error) {
+func NewCreateLoadBalancerPolicyRequest(server string, spaceId SpaceId, id string, body CreateLoadBalancerPolicyJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateLoadBalancerPolicyRequestWithBody(server, id, "application/json", bodyReader)
+	return NewCreateLoadBalancerPolicyRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewCreateLoadBalancerPolicyRequestWithBody generates requests for CreateLoadBalancerPolicy with any type of body
-func NewCreateLoadBalancerPolicyRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateLoadBalancerPolicyRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11343,7 +11766,7 @@ func NewCreateLoadBalancerPolicyRequestWithBody(server string, id string, conten
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s/policies", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/policies", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11364,23 +11787,30 @@ func NewCreateLoadBalancerPolicyRequestWithBody(server string, id string, conten
 }
 
 // NewReadVmsHealthRequest calls the generic ReadVmsHealth builder with application/json body
-func NewReadVmsHealthRequest(server string, id string, body ReadVmsHealthJSONRequestBody) (*http.Request, error) {
+func NewReadVmsHealthRequest(server string, spaceId SpaceId, id string, body ReadVmsHealthJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewReadVmsHealthRequestWithBody(server, id, "application/json", bodyReader)
+	return NewReadVmsHealthRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewReadVmsHealthRequestWithBody generates requests for ReadVmsHealth with any type of body
-func NewReadVmsHealthRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewReadVmsHealthRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11390,7 +11820,7 @@ func NewReadVmsHealthRequestWithBody(server string, id string, contentType strin
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancers/%s/vmsHealth", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/vmsHealth", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11411,26 +11841,33 @@ func NewReadVmsHealthRequestWithBody(server string, id string, contentType strin
 }
 
 // NewReadLoadBalancerTagsRequest calls the generic ReadLoadBalancerTags builder with application/json body
-func NewReadLoadBalancerTagsRequest(server string, body ReadLoadBalancerTagsJSONRequestBody) (*http.Request, error) {
+func NewReadLoadBalancerTagsRequest(server string, spaceId SpaceId, body ReadLoadBalancerTagsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewReadLoadBalancerTagsRequestWithBody(server, "application/json", bodyReader)
+	return NewReadLoadBalancerTagsRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewReadLoadBalancerTagsRequestWithBody generates requests for ReadLoadBalancerTags with any type of body
-func NewReadLoadBalancerTagsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewReadLoadBalancerTagsRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/loadBalancersTags")
+	operationPath := fmt.Sprintf("/spaces/%s/loadBalancersTags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11451,15 +11888,22 @@ func NewReadLoadBalancerTagsRequestWithBody(server string, contentType string, b
 }
 
 // NewReadLocationsRequest generates requests for ReadLocations
-func NewReadLocationsRequest(server string) (*http.Request, error) {
+func NewReadLocationsRequest(server string, spaceId SpaceId) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/locations")
+	operationPath := fmt.Sprintf("/spaces/%s/locations", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11478,15 +11922,22 @@ func NewReadLocationsRequest(server string) (*http.Request, error) {
 }
 
 // NewReadNatGatewayRequest generates requests for ReadNatGateway
-func NewReadNatGatewayRequest(server string, params *ReadNatGatewayParams) (*http.Request, error) {
+func NewReadNatGatewayRequest(server string, spaceId SpaceId, params *ReadNatGatewayParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/natGateways")
+	operationPath := fmt.Sprintf("/spaces/%s/natGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11623,26 +12074,33 @@ func NewReadNatGatewayRequest(server string, params *ReadNatGatewayParams) (*htt
 }
 
 // NewCreateNatGatewayRequest calls the generic CreateNatGateway builder with application/json body
-func NewCreateNatGatewayRequest(server string, body CreateNatGatewayJSONRequestBody) (*http.Request, error) {
+func NewCreateNatGatewayRequest(server string, spaceId SpaceId, body CreateNatGatewayJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateNatGatewayRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateNatGatewayRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateNatGatewayRequestWithBody generates requests for CreateNatGateway with any type of body
-func NewCreateNatGatewayRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateNatGatewayRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/natGateways")
+	operationPath := fmt.Sprintf("/spaces/%s/natGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11663,12 +12121,19 @@ func NewCreateNatGatewayRequestWithBody(server string, contentType string, body 
 }
 
 // NewDeleteNatGatewayRequest generates requests for DeleteNatGateway
-func NewDeleteNatGatewayRequest(server string, id string) (*http.Request, error) {
+func NewDeleteNatGatewayRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11678,7 +12143,7 @@ func NewDeleteNatGatewayRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/natGateways/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/natGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11697,12 +12162,19 @@ func NewDeleteNatGatewayRequest(server string, id string) (*http.Request, error)
 }
 
 // NewReadNatGatewayByIdRequest generates requests for ReadNatGatewayById
-func NewReadNatGatewayByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadNatGatewayByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -11712,7 +12184,7 @@ func NewReadNatGatewayByIdRequest(server string, id string) (*http.Request, erro
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/natGateways/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/natGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11731,15 +12203,22 @@ func NewReadNatGatewayByIdRequest(server string, id string) (*http.Request, erro
 }
 
 // NewReadNicsRequest generates requests for ReadNics
-func NewReadNicsRequest(server string, params *ReadNicsParams) (*http.Request, error) {
+func NewReadNicsRequest(server string, spaceId SpaceId, params *ReadNicsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/nics")
+	operationPath := fmt.Sprintf("/spaces/%s/nics", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12196,26 +12675,33 @@ func NewReadNicsRequest(server string, params *ReadNicsParams) (*http.Request, e
 }
 
 // NewCreateNicRequest calls the generic CreateNic builder with application/json body
-func NewCreateNicRequest(server string, body CreateNicJSONRequestBody) (*http.Request, error) {
+func NewCreateNicRequest(server string, spaceId SpaceId, body CreateNicJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateNicRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateNicRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateNicRequestWithBody generates requests for CreateNic with any type of body
-func NewCreateNicRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateNicRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/nics")
+	operationPath := fmt.Sprintf("/spaces/%s/nics", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12236,12 +12722,19 @@ func NewCreateNicRequestWithBody(server string, contentType string, body io.Read
 }
 
 // NewDeleteNicRequest generates requests for DeleteNic
-func NewDeleteNicRequest(server string, id string) (*http.Request, error) {
+func NewDeleteNicRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12251,7 +12744,7 @@ func NewDeleteNicRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/nics/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/nics/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12270,12 +12763,19 @@ func NewDeleteNicRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewReadNicsByIdRequest generates requests for ReadNicsById
-func NewReadNicsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadNicsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12285,7 +12785,7 @@ func NewReadNicsByIdRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/nics/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/nics/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12304,23 +12804,30 @@ func NewReadNicsByIdRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewUpdateNicRequest calls the generic UpdateNic builder with application/json body
-func NewUpdateNicRequest(server string, id string, body UpdateNicJSONRequestBody) (*http.Request, error) {
+func NewUpdateNicRequest(server string, spaceId SpaceId, id string, body UpdateNicJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateNicRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateNicRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateNicRequestWithBody generates requests for UpdateNic with any type of body
-func NewUpdateNicRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateNicRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12330,7 +12837,7 @@ func NewUpdateNicRequestWithBody(server string, id string, contentType string, b
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/nics/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/nics/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12351,23 +12858,30 @@ func NewUpdateNicRequestWithBody(server string, id string, contentType string, b
 }
 
 // NewLinkPrivateIpsRequest calls the generic LinkPrivateIps builder with application/json body
-func NewLinkPrivateIpsRequest(server string, id string, body LinkPrivateIpsJSONRequestBody) (*http.Request, error) {
+func NewLinkPrivateIpsRequest(server string, spaceId SpaceId, id string, body LinkPrivateIpsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLinkPrivateIpsRequestWithBody(server, id, "application/json", bodyReader)
+	return NewLinkPrivateIpsRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewLinkPrivateIpsRequestWithBody generates requests for LinkPrivateIps with any type of body
-func NewLinkPrivateIpsRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewLinkPrivateIpsRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12377,7 +12891,7 @@ func NewLinkPrivateIpsRequestWithBody(server string, id string, contentType stri
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/nics/%s/privateIps/link", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/nics/%s/privateIps/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12398,23 +12912,30 @@ func NewLinkPrivateIpsRequestWithBody(server string, id string, contentType stri
 }
 
 // NewUnlinkPrivateIpsRequest calls the generic UnlinkPrivateIps builder with application/json body
-func NewUnlinkPrivateIpsRequest(server string, id string, body UnlinkPrivateIpsJSONRequestBody) (*http.Request, error) {
+func NewUnlinkPrivateIpsRequest(server string, spaceId SpaceId, id string, body UnlinkPrivateIpsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUnlinkPrivateIpsRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUnlinkPrivateIpsRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUnlinkPrivateIpsRequestWithBody generates requests for UnlinkPrivateIps with any type of body
-func NewUnlinkPrivateIpsRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUnlinkPrivateIpsRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12424,7 +12945,7 @@ func NewUnlinkPrivateIpsRequestWithBody(server string, id string, contentType st
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/nics/%s/privateIps/unlink", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/nics/%s/privateIps/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12445,23 +12966,30 @@ func NewUnlinkPrivateIpsRequestWithBody(server string, id string, contentType st
 }
 
 // NewLinkNicRequest calls the generic LinkNic builder with application/json body
-func NewLinkNicRequest(server string, id string, body LinkNicJSONRequestBody) (*http.Request, error) {
+func NewLinkNicRequest(server string, spaceId SpaceId, id string, body LinkNicJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLinkNicRequestWithBody(server, id, "application/json", bodyReader)
+	return NewLinkNicRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewLinkNicRequestWithBody generates requests for LinkNic with any type of body
-func NewLinkNicRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewLinkNicRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12471,7 +12999,7 @@ func NewLinkNicRequestWithBody(server string, id string, contentType string, bod
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/nics/%s/vms/link", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/nics/%s/vms/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12492,23 +13020,30 @@ func NewLinkNicRequestWithBody(server string, id string, contentType string, bod
 }
 
 // NewUnlinkNicRequest calls the generic UnlinkNic builder with application/json body
-func NewUnlinkNicRequest(server string, id string, body UnlinkNicJSONRequestBody) (*http.Request, error) {
+func NewUnlinkNicRequest(server string, spaceId SpaceId, id string, body UnlinkNicJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUnlinkNicRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUnlinkNicRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUnlinkNicRequestWithBody generates requests for UnlinkNic with any type of body
-func NewUnlinkNicRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUnlinkNicRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12518,7 +13053,7 @@ func NewUnlinkNicRequestWithBody(server string, id string, contentType string, b
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/nics/%s/vms/unlink", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/nics/%s/vms/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12539,15 +13074,22 @@ func NewUnlinkNicRequestWithBody(server string, id string, contentType string, b
 }
 
 // NewReadProductTypesRequest generates requests for ReadProductTypes
-func NewReadProductTypesRequest(server string, params *ReadProductTypesParams) (*http.Request, error) {
+func NewReadProductTypesRequest(server string, spaceId SpaceId, params *ReadProductTypesParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/productTypes")
+	operationPath := fmt.Sprintf("/spaces/%s/productTypes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12588,26 +13130,33 @@ func NewReadProductTypesRequest(server string, params *ReadProductTypesParams) (
 }
 
 // NewCreateProductTypeRequest calls the generic CreateProductType builder with application/json body
-func NewCreateProductTypeRequest(server string, body CreateProductTypeJSONRequestBody) (*http.Request, error) {
+func NewCreateProductTypeRequest(server string, spaceId SpaceId, body CreateProductTypeJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateProductTypeRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateProductTypeRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateProductTypeRequestWithBody generates requests for CreateProductType with any type of body
-func NewCreateProductTypeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateProductTypeRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/productTypes")
+	operationPath := fmt.Sprintf("/spaces/%s/productTypes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12628,12 +13177,19 @@ func NewCreateProductTypeRequestWithBody(server string, contentType string, body
 }
 
 // NewReadProductTypesByIdRequest generates requests for ReadProductTypesById
-func NewReadProductTypesByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadProductTypesByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12643,7 +13199,7 @@ func NewReadProductTypesByIdRequest(server string, id string) (*http.Request, er
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/productTypes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/productTypes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12662,15 +13218,22 @@ func NewReadProductTypesByIdRequest(server string, id string) (*http.Request, er
 }
 
 // NewReadPublicIpRangesRequest generates requests for ReadPublicIpRanges
-func NewReadPublicIpRangesRequest(server string) (*http.Request, error) {
+func NewReadPublicIpRangesRequest(server string, spaceId SpaceId) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/publicIpRanges")
+	operationPath := fmt.Sprintf("/spaces/%s/publicIpRanges", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12689,15 +13252,22 @@ func NewReadPublicIpRangesRequest(server string) (*http.Request, error) {
 }
 
 // NewReadPublicIpsRequest generates requests for ReadPublicIps
-func NewReadPublicIpsRequest(server string, params *ReadPublicIpsParams) (*http.Request, error) {
+func NewReadPublicIpsRequest(server string, spaceId SpaceId, params *ReadPublicIpsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/publicIps")
+	operationPath := fmt.Sprintf("/spaces/%s/publicIps", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12850,15 +13420,22 @@ func NewReadPublicIpsRequest(server string, params *ReadPublicIpsParams) (*http.
 }
 
 // NewCreatePublicIpRequest generates requests for CreatePublicIp
-func NewCreatePublicIpRequest(server string) (*http.Request, error) {
+func NewCreatePublicIpRequest(server string, spaceId SpaceId) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/publicIps")
+	operationPath := fmt.Sprintf("/spaces/%s/publicIps", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12877,12 +13454,19 @@ func NewCreatePublicIpRequest(server string) (*http.Request, error) {
 }
 
 // NewDeletePublicIpRequest generates requests for DeletePublicIp
-func NewDeletePublicIpRequest(server string, id string) (*http.Request, error) {
+func NewDeletePublicIpRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12892,7 +13476,7 @@ func NewDeletePublicIpRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/publicIps/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/publicIps/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12911,12 +13495,19 @@ func NewDeletePublicIpRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewReadPublicIpsByIdRequest generates requests for ReadPublicIpsById
-func NewReadPublicIpsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadPublicIpsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12926,7 +13517,7 @@ func NewReadPublicIpsByIdRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/publicIps/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/publicIps/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12945,23 +13536,30 @@ func NewReadPublicIpsByIdRequest(server string, id string) (*http.Request, error
 }
 
 // NewLinkPublicIpRequest calls the generic LinkPublicIp builder with application/json body
-func NewLinkPublicIpRequest(server string, id string, body LinkPublicIpJSONRequestBody) (*http.Request, error) {
+func NewLinkPublicIpRequest(server string, spaceId SpaceId, id string, body LinkPublicIpJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLinkPublicIpRequestWithBody(server, id, "application/json", bodyReader)
+	return NewLinkPublicIpRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewLinkPublicIpRequestWithBody generates requests for LinkPublicIp with any type of body
-func NewLinkPublicIpRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewLinkPublicIpRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -12971,7 +13569,7 @@ func NewLinkPublicIpRequestWithBody(server string, id string, contentType string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/publicIps/%s/link", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/publicIps/%s/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12992,23 +13590,30 @@ func NewLinkPublicIpRequestWithBody(server string, id string, contentType string
 }
 
 // NewUnlinkPublicIpRequest calls the generic UnlinkPublicIp builder with application/json body
-func NewUnlinkPublicIpRequest(server string, id interface{}, body UnlinkPublicIpJSONRequestBody) (*http.Request, error) {
+func NewUnlinkPublicIpRequest(server string, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUnlinkPublicIpRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUnlinkPublicIpRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUnlinkPublicIpRequestWithBody generates requests for UnlinkPublicIp with any type of body
-func NewUnlinkPublicIpRequestWithBody(server string, id interface{}, contentType string, body io.Reader) (*http.Request, error) {
+func NewUnlinkPublicIpRequestWithBody(server string, spaceId SpaceId, id interface{}, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13018,7 +13623,7 @@ func NewUnlinkPublicIpRequestWithBody(server string, id interface{}, contentType
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/publicIps/%s/unlink", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/publicIps/%s/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13039,15 +13644,22 @@ func NewUnlinkPublicIpRequestWithBody(server string, id interface{}, contentType
 }
 
 // NewReadRouteTablesRequest generates requests for ReadRouteTables
-func NewReadRouteTablesRequest(server string, params *ReadRouteTablesParams) (*http.Request, error) {
+func NewReadRouteTablesRequest(server string, spaceId SpaceId, params *ReadRouteTablesParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables")
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13344,26 +13956,33 @@ func NewReadRouteTablesRequest(server string, params *ReadRouteTablesParams) (*h
 }
 
 // NewCreateRouteTableRequest calls the generic CreateRouteTable builder with application/json body
-func NewCreateRouteTableRequest(server string, body CreateRouteTableJSONRequestBody) (*http.Request, error) {
+func NewCreateRouteTableRequest(server string, spaceId SpaceId, body CreateRouteTableJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateRouteTableRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateRouteTableRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateRouteTableRequestWithBody generates requests for CreateRouteTable with any type of body
-func NewCreateRouteTableRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateRouteTableRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables")
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13384,12 +14003,19 @@ func NewCreateRouteTableRequestWithBody(server string, contentType string, body 
 }
 
 // NewDeleteRouteTableRequest generates requests for DeleteRouteTable
-func NewDeleteRouteTableRequest(server string, id string) (*http.Request, error) {
+func NewDeleteRouteTableRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13399,7 +14025,7 @@ func NewDeleteRouteTableRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13418,12 +14044,19 @@ func NewDeleteRouteTableRequest(server string, id string) (*http.Request, error)
 }
 
 // NewReadRouteTablesByIdRequest generates requests for ReadRouteTablesById
-func NewReadRouteTablesByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadRouteTablesByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13433,7 +14066,7 @@ func NewReadRouteTablesByIdRequest(server string, id string) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13452,23 +14085,30 @@ func NewReadRouteTablesByIdRequest(server string, id string) (*http.Request, err
 }
 
 // NewDeleteRouteRequest calls the generic DeleteRoute builder with application/json body
-func NewDeleteRouteRequest(server string, id string, body DeleteRouteJSONRequestBody) (*http.Request, error) {
+func NewDeleteRouteRequest(server string, spaceId SpaceId, id string, body DeleteRouteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewDeleteRouteRequestWithBody(server, id, "application/json", bodyReader)
+	return NewDeleteRouteRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewDeleteRouteRequestWithBody generates requests for DeleteRoute with any type of body
-func NewDeleteRouteRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewDeleteRouteRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13478,7 +14118,7 @@ func NewDeleteRouteRequestWithBody(server string, id string, contentType string,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables/%s/routes", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13499,23 +14139,30 @@ func NewDeleteRouteRequestWithBody(server string, id string, contentType string,
 }
 
 // NewCreateRouteRequest calls the generic CreateRoute builder with application/json body
-func NewCreateRouteRequest(server string, id string, body CreateRouteJSONRequestBody) (*http.Request, error) {
+func NewCreateRouteRequest(server string, spaceId SpaceId, id string, body CreateRouteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateRouteRequestWithBody(server, id, "application/json", bodyReader)
+	return NewCreateRouteRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewCreateRouteRequestWithBody generates requests for CreateRoute with any type of body
-func NewCreateRouteRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateRouteRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13525,7 +14172,7 @@ func NewCreateRouteRequestWithBody(server string, id string, contentType string,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables/%s/routes", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13546,23 +14193,30 @@ func NewCreateRouteRequestWithBody(server string, id string, contentType string,
 }
 
 // NewUpdateRouteRequest calls the generic UpdateRoute builder with application/json body
-func NewUpdateRouteRequest(server string, id string, body UpdateRouteJSONRequestBody) (*http.Request, error) {
+func NewUpdateRouteRequest(server string, spaceId SpaceId, id string, body UpdateRouteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateRouteRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateRouteRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateRouteRequestWithBody generates requests for UpdateRoute with any type of body
-func NewUpdateRouteRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateRouteRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13572,7 +14226,7 @@ func NewUpdateRouteRequestWithBody(server string, id string, contentType string,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables/%s/routes", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13593,23 +14247,30 @@ func NewUpdateRouteRequestWithBody(server string, id string, contentType string,
 }
 
 // NewLinkRouteTableRequest calls the generic LinkRouteTable builder with application/json body
-func NewLinkRouteTableRequest(server string, id string, body LinkRouteTableJSONRequestBody) (*http.Request, error) {
+func NewLinkRouteTableRequest(server string, spaceId SpaceId, id string, body LinkRouteTableJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLinkRouteTableRequestWithBody(server, id, "application/json", bodyReader)
+	return NewLinkRouteTableRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewLinkRouteTableRequestWithBody generates requests for LinkRouteTable with any type of body
-func NewLinkRouteTableRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewLinkRouteTableRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13619,7 +14280,7 @@ func NewLinkRouteTableRequestWithBody(server string, id string, contentType stri
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables/%s/subnets/link", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/subnets/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13640,23 +14301,30 @@ func NewLinkRouteTableRequestWithBody(server string, id string, contentType stri
 }
 
 // NewUnlinkRouteTableRequest calls the generic UnlinkRouteTable builder with application/json body
-func NewUnlinkRouteTableRequest(server string, id string, body UnlinkRouteTableJSONRequestBody) (*http.Request, error) {
+func NewUnlinkRouteTableRequest(server string, spaceId SpaceId, id string, body UnlinkRouteTableJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUnlinkRouteTableRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUnlinkRouteTableRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUnlinkRouteTableRequestWithBody generates requests for UnlinkRouteTable with any type of body
-func NewUnlinkRouteTableRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUnlinkRouteTableRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13666,7 +14334,7 @@ func NewUnlinkRouteTableRequestWithBody(server string, id string, contentType st
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables/%s/subnets/unlink", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/subnets/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13687,23 +14355,30 @@ func NewUnlinkRouteTableRequestWithBody(server string, id string, contentType st
 }
 
 // NewUpdateRouteTableRoutePropagationRequest calls the generic UpdateRouteTableRoutePropagation builder with application/json body
-func NewUpdateRouteTableRoutePropagationRequest(server string, id string, body UpdateRouteTableRoutePropagationJSONRequestBody) (*http.Request, error) {
+func NewUpdateRouteTableRoutePropagationRequest(server string, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateRouteTableRoutePropagationRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateRouteTableRoutePropagationRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateRouteTableRoutePropagationRequestWithBody generates requests for UpdateRouteTableRoutePropagation with any type of body
-func NewUpdateRouteTableRoutePropagationRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateRouteTableRoutePropagationRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -13713,7 +14388,7 @@ func NewUpdateRouteTableRoutePropagationRequestWithBody(server string, id string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/routeTables/%s/updateRoutePropagation", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/updateRoutePropagation", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13734,15 +14409,22 @@ func NewUpdateRouteTableRoutePropagationRequestWithBody(server string, id string
 }
 
 // NewReadSecurityGroupsRequest generates requests for ReadSecurityGroups
-func NewReadSecurityGroupsRequest(server string, params *ReadSecurityGroupsParams) (*http.Request, error) {
+func NewReadSecurityGroupsRequest(server string, spaceId SpaceId, params *ReadSecurityGroupsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/securityGroups")
+	operationPath := fmt.Sprintf("/spaces/%s/securityGroups", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14103,26 +14785,33 @@ func NewReadSecurityGroupsRequest(server string, params *ReadSecurityGroupsParam
 }
 
 // NewCreateSecurityGroupRequest calls the generic CreateSecurityGroup builder with application/json body
-func NewCreateSecurityGroupRequest(server string, body CreateSecurityGroupJSONRequestBody) (*http.Request, error) {
+func NewCreateSecurityGroupRequest(server string, spaceId SpaceId, body CreateSecurityGroupJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateSecurityGroupRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateSecurityGroupRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateSecurityGroupRequestWithBody generates requests for CreateSecurityGroup with any type of body
-func NewCreateSecurityGroupRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateSecurityGroupRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/securityGroups")
+	operationPath := fmt.Sprintf("/spaces/%s/securityGroups", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14143,12 +14832,19 @@ func NewCreateSecurityGroupRequestWithBody(server string, contentType string, bo
 }
 
 // NewDeleteSecurityGroupRequest generates requests for DeleteSecurityGroup
-func NewDeleteSecurityGroupRequest(server string, id string) (*http.Request, error) {
+func NewDeleteSecurityGroupRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -14158,7 +14854,7 @@ func NewDeleteSecurityGroupRequest(server string, id string) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/securityGroups/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/securityGroups/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14177,12 +14873,19 @@ func NewDeleteSecurityGroupRequest(server string, id string) (*http.Request, err
 }
 
 // NewReadSecurityGroupsByIdRequest generates requests for ReadSecurityGroupsById
-func NewReadSecurityGroupsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadSecurityGroupsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -14192,7 +14895,7 @@ func NewReadSecurityGroupsByIdRequest(server string, id string) (*http.Request, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/securityGroups/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/securityGroups/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14211,23 +14914,30 @@ func NewReadSecurityGroupsByIdRequest(server string, id string) (*http.Request, 
 }
 
 // NewDeleteSecurityGroupRuleRequest calls the generic DeleteSecurityGroupRule builder with application/json body
-func NewDeleteSecurityGroupRuleRequest(server string, id string, body DeleteSecurityGroupRuleJSONRequestBody) (*http.Request, error) {
+func NewDeleteSecurityGroupRuleRequest(server string, spaceId SpaceId, id string, body DeleteSecurityGroupRuleJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewDeleteSecurityGroupRuleRequestWithBody(server, id, "application/json", bodyReader)
+	return NewDeleteSecurityGroupRuleRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewDeleteSecurityGroupRuleRequestWithBody generates requests for DeleteSecurityGroupRule with any type of body
-func NewDeleteSecurityGroupRuleRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewDeleteSecurityGroupRuleRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -14237,7 +14947,7 @@ func NewDeleteSecurityGroupRuleRequestWithBody(server string, id string, content
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/securityGroups/%s/rules", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/securityGroups/%s/rules", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14258,23 +14968,30 @@ func NewDeleteSecurityGroupRuleRequestWithBody(server string, id string, content
 }
 
 // NewCreateSecurityGroupRuleRequest calls the generic CreateSecurityGroupRule builder with application/json body
-func NewCreateSecurityGroupRuleRequest(server string, id string, body CreateSecurityGroupRuleJSONRequestBody) (*http.Request, error) {
+func NewCreateSecurityGroupRuleRequest(server string, spaceId SpaceId, id string, body CreateSecurityGroupRuleJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateSecurityGroupRuleRequestWithBody(server, id, "application/json", bodyReader)
+	return NewCreateSecurityGroupRuleRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewCreateSecurityGroupRuleRequestWithBody generates requests for CreateSecurityGroupRule with any type of body
-func NewCreateSecurityGroupRuleRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateSecurityGroupRuleRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -14284,7 +15001,7 @@ func NewCreateSecurityGroupRuleRequestWithBody(server string, id string, content
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/securityGroups/%s/rules", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/securityGroups/%s/rules", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14305,15 +15022,22 @@ func NewCreateSecurityGroupRuleRequestWithBody(server string, id string, content
 }
 
 // NewReadSnapshotsRequest generates requests for ReadSnapshots
-func NewReadSnapshotsRequest(server string, params *ReadSnapshotsParams) (*http.Request, error) {
+func NewReadSnapshotsRequest(server string, spaceId SpaceId, params *ReadSnapshotsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/snapshots")
+	operationPath := fmt.Sprintf("/spaces/%s/snapshots", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14530,26 +15254,33 @@ func NewReadSnapshotsRequest(server string, params *ReadSnapshotsParams) (*http.
 }
 
 // NewCreateSnapshotRequest calls the generic CreateSnapshot builder with application/json body
-func NewCreateSnapshotRequest(server string, body CreateSnapshotJSONRequestBody) (*http.Request, error) {
+func NewCreateSnapshotRequest(server string, spaceId SpaceId, body CreateSnapshotJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateSnapshotRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateSnapshotRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateSnapshotRequestWithBody generates requests for CreateSnapshot with any type of body
-func NewCreateSnapshotRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateSnapshotRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/snapshots")
+	operationPath := fmt.Sprintf("/spaces/%s/snapshots", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14570,12 +15301,19 @@ func NewCreateSnapshotRequestWithBody(server string, contentType string, body io
 }
 
 // NewDeleteSnapshotRequest generates requests for DeleteSnapshot
-func NewDeleteSnapshotRequest(server string, id string) (*http.Request, error) {
+func NewDeleteSnapshotRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -14585,7 +15323,7 @@ func NewDeleteSnapshotRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/snapshots/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/snapshots/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14604,12 +15342,19 @@ func NewDeleteSnapshotRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewReadSnapshotsByIdRequest generates requests for ReadSnapshotsById
-func NewReadSnapshotsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadSnapshotsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -14619,7 +15364,7 @@ func NewReadSnapshotsByIdRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/snapshots/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/snapshots/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14638,15 +15383,22 @@ func NewReadSnapshotsByIdRequest(server string, id string) (*http.Request, error
 }
 
 // NewReadSubnetsRequest generates requests for ReadSubnets
-func NewReadSubnetsRequest(server string, params *ReadSubnetsParams) (*http.Request, error) {
+func NewReadSubnetsRequest(server string, spaceId SpaceId, params *ReadSubnetsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/subnets")
+	operationPath := fmt.Sprintf("/spaces/%s/subnets", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14815,26 +15567,33 @@ func NewReadSubnetsRequest(server string, params *ReadSubnetsParams) (*http.Requ
 }
 
 // NewCreateSubnetRequest calls the generic CreateSubnet builder with application/json body
-func NewCreateSubnetRequest(server string, body CreateSubnetJSONRequestBody) (*http.Request, error) {
+func NewCreateSubnetRequest(server string, spaceId SpaceId, body CreateSubnetJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateSubnetRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateSubnetRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateSubnetRequestWithBody generates requests for CreateSubnet with any type of body
-func NewCreateSubnetRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateSubnetRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/subnets")
+	operationPath := fmt.Sprintf("/spaces/%s/subnets", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14855,12 +15614,19 @@ func NewCreateSubnetRequestWithBody(server string, contentType string, body io.R
 }
 
 // NewDeleteSubnetRequest generates requests for DeleteSubnet
-func NewDeleteSubnetRequest(server string, id string) (*http.Request, error) {
+func NewDeleteSubnetRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -14870,7 +15636,7 @@ func NewDeleteSubnetRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/subnets/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/subnets/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14889,12 +15655,19 @@ func NewDeleteSubnetRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewReadSubnetsByIdRequest generates requests for ReadSubnetsById
-func NewReadSubnetsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadSubnetsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -14904,7 +15677,7 @@ func NewReadSubnetsByIdRequest(server string, id string) (*http.Request, error) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/subnets/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/subnets/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14923,23 +15696,30 @@ func NewReadSubnetsByIdRequest(server string, id string) (*http.Request, error) 
 }
 
 // NewUpdateSubnetRequest calls the generic UpdateSubnet builder with application/json body
-func NewUpdateSubnetRequest(server string, id string, body UpdateSubnetJSONRequestBody) (*http.Request, error) {
+func NewUpdateSubnetRequest(server string, spaceId SpaceId, id string, body UpdateSubnetJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateSubnetRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateSubnetRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateSubnetRequestWithBody generates requests for UpdateSubnet with any type of body
-func NewUpdateSubnetRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateSubnetRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -14949,7 +15729,7 @@ func NewUpdateSubnetRequestWithBody(server string, id string, contentType string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/subnets/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/subnets/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14970,15 +15750,22 @@ func NewUpdateSubnetRequestWithBody(server string, id string, contentType string
 }
 
 // NewReadTagsRequest generates requests for ReadTags
-func NewReadTagsRequest(server string, params *ReadTagsParams) (*http.Request, error) {
+func NewReadTagsRequest(server string, spaceId SpaceId, params *ReadTagsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/tags")
+	operationPath := fmt.Sprintf("/spaces/%s/tags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15067,15 +15854,22 @@ func NewReadTagsRequest(server string, params *ReadTagsParams) (*http.Request, e
 }
 
 // NewReadVirtualGatewaysRequest generates requests for ReadVirtualGateways
-func NewReadVirtualGatewaysRequest(server string, params *ReadVirtualGatewaysParams) (*http.Request, error) {
+func NewReadVirtualGatewaysRequest(server string, spaceId SpaceId, params *ReadVirtualGatewaysParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/virtualGateways")
+	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15228,26 +16022,33 @@ func NewReadVirtualGatewaysRequest(server string, params *ReadVirtualGatewaysPar
 }
 
 // NewCreateVirtualGatewayRequest calls the generic CreateVirtualGateway builder with application/json body
-func NewCreateVirtualGatewayRequest(server string, body CreateVirtualGatewayJSONRequestBody) (*http.Request, error) {
+func NewCreateVirtualGatewayRequest(server string, spaceId SpaceId, body CreateVirtualGatewayJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateVirtualGatewayRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateVirtualGatewayRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateVirtualGatewayRequestWithBody generates requests for CreateVirtualGateway with any type of body
-func NewCreateVirtualGatewayRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateVirtualGatewayRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/virtualGateways")
+	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15268,12 +16069,19 @@ func NewCreateVirtualGatewayRequestWithBody(server string, contentType string, b
 }
 
 // NewDeleteVirtualGatewayRequest generates requests for DeleteVirtualGateway
-func NewDeleteVirtualGatewayRequest(server string, id string) (*http.Request, error) {
+func NewDeleteVirtualGatewayRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -15283,7 +16091,7 @@ func NewDeleteVirtualGatewayRequest(server string, id string) (*http.Request, er
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/virtualGateways/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15302,12 +16110,19 @@ func NewDeleteVirtualGatewayRequest(server string, id string) (*http.Request, er
 }
 
 // NewReadVirtualGatewaysByIdRequest generates requests for ReadVirtualGatewaysById
-func NewReadVirtualGatewaysByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadVirtualGatewaysByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -15317,7 +16132,7 @@ func NewReadVirtualGatewaysByIdRequest(server string, id string) (*http.Request,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/virtualGateways/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15336,23 +16151,30 @@ func NewReadVirtualGatewaysByIdRequest(server string, id string) (*http.Request,
 }
 
 // NewLinkVirtualGatewayToVpcRequest calls the generic LinkVirtualGatewayToVpc builder with application/json body
-func NewLinkVirtualGatewayToVpcRequest(server string, id string, body LinkVirtualGatewayToVpcJSONRequestBody) (*http.Request, error) {
+func NewLinkVirtualGatewayToVpcRequest(server string, spaceId SpaceId, id string, body LinkVirtualGatewayToVpcJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLinkVirtualGatewayToVpcRequestWithBody(server, id, "application/json", bodyReader)
+	return NewLinkVirtualGatewayToVpcRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewLinkVirtualGatewayToVpcRequestWithBody generates requests for LinkVirtualGatewayToVpc with any type of body
-func NewLinkVirtualGatewayToVpcRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewLinkVirtualGatewayToVpcRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -15362,7 +16184,7 @@ func NewLinkVirtualGatewayToVpcRequestWithBody(server string, id string, content
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/virtualGateways/%s/vpcs/link", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways/%s/vpcs/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15383,23 +16205,30 @@ func NewLinkVirtualGatewayToVpcRequestWithBody(server string, id string, content
 }
 
 // NewUnlinkVirtualGatewayToVpcRequest calls the generic UnlinkVirtualGatewayToVpc builder with application/json body
-func NewUnlinkVirtualGatewayToVpcRequest(server string, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody) (*http.Request, error) {
+func NewUnlinkVirtualGatewayToVpcRequest(server string, spaceId SpaceId, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUnlinkVirtualGatewayToVpcRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUnlinkVirtualGatewayToVpcRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUnlinkVirtualGatewayToVpcRequestWithBody generates requests for UnlinkVirtualGatewayToVpc with any type of body
-func NewUnlinkVirtualGatewayToVpcRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUnlinkVirtualGatewayToVpcRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -15409,7 +16238,7 @@ func NewUnlinkVirtualGatewayToVpcRequestWithBody(server string, id string, conte
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/virtualGateways/%s/vpcs/unlink", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways/%s/vpcs/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15430,15 +16259,22 @@ func NewUnlinkVirtualGatewayToVpcRequestWithBody(server string, id string, conte
 }
 
 // NewReadVmsRequest generates requests for ReadVms
-func NewReadVmsRequest(server string, params *ReadVmsParams) (*http.Request, error) {
+func NewReadVmsRequest(server string, spaceId SpaceId, params *ReadVmsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms")
+	operationPath := fmt.Sprintf("/spaces/%s/vms", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16487,26 +17323,33 @@ func NewReadVmsRequest(server string, params *ReadVmsParams) (*http.Request, err
 }
 
 // NewCreateVmsRequest calls the generic CreateVms builder with application/json body
-func NewCreateVmsRequest(server string, body CreateVmsJSONRequestBody) (*http.Request, error) {
+func NewCreateVmsRequest(server string, spaceId SpaceId, body CreateVmsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateVmsRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateVmsRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateVmsRequestWithBody generates requests for CreateVms with any type of body
-func NewCreateVmsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateVmsRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms")
+	operationPath := fmt.Sprintf("/spaces/%s/vms", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16527,15 +17370,22 @@ func NewCreateVmsRequestWithBody(server string, contentType string, body io.Read
 }
 
 // NewReadVmsStateRequest generates requests for ReadVmsState
-func NewReadVmsStateRequest(server string, params *ReadVmsStateParams) (*http.Request, error) {
+func NewReadVmsStateRequest(server string, spaceId SpaceId, params *ReadVmsStateParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms/states")
+	operationPath := fmt.Sprintf("/spaces/%s/vms/states", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16672,12 +17522,19 @@ func NewReadVmsStateRequest(server string, params *ReadVmsStateParams) (*http.Re
 }
 
 // NewDeleteVmsRequest generates requests for DeleteVms
-func NewDeleteVmsRequest(server string, id []interface{}) (*http.Request, error) {
+func NewDeleteVmsRequest(server string, spaceId SpaceId, id []interface{}) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -16687,7 +17544,7 @@ func NewDeleteVmsRequest(server string, id []interface{}) (*http.Request, error)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vms/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16706,12 +17563,19 @@ func NewDeleteVmsRequest(server string, id []interface{}) (*http.Request, error)
 }
 
 // NewReadVmsByIdRequest generates requests for ReadVmsById
-func NewReadVmsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadVmsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -16721,7 +17585,7 @@ func NewReadVmsByIdRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vms/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16740,23 +17604,30 @@ func NewReadVmsByIdRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewUpdateVmRequest calls the generic UpdateVm builder with application/json body
-func NewUpdateVmRequest(server string, id string, body UpdateVmJSONRequestBody) (*http.Request, error) {
+func NewUpdateVmRequest(server string, spaceId SpaceId, id string, body UpdateVmJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateVmRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateVmRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateVmRequestWithBody generates requests for UpdateVm with any type of body
-func NewUpdateVmRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateVmRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -16766,7 +17637,7 @@ func NewUpdateVmRequestWithBody(server string, id string, contentType string, bo
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vms/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16787,12 +17658,19 @@ func NewUpdateVmRequestWithBody(server string, id string, contentType string, bo
 }
 
 // NewReadAdminPasswordRequest generates requests for ReadAdminPassword
-func NewReadAdminPasswordRequest(server string, id string) (*http.Request, error) {
+func NewReadAdminPasswordRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -16802,7 +17680,7 @@ func NewReadAdminPasswordRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms/%s/adminPasswords", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/adminPasswords", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16821,12 +17699,19 @@ func NewReadAdminPasswordRequest(server string, id string) (*http.Request, error
 }
 
 // NewReadConsoleOutputRequest generates requests for ReadConsoleOutput
-func NewReadConsoleOutputRequest(server string, id string) (*http.Request, error) {
+func NewReadConsoleOutputRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -16836,7 +17721,7 @@ func NewReadConsoleOutputRequest(server string, id string) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms/%s/consoleOutputs", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/consoleOutputs", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16855,12 +17740,19 @@ func NewReadConsoleOutputRequest(server string, id string) (*http.Request, error
 }
 
 // NewRebootVmsRequest generates requests for RebootVms
-func NewRebootVmsRequest(server string, id []interface{}) (*http.Request, error) {
+func NewRebootVmsRequest(server string, spaceId SpaceId, id []interface{}) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -16870,7 +17762,7 @@ func NewRebootVmsRequest(server string, id []interface{}) (*http.Request, error)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms/%s/reboot", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/reboot", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16889,12 +17781,19 @@ func NewRebootVmsRequest(server string, id []interface{}) (*http.Request, error)
 }
 
 // NewStartVmsRequest generates requests for StartVms
-func NewStartVmsRequest(server string, id []interface{}) (*http.Request, error) {
+func NewStartVmsRequest(server string, spaceId SpaceId, id []interface{}) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -16904,7 +17803,7 @@ func NewStartVmsRequest(server string, id []interface{}) (*http.Request, error) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms/%s/start", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/start", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16923,23 +17822,30 @@ func NewStartVmsRequest(server string, id []interface{}) (*http.Request, error) 
 }
 
 // NewStopVmsRequest calls the generic StopVms builder with application/json body
-func NewStopVmsRequest(server string, id []interface{}, body StopVmsJSONRequestBody) (*http.Request, error) {
+func NewStopVmsRequest(server string, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewStopVmsRequestWithBody(server, id, "application/json", bodyReader)
+	return NewStopVmsRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewStopVmsRequestWithBody generates requests for StopVms with any type of body
-func NewStopVmsRequestWithBody(server string, id []interface{}, contentType string, body io.Reader) (*http.Request, error) {
+func NewStopVmsRequestWithBody(server string, spaceId SpaceId, id []interface{}, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -16949,7 +17855,7 @@ func NewStopVmsRequestWithBody(server string, id []interface{}, contentType stri
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vms/%s/stop", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/stop", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16970,15 +17876,22 @@ func NewStopVmsRequestWithBody(server string, id []interface{}, contentType stri
 }
 
 // NewReadVolumesRequest generates requests for ReadVolumes
-func NewReadVolumesRequest(server string, params *ReadVolumesParams) (*http.Request, error) {
+func NewReadVolumesRequest(server string, spaceId SpaceId, params *ReadVolumesParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/volumes")
+	operationPath := fmt.Sprintf("/spaces/%s/volumes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17243,26 +18156,33 @@ func NewReadVolumesRequest(server string, params *ReadVolumesParams) (*http.Requ
 }
 
 // NewCreateVolumeRequest calls the generic CreateVolume builder with application/json body
-func NewCreateVolumeRequest(server string, body CreateVolumeJSONRequestBody) (*http.Request, error) {
+func NewCreateVolumeRequest(server string, spaceId SpaceId, body CreateVolumeJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateVolumeRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateVolumeRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateVolumeRequestWithBody generates requests for CreateVolume with any type of body
-func NewCreateVolumeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateVolumeRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/volumes")
+	operationPath := fmt.Sprintf("/spaces/%s/volumes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17283,12 +18203,19 @@ func NewCreateVolumeRequestWithBody(server string, contentType string, body io.R
 }
 
 // NewDeleteVolumeRequest generates requests for DeleteVolume
-func NewDeleteVolumeRequest(server string, id string) (*http.Request, error) {
+func NewDeleteVolumeRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -17298,7 +18225,7 @@ func NewDeleteVolumeRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/volumes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17317,12 +18244,19 @@ func NewDeleteVolumeRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewReadVolumesByIdRequest generates requests for ReadVolumesById
-func NewReadVolumesByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadVolumesByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -17332,7 +18266,7 @@ func NewReadVolumesByIdRequest(server string, id string) (*http.Request, error) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/volumes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17351,23 +18285,30 @@ func NewReadVolumesByIdRequest(server string, id string) (*http.Request, error) 
 }
 
 // NewUpdateVolumeRequest calls the generic UpdateVolume builder with application/json body
-func NewUpdateVolumeRequest(server string, id string, body UpdateVolumeJSONRequestBody) (*http.Request, error) {
+func NewUpdateVolumeRequest(server string, spaceId SpaceId, id string, body UpdateVolumeJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateVolumeRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateVolumeRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateVolumeRequestWithBody generates requests for UpdateVolume with any type of body
-func NewUpdateVolumeRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateVolumeRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -17377,7 +18318,7 @@ func NewUpdateVolumeRequestWithBody(server string, id string, contentType string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/volumes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17398,23 +18339,30 @@ func NewUpdateVolumeRequestWithBody(server string, id string, contentType string
 }
 
 // NewLinkVolumeRequest calls the generic LinkVolume builder with application/json body
-func NewLinkVolumeRequest(server string, id string, body LinkVolumeJSONRequestBody) (*http.Request, error) {
+func NewLinkVolumeRequest(server string, spaceId SpaceId, id string, body LinkVolumeJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewLinkVolumeRequestWithBody(server, id, "application/json", bodyReader)
+	return NewLinkVolumeRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewLinkVolumeRequestWithBody generates requests for LinkVolume with any type of body
-func NewLinkVolumeRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewLinkVolumeRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -17424,7 +18372,7 @@ func NewLinkVolumeRequestWithBody(server string, id string, contentType string, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/volumes/%s/vms/link", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s/vms/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17445,23 +18393,30 @@ func NewLinkVolumeRequestWithBody(server string, id string, contentType string, 
 }
 
 // NewUnlinkVolumeRequest calls the generic UnlinkVolume builder with application/json body
-func NewUnlinkVolumeRequest(server string, id string, body UnlinkVolumeJSONRequestBody) (*http.Request, error) {
+func NewUnlinkVolumeRequest(server string, spaceId SpaceId, id string, body UnlinkVolumeJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUnlinkVolumeRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUnlinkVolumeRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUnlinkVolumeRequestWithBody generates requests for UnlinkVolume with any type of body
-func NewUnlinkVolumeRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUnlinkVolumeRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -17471,7 +18426,7 @@ func NewUnlinkVolumeRequestWithBody(server string, id string, contentType string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/volumes/%s/vms/unlink", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s/vms/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17492,15 +18447,22 @@ func NewUnlinkVolumeRequestWithBody(server string, id string, contentType string
 }
 
 // NewReadVpcAccessPointsRequest generates requests for ReadVpcAccessPoints
-func NewReadVpcAccessPointsRequest(server string, params *ReadVpcAccessPointsParams) (*http.Request, error) {
+func NewReadVpcAccessPointsRequest(server string, spaceId SpaceId, params *ReadVpcAccessPointsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcAccessPoints")
+	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17637,26 +18599,33 @@ func NewReadVpcAccessPointsRequest(server string, params *ReadVpcAccessPointsPar
 }
 
 // NewCreateVpcAccessPointRequest calls the generic CreateVpcAccessPoint builder with application/json body
-func NewCreateVpcAccessPointRequest(server string, body CreateVpcAccessPointJSONRequestBody) (*http.Request, error) {
+func NewCreateVpcAccessPointRequest(server string, spaceId SpaceId, body CreateVpcAccessPointJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateVpcAccessPointRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateVpcAccessPointRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateVpcAccessPointRequestWithBody generates requests for CreateVpcAccessPoint with any type of body
-func NewCreateVpcAccessPointRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateVpcAccessPointRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcAccessPoints")
+	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17677,12 +18646,19 @@ func NewCreateVpcAccessPointRequestWithBody(server string, contentType string, b
 }
 
 // NewDeleteVpcAccessPointRequest generates requests for DeleteVpcAccessPoint
-func NewDeleteVpcAccessPointRequest(server string, id string) (*http.Request, error) {
+func NewDeleteVpcAccessPointRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -17692,7 +18668,7 @@ func NewDeleteVpcAccessPointRequest(server string, id string) (*http.Request, er
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcAccessPoints/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17711,12 +18687,19 @@ func NewDeleteVpcAccessPointRequest(server string, id string) (*http.Request, er
 }
 
 // NewReadVpcAccessPointsByIdRequest generates requests for ReadVpcAccessPointsById
-func NewReadVpcAccessPointsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadVpcAccessPointsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -17726,7 +18709,7 @@ func NewReadVpcAccessPointsByIdRequest(server string, id string) (*http.Request,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcAccessPoints/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17745,23 +18728,30 @@ func NewReadVpcAccessPointsByIdRequest(server string, id string) (*http.Request,
 }
 
 // NewUpdateVpcAccessPointRequest calls the generic UpdateVpcAccessPoint builder with application/json body
-func NewUpdateVpcAccessPointRequest(server string, id string, body UpdateVpcAccessPointJSONRequestBody) (*http.Request, error) {
+func NewUpdateVpcAccessPointRequest(server string, spaceId SpaceId, id string, body UpdateVpcAccessPointJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateVpcAccessPointRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateVpcAccessPointRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateVpcAccessPointRequestWithBody generates requests for UpdateVpcAccessPoint with any type of body
-func NewUpdateVpcAccessPointRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateVpcAccessPointRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -17771,7 +18761,7 @@ func NewUpdateVpcAccessPointRequestWithBody(server string, id string, contentTyp
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcAccessPoints/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17792,15 +18782,22 @@ func NewUpdateVpcAccessPointRequestWithBody(server string, id string, contentTyp
 }
 
 // NewReadVpcPeeringsRequest generates requests for ReadVpcPeerings
-func NewReadVpcPeeringsRequest(server string, params *ReadVpcPeeringsParams) (*http.Request, error) {
+func NewReadVpcPeeringsRequest(server string, spaceId SpaceId, params *ReadVpcPeeringsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcPeerings")
+	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18033,26 +19030,33 @@ func NewReadVpcPeeringsRequest(server string, params *ReadVpcPeeringsParams) (*h
 }
 
 // NewCreateVpcPeeringRequest calls the generic CreateVpcPeering builder with application/json body
-func NewCreateVpcPeeringRequest(server string, body CreateVpcPeeringJSONRequestBody) (*http.Request, error) {
+func NewCreateVpcPeeringRequest(server string, spaceId SpaceId, body CreateVpcPeeringJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateVpcPeeringRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateVpcPeeringRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateVpcPeeringRequestWithBody generates requests for CreateVpcPeering with any type of body
-func NewCreateVpcPeeringRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateVpcPeeringRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcPeerings")
+	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18073,12 +19077,19 @@ func NewCreateVpcPeeringRequestWithBody(server string, contentType string, body 
 }
 
 // NewDeleteVpcPeeringRequest generates requests for DeleteVpcPeering
-func NewDeleteVpcPeeringRequest(server string, id string) (*http.Request, error) {
+func NewDeleteVpcPeeringRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18088,7 +19099,7 @@ func NewDeleteVpcPeeringRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcPeerings/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18107,12 +19118,19 @@ func NewDeleteVpcPeeringRequest(server string, id string) (*http.Request, error)
 }
 
 // NewReadVpcPeeringsByIdRequest generates requests for ReadVpcPeeringsById
-func NewReadVpcPeeringsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadVpcPeeringsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18122,7 +19140,7 @@ func NewReadVpcPeeringsByIdRequest(server string, id string) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcPeerings/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18141,12 +19159,19 @@ func NewReadVpcPeeringsByIdRequest(server string, id string) (*http.Request, err
 }
 
 // NewAcceptVpcPeeringRequest generates requests for AcceptVpcPeering
-func NewAcceptVpcPeeringRequest(server string, id string) (*http.Request, error) {
+func NewAcceptVpcPeeringRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18156,7 +19181,7 @@ func NewAcceptVpcPeeringRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcPeerings/%s/accept", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings/%s/accept", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18175,12 +19200,19 @@ func NewAcceptVpcPeeringRequest(server string, id string) (*http.Request, error)
 }
 
 // NewRejectVpcPeeringRequest generates requests for RejectVpcPeering
-func NewRejectVpcPeeringRequest(server string, id string) (*http.Request, error) {
+func NewRejectVpcPeeringRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18190,7 +19222,7 @@ func NewRejectVpcPeeringRequest(server string, id string) (*http.Request, error)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcPeerings/%s/reject", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings/%s/reject", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18209,15 +19241,22 @@ func NewRejectVpcPeeringRequest(server string, id string) (*http.Request, error)
 }
 
 // NewReadVpcsRequest generates requests for ReadVpcs
-func NewReadVpcsRequest(server string, params *ReadVpcsParams) (*http.Request, error) {
+func NewReadVpcsRequest(server string, spaceId SpaceId, params *ReadVpcsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcs")
+	operationPath := fmt.Sprintf("/spaces/%s/vpcs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18370,26 +19409,33 @@ func NewReadVpcsRequest(server string, params *ReadVpcsParams) (*http.Request, e
 }
 
 // NewCreateVpcRequest calls the generic CreateVpc builder with application/json body
-func NewCreateVpcRequest(server string, body CreateVpcJSONRequestBody) (*http.Request, error) {
+func NewCreateVpcRequest(server string, spaceId SpaceId, body CreateVpcJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateVpcRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateVpcRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateVpcRequestWithBody generates requests for CreateVpc with any type of body
-func NewCreateVpcRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateVpcRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcs")
+	operationPath := fmt.Sprintf("/spaces/%s/vpcs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18410,12 +19456,19 @@ func NewCreateVpcRequestWithBody(server string, contentType string, body io.Read
 }
 
 // NewDeleteVpcRequest generates requests for DeleteVpc
-func NewDeleteVpcRequest(server string, id string) (*http.Request, error) {
+func NewDeleteVpcRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18425,7 +19478,7 @@ func NewDeleteVpcRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcs/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18444,12 +19497,19 @@ func NewDeleteVpcRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewReadVpcsByIdRequest generates requests for ReadVpcsById
-func NewReadVpcsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadVpcsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18459,7 +19519,7 @@ func NewReadVpcsByIdRequest(server string, id string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcs/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18478,23 +19538,30 @@ func NewReadVpcsByIdRequest(server string, id string) (*http.Request, error) {
 }
 
 // NewUpdateVpcRequest calls the generic UpdateVpc builder with application/json body
-func NewUpdateVpcRequest(server string, id string, body UpdateVpcJSONRequestBody) (*http.Request, error) {
+func NewUpdateVpcRequest(server string, spaceId SpaceId, id string, body UpdateVpcJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateVpcRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateVpcRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateVpcRequestWithBody generates requests for UpdateVpc with any type of body
-func NewUpdateVpcRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateVpcRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18504,7 +19571,7 @@ func NewUpdateVpcRequestWithBody(server string, id string, contentType string, b
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpcs/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpcs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18525,15 +19592,22 @@ func NewUpdateVpcRequestWithBody(server string, id string, contentType string, b
 }
 
 // NewReadVpnConnectionsRequest generates requests for ReadVpnConnections
-func NewReadVpnConnectionsRequest(server string, params *ReadVpnConnectionsParams) (*http.Request, error) {
+func NewReadVpnConnectionsRequest(server string, spaceId SpaceId, params *ReadVpnConnectionsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpnConnections")
+	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18734,26 +19808,33 @@ func NewReadVpnConnectionsRequest(server string, params *ReadVpnConnectionsParam
 }
 
 // NewCreateVpnConnectionRequest calls the generic CreateVpnConnection builder with application/json body
-func NewCreateVpnConnectionRequest(server string, body CreateVpnConnectionJSONRequestBody) (*http.Request, error) {
+func NewCreateVpnConnectionRequest(server string, spaceId SpaceId, body CreateVpnConnectionJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateVpnConnectionRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateVpnConnectionRequestWithBody(server, spaceId, "application/json", bodyReader)
 }
 
 // NewCreateVpnConnectionRequestWithBody generates requests for CreateVpnConnection with any type of body
-func NewCreateVpnConnectionRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateVpnConnectionRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpnConnections")
+	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18774,12 +19855,19 @@ func NewCreateVpnConnectionRequestWithBody(server string, contentType string, bo
 }
 
 // NewDeleteVpnConnectionRequest generates requests for DeleteVpnConnection
-func NewDeleteVpnConnectionRequest(server string, id string) (*http.Request, error) {
+func NewDeleteVpnConnectionRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18789,7 +19877,7 @@ func NewDeleteVpnConnectionRequest(server string, id string) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpnConnections/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18808,12 +19896,19 @@ func NewDeleteVpnConnectionRequest(server string, id string) (*http.Request, err
 }
 
 // NewReadVpnConnectionsByIdRequest generates requests for ReadVpnConnectionsById
-func NewReadVpnConnectionsByIdRequest(server string, id string) (*http.Request, error) {
+func NewReadVpnConnectionsByIdRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18823,7 +19918,7 @@ func NewReadVpnConnectionsByIdRequest(server string, id string) (*http.Request, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpnConnections/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18842,23 +19937,30 @@ func NewReadVpnConnectionsByIdRequest(server string, id string) (*http.Request, 
 }
 
 // NewUpdateVpnConnectionRequest calls the generic UpdateVpnConnection builder with application/json body
-func NewUpdateVpnConnectionRequest(server string, id string, body UpdateVpnConnectionJSONRequestBody) (*http.Request, error) {
+func NewUpdateVpnConnectionRequest(server string, spaceId SpaceId, id string, body UpdateVpnConnectionJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateVpnConnectionRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateVpnConnectionRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewUpdateVpnConnectionRequestWithBody generates requests for UpdateVpnConnection with any type of body
-func NewUpdateVpnConnectionRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateVpnConnectionRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18868,7 +19970,7 @@ func NewUpdateVpnConnectionRequestWithBody(server string, id string, contentType
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpnConnections/%s", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18889,23 +19991,30 @@ func NewUpdateVpnConnectionRequestWithBody(server string, id string, contentType
 }
 
 // NewDeleteVpnConnectionRouteRequest calls the generic DeleteVpnConnectionRoute builder with application/json body
-func NewDeleteVpnConnectionRouteRequest(server string, id string, body DeleteVpnConnectionRouteJSONRequestBody) (*http.Request, error) {
+func NewDeleteVpnConnectionRouteRequest(server string, spaceId SpaceId, id string, body DeleteVpnConnectionRouteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewDeleteVpnConnectionRouteRequestWithBody(server, id, "application/json", bodyReader)
+	return NewDeleteVpnConnectionRouteRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewDeleteVpnConnectionRouteRequestWithBody generates requests for DeleteVpnConnectionRoute with any type of body
-func NewDeleteVpnConnectionRouteRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewDeleteVpnConnectionRouteRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18915,7 +20024,7 @@ func NewDeleteVpnConnectionRouteRequestWithBody(server string, id string, conten
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpnConnections/%s/routes", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18936,23 +20045,30 @@ func NewDeleteVpnConnectionRouteRequestWithBody(server string, id string, conten
 }
 
 // NewCreateVpnConnectionRouteRequest calls the generic CreateVpnConnectionRoute builder with application/json body
-func NewCreateVpnConnectionRouteRequest(server string, id string, body CreateVpnConnectionRouteJSONRequestBody) (*http.Request, error) {
+func NewCreateVpnConnectionRouteRequest(server string, spaceId SpaceId, id string, body CreateVpnConnectionRouteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateVpnConnectionRouteRequestWithBody(server, id, "application/json", bodyReader)
+	return NewCreateVpnConnectionRouteRequestWithBody(server, spaceId, id, "application/json", bodyReader)
 }
 
 // NewCreateVpnConnectionRouteRequestWithBody generates requests for CreateVpnConnectionRoute with any type of body
-func NewCreateVpnConnectionRouteRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateVpnConnectionRouteRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
 	if err != nil {
 		return nil, err
 	}
@@ -18962,7 +20078,7 @@ func NewCreateVpnConnectionRouteRequestWithBody(server string, id string, conten
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/vpnConnections/%s/routes", pathParam0)
+	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19026,623 +20142,623 @@ func WithBaseURL(baseURL string) ClientOption {
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 	// DeleteLoadBalancerTagsWithBodyWithResponse request with any body
-	DeleteLoadBalancerTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerTagsResponse, error)
+	DeleteLoadBalancerTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerTagsResponse, error)
 
-	DeleteLoadBalancerTagsWithResponse(ctx context.Context, body DeleteLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerTagsResponse, error)
+	DeleteLoadBalancerTagsWithResponse(ctx context.Context, spaceId SpaceId, body DeleteLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerTagsResponse, error)
 
 	// CreateLoadBalancerTagsWithBodyWithResponse request with any body
-	CreateLoadBalancerTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerTagsResponse, error)
+	CreateLoadBalancerTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerTagsResponse, error)
 
-	CreateLoadBalancerTagsWithResponse(ctx context.Context, body CreateLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerTagsResponse, error)
+	CreateLoadBalancerTagsWithResponse(ctx context.Context, spaceId SpaceId, body CreateLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerTagsResponse, error)
 
 	// DeleteTagsWithBodyWithResponse request with any body
-	DeleteTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteTagsResponse, error)
+	DeleteTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteTagsResponse, error)
 
-	DeleteTagsWithResponse(ctx context.Context, body DeleteTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteTagsResponse, error)
+	DeleteTagsWithResponse(ctx context.Context, spaceId SpaceId, body DeleteTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteTagsResponse, error)
 
 	// CreateTagsWithBodyWithResponse request with any body
-	CreateTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTagsResponse, error)
+	CreateTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTagsResponse, error)
 
-	CreateTagsWithResponse(ctx context.Context, body CreateTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTagsResponse, error)
+	CreateTagsWithResponse(ctx context.Context, spaceId SpaceId, body CreateTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTagsResponse, error)
 
 	// ReadClientGatewaysWithResponse request
-	ReadClientGatewaysWithResponse(ctx context.Context, params *ReadClientGatewaysParams, reqEditors ...RequestEditorFn) (*ReadClientGatewaysResponse, error)
+	ReadClientGatewaysWithResponse(ctx context.Context, spaceId SpaceId, params *ReadClientGatewaysParams, reqEditors ...RequestEditorFn) (*ReadClientGatewaysResponse, error)
 
 	// CreateClientGatewayWithBodyWithResponse request with any body
-	CreateClientGatewayWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateClientGatewayResponse, error)
+	CreateClientGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateClientGatewayResponse, error)
 
-	CreateClientGatewayWithResponse(ctx context.Context, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateClientGatewayResponse, error)
+	CreateClientGatewayWithResponse(ctx context.Context, spaceId SpaceId, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateClientGatewayResponse, error)
 
 	// DeleteClientGatewayWithResponse request
-	DeleteClientGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error)
+	DeleteClientGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error)
 
 	// ReadClientGatewaysByIdWithResponse request
-	ReadClientGatewaysByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadClientGatewaysByIdResponse, error)
+	ReadClientGatewaysByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadClientGatewaysByIdResponse, error)
 
 	// ReadDhcpOptionsWithResponse request
-	ReadDhcpOptionsWithResponse(ctx context.Context, params *ReadDhcpOptionsParams, reqEditors ...RequestEditorFn) (*ReadDhcpOptionsResponse, error)
+	ReadDhcpOptionsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadDhcpOptionsParams, reqEditors ...RequestEditorFn) (*ReadDhcpOptionsResponse, error)
 
 	// CreateDhcpOptionsWithBodyWithResponse request with any body
-	CreateDhcpOptionsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsResponse, error)
+	CreateDhcpOptionsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsResponse, error)
 
-	CreateDhcpOptionsWithResponse(ctx context.Context, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsResponse, error)
+	CreateDhcpOptionsWithResponse(ctx context.Context, spaceId SpaceId, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsResponse, error)
 
 	// DeleteDhcpOptionsWithResponse request
-	DeleteDhcpOptionsWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error)
+	DeleteDhcpOptionsWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error)
 
 	// ReadDhcpOptionsByIdWithResponse request
-	ReadDhcpOptionsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadDhcpOptionsByIdResponse, error)
+	ReadDhcpOptionsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadDhcpOptionsByIdResponse, error)
 
 	// ReadDirectLinkInterfacesWithResponse request
-	ReadDirectLinkInterfacesWithResponse(ctx context.Context, params *ReadDirectLinkInterfacesParams, reqEditors ...RequestEditorFn) (*ReadDirectLinkInterfacesResponse, error)
+	ReadDirectLinkInterfacesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadDirectLinkInterfacesParams, reqEditors ...RequestEditorFn) (*ReadDirectLinkInterfacesResponse, error)
 
 	// CreateDirectLinkInterfaceWithBodyWithResponse request with any body
-	CreateDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDirectLinkInterfaceResponse, error)
+	CreateDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDirectLinkInterfaceResponse, error)
 
-	CreateDirectLinkInterfaceWithResponse(ctx context.Context, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkInterfaceResponse, error)
+	CreateDirectLinkInterfaceWithResponse(ctx context.Context, spaceId SpaceId, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkInterfaceResponse, error)
 
 	// DeleteDirectLinkInterfaceWithResponse request
-	DeleteDirectLinkInterfaceWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error)
+	DeleteDirectLinkInterfaceWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error)
 
 	// ReadDirectLinkInterfacesByIdWithResponse request
-	ReadDirectLinkInterfacesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinkInterfacesByIdResponse, error)
+	ReadDirectLinkInterfacesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinkInterfacesByIdResponse, error)
 
 	// UpdateDirectLinkInterfaceWithBodyWithResponse request with any body
-	UpdateDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDirectLinkInterfaceResponse, error)
+	UpdateDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDirectLinkInterfaceResponse, error)
 
-	UpdateDirectLinkInterfaceWithResponse(ctx context.Context, id string, body UpdateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDirectLinkInterfaceResponse, error)
+	UpdateDirectLinkInterfaceWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDirectLinkInterfaceResponse, error)
 
 	// ReadDirectLinksWithResponse request
-	ReadDirectLinksWithResponse(ctx context.Context, params *ReadDirectLinksParams, reqEditors ...RequestEditorFn) (*ReadDirectLinksResponse, error)
+	ReadDirectLinksWithResponse(ctx context.Context, spaceId SpaceId, params *ReadDirectLinksParams, reqEditors ...RequestEditorFn) (*ReadDirectLinksResponse, error)
 
 	// CreateDirectLinkWithBodyWithResponse request with any body
-	CreateDirectLinkWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDirectLinkResponse, error)
+	CreateDirectLinkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDirectLinkResponse, error)
 
-	CreateDirectLinkWithResponse(ctx context.Context, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkResponse, error)
+	CreateDirectLinkWithResponse(ctx context.Context, spaceId SpaceId, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkResponse, error)
 
 	// DeleteDirectLinkWithResponse request
-	DeleteDirectLinkWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error)
+	DeleteDirectLinkWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error)
 
 	// ReadDirectLinksByIdWithResponse request
-	ReadDirectLinksByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinksByIdResponse, error)
+	ReadDirectLinksByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinksByIdResponse, error)
 
 	// ReadFlexibleGpuCatalogWithResponse request
-	ReadFlexibleGpuCatalogWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error)
+	ReadFlexibleGpuCatalogWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error)
 
 	// ReadFlexibleGpusWithResponse request
-	ReadFlexibleGpusWithResponse(ctx context.Context, params *ReadFlexibleGpusParams, reqEditors ...RequestEditorFn) (*ReadFlexibleGpusResponse, error)
+	ReadFlexibleGpusWithResponse(ctx context.Context, spaceId SpaceId, params *ReadFlexibleGpusParams, reqEditors ...RequestEditorFn) (*ReadFlexibleGpusResponse, error)
 
 	// CreateFlexibleGpuWithBodyWithResponse request with any body
-	CreateFlexibleGpuWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFlexibleGpuResponse, error)
+	CreateFlexibleGpuWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFlexibleGpuResponse, error)
 
-	CreateFlexibleGpuWithResponse(ctx context.Context, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFlexibleGpuResponse, error)
+	CreateFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFlexibleGpuResponse, error)
 
 	// DeleteFlexibleGpuWithResponse request
-	DeleteFlexibleGpuWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error)
+	DeleteFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error)
 
 	// ReadFlexibleGpusByIdWithResponse request
-	ReadFlexibleGpusByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadFlexibleGpusByIdResponse, error)
+	ReadFlexibleGpusByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadFlexibleGpusByIdResponse, error)
 
 	// UpdateFlexibleGpuWithBodyWithResponse request with any body
-	UpdateFlexibleGpuWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFlexibleGpuResponse, error)
+	UpdateFlexibleGpuWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFlexibleGpuResponse, error)
 
-	UpdateFlexibleGpuWithResponse(ctx context.Context, id string, body UpdateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFlexibleGpuResponse, error)
+	UpdateFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFlexibleGpuResponse, error)
 
 	// LinkFlexibleGpuWithBodyWithResponse request with any body
-	LinkFlexibleGpuWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkFlexibleGpuResponse, error)
+	LinkFlexibleGpuWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkFlexibleGpuResponse, error)
 
-	LinkFlexibleGpuWithResponse(ctx context.Context, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkFlexibleGpuResponse, error)
+	LinkFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkFlexibleGpuResponse, error)
 
 	// UnlinkFlexibleGpuWithResponse request
-	UnlinkFlexibleGpuWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error)
+	UnlinkFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error)
 
 	// ReadImagesWithResponse request
-	ReadImagesWithResponse(ctx context.Context, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*ReadImagesResponse, error)
+	ReadImagesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*ReadImagesResponse, error)
 
 	// CreateImageWithBodyWithResponse request with any body
-	CreateImageWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateImageResponse, error)
+	CreateImageWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateImageResponse, error)
 
-	CreateImageWithResponse(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateImageResponse, error)
+	CreateImageWithResponse(ctx context.Context, spaceId SpaceId, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateImageResponse, error)
 
 	// DeleteImageWithResponse request
-	DeleteImageWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error)
+	DeleteImageWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error)
 
 	// ReadImagesByIdWithResponse request
-	ReadImagesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadImagesByIdResponse, error)
+	ReadImagesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadImagesByIdResponse, error)
 
 	// UpdateImageWithBodyWithResponse request with any body
-	UpdateImageWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error)
+	UpdateImageWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error)
 
-	UpdateImageWithResponse(ctx context.Context, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error)
+	UpdateImageWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error)
 
 	// ReadInternetGatewaysWithResponse request
-	ReadInternetGatewaysWithResponse(ctx context.Context, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*ReadInternetGatewaysResponse, error)
+	ReadInternetGatewaysWithResponse(ctx context.Context, spaceId SpaceId, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*ReadInternetGatewaysResponse, error)
 
 	// CreateInternetGatewayWithResponse request
-	CreateInternetGatewayWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreateInternetGatewayResponse, error)
+	CreateInternetGatewayWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*CreateInternetGatewayResponse, error)
 
 	// DeleteInternetGatewayWithResponse request
-	DeleteInternetGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteInternetGatewayResponse, error)
+	DeleteInternetGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteInternetGatewayResponse, error)
 
 	// ReadInternetGatewaysByIdWithResponse request
-	ReadInternetGatewaysByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadInternetGatewaysByIdResponse, error)
+	ReadInternetGatewaysByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadInternetGatewaysByIdResponse, error)
 
 	// LinkInternetGatewayWithBodyWithResponse request with any body
-	LinkInternetGatewayWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkInternetGatewayResponse, error)
+	LinkInternetGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkInternetGatewayResponse, error)
 
-	LinkInternetGatewayWithResponse(ctx context.Context, id string, body LinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkInternetGatewayResponse, error)
+	LinkInternetGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkInternetGatewayResponse, error)
 
 	// UnlinkInternetGatewayWithBodyWithResponse request with any body
-	UnlinkInternetGatewayWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkInternetGatewayResponse, error)
+	UnlinkInternetGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkInternetGatewayResponse, error)
 
-	UnlinkInternetGatewayWithResponse(ctx context.Context, id string, body UnlinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkInternetGatewayResponse, error)
+	UnlinkInternetGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkInternetGatewayResponse, error)
 
 	// ReadKeypairsWithResponse request
-	ReadKeypairsWithResponse(ctx context.Context, params *ReadKeypairsParams, reqEditors ...RequestEditorFn) (*ReadKeypairsResponse, error)
+	ReadKeypairsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadKeypairsParams, reqEditors ...RequestEditorFn) (*ReadKeypairsResponse, error)
 
 	// CreateKeypairWithBodyWithResponse request with any body
-	CreateKeypairWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKeypairResponse, error)
+	CreateKeypairWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKeypairResponse, error)
 
-	CreateKeypairWithResponse(ctx context.Context, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKeypairResponse, error)
+	CreateKeypairWithResponse(ctx context.Context, spaceId SpaceId, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKeypairResponse, error)
 
 	// DeleteKeypairWithResponse request
-	DeleteKeypairWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error)
+	DeleteKeypairWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error)
 
 	// ReadKeypairsByIdWithResponse request
-	ReadKeypairsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadKeypairsByIdResponse, error)
+	ReadKeypairsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadKeypairsByIdResponse, error)
 
 	// ReadListenerRulesWithResponse request
-	ReadListenerRulesWithResponse(ctx context.Context, params *ReadListenerRulesParams, reqEditors ...RequestEditorFn) (*ReadListenerRulesResponse, error)
+	ReadListenerRulesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadListenerRulesParams, reqEditors ...RequestEditorFn) (*ReadListenerRulesResponse, error)
 
 	// CreateListenerRuleWithBodyWithResponse request with any body
-	CreateListenerRuleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateListenerRuleResponse, error)
+	CreateListenerRuleWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateListenerRuleResponse, error)
 
-	CreateListenerRuleWithResponse(ctx context.Context, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateListenerRuleResponse, error)
+	CreateListenerRuleWithResponse(ctx context.Context, spaceId SpaceId, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateListenerRuleResponse, error)
 
 	// DeleteListenerRuleWithResponse request
-	DeleteListenerRuleWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error)
+	DeleteListenerRuleWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error)
 
 	// ReadListenerRulesByIdWithResponse request
-	ReadListenerRulesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadListenerRulesByIdResponse, error)
+	ReadListenerRulesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadListenerRulesByIdResponse, error)
 
 	// UpdateListenerRuleWithBodyWithResponse request with any body
-	UpdateListenerRuleWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateListenerRuleResponse, error)
+	UpdateListenerRuleWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateListenerRuleResponse, error)
 
-	UpdateListenerRuleWithResponse(ctx context.Context, id string, body UpdateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateListenerRuleResponse, error)
+	UpdateListenerRuleWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateListenerRuleResponse, error)
 
 	// ReadLoadBalancersWithResponse request
-	ReadLoadBalancersWithResponse(ctx context.Context, params *ReadLoadBalancersParams, reqEditors ...RequestEditorFn) (*ReadLoadBalancersResponse, error)
+	ReadLoadBalancersWithResponse(ctx context.Context, spaceId SpaceId, params *ReadLoadBalancersParams, reqEditors ...RequestEditorFn) (*ReadLoadBalancersResponse, error)
 
 	// CreateLoadBalancerWithBodyWithResponse request with any body
-	CreateLoadBalancerWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerResponse, error)
+	CreateLoadBalancerWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerResponse, error)
 
-	CreateLoadBalancerWithResponse(ctx context.Context, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerResponse, error)
+	CreateLoadBalancerWithResponse(ctx context.Context, spaceId SpaceId, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerResponse, error)
 
 	// DeleteLoadBalancerWithResponse request
-	DeleteLoadBalancerWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error)
+	DeleteLoadBalancerWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error)
 
 	// ReadLoadBalancersByIdWithResponse request
-	ReadLoadBalancersByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadLoadBalancersByIdResponse, error)
+	ReadLoadBalancersByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadLoadBalancersByIdResponse, error)
 
 	// UpdateLoadBalancerWithBodyWithResponse request with any body
-	UpdateLoadBalancerWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateLoadBalancerResponse, error)
+	UpdateLoadBalancerWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateLoadBalancerResponse, error)
 
-	UpdateLoadBalancerWithResponse(ctx context.Context, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateLoadBalancerResponse, error)
+	UpdateLoadBalancerWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateLoadBalancerResponse, error)
 
 	// LinkLoadBalancerBackendMachinesWithBodyWithResponse request with any body
-	LinkLoadBalancerBackendMachinesWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkLoadBalancerBackendMachinesResponse, error)
+	LinkLoadBalancerBackendMachinesWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkLoadBalancerBackendMachinesResponse, error)
 
-	LinkLoadBalancerBackendMachinesWithResponse(ctx context.Context, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkLoadBalancerBackendMachinesResponse, error)
+	LinkLoadBalancerBackendMachinesWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkLoadBalancerBackendMachinesResponse, error)
 
 	// UnlinkLoadBalancerBackendMachinesWithBodyWithResponse request with any body
-	UnlinkLoadBalancerBackendMachinesWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkLoadBalancerBackendMachinesResponse, error)
+	UnlinkLoadBalancerBackendMachinesWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkLoadBalancerBackendMachinesResponse, error)
 
-	UnlinkLoadBalancerBackendMachinesWithResponse(ctx context.Context, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkLoadBalancerBackendMachinesResponse, error)
+	UnlinkLoadBalancerBackendMachinesWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkLoadBalancerBackendMachinesResponse, error)
 
 	// DeleteLoadBalancerListenersWithBodyWithResponse request with any body
-	DeleteLoadBalancerListenersWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerListenersResponse, error)
+	DeleteLoadBalancerListenersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerListenersResponse, error)
 
-	DeleteLoadBalancerListenersWithResponse(ctx context.Context, id string, body DeleteLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerListenersResponse, error)
+	DeleteLoadBalancerListenersWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerListenersResponse, error)
 
 	// CreateLoadBalancerListenersWithBodyWithResponse request with any body
-	CreateLoadBalancerListenersWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerListenersResponse, error)
+	CreateLoadBalancerListenersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerListenersResponse, error)
 
-	CreateLoadBalancerListenersWithResponse(ctx context.Context, id string, body CreateLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerListenersResponse, error)
+	CreateLoadBalancerListenersWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerListenersResponse, error)
 
 	// DeleteLoadBalancerPolicyWithBodyWithResponse request with any body
-	DeleteLoadBalancerPolicyWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerPolicyResponse, error)
+	DeleteLoadBalancerPolicyWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerPolicyResponse, error)
 
-	DeleteLoadBalancerPolicyWithResponse(ctx context.Context, id string, body DeleteLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerPolicyResponse, error)
+	DeleteLoadBalancerPolicyWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerPolicyResponse, error)
 
 	// CreateLoadBalancerPolicyWithBodyWithResponse request with any body
-	CreateLoadBalancerPolicyWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerPolicyResponse, error)
+	CreateLoadBalancerPolicyWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerPolicyResponse, error)
 
-	CreateLoadBalancerPolicyWithResponse(ctx context.Context, id string, body CreateLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerPolicyResponse, error)
+	CreateLoadBalancerPolicyWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerPolicyResponse, error)
 
 	// ReadVmsHealthWithBodyWithResponse request with any body
-	ReadVmsHealthWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadVmsHealthResponse, error)
+	ReadVmsHealthWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadVmsHealthResponse, error)
 
-	ReadVmsHealthWithResponse(ctx context.Context, id string, body ReadVmsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadVmsHealthResponse, error)
+	ReadVmsHealthWithResponse(ctx context.Context, spaceId SpaceId, id string, body ReadVmsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadVmsHealthResponse, error)
 
 	// ReadLoadBalancerTagsWithBodyWithResponse request with any body
-	ReadLoadBalancerTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadLoadBalancerTagsResponse, error)
+	ReadLoadBalancerTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadLoadBalancerTagsResponse, error)
 
-	ReadLoadBalancerTagsWithResponse(ctx context.Context, body ReadLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadLoadBalancerTagsResponse, error)
+	ReadLoadBalancerTagsWithResponse(ctx context.Context, spaceId SpaceId, body ReadLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadLoadBalancerTagsResponse, error)
 
 	// ReadLocationsWithResponse request
-	ReadLocationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error)
+	ReadLocationsWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error)
 
 	// ReadNatGatewayWithResponse request
-	ReadNatGatewayWithResponse(ctx context.Context, params *ReadNatGatewayParams, reqEditors ...RequestEditorFn) (*ReadNatGatewayResponse, error)
+	ReadNatGatewayWithResponse(ctx context.Context, spaceId SpaceId, params *ReadNatGatewayParams, reqEditors ...RequestEditorFn) (*ReadNatGatewayResponse, error)
 
 	// CreateNatGatewayWithBodyWithResponse request with any body
-	CreateNatGatewayWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNatGatewayResponse, error)
+	CreateNatGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNatGatewayResponse, error)
 
-	CreateNatGatewayWithResponse(ctx context.Context, body CreateNatGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNatGatewayResponse, error)
+	CreateNatGatewayWithResponse(ctx context.Context, spaceId SpaceId, body CreateNatGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNatGatewayResponse, error)
 
 	// DeleteNatGatewayWithResponse request
-	DeleteNatGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNatGatewayResponse, error)
+	DeleteNatGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteNatGatewayResponse, error)
 
 	// ReadNatGatewayByIdWithResponse request
-	ReadNatGatewayByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadNatGatewayByIdResponse, error)
+	ReadNatGatewayByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadNatGatewayByIdResponse, error)
 
 	// ReadNicsWithResponse request
-	ReadNicsWithResponse(ctx context.Context, params *ReadNicsParams, reqEditors ...RequestEditorFn) (*ReadNicsResponse, error)
+	ReadNicsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadNicsParams, reqEditors ...RequestEditorFn) (*ReadNicsResponse, error)
 
 	// CreateNicWithBodyWithResponse request with any body
-	CreateNicWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNicResponse, error)
+	CreateNicWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNicResponse, error)
 
-	CreateNicWithResponse(ctx context.Context, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNicResponse, error)
+	CreateNicWithResponse(ctx context.Context, spaceId SpaceId, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNicResponse, error)
 
 	// DeleteNicWithResponse request
-	DeleteNicWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error)
+	DeleteNicWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error)
 
 	// ReadNicsByIdWithResponse request
-	ReadNicsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadNicsByIdResponse, error)
+	ReadNicsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadNicsByIdResponse, error)
 
 	// UpdateNicWithBodyWithResponse request with any body
-	UpdateNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateNicResponse, error)
+	UpdateNicWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateNicResponse, error)
 
-	UpdateNicWithResponse(ctx context.Context, id string, body UpdateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateNicResponse, error)
+	UpdateNicWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateNicResponse, error)
 
 	// LinkPrivateIpsWithBodyWithResponse request with any body
-	LinkPrivateIpsWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkPrivateIpsResponse, error)
+	LinkPrivateIpsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkPrivateIpsResponse, error)
 
-	LinkPrivateIpsWithResponse(ctx context.Context, id string, body LinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkPrivateIpsResponse, error)
+	LinkPrivateIpsWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkPrivateIpsResponse, error)
 
 	// UnlinkPrivateIpsWithBodyWithResponse request with any body
-	UnlinkPrivateIpsWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPrivateIpsResponse, error)
+	UnlinkPrivateIpsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPrivateIpsResponse, error)
 
-	UnlinkPrivateIpsWithResponse(ctx context.Context, id string, body UnlinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPrivateIpsResponse, error)
+	UnlinkPrivateIpsWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPrivateIpsResponse, error)
 
 	// LinkNicWithBodyWithResponse request with any body
-	LinkNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkNicResponse, error)
+	LinkNicWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkNicResponse, error)
 
-	LinkNicWithResponse(ctx context.Context, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkNicResponse, error)
+	LinkNicWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkNicResponse, error)
 
 	// UnlinkNicWithBodyWithResponse request with any body
-	UnlinkNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error)
+	UnlinkNicWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error)
 
-	UnlinkNicWithResponse(ctx context.Context, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error)
+	UnlinkNicWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error)
 
 	// ReadProductTypesWithResponse request
-	ReadProductTypesWithResponse(ctx context.Context, params *ReadProductTypesParams, reqEditors ...RequestEditorFn) (*ReadProductTypesResponse, error)
+	ReadProductTypesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadProductTypesParams, reqEditors ...RequestEditorFn) (*ReadProductTypesResponse, error)
 
 	// CreateProductTypeWithBodyWithResponse request with any body
-	CreateProductTypeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateProductTypeResponse, error)
+	CreateProductTypeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateProductTypeResponse, error)
 
-	CreateProductTypeWithResponse(ctx context.Context, body CreateProductTypeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateProductTypeResponse, error)
+	CreateProductTypeWithResponse(ctx context.Context, spaceId SpaceId, body CreateProductTypeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateProductTypeResponse, error)
 
 	// ReadProductTypesByIdWithResponse request
-	ReadProductTypesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadProductTypesByIdResponse, error)
+	ReadProductTypesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadProductTypesByIdResponse, error)
 
 	// ReadPublicIpRangesWithResponse request
-	ReadPublicIpRangesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error)
+	ReadPublicIpRangesWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error)
 
 	// ReadPublicIpsWithResponse request
-	ReadPublicIpsWithResponse(ctx context.Context, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*ReadPublicIpsResponse, error)
+	ReadPublicIpsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*ReadPublicIpsResponse, error)
 
 	// CreatePublicIpWithResponse request
-	CreatePublicIpWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error)
+	CreatePublicIpWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error)
 
 	// DeletePublicIpWithResponse request
-	DeletePublicIpWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error)
+	DeletePublicIpWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error)
 
 	// ReadPublicIpsByIdWithResponse request
-	ReadPublicIpsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadPublicIpsByIdResponse, error)
+	ReadPublicIpsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadPublicIpsByIdResponse, error)
 
 	// LinkPublicIpWithBodyWithResponse request with any body
-	LinkPublicIpWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkPublicIpResponse, error)
+	LinkPublicIpWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkPublicIpResponse, error)
 
-	LinkPublicIpWithResponse(ctx context.Context, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkPublicIpResponse, error)
+	LinkPublicIpWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkPublicIpResponse, error)
 
 	// UnlinkPublicIpWithBodyWithResponse request with any body
-	UnlinkPublicIpWithBodyWithResponse(ctx context.Context, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error)
+	UnlinkPublicIpWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error)
 
-	UnlinkPublicIpWithResponse(ctx context.Context, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error)
+	UnlinkPublicIpWithResponse(ctx context.Context, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error)
 
 	// ReadRouteTablesWithResponse request
-	ReadRouteTablesWithResponse(ctx context.Context, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*ReadRouteTablesResponse, error)
+	ReadRouteTablesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*ReadRouteTablesResponse, error)
 
 	// CreateRouteTableWithBodyWithResponse request with any body
-	CreateRouteTableWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error)
+	CreateRouteTableWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error)
 
-	CreateRouteTableWithResponse(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error)
+	CreateRouteTableWithResponse(ctx context.Context, spaceId SpaceId, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error)
 
 	// DeleteRouteTableWithResponse request
-	DeleteRouteTableWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error)
+	DeleteRouteTableWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error)
 
 	// ReadRouteTablesByIdWithResponse request
-	ReadRouteTablesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadRouteTablesByIdResponse, error)
+	ReadRouteTablesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadRouteTablesByIdResponse, error)
 
 	// DeleteRouteWithBodyWithResponse request with any body
-	DeleteRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error)
+	DeleteRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error)
 
-	DeleteRouteWithResponse(ctx context.Context, id string, body DeleteRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error)
+	DeleteRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error)
 
 	// CreateRouteWithBodyWithResponse request with any body
-	CreateRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteResponse, error)
+	CreateRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteResponse, error)
 
-	CreateRouteWithResponse(ctx context.Context, id string, body CreateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteResponse, error)
+	CreateRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteResponse, error)
 
 	// UpdateRouteWithBodyWithResponse request with any body
-	UpdateRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error)
+	UpdateRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error)
 
-	UpdateRouteWithResponse(ctx context.Context, id string, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error)
+	UpdateRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error)
 
 	// LinkRouteTableWithBodyWithResponse request with any body
-	LinkRouteTableWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkRouteTableResponse, error)
+	LinkRouteTableWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkRouteTableResponse, error)
 
-	LinkRouteTableWithResponse(ctx context.Context, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkRouteTableResponse, error)
+	LinkRouteTableWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkRouteTableResponse, error)
 
 	// UnlinkRouteTableWithBodyWithResponse request with any body
-	UnlinkRouteTableWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error)
+	UnlinkRouteTableWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error)
 
-	UnlinkRouteTableWithResponse(ctx context.Context, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error)
+	UnlinkRouteTableWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error)
 
 	// UpdateRouteTableRoutePropagationWithBodyWithResponse request with any body
-	UpdateRouteTableRoutePropagationWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error)
+	UpdateRouteTableRoutePropagationWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error)
 
-	UpdateRouteTableRoutePropagationWithResponse(ctx context.Context, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error)
+	UpdateRouteTableRoutePropagationWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error)
 
 	// ReadSecurityGroupsWithResponse request
-	ReadSecurityGroupsWithResponse(ctx context.Context, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*ReadSecurityGroupsResponse, error)
+	ReadSecurityGroupsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*ReadSecurityGroupsResponse, error)
 
 	// CreateSecurityGroupWithBodyWithResponse request with any body
-	CreateSecurityGroupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error)
+	CreateSecurityGroupWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error)
 
-	CreateSecurityGroupWithResponse(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error)
+	CreateSecurityGroupWithResponse(ctx context.Context, spaceId SpaceId, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error)
 
 	// DeleteSecurityGroupWithResponse request
-	DeleteSecurityGroupWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error)
+	DeleteSecurityGroupWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error)
 
 	// ReadSecurityGroupsByIdWithResponse request
-	ReadSecurityGroupsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadSecurityGroupsByIdResponse, error)
+	ReadSecurityGroupsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadSecurityGroupsByIdResponse, error)
 
 	// DeleteSecurityGroupRuleWithBodyWithResponse request with any body
-	DeleteSecurityGroupRuleWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupRuleResponse, error)
+	DeleteSecurityGroupRuleWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupRuleResponse, error)
 
-	DeleteSecurityGroupRuleWithResponse(ctx context.Context, id string, body DeleteSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupRuleResponse, error)
+	DeleteSecurityGroupRuleWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupRuleResponse, error)
 
 	// CreateSecurityGroupRuleWithBodyWithResponse request with any body
-	CreateSecurityGroupRuleWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupRuleResponse, error)
+	CreateSecurityGroupRuleWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupRuleResponse, error)
 
-	CreateSecurityGroupRuleWithResponse(ctx context.Context, id string, body CreateSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupRuleResponse, error)
+	CreateSecurityGroupRuleWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupRuleResponse, error)
 
 	// ReadSnapshotsWithResponse request
-	ReadSnapshotsWithResponse(ctx context.Context, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*ReadSnapshotsResponse, error)
+	ReadSnapshotsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*ReadSnapshotsResponse, error)
 
 	// CreateSnapshotWithBodyWithResponse request with any body
-	CreateSnapshotWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error)
+	CreateSnapshotWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error)
 
-	CreateSnapshotWithResponse(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error)
+	CreateSnapshotWithResponse(ctx context.Context, spaceId SpaceId, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error)
 
 	// DeleteSnapshotWithResponse request
-	DeleteSnapshotWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error)
+	DeleteSnapshotWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error)
 
 	// ReadSnapshotsByIdWithResponse request
-	ReadSnapshotsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadSnapshotsByIdResponse, error)
+	ReadSnapshotsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadSnapshotsByIdResponse, error)
 
 	// ReadSubnetsWithResponse request
-	ReadSubnetsWithResponse(ctx context.Context, params *ReadSubnetsParams, reqEditors ...RequestEditorFn) (*ReadSubnetsResponse, error)
+	ReadSubnetsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSubnetsParams, reqEditors ...RequestEditorFn) (*ReadSubnetsResponse, error)
 
 	// CreateSubnetWithBodyWithResponse request with any body
-	CreateSubnetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error)
+	CreateSubnetWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error)
 
-	CreateSubnetWithResponse(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error)
+	CreateSubnetWithResponse(ctx context.Context, spaceId SpaceId, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error)
 
 	// DeleteSubnetWithResponse request
-	DeleteSubnetWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error)
+	DeleteSubnetWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error)
 
 	// ReadSubnetsByIdWithResponse request
-	ReadSubnetsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadSubnetsByIdResponse, error)
+	ReadSubnetsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadSubnetsByIdResponse, error)
 
 	// UpdateSubnetWithBodyWithResponse request with any body
-	UpdateSubnetWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSubnetResponse, error)
+	UpdateSubnetWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSubnetResponse, error)
 
-	UpdateSubnetWithResponse(ctx context.Context, id string, body UpdateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSubnetResponse, error)
+	UpdateSubnetWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSubnetResponse, error)
 
 	// ReadTagsWithResponse request
-	ReadTagsWithResponse(ctx context.Context, params *ReadTagsParams, reqEditors ...RequestEditorFn) (*ReadTagsResponse, error)
+	ReadTagsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadTagsParams, reqEditors ...RequestEditorFn) (*ReadTagsResponse, error)
 
 	// ReadVirtualGatewaysWithResponse request
-	ReadVirtualGatewaysWithResponse(ctx context.Context, params *ReadVirtualGatewaysParams, reqEditors ...RequestEditorFn) (*ReadVirtualGatewaysResponse, error)
+	ReadVirtualGatewaysWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVirtualGatewaysParams, reqEditors ...RequestEditorFn) (*ReadVirtualGatewaysResponse, error)
 
 	// CreateVirtualGatewayWithBodyWithResponse request with any body
-	CreateVirtualGatewayWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVirtualGatewayResponse, error)
+	CreateVirtualGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVirtualGatewayResponse, error)
 
-	CreateVirtualGatewayWithResponse(ctx context.Context, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVirtualGatewayResponse, error)
+	CreateVirtualGatewayWithResponse(ctx context.Context, spaceId SpaceId, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVirtualGatewayResponse, error)
 
 	// DeleteVirtualGatewayWithResponse request
-	DeleteVirtualGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error)
+	DeleteVirtualGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error)
 
 	// ReadVirtualGatewaysByIdWithResponse request
-	ReadVirtualGatewaysByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVirtualGatewaysByIdResponse, error)
+	ReadVirtualGatewaysByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVirtualGatewaysByIdResponse, error)
 
 	// LinkVirtualGatewayToVpcWithBodyWithResponse request with any body
-	LinkVirtualGatewayToVpcWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkVirtualGatewayToVpcResponse, error)
+	LinkVirtualGatewayToVpcWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkVirtualGatewayToVpcResponse, error)
 
-	LinkVirtualGatewayToVpcWithResponse(ctx context.Context, id string, body LinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkVirtualGatewayToVpcResponse, error)
+	LinkVirtualGatewayToVpcWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkVirtualGatewayToVpcResponse, error)
 
 	// UnlinkVirtualGatewayToVpcWithBodyWithResponse request with any body
-	UnlinkVirtualGatewayToVpcWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkVirtualGatewayToVpcResponse, error)
+	UnlinkVirtualGatewayToVpcWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkVirtualGatewayToVpcResponse, error)
 
-	UnlinkVirtualGatewayToVpcWithResponse(ctx context.Context, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkVirtualGatewayToVpcResponse, error)
+	UnlinkVirtualGatewayToVpcWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkVirtualGatewayToVpcResponse, error)
 
 	// ReadVmsWithResponse request
-	ReadVmsWithResponse(ctx context.Context, params *ReadVmsParams, reqEditors ...RequestEditorFn) (*ReadVmsResponse, error)
+	ReadVmsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVmsParams, reqEditors ...RequestEditorFn) (*ReadVmsResponse, error)
 
 	// CreateVmsWithBodyWithResponse request with any body
-	CreateVmsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVmsResponse, error)
+	CreateVmsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVmsResponse, error)
 
-	CreateVmsWithResponse(ctx context.Context, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVmsResponse, error)
+	CreateVmsWithResponse(ctx context.Context, spaceId SpaceId, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVmsResponse, error)
 
 	// ReadVmsStateWithResponse request
-	ReadVmsStateWithResponse(ctx context.Context, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*ReadVmsStateResponse, error)
+	ReadVmsStateWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*ReadVmsStateResponse, error)
 
 	// DeleteVmsWithResponse request
-	DeleteVmsWithResponse(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error)
+	DeleteVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error)
 
 	// ReadVmsByIdWithResponse request
-	ReadVmsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVmsByIdResponse, error)
+	ReadVmsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVmsByIdResponse, error)
 
 	// UpdateVmWithBodyWithResponse request with any body
-	UpdateVmWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVmResponse, error)
+	UpdateVmWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVmResponse, error)
 
-	UpdateVmWithResponse(ctx context.Context, id string, body UpdateVmJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVmResponse, error)
+	UpdateVmWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVmJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVmResponse, error)
 
 	// ReadAdminPasswordWithResponse request
-	ReadAdminPasswordWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadAdminPasswordResponse, error)
+	ReadAdminPasswordWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadAdminPasswordResponse, error)
 
 	// ReadConsoleOutputWithResponse request
-	ReadConsoleOutputWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadConsoleOutputResponse, error)
+	ReadConsoleOutputWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadConsoleOutputResponse, error)
 
 	// RebootVmsWithResponse request
-	RebootVmsWithResponse(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*RebootVmsResponse, error)
+	RebootVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*RebootVmsResponse, error)
 
 	// StartVmsWithResponse request
-	StartVmsWithResponse(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*StartVmsResponse, error)
+	StartVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*StartVmsResponse, error)
 
 	// StopVmsWithBodyWithResponse request with any body
-	StopVmsWithBodyWithResponse(ctx context.Context, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*StopVmsResponse, error)
+	StopVmsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*StopVmsResponse, error)
 
-	StopVmsWithResponse(ctx context.Context, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*StopVmsResponse, error)
+	StopVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*StopVmsResponse, error)
 
 	// ReadVolumesWithResponse request
-	ReadVolumesWithResponse(ctx context.Context, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*ReadVolumesResponse, error)
+	ReadVolumesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*ReadVolumesResponse, error)
 
 	// CreateVolumeWithBodyWithResponse request with any body
-	CreateVolumeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error)
+	CreateVolumeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error)
 
-	CreateVolumeWithResponse(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error)
+	CreateVolumeWithResponse(ctx context.Context, spaceId SpaceId, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error)
 
 	// DeleteVolumeWithResponse request
-	DeleteVolumeWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error)
+	DeleteVolumeWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error)
 
 	// ReadVolumesByIdWithResponse request
-	ReadVolumesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVolumesByIdResponse, error)
+	ReadVolumesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVolumesByIdResponse, error)
 
 	// UpdateVolumeWithBodyWithResponse request with any body
-	UpdateVolumeWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVolumeResponse, error)
+	UpdateVolumeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVolumeResponse, error)
 
-	UpdateVolumeWithResponse(ctx context.Context, id string, body UpdateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVolumeResponse, error)
+	UpdateVolumeWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVolumeResponse, error)
 
 	// LinkVolumeWithBodyWithResponse request with any body
-	LinkVolumeWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkVolumeResponse, error)
+	LinkVolumeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkVolumeResponse, error)
 
-	LinkVolumeWithResponse(ctx context.Context, id string, body LinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkVolumeResponse, error)
+	LinkVolumeWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkVolumeResponse, error)
 
 	// UnlinkVolumeWithBodyWithResponse request with any body
-	UnlinkVolumeWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkVolumeResponse, error)
+	UnlinkVolumeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkVolumeResponse, error)
 
-	UnlinkVolumeWithResponse(ctx context.Context, id string, body UnlinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkVolumeResponse, error)
+	UnlinkVolumeWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkVolumeResponse, error)
 
 	// ReadVpcAccessPointsWithResponse request
-	ReadVpcAccessPointsWithResponse(ctx context.Context, params *ReadVpcAccessPointsParams, reqEditors ...RequestEditorFn) (*ReadVpcAccessPointsResponse, error)
+	ReadVpcAccessPointsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVpcAccessPointsParams, reqEditors ...RequestEditorFn) (*ReadVpcAccessPointsResponse, error)
 
 	// CreateVpcAccessPointWithBodyWithResponse request with any body
-	CreateVpcAccessPointWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcAccessPointResponse, error)
+	CreateVpcAccessPointWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcAccessPointResponse, error)
 
-	CreateVpcAccessPointWithResponse(ctx context.Context, body CreateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcAccessPointResponse, error)
+	CreateVpcAccessPointWithResponse(ctx context.Context, spaceId SpaceId, body CreateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcAccessPointResponse, error)
 
 	// DeleteVpcAccessPointWithResponse request
-	DeleteVpcAccessPointWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpcAccessPointResponse, error)
+	DeleteVpcAccessPointWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVpcAccessPointResponse, error)
 
 	// ReadVpcAccessPointsByIdWithResponse request
-	ReadVpcAccessPointsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVpcAccessPointsByIdResponse, error)
+	ReadVpcAccessPointsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVpcAccessPointsByIdResponse, error)
 
 	// UpdateVpcAccessPointWithBodyWithResponse request with any body
-	UpdateVpcAccessPointWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpcAccessPointResponse, error)
+	UpdateVpcAccessPointWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpcAccessPointResponse, error)
 
-	UpdateVpcAccessPointWithResponse(ctx context.Context, id string, body UpdateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpcAccessPointResponse, error)
+	UpdateVpcAccessPointWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpcAccessPointResponse, error)
 
 	// ReadVpcPeeringsWithResponse request
-	ReadVpcPeeringsWithResponse(ctx context.Context, params *ReadVpcPeeringsParams, reqEditors ...RequestEditorFn) (*ReadVpcPeeringsResponse, error)
+	ReadVpcPeeringsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVpcPeeringsParams, reqEditors ...RequestEditorFn) (*ReadVpcPeeringsResponse, error)
 
 	// CreateVpcPeeringWithBodyWithResponse request with any body
-	CreateVpcPeeringWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcPeeringResponse, error)
+	CreateVpcPeeringWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcPeeringResponse, error)
 
-	CreateVpcPeeringWithResponse(ctx context.Context, body CreateVpcPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcPeeringResponse, error)
+	CreateVpcPeeringWithResponse(ctx context.Context, spaceId SpaceId, body CreateVpcPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcPeeringResponse, error)
 
 	// DeleteVpcPeeringWithResponse request
-	DeleteVpcPeeringWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpcPeeringResponse, error)
+	DeleteVpcPeeringWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVpcPeeringResponse, error)
 
 	// ReadVpcPeeringsByIdWithResponse request
-	ReadVpcPeeringsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVpcPeeringsByIdResponse, error)
+	ReadVpcPeeringsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVpcPeeringsByIdResponse, error)
 
 	// AcceptVpcPeeringWithResponse request
-	AcceptVpcPeeringWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*AcceptVpcPeeringResponse, error)
+	AcceptVpcPeeringWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*AcceptVpcPeeringResponse, error)
 
 	// RejectVpcPeeringWithResponse request
-	RejectVpcPeeringWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*RejectVpcPeeringResponse, error)
+	RejectVpcPeeringWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*RejectVpcPeeringResponse, error)
 
 	// ReadVpcsWithResponse request
-	ReadVpcsWithResponse(ctx context.Context, params *ReadVpcsParams, reqEditors ...RequestEditorFn) (*ReadVpcsResponse, error)
+	ReadVpcsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVpcsParams, reqEditors ...RequestEditorFn) (*ReadVpcsResponse, error)
 
 	// CreateVpcWithBodyWithResponse request with any body
-	CreateVpcWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcResponse, error)
+	CreateVpcWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcResponse, error)
 
-	CreateVpcWithResponse(ctx context.Context, body CreateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcResponse, error)
+	CreateVpcWithResponse(ctx context.Context, spaceId SpaceId, body CreateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcResponse, error)
 
 	// DeleteVpcWithResponse request
-	DeleteVpcWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpcResponse, error)
+	DeleteVpcWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVpcResponse, error)
 
 	// ReadVpcsByIdWithResponse request
-	ReadVpcsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVpcsByIdResponse, error)
+	ReadVpcsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVpcsByIdResponse, error)
 
 	// UpdateVpcWithBodyWithResponse request with any body
-	UpdateVpcWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error)
+	UpdateVpcWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error)
 
-	UpdateVpcWithResponse(ctx context.Context, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error)
+	UpdateVpcWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error)
 
 	// ReadVpnConnectionsWithResponse request
-	ReadVpnConnectionsWithResponse(ctx context.Context, params *ReadVpnConnectionsParams, reqEditors ...RequestEditorFn) (*ReadVpnConnectionsResponse, error)
+	ReadVpnConnectionsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVpnConnectionsParams, reqEditors ...RequestEditorFn) (*ReadVpnConnectionsResponse, error)
 
 	// CreateVpnConnectionWithBodyWithResponse request with any body
-	CreateVpnConnectionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpnConnectionResponse, error)
+	CreateVpnConnectionWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpnConnectionResponse, error)
 
-	CreateVpnConnectionWithResponse(ctx context.Context, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpnConnectionResponse, error)
+	CreateVpnConnectionWithResponse(ctx context.Context, spaceId SpaceId, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpnConnectionResponse, error)
 
 	// DeleteVpnConnectionWithResponse request
-	DeleteVpnConnectionWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error)
+	DeleteVpnConnectionWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error)
 
 	// ReadVpnConnectionsByIdWithResponse request
-	ReadVpnConnectionsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVpnConnectionsByIdResponse, error)
+	ReadVpnConnectionsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVpnConnectionsByIdResponse, error)
 
 	// UpdateVpnConnectionWithBodyWithResponse request with any body
-	UpdateVpnConnectionWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpnConnectionResponse, error)
+	UpdateVpnConnectionWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpnConnectionResponse, error)
 
-	UpdateVpnConnectionWithResponse(ctx context.Context, id string, body UpdateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpnConnectionResponse, error)
+	UpdateVpnConnectionWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpnConnectionResponse, error)
 
 	// DeleteVpnConnectionRouteWithBodyWithResponse request with any body
-	DeleteVpnConnectionRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionRouteResponse, error)
+	DeleteVpnConnectionRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionRouteResponse, error)
 
-	DeleteVpnConnectionRouteWithResponse(ctx context.Context, id string, body DeleteVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionRouteResponse, error)
+	DeleteVpnConnectionRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionRouteResponse, error)
 
 	// CreateVpnConnectionRouteWithBodyWithResponse request with any body
-	CreateVpnConnectionRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpnConnectionRouteResponse, error)
+	CreateVpnConnectionRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpnConnectionRouteResponse, error)
 
-	CreateVpnConnectionRouteWithResponse(ctx context.Context, id string, body CreateVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpnConnectionRouteResponse, error)
+	CreateVpnConnectionRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpnConnectionRouteResponse, error)
 }
 
 type DeleteLoadBalancerTagsResponse struct {
@@ -23373,16 +24489,16 @@ func (r CreateVpnConnectionRouteResponse) StatusCode() int {
 }
 
 // DeleteLoadBalancerTagsWithBodyWithResponse request with arbitrary body returning *DeleteLoadBalancerTagsResponse
-func (c *ClientWithResponses) DeleteLoadBalancerTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerTagsResponse, error) {
-	rsp, err := c.DeleteLoadBalancerTagsWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) DeleteLoadBalancerTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerTagsResponse, error) {
+	rsp, err := c.DeleteLoadBalancerTagsWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseDeleteLoadBalancerTagsResponse(rsp)
 }
 
-func (c *ClientWithResponses) DeleteLoadBalancerTagsWithResponse(ctx context.Context, body DeleteLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerTagsResponse, error) {
-	rsp, err := c.DeleteLoadBalancerTags(ctx, body, reqEditors...)
+func (c *ClientWithResponses) DeleteLoadBalancerTagsWithResponse(ctx context.Context, spaceId SpaceId, body DeleteLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerTagsResponse, error) {
+	rsp, err := c.DeleteLoadBalancerTags(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23390,16 +24506,16 @@ func (c *ClientWithResponses) DeleteLoadBalancerTagsWithResponse(ctx context.Con
 }
 
 // CreateLoadBalancerTagsWithBodyWithResponse request with arbitrary body returning *CreateLoadBalancerTagsResponse
-func (c *ClientWithResponses) CreateLoadBalancerTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerTagsResponse, error) {
-	rsp, err := c.CreateLoadBalancerTagsWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateLoadBalancerTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerTagsResponse, error) {
+	rsp, err := c.CreateLoadBalancerTagsWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateLoadBalancerTagsResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateLoadBalancerTagsWithResponse(ctx context.Context, body CreateLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerTagsResponse, error) {
-	rsp, err := c.CreateLoadBalancerTags(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateLoadBalancerTagsWithResponse(ctx context.Context, spaceId SpaceId, body CreateLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerTagsResponse, error) {
+	rsp, err := c.CreateLoadBalancerTags(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23407,16 +24523,16 @@ func (c *ClientWithResponses) CreateLoadBalancerTagsWithResponse(ctx context.Con
 }
 
 // DeleteTagsWithBodyWithResponse request with arbitrary body returning *DeleteTagsResponse
-func (c *ClientWithResponses) DeleteTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteTagsResponse, error) {
-	rsp, err := c.DeleteTagsWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) DeleteTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteTagsResponse, error) {
+	rsp, err := c.DeleteTagsWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseDeleteTagsResponse(rsp)
 }
 
-func (c *ClientWithResponses) DeleteTagsWithResponse(ctx context.Context, body DeleteTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteTagsResponse, error) {
-	rsp, err := c.DeleteTags(ctx, body, reqEditors...)
+func (c *ClientWithResponses) DeleteTagsWithResponse(ctx context.Context, spaceId SpaceId, body DeleteTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteTagsResponse, error) {
+	rsp, err := c.DeleteTags(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23424,16 +24540,16 @@ func (c *ClientWithResponses) DeleteTagsWithResponse(ctx context.Context, body D
 }
 
 // CreateTagsWithBodyWithResponse request with arbitrary body returning *CreateTagsResponse
-func (c *ClientWithResponses) CreateTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTagsResponse, error) {
-	rsp, err := c.CreateTagsWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTagsResponse, error) {
+	rsp, err := c.CreateTagsWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateTagsResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateTagsWithResponse(ctx context.Context, body CreateTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTagsResponse, error) {
-	rsp, err := c.CreateTags(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateTagsWithResponse(ctx context.Context, spaceId SpaceId, body CreateTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateTagsResponse, error) {
+	rsp, err := c.CreateTags(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23441,8 +24557,8 @@ func (c *ClientWithResponses) CreateTagsWithResponse(ctx context.Context, body C
 }
 
 // ReadClientGatewaysWithResponse request returning *ReadClientGatewaysResponse
-func (c *ClientWithResponses) ReadClientGatewaysWithResponse(ctx context.Context, params *ReadClientGatewaysParams, reqEditors ...RequestEditorFn) (*ReadClientGatewaysResponse, error) {
-	rsp, err := c.ReadClientGateways(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadClientGatewaysWithResponse(ctx context.Context, spaceId SpaceId, params *ReadClientGatewaysParams, reqEditors ...RequestEditorFn) (*ReadClientGatewaysResponse, error) {
+	rsp, err := c.ReadClientGateways(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23450,16 +24566,16 @@ func (c *ClientWithResponses) ReadClientGatewaysWithResponse(ctx context.Context
 }
 
 // CreateClientGatewayWithBodyWithResponse request with arbitrary body returning *CreateClientGatewayResponse
-func (c *ClientWithResponses) CreateClientGatewayWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateClientGatewayResponse, error) {
-	rsp, err := c.CreateClientGatewayWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateClientGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateClientGatewayResponse, error) {
+	rsp, err := c.CreateClientGatewayWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateClientGatewayResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateClientGatewayWithResponse(ctx context.Context, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateClientGatewayResponse, error) {
-	rsp, err := c.CreateClientGateway(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateClientGatewayWithResponse(ctx context.Context, spaceId SpaceId, body CreateClientGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateClientGatewayResponse, error) {
+	rsp, err := c.CreateClientGateway(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23467,8 +24583,8 @@ func (c *ClientWithResponses) CreateClientGatewayWithResponse(ctx context.Contex
 }
 
 // DeleteClientGatewayWithResponse request returning *DeleteClientGatewayResponse
-func (c *ClientWithResponses) DeleteClientGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error) {
-	rsp, err := c.DeleteClientGateway(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteClientGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteClientGatewayResponse, error) {
+	rsp, err := c.DeleteClientGateway(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23476,8 +24592,8 @@ func (c *ClientWithResponses) DeleteClientGatewayWithResponse(ctx context.Contex
 }
 
 // ReadClientGatewaysByIdWithResponse request returning *ReadClientGatewaysByIdResponse
-func (c *ClientWithResponses) ReadClientGatewaysByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadClientGatewaysByIdResponse, error) {
-	rsp, err := c.ReadClientGatewaysById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadClientGatewaysByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadClientGatewaysByIdResponse, error) {
+	rsp, err := c.ReadClientGatewaysById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23485,8 +24601,8 @@ func (c *ClientWithResponses) ReadClientGatewaysByIdWithResponse(ctx context.Con
 }
 
 // ReadDhcpOptionsWithResponse request returning *ReadDhcpOptionsResponse
-func (c *ClientWithResponses) ReadDhcpOptionsWithResponse(ctx context.Context, params *ReadDhcpOptionsParams, reqEditors ...RequestEditorFn) (*ReadDhcpOptionsResponse, error) {
-	rsp, err := c.ReadDhcpOptions(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadDhcpOptionsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadDhcpOptionsParams, reqEditors ...RequestEditorFn) (*ReadDhcpOptionsResponse, error) {
+	rsp, err := c.ReadDhcpOptions(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23494,16 +24610,16 @@ func (c *ClientWithResponses) ReadDhcpOptionsWithResponse(ctx context.Context, p
 }
 
 // CreateDhcpOptionsWithBodyWithResponse request with arbitrary body returning *CreateDhcpOptionsResponse
-func (c *ClientWithResponses) CreateDhcpOptionsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsResponse, error) {
-	rsp, err := c.CreateDhcpOptionsWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateDhcpOptionsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsResponse, error) {
+	rsp, err := c.CreateDhcpOptionsWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateDhcpOptionsResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateDhcpOptionsWithResponse(ctx context.Context, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsResponse, error) {
-	rsp, err := c.CreateDhcpOptions(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateDhcpOptionsWithResponse(ctx context.Context, spaceId SpaceId, body CreateDhcpOptionsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDhcpOptionsResponse, error) {
+	rsp, err := c.CreateDhcpOptions(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23511,8 +24627,8 @@ func (c *ClientWithResponses) CreateDhcpOptionsWithResponse(ctx context.Context,
 }
 
 // DeleteDhcpOptionsWithResponse request returning *DeleteDhcpOptionsResponse
-func (c *ClientWithResponses) DeleteDhcpOptionsWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error) {
-	rsp, err := c.DeleteDhcpOptions(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteDhcpOptionsWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteDhcpOptionsResponse, error) {
+	rsp, err := c.DeleteDhcpOptions(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23520,8 +24636,8 @@ func (c *ClientWithResponses) DeleteDhcpOptionsWithResponse(ctx context.Context,
 }
 
 // ReadDhcpOptionsByIdWithResponse request returning *ReadDhcpOptionsByIdResponse
-func (c *ClientWithResponses) ReadDhcpOptionsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadDhcpOptionsByIdResponse, error) {
-	rsp, err := c.ReadDhcpOptionsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadDhcpOptionsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadDhcpOptionsByIdResponse, error) {
+	rsp, err := c.ReadDhcpOptionsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23529,8 +24645,8 @@ func (c *ClientWithResponses) ReadDhcpOptionsByIdWithResponse(ctx context.Contex
 }
 
 // ReadDirectLinkInterfacesWithResponse request returning *ReadDirectLinkInterfacesResponse
-func (c *ClientWithResponses) ReadDirectLinkInterfacesWithResponse(ctx context.Context, params *ReadDirectLinkInterfacesParams, reqEditors ...RequestEditorFn) (*ReadDirectLinkInterfacesResponse, error) {
-	rsp, err := c.ReadDirectLinkInterfaces(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadDirectLinkInterfacesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadDirectLinkInterfacesParams, reqEditors ...RequestEditorFn) (*ReadDirectLinkInterfacesResponse, error) {
+	rsp, err := c.ReadDirectLinkInterfaces(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23538,16 +24654,16 @@ func (c *ClientWithResponses) ReadDirectLinkInterfacesWithResponse(ctx context.C
 }
 
 // CreateDirectLinkInterfaceWithBodyWithResponse request with arbitrary body returning *CreateDirectLinkInterfaceResponse
-func (c *ClientWithResponses) CreateDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDirectLinkInterfaceResponse, error) {
-	rsp, err := c.CreateDirectLinkInterfaceWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDirectLinkInterfaceResponse, error) {
+	rsp, err := c.CreateDirectLinkInterfaceWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateDirectLinkInterfaceResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateDirectLinkInterfaceWithResponse(ctx context.Context, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkInterfaceResponse, error) {
-	rsp, err := c.CreateDirectLinkInterface(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateDirectLinkInterfaceWithResponse(ctx context.Context, spaceId SpaceId, body CreateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkInterfaceResponse, error) {
+	rsp, err := c.CreateDirectLinkInterface(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23555,8 +24671,8 @@ func (c *ClientWithResponses) CreateDirectLinkInterfaceWithResponse(ctx context.
 }
 
 // DeleteDirectLinkInterfaceWithResponse request returning *DeleteDirectLinkInterfaceResponse
-func (c *ClientWithResponses) DeleteDirectLinkInterfaceWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error) {
-	rsp, err := c.DeleteDirectLinkInterface(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteDirectLinkInterfaceWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkInterfaceResponse, error) {
+	rsp, err := c.DeleteDirectLinkInterface(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23564,8 +24680,8 @@ func (c *ClientWithResponses) DeleteDirectLinkInterfaceWithResponse(ctx context.
 }
 
 // ReadDirectLinkInterfacesByIdWithResponse request returning *ReadDirectLinkInterfacesByIdResponse
-func (c *ClientWithResponses) ReadDirectLinkInterfacesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinkInterfacesByIdResponse, error) {
-	rsp, err := c.ReadDirectLinkInterfacesById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadDirectLinkInterfacesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinkInterfacesByIdResponse, error) {
+	rsp, err := c.ReadDirectLinkInterfacesById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23573,16 +24689,16 @@ func (c *ClientWithResponses) ReadDirectLinkInterfacesByIdWithResponse(ctx conte
 }
 
 // UpdateDirectLinkInterfaceWithBodyWithResponse request with arbitrary body returning *UpdateDirectLinkInterfaceResponse
-func (c *ClientWithResponses) UpdateDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDirectLinkInterfaceResponse, error) {
-	rsp, err := c.UpdateDirectLinkInterfaceWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateDirectLinkInterfaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateDirectLinkInterfaceResponse, error) {
+	rsp, err := c.UpdateDirectLinkInterfaceWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateDirectLinkInterfaceResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateDirectLinkInterfaceWithResponse(ctx context.Context, id string, body UpdateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDirectLinkInterfaceResponse, error) {
-	rsp, err := c.UpdateDirectLinkInterface(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateDirectLinkInterfaceWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateDirectLinkInterfaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateDirectLinkInterfaceResponse, error) {
+	rsp, err := c.UpdateDirectLinkInterface(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23590,8 +24706,8 @@ func (c *ClientWithResponses) UpdateDirectLinkInterfaceWithResponse(ctx context.
 }
 
 // ReadDirectLinksWithResponse request returning *ReadDirectLinksResponse
-func (c *ClientWithResponses) ReadDirectLinksWithResponse(ctx context.Context, params *ReadDirectLinksParams, reqEditors ...RequestEditorFn) (*ReadDirectLinksResponse, error) {
-	rsp, err := c.ReadDirectLinks(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadDirectLinksWithResponse(ctx context.Context, spaceId SpaceId, params *ReadDirectLinksParams, reqEditors ...RequestEditorFn) (*ReadDirectLinksResponse, error) {
+	rsp, err := c.ReadDirectLinks(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23599,16 +24715,16 @@ func (c *ClientWithResponses) ReadDirectLinksWithResponse(ctx context.Context, p
 }
 
 // CreateDirectLinkWithBodyWithResponse request with arbitrary body returning *CreateDirectLinkResponse
-func (c *ClientWithResponses) CreateDirectLinkWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDirectLinkResponse, error) {
-	rsp, err := c.CreateDirectLinkWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateDirectLinkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDirectLinkResponse, error) {
+	rsp, err := c.CreateDirectLinkWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateDirectLinkResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateDirectLinkWithResponse(ctx context.Context, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkResponse, error) {
-	rsp, err := c.CreateDirectLink(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateDirectLinkWithResponse(ctx context.Context, spaceId SpaceId, body CreateDirectLinkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDirectLinkResponse, error) {
+	rsp, err := c.CreateDirectLink(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23616,8 +24732,8 @@ func (c *ClientWithResponses) CreateDirectLinkWithResponse(ctx context.Context, 
 }
 
 // DeleteDirectLinkWithResponse request returning *DeleteDirectLinkResponse
-func (c *ClientWithResponses) DeleteDirectLinkWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error) {
-	rsp, err := c.DeleteDirectLink(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteDirectLinkWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteDirectLinkResponse, error) {
+	rsp, err := c.DeleteDirectLink(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23625,8 +24741,8 @@ func (c *ClientWithResponses) DeleteDirectLinkWithResponse(ctx context.Context, 
 }
 
 // ReadDirectLinksByIdWithResponse request returning *ReadDirectLinksByIdResponse
-func (c *ClientWithResponses) ReadDirectLinksByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinksByIdResponse, error) {
-	rsp, err := c.ReadDirectLinksById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadDirectLinksByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadDirectLinksByIdResponse, error) {
+	rsp, err := c.ReadDirectLinksById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23634,8 +24750,8 @@ func (c *ClientWithResponses) ReadDirectLinksByIdWithResponse(ctx context.Contex
 }
 
 // ReadFlexibleGpuCatalogWithResponse request returning *ReadFlexibleGpuCatalogResponse
-func (c *ClientWithResponses) ReadFlexibleGpuCatalogWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error) {
-	rsp, err := c.ReadFlexibleGpuCatalog(ctx, reqEditors...)
+func (c *ClientWithResponses) ReadFlexibleGpuCatalogWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ReadFlexibleGpuCatalogResponse, error) {
+	rsp, err := c.ReadFlexibleGpuCatalog(ctx, spaceId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23643,8 +24759,8 @@ func (c *ClientWithResponses) ReadFlexibleGpuCatalogWithResponse(ctx context.Con
 }
 
 // ReadFlexibleGpusWithResponse request returning *ReadFlexibleGpusResponse
-func (c *ClientWithResponses) ReadFlexibleGpusWithResponse(ctx context.Context, params *ReadFlexibleGpusParams, reqEditors ...RequestEditorFn) (*ReadFlexibleGpusResponse, error) {
-	rsp, err := c.ReadFlexibleGpus(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadFlexibleGpusWithResponse(ctx context.Context, spaceId SpaceId, params *ReadFlexibleGpusParams, reqEditors ...RequestEditorFn) (*ReadFlexibleGpusResponse, error) {
+	rsp, err := c.ReadFlexibleGpus(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23652,16 +24768,16 @@ func (c *ClientWithResponses) ReadFlexibleGpusWithResponse(ctx context.Context, 
 }
 
 // CreateFlexibleGpuWithBodyWithResponse request with arbitrary body returning *CreateFlexibleGpuResponse
-func (c *ClientWithResponses) CreateFlexibleGpuWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFlexibleGpuResponse, error) {
-	rsp, err := c.CreateFlexibleGpuWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateFlexibleGpuWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFlexibleGpuResponse, error) {
+	rsp, err := c.CreateFlexibleGpuWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateFlexibleGpuResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateFlexibleGpuWithResponse(ctx context.Context, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFlexibleGpuResponse, error) {
-	rsp, err := c.CreateFlexibleGpu(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, body CreateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFlexibleGpuResponse, error) {
+	rsp, err := c.CreateFlexibleGpu(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23669,8 +24785,8 @@ func (c *ClientWithResponses) CreateFlexibleGpuWithResponse(ctx context.Context,
 }
 
 // DeleteFlexibleGpuWithResponse request returning *DeleteFlexibleGpuResponse
-func (c *ClientWithResponses) DeleteFlexibleGpuWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error) {
-	rsp, err := c.DeleteFlexibleGpu(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteFlexibleGpuResponse, error) {
+	rsp, err := c.DeleteFlexibleGpu(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23678,8 +24794,8 @@ func (c *ClientWithResponses) DeleteFlexibleGpuWithResponse(ctx context.Context,
 }
 
 // ReadFlexibleGpusByIdWithResponse request returning *ReadFlexibleGpusByIdResponse
-func (c *ClientWithResponses) ReadFlexibleGpusByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadFlexibleGpusByIdResponse, error) {
-	rsp, err := c.ReadFlexibleGpusById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadFlexibleGpusByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadFlexibleGpusByIdResponse, error) {
+	rsp, err := c.ReadFlexibleGpusById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23687,16 +24803,16 @@ func (c *ClientWithResponses) ReadFlexibleGpusByIdWithResponse(ctx context.Conte
 }
 
 // UpdateFlexibleGpuWithBodyWithResponse request with arbitrary body returning *UpdateFlexibleGpuResponse
-func (c *ClientWithResponses) UpdateFlexibleGpuWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFlexibleGpuResponse, error) {
-	rsp, err := c.UpdateFlexibleGpuWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateFlexibleGpuWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateFlexibleGpuResponse, error) {
+	rsp, err := c.UpdateFlexibleGpuWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateFlexibleGpuResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateFlexibleGpuWithResponse(ctx context.Context, id string, body UpdateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFlexibleGpuResponse, error) {
-	rsp, err := c.UpdateFlexibleGpu(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateFlexibleGpuResponse, error) {
+	rsp, err := c.UpdateFlexibleGpu(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23704,16 +24820,16 @@ func (c *ClientWithResponses) UpdateFlexibleGpuWithResponse(ctx context.Context,
 }
 
 // LinkFlexibleGpuWithBodyWithResponse request with arbitrary body returning *LinkFlexibleGpuResponse
-func (c *ClientWithResponses) LinkFlexibleGpuWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkFlexibleGpuResponse, error) {
-	rsp, err := c.LinkFlexibleGpuWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) LinkFlexibleGpuWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkFlexibleGpuResponse, error) {
+	rsp, err := c.LinkFlexibleGpuWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseLinkFlexibleGpuResponse(rsp)
 }
 
-func (c *ClientWithResponses) LinkFlexibleGpuWithResponse(ctx context.Context, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkFlexibleGpuResponse, error) {
-	rsp, err := c.LinkFlexibleGpu(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) LinkFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkFlexibleGpuJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkFlexibleGpuResponse, error) {
+	rsp, err := c.LinkFlexibleGpu(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23721,8 +24837,8 @@ func (c *ClientWithResponses) LinkFlexibleGpuWithResponse(ctx context.Context, i
 }
 
 // UnlinkFlexibleGpuWithResponse request returning *UnlinkFlexibleGpuResponse
-func (c *ClientWithResponses) UnlinkFlexibleGpuWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error) {
-	rsp, err := c.UnlinkFlexibleGpu(ctx, id, reqEditors...)
+func (c *ClientWithResponses) UnlinkFlexibleGpuWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*UnlinkFlexibleGpuResponse, error) {
+	rsp, err := c.UnlinkFlexibleGpu(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23730,8 +24846,8 @@ func (c *ClientWithResponses) UnlinkFlexibleGpuWithResponse(ctx context.Context,
 }
 
 // ReadImagesWithResponse request returning *ReadImagesResponse
-func (c *ClientWithResponses) ReadImagesWithResponse(ctx context.Context, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*ReadImagesResponse, error) {
-	rsp, err := c.ReadImages(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadImagesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadImagesParams, reqEditors ...RequestEditorFn) (*ReadImagesResponse, error) {
+	rsp, err := c.ReadImages(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23739,16 +24855,16 @@ func (c *ClientWithResponses) ReadImagesWithResponse(ctx context.Context, params
 }
 
 // CreateImageWithBodyWithResponse request with arbitrary body returning *CreateImageResponse
-func (c *ClientWithResponses) CreateImageWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateImageResponse, error) {
-	rsp, err := c.CreateImageWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateImageWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateImageResponse, error) {
+	rsp, err := c.CreateImageWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateImageResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateImageWithResponse(ctx context.Context, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateImageResponse, error) {
-	rsp, err := c.CreateImage(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateImageWithResponse(ctx context.Context, spaceId SpaceId, body CreateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateImageResponse, error) {
+	rsp, err := c.CreateImage(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23756,8 +24872,8 @@ func (c *ClientWithResponses) CreateImageWithResponse(ctx context.Context, body 
 }
 
 // DeleteImageWithResponse request returning *DeleteImageResponse
-func (c *ClientWithResponses) DeleteImageWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error) {
-	rsp, err := c.DeleteImage(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteImageWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteImageResponse, error) {
+	rsp, err := c.DeleteImage(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23765,8 +24881,8 @@ func (c *ClientWithResponses) DeleteImageWithResponse(ctx context.Context, id st
 }
 
 // ReadImagesByIdWithResponse request returning *ReadImagesByIdResponse
-func (c *ClientWithResponses) ReadImagesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadImagesByIdResponse, error) {
-	rsp, err := c.ReadImagesById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadImagesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadImagesByIdResponse, error) {
+	rsp, err := c.ReadImagesById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23774,16 +24890,16 @@ func (c *ClientWithResponses) ReadImagesByIdWithResponse(ctx context.Context, id
 }
 
 // UpdateImageWithBodyWithResponse request with arbitrary body returning *UpdateImageResponse
-func (c *ClientWithResponses) UpdateImageWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error) {
-	rsp, err := c.UpdateImageWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateImageWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error) {
+	rsp, err := c.UpdateImageWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateImageResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateImageWithResponse(ctx context.Context, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error) {
-	rsp, err := c.UpdateImage(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateImageWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateImageJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateImageResponse, error) {
+	rsp, err := c.UpdateImage(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23791,8 +24907,8 @@ func (c *ClientWithResponses) UpdateImageWithResponse(ctx context.Context, id st
 }
 
 // ReadInternetGatewaysWithResponse request returning *ReadInternetGatewaysResponse
-func (c *ClientWithResponses) ReadInternetGatewaysWithResponse(ctx context.Context, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*ReadInternetGatewaysResponse, error) {
-	rsp, err := c.ReadInternetGateways(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadInternetGatewaysWithResponse(ctx context.Context, spaceId SpaceId, params *ReadInternetGatewaysParams, reqEditors ...RequestEditorFn) (*ReadInternetGatewaysResponse, error) {
+	rsp, err := c.ReadInternetGateways(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23800,8 +24916,8 @@ func (c *ClientWithResponses) ReadInternetGatewaysWithResponse(ctx context.Conte
 }
 
 // CreateInternetGatewayWithResponse request returning *CreateInternetGatewayResponse
-func (c *ClientWithResponses) CreateInternetGatewayWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreateInternetGatewayResponse, error) {
-	rsp, err := c.CreateInternetGateway(ctx, reqEditors...)
+func (c *ClientWithResponses) CreateInternetGatewayWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*CreateInternetGatewayResponse, error) {
+	rsp, err := c.CreateInternetGateway(ctx, spaceId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23809,8 +24925,8 @@ func (c *ClientWithResponses) CreateInternetGatewayWithResponse(ctx context.Cont
 }
 
 // DeleteInternetGatewayWithResponse request returning *DeleteInternetGatewayResponse
-func (c *ClientWithResponses) DeleteInternetGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteInternetGatewayResponse, error) {
-	rsp, err := c.DeleteInternetGateway(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteInternetGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteInternetGatewayResponse, error) {
+	rsp, err := c.DeleteInternetGateway(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23818,8 +24934,8 @@ func (c *ClientWithResponses) DeleteInternetGatewayWithResponse(ctx context.Cont
 }
 
 // ReadInternetGatewaysByIdWithResponse request returning *ReadInternetGatewaysByIdResponse
-func (c *ClientWithResponses) ReadInternetGatewaysByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadInternetGatewaysByIdResponse, error) {
-	rsp, err := c.ReadInternetGatewaysById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadInternetGatewaysByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadInternetGatewaysByIdResponse, error) {
+	rsp, err := c.ReadInternetGatewaysById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23827,16 +24943,16 @@ func (c *ClientWithResponses) ReadInternetGatewaysByIdWithResponse(ctx context.C
 }
 
 // LinkInternetGatewayWithBodyWithResponse request with arbitrary body returning *LinkInternetGatewayResponse
-func (c *ClientWithResponses) LinkInternetGatewayWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkInternetGatewayResponse, error) {
-	rsp, err := c.LinkInternetGatewayWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) LinkInternetGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkInternetGatewayResponse, error) {
+	rsp, err := c.LinkInternetGatewayWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseLinkInternetGatewayResponse(rsp)
 }
 
-func (c *ClientWithResponses) LinkInternetGatewayWithResponse(ctx context.Context, id string, body LinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkInternetGatewayResponse, error) {
-	rsp, err := c.LinkInternetGateway(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) LinkInternetGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkInternetGatewayResponse, error) {
+	rsp, err := c.LinkInternetGateway(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23844,16 +24960,16 @@ func (c *ClientWithResponses) LinkInternetGatewayWithResponse(ctx context.Contex
 }
 
 // UnlinkInternetGatewayWithBodyWithResponse request with arbitrary body returning *UnlinkInternetGatewayResponse
-func (c *ClientWithResponses) UnlinkInternetGatewayWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkInternetGatewayResponse, error) {
-	rsp, err := c.UnlinkInternetGatewayWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkInternetGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkInternetGatewayResponse, error) {
+	rsp, err := c.UnlinkInternetGatewayWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUnlinkInternetGatewayResponse(rsp)
 }
 
-func (c *ClientWithResponses) UnlinkInternetGatewayWithResponse(ctx context.Context, id string, body UnlinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkInternetGatewayResponse, error) {
-	rsp, err := c.UnlinkInternetGateway(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkInternetGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkInternetGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkInternetGatewayResponse, error) {
+	rsp, err := c.UnlinkInternetGateway(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23861,8 +24977,8 @@ func (c *ClientWithResponses) UnlinkInternetGatewayWithResponse(ctx context.Cont
 }
 
 // ReadKeypairsWithResponse request returning *ReadKeypairsResponse
-func (c *ClientWithResponses) ReadKeypairsWithResponse(ctx context.Context, params *ReadKeypairsParams, reqEditors ...RequestEditorFn) (*ReadKeypairsResponse, error) {
-	rsp, err := c.ReadKeypairs(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadKeypairsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadKeypairsParams, reqEditors ...RequestEditorFn) (*ReadKeypairsResponse, error) {
+	rsp, err := c.ReadKeypairs(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23870,16 +24986,16 @@ func (c *ClientWithResponses) ReadKeypairsWithResponse(ctx context.Context, para
 }
 
 // CreateKeypairWithBodyWithResponse request with arbitrary body returning *CreateKeypairResponse
-func (c *ClientWithResponses) CreateKeypairWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKeypairResponse, error) {
-	rsp, err := c.CreateKeypairWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateKeypairWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKeypairResponse, error) {
+	rsp, err := c.CreateKeypairWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateKeypairResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateKeypairWithResponse(ctx context.Context, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKeypairResponse, error) {
-	rsp, err := c.CreateKeypair(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateKeypairWithResponse(ctx context.Context, spaceId SpaceId, body CreateKeypairJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKeypairResponse, error) {
+	rsp, err := c.CreateKeypair(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23887,8 +25003,8 @@ func (c *ClientWithResponses) CreateKeypairWithResponse(ctx context.Context, bod
 }
 
 // DeleteKeypairWithResponse request returning *DeleteKeypairResponse
-func (c *ClientWithResponses) DeleteKeypairWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error) {
-	rsp, err := c.DeleteKeypair(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteKeypairWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteKeypairResponse, error) {
+	rsp, err := c.DeleteKeypair(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23896,8 +25012,8 @@ func (c *ClientWithResponses) DeleteKeypairWithResponse(ctx context.Context, id 
 }
 
 // ReadKeypairsByIdWithResponse request returning *ReadKeypairsByIdResponse
-func (c *ClientWithResponses) ReadKeypairsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadKeypairsByIdResponse, error) {
-	rsp, err := c.ReadKeypairsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadKeypairsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadKeypairsByIdResponse, error) {
+	rsp, err := c.ReadKeypairsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23905,8 +25021,8 @@ func (c *ClientWithResponses) ReadKeypairsByIdWithResponse(ctx context.Context, 
 }
 
 // ReadListenerRulesWithResponse request returning *ReadListenerRulesResponse
-func (c *ClientWithResponses) ReadListenerRulesWithResponse(ctx context.Context, params *ReadListenerRulesParams, reqEditors ...RequestEditorFn) (*ReadListenerRulesResponse, error) {
-	rsp, err := c.ReadListenerRules(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadListenerRulesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadListenerRulesParams, reqEditors ...RequestEditorFn) (*ReadListenerRulesResponse, error) {
+	rsp, err := c.ReadListenerRules(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23914,16 +25030,16 @@ func (c *ClientWithResponses) ReadListenerRulesWithResponse(ctx context.Context,
 }
 
 // CreateListenerRuleWithBodyWithResponse request with arbitrary body returning *CreateListenerRuleResponse
-func (c *ClientWithResponses) CreateListenerRuleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateListenerRuleResponse, error) {
-	rsp, err := c.CreateListenerRuleWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateListenerRuleWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateListenerRuleResponse, error) {
+	rsp, err := c.CreateListenerRuleWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateListenerRuleResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateListenerRuleWithResponse(ctx context.Context, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateListenerRuleResponse, error) {
-	rsp, err := c.CreateListenerRule(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateListenerRuleWithResponse(ctx context.Context, spaceId SpaceId, body CreateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateListenerRuleResponse, error) {
+	rsp, err := c.CreateListenerRule(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23931,8 +25047,8 @@ func (c *ClientWithResponses) CreateListenerRuleWithResponse(ctx context.Context
 }
 
 // DeleteListenerRuleWithResponse request returning *DeleteListenerRuleResponse
-func (c *ClientWithResponses) DeleteListenerRuleWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error) {
-	rsp, err := c.DeleteListenerRule(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteListenerRuleWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteListenerRuleResponse, error) {
+	rsp, err := c.DeleteListenerRule(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23940,8 +25056,8 @@ func (c *ClientWithResponses) DeleteListenerRuleWithResponse(ctx context.Context
 }
 
 // ReadListenerRulesByIdWithResponse request returning *ReadListenerRulesByIdResponse
-func (c *ClientWithResponses) ReadListenerRulesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadListenerRulesByIdResponse, error) {
-	rsp, err := c.ReadListenerRulesById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadListenerRulesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadListenerRulesByIdResponse, error) {
+	rsp, err := c.ReadListenerRulesById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23949,16 +25065,16 @@ func (c *ClientWithResponses) ReadListenerRulesByIdWithResponse(ctx context.Cont
 }
 
 // UpdateListenerRuleWithBodyWithResponse request with arbitrary body returning *UpdateListenerRuleResponse
-func (c *ClientWithResponses) UpdateListenerRuleWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateListenerRuleResponse, error) {
-	rsp, err := c.UpdateListenerRuleWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateListenerRuleWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateListenerRuleResponse, error) {
+	rsp, err := c.UpdateListenerRuleWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateListenerRuleResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateListenerRuleWithResponse(ctx context.Context, id string, body UpdateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateListenerRuleResponse, error) {
-	rsp, err := c.UpdateListenerRule(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateListenerRuleWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateListenerRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateListenerRuleResponse, error) {
+	rsp, err := c.UpdateListenerRule(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23966,8 +25082,8 @@ func (c *ClientWithResponses) UpdateListenerRuleWithResponse(ctx context.Context
 }
 
 // ReadLoadBalancersWithResponse request returning *ReadLoadBalancersResponse
-func (c *ClientWithResponses) ReadLoadBalancersWithResponse(ctx context.Context, params *ReadLoadBalancersParams, reqEditors ...RequestEditorFn) (*ReadLoadBalancersResponse, error) {
-	rsp, err := c.ReadLoadBalancers(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadLoadBalancersWithResponse(ctx context.Context, spaceId SpaceId, params *ReadLoadBalancersParams, reqEditors ...RequestEditorFn) (*ReadLoadBalancersResponse, error) {
+	rsp, err := c.ReadLoadBalancers(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23975,16 +25091,16 @@ func (c *ClientWithResponses) ReadLoadBalancersWithResponse(ctx context.Context,
 }
 
 // CreateLoadBalancerWithBodyWithResponse request with arbitrary body returning *CreateLoadBalancerResponse
-func (c *ClientWithResponses) CreateLoadBalancerWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerResponse, error) {
-	rsp, err := c.CreateLoadBalancerWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateLoadBalancerWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerResponse, error) {
+	rsp, err := c.CreateLoadBalancerWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateLoadBalancerResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateLoadBalancerWithResponse(ctx context.Context, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerResponse, error) {
-	rsp, err := c.CreateLoadBalancer(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateLoadBalancerWithResponse(ctx context.Context, spaceId SpaceId, body CreateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerResponse, error) {
+	rsp, err := c.CreateLoadBalancer(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -23992,8 +25108,8 @@ func (c *ClientWithResponses) CreateLoadBalancerWithResponse(ctx context.Context
 }
 
 // DeleteLoadBalancerWithResponse request returning *DeleteLoadBalancerResponse
-func (c *ClientWithResponses) DeleteLoadBalancerWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error) {
-	rsp, err := c.DeleteLoadBalancer(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteLoadBalancerWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerResponse, error) {
+	rsp, err := c.DeleteLoadBalancer(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24001,8 +25117,8 @@ func (c *ClientWithResponses) DeleteLoadBalancerWithResponse(ctx context.Context
 }
 
 // ReadLoadBalancersByIdWithResponse request returning *ReadLoadBalancersByIdResponse
-func (c *ClientWithResponses) ReadLoadBalancersByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadLoadBalancersByIdResponse, error) {
-	rsp, err := c.ReadLoadBalancersById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadLoadBalancersByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadLoadBalancersByIdResponse, error) {
+	rsp, err := c.ReadLoadBalancersById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24010,16 +25126,16 @@ func (c *ClientWithResponses) ReadLoadBalancersByIdWithResponse(ctx context.Cont
 }
 
 // UpdateLoadBalancerWithBodyWithResponse request with arbitrary body returning *UpdateLoadBalancerResponse
-func (c *ClientWithResponses) UpdateLoadBalancerWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateLoadBalancerResponse, error) {
-	rsp, err := c.UpdateLoadBalancerWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateLoadBalancerWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateLoadBalancerResponse, error) {
+	rsp, err := c.UpdateLoadBalancerWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateLoadBalancerResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateLoadBalancerWithResponse(ctx context.Context, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateLoadBalancerResponse, error) {
-	rsp, err := c.UpdateLoadBalancer(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateLoadBalancerWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateLoadBalancerJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateLoadBalancerResponse, error) {
+	rsp, err := c.UpdateLoadBalancer(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24027,16 +25143,16 @@ func (c *ClientWithResponses) UpdateLoadBalancerWithResponse(ctx context.Context
 }
 
 // LinkLoadBalancerBackendMachinesWithBodyWithResponse request with arbitrary body returning *LinkLoadBalancerBackendMachinesResponse
-func (c *ClientWithResponses) LinkLoadBalancerBackendMachinesWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkLoadBalancerBackendMachinesResponse, error) {
-	rsp, err := c.LinkLoadBalancerBackendMachinesWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) LinkLoadBalancerBackendMachinesWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkLoadBalancerBackendMachinesResponse, error) {
+	rsp, err := c.LinkLoadBalancerBackendMachinesWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseLinkLoadBalancerBackendMachinesResponse(rsp)
 }
 
-func (c *ClientWithResponses) LinkLoadBalancerBackendMachinesWithResponse(ctx context.Context, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkLoadBalancerBackendMachinesResponse, error) {
-	rsp, err := c.LinkLoadBalancerBackendMachines(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) LinkLoadBalancerBackendMachinesWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkLoadBalancerBackendMachinesResponse, error) {
+	rsp, err := c.LinkLoadBalancerBackendMachines(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24044,16 +25160,16 @@ func (c *ClientWithResponses) LinkLoadBalancerBackendMachinesWithResponse(ctx co
 }
 
 // UnlinkLoadBalancerBackendMachinesWithBodyWithResponse request with arbitrary body returning *UnlinkLoadBalancerBackendMachinesResponse
-func (c *ClientWithResponses) UnlinkLoadBalancerBackendMachinesWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkLoadBalancerBackendMachinesResponse, error) {
-	rsp, err := c.UnlinkLoadBalancerBackendMachinesWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkLoadBalancerBackendMachinesWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkLoadBalancerBackendMachinesResponse, error) {
+	rsp, err := c.UnlinkLoadBalancerBackendMachinesWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUnlinkLoadBalancerBackendMachinesResponse(rsp)
 }
 
-func (c *ClientWithResponses) UnlinkLoadBalancerBackendMachinesWithResponse(ctx context.Context, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkLoadBalancerBackendMachinesResponse, error) {
-	rsp, err := c.UnlinkLoadBalancerBackendMachines(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkLoadBalancerBackendMachinesWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkLoadBalancerBackendMachinesJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkLoadBalancerBackendMachinesResponse, error) {
+	rsp, err := c.UnlinkLoadBalancerBackendMachines(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24061,16 +25177,16 @@ func (c *ClientWithResponses) UnlinkLoadBalancerBackendMachinesWithResponse(ctx 
 }
 
 // DeleteLoadBalancerListenersWithBodyWithResponse request with arbitrary body returning *DeleteLoadBalancerListenersResponse
-func (c *ClientWithResponses) DeleteLoadBalancerListenersWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerListenersResponse, error) {
-	rsp, err := c.DeleteLoadBalancerListenersWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) DeleteLoadBalancerListenersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerListenersResponse, error) {
+	rsp, err := c.DeleteLoadBalancerListenersWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseDeleteLoadBalancerListenersResponse(rsp)
 }
 
-func (c *ClientWithResponses) DeleteLoadBalancerListenersWithResponse(ctx context.Context, id string, body DeleteLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerListenersResponse, error) {
-	rsp, err := c.DeleteLoadBalancerListeners(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) DeleteLoadBalancerListenersWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerListenersResponse, error) {
+	rsp, err := c.DeleteLoadBalancerListeners(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24078,16 +25194,16 @@ func (c *ClientWithResponses) DeleteLoadBalancerListenersWithResponse(ctx contex
 }
 
 // CreateLoadBalancerListenersWithBodyWithResponse request with arbitrary body returning *CreateLoadBalancerListenersResponse
-func (c *ClientWithResponses) CreateLoadBalancerListenersWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerListenersResponse, error) {
-	rsp, err := c.CreateLoadBalancerListenersWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateLoadBalancerListenersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerListenersResponse, error) {
+	rsp, err := c.CreateLoadBalancerListenersWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateLoadBalancerListenersResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateLoadBalancerListenersWithResponse(ctx context.Context, id string, body CreateLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerListenersResponse, error) {
-	rsp, err := c.CreateLoadBalancerListeners(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) CreateLoadBalancerListenersWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateLoadBalancerListenersJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerListenersResponse, error) {
+	rsp, err := c.CreateLoadBalancerListeners(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24095,16 +25211,16 @@ func (c *ClientWithResponses) CreateLoadBalancerListenersWithResponse(ctx contex
 }
 
 // DeleteLoadBalancerPolicyWithBodyWithResponse request with arbitrary body returning *DeleteLoadBalancerPolicyResponse
-func (c *ClientWithResponses) DeleteLoadBalancerPolicyWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerPolicyResponse, error) {
-	rsp, err := c.DeleteLoadBalancerPolicyWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) DeleteLoadBalancerPolicyWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerPolicyResponse, error) {
+	rsp, err := c.DeleteLoadBalancerPolicyWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseDeleteLoadBalancerPolicyResponse(rsp)
 }
 
-func (c *ClientWithResponses) DeleteLoadBalancerPolicyWithResponse(ctx context.Context, id string, body DeleteLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerPolicyResponse, error) {
-	rsp, err := c.DeleteLoadBalancerPolicy(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) DeleteLoadBalancerPolicyWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteLoadBalancerPolicyResponse, error) {
+	rsp, err := c.DeleteLoadBalancerPolicy(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24112,16 +25228,16 @@ func (c *ClientWithResponses) DeleteLoadBalancerPolicyWithResponse(ctx context.C
 }
 
 // CreateLoadBalancerPolicyWithBodyWithResponse request with arbitrary body returning *CreateLoadBalancerPolicyResponse
-func (c *ClientWithResponses) CreateLoadBalancerPolicyWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerPolicyResponse, error) {
-	rsp, err := c.CreateLoadBalancerPolicyWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateLoadBalancerPolicyWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateLoadBalancerPolicyResponse, error) {
+	rsp, err := c.CreateLoadBalancerPolicyWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateLoadBalancerPolicyResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateLoadBalancerPolicyWithResponse(ctx context.Context, id string, body CreateLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerPolicyResponse, error) {
-	rsp, err := c.CreateLoadBalancerPolicy(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) CreateLoadBalancerPolicyWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateLoadBalancerPolicyJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateLoadBalancerPolicyResponse, error) {
+	rsp, err := c.CreateLoadBalancerPolicy(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24129,16 +25245,16 @@ func (c *ClientWithResponses) CreateLoadBalancerPolicyWithResponse(ctx context.C
 }
 
 // ReadVmsHealthWithBodyWithResponse request with arbitrary body returning *ReadVmsHealthResponse
-func (c *ClientWithResponses) ReadVmsHealthWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadVmsHealthResponse, error) {
-	rsp, err := c.ReadVmsHealthWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) ReadVmsHealthWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadVmsHealthResponse, error) {
+	rsp, err := c.ReadVmsHealthWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseReadVmsHealthResponse(rsp)
 }
 
-func (c *ClientWithResponses) ReadVmsHealthWithResponse(ctx context.Context, id string, body ReadVmsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadVmsHealthResponse, error) {
-	rsp, err := c.ReadVmsHealth(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) ReadVmsHealthWithResponse(ctx context.Context, spaceId SpaceId, id string, body ReadVmsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadVmsHealthResponse, error) {
+	rsp, err := c.ReadVmsHealth(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24146,16 +25262,16 @@ func (c *ClientWithResponses) ReadVmsHealthWithResponse(ctx context.Context, id 
 }
 
 // ReadLoadBalancerTagsWithBodyWithResponse request with arbitrary body returning *ReadLoadBalancerTagsResponse
-func (c *ClientWithResponses) ReadLoadBalancerTagsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadLoadBalancerTagsResponse, error) {
-	rsp, err := c.ReadLoadBalancerTagsWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) ReadLoadBalancerTagsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReadLoadBalancerTagsResponse, error) {
+	rsp, err := c.ReadLoadBalancerTagsWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseReadLoadBalancerTagsResponse(rsp)
 }
 
-func (c *ClientWithResponses) ReadLoadBalancerTagsWithResponse(ctx context.Context, body ReadLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadLoadBalancerTagsResponse, error) {
-	rsp, err := c.ReadLoadBalancerTags(ctx, body, reqEditors...)
+func (c *ClientWithResponses) ReadLoadBalancerTagsWithResponse(ctx context.Context, spaceId SpaceId, body ReadLoadBalancerTagsJSONRequestBody, reqEditors ...RequestEditorFn) (*ReadLoadBalancerTagsResponse, error) {
+	rsp, err := c.ReadLoadBalancerTags(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24163,8 +25279,8 @@ func (c *ClientWithResponses) ReadLoadBalancerTagsWithResponse(ctx context.Conte
 }
 
 // ReadLocationsWithResponse request returning *ReadLocationsResponse
-func (c *ClientWithResponses) ReadLocationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error) {
-	rsp, err := c.ReadLocations(ctx, reqEditors...)
+func (c *ClientWithResponses) ReadLocationsWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ReadLocationsResponse, error) {
+	rsp, err := c.ReadLocations(ctx, spaceId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24172,8 +25288,8 @@ func (c *ClientWithResponses) ReadLocationsWithResponse(ctx context.Context, req
 }
 
 // ReadNatGatewayWithResponse request returning *ReadNatGatewayResponse
-func (c *ClientWithResponses) ReadNatGatewayWithResponse(ctx context.Context, params *ReadNatGatewayParams, reqEditors ...RequestEditorFn) (*ReadNatGatewayResponse, error) {
-	rsp, err := c.ReadNatGateway(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadNatGatewayWithResponse(ctx context.Context, spaceId SpaceId, params *ReadNatGatewayParams, reqEditors ...RequestEditorFn) (*ReadNatGatewayResponse, error) {
+	rsp, err := c.ReadNatGateway(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24181,16 +25297,16 @@ func (c *ClientWithResponses) ReadNatGatewayWithResponse(ctx context.Context, pa
 }
 
 // CreateNatGatewayWithBodyWithResponse request with arbitrary body returning *CreateNatGatewayResponse
-func (c *ClientWithResponses) CreateNatGatewayWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNatGatewayResponse, error) {
-	rsp, err := c.CreateNatGatewayWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateNatGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNatGatewayResponse, error) {
+	rsp, err := c.CreateNatGatewayWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateNatGatewayResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateNatGatewayWithResponse(ctx context.Context, body CreateNatGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNatGatewayResponse, error) {
-	rsp, err := c.CreateNatGateway(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateNatGatewayWithResponse(ctx context.Context, spaceId SpaceId, body CreateNatGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNatGatewayResponse, error) {
+	rsp, err := c.CreateNatGateway(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24198,8 +25314,8 @@ func (c *ClientWithResponses) CreateNatGatewayWithResponse(ctx context.Context, 
 }
 
 // DeleteNatGatewayWithResponse request returning *DeleteNatGatewayResponse
-func (c *ClientWithResponses) DeleteNatGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNatGatewayResponse, error) {
-	rsp, err := c.DeleteNatGateway(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteNatGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteNatGatewayResponse, error) {
+	rsp, err := c.DeleteNatGateway(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24207,8 +25323,8 @@ func (c *ClientWithResponses) DeleteNatGatewayWithResponse(ctx context.Context, 
 }
 
 // ReadNatGatewayByIdWithResponse request returning *ReadNatGatewayByIdResponse
-func (c *ClientWithResponses) ReadNatGatewayByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadNatGatewayByIdResponse, error) {
-	rsp, err := c.ReadNatGatewayById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadNatGatewayByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadNatGatewayByIdResponse, error) {
+	rsp, err := c.ReadNatGatewayById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24216,8 +25332,8 @@ func (c *ClientWithResponses) ReadNatGatewayByIdWithResponse(ctx context.Context
 }
 
 // ReadNicsWithResponse request returning *ReadNicsResponse
-func (c *ClientWithResponses) ReadNicsWithResponse(ctx context.Context, params *ReadNicsParams, reqEditors ...RequestEditorFn) (*ReadNicsResponse, error) {
-	rsp, err := c.ReadNics(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadNicsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadNicsParams, reqEditors ...RequestEditorFn) (*ReadNicsResponse, error) {
+	rsp, err := c.ReadNics(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24225,16 +25341,16 @@ func (c *ClientWithResponses) ReadNicsWithResponse(ctx context.Context, params *
 }
 
 // CreateNicWithBodyWithResponse request with arbitrary body returning *CreateNicResponse
-func (c *ClientWithResponses) CreateNicWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNicResponse, error) {
-	rsp, err := c.CreateNicWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateNicWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNicResponse, error) {
+	rsp, err := c.CreateNicWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateNicResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateNicWithResponse(ctx context.Context, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNicResponse, error) {
-	rsp, err := c.CreateNic(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateNicWithResponse(ctx context.Context, spaceId SpaceId, body CreateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNicResponse, error) {
+	rsp, err := c.CreateNic(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24242,8 +25358,8 @@ func (c *ClientWithResponses) CreateNicWithResponse(ctx context.Context, body Cr
 }
 
 // DeleteNicWithResponse request returning *DeleteNicResponse
-func (c *ClientWithResponses) DeleteNicWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error) {
-	rsp, err := c.DeleteNic(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteNicWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteNicResponse, error) {
+	rsp, err := c.DeleteNic(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24251,8 +25367,8 @@ func (c *ClientWithResponses) DeleteNicWithResponse(ctx context.Context, id stri
 }
 
 // ReadNicsByIdWithResponse request returning *ReadNicsByIdResponse
-func (c *ClientWithResponses) ReadNicsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadNicsByIdResponse, error) {
-	rsp, err := c.ReadNicsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadNicsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadNicsByIdResponse, error) {
+	rsp, err := c.ReadNicsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24260,16 +25376,16 @@ func (c *ClientWithResponses) ReadNicsByIdWithResponse(ctx context.Context, id s
 }
 
 // UpdateNicWithBodyWithResponse request with arbitrary body returning *UpdateNicResponse
-func (c *ClientWithResponses) UpdateNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateNicResponse, error) {
-	rsp, err := c.UpdateNicWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateNicWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateNicResponse, error) {
+	rsp, err := c.UpdateNicWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateNicResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateNicWithResponse(ctx context.Context, id string, body UpdateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateNicResponse, error) {
-	rsp, err := c.UpdateNic(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateNicWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateNicResponse, error) {
+	rsp, err := c.UpdateNic(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24277,16 +25393,16 @@ func (c *ClientWithResponses) UpdateNicWithResponse(ctx context.Context, id stri
 }
 
 // LinkPrivateIpsWithBodyWithResponse request with arbitrary body returning *LinkPrivateIpsResponse
-func (c *ClientWithResponses) LinkPrivateIpsWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkPrivateIpsResponse, error) {
-	rsp, err := c.LinkPrivateIpsWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) LinkPrivateIpsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkPrivateIpsResponse, error) {
+	rsp, err := c.LinkPrivateIpsWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseLinkPrivateIpsResponse(rsp)
 }
 
-func (c *ClientWithResponses) LinkPrivateIpsWithResponse(ctx context.Context, id string, body LinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkPrivateIpsResponse, error) {
-	rsp, err := c.LinkPrivateIps(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) LinkPrivateIpsWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkPrivateIpsResponse, error) {
+	rsp, err := c.LinkPrivateIps(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24294,16 +25410,16 @@ func (c *ClientWithResponses) LinkPrivateIpsWithResponse(ctx context.Context, id
 }
 
 // UnlinkPrivateIpsWithBodyWithResponse request with arbitrary body returning *UnlinkPrivateIpsResponse
-func (c *ClientWithResponses) UnlinkPrivateIpsWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPrivateIpsResponse, error) {
-	rsp, err := c.UnlinkPrivateIpsWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkPrivateIpsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPrivateIpsResponse, error) {
+	rsp, err := c.UnlinkPrivateIpsWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUnlinkPrivateIpsResponse(rsp)
 }
 
-func (c *ClientWithResponses) UnlinkPrivateIpsWithResponse(ctx context.Context, id string, body UnlinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPrivateIpsResponse, error) {
-	rsp, err := c.UnlinkPrivateIps(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkPrivateIpsWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkPrivateIpsJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPrivateIpsResponse, error) {
+	rsp, err := c.UnlinkPrivateIps(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24311,16 +25427,16 @@ func (c *ClientWithResponses) UnlinkPrivateIpsWithResponse(ctx context.Context, 
 }
 
 // LinkNicWithBodyWithResponse request with arbitrary body returning *LinkNicResponse
-func (c *ClientWithResponses) LinkNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkNicResponse, error) {
-	rsp, err := c.LinkNicWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) LinkNicWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkNicResponse, error) {
+	rsp, err := c.LinkNicWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseLinkNicResponse(rsp)
 }
 
-func (c *ClientWithResponses) LinkNicWithResponse(ctx context.Context, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkNicResponse, error) {
-	rsp, err := c.LinkNic(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) LinkNicWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkNicResponse, error) {
+	rsp, err := c.LinkNic(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24328,16 +25444,16 @@ func (c *ClientWithResponses) LinkNicWithResponse(ctx context.Context, id string
 }
 
 // UnlinkNicWithBodyWithResponse request with arbitrary body returning *UnlinkNicResponse
-func (c *ClientWithResponses) UnlinkNicWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error) {
-	rsp, err := c.UnlinkNicWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkNicWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error) {
+	rsp, err := c.UnlinkNicWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUnlinkNicResponse(rsp)
 }
 
-func (c *ClientWithResponses) UnlinkNicWithResponse(ctx context.Context, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error) {
-	rsp, err := c.UnlinkNic(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkNicWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkNicJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkNicResponse, error) {
+	rsp, err := c.UnlinkNic(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24345,8 +25461,8 @@ func (c *ClientWithResponses) UnlinkNicWithResponse(ctx context.Context, id stri
 }
 
 // ReadProductTypesWithResponse request returning *ReadProductTypesResponse
-func (c *ClientWithResponses) ReadProductTypesWithResponse(ctx context.Context, params *ReadProductTypesParams, reqEditors ...RequestEditorFn) (*ReadProductTypesResponse, error) {
-	rsp, err := c.ReadProductTypes(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadProductTypesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadProductTypesParams, reqEditors ...RequestEditorFn) (*ReadProductTypesResponse, error) {
+	rsp, err := c.ReadProductTypes(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24354,16 +25470,16 @@ func (c *ClientWithResponses) ReadProductTypesWithResponse(ctx context.Context, 
 }
 
 // CreateProductTypeWithBodyWithResponse request with arbitrary body returning *CreateProductTypeResponse
-func (c *ClientWithResponses) CreateProductTypeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateProductTypeResponse, error) {
-	rsp, err := c.CreateProductTypeWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateProductTypeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateProductTypeResponse, error) {
+	rsp, err := c.CreateProductTypeWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateProductTypeResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateProductTypeWithResponse(ctx context.Context, body CreateProductTypeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateProductTypeResponse, error) {
-	rsp, err := c.CreateProductType(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateProductTypeWithResponse(ctx context.Context, spaceId SpaceId, body CreateProductTypeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateProductTypeResponse, error) {
+	rsp, err := c.CreateProductType(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24371,8 +25487,8 @@ func (c *ClientWithResponses) CreateProductTypeWithResponse(ctx context.Context,
 }
 
 // ReadProductTypesByIdWithResponse request returning *ReadProductTypesByIdResponse
-func (c *ClientWithResponses) ReadProductTypesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadProductTypesByIdResponse, error) {
-	rsp, err := c.ReadProductTypesById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadProductTypesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadProductTypesByIdResponse, error) {
+	rsp, err := c.ReadProductTypesById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24380,8 +25496,8 @@ func (c *ClientWithResponses) ReadProductTypesByIdWithResponse(ctx context.Conte
 }
 
 // ReadPublicIpRangesWithResponse request returning *ReadPublicIpRangesResponse
-func (c *ClientWithResponses) ReadPublicIpRangesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error) {
-	rsp, err := c.ReadPublicIpRanges(ctx, reqEditors...)
+func (c *ClientWithResponses) ReadPublicIpRangesWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*ReadPublicIpRangesResponse, error) {
+	rsp, err := c.ReadPublicIpRanges(ctx, spaceId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24389,8 +25505,8 @@ func (c *ClientWithResponses) ReadPublicIpRangesWithResponse(ctx context.Context
 }
 
 // ReadPublicIpsWithResponse request returning *ReadPublicIpsResponse
-func (c *ClientWithResponses) ReadPublicIpsWithResponse(ctx context.Context, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*ReadPublicIpsResponse, error) {
-	rsp, err := c.ReadPublicIps(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadPublicIpsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadPublicIpsParams, reqEditors ...RequestEditorFn) (*ReadPublicIpsResponse, error) {
+	rsp, err := c.ReadPublicIps(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24398,8 +25514,8 @@ func (c *ClientWithResponses) ReadPublicIpsWithResponse(ctx context.Context, par
 }
 
 // CreatePublicIpWithResponse request returning *CreatePublicIpResponse
-func (c *ClientWithResponses) CreatePublicIpWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error) {
-	rsp, err := c.CreatePublicIp(ctx, reqEditors...)
+func (c *ClientWithResponses) CreatePublicIpWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*CreatePublicIpResponse, error) {
+	rsp, err := c.CreatePublicIp(ctx, spaceId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24407,8 +25523,8 @@ func (c *ClientWithResponses) CreatePublicIpWithResponse(ctx context.Context, re
 }
 
 // DeletePublicIpWithResponse request returning *DeletePublicIpResponse
-func (c *ClientWithResponses) DeletePublicIpWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error) {
-	rsp, err := c.DeletePublicIp(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeletePublicIpWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeletePublicIpResponse, error) {
+	rsp, err := c.DeletePublicIp(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24416,8 +25532,8 @@ func (c *ClientWithResponses) DeletePublicIpWithResponse(ctx context.Context, id
 }
 
 // ReadPublicIpsByIdWithResponse request returning *ReadPublicIpsByIdResponse
-func (c *ClientWithResponses) ReadPublicIpsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadPublicIpsByIdResponse, error) {
-	rsp, err := c.ReadPublicIpsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadPublicIpsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadPublicIpsByIdResponse, error) {
+	rsp, err := c.ReadPublicIpsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24425,16 +25541,16 @@ func (c *ClientWithResponses) ReadPublicIpsByIdWithResponse(ctx context.Context,
 }
 
 // LinkPublicIpWithBodyWithResponse request with arbitrary body returning *LinkPublicIpResponse
-func (c *ClientWithResponses) LinkPublicIpWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkPublicIpResponse, error) {
-	rsp, err := c.LinkPublicIpWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) LinkPublicIpWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkPublicIpResponse, error) {
+	rsp, err := c.LinkPublicIpWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseLinkPublicIpResponse(rsp)
 }
 
-func (c *ClientWithResponses) LinkPublicIpWithResponse(ctx context.Context, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkPublicIpResponse, error) {
-	rsp, err := c.LinkPublicIp(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) LinkPublicIpWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkPublicIpResponse, error) {
+	rsp, err := c.LinkPublicIp(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24442,16 +25558,16 @@ func (c *ClientWithResponses) LinkPublicIpWithResponse(ctx context.Context, id s
 }
 
 // UnlinkPublicIpWithBodyWithResponse request with arbitrary body returning *UnlinkPublicIpResponse
-func (c *ClientWithResponses) UnlinkPublicIpWithBodyWithResponse(ctx context.Context, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error) {
-	rsp, err := c.UnlinkPublicIpWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkPublicIpWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error) {
+	rsp, err := c.UnlinkPublicIpWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUnlinkPublicIpResponse(rsp)
 }
 
-func (c *ClientWithResponses) UnlinkPublicIpWithResponse(ctx context.Context, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error) {
-	rsp, err := c.UnlinkPublicIp(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkPublicIpWithResponse(ctx context.Context, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error) {
+	rsp, err := c.UnlinkPublicIp(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24459,8 +25575,8 @@ func (c *ClientWithResponses) UnlinkPublicIpWithResponse(ctx context.Context, id
 }
 
 // ReadRouteTablesWithResponse request returning *ReadRouteTablesResponse
-func (c *ClientWithResponses) ReadRouteTablesWithResponse(ctx context.Context, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*ReadRouteTablesResponse, error) {
-	rsp, err := c.ReadRouteTables(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadRouteTablesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*ReadRouteTablesResponse, error) {
+	rsp, err := c.ReadRouteTables(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24468,16 +25584,16 @@ func (c *ClientWithResponses) ReadRouteTablesWithResponse(ctx context.Context, p
 }
 
 // CreateRouteTableWithBodyWithResponse request with arbitrary body returning *CreateRouteTableResponse
-func (c *ClientWithResponses) CreateRouteTableWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error) {
-	rsp, err := c.CreateRouteTableWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateRouteTableWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error) {
+	rsp, err := c.CreateRouteTableWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateRouteTableResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateRouteTableWithResponse(ctx context.Context, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error) {
-	rsp, err := c.CreateRouteTable(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateRouteTableWithResponse(ctx context.Context, spaceId SpaceId, body CreateRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteTableResponse, error) {
+	rsp, err := c.CreateRouteTable(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24485,8 +25601,8 @@ func (c *ClientWithResponses) CreateRouteTableWithResponse(ctx context.Context, 
 }
 
 // DeleteRouteTableWithResponse request returning *DeleteRouteTableResponse
-func (c *ClientWithResponses) DeleteRouteTableWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error) {
-	rsp, err := c.DeleteRouteTable(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteRouteTableWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteRouteTableResponse, error) {
+	rsp, err := c.DeleteRouteTable(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24494,8 +25610,8 @@ func (c *ClientWithResponses) DeleteRouteTableWithResponse(ctx context.Context, 
 }
 
 // ReadRouteTablesByIdWithResponse request returning *ReadRouteTablesByIdResponse
-func (c *ClientWithResponses) ReadRouteTablesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadRouteTablesByIdResponse, error) {
-	rsp, err := c.ReadRouteTablesById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadRouteTablesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadRouteTablesByIdResponse, error) {
+	rsp, err := c.ReadRouteTablesById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24503,16 +25619,16 @@ func (c *ClientWithResponses) ReadRouteTablesByIdWithResponse(ctx context.Contex
 }
 
 // DeleteRouteWithBodyWithResponse request with arbitrary body returning *DeleteRouteResponse
-func (c *ClientWithResponses) DeleteRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error) {
-	rsp, err := c.DeleteRouteWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) DeleteRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error) {
+	rsp, err := c.DeleteRouteWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseDeleteRouteResponse(rsp)
 }
 
-func (c *ClientWithResponses) DeleteRouteWithResponse(ctx context.Context, id string, body DeleteRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error) {
-	rsp, err := c.DeleteRoute(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) DeleteRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error) {
+	rsp, err := c.DeleteRoute(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24520,16 +25636,16 @@ func (c *ClientWithResponses) DeleteRouteWithResponse(ctx context.Context, id st
 }
 
 // CreateRouteWithBodyWithResponse request with arbitrary body returning *CreateRouteResponse
-func (c *ClientWithResponses) CreateRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteResponse, error) {
-	rsp, err := c.CreateRouteWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRouteResponse, error) {
+	rsp, err := c.CreateRouteWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateRouteResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateRouteWithResponse(ctx context.Context, id string, body CreateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteResponse, error) {
-	rsp, err := c.CreateRoute(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) CreateRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRouteResponse, error) {
+	rsp, err := c.CreateRoute(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24537,16 +25653,16 @@ func (c *ClientWithResponses) CreateRouteWithResponse(ctx context.Context, id st
 }
 
 // UpdateRouteWithBodyWithResponse request with arbitrary body returning *UpdateRouteResponse
-func (c *ClientWithResponses) UpdateRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error) {
-	rsp, err := c.UpdateRouteWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error) {
+	rsp, err := c.UpdateRouteWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateRouteResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateRouteWithResponse(ctx context.Context, id string, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error) {
-	rsp, err := c.UpdateRoute(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteResponse, error) {
+	rsp, err := c.UpdateRoute(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24554,16 +25670,16 @@ func (c *ClientWithResponses) UpdateRouteWithResponse(ctx context.Context, id st
 }
 
 // LinkRouteTableWithBodyWithResponse request with arbitrary body returning *LinkRouteTableResponse
-func (c *ClientWithResponses) LinkRouteTableWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkRouteTableResponse, error) {
-	rsp, err := c.LinkRouteTableWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) LinkRouteTableWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkRouteTableResponse, error) {
+	rsp, err := c.LinkRouteTableWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseLinkRouteTableResponse(rsp)
 }
 
-func (c *ClientWithResponses) LinkRouteTableWithResponse(ctx context.Context, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkRouteTableResponse, error) {
-	rsp, err := c.LinkRouteTable(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) LinkRouteTableWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkRouteTableResponse, error) {
+	rsp, err := c.LinkRouteTable(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24571,16 +25687,16 @@ func (c *ClientWithResponses) LinkRouteTableWithResponse(ctx context.Context, id
 }
 
 // UnlinkRouteTableWithBodyWithResponse request with arbitrary body returning *UnlinkRouteTableResponse
-func (c *ClientWithResponses) UnlinkRouteTableWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error) {
-	rsp, err := c.UnlinkRouteTableWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkRouteTableWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error) {
+	rsp, err := c.UnlinkRouteTableWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUnlinkRouteTableResponse(rsp)
 }
 
-func (c *ClientWithResponses) UnlinkRouteTableWithResponse(ctx context.Context, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error) {
-	rsp, err := c.UnlinkRouteTable(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkRouteTableWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error) {
+	rsp, err := c.UnlinkRouteTable(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24588,16 +25704,16 @@ func (c *ClientWithResponses) UnlinkRouteTableWithResponse(ctx context.Context, 
 }
 
 // UpdateRouteTableRoutePropagationWithBodyWithResponse request with arbitrary body returning *UpdateRouteTableRoutePropagationResponse
-func (c *ClientWithResponses) UpdateRouteTableRoutePropagationWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error) {
-	rsp, err := c.UpdateRouteTableRoutePropagationWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateRouteTableRoutePropagationWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error) {
+	rsp, err := c.UpdateRouteTableRoutePropagationWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateRouteTableRoutePropagationResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateRouteTableRoutePropagationWithResponse(ctx context.Context, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error) {
-	rsp, err := c.UpdateRouteTableRoutePropagation(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateRouteTableRoutePropagationWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error) {
+	rsp, err := c.UpdateRouteTableRoutePropagation(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24605,8 +25721,8 @@ func (c *ClientWithResponses) UpdateRouteTableRoutePropagationWithResponse(ctx c
 }
 
 // ReadSecurityGroupsWithResponse request returning *ReadSecurityGroupsResponse
-func (c *ClientWithResponses) ReadSecurityGroupsWithResponse(ctx context.Context, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*ReadSecurityGroupsResponse, error) {
-	rsp, err := c.ReadSecurityGroups(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadSecurityGroupsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*ReadSecurityGroupsResponse, error) {
+	rsp, err := c.ReadSecurityGroups(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24614,16 +25730,16 @@ func (c *ClientWithResponses) ReadSecurityGroupsWithResponse(ctx context.Context
 }
 
 // CreateSecurityGroupWithBodyWithResponse request with arbitrary body returning *CreateSecurityGroupResponse
-func (c *ClientWithResponses) CreateSecurityGroupWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error) {
-	rsp, err := c.CreateSecurityGroupWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateSecurityGroupWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error) {
+	rsp, err := c.CreateSecurityGroupWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateSecurityGroupResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateSecurityGroupWithResponse(ctx context.Context, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error) {
-	rsp, err := c.CreateSecurityGroup(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateSecurityGroupWithResponse(ctx context.Context, spaceId SpaceId, body CreateSecurityGroupJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupResponse, error) {
+	rsp, err := c.CreateSecurityGroup(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24631,8 +25747,8 @@ func (c *ClientWithResponses) CreateSecurityGroupWithResponse(ctx context.Contex
 }
 
 // DeleteSecurityGroupWithResponse request returning *DeleteSecurityGroupResponse
-func (c *ClientWithResponses) DeleteSecurityGroupWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error) {
-	rsp, err := c.DeleteSecurityGroup(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteSecurityGroupWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupResponse, error) {
+	rsp, err := c.DeleteSecurityGroup(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24640,8 +25756,8 @@ func (c *ClientWithResponses) DeleteSecurityGroupWithResponse(ctx context.Contex
 }
 
 // ReadSecurityGroupsByIdWithResponse request returning *ReadSecurityGroupsByIdResponse
-func (c *ClientWithResponses) ReadSecurityGroupsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadSecurityGroupsByIdResponse, error) {
-	rsp, err := c.ReadSecurityGroupsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadSecurityGroupsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadSecurityGroupsByIdResponse, error) {
+	rsp, err := c.ReadSecurityGroupsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24649,16 +25765,16 @@ func (c *ClientWithResponses) ReadSecurityGroupsByIdWithResponse(ctx context.Con
 }
 
 // DeleteSecurityGroupRuleWithBodyWithResponse request with arbitrary body returning *DeleteSecurityGroupRuleResponse
-func (c *ClientWithResponses) DeleteSecurityGroupRuleWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupRuleResponse, error) {
-	rsp, err := c.DeleteSecurityGroupRuleWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) DeleteSecurityGroupRuleWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupRuleResponse, error) {
+	rsp, err := c.DeleteSecurityGroupRuleWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseDeleteSecurityGroupRuleResponse(rsp)
 }
 
-func (c *ClientWithResponses) DeleteSecurityGroupRuleWithResponse(ctx context.Context, id string, body DeleteSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupRuleResponse, error) {
-	rsp, err := c.DeleteSecurityGroupRule(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) DeleteSecurityGroupRuleWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteSecurityGroupRuleResponse, error) {
+	rsp, err := c.DeleteSecurityGroupRule(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24666,16 +25782,16 @@ func (c *ClientWithResponses) DeleteSecurityGroupRuleWithResponse(ctx context.Co
 }
 
 // CreateSecurityGroupRuleWithBodyWithResponse request with arbitrary body returning *CreateSecurityGroupRuleResponse
-func (c *ClientWithResponses) CreateSecurityGroupRuleWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupRuleResponse, error) {
-	rsp, err := c.CreateSecurityGroupRuleWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateSecurityGroupRuleWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSecurityGroupRuleResponse, error) {
+	rsp, err := c.CreateSecurityGroupRuleWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateSecurityGroupRuleResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateSecurityGroupRuleWithResponse(ctx context.Context, id string, body CreateSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupRuleResponse, error) {
-	rsp, err := c.CreateSecurityGroupRule(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) CreateSecurityGroupRuleWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateSecurityGroupRuleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSecurityGroupRuleResponse, error) {
+	rsp, err := c.CreateSecurityGroupRule(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24683,8 +25799,8 @@ func (c *ClientWithResponses) CreateSecurityGroupRuleWithResponse(ctx context.Co
 }
 
 // ReadSnapshotsWithResponse request returning *ReadSnapshotsResponse
-func (c *ClientWithResponses) ReadSnapshotsWithResponse(ctx context.Context, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*ReadSnapshotsResponse, error) {
-	rsp, err := c.ReadSnapshots(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadSnapshotsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSnapshotsParams, reqEditors ...RequestEditorFn) (*ReadSnapshotsResponse, error) {
+	rsp, err := c.ReadSnapshots(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24692,16 +25808,16 @@ func (c *ClientWithResponses) ReadSnapshotsWithResponse(ctx context.Context, par
 }
 
 // CreateSnapshotWithBodyWithResponse request with arbitrary body returning *CreateSnapshotResponse
-func (c *ClientWithResponses) CreateSnapshotWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error) {
-	rsp, err := c.CreateSnapshotWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateSnapshotWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error) {
+	rsp, err := c.CreateSnapshotWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateSnapshotResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateSnapshotWithResponse(ctx context.Context, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error) {
-	rsp, err := c.CreateSnapshot(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateSnapshotWithResponse(ctx context.Context, spaceId SpaceId, body CreateSnapshotJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSnapshotResponse, error) {
+	rsp, err := c.CreateSnapshot(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24709,8 +25825,8 @@ func (c *ClientWithResponses) CreateSnapshotWithResponse(ctx context.Context, bo
 }
 
 // DeleteSnapshotWithResponse request returning *DeleteSnapshotResponse
-func (c *ClientWithResponses) DeleteSnapshotWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error) {
-	rsp, err := c.DeleteSnapshot(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteSnapshotWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteSnapshotResponse, error) {
+	rsp, err := c.DeleteSnapshot(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24718,8 +25834,8 @@ func (c *ClientWithResponses) DeleteSnapshotWithResponse(ctx context.Context, id
 }
 
 // ReadSnapshotsByIdWithResponse request returning *ReadSnapshotsByIdResponse
-func (c *ClientWithResponses) ReadSnapshotsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadSnapshotsByIdResponse, error) {
-	rsp, err := c.ReadSnapshotsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadSnapshotsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadSnapshotsByIdResponse, error) {
+	rsp, err := c.ReadSnapshotsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24727,8 +25843,8 @@ func (c *ClientWithResponses) ReadSnapshotsByIdWithResponse(ctx context.Context,
 }
 
 // ReadSubnetsWithResponse request returning *ReadSubnetsResponse
-func (c *ClientWithResponses) ReadSubnetsWithResponse(ctx context.Context, params *ReadSubnetsParams, reqEditors ...RequestEditorFn) (*ReadSubnetsResponse, error) {
-	rsp, err := c.ReadSubnets(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadSubnetsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSubnetsParams, reqEditors ...RequestEditorFn) (*ReadSubnetsResponse, error) {
+	rsp, err := c.ReadSubnets(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24736,16 +25852,16 @@ func (c *ClientWithResponses) ReadSubnetsWithResponse(ctx context.Context, param
 }
 
 // CreateSubnetWithBodyWithResponse request with arbitrary body returning *CreateSubnetResponse
-func (c *ClientWithResponses) CreateSubnetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error) {
-	rsp, err := c.CreateSubnetWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateSubnetWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error) {
+	rsp, err := c.CreateSubnetWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateSubnetResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateSubnetWithResponse(ctx context.Context, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error) {
-	rsp, err := c.CreateSubnet(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateSubnetWithResponse(ctx context.Context, spaceId SpaceId, body CreateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSubnetResponse, error) {
+	rsp, err := c.CreateSubnet(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24753,8 +25869,8 @@ func (c *ClientWithResponses) CreateSubnetWithResponse(ctx context.Context, body
 }
 
 // DeleteSubnetWithResponse request returning *DeleteSubnetResponse
-func (c *ClientWithResponses) DeleteSubnetWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error) {
-	rsp, err := c.DeleteSubnet(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteSubnetWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteSubnetResponse, error) {
+	rsp, err := c.DeleteSubnet(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24762,8 +25878,8 @@ func (c *ClientWithResponses) DeleteSubnetWithResponse(ctx context.Context, id s
 }
 
 // ReadSubnetsByIdWithResponse request returning *ReadSubnetsByIdResponse
-func (c *ClientWithResponses) ReadSubnetsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadSubnetsByIdResponse, error) {
-	rsp, err := c.ReadSubnetsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadSubnetsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadSubnetsByIdResponse, error) {
+	rsp, err := c.ReadSubnetsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24771,16 +25887,16 @@ func (c *ClientWithResponses) ReadSubnetsByIdWithResponse(ctx context.Context, i
 }
 
 // UpdateSubnetWithBodyWithResponse request with arbitrary body returning *UpdateSubnetResponse
-func (c *ClientWithResponses) UpdateSubnetWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSubnetResponse, error) {
-	rsp, err := c.UpdateSubnetWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateSubnetWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSubnetResponse, error) {
+	rsp, err := c.UpdateSubnetWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateSubnetResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateSubnetWithResponse(ctx context.Context, id string, body UpdateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSubnetResponse, error) {
-	rsp, err := c.UpdateSubnet(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateSubnetWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateSubnetJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSubnetResponse, error) {
+	rsp, err := c.UpdateSubnet(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24788,8 +25904,8 @@ func (c *ClientWithResponses) UpdateSubnetWithResponse(ctx context.Context, id s
 }
 
 // ReadTagsWithResponse request returning *ReadTagsResponse
-func (c *ClientWithResponses) ReadTagsWithResponse(ctx context.Context, params *ReadTagsParams, reqEditors ...RequestEditorFn) (*ReadTagsResponse, error) {
-	rsp, err := c.ReadTags(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadTagsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadTagsParams, reqEditors ...RequestEditorFn) (*ReadTagsResponse, error) {
+	rsp, err := c.ReadTags(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24797,8 +25913,8 @@ func (c *ClientWithResponses) ReadTagsWithResponse(ctx context.Context, params *
 }
 
 // ReadVirtualGatewaysWithResponse request returning *ReadVirtualGatewaysResponse
-func (c *ClientWithResponses) ReadVirtualGatewaysWithResponse(ctx context.Context, params *ReadVirtualGatewaysParams, reqEditors ...RequestEditorFn) (*ReadVirtualGatewaysResponse, error) {
-	rsp, err := c.ReadVirtualGateways(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadVirtualGatewaysWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVirtualGatewaysParams, reqEditors ...RequestEditorFn) (*ReadVirtualGatewaysResponse, error) {
+	rsp, err := c.ReadVirtualGateways(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24806,16 +25922,16 @@ func (c *ClientWithResponses) ReadVirtualGatewaysWithResponse(ctx context.Contex
 }
 
 // CreateVirtualGatewayWithBodyWithResponse request with arbitrary body returning *CreateVirtualGatewayResponse
-func (c *ClientWithResponses) CreateVirtualGatewayWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVirtualGatewayResponse, error) {
-	rsp, err := c.CreateVirtualGatewayWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateVirtualGatewayWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVirtualGatewayResponse, error) {
+	rsp, err := c.CreateVirtualGatewayWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateVirtualGatewayResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateVirtualGatewayWithResponse(ctx context.Context, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVirtualGatewayResponse, error) {
-	rsp, err := c.CreateVirtualGateway(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateVirtualGatewayWithResponse(ctx context.Context, spaceId SpaceId, body CreateVirtualGatewayJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVirtualGatewayResponse, error) {
+	rsp, err := c.CreateVirtualGateway(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24823,8 +25939,8 @@ func (c *ClientWithResponses) CreateVirtualGatewayWithResponse(ctx context.Conte
 }
 
 // DeleteVirtualGatewayWithResponse request returning *DeleteVirtualGatewayResponse
-func (c *ClientWithResponses) DeleteVirtualGatewayWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error) {
-	rsp, err := c.DeleteVirtualGateway(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteVirtualGatewayWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVirtualGatewayResponse, error) {
+	rsp, err := c.DeleteVirtualGateway(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24832,8 +25948,8 @@ func (c *ClientWithResponses) DeleteVirtualGatewayWithResponse(ctx context.Conte
 }
 
 // ReadVirtualGatewaysByIdWithResponse request returning *ReadVirtualGatewaysByIdResponse
-func (c *ClientWithResponses) ReadVirtualGatewaysByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVirtualGatewaysByIdResponse, error) {
-	rsp, err := c.ReadVirtualGatewaysById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadVirtualGatewaysByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVirtualGatewaysByIdResponse, error) {
+	rsp, err := c.ReadVirtualGatewaysById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24841,16 +25957,16 @@ func (c *ClientWithResponses) ReadVirtualGatewaysByIdWithResponse(ctx context.Co
 }
 
 // LinkVirtualGatewayToVpcWithBodyWithResponse request with arbitrary body returning *LinkVirtualGatewayToVpcResponse
-func (c *ClientWithResponses) LinkVirtualGatewayToVpcWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkVirtualGatewayToVpcResponse, error) {
-	rsp, err := c.LinkVirtualGatewayToVpcWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) LinkVirtualGatewayToVpcWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkVirtualGatewayToVpcResponse, error) {
+	rsp, err := c.LinkVirtualGatewayToVpcWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseLinkVirtualGatewayToVpcResponse(rsp)
 }
 
-func (c *ClientWithResponses) LinkVirtualGatewayToVpcWithResponse(ctx context.Context, id string, body LinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkVirtualGatewayToVpcResponse, error) {
-	rsp, err := c.LinkVirtualGatewayToVpc(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) LinkVirtualGatewayToVpcWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkVirtualGatewayToVpcResponse, error) {
+	rsp, err := c.LinkVirtualGatewayToVpc(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24858,16 +25974,16 @@ func (c *ClientWithResponses) LinkVirtualGatewayToVpcWithResponse(ctx context.Co
 }
 
 // UnlinkVirtualGatewayToVpcWithBodyWithResponse request with arbitrary body returning *UnlinkVirtualGatewayToVpcResponse
-func (c *ClientWithResponses) UnlinkVirtualGatewayToVpcWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkVirtualGatewayToVpcResponse, error) {
-	rsp, err := c.UnlinkVirtualGatewayToVpcWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkVirtualGatewayToVpcWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkVirtualGatewayToVpcResponse, error) {
+	rsp, err := c.UnlinkVirtualGatewayToVpcWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUnlinkVirtualGatewayToVpcResponse(rsp)
 }
 
-func (c *ClientWithResponses) UnlinkVirtualGatewayToVpcWithResponse(ctx context.Context, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkVirtualGatewayToVpcResponse, error) {
-	rsp, err := c.UnlinkVirtualGatewayToVpc(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkVirtualGatewayToVpcWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkVirtualGatewayToVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkVirtualGatewayToVpcResponse, error) {
+	rsp, err := c.UnlinkVirtualGatewayToVpc(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24875,8 +25991,8 @@ func (c *ClientWithResponses) UnlinkVirtualGatewayToVpcWithResponse(ctx context.
 }
 
 // ReadVmsWithResponse request returning *ReadVmsResponse
-func (c *ClientWithResponses) ReadVmsWithResponse(ctx context.Context, params *ReadVmsParams, reqEditors ...RequestEditorFn) (*ReadVmsResponse, error) {
-	rsp, err := c.ReadVms(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadVmsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVmsParams, reqEditors ...RequestEditorFn) (*ReadVmsResponse, error) {
+	rsp, err := c.ReadVms(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24884,16 +26000,16 @@ func (c *ClientWithResponses) ReadVmsWithResponse(ctx context.Context, params *R
 }
 
 // CreateVmsWithBodyWithResponse request with arbitrary body returning *CreateVmsResponse
-func (c *ClientWithResponses) CreateVmsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVmsResponse, error) {
-	rsp, err := c.CreateVmsWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateVmsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVmsResponse, error) {
+	rsp, err := c.CreateVmsWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateVmsResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateVmsWithResponse(ctx context.Context, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVmsResponse, error) {
-	rsp, err := c.CreateVms(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateVmsWithResponse(ctx context.Context, spaceId SpaceId, body CreateVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVmsResponse, error) {
+	rsp, err := c.CreateVms(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24901,8 +26017,8 @@ func (c *ClientWithResponses) CreateVmsWithResponse(ctx context.Context, body Cr
 }
 
 // ReadVmsStateWithResponse request returning *ReadVmsStateResponse
-func (c *ClientWithResponses) ReadVmsStateWithResponse(ctx context.Context, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*ReadVmsStateResponse, error) {
-	rsp, err := c.ReadVmsState(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadVmsStateWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*ReadVmsStateResponse, error) {
+	rsp, err := c.ReadVmsState(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24910,8 +26026,8 @@ func (c *ClientWithResponses) ReadVmsStateWithResponse(ctx context.Context, para
 }
 
 // DeleteVmsWithResponse request returning *DeleteVmsResponse
-func (c *ClientWithResponses) DeleteVmsWithResponse(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error) {
-	rsp, err := c.DeleteVms(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error) {
+	rsp, err := c.DeleteVms(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24919,8 +26035,8 @@ func (c *ClientWithResponses) DeleteVmsWithResponse(ctx context.Context, id []in
 }
 
 // ReadVmsByIdWithResponse request returning *ReadVmsByIdResponse
-func (c *ClientWithResponses) ReadVmsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVmsByIdResponse, error) {
-	rsp, err := c.ReadVmsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadVmsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVmsByIdResponse, error) {
+	rsp, err := c.ReadVmsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24928,16 +26044,16 @@ func (c *ClientWithResponses) ReadVmsByIdWithResponse(ctx context.Context, id st
 }
 
 // UpdateVmWithBodyWithResponse request with arbitrary body returning *UpdateVmResponse
-func (c *ClientWithResponses) UpdateVmWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVmResponse, error) {
-	rsp, err := c.UpdateVmWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVmWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVmResponse, error) {
+	rsp, err := c.UpdateVmWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateVmResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateVmWithResponse(ctx context.Context, id string, body UpdateVmJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVmResponse, error) {
-	rsp, err := c.UpdateVm(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVmWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVmJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVmResponse, error) {
+	rsp, err := c.UpdateVm(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24945,8 +26061,8 @@ func (c *ClientWithResponses) UpdateVmWithResponse(ctx context.Context, id strin
 }
 
 // ReadAdminPasswordWithResponse request returning *ReadAdminPasswordResponse
-func (c *ClientWithResponses) ReadAdminPasswordWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadAdminPasswordResponse, error) {
-	rsp, err := c.ReadAdminPassword(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadAdminPasswordWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadAdminPasswordResponse, error) {
+	rsp, err := c.ReadAdminPassword(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24954,8 +26070,8 @@ func (c *ClientWithResponses) ReadAdminPasswordWithResponse(ctx context.Context,
 }
 
 // ReadConsoleOutputWithResponse request returning *ReadConsoleOutputResponse
-func (c *ClientWithResponses) ReadConsoleOutputWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadConsoleOutputResponse, error) {
-	rsp, err := c.ReadConsoleOutput(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadConsoleOutputWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadConsoleOutputResponse, error) {
+	rsp, err := c.ReadConsoleOutput(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24963,8 +26079,8 @@ func (c *ClientWithResponses) ReadConsoleOutputWithResponse(ctx context.Context,
 }
 
 // RebootVmsWithResponse request returning *RebootVmsResponse
-func (c *ClientWithResponses) RebootVmsWithResponse(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*RebootVmsResponse, error) {
-	rsp, err := c.RebootVms(ctx, id, reqEditors...)
+func (c *ClientWithResponses) RebootVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*RebootVmsResponse, error) {
+	rsp, err := c.RebootVms(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24972,8 +26088,8 @@ func (c *ClientWithResponses) RebootVmsWithResponse(ctx context.Context, id []in
 }
 
 // StartVmsWithResponse request returning *StartVmsResponse
-func (c *ClientWithResponses) StartVmsWithResponse(ctx context.Context, id []interface{}, reqEditors ...RequestEditorFn) (*StartVmsResponse, error) {
-	rsp, err := c.StartVms(ctx, id, reqEditors...)
+func (c *ClientWithResponses) StartVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*StartVmsResponse, error) {
+	rsp, err := c.StartVms(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24981,16 +26097,16 @@ func (c *ClientWithResponses) StartVmsWithResponse(ctx context.Context, id []int
 }
 
 // StopVmsWithBodyWithResponse request with arbitrary body returning *StopVmsResponse
-func (c *ClientWithResponses) StopVmsWithBodyWithResponse(ctx context.Context, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*StopVmsResponse, error) {
-	rsp, err := c.StopVmsWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) StopVmsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*StopVmsResponse, error) {
+	rsp, err := c.StopVmsWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseStopVmsResponse(rsp)
 }
 
-func (c *ClientWithResponses) StopVmsWithResponse(ctx context.Context, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*StopVmsResponse, error) {
-	rsp, err := c.StopVms(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) StopVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*StopVmsResponse, error) {
+	rsp, err := c.StopVms(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -24998,8 +26114,8 @@ func (c *ClientWithResponses) StopVmsWithResponse(ctx context.Context, id []inte
 }
 
 // ReadVolumesWithResponse request returning *ReadVolumesResponse
-func (c *ClientWithResponses) ReadVolumesWithResponse(ctx context.Context, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*ReadVolumesResponse, error) {
-	rsp, err := c.ReadVolumes(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadVolumesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*ReadVolumesResponse, error) {
+	rsp, err := c.ReadVolumes(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25007,16 +26123,16 @@ func (c *ClientWithResponses) ReadVolumesWithResponse(ctx context.Context, param
 }
 
 // CreateVolumeWithBodyWithResponse request with arbitrary body returning *CreateVolumeResponse
-func (c *ClientWithResponses) CreateVolumeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error) {
-	rsp, err := c.CreateVolumeWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateVolumeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error) {
+	rsp, err := c.CreateVolumeWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateVolumeResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateVolumeWithResponse(ctx context.Context, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error) {
-	rsp, err := c.CreateVolume(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateVolumeWithResponse(ctx context.Context, spaceId SpaceId, body CreateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVolumeResponse, error) {
+	rsp, err := c.CreateVolume(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25024,8 +26140,8 @@ func (c *ClientWithResponses) CreateVolumeWithResponse(ctx context.Context, body
 }
 
 // DeleteVolumeWithResponse request returning *DeleteVolumeResponse
-func (c *ClientWithResponses) DeleteVolumeWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error) {
-	rsp, err := c.DeleteVolume(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteVolumeWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVolumeResponse, error) {
+	rsp, err := c.DeleteVolume(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25033,8 +26149,8 @@ func (c *ClientWithResponses) DeleteVolumeWithResponse(ctx context.Context, id s
 }
 
 // ReadVolumesByIdWithResponse request returning *ReadVolumesByIdResponse
-func (c *ClientWithResponses) ReadVolumesByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVolumesByIdResponse, error) {
-	rsp, err := c.ReadVolumesById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadVolumesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVolumesByIdResponse, error) {
+	rsp, err := c.ReadVolumesById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25042,16 +26158,16 @@ func (c *ClientWithResponses) ReadVolumesByIdWithResponse(ctx context.Context, i
 }
 
 // UpdateVolumeWithBodyWithResponse request with arbitrary body returning *UpdateVolumeResponse
-func (c *ClientWithResponses) UpdateVolumeWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVolumeResponse, error) {
-	rsp, err := c.UpdateVolumeWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVolumeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVolumeResponse, error) {
+	rsp, err := c.UpdateVolumeWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateVolumeResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateVolumeWithResponse(ctx context.Context, id string, body UpdateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVolumeResponse, error) {
-	rsp, err := c.UpdateVolume(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVolumeWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVolumeResponse, error) {
+	rsp, err := c.UpdateVolume(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25059,16 +26175,16 @@ func (c *ClientWithResponses) UpdateVolumeWithResponse(ctx context.Context, id s
 }
 
 // LinkVolumeWithBodyWithResponse request with arbitrary body returning *LinkVolumeResponse
-func (c *ClientWithResponses) LinkVolumeWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkVolumeResponse, error) {
-	rsp, err := c.LinkVolumeWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) LinkVolumeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LinkVolumeResponse, error) {
+	rsp, err := c.LinkVolumeWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseLinkVolumeResponse(rsp)
 }
 
-func (c *ClientWithResponses) LinkVolumeWithResponse(ctx context.Context, id string, body LinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkVolumeResponse, error) {
-	rsp, err := c.LinkVolume(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) LinkVolumeWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkVolumeResponse, error) {
+	rsp, err := c.LinkVolume(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25076,16 +26192,16 @@ func (c *ClientWithResponses) LinkVolumeWithResponse(ctx context.Context, id str
 }
 
 // UnlinkVolumeWithBodyWithResponse request with arbitrary body returning *UnlinkVolumeResponse
-func (c *ClientWithResponses) UnlinkVolumeWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkVolumeResponse, error) {
-	rsp, err := c.UnlinkVolumeWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkVolumeWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkVolumeResponse, error) {
+	rsp, err := c.UnlinkVolumeWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUnlinkVolumeResponse(rsp)
 }
 
-func (c *ClientWithResponses) UnlinkVolumeWithResponse(ctx context.Context, id string, body UnlinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkVolumeResponse, error) {
-	rsp, err := c.UnlinkVolume(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UnlinkVolumeWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkVolumeJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkVolumeResponse, error) {
+	rsp, err := c.UnlinkVolume(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25093,8 +26209,8 @@ func (c *ClientWithResponses) UnlinkVolumeWithResponse(ctx context.Context, id s
 }
 
 // ReadVpcAccessPointsWithResponse request returning *ReadVpcAccessPointsResponse
-func (c *ClientWithResponses) ReadVpcAccessPointsWithResponse(ctx context.Context, params *ReadVpcAccessPointsParams, reqEditors ...RequestEditorFn) (*ReadVpcAccessPointsResponse, error) {
-	rsp, err := c.ReadVpcAccessPoints(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadVpcAccessPointsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVpcAccessPointsParams, reqEditors ...RequestEditorFn) (*ReadVpcAccessPointsResponse, error) {
+	rsp, err := c.ReadVpcAccessPoints(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25102,16 +26218,16 @@ func (c *ClientWithResponses) ReadVpcAccessPointsWithResponse(ctx context.Contex
 }
 
 // CreateVpcAccessPointWithBodyWithResponse request with arbitrary body returning *CreateVpcAccessPointResponse
-func (c *ClientWithResponses) CreateVpcAccessPointWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcAccessPointResponse, error) {
-	rsp, err := c.CreateVpcAccessPointWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpcAccessPointWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcAccessPointResponse, error) {
+	rsp, err := c.CreateVpcAccessPointWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateVpcAccessPointResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateVpcAccessPointWithResponse(ctx context.Context, body CreateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcAccessPointResponse, error) {
-	rsp, err := c.CreateVpcAccessPoint(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpcAccessPointWithResponse(ctx context.Context, spaceId SpaceId, body CreateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcAccessPointResponse, error) {
+	rsp, err := c.CreateVpcAccessPoint(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25119,8 +26235,8 @@ func (c *ClientWithResponses) CreateVpcAccessPointWithResponse(ctx context.Conte
 }
 
 // DeleteVpcAccessPointWithResponse request returning *DeleteVpcAccessPointResponse
-func (c *ClientWithResponses) DeleteVpcAccessPointWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpcAccessPointResponse, error) {
-	rsp, err := c.DeleteVpcAccessPoint(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteVpcAccessPointWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVpcAccessPointResponse, error) {
+	rsp, err := c.DeleteVpcAccessPoint(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25128,8 +26244,8 @@ func (c *ClientWithResponses) DeleteVpcAccessPointWithResponse(ctx context.Conte
 }
 
 // ReadVpcAccessPointsByIdWithResponse request returning *ReadVpcAccessPointsByIdResponse
-func (c *ClientWithResponses) ReadVpcAccessPointsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVpcAccessPointsByIdResponse, error) {
-	rsp, err := c.ReadVpcAccessPointsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadVpcAccessPointsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVpcAccessPointsByIdResponse, error) {
+	rsp, err := c.ReadVpcAccessPointsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25137,16 +26253,16 @@ func (c *ClientWithResponses) ReadVpcAccessPointsByIdWithResponse(ctx context.Co
 }
 
 // UpdateVpcAccessPointWithBodyWithResponse request with arbitrary body returning *UpdateVpcAccessPointResponse
-func (c *ClientWithResponses) UpdateVpcAccessPointWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpcAccessPointResponse, error) {
-	rsp, err := c.UpdateVpcAccessPointWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVpcAccessPointWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpcAccessPointResponse, error) {
+	rsp, err := c.UpdateVpcAccessPointWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateVpcAccessPointResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateVpcAccessPointWithResponse(ctx context.Context, id string, body UpdateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpcAccessPointResponse, error) {
-	rsp, err := c.UpdateVpcAccessPoint(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVpcAccessPointWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcAccessPointJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpcAccessPointResponse, error) {
+	rsp, err := c.UpdateVpcAccessPoint(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25154,8 +26270,8 @@ func (c *ClientWithResponses) UpdateVpcAccessPointWithResponse(ctx context.Conte
 }
 
 // ReadVpcPeeringsWithResponse request returning *ReadVpcPeeringsResponse
-func (c *ClientWithResponses) ReadVpcPeeringsWithResponse(ctx context.Context, params *ReadVpcPeeringsParams, reqEditors ...RequestEditorFn) (*ReadVpcPeeringsResponse, error) {
-	rsp, err := c.ReadVpcPeerings(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadVpcPeeringsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVpcPeeringsParams, reqEditors ...RequestEditorFn) (*ReadVpcPeeringsResponse, error) {
+	rsp, err := c.ReadVpcPeerings(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25163,16 +26279,16 @@ func (c *ClientWithResponses) ReadVpcPeeringsWithResponse(ctx context.Context, p
 }
 
 // CreateVpcPeeringWithBodyWithResponse request with arbitrary body returning *CreateVpcPeeringResponse
-func (c *ClientWithResponses) CreateVpcPeeringWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcPeeringResponse, error) {
-	rsp, err := c.CreateVpcPeeringWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpcPeeringWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcPeeringResponse, error) {
+	rsp, err := c.CreateVpcPeeringWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateVpcPeeringResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateVpcPeeringWithResponse(ctx context.Context, body CreateVpcPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcPeeringResponse, error) {
-	rsp, err := c.CreateVpcPeering(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpcPeeringWithResponse(ctx context.Context, spaceId SpaceId, body CreateVpcPeeringJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcPeeringResponse, error) {
+	rsp, err := c.CreateVpcPeering(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25180,8 +26296,8 @@ func (c *ClientWithResponses) CreateVpcPeeringWithResponse(ctx context.Context, 
 }
 
 // DeleteVpcPeeringWithResponse request returning *DeleteVpcPeeringResponse
-func (c *ClientWithResponses) DeleteVpcPeeringWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpcPeeringResponse, error) {
-	rsp, err := c.DeleteVpcPeering(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteVpcPeeringWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVpcPeeringResponse, error) {
+	rsp, err := c.DeleteVpcPeering(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25189,8 +26305,8 @@ func (c *ClientWithResponses) DeleteVpcPeeringWithResponse(ctx context.Context, 
 }
 
 // ReadVpcPeeringsByIdWithResponse request returning *ReadVpcPeeringsByIdResponse
-func (c *ClientWithResponses) ReadVpcPeeringsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVpcPeeringsByIdResponse, error) {
-	rsp, err := c.ReadVpcPeeringsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadVpcPeeringsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVpcPeeringsByIdResponse, error) {
+	rsp, err := c.ReadVpcPeeringsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25198,8 +26314,8 @@ func (c *ClientWithResponses) ReadVpcPeeringsByIdWithResponse(ctx context.Contex
 }
 
 // AcceptVpcPeeringWithResponse request returning *AcceptVpcPeeringResponse
-func (c *ClientWithResponses) AcceptVpcPeeringWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*AcceptVpcPeeringResponse, error) {
-	rsp, err := c.AcceptVpcPeering(ctx, id, reqEditors...)
+func (c *ClientWithResponses) AcceptVpcPeeringWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*AcceptVpcPeeringResponse, error) {
+	rsp, err := c.AcceptVpcPeering(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25207,8 +26323,8 @@ func (c *ClientWithResponses) AcceptVpcPeeringWithResponse(ctx context.Context, 
 }
 
 // RejectVpcPeeringWithResponse request returning *RejectVpcPeeringResponse
-func (c *ClientWithResponses) RejectVpcPeeringWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*RejectVpcPeeringResponse, error) {
-	rsp, err := c.RejectVpcPeering(ctx, id, reqEditors...)
+func (c *ClientWithResponses) RejectVpcPeeringWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*RejectVpcPeeringResponse, error) {
+	rsp, err := c.RejectVpcPeering(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25216,8 +26332,8 @@ func (c *ClientWithResponses) RejectVpcPeeringWithResponse(ctx context.Context, 
 }
 
 // ReadVpcsWithResponse request returning *ReadVpcsResponse
-func (c *ClientWithResponses) ReadVpcsWithResponse(ctx context.Context, params *ReadVpcsParams, reqEditors ...RequestEditorFn) (*ReadVpcsResponse, error) {
-	rsp, err := c.ReadVpcs(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadVpcsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVpcsParams, reqEditors ...RequestEditorFn) (*ReadVpcsResponse, error) {
+	rsp, err := c.ReadVpcs(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25225,16 +26341,16 @@ func (c *ClientWithResponses) ReadVpcsWithResponse(ctx context.Context, params *
 }
 
 // CreateVpcWithBodyWithResponse request with arbitrary body returning *CreateVpcResponse
-func (c *ClientWithResponses) CreateVpcWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcResponse, error) {
-	rsp, err := c.CreateVpcWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpcWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpcResponse, error) {
+	rsp, err := c.CreateVpcWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateVpcResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateVpcWithResponse(ctx context.Context, body CreateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcResponse, error) {
-	rsp, err := c.CreateVpc(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpcWithResponse(ctx context.Context, spaceId SpaceId, body CreateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpcResponse, error) {
+	rsp, err := c.CreateVpc(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25242,8 +26358,8 @@ func (c *ClientWithResponses) CreateVpcWithResponse(ctx context.Context, body Cr
 }
 
 // DeleteVpcWithResponse request returning *DeleteVpcResponse
-func (c *ClientWithResponses) DeleteVpcWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpcResponse, error) {
-	rsp, err := c.DeleteVpc(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteVpcWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVpcResponse, error) {
+	rsp, err := c.DeleteVpc(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25251,8 +26367,8 @@ func (c *ClientWithResponses) DeleteVpcWithResponse(ctx context.Context, id stri
 }
 
 // ReadVpcsByIdWithResponse request returning *ReadVpcsByIdResponse
-func (c *ClientWithResponses) ReadVpcsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVpcsByIdResponse, error) {
-	rsp, err := c.ReadVpcsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadVpcsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVpcsByIdResponse, error) {
+	rsp, err := c.ReadVpcsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25260,16 +26376,16 @@ func (c *ClientWithResponses) ReadVpcsByIdWithResponse(ctx context.Context, id s
 }
 
 // UpdateVpcWithBodyWithResponse request with arbitrary body returning *UpdateVpcResponse
-func (c *ClientWithResponses) UpdateVpcWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error) {
-	rsp, err := c.UpdateVpcWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVpcWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error) {
+	rsp, err := c.UpdateVpcWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateVpcResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateVpcWithResponse(ctx context.Context, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error) {
-	rsp, err := c.UpdateVpc(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVpcWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVpcJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpcResponse, error) {
+	rsp, err := c.UpdateVpc(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25277,8 +26393,8 @@ func (c *ClientWithResponses) UpdateVpcWithResponse(ctx context.Context, id stri
 }
 
 // ReadVpnConnectionsWithResponse request returning *ReadVpnConnectionsResponse
-func (c *ClientWithResponses) ReadVpnConnectionsWithResponse(ctx context.Context, params *ReadVpnConnectionsParams, reqEditors ...RequestEditorFn) (*ReadVpnConnectionsResponse, error) {
-	rsp, err := c.ReadVpnConnections(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ReadVpnConnectionsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVpnConnectionsParams, reqEditors ...RequestEditorFn) (*ReadVpnConnectionsResponse, error) {
+	rsp, err := c.ReadVpnConnections(ctx, spaceId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25286,16 +26402,16 @@ func (c *ClientWithResponses) ReadVpnConnectionsWithResponse(ctx context.Context
 }
 
 // CreateVpnConnectionWithBodyWithResponse request with arbitrary body returning *CreateVpnConnectionResponse
-func (c *ClientWithResponses) CreateVpnConnectionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpnConnectionResponse, error) {
-	rsp, err := c.CreateVpnConnectionWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpnConnectionWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpnConnectionResponse, error) {
+	rsp, err := c.CreateVpnConnectionWithBody(ctx, spaceId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateVpnConnectionResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateVpnConnectionWithResponse(ctx context.Context, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpnConnectionResponse, error) {
-	rsp, err := c.CreateVpnConnection(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpnConnectionWithResponse(ctx context.Context, spaceId SpaceId, body CreateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpnConnectionResponse, error) {
+	rsp, err := c.CreateVpnConnection(ctx, spaceId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25303,8 +26419,8 @@ func (c *ClientWithResponses) CreateVpnConnectionWithResponse(ctx context.Contex
 }
 
 // DeleteVpnConnectionWithResponse request returning *DeleteVpnConnectionResponse
-func (c *ClientWithResponses) DeleteVpnConnectionWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error) {
-	rsp, err := c.DeleteVpnConnection(ctx, id, reqEditors...)
+func (c *ClientWithResponses) DeleteVpnConnectionWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionResponse, error) {
+	rsp, err := c.DeleteVpnConnection(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25312,8 +26428,8 @@ func (c *ClientWithResponses) DeleteVpnConnectionWithResponse(ctx context.Contex
 }
 
 // ReadVpnConnectionsByIdWithResponse request returning *ReadVpnConnectionsByIdResponse
-func (c *ClientWithResponses) ReadVpnConnectionsByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*ReadVpnConnectionsByIdResponse, error) {
-	rsp, err := c.ReadVpnConnectionsById(ctx, id, reqEditors...)
+func (c *ClientWithResponses) ReadVpnConnectionsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVpnConnectionsByIdResponse, error) {
+	rsp, err := c.ReadVpnConnectionsById(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25321,16 +26437,16 @@ func (c *ClientWithResponses) ReadVpnConnectionsByIdWithResponse(ctx context.Con
 }
 
 // UpdateVpnConnectionWithBodyWithResponse request with arbitrary body returning *UpdateVpnConnectionResponse
-func (c *ClientWithResponses) UpdateVpnConnectionWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpnConnectionResponse, error) {
-	rsp, err := c.UpdateVpnConnectionWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVpnConnectionWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVpnConnectionResponse, error) {
+	rsp, err := c.UpdateVpnConnectionWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseUpdateVpnConnectionResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateVpnConnectionWithResponse(ctx context.Context, id string, body UpdateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpnConnectionResponse, error) {
-	rsp, err := c.UpdateVpnConnection(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateVpnConnectionWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateVpnConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVpnConnectionResponse, error) {
+	rsp, err := c.UpdateVpnConnection(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25338,16 +26454,16 @@ func (c *ClientWithResponses) UpdateVpnConnectionWithResponse(ctx context.Contex
 }
 
 // DeleteVpnConnectionRouteWithBodyWithResponse request with arbitrary body returning *DeleteVpnConnectionRouteResponse
-func (c *ClientWithResponses) DeleteVpnConnectionRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionRouteResponse, error) {
-	rsp, err := c.DeleteVpnConnectionRouteWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) DeleteVpnConnectionRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionRouteResponse, error) {
+	rsp, err := c.DeleteVpnConnectionRouteWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseDeleteVpnConnectionRouteResponse(rsp)
 }
 
-func (c *ClientWithResponses) DeleteVpnConnectionRouteWithResponse(ctx context.Context, id string, body DeleteVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionRouteResponse, error) {
-	rsp, err := c.DeleteVpnConnectionRoute(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) DeleteVpnConnectionRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body DeleteVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteVpnConnectionRouteResponse, error) {
+	rsp, err := c.DeleteVpnConnectionRoute(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -25355,16 +26471,16 @@ func (c *ClientWithResponses) DeleteVpnConnectionRouteWithResponse(ctx context.C
 }
 
 // CreateVpnConnectionRouteWithBodyWithResponse request with arbitrary body returning *CreateVpnConnectionRouteResponse
-func (c *ClientWithResponses) CreateVpnConnectionRouteWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpnConnectionRouteResponse, error) {
-	rsp, err := c.CreateVpnConnectionRouteWithBody(ctx, id, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpnConnectionRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateVpnConnectionRouteResponse, error) {
+	rsp, err := c.CreateVpnConnectionRouteWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateVpnConnectionRouteResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateVpnConnectionRouteWithResponse(ctx context.Context, id string, body CreateVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpnConnectionRouteResponse, error) {
-	rsp, err := c.CreateVpnConnectionRoute(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) CreateVpnConnectionRouteWithResponse(ctx context.Context, spaceId SpaceId, id string, body CreateVpnConnectionRouteJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateVpnConnectionRouteResponse, error) {
+	rsp, err := c.CreateVpnConnectionRoute(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

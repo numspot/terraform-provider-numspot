@@ -64,7 +64,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 
 	res := utils.ExecuteRequest(func() (*api.CreateImageResponse, error) {
 		body := ImageFromTfToCreateRequest(&data)
-		return r.client.CreateImageWithResponse(ctx, body)
+		return r.client.CreateImageWithResponse(ctx, spaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -79,7 +79,7 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadImagesByIdResponse, error) {
-		return r.client.ReadImagesByIdWithResponse(ctx, data.Id.ValueString())
+		return r.client.ReadImagesByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
 	tf := ImageFromHttpToTf(res.JSON200)
@@ -96,6 +96,6 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteImageResponse, error) {
-		return r.client.DeleteImageWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteImageWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

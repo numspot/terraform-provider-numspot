@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
+	"github.com/google/uuid"
 	"net/http"
 	"os"
 
@@ -28,6 +29,7 @@ type Key string
 var (
 	clientIdKey     = Key("client_id")
 	clientSecretKey = Key("client_secret")
+	spaceID         = uuid.New()
 )
 
 var (

@@ -61,7 +61,7 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 
 	res := utils.ExecuteRequest(func() (*api.CreateDhcpOptionsResponse, error) {
 		body := DhcpOptionsFromTfToCreateRequest(ctx, data)
-		return r.client.CreateDhcpOptionsWithResponse(ctx, body)
+		return r.client.CreateDhcpOptionsWithResponse(ctx, spaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -81,7 +81,7 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadDhcpOptionsByIdResponse, error) {
-		return r.client.ReadDhcpOptionsByIdWithResponse(ctx, data.Id.ValueString())
+		return r.client.ReadDhcpOptionsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -105,7 +105,7 @@ func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.Delet
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteDhcpOptionsResponse, error) {
-		return r.client.DeleteDhcpOptionsWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteDhcpOptionsWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

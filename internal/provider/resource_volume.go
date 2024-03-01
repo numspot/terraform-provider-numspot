@@ -64,7 +64,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 
 	res := utils.ExecuteRequest(func() (*api.CreateVolumeResponse, error) {
 		body := VolumeFromTfToCreateRequest(&data)
-		return r.client.CreateVolumeWithResponse(ctx, body)
+		return r.client.CreateVolumeWithResponse(ctx, spaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -83,7 +83,7 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
-		return r.client.ReadVolumesByIdWithResponse(ctx, data.Id.String())
+		return r.client.ReadVolumesByIdWithResponse(ctx, spaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 
 	tf, diags := VolumeFromHttpToTf(ctx, res.JSON200)
@@ -103,6 +103,6 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteVolumeResponse, error) {
-		return r.client.DeleteVolumeWithResponse(ctx, data.Id.String())
+		return r.client.DeleteVolumeWithResponse(ctx, spaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

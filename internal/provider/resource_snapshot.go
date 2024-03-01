@@ -64,7 +64,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 
 	res := utils.ExecuteRequest(func() (*api.CreateSnapshotResponse, error) {
 		body := SnapshotFromTfToCreateRequest(&data)
-		return r.client.CreateSnapshotWithResponse(ctx, body)
+		return r.client.CreateSnapshotWithResponse(ctx, spaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -79,7 +79,7 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadSnapshotsByIdResponse, error) {
-		return r.client.ReadSnapshotsByIdWithResponse(ctx, data.Id.String())
+		return r.client.ReadSnapshotsByIdWithResponse(ctx, spaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -98,6 +98,6 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSnapshotResponse, error) {
-		return r.client.DeleteSnapshotWithResponse(ctx, data.Id.String())
+		return r.client.DeleteSnapshotWithResponse(ctx, spaceID, data.Id.String())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

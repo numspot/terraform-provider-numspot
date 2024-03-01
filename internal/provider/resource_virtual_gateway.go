@@ -61,7 +61,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 
 	res := utils.ExecuteRequest(func() (*api.CreateVirtualGatewayResponse, error) {
 		body := VirtualGatewayFromTfToCreateRequest(data)
-		return r.client.CreateVirtualGatewayWithResponse(ctx, body)
+		return r.client.CreateVirtualGatewayWithResponse(ctx, spaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -80,7 +80,7 @@ func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.Read
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVirtualGatewaysByIdResponse, error) {
-		return r.client.ReadVirtualGatewaysByIdWithResponse(ctx, data.Id.ValueString())
+		return r.client.ReadVirtualGatewaysByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -103,7 +103,7 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVirtualGatewayResponse, error) {
-		return r.client.DeleteVirtualGatewayWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteVirtualGatewayWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

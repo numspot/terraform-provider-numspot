@@ -61,7 +61,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 
 	body := LoadBalancerFromTfToCreateRequest(ctx, &data)
 	res := utils.ExecuteRequest(func() (*api.CreateLoadBalancerResponse, error) {
-		return r.client.CreateLoadBalancerWithResponse(ctx, body)
+		return r.client.CreateLoadBalancerWithResponse(ctx, spaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -76,7 +76,7 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadLoadBalancersByIdResponse, error) {
-		return r.client.ReadLoadBalancersByIdWithResponse(ctx, data.Id.ValueString())
+		return r.client.ReadLoadBalancersByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -104,7 +104,7 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 	payload := LoadBalancerFromTfToUpdateRequest(ctx, &plan)
 
 	res := utils.ExecuteRequest(func() (*api.UpdateLoadBalancerResponse, error) {
-		return r.client.UpdateLoadBalancerWithResponse(ctx, plan.Name.ValueString(), payload)
+		return r.client.UpdateLoadBalancerWithResponse(ctx, spaceID, plan.Name.ValueString(), payload)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -127,14 +127,14 @@ func (r *LoadBalancerResource) LinkBackendMachines(ctx context.Context, request 
 	}
 
 	res := utils.ExecuteRequest(func() (*api.LinkLoadBalancerBackendMachinesResponse, error) {
-		return r.client.LinkLoadBalancerBackendMachinesWithResponse(ctx, plan.Name.ValueString(), payload)
+		return r.client.LinkLoadBalancerBackendMachinesWithResponse(ctx, spaceID, plan.Name.ValueString(), payload)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
 	resRead := utils.ExecuteRequest(func() (*api.ReadLoadBalancersByIdResponse, error) {
-		return r.client.ReadLoadBalancersByIdWithResponse(ctx, state.Id.ValueString())
+		return r.client.ReadLoadBalancersByIdWithResponse(ctx, spaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if resRead == nil {
 		return
@@ -148,7 +148,7 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteLoadBalancerResponse, error) {
-		return r.client.DeleteLoadBalancerWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteLoadBalancerWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

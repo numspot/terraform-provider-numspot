@@ -64,7 +64,7 @@ func (r *ListenerRuleResource) Create(ctx context.Context, request resource.Crea
 
 	res := utils.ExecuteRequest(func() (*api.CreateListenerRuleResponse, error) {
 		body := ListenerRuleFromTfToCreateRequest(&data)
-		return r.client.CreateListenerRuleWithResponse(ctx, body)
+		return r.client.CreateListenerRuleWithResponse(ctx, spaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 
 	tf := ListenerRuleFromHttpToTf(res.JSON201)
@@ -76,7 +76,7 @@ func (r *ListenerRuleResource) Read(ctx context.Context, request resource.ReadRe
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadListenerRulesByIdResponse, error) {
-		return r.client.ReadListenerRulesByIdWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()))
+		return r.client.ReadListenerRulesByIdWithResponse(ctx, spaceID, fmt.Sprint(data.Id.ValueInt64()))
 	}, http.StatusOK, &response.Diagnostics)
 
 	tf := ListenerRuleFromHttpToTf(res.JSON200)
@@ -92,6 +92,6 @@ func (r *ListenerRuleResource) Delete(ctx context.Context, request resource.Dele
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteListenerRuleResponse, error) {
-		return r.client.DeleteListenerRuleWithResponse(ctx, fmt.Sprint(data.Id.ValueInt64()))
+		return r.client.DeleteListenerRuleWithResponse(ctx, spaceID, fmt.Sprint(data.Id.ValueInt64()))
 	}, http.StatusOK, &response.Diagnostics)
 }

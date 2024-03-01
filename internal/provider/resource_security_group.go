@@ -65,7 +65,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 	res := utils.ExecuteRequest(func() (*api.CreateSecurityGroupResponse, error) {
 		body := SecurityGroupFromTfToCreateRequest(&data)
-		return r.client.CreateSecurityGroupWithResponse(ctx, body)
+		return r.client.CreateSecurityGroupWithResponse(ctx, spaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -80,7 +80,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 		createdIbdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateInboundRulesRequest(ctx, *createdId, inboundRules)
-			return r.client.CreateSecurityGroupRuleWithResponse(ctx, *createdId, body)
+			return r.client.CreateSecurityGroupRuleWithResponse(ctx, spaceID, *createdId, body)
 		}, http.StatusCreated, &response.Diagnostics)
 		if createdIbdRules == nil {
 			return
@@ -108,7 +108,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 				Flow:  "Outbound",
 				Rules: &rules,
 			}
-			return r.client.DeleteSecurityGroupRuleWithResponse(ctx, *createdId, body)
+			return r.client.DeleteSecurityGroupRuleWithResponse(ctx, spaceID, *createdId, body)
 		}, http.StatusNoContent, &response.Diagnostics)
 
 		// Create SG rules:
@@ -117,7 +117,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 		createdObdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateOutboundRulesRequest(ctx, *createdId, outboundRules)
-			return r.client.CreateSecurityGroupRuleWithResponse(ctx, *createdId, body)
+			return r.client.CreateSecurityGroupRuleWithResponse(ctx, spaceID, *createdId, body)
 		}, http.StatusCreated, &response.Diagnostics)
 		if createdObdRules == nil {
 			return
@@ -161,7 +161,7 @@ func (r *SecurityGroupResource) readSecurityGroup(
 	id string,
 	diagnostics diag.Diagnostics,
 ) *api.ReadSecurityGroupsByIdResponse {
-	res, err := r.client.ReadSecurityGroupsByIdWithResponse(ctx, id)
+	res, err := r.client.ReadSecurityGroupsByIdWithResponse(ctx, spaceID, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -185,6 +185,6 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSecurityGroupResponse, error) {
-		return r.client.DeleteSecurityGroupWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteSecurityGroupWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

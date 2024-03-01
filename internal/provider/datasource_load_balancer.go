@@ -315,7 +315,7 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 		params.LoadBalancerNames = &lbNames
 	}
 	res := utils.ExecuteRequest(func() (*api.ReadLoadBalancersResponse, error) {
-		return d.client.ReadLoadBalancersWithResponse(ctx, &params)
+		return d.client.ReadLoadBalancersWithResponse(ctx, spaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

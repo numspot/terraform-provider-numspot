@@ -66,7 +66,7 @@ func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest
 
 	res := utils.ExecuteRequest(func() (*api.CreateVpcResponse, error) {
 		body := NetFromTfToCreateRequest(&data)
-		return r.client.CreateVpcWithResponse(ctx, body)
+		return r.client.CreateVpcWithResponse(ctx, spaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -78,7 +78,7 @@ func (r *NetResource) Create(ctx context.Context, request resource.CreateRequest
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
 			readRes := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
-				return r.client.ReadVpcsByIdWithResponse(ctx, createdId)
+				return r.client.ReadVpcsByIdWithResponse(ctx, spaceID, createdId)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
 				return
@@ -105,7 +105,7 @@ func (r *NetResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
-		return r.client.ReadVpcsByIdWithResponse(ctx, data.Id.ValueString())
+		return r.client.ReadVpcsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -124,7 +124,7 @@ func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVpcResponse, error) {
-		return r.client.DeleteVpcWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteVpcWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
@@ -135,7 +135,7 @@ func (r *NetResource) Delete(ctx context.Context, request resource.DeleteRequest
 		Target:  []string{"deleted"},
 		Refresh: func() (result interface{}, state string, err error) {
 			// Do not use utils.ExecuteRequest to access error response to know if it's a 404 Not Found expected response
-			readNetRes, err := r.client.ReadVpcsByIdWithResponse(ctx, data.Id.ValueString())
+			readNetRes, err := r.client.ReadVpcsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 			if err != nil {
 				response.Diagnostics.AddError("Failed to read Net on delete", err.Error())
 				return

@@ -297,7 +297,7 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 	state.ID = types.StringValue("placeholder")
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpnConnectionsResponse, error) {
-		return d.client.ReadVpnConnectionsWithResponse(ctx, &api.ReadVpnConnectionsParams{})
+		return d.client.ReadVpnConnectionsWithResponse(ctx, spaceID, &api.ReadVpnConnectionsParams{})
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -67,7 +67,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 
 	res := utils.ExecuteRequest(func() (*api.CreateFlexibleGpuResponse, error) {
 		body := FlexibleGpuFromTfToCreateRequest(&data)
-		return r.client.CreateFlexibleGpuWithResponse(ctx, body)
+		return r.client.CreateFlexibleGpuWithResponse(ctx, spaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 
 	createStateConf := &retry.StateChangeConf{
@@ -96,7 +96,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 }
 
 func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *api.FlexibleGpu {
-	res, err := r.client.ReadFlexibleGpusByIdWithResponse(ctx, id)
+	res, err := r.client.ReadFlexibleGpusByIdWithResponse(ctx, spaceID, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -133,6 +133,6 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteFlexibleGpuResponse, error) {
-		return r.client.DeleteFlexibleGpuWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteFlexibleGpuWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

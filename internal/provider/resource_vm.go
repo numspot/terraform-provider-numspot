@@ -67,7 +67,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 
 	res := utils.ExecuteRequest(func() (*api.CreateVmsResponse, error) {
 		body := VmFromTfToCreateRequest(ctx, &data)
-		return r.client.CreateVmsWithResponse(ctx, body)
+		return r.client.CreateVmsWithResponse(ctx, spaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -110,7 +110,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 }
 
 func (r *VmResource) readVmById(ctx context.Context, id *string, diagnostics diag.Diagnostics) *api.Vm {
-	res, err := r.client.ReadVmsByIdWithResponse(ctx, *id)
+	res, err := r.client.ReadVmsByIdWithResponse(ctx, spaceID, *id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -131,7 +131,7 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 
 	res := utils.ExecuteRequest(func() (*api.ReadVmsByIdResponse, error) {
 		id := data.Id.ValueStringPointer()
-		return r.client.ReadVmsByIdWithResponse(ctx, *id)
+		return r.client.ReadVmsByIdWithResponse(ctx, spaceID, *id)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -157,7 +157,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	res := utils.ExecuteRequest(func() (*api.DeleteVmsResponse, error) {
 		idsSlice := make([]interface{}, 1)
 		idsSlice[0] = data.Id.ValueString()
-		return r.client.DeleteVmsWithResponse(ctx, idsSlice)
+		return r.client.DeleteVmsWithResponse(ctx, spaceID, idsSlice)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

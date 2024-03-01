@@ -61,7 +61,7 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 
 	res := utils.ExecuteRequest(func() (*api.CreateNatGatewayResponse, error) {
 		body := NatGatewayFromTfToCreateRequest(data)
-		return r.client.CreateNatGatewayWithResponse(ctx, body)
+		return r.client.CreateNatGatewayWithResponse(ctx, spaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -80,7 +80,7 @@ func (r *NatGatewayResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadNatGatewayByIdResponse, error) {
-		return r.client.ReadNatGatewayByIdWithResponse(ctx, data.Id.ValueString())
+		return r.client.ReadNatGatewayByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -104,7 +104,7 @@ func (r *NatGatewayResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteNatGatewayResponse, error) {
-		return r.client.DeleteNatGatewayWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteNatGatewayWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

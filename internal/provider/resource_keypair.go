@@ -64,7 +64,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 
 	res := utils.ExecuteRequest(func() (*api.CreateKeypairResponse, error) {
 		body := KeyPairFromTfToCreateRequest(&data)
-		return r.client.CreateKeypairWithResponse(ctx, body)
+		return r.client.CreateKeypairWithResponse(ctx, spaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -86,7 +86,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadKeypairsByIdResponse, error) {
-		return r.client.ReadKeypairsByIdWithResponse(ctx, data.Id.ValueString()) // Use faker to inject token_200 status code
+		return r.client.ReadKeypairsByIdWithResponse(ctx, spaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -116,6 +116,6 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteKeypairResponse, error) {
-		return r.client.DeleteKeypairWithResponse(ctx, data.Id.ValueString()) // Use faker to inject token_200 status code
+		return r.client.DeleteKeypairWithResponse(ctx, spaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 }

@@ -64,7 +64,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 
 	res := utils.ExecuteRequest(func() (*api.CreateClientGatewayResponse, error) {
 		body := ClientGatewayFromTfToCreateRequest(&data)
-		return r.client.CreateClientGatewayWithResponse(ctx, body)
+		return r.client.CreateClientGatewayWithResponse(ctx, spaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -79,7 +79,7 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadClientGatewaysByIdResponse, error) {
-		return r.client.ReadClientGatewaysByIdWithResponse(ctx, data.Id.ValueString())
+		return r.client.ReadClientGatewaysByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -99,7 +99,7 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteClientGatewayResponse, error) {
-		return r.client.DeleteClientGatewayWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteClientGatewayWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

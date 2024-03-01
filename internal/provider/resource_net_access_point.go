@@ -64,7 +64,7 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 
 	res := utils.ExecuteRequest(func() (*api.CreateVpcAccessPointResponse, error) {
 		body := NetAccessPointFromTfToCreateRequest(ctx, &data)
-		return r.client.CreateVpcAccessPointWithResponse(ctx, body)
+		return r.client.CreateVpcAccessPointWithResponse(ctx, spaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -83,7 +83,7 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpcAccessPointsByIdResponse, error) {
-		return r.client.ReadVpcAccessPointsByIdWithResponse(ctx, data.Id.String())
+		return r.client.ReadVpcAccessPointsByIdWithResponse(ctx, spaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -106,6 +106,6 @@ func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.De
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteVpcAccessPointResponse, error) {
-		return r.client.DeleteVpcAccessPointWithResponse(ctx, data.Id.String())
+		return r.client.DeleteVpcAccessPointWithResponse(ctx, spaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

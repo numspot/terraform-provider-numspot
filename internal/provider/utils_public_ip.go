@@ -57,7 +57,7 @@ func invokeLinkPublicIP(ctx context.Context, client *api.ClientWithResponses, da
 			PrivateIp: data.PrivateIp.ValueStringPointer(),
 		}
 	}
-	res, err := client.LinkPublicIpWithResponse(ctx, data.Id.ValueString(), payload)
+	res, err := client.LinkPublicIpWithResponse(ctx, spaceID, data.Id.ValueString(), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func invokeLinkPublicIP(ctx context.Context, client *api.ClientWithResponses, da
 
 func invokeUnlinkPublicIP(ctx context.Context, client *api.ClientWithResponses, data *resource_public_ip.PublicIpModel) error {
 	payload := api.UnlinkPublicIpJSONRequestBody{}
-	res, err := client.UnlinkPublicIpWithResponse(ctx, data.LinkPublicIP.ValueString(), payload)
+	res, err := client.UnlinkPublicIpWithResponse(ctx, spaceID, data.LinkPublicIP.ValueString(), payload)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func invokeUnlinkPublicIP(ctx context.Context, client *api.ClientWithResponses, 
 
 func refreshState(ctx context.Context, client *api.ClientWithResponses, data *resource_public_ip.PublicIpModel) (*resource_public_ip.PublicIpModel, error) {
 	// Refresh state
-	res, err := client.ReadPublicIpsByIdWithResponse(ctx, data.Id.ValueString())
+	res, err := client.ReadPublicIpsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	if err != nil {
 		return nil, err
 	}

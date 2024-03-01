@@ -73,7 +73,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 
 	res := utils.ExecuteRequest(func() (*api.CreateRouteTableResponse, error) {
 		body := RouteTableFromTfToCreateRequest(&data)
-		return r.client.CreateRouteTableWithResponse(ctx, body)
+		return r.client.CreateRouteTableWithResponse(ctx, spaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -91,7 +91,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	for i := range routes {
 		route := &routes[i]
 		createdRoute := utils.ExecuteRequest(func() (*api.CreateRouteResponse, error) {
-			return r.client.CreateRouteWithResponse(ctx, *createdId, api.CreateRouteJSONRequestBody{
+			return r.client.CreateRouteWithResponse(ctx, spaceID, *createdId, api.CreateRouteJSONRequestBody{
 				DestinationIpRange: route.DestinationIpRange.ValueString(),
 				GatewayId:          route.GatewayId.ValueStringPointer(),
 				NatGatewayId:       route.NatServiceId.ValueStringPointer(),
@@ -107,7 +107,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 
 	if !data.SubnetId.IsNull() {
 		linkRes := utils.ExecuteRequest(func() (*api.LinkRouteTableResponse, error) {
-			return r.client.LinkRouteTableWithResponse(ctx, *createdId, api.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
+			return r.client.LinkRouteTableWithResponse(ctx, spaceID, *createdId, api.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
 		}, http.StatusOK, &response.Diagnostics)
 		if linkRes == nil {
 			return
@@ -165,7 +165,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 		}
 	} else {
 		// Retrieve Default Destination IP Range
-		readNetRes, err := r.client.ReadVpcsByIdWithResponse(ctx, *res.JSON200.VpcId)
+		readNetRes, err := r.client.ReadVpcsByIdWithResponse(ctx, spaceID, *res.JSON200.VpcId)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to read associated Net", err.Error())
 			return
@@ -207,7 +207,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 }
 
 func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag diag.Diagnostics) *api.ReadRouteTablesByIdResponse {
-	res, err := r.client.ReadRouteTablesByIdWithResponse(ctx, id)
+	res, err := r.client.ReadRouteTablesByIdWithResponse(ctx, spaceID, id)
 	if err != nil {
 		diag.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -242,6 +242,7 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 		unlinkRes := utils.ExecuteRequest(func() (*api.UnlinkRouteTableResponse, error) {
 			return r.client.UnlinkRouteTableWithResponse(
 				ctx,
+				spaceID,
 				data.Id.ValueString(),
 				api.UnlinkRouteTableJSONRequestBody{
 					LinkRouteTableId: link.Id.ValueString(),
@@ -254,6 +255,6 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 	}
 
 	utils.ExecuteRequest(func() (*api.DeleteRouteTableResponse, error) {
-		return r.client.DeleteRouteTableWithResponse(ctx, data.Id.ValueString())
+		return r.client.DeleteRouteTableWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

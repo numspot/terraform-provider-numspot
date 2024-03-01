@@ -64,7 +64,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.CreateInternetGatewayResponse, error) {
-		return r.client.CreateInternetGatewayWithResponse(ctx)
+		return r.client.CreateInternetGatewayWithResponse(ctx, spaceID)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil || res.JSON201 == nil {
 		return
@@ -80,6 +80,7 @@ func (r *InternetServiceResource) Create(ctx context.Context, request resource.C
 		linRes := utils.ExecuteRequest(func() (*api.LinkInternetGatewayResponse, error) {
 			return r.client.LinkInternetGatewayWithResponse(
 				ctx,
+				spaceID,
 				createdId,
 				api.LinkInternetGatewayJSONRequestBody{
 					VpcId: data.NetId.ValueString(),
@@ -102,7 +103,7 @@ func (r *InternetServiceResource) Read(ctx context.Context, request resource.Rea
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadInternetGatewaysByIdResponse, error) {
-		return r.client.ReadInternetGatewaysByIdWithResponse(ctx, data.Id.ValueString())
+		return r.client.ReadInternetGatewaysByIdWithResponse(ctx, spaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -124,6 +125,7 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 		res := utils.ExecuteRequest(func() (*api.UnlinkInternetGatewayResponse, error) {
 			return r.client.UnlinkInternetGatewayWithResponse(
 				ctx,
+				spaceID,
 				data.Id.ValueString(),
 				api.UnlinkInternetGatewayJSONRequestBody{
 					VpcId: data.NetId.ValueString(),
@@ -134,7 +136,7 @@ func (r *InternetServiceResource) Delete(ctx context.Context, request resource.D
 		}
 	}
 
-	res, err := r.client.DeleteInternetGatewayWithResponse(ctx, data.Id.ValueString())
+	res, err := r.client.DeleteInternetGatewayWithResponse(ctx, spaceID, data.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete InternetService", err.Error())
 		return

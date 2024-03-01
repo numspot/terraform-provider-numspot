@@ -20,8 +20,8 @@ func SnapshotFromHttpToTf(http *api.Snapshot) resource_snapshot.SnapshotModel {
 	}
 
 	return resource_snapshot.SnapshotModel{
-		AccountAlias: types.StringPointerValue(http.AccountAlias),
-		AccountId:    types.StringPointerValue(http.AccountId),
+		//AccountAlias: types.StringPointerValue(http.AccountAlias),
+		//AccountId:    types.StringPointerValue(http.AccountId),
 		CreationDate: types.StringPointerValue(creationDateStr),
 		Description:  types.StringPointerValue(http.Description),
 		Id:           types.StringPointerValue(http.Id),
