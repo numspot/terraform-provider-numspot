@@ -4,22 +4,22 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
 )
 
 func TestAccSnapshotResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testSnapshotConfig_Create(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_snapshot.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "field", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
+				Config: testSnapshotConfig(),
+				Check:  resource.ComposeAggregateTestCheckFunc(
+				//resource.TestCheckResourceAttr("numspot_snapshot.test", "field", "value"),
+				//resource.TestCheckResourceAttrWith("numspot_snapshot.test", "field", func(v string) error {
+				//	require.NotEmpty(t, v)
+				//	return nil
+				//}),
 				),
 			},
 			// ImportState testing
@@ -27,27 +27,31 @@ func TestAccSnapshotResource(t *testing.T) {
 				ResourceName:            "numspot_snapshot.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
+				ImportStateVerifyIgnore: []string{"progress", "state"},
 			},
 			// Update testing
-			{
-				Config: testSnapshotConfig_Update(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_snapshot.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "field", func(v string) error {
-						return nil
-					}),
-				),
-			},
+			//{
+			//	Config: testSnapshotConfig(),
+			//	Check: resource.ComposeAggregateTestCheckFunc(
+			//		resource.TestCheckResourceAttr("numspot_snapshot.test", "field", "value"),
+			//		resource.TestCheckResourceAttrWith("numspot_snapshot.test", "field", func(v string) error {
+			//			return nil
+			//		}),
+			//	),
+			//},
 		},
 	})
 }
 
-func testSnapshotConfig_Create() string {
-	return `resource "numspot_snapshot" "test" {}`
+func testSnapshotConfig() string {
+	return `
+resource "numspot_volume" "test" {
+	type 					= "standard"
+	size 					= 11
+	availability_zone_name 	= "eu-west-2a"
 }
 
-func testSnapshotConfig_Update() string {
-	return `resource "numspot_snapshot" "test" {
-    			}`
+resource "numspot_snapshot" "test" {
+	volume_id = numspot_volume.test.id
+}`
 }

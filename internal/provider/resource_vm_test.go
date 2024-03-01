@@ -183,7 +183,7 @@ func TestAccVmResource_NetSubnetSGRouteTable(t *testing.T) {
 
 func testVmConfig_NetSubnetSGRouteTable(imageId, vmType string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "net" {
   ip_range = "10.101.0.0/16"
 }
 

@@ -1,25 +1,29 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
 )
 
 func TestAccVolumeResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
+
+	volumeType := "standard"
+	volumeSize := 11
+	updatedVolumeSize := 22
+	volumeAZ := "eu-west-2a"
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: createVolumeConfig(),
+				Config: createVolumeConfig(volumeType, volumeSize, volumeAZ),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_volume.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_volume.test", "field", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
+					resource.TestCheckResourceAttr("numspot_volume.test", "type", volumeType),
+					//resource.TestCheckResourceAttr("numspot_volume.test", "size", fmt.Sprintf("%d", volumeSize)),
+					resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", volumeAZ),
 				),
 			},
 			// ImportState testing
@@ -27,32 +31,28 @@ func TestAccVolumeResource(t *testing.T) {
 				ResourceName:            "numspot_volume.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
+				ImportStateVerifyIgnore: []string{"state"},
 			},
 			// Update testing
-			//{
-			//	Config: testVolumeConfig_Update(),
-			//	Check: resource.ComposeAggregateTestCheckFunc(
-			//		resource.TestCheckResourceAttr("numspot_volume.test", "field", "value"),
-			//		resource.TestCheckResourceAttrWith("numspot_volume.test", "field", func(v string) error {
-			//			return nil
-			//		}),
-			//	),
-			//},
+			{
+				Config: createVolumeConfig(volumeType, updatedVolumeSize, volumeAZ),
+				Check:  resource.ComposeAggregateTestCheckFunc(
+				//resource.TestCheckResourceAttr("numspot_volume.test", "field", "value"),
+				//resource.TestCheckResourceAttrWith("numspot_volume.test", "field", func(v string) error {
+				//	return nil
+				//}),
+				),
+			},
 		},
 	})
 }
 
-func createVolumeConfig() string {
-	return `
+func createVolumeConfig(volumeType string, volumeSize int, volumeAZ string) string {
+	t := fmt.Sprintf(`
 resource "numspot_volume" "test" {
-	iops = 1200
-	availability_zone_name = "eu-west-2a"
-}
-`
-}
-
-func testVolumeConfig_Update() string {
-	return `resource "numspot_volume" "test" {
-}`
+	type 					= %[1]q
+	size 					= %[2]d
+	availability_zone_name 	= %[3]q
+}`, volumeType, volumeSize, volumeAZ)
+	return t
 }

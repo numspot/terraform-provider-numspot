@@ -353,7 +353,7 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewDirectLinkInterfaceResource,
 		NewFlexibleGpuResource,
 		NewImageResource,
-		NewInternetServiceResource,
+		NewInternetGatewayResource,
 		NewListenerRuleResource,
 		NewLoadBalancerResource,
 		NewNatGatewayResource,
@@ -371,5 +371,6 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewKeyPairResource,
 		NewDhcpOptionsResource,
 		NewVirtualGatewayResource,
+		NewVpcPeeringResource,
 	}
 }

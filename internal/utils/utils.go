@@ -27,6 +27,10 @@ func FromIntToTfInt64(val int) types.Int64 {
 }
 
 func FromIntPtrToTfInt64(val *int) types.Int64 {
+	if val == nil {
+		return types.Int64Null()
+	}
+
 	return FromIntToTfInt64(*val)
 }
 

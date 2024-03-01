@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"net/http"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -71,6 +72,18 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	}
 
 	tf := SnapshotFromHttpToTf(res.JSON201)
+	if !data.SourceRegionName.IsUnknown() {
+		tf.SourceRegionName = data.SourceRegionName
+	} else {
+		tf.SourceRegionName = types.StringNull()
+	}
+
+	if !data.SourceSnapshotId.IsUnknown() {
+		tf.SourceSnapshotId = data.SourceSnapshotId
+	} else {
+		tf.SourceSnapshotId = types.StringNull()
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -86,6 +99,18 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	}
 
 	tf := SnapshotFromHttpToTf(res.JSON200)
+	if !data.SourceRegionName.IsUnknown() {
+		tf.SourceRegionName = data.SourceRegionName
+	} else {
+		tf.SourceRegionName = types.StringNull()
+	}
+
+	if !data.SourceSnapshotId.IsUnknown() {
+		tf.SourceSnapshotId = data.SourceSnapshotId
+	} else {
+		tf.SourceSnapshotId = types.StringNull()
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

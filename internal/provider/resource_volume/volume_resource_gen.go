@@ -52,6 +52,11 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The name of the device.",
 							MarkdownDescription: "The name of the device.",
 						},
+						"id": schema.StringAttribute{
+							Computed:            true,
+							Description:         "The ID of the volume.",
+							MarkdownDescription: "The ID of the volume.",
+						},
 						"state": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The state of the attachment of the volume (`attaching` \\| `detaching` \\| `attached` \\| `detached`).",
@@ -61,11 +66,6 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "The ID of the VM.",
 							MarkdownDescription: "The ID of the VM.",
-						},
-						"volume_id": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The ID of the volume.",
-							MarkdownDescription: "The ID of the volume.",
 						},
 					},
 					CustomType: LinkedVolumesType{
@@ -178,6 +178,24 @@ func (t LinkedVolumesType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`device_name expected to be basetypes.StringValue, was: %T`, deviceNameAttribute))
 	}
 
+	idAttribute, ok := attributes["id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`id is missing from object`)
+
+		return nil, diags
+	}
+
+	idVal, ok := idAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`id expected to be basetypes.StringValue, was: %T`, idAttribute))
+	}
+
 	stateAttribute, ok := attributes["state"]
 
 	if !ok {
@@ -214,24 +232,6 @@ func (t LinkedVolumesType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`vm_id expected to be basetypes.StringValue, was: %T`, vmIdAttribute))
 	}
 
-	volumeIdAttribute, ok := attributes["volume_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`volume_id is missing from object`)
-
-		return nil, diags
-	}
-
-	volumeIdVal, ok := volumeIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`volume_id expected to be basetypes.StringValue, was: %T`, volumeIdAttribute))
-	}
-
 	if diags.HasError() {
 		return nil, diags
 	}
@@ -239,9 +239,9 @@ func (t LinkedVolumesType) ValueFromObject(ctx context.Context, in basetypes.Obj
 	return LinkedVolumesValue{
 		DeleteOnVmDeletion: deleteOnVmDeletionVal,
 		DeviceName:         deviceNameVal,
+		Id:                 idVal,
 		State:              stateVal,
 		VmId:               vmIdVal,
-		VolumeId:           volumeIdVal,
 		state:              attr.ValueStateKnown,
 	}, diags
 }
@@ -345,6 +345,24 @@ func NewLinkedVolumesValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`device_name expected to be basetypes.StringValue, was: %T`, deviceNameAttribute))
 	}
 
+	idAttribute, ok := attributes["id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`id is missing from object`)
+
+		return NewLinkedVolumesValueUnknown(), diags
+	}
+
+	idVal, ok := idAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`id expected to be basetypes.StringValue, was: %T`, idAttribute))
+	}
+
 	stateAttribute, ok := attributes["state"]
 
 	if !ok {
@@ -381,24 +399,6 @@ func NewLinkedVolumesValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`vm_id expected to be basetypes.StringValue, was: %T`, vmIdAttribute))
 	}
 
-	volumeIdAttribute, ok := attributes["volume_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`volume_id is missing from object`)
-
-		return NewLinkedVolumesValueUnknown(), diags
-	}
-
-	volumeIdVal, ok := volumeIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`volume_id expected to be basetypes.StringValue, was: %T`, volumeIdAttribute))
-	}
-
 	if diags.HasError() {
 		return NewLinkedVolumesValueUnknown(), diags
 	}
@@ -406,9 +406,9 @@ func NewLinkedVolumesValue(attributeTypes map[string]attr.Type, attributes map[s
 	return LinkedVolumesValue{
 		DeleteOnVmDeletion: deleteOnVmDeletionVal,
 		DeviceName:         deviceNameVal,
+		Id:                 idVal,
 		State:              stateVal,
 		VmId:               vmIdVal,
-		VolumeId:           volumeIdVal,
 		state:              attr.ValueStateKnown,
 	}, diags
 }
@@ -483,9 +483,9 @@ var _ basetypes.ObjectValuable = LinkedVolumesValue{}
 type LinkedVolumesValue struct {
 	DeleteOnVmDeletion basetypes.BoolValue   `tfsdk:"delete_on_vm_deletion"`
 	DeviceName         basetypes.StringValue `tfsdk:"device_name"`
+	Id                 basetypes.StringValue `tfsdk:"id"`
 	State              basetypes.StringValue `tfsdk:"state"`
 	VmId               basetypes.StringValue `tfsdk:"vm_id"`
-	VolumeId           basetypes.StringValue `tfsdk:"volume_id"`
 	state              attr.ValueState
 }
 
@@ -497,9 +497,9 @@ func (v LinkedVolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	attrTypes["delete_on_vm_deletion"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["device_name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vm_id"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["volume_id"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
@@ -523,6 +523,14 @@ func (v LinkedVolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 		vals["device_name"] = val
 
+		val, err = v.Id.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["id"] = val
+
 		val, err = v.State.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -538,14 +546,6 @@ func (v LinkedVolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["vm_id"] = val
-
-		val, err = v.VolumeId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["volume_id"] = val
 
 		if err := tftypes.ValidateValue(objectType, vals); err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
@@ -580,16 +580,16 @@ func (v LinkedVolumesValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		map[string]attr.Type{
 			"delete_on_vm_deletion": basetypes.BoolType{},
 			"device_name":           basetypes.StringType{},
+			"id":                    basetypes.StringType{},
 			"state":                 basetypes.StringType{},
 			"vm_id":                 basetypes.StringType{},
-			"volume_id":             basetypes.StringType{},
 		},
 		map[string]attr.Value{
 			"delete_on_vm_deletion": v.DeleteOnVmDeletion,
 			"device_name":           v.DeviceName,
+			"id":                    v.Id,
 			"state":                 v.State,
 			"vm_id":                 v.VmId,
-			"volume_id":             v.VolumeId,
 		})
 
 	return objVal, diags
@@ -618,15 +618,15 @@ func (v LinkedVolumesValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.Id.Equal(other.Id) {
+		return false
+	}
+
 	if !v.State.Equal(other.State) {
 		return false
 	}
 
 	if !v.VmId.Equal(other.VmId) {
-		return false
-	}
-
-	if !v.VolumeId.Equal(other.VolumeId) {
 		return false
 	}
 
@@ -645,8 +645,8 @@ func (v LinkedVolumesValue) AttributeTypes(ctx context.Context) map[string]attr.
 	return map[string]attr.Type{
 		"delete_on_vm_deletion": basetypes.BoolType{},
 		"device_name":           basetypes.StringType{},
+		"id":                    basetypes.StringType{},
 		"state":                 basetypes.StringType{},
 		"vm_id":                 basetypes.StringType{},
-		"volume_id":             basetypes.StringType{},
 	}
 }
