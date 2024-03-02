@@ -26,17 +26,17 @@ func fetchLoadBalancersConfig() string {
 data "numspot_load_balancers" "test" {
 	load_balancer_names = [numspot_load_balancer.testlb.name]
 }
-resource "numspot_net" "net" {
+resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
 resource "numspot_subnet" "subnet" {
-	net_id 		= numspot_net.net.id
+	vpc_id 		= numspot_vpc.vpc.id
 	ip_range 	= "10.101.1.0/24"
 }
 
 resource "numspot_security_group" "sg" {
-	net_id 		= numspot_net.net.id
+	net_id 		= numspot_vpc.vpc.id
 	name 		= "terraform-vm-tests-sg-name"
 	description = "terraform-vm-tests-sg-description"
 
@@ -50,18 +50,18 @@ resource "numspot_security_group" "sg" {
 	]
 }
 
-resource "numspot_internet_service" "is" {
-  net_id = numspot_net.net.id
+resource "numspot_internet_gateway" "igw" {
+  vpc_id = numspot_vpc.vpc.id
 }
 
 resource "numspot_route_table" "rt" {
-  net_id    = numspot_net.net.id
+  net_id    = numspot_vpc.vpc.id
   subnet_id = numspot_subnet.subnet.id
 
   routes = [
     {
       destination_ip_range = "0.0.0.0/0"
-      gateway_id           = numspot_internet_service.is.id
+      gateway_id           = numspot_internet_gateway.igw.id
     }
   ]
 }
