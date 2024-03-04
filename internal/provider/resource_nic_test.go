@@ -26,8 +26,7 @@ func TestAccNicResource(t *testing.T) {
 				ResourceName:            "numspot_nic.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"mac_address"},
-				// FIXME: The mac address is uppercase then lowercase...
+				ImportStateVerifyIgnore: []string{},
 			},
 			//// Update testing
 			//{

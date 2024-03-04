@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -109,13 +110,19 @@ func NicFromHttpToTf(ctx context.Context, http *api.Nic) (*resource_nic.NicModel
 		linkPublicIpTf = resource_nic.NewLinkPublicIpValueNull()
 	}
 
+	var macAddress *string
+	if http.MacAddress != nil {
+		lowerMacAddr := strings.ToLower(*http.MacAddress)
+		macAddress = &lowerMacAddr
+	}
+
 	return &resource_nic.NicModel{
 		AccountId:            types.StringPointerValue(http.AccountId),
 		Description:          types.StringPointerValue(http.AccountId),
 		Id:                   types.StringPointerValue(http.Id),
 		IsSourceDestChecked:  types.BoolPointerValue(http.IsSourceDestChecked),
 		LinkPublicIp:         linkPublicIpTf,
-		MacAddress:           types.StringPointerValue(http.MacAddress),
+		MacAddress:           types.StringPointerValue(macAddress),
 		VpcId:                types.StringPointerValue(http.VpcId),
 		PrivateDnsName:       types.StringPointerValue(http.PrivateDnsName),
 		PrivateIps:           privateIps,
