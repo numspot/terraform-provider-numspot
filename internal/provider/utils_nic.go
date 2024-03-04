@@ -12,9 +12,16 @@ import (
 )
 
 func privatesIpFromApi(ctx context.Context, elt api.PrivateIp) (resource_nic.PrivateIpsValue, diag.Diagnostics) {
-	linkPublicIpTf, diagnostics := linkPublicIpFromApi(ctx, *elt.LinkPublicIp)
-	if diagnostics.HasError() {
-		return resource_nic.PrivateIpsValue{}, diagnostics
+	var (
+		linkPublicIpTf resource_nic.LinkPublicIpValue
+		diagnostics    diag.Diagnostics
+	)
+
+	if elt.LinkPublicIp != nil {
+		linkPublicIpTf, diagnostics = linkPublicIpFromApi(ctx, *elt.LinkPublicIp)
+		if diagnostics.HasError() {
+			return resource_nic.PrivateIpsValue{}, diagnostics
+		}
 	}
 
 	return resource_nic.NewPrivateIpsValue(

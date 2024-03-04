@@ -65,7 +65,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 	res := utils.ExecuteRequest(func() (*api.CreateNicResponse, error) {
 		body := NicFromTfToCreateRequest(ctx, &data)
 		return r.provider.ApiClient.CreateNicWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}
@@ -110,5 +110,5 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteNicResponse, error) {
 		return r.provider.ApiClient.DeleteNicWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 }

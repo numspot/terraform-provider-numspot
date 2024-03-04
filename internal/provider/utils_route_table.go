@@ -41,7 +41,7 @@ func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTable, defaultRo
 	res := resource_route_table.RouteTableModel{
 		Id:                              types.StringPointerValue(http.Id),
 		LinkRouteTables:                 tfLinks,
-		NetId:                           types.StringPointerValue(http.VpcId),
+		VpcId:                           types.StringPointerValue(http.VpcId),
 		RoutePropagatingVirtualGateways: types.ListNull(resource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(ctx)),
 		Routes:                          tfRoutes,
 		SubnetId:                        types.StringPointerValue(subnetId),
@@ -58,6 +58,7 @@ func routeTableLinkFromAPI(ctx context.Context, link api.LinkRouteTable) (resour
 			"main":           types.BoolPointerValue(link.Main),
 			"route_table_id": types.StringPointerValue(link.RouteTableId),
 			"subnet_id":      types.StringPointerValue(link.SubnetId),
+			"vpc_id":         types.StringPointerValue(link.VpcId),
 		},
 	)
 }
@@ -70,9 +71,9 @@ func routeTableRouteFromAPI(ctx context.Context, route api.Route) (resource_rout
 			"destination_ip_range":   types.StringPointerValue(route.DestinationIpRange),
 			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
 			"gateway_id":             types.StringPointerValue(route.GatewayId),
-			"nat_service_id":         types.StringPointerValue(route.NatGatewayId),
-			"net_access_point_id":    types.StringPointerValue(route.VpcAccessPointId),
-			"net_peering_id":         types.StringPointerValue(route.VpcPeeringId),
+			"nat_gateway_id":         types.StringPointerValue(route.NatGatewayId),
+			"vpc_access_point_id":    types.StringPointerValue(route.VpcAccessPointId),
+			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
 			"nic_id":                 types.StringPointerValue(route.NicId),
 			"state":                  types.StringPointerValue(route.State),
 			"vm_account_id":          types.StringPointerValue(route.VmAccountId),
@@ -83,6 +84,6 @@ func routeTableRouteFromAPI(ctx context.Context, route api.Route) (resource_rout
 
 func RouteTableFromTfToCreateRequest(tf *resource_route_table.RouteTableModel) api.CreateRouteTableJSONRequestBody {
 	return api.CreateRouteTableJSONRequestBody{
-		VpcId: tf.NetId.ValueString(),
+		VpcId: tf.VpcId.ValueString(),
 	}
 }

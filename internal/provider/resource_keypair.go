@@ -65,7 +65,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 	res := utils.ExecuteRequest(func() (*api.CreateKeypairResponse, error) {
 		body := KeyPairFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateKeypairWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}

@@ -94,8 +94,8 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 			return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, *createdId, api.CreateRouteJSONRequestBody{
 				DestinationIpRange: route.DestinationIpRange.ValueString(),
 				GatewayId:          route.GatewayId.ValueStringPointer(),
-				NatGatewayId:       route.NatServiceId.ValueStringPointer(),
-				VpcPeeringId:       route.NetPeeringId.ValueStringPointer(),
+				NatGatewayId:       route.NatGatewayId.ValueStringPointer(),
+				VpcPeeringId:       route.VpcPeeringId.ValueStringPointer(),
 				NicId:              route.NicId.ValueStringPointer(),
 				VmId:               route.VmId.ValueStringPointer(),
 			})

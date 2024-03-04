@@ -46,6 +46,11 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The ID of the Subnet.",
 							MarkdownDescription: "The ID of the Subnet.",
 						},
+						"vpc_id": schema.StringAttribute{
+							Computed:            true,
+							Description:         "The ID of the Net.",
+							MarkdownDescription: "The ID of the Net.",
+						},
 					},
 					CustomType: LinkRouteTablesType{
 						ObjectType: types.ObjectType{
@@ -56,11 +61,6 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "One or more associations between the route table and Subnets.",
 				MarkdownDescription: "One or more associations between the route table and Subnets.",
-			},
-			"net_id": schema.StringAttribute{
-				Required:            true,
-				Description:         "The ID of the Net for which you want to create a route table.",
-				MarkdownDescription: "The ID of the Net for which you want to create a route table.",
 			},
 			"route_propagating_virtual_gateways": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -95,32 +95,25 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
 						},
 						"destination_service_id": schema.StringAttribute{
-							Optional:            true,
+							Computed:            true,
 							Description:         "The ID of the OUTSCALE service.",
 							MarkdownDescription: "The ID of the OUTSCALE service.",
 						},
 						"gateway_id": schema.StringAttribute{
-							Optional:            true,
+							Computed:            true,
+							Optional: true,
 							Description:         "The ID of the Internet service or virtual gateway attached to the Net.",
 							MarkdownDescription: "The ID of the Internet service or virtual gateway attached to the Net.",
 						},
-						"nat_service_id": schema.StringAttribute{
-							Optional:            true,
+						"nat_gateway_id": schema.StringAttribute{
+							Computed:            true,
+							Optional: true,
 							Description:         "The ID of a NAT service attached to the Net.",
 							MarkdownDescription: "The ID of a NAT service attached to the Net.",
 						},
-						"net_access_point_id": schema.StringAttribute{
-							Optional:            true,
-							Description:         "The ID of the Net access point.",
-							MarkdownDescription: "The ID of the Net access point.",
-						},
-						"net_peering_id": schema.StringAttribute{
-							Optional:            true,
-							Description:         "The ID of the Net peering.",
-							MarkdownDescription: "The ID of the Net peering.",
-						},
 						"nic_id": schema.StringAttribute{
-							Optional:            true,
+							Computed:            true,
+							Optional: true,
 							Description:         "The ID of the NIC.",
 							MarkdownDescription: "The ID of the NIC.",
 						},
@@ -130,14 +123,26 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The state of a route in the route table (always `active`). ",
 						},
 						"vm_account_id": schema.StringAttribute{
-							Optional:            true,
+							Computed:            true,
 							Description:         "The account ID of the owner of the VM.",
 							MarkdownDescription: "The account ID of the owner of the VM.",
 						},
 						"vm_id": schema.StringAttribute{
-							Optional:            true,
+							Computed:            true,
+							Optional: true,
 							Description:         "The ID of a VM specified in a route in the table.",
 							MarkdownDescription: "The ID of a VM specified in a route in the table.",
+						},
+						"vpc_access_point_id": schema.StringAttribute{
+							Computed:            true,
+							Description:         "The ID of the Net access point.",
+							MarkdownDescription: "The ID of the Net access point.",
+						},
+						"vpc_peering_id": schema.StringAttribute{
+							Computed:            true,
+							Optional: true,
+							Description:         "The ID of the Net peering.",
+							MarkdownDescription: "The ID of the Net peering.",
 						},
 					},
 					CustomType: RoutesType{
@@ -146,10 +151,21 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Optional:            true,
 				Computed:            true,
+				Optional: 			 true,
 				Description:         "One or more routes in the route table.",
 				MarkdownDescription: "One or more routes in the route table.",
+			},
+			"space_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "space identifier",
+				MarkdownDescription: "space identifier",
+			},
+			"vpc_id": schema.StringAttribute{
+				Required:            true,
+				Description:         "The ID of the Net for which you want to create a route table.",
+				MarkdownDescription: "The ID of the Net for which you want to create a route table.",
 			},
 			"subnet_id": schema.StringAttribute{
 				Optional:            true,
@@ -163,10 +179,11 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 type RouteTableModel struct {
 	Id                              types.String `tfsdk:"id"`
 	LinkRouteTables                 types.List   `tfsdk:"link_route_tables"`
-	NetId                           types.String `tfsdk:"net_id"`
 	RoutePropagatingVirtualGateways types.List   `tfsdk:"route_propagating_virtual_gateways"`
 	Routes                          types.List   `tfsdk:"routes"`
-	SubnetId                        types.String `tfsdk:"subnet_id"`
+	SpaceId                         types.String `tfsdk:"space_id"`
+	VpcId                           types.String `tfsdk:"vpc_id"`
+	SubnetId						types.String `tfsdk:"subnet_id"`
 }
 
 var _ basetypes.ObjectTypable = LinkRouteTablesType{}
@@ -266,6 +283,24 @@ func (t LinkRouteTablesType) ValueFromObject(ctx context.Context, in basetypes.O
 			fmt.Sprintf(`subnet_id expected to be basetypes.StringValue, was: %T`, subnetIdAttribute))
 	}
 
+	vpcIdAttribute, ok := attributes["vpc_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vpc_id is missing from object`)
+
+		return nil, diags
+	}
+
+	vpcIdVal, ok := vpcIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vpc_id expected to be basetypes.StringValue, was: %T`, vpcIdAttribute))
+	}
+
 	if diags.HasError() {
 		return nil, diags
 	}
@@ -275,6 +310,7 @@ func (t LinkRouteTablesType) ValueFromObject(ctx context.Context, in basetypes.O
 		Main:         mainVal,
 		RouteTableId: routeTableIdVal,
 		SubnetId:     subnetIdVal,
+		VpcId:        vpcIdVal,
 		state:        attr.ValueStateKnown,
 	}, diags
 }
@@ -414,6 +450,24 @@ func NewLinkRouteTablesValue(attributeTypes map[string]attr.Type, attributes map
 			fmt.Sprintf(`subnet_id expected to be basetypes.StringValue, was: %T`, subnetIdAttribute))
 	}
 
+	vpcIdAttribute, ok := attributes["vpc_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vpc_id is missing from object`)
+
+		return NewLinkRouteTablesValueUnknown(), diags
+	}
+
+	vpcIdVal, ok := vpcIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vpc_id expected to be basetypes.StringValue, was: %T`, vpcIdAttribute))
+	}
+
 	if diags.HasError() {
 		return NewLinkRouteTablesValueUnknown(), diags
 	}
@@ -423,6 +477,7 @@ func NewLinkRouteTablesValue(attributeTypes map[string]attr.Type, attributes map
 		Main:         mainVal,
 		RouteTableId: routeTableIdVal,
 		SubnetId:     subnetIdVal,
+		VpcId:        vpcIdVal,
 		state:        attr.ValueStateKnown,
 	}, diags
 }
@@ -499,11 +554,12 @@ type LinkRouteTablesValue struct {
 	Main         basetypes.BoolValue   `tfsdk:"main"`
 	RouteTableId basetypes.StringValue `tfsdk:"route_table_id"`
 	SubnetId     basetypes.StringValue `tfsdk:"subnet_id"`
+	VpcId        basetypes.StringValue `tfsdk:"vpc_id"`
 	state        attr.ValueState
 }
 
 func (v LinkRouteTablesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 4)
+	attrTypes := make(map[string]tftypes.Type, 5)
 
 	var val tftypes.Value
 	var err error
@@ -512,12 +568,13 @@ func (v LinkRouteTablesValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 	attrTypes["main"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["route_table_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["subnet_id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["vpc_id"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 4)
+		vals := make(map[string]tftypes.Value, 5)
 
 		val, err = v.Id.ToTerraformValue(ctx)
 
@@ -550,6 +607,14 @@ func (v LinkRouteTablesValue) ToTerraformValue(ctx context.Context) (tftypes.Val
 		}
 
 		vals["subnet_id"] = val
+
+		val, err = v.VpcId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["vpc_id"] = val
 
 		if err := tftypes.ValidateValue(objectType, vals); err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
@@ -586,12 +651,14 @@ func (v LinkRouteTablesValue) ToObjectValue(ctx context.Context) (basetypes.Obje
 			"main":           basetypes.BoolType{},
 			"route_table_id": basetypes.StringType{},
 			"subnet_id":      basetypes.StringType{},
+			"vpc_id":         basetypes.StringType{},
 		},
 		map[string]attr.Value{
 			"id":             v.Id,
 			"main":           v.Main,
 			"route_table_id": v.RouteTableId,
 			"subnet_id":      v.SubnetId,
+			"vpc_id":         v.VpcId,
 		})
 
 	return objVal, diags
@@ -628,6 +695,10 @@ func (v LinkRouteTablesValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.VpcId.Equal(other.VpcId) {
+		return false
+	}
+
 	return true
 }
 
@@ -645,6 +716,7 @@ func (v LinkRouteTablesValue) AttributeTypes(ctx context.Context) map[string]att
 		"main":           basetypes.BoolType{},
 		"route_table_id": basetypes.StringType{},
 		"subnet_id":      basetypes.StringType{},
+		"vpc_id":         basetypes.StringType{},
 	}
 }
 
@@ -1059,58 +1131,22 @@ func (t RoutesType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`gateway_id expected to be basetypes.StringValue, was: %T`, gatewayIdAttribute))
 	}
 
-	natServiceIdAttribute, ok := attributes["nat_service_id"]
+	natGatewayIdAttribute, ok := attributes["nat_gateway_id"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`nat_service_id is missing from object`)
+			`nat_gateway_id is missing from object`)
 
 		return nil, diags
 	}
 
-	natServiceIdVal, ok := natServiceIdAttribute.(basetypes.StringValue)
+	natGatewayIdVal, ok := natGatewayIdAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`nat_service_id expected to be basetypes.StringValue, was: %T`, natServiceIdAttribute))
-	}
-
-	netAccessPointIdAttribute, ok := attributes["net_access_point_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`net_access_point_id is missing from object`)
-
-		return nil, diags
-	}
-
-	netAccessPointIdVal, ok := netAccessPointIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`net_access_point_id expected to be basetypes.StringValue, was: %T`, netAccessPointIdAttribute))
-	}
-
-	netPeeringIdAttribute, ok := attributes["net_peering_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`net_peering_id is missing from object`)
-
-		return nil, diags
-	}
-
-	netPeeringIdVal, ok := netPeeringIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`net_peering_id expected to be basetypes.StringValue, was: %T`, netPeeringIdAttribute))
+			fmt.Sprintf(`nat_gateway_id expected to be basetypes.StringValue, was: %T`, natGatewayIdAttribute))
 	}
 
 	nicIdAttribute, ok := attributes["nic_id"]
@@ -1185,6 +1221,42 @@ func (t RoutesType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`vm_id expected to be basetypes.StringValue, was: %T`, vmIdAttribute))
 	}
 
+	vpcAccessPointIdAttribute, ok := attributes["vpc_access_point_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vpc_access_point_id is missing from object`)
+
+		return nil, diags
+	}
+
+	vpcAccessPointIdVal, ok := vpcAccessPointIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vpc_access_point_id expected to be basetypes.StringValue, was: %T`, vpcAccessPointIdAttribute))
+	}
+
+	vpcPeeringIdAttribute, ok := attributes["vpc_peering_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vpc_peering_id is missing from object`)
+
+		return nil, diags
+	}
+
+	vpcPeeringIdVal, ok := vpcPeeringIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vpc_peering_id expected to be basetypes.StringValue, was: %T`, vpcPeeringIdAttribute))
+	}
+
 	if diags.HasError() {
 		return nil, diags
 	}
@@ -1194,13 +1266,13 @@ func (t RoutesType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		DestinationIpRange:   destinationIpRangeVal,
 		DestinationServiceId: destinationServiceIdVal,
 		GatewayId:            gatewayIdVal,
-		NatServiceId:         natServiceIdVal,
-		NetAccessPointId:     netAccessPointIdVal,
-		NetPeeringId:         netPeeringIdVal,
+		NatGatewayId:         natGatewayIdVal,
 		NicId:                nicIdVal,
 		State:                stateVal,
 		VmAccountId:          vmAccountIdVal,
 		VmId:                 vmIdVal,
+		VpcAccessPointId:     vpcAccessPointIdVal,
+		VpcPeeringId:         vpcPeeringIdVal,
 		state:                attr.ValueStateKnown,
 	}, diags
 }
@@ -1340,58 +1412,22 @@ func NewRoutesValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`gateway_id expected to be basetypes.StringValue, was: %T`, gatewayIdAttribute))
 	}
 
-	natServiceIdAttribute, ok := attributes["nat_service_id"]
+	natGatewayIdAttribute, ok := attributes["nat_gateway_id"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`nat_service_id is missing from object`)
+			`nat_gateway_id is missing from object`)
 
 		return NewRoutesValueUnknown(), diags
 	}
 
-	natServiceIdVal, ok := natServiceIdAttribute.(basetypes.StringValue)
+	natGatewayIdVal, ok := natGatewayIdAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`nat_service_id expected to be basetypes.StringValue, was: %T`, natServiceIdAttribute))
-	}
-
-	netAccessPointIdAttribute, ok := attributes["net_access_point_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`net_access_point_id is missing from object`)
-
-		return NewRoutesValueUnknown(), diags
-	}
-
-	netAccessPointIdVal, ok := netAccessPointIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`net_access_point_id expected to be basetypes.StringValue, was: %T`, netAccessPointIdAttribute))
-	}
-
-	netPeeringIdAttribute, ok := attributes["net_peering_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`net_peering_id is missing from object`)
-
-		return NewRoutesValueUnknown(), diags
-	}
-
-	netPeeringIdVal, ok := netPeeringIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`net_peering_id expected to be basetypes.StringValue, was: %T`, netPeeringIdAttribute))
+			fmt.Sprintf(`nat_gateway_id expected to be basetypes.StringValue, was: %T`, natGatewayIdAttribute))
 	}
 
 	nicIdAttribute, ok := attributes["nic_id"]
@@ -1466,6 +1502,42 @@ func NewRoutesValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`vm_id expected to be basetypes.StringValue, was: %T`, vmIdAttribute))
 	}
 
+	vpcAccessPointIdAttribute, ok := attributes["vpc_access_point_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vpc_access_point_id is missing from object`)
+
+		return NewRoutesValueUnknown(), diags
+	}
+
+	vpcAccessPointIdVal, ok := vpcAccessPointIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vpc_access_point_id expected to be basetypes.StringValue, was: %T`, vpcAccessPointIdAttribute))
+	}
+
+	vpcPeeringIdAttribute, ok := attributes["vpc_peering_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vpc_peering_id is missing from object`)
+
+		return NewRoutesValueUnknown(), diags
+	}
+
+	vpcPeeringIdVal, ok := vpcPeeringIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vpc_peering_id expected to be basetypes.StringValue, was: %T`, vpcPeeringIdAttribute))
+	}
+
 	if diags.HasError() {
 		return NewRoutesValueUnknown(), diags
 	}
@@ -1475,13 +1547,13 @@ func NewRoutesValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		DestinationIpRange:   destinationIpRangeVal,
 		DestinationServiceId: destinationServiceIdVal,
 		GatewayId:            gatewayIdVal,
-		NatServiceId:         natServiceIdVal,
-		NetAccessPointId:     netAccessPointIdVal,
-		NetPeeringId:         netPeeringIdVal,
+		NatGatewayId:         natGatewayIdVal,
 		NicId:                nicIdVal,
 		State:                stateVal,
 		VmAccountId:          vmAccountIdVal,
 		VmId:                 vmIdVal,
+		VpcAccessPointId:     vpcAccessPointIdVal,
+		VpcPeeringId:         vpcPeeringIdVal,
 		state:                attr.ValueStateKnown,
 	}, diags
 }
@@ -1558,13 +1630,13 @@ type RoutesValue struct {
 	DestinationIpRange   basetypes.StringValue `tfsdk:"destination_ip_range"`
 	DestinationServiceId basetypes.StringValue `tfsdk:"destination_service_id"`
 	GatewayId            basetypes.StringValue `tfsdk:"gateway_id"`
-	NatServiceId         basetypes.StringValue `tfsdk:"nat_service_id"`
-	NetAccessPointId     basetypes.StringValue `tfsdk:"net_access_point_id"`
-	NetPeeringId         basetypes.StringValue `tfsdk:"net_peering_id"`
+	NatGatewayId         basetypes.StringValue `tfsdk:"nat_gateway_id"`
 	NicId                basetypes.StringValue `tfsdk:"nic_id"`
 	State                basetypes.StringValue `tfsdk:"state"`
 	VmAccountId          basetypes.StringValue `tfsdk:"vm_account_id"`
 	VmId                 basetypes.StringValue `tfsdk:"vm_id"`
+	VpcAccessPointId     basetypes.StringValue `tfsdk:"vpc_access_point_id"`
+	VpcPeeringId         basetypes.StringValue `tfsdk:"vpc_peering_id"`
 	state                attr.ValueState
 }
 
@@ -1578,13 +1650,13 @@ func (v RoutesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["destination_ip_range"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["destination_service_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["gateway_id"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["nat_service_id"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["net_access_point_id"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["net_peering_id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["nat_gateway_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["nic_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vm_account_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vm_id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["vpc_access_point_id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["vpc_peering_id"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
@@ -1624,29 +1696,13 @@ func (v RoutesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 		vals["gateway_id"] = val
 
-		val, err = v.NatServiceId.ToTerraformValue(ctx)
+		val, err = v.NatGatewayId.ToTerraformValue(ctx)
 
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
 
-		vals["nat_service_id"] = val
-
-		val, err = v.NetAccessPointId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["net_access_point_id"] = val
-
-		val, err = v.NetPeeringId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["net_peering_id"] = val
+		vals["nat_gateway_id"] = val
 
 		val, err = v.NicId.ToTerraformValue(ctx)
 
@@ -1679,6 +1735,22 @@ func (v RoutesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 		}
 
 		vals["vm_id"] = val
+
+		val, err = v.VpcAccessPointId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["vpc_access_point_id"] = val
+
+		val, err = v.VpcPeeringId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["vpc_peering_id"] = val
 
 		if err := tftypes.ValidateValue(objectType, vals); err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
@@ -1715,26 +1787,26 @@ func (v RoutesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"destination_ip_range":   basetypes.StringType{},
 			"destination_service_id": basetypes.StringType{},
 			"gateway_id":             basetypes.StringType{},
-			"nat_service_id":         basetypes.StringType{},
-			"net_access_point_id":    basetypes.StringType{},
-			"net_peering_id":         basetypes.StringType{},
+			"nat_gateway_id":         basetypes.StringType{},
 			"nic_id":                 basetypes.StringType{},
 			"state":                  basetypes.StringType{},
 			"vm_account_id":          basetypes.StringType{},
 			"vm_id":                  basetypes.StringType{},
+			"vpc_access_point_id":    basetypes.StringType{},
+			"vpc_peering_id":         basetypes.StringType{},
 		},
 		map[string]attr.Value{
 			"creation_method":        v.CreationMethod,
 			"destination_ip_range":   v.DestinationIpRange,
 			"destination_service_id": v.DestinationServiceId,
 			"gateway_id":             v.GatewayId,
-			"nat_service_id":         v.NatServiceId,
-			"net_access_point_id":    v.NetAccessPointId,
-			"net_peering_id":         v.NetPeeringId,
+			"nat_gateway_id":         v.NatGatewayId,
 			"nic_id":                 v.NicId,
 			"state":                  v.State,
 			"vm_account_id":          v.VmAccountId,
 			"vm_id":                  v.VmId,
+			"vpc_access_point_id":    v.VpcAccessPointId,
+			"vpc_peering_id":         v.VpcPeeringId,
 		})
 
 	return objVal, diags
@@ -1771,15 +1843,7 @@ func (v RoutesValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.NatServiceId.Equal(other.NatServiceId) {
-		return false
-	}
-
-	if !v.NetAccessPointId.Equal(other.NetAccessPointId) {
-		return false
-	}
-
-	if !v.NetPeeringId.Equal(other.NetPeeringId) {
+	if !v.NatGatewayId.Equal(other.NatGatewayId) {
 		return false
 	}
 
@@ -1796,6 +1860,14 @@ func (v RoutesValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.VmId.Equal(other.VmId) {
+		return false
+	}
+
+	if !v.VpcAccessPointId.Equal(other.VpcAccessPointId) {
+		return false
+	}
+
+	if !v.VpcPeeringId.Equal(other.VpcPeeringId) {
 		return false
 	}
 
@@ -1816,12 +1888,12 @@ func (v RoutesValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"destination_ip_range":   basetypes.StringType{},
 		"destination_service_id": basetypes.StringType{},
 		"gateway_id":             basetypes.StringType{},
-		"nat_service_id":         basetypes.StringType{},
-		"net_access_point_id":    basetypes.StringType{},
-		"net_peering_id":         basetypes.StringType{},
+		"nat_gateway_id":         basetypes.StringType{},
 		"nic_id":                 basetypes.StringType{},
 		"state":                  basetypes.StringType{},
 		"vm_account_id":          basetypes.StringType{},
 		"vm_id":                  basetypes.StringType{},
+		"vpc_access_point_id":    basetypes.StringType{},
+		"vpc_peering_id":         basetypes.StringType{},
 	}
 }

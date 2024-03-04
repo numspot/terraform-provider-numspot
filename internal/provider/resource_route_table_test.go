@@ -50,26 +50,26 @@ func TestAccRouteTableResource(t *testing.T) {
 
 func testRouteTableConfig(netIpRange, subnetIpRange string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "net" {
   ip_range = %[1]q
 }
 
 resource "numspot_subnet" "subnet" {
-  net_id                  = numspot_net.net.id
+  vpc_id                  = numspot_vpc.net.id
   ip_range                = %[2]q
 }
 
-resource "numspot_internet_service" "test" {
-	net_id = numspot_net.net.id
+resource "numspot_internet_gateway" "test" {
+	vpc_id = numspot_vpc.net.id
 }
 
 resource "numspot_route_table" "test" {
-	net_id =  numspot_net.net.id
+	vpc_id =  numspot_vpc.net.id
 	subnet_id = numspot_subnet.subnet.id
 	routes = [
 		{
 			destination_ip_range 	= "0.0.0.0/0"
-			gateway_id 	 			= numspot_internet_service.test.id
+			gateway_id 	 			= numspot_internet_gateway.test.id
 		}
 	]
 }`, netIpRange, subnetIpRange)
