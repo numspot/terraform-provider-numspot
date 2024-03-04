@@ -69,7 +69,9 @@ func invokeLinkPublicIP(ctx context.Context, provider Provider, data *resource_p
 }
 
 func invokeUnlinkPublicIP(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) error {
-	payload := api.UnlinkPublicIpJSONRequestBody{}
+	payload := api.UnlinkPublicIpJSONRequestBody{
+		LinkPublicIpId: data.LinkPublicIP.ValueStringPointer(),
+	}
 	res, err := provider.ApiClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.LinkPublicIP.ValueString(), payload)
 	if err != nil {
 		return err
