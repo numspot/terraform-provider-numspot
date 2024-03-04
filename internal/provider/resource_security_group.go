@@ -186,5 +186,5 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSecurityGroupResponse, error) {
 		return r.client.DeleteSecurityGroupWithResponse(ctx, spaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 }

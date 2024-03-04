@@ -68,7 +68,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	res := utils.ExecuteRequest(func() (*api.CreateVmsResponse, error) {
 		body := VmFromTfToCreateRequest(ctx, &data)
 		return r.client.CreateVmsWithResponse(ctx, spaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}
@@ -158,7 +158,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 		idsSlice := make([]interface{}, 1)
 		idsSlice[0] = data.Id.ValueString()
 		return r.client.DeleteVmsWithResponse(ctx, spaceID, idsSlice)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
 	}
