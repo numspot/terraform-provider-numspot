@@ -23,6 +23,11 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The account ID of the owner of the NIC.",
 				MarkdownDescription: "The account ID of the owner of the NIC.",
 			},
+			"availability_zone_name": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The Subregion in which the NIC is located.",
+				MarkdownDescription: "The Subregion in which the NIC is located.",
+			},
 			"description": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -38,6 +43,48 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
 				MarkdownDescription: "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
+			},
+			"link_nic": schema.SingleNestedAttribute{
+				Attributes: map[string]schema.Attribute{
+					"delete_on_vm_deletion": schema.BoolAttribute{
+						Computed:            true,
+						Description:         "If true, the NIC is deleted when the VM is terminated.",
+						MarkdownDescription: "If true, the NIC is deleted when the VM is terminated.",
+					},
+					"device_number": schema.Int64Attribute{
+						Computed:            true,
+						Description:         "The device index for the NIC attachment (between `1` and `7`, both included).",
+						MarkdownDescription: "The device index for the NIC attachment (between `1` and `7`, both included).",
+					},
+					"id": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The ID of the NIC to attach.",
+						MarkdownDescription: "The ID of the NIC to attach.",
+					},
+					"state": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
+						MarkdownDescription: "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
+					},
+					"vm_account_id": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The account ID of the owner of the VM.",
+						MarkdownDescription: "The account ID of the owner of the VM.",
+					},
+					"vm_id": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The ID of the VM.",
+						MarkdownDescription: "The ID of the VM.",
+					},
+				},
+				CustomType: LinkNicType{
+					ObjectType: types.ObjectType{
+						AttrTypes: LinkNicValue{}.AttributeTypes(ctx),
+					},
+				},
+				Computed:            true,
+				Description:         "Information about the NIC attachment.",
+				MarkdownDescription: "Information about the NIC attachment.",
 			},
 			"link_public_ip": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
@@ -80,11 +127,6 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The Media Access Control (MAC) address of the NIC.",
 				MarkdownDescription: "The Media Access Control (MAC) address of the NIC.",
-			},
-			"net_id": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The ID of the Net for the NIC.",
-				MarkdownDescription: "The ID of the Net for the NIC.",
 			},
 			"private_dns_name": schema.StringAttribute{
 				Computed:            true,
@@ -191,6 +233,12 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "One or more IDs of security groups for the NIC.",
 				MarkdownDescription: "One or more IDs of security groups for the NIC.",
 			},
+			"space_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "space identifier",
+				MarkdownDescription: "space identifier",
+			},
 			"state": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The state of the NIC (`available` \\| `attaching` \\| `in-use` \\| `detaching`).",
@@ -201,30 +249,621 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Subnet in which you want to create the NIC.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the NIC.",
 			},
-			"subregion_name": schema.StringAttribute{
+			"vpc_id": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The Subregion in which the NIC is located.",
-				MarkdownDescription: "The Subregion in which the NIC is located.",
+				Description:         "The ID of the Net for the NIC.",
+				MarkdownDescription: "The ID of the Net for the NIC.",
 			},
 		},
 	}
 }
 
 type NicModel struct {
-	AccountId           types.String      `tfsdk:"account_id"`
-	Description         types.String      `tfsdk:"description"`
-	Id                  types.String      `tfsdk:"id"`
-	IsSourceDestChecked types.Bool        `tfsdk:"is_source_dest_checked"`
-	LinkPublicIp        LinkPublicIpValue `tfsdk:"link_public_ip"`
-	MacAddress          types.String      `tfsdk:"mac_address"`
-	NetId               types.String      `tfsdk:"net_id"`
-	PrivateDnsName      types.String      `tfsdk:"private_dns_name"`
-	PrivateIps          types.List        `tfsdk:"private_ips"`
-	SecurityGroupIds    types.List        `tfsdk:"security_group_ids"`
-	SecurityGroups      types.List        `tfsdk:"security_groups"`
-	State               types.String      `tfsdk:"state"`
-	SubnetId            types.String      `tfsdk:"subnet_id"`
-	SubregionName       types.String      `tfsdk:"subregion_name"`
+	AccountId            types.String      `tfsdk:"account_id"`
+	AvailabilityZoneName types.String      `tfsdk:"availability_zone_name"`
+	Description          types.String      `tfsdk:"description"`
+	Id                   types.String      `tfsdk:"id"`
+	IsSourceDestChecked  types.Bool        `tfsdk:"is_source_dest_checked"`
+	LinkNic              LinkNicValue      `tfsdk:"link_nic"`
+	LinkPublicIp         LinkPublicIpValue `tfsdk:"link_public_ip"`
+	MacAddress           types.String      `tfsdk:"mac_address"`
+	PrivateDnsName       types.String      `tfsdk:"private_dns_name"`
+	PrivateIps           types.List        `tfsdk:"private_ips"`
+	SecurityGroupIds     types.List        `tfsdk:"security_group_ids"`
+	SecurityGroups       types.List        `tfsdk:"security_groups"`
+	SpaceId              types.String      `tfsdk:"space_id"`
+	State                types.String      `tfsdk:"state"`
+	SubnetId             types.String      `tfsdk:"subnet_id"`
+	VpcId                types.String      `tfsdk:"vpc_id"`
+}
+
+var _ basetypes.ObjectTypable = LinkNicType{}
+
+type LinkNicType struct {
+	basetypes.ObjectType
+}
+
+func (t LinkNicType) Equal(o attr.Type) bool {
+	other, ok := o.(LinkNicType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t LinkNicType) String() string {
+	return "LinkNicType"
+}
+
+func (t LinkNicType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	deleteOnVmDeletionAttribute, ok := attributes["delete_on_vm_deletion"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`delete_on_vm_deletion is missing from object`)
+
+		return nil, diags
+	}
+
+	deleteOnVmDeletionVal, ok := deleteOnVmDeletionAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`delete_on_vm_deletion expected to be basetypes.BoolValue, was: %T`, deleteOnVmDeletionAttribute))
+	}
+
+	deviceNumberAttribute, ok := attributes["device_number"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`device_number is missing from object`)
+
+		return nil, diags
+	}
+
+	deviceNumberVal, ok := deviceNumberAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`device_number expected to be basetypes.Int64Value, was: %T`, deviceNumberAttribute))
+	}
+
+	idAttribute, ok := attributes["id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`id is missing from object`)
+
+		return nil, diags
+	}
+
+	idVal, ok := idAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`id expected to be basetypes.StringValue, was: %T`, idAttribute))
+	}
+
+	stateAttribute, ok := attributes["state"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`state is missing from object`)
+
+		return nil, diags
+	}
+
+	stateVal, ok := stateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
+	}
+
+	vmAccountIdAttribute, ok := attributes["vm_account_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vm_account_id is missing from object`)
+
+		return nil, diags
+	}
+
+	vmAccountIdVal, ok := vmAccountIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vm_account_id expected to be basetypes.StringValue, was: %T`, vmAccountIdAttribute))
+	}
+
+	vmIdAttribute, ok := attributes["vm_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vm_id is missing from object`)
+
+		return nil, diags
+	}
+
+	vmIdVal, ok := vmIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vm_id expected to be basetypes.StringValue, was: %T`, vmIdAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return LinkNicValue{
+		DeleteOnVmDeletion: deleteOnVmDeletionVal,
+		DeviceNumber:       deviceNumberVal,
+		Id:                 idVal,
+		State:              stateVal,
+		VmAccountId:        vmAccountIdVal,
+		VmId:               vmIdVal,
+		state:              attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkNicValueNull() LinkNicValue {
+	return LinkNicValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewLinkNicValueUnknown() LinkNicValue {
+	return LinkNicValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewLinkNicValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (LinkNicValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing LinkNicValue Attribute Value",
+				"While creating a LinkNicValue value, a missing attribute value was detected. "+
+					"A LinkNicValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkNicValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid LinkNicValue Attribute Type",
+				"While creating a LinkNicValue value, an invalid attribute value was detected. "+
+					"A LinkNicValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkNicValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("LinkNicValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra LinkNicValue Attribute Value",
+				"While creating a LinkNicValue value, an extra attribute value was detected. "+
+					"A LinkNicValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra LinkNicValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewLinkNicValueUnknown(), diags
+	}
+
+	deleteOnVmDeletionAttribute, ok := attributes["delete_on_vm_deletion"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`delete_on_vm_deletion is missing from object`)
+
+		return NewLinkNicValueUnknown(), diags
+	}
+
+	deleteOnVmDeletionVal, ok := deleteOnVmDeletionAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`delete_on_vm_deletion expected to be basetypes.BoolValue, was: %T`, deleteOnVmDeletionAttribute))
+	}
+
+	deviceNumberAttribute, ok := attributes["device_number"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`device_number is missing from object`)
+
+		return NewLinkNicValueUnknown(), diags
+	}
+
+	deviceNumberVal, ok := deviceNumberAttribute.(basetypes.Int64Value)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`device_number expected to be basetypes.Int64Value, was: %T`, deviceNumberAttribute))
+	}
+
+	idAttribute, ok := attributes["id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`id is missing from object`)
+
+		return NewLinkNicValueUnknown(), diags
+	}
+
+	idVal, ok := idAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`id expected to be basetypes.StringValue, was: %T`, idAttribute))
+	}
+
+	stateAttribute, ok := attributes["state"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`state is missing from object`)
+
+		return NewLinkNicValueUnknown(), diags
+	}
+
+	stateVal, ok := stateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
+	}
+
+	vmAccountIdAttribute, ok := attributes["vm_account_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vm_account_id is missing from object`)
+
+		return NewLinkNicValueUnknown(), diags
+	}
+
+	vmAccountIdVal, ok := vmAccountIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vm_account_id expected to be basetypes.StringValue, was: %T`, vmAccountIdAttribute))
+	}
+
+	vmIdAttribute, ok := attributes["vm_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vm_id is missing from object`)
+
+		return NewLinkNicValueUnknown(), diags
+	}
+
+	vmIdVal, ok := vmIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vm_id expected to be basetypes.StringValue, was: %T`, vmIdAttribute))
+	}
+
+	if diags.HasError() {
+		return NewLinkNicValueUnknown(), diags
+	}
+
+	return LinkNicValue{
+		DeleteOnVmDeletion: deleteOnVmDeletionVal,
+		DeviceNumber:       deviceNumberVal,
+		Id:                 idVal,
+		State:              stateVal,
+		VmAccountId:        vmAccountIdVal,
+		VmId:               vmIdVal,
+		state:              attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkNicValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) LinkNicValue {
+	object, diags := NewLinkNicValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewLinkNicValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t LinkNicType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewLinkNicValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewLinkNicValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewLinkNicValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewLinkNicValueMust(LinkNicValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t LinkNicType) ValueType(ctx context.Context) attr.Value {
+	return LinkNicValue{}
+}
+
+var _ basetypes.ObjectValuable = LinkNicValue{}
+
+type LinkNicValue struct {
+	DeleteOnVmDeletion basetypes.BoolValue   `tfsdk:"delete_on_vm_deletion"`
+	DeviceNumber       basetypes.Int64Value  `tfsdk:"device_number"`
+	Id                 basetypes.StringValue `tfsdk:"id"`
+	State              basetypes.StringValue `tfsdk:"state"`
+	VmAccountId        basetypes.StringValue `tfsdk:"vm_account_id"`
+	VmId               basetypes.StringValue `tfsdk:"vm_id"`
+	state              attr.ValueState
+}
+
+func (v LinkNicValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 6)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["delete_on_vm_deletion"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["device_number"] = basetypes.Int64Type{}.TerraformType(ctx)
+	attrTypes["id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["vm_account_id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["vm_id"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 6)
+
+		val, err = v.DeleteOnVmDeletion.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["delete_on_vm_deletion"] = val
+
+		val, err = v.DeviceNumber.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["device_number"] = val
+
+		val, err = v.Id.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["id"] = val
+
+		val, err = v.State.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["state"] = val
+
+		val, err = v.VmAccountId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["vm_account_id"] = val
+
+		val, err = v.VmId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["vm_id"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v LinkNicValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v LinkNicValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v LinkNicValue) String() string {
+	return "LinkNicValue"
+}
+
+func (v LinkNicValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	objVal, diags := types.ObjectValue(
+		map[string]attr.Type{
+			"delete_on_vm_deletion": basetypes.BoolType{},
+			"device_number":         basetypes.Int64Type{},
+			"id":                    basetypes.StringType{},
+			"state":                 basetypes.StringType{},
+			"vm_account_id":         basetypes.StringType{},
+			"vm_id":                 basetypes.StringType{},
+		},
+		map[string]attr.Value{
+			"delete_on_vm_deletion": v.DeleteOnVmDeletion,
+			"device_number":         v.DeviceNumber,
+			"id":                    v.Id,
+			"state":                 v.State,
+			"vm_account_id":         v.VmAccountId,
+			"vm_id":                 v.VmId,
+		})
+
+	return objVal, diags
+}
+
+func (v LinkNicValue) Equal(o attr.Value) bool {
+	other, ok := o.(LinkNicValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.DeleteOnVmDeletion.Equal(other.DeleteOnVmDeletion) {
+		return false
+	}
+
+	if !v.DeviceNumber.Equal(other.DeviceNumber) {
+		return false
+	}
+
+	if !v.Id.Equal(other.Id) {
+		return false
+	}
+
+	if !v.State.Equal(other.State) {
+		return false
+	}
+
+	if !v.VmAccountId.Equal(other.VmAccountId) {
+		return false
+	}
+
+	if !v.VmId.Equal(other.VmId) {
+		return false
+	}
+
+	return true
+}
+
+func (v LinkNicValue) Type(ctx context.Context) attr.Type {
+	return LinkNicType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v LinkNicValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"delete_on_vm_deletion": basetypes.BoolType{},
+		"device_number":         basetypes.Int64Type{},
+		"id":                    basetypes.StringType{},
+		"state":                 basetypes.StringType{},
+		"vm_account_id":         basetypes.StringType{},
+		"vm_id":                 basetypes.StringType{},
+	}
 }
 
 var _ basetypes.ObjectTypable = LinkPublicIpType{}
@@ -1266,6 +1905,27 @@ func (v PrivateIpsValue) AttributeTypes(ctx context.Context) map[string]attr.Typ
 		"private_ip":       basetypes.StringType{},
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var _ basetypes.ObjectTypable = SecurityGroupsType{}
 
