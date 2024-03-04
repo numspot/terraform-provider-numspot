@@ -17,11 +17,6 @@ func DirectLinkResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The bandwidth of the DirectLink (`1Gbps` \\| `10Gbps`).",
 				MarkdownDescription: "The bandwidth of the DirectLink (`1Gbps` \\| `10Gbps`).",
 			},
-			"direct_link_name": schema.StringAttribute{
-				Required:            true,
-				Description:         "The name of the DirectLink.",
-				MarkdownDescription: "The name of the DirectLink.",
-			},
 			"id": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The ID of the DirectLink (for example, `dxcon-xxxxxxxx`).",
@@ -33,7 +28,7 @@ func DirectLinkResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The code of the requested location for the DirectLink, returned by the [ReadLocations](#readlocations) method.",
 			},
 			"name": schema.StringAttribute{
-				Computed:            true,
+				Required:            true,
 				Description:         "The name of the DirectLink.",
 				MarkdownDescription: "The name of the DirectLink.",
 			},
@@ -41,6 +36,12 @@ func DirectLinkResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The Region in which the DirectLink has been created.",
 				MarkdownDescription: "The Region in which the DirectLink has been created.",
+			},
+			"space_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "space identifier",
+				MarkdownDescription: "space identifier",
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,
@@ -52,11 +53,11 @@ func DirectLinkResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type DirectLinkModel struct {
-	Bandwidth      types.String `tfsdk:"bandwidth"`
-	DirectLinkName types.String `tfsdk:"direct_link_name"`
-	Id             types.String `tfsdk:"id"`
-	Location       types.String `tfsdk:"location"`
-	Name           types.String `tfsdk:"name"`
-	RegionName     types.String `tfsdk:"region_name"`
-	State          types.String `tfsdk:"state"`
+	Bandwidth  types.String `tfsdk:"bandwidth"`
+	Id         types.String `tfsdk:"id"`
+	Location   types.String `tfsdk:"location"`
+	Name       types.String `tfsdk:"name"`
+	RegionName types.String `tfsdk:"region_name"`
+	SpaceId    types.String `tfsdk:"space_id"`
+	State      types.String `tfsdk:"state"`
 }
