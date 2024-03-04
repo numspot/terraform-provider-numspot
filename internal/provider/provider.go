@@ -29,12 +29,13 @@ type Key string
 var (
 	clientIdKey     = Key("client_id")
 	clientSecretKey = Key("client_secret")
-	spaceID         = uuid.New()
+	spaceIdKey      = Key("space_id")
 )
 
 var (
 	errClientIdNotFound     = errors.New("can't find client_id")
 	errClientSecretNotFound = errors.New("can't find client_secret")
+	errSpaceIdNotFound      = errors.New("can't find space_id")
 )
 
 func New(version string, development bool) func() provider.Provider {
@@ -56,6 +57,7 @@ type NumspotProviderModel struct {
 	IAMHost      types.String `tfsdk:"iam_host"`
 	ClientId     types.String `tfsdk:"client_id"`
 	ClientSecret types.String `tfsdk:"client_secret"`
+	SpaceId      types.String `tfsdk:"space_id"`
 }
 
 func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
@@ -75,6 +77,10 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 			},
 			"client_secret": schema.StringAttribute{
 				MarkdownDescription: "Client secret to authenticate user.",
+				Optional:            true,
+			},
+			"space_id": schema.StringAttribute{
+				MarkdownDescription: "Space ID.",
 				Optional:            true,
 			},
 		},
@@ -157,7 +163,7 @@ func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag *diag.Diag
 		}),
 	)
 	if err != nil {
-		diag.AddError("Failed to create NumSpot api client", err.Error())
+		diag.AddError("Failed to create NumSpot api provider", err.Error())
 		return nil
 	}
 
@@ -172,7 +178,7 @@ func (p *numspotProvider) apiClientWithFakeAuth(data *NumspotProviderModel, diag
 			},
 		}))
 	if err != nil {
-		diag.AddError("Failed to create NumSpot api client", err.Error())
+		diag.AddError("Failed to create NumSpot api provider", err.Error())
 		return nil
 	}
 
@@ -187,6 +193,11 @@ func faker(_ context.Context, req *http.Request) error {
 
 	req.Header.Add("Authorization", "Bearer token_200")
 	return nil
+}
+
+type Provider struct {
+	SpaceID   api.SpaceId
+	ApiClient *api.ClientWithResponses
 }
 
 func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -205,7 +216,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		resp.Diagnostics.AddAttributeError(
 			path.Root("host"),
 			"Unknown Numspot API Host",
-			"The provider cannot create the Numspot API client as there is an unknown configuration value for the Numspot API host. "+
+			"The provider cannot create the Numspot API provider as there is an unknown configuration value for the Numspot API host. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_API_HOST environment variable.",
 		)
 	}
@@ -214,7 +225,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		resp.Diagnostics.AddAttributeError(
 			path.Root("iam_host"),
 			"Unknown IAM API Host",
-			"The provider cannot create the IAM API client as there is an unknown configuration value for the IAM API host. "+
+			"The provider cannot create the IAM API provider as there is an unknown configuration value for the IAM API host. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_IAM_HOST environment variable.",
 		)
 	}
@@ -223,7 +234,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_id"),
 			"Unknown Numspot Client id",
-			"The provider cannot create the Numspot API client as there is an unknown configuration value for the Numspot IAM API client ID. "+
+			"The provider cannot create the Numspot API provider as there is an unknown configuration value for the Numspot IAM API provider ID. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_CLIENT_ID environment variable.",
 		)
 	}
@@ -232,7 +243,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_secret"),
 			"Unknown Numspot Client secret",
-			"The provider cannot create the Numspot API client as there is an unknown configuration value for the Numspot IAM API client secret. "+
+			"The provider cannot create the Numspot API provider as there is an unknown configuration value for the Numspot IAM API provider secret. "+
 				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_CLIENT_SECRET environment variable.",
 		)
 	}
@@ -248,6 +259,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	iamHost := os.Getenv("NUMSPOT_IAM_HOST")
 	clientID := os.Getenv("NUMSPOT_CLIENT_ID")
 	clientSecret := os.Getenv("NUMSPOT_CLIENT_SECRET")
+	spaceId := os.Getenv("NUMSPOT_SPACE_ID")
 
 	if !config.Host.IsNull() {
 		host = config.Host.ValueString()
@@ -265,6 +277,10 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		clientSecret = config.ClientSecret.ValueString()
 	}
 
+	if !config.SpaceId.IsNull() {
+		spaceId = config.SpaceId.ValueString()
+	}
+
 	// If any of the expected configurations are missing, return
 	// errors with provider-specific guidance.
 
@@ -272,7 +288,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		resp.Diagnostics.AddAttributeError(
 			path.Root("host"),
 			"Missing Numspot API Host",
-			"The provider cannot create the Numspot API client as there is a missing or empty value for the Numspot API host. "+
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot API host. "+
 				"Set the host value in the configuration or use the NUMSPOT_API_HOST environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
@@ -282,7 +298,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		resp.Diagnostics.AddAttributeError(
 			path.Root("iam_host"),
 			"Missing Numspot IAM API Host",
-			"The provider cannot create the Numspot API client as there is a missing or empty value for the Numspot IAM API host. "+
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot IAM API host. "+
 				"Set the iam_host value in the configuration or use the NUMSPOT_IAM_HOST environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
@@ -292,7 +308,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_id"),
 			"Missing Numspot Client ID",
-			"The provider cannot create the Numspot API client as there is a missing or empty value for the Numspot Client ID. "+
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot Client ID. "+
 				"Set the client_id value in the configuration or use the NUMSPOT_CLIENT_ID environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
@@ -302,8 +318,18 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_secret"),
 			"Missing Numspot Client Secret",
-			"The provider cannot create the Numspot API client as there is a missing or empty value for the Numspot Client Secret. "+
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot Client Secret. "+
 				"Set the client_secret value in the configuration or use the NUMSPOT_CLIENT_SECRET environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
+	if spaceId == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("space_id"),
+			"Missing Numspot Space ID",
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot Space ID. "+
+				"Set the space_id value in the configuration or use the NUMSPOT_SPACE_ID environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
 	}
@@ -317,7 +343,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	config.ClientId = types.StringValue(clientID)
 	config.ClientSecret = types.StringValue(clientSecret)
 
-	// Create a new Numspot client using the configuration values
+	// Create a new Numspot provider using the configuration values
 	var client *api.ClientWithResponses
 	if p.development {
 		client = p.apiClientWithFakeAuth(&config, resp.Diagnostics)
@@ -326,13 +352,28 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	}
 
 	if resp.Diagnostics.HasError() {
-		resp.Diagnostics.AddError("Failed to create NumSpot api client", "")
+		resp.Diagnostics.AddError("Failed to create NumSpot api provider", "")
 	}
 
-	// Make the Numspot client available during DataSource and Resource
+	// Make the Numspot provider available during DataSource and Resource
 	// type Configure methods.
-	resp.DataSourceData = client
-	resp.ResourceData = client
+	spaceUuid, err := uuid.Parse(spaceId)
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("space_id"),
+			"Missing Numspot Client ID",
+			"Failed to parse Space ID, please provide a valid Space ID.",
+		)
+		return
+	}
+
+	providerData := Provider{
+		ApiClient: client,
+		SpaceID:   spaceUuid,
+	}
+
+	resp.DataSourceData = providerData
+	resp.ResourceData = providerData
 }
 
 func (p *numspotProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {

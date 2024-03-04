@@ -27,8 +27,8 @@ func (d *loadBalancersDataSource) Configure(_ context.Context, request datasourc
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
-	if !ok || client == nil {
+	provider, ok := request.ProviderData.(Provider)
+	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
 			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
@@ -37,7 +37,7 @@ func (d *loadBalancersDataSource) Configure(_ context.Context, request datasourc
 		return
 	}
 
-	d.client = client
+	d.provider = provider
 }
 
 // NewCoffeesDataSource is a helper function to simplify the provider implementation.
@@ -47,7 +47,7 @@ func NewLoadBalancersDataSource() datasource.DataSource {
 
 // coffeesDataSource is the data source implementation.
 type loadBalancersDataSource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 // Metadata returns the data source type name.
@@ -315,7 +315,7 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 		params.LoadBalancerNames = &lbNames
 	}
 	res := utils.ExecuteRequest(func() (*api.ReadLoadBalancersResponse, error) {
-		return d.client.ReadLoadBalancersWithResponse(ctx, spaceID, &params)
+		return d.provider.ApiClient.ReadLoadBalancersWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

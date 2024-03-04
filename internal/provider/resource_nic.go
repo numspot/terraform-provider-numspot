@@ -21,7 +21,7 @@ var (
 )
 
 type NicResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewNicResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *NicResource) Configure(ctx context.Context, request resource.ConfigureR
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -43,7 +43,7 @@ func (r *NicResource) Configure(ctx context.Context, request resource.ConfigureR
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *NicResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -64,7 +64,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 
 	res := utils.ExecuteRequest(func() (*api.CreateNicResponse, error) {
 		body := NicFromTfToCreateRequest(ctx, &data)
-		return r.client.CreateNicWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateNicWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -84,7 +84,7 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadNicsByIdResponse, error) {
-		return r.client.ReadNicsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -109,6 +109,6 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteNicResponse, error) {
-		return r.client.DeleteNicWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteNicWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

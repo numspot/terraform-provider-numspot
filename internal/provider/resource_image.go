@@ -21,7 +21,7 @@ var (
 )
 
 type ImageResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewImageResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *ImageResource) Configure(ctx context.Context, request resource.Configur
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -43,7 +43,7 @@ func (r *ImageResource) Configure(ctx context.Context, request resource.Configur
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *ImageResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -64,7 +64,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 
 	res := utils.ExecuteRequest(func() (*api.CreateImageResponse, error) {
 		body := ImageFromTfToCreateRequest(&data)
-		return r.client.CreateImageWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateImageWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -79,7 +79,7 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadImagesByIdResponse, error) {
-		return r.client.ReadImagesByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadImagesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
 	tf := ImageFromHttpToTf(res.JSON200)
@@ -96,6 +96,6 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteImageResponse, error) {
-		return r.client.DeleteImageWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteImageWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

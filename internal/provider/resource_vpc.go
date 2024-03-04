@@ -23,7 +23,7 @@ var (
 )
 
 type VpcResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewNetResource() resource.Resource {
@@ -35,7 +35,7 @@ func (r *VpcResource) Configure(ctx context.Context, request resource.ConfigureR
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -45,7 +45,7 @@ func (r *VpcResource) Configure(ctx context.Context, request resource.ConfigureR
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *VpcResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -66,7 +66,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 
 	res := utils.ExecuteRequest(func() (*api.CreateVpcResponse, error) {
 		body := NetFromTfToCreateRequest(&data)
-		return r.client.CreateVpcWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateVpcWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -78,7 +78,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
 			readRes := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
-				return r.client.ReadVpcsByIdWithResponse(ctx, spaceID, createdId)
+				return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
 				return
@@ -105,7 +105,7 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
-		return r.client.ReadVpcsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -124,7 +124,7 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVpcResponse, error) {
-		return r.client.DeleteVpcWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteVpcWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
@@ -135,7 +135,7 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 		Target:  []string{"deleted"},
 		Refresh: func() (result interface{}, state string, err error) {
 			// Do not use utils.ExecuteRequest to access error response to know if it's a 404 Not Found expected response
-			readNetRes, err := r.client.ReadVpcsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+			readNetRes, err := r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 			if err != nil {
 				response.Diagnostics.AddError("Failed to read Net on delete", err.Error())
 				return

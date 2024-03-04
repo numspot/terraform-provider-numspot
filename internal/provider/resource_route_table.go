@@ -23,7 +23,7 @@ var (
 )
 
 type RouteTableResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 type PrivateState struct {
@@ -42,7 +42,7 @@ func (r *RouteTableResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -52,7 +52,7 @@ func (r *RouteTableResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *RouteTableResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -73,7 +73,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 
 	res := utils.ExecuteRequest(func() (*api.CreateRouteTableResponse, error) {
 		body := RouteTableFromTfToCreateRequest(&data)
-		return r.client.CreateRouteTableWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateRouteTableWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -91,7 +91,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	for i := range routes {
 		route := &routes[i]
 		createdRoute := utils.ExecuteRequest(func() (*api.CreateRouteResponse, error) {
-			return r.client.CreateRouteWithResponse(ctx, spaceID, *createdId, api.CreateRouteJSONRequestBody{
+			return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, *createdId, api.CreateRouteJSONRequestBody{
 				DestinationIpRange: route.DestinationIpRange.ValueString(),
 				GatewayId:          route.GatewayId.ValueStringPointer(),
 				NatGatewayId:       route.NatServiceId.ValueStringPointer(),
@@ -107,7 +107,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 
 	if !data.SubnetId.IsNull() {
 		linkRes := utils.ExecuteRequest(func() (*api.LinkRouteTableResponse, error) {
-			return r.client.LinkRouteTableWithResponse(ctx, spaceID, *createdId, api.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
+			return r.provider.ApiClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, *createdId, api.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
 		}, http.StatusOK, &response.Diagnostics)
 		if linkRes == nil {
 			return
@@ -165,7 +165,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 		}
 	} else {
 		// Retrieve Default Destination IP Range
-		readNetRes, err := r.client.ReadVpcsByIdWithResponse(ctx, spaceID, *res.JSON200.VpcId)
+		readNetRes, err := r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, *res.JSON200.VpcId)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to read associated Net", err.Error())
 			return
@@ -207,7 +207,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 }
 
 func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag diag.Diagnostics) *api.ReadRouteTablesByIdResponse {
-	res, err := r.client.ReadRouteTablesByIdWithResponse(ctx, spaceID, id)
+	res, err := r.provider.ApiClient.ReadRouteTablesByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diag.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -240,9 +240,9 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 
 	for _, link := range links {
 		unlinkRes := utils.ExecuteRequest(func() (*api.UnlinkRouteTableResponse, error) {
-			return r.client.UnlinkRouteTableWithResponse(
+			return r.provider.ApiClient.UnlinkRouteTableWithResponse(
 				ctx,
-				spaceID,
+				r.provider.SpaceID,
 				data.Id.ValueString(),
 				api.UnlinkRouteTableJSONRequestBody{
 					LinkRouteTableId: link.Id.ValueString(),
@@ -255,6 +255,6 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 	}
 
 	utils.ExecuteRequest(func() (*api.DeleteRouteTableResponse, error) {
-		return r.client.DeleteRouteTableWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteRouteTableWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

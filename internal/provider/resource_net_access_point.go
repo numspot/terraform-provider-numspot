@@ -21,7 +21,7 @@ var (
 )
 
 type NetAccessPointResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewNetAccessPointResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *NetAccessPointResource) Configure(ctx context.Context, request resource
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -43,7 +43,7 @@ func (r *NetAccessPointResource) Configure(ctx context.Context, request resource
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *NetAccessPointResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -64,7 +64,7 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 
 	res := utils.ExecuteRequest(func() (*api.CreateVpcAccessPointResponse, error) {
 		body := NetAccessPointFromTfToCreateRequest(ctx, &data)
-		return r.client.CreateVpcAccessPointWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateVpcAccessPointWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -83,7 +83,7 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpcAccessPointsByIdResponse, error) {
-		return r.client.ReadVpcAccessPointsByIdWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -106,6 +106,6 @@ func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.De
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteVpcAccessPointResponse, error) {
-		return r.client.DeleteVpcAccessPointWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.DeleteVpcAccessPointWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

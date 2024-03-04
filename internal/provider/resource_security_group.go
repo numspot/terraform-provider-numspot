@@ -22,7 +22,7 @@ var (
 )
 
 type SecurityGroupResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewSecurityGroupResource() resource.Resource {
@@ -34,7 +34,7 @@ func (r *SecurityGroupResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -44,7 +44,7 @@ func (r *SecurityGroupResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *SecurityGroupResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -65,7 +65,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 	res := utils.ExecuteRequest(func() (*api.CreateSecurityGroupResponse, error) {
 		body := SecurityGroupFromTfToCreateRequest(&data)
-		return r.client.CreateSecurityGroupWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateSecurityGroupWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -80,7 +80,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 		createdIbdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateInboundRulesRequest(ctx, *createdId, inboundRules)
-			return r.client.CreateSecurityGroupRuleWithResponse(ctx, spaceID, *createdId, body)
+			return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, *createdId, body)
 		}, http.StatusCreated, &response.Diagnostics)
 		if createdIbdRules == nil {
 			return
@@ -108,7 +108,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 				Flow:  "Outbound",
 				Rules: &rules,
 			}
-			return r.client.DeleteSecurityGroupRuleWithResponse(ctx, spaceID, *createdId, body)
+			return r.provider.ApiClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, *createdId, body)
 		}, http.StatusNoContent, &response.Diagnostics)
 
 		// Create SG rules:
@@ -117,7 +117,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 		createdObdRules := utils.ExecuteRequest(func() (*api.CreateSecurityGroupRuleResponse, error) {
 			body := CreateOutboundRulesRequest(ctx, *createdId, outboundRules)
-			return r.client.CreateSecurityGroupRuleWithResponse(ctx, spaceID, *createdId, body)
+			return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, *createdId, body)
 		}, http.StatusCreated, &response.Diagnostics)
 		if createdObdRules == nil {
 			return
@@ -161,7 +161,7 @@ func (r *SecurityGroupResource) readSecurityGroup(
 	id string,
 	diagnostics diag.Diagnostics,
 ) *api.ReadSecurityGroupsByIdResponse {
-	res, err := r.client.ReadSecurityGroupsByIdWithResponse(ctx, spaceID, id)
+	res, err := r.provider.ApiClient.ReadSecurityGroupsByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -185,6 +185,6 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSecurityGroupResponse, error) {
-		return r.client.DeleteSecurityGroupWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteSecurityGroupWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

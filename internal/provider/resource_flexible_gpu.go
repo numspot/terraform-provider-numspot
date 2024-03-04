@@ -24,7 +24,7 @@ var (
 )
 
 type FlexibleGpuResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewFlexibleGpuResource() resource.Resource {
@@ -36,7 +36,7 @@ func (r *FlexibleGpuResource) Configure(ctx context.Context, request resource.Co
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -46,7 +46,7 @@ func (r *FlexibleGpuResource) Configure(ctx context.Context, request resource.Co
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *FlexibleGpuResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -67,7 +67,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 
 	res := utils.ExecuteRequest(func() (*api.CreateFlexibleGpuResponse, error) {
 		body := FlexibleGpuFromTfToCreateRequest(&data)
-		return r.client.CreateFlexibleGpuWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateFlexibleGpuWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 
 	createStateConf := &retry.StateChangeConf{
@@ -96,7 +96,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 }
 
 func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *api.FlexibleGpu {
-	res, err := r.client.ReadFlexibleGpusByIdWithResponse(ctx, spaceID, id)
+	res, err := r.provider.ApiClient.ReadFlexibleGpusByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -133,6 +133,6 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteFlexibleGpuResponse, error) {
-		return r.client.DeleteFlexibleGpuWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteFlexibleGpuWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

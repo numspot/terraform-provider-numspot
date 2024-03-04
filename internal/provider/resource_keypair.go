@@ -21,7 +21,7 @@ var (
 )
 
 type KeyPairResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewKeyPairResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *KeyPairResource) Configure(ctx context.Context, request resource.Config
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -43,7 +43,7 @@ func (r *KeyPairResource) Configure(ctx context.Context, request resource.Config
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *KeyPairResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -64,7 +64,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 
 	res := utils.ExecuteRequest(func() (*api.CreateKeypairResponse, error) {
 		body := KeyPairFromTfToCreateRequest(&data)
-		return r.client.CreateKeypairWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateKeypairWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -86,7 +86,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadKeypairsByIdResponse, error) {
-		return r.client.ReadKeypairsByIdWithResponse(ctx, spaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
+		return r.provider.ApiClient.ReadKeypairsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -116,6 +116,6 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteKeypairResponse, error) {
-		return r.client.DeleteKeypairWithResponse(ctx, spaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
+		return r.provider.ApiClient.DeleteKeypairWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 }

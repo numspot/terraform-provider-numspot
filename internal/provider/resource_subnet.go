@@ -24,7 +24,7 @@ var (
 )
 
 type SubnetResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewSubnetResource() resource.Resource {
@@ -36,7 +36,7 @@ func (r *SubnetResource) Configure(ctx context.Context, request resource.Configu
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -46,7 +46,7 @@ func (r *SubnetResource) Configure(ctx context.Context, request resource.Configu
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *SubnetResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -67,7 +67,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 
 	res := utils.ExecuteRequest(func() (*api.CreateSubnetResponse, error) {
 		body := SubnetFromTfToCreateRequest(&data)
-		return r.client.CreateSubnetWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateSubnetWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -78,7 +78,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		Pending: []string{"pending"},
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
-			res, err := r.client.ReadSubnetsByIdWithResponse(ctx, spaceID, createdId)
+			res, err := r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
 			if err != nil {
 				response.Diagnostics.AddError("Failed to read Subnet", err.Error())
 				return
@@ -104,7 +104,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 
 	if data.MapPublicIpOnLaunch.ValueBool() {
 		updateRes := utils.ExecuteRequest(func() (*api.UpdateSubnetResponse, error) {
-			return r.client.UpdateSubnetWithResponse(ctx, spaceID, createdId, api.UpdateSubnetJSONRequestBody{
+			return r.provider.ApiClient.UpdateSubnetWithResponse(ctx, r.provider.SpaceID, createdId, api.UpdateSubnetJSONRequestBody{
 				MapPublicIpOnLaunch: true,
 			})
 		}, http.StatusOK, &response.Diagnostics)
@@ -114,7 +114,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	}
 
 	readRes := utils.ExecuteRequest(func() (*api.ReadSubnetsByIdResponse, error) {
-		return r.client.ReadSubnetsByIdWithResponse(ctx, spaceID, createdId)
+		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
 		return
@@ -129,7 +129,7 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadSubnetsByIdResponse, error) {
-		return r.client.ReadSubnetsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -148,7 +148,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteSubnetResponse, error) {
-		return r.client.DeleteSubnetWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteSubnetWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
@@ -158,14 +158,13 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 		Pending: []string{"pending", "available"},
 		Target:  []string{"deleted"},
 		Refresh: func() (result interface{}, state string, err error) {
-			res, err := r.client.ReadSubnetsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+			res, err := r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 			if err != nil {
 				response.Diagnostics.AddError("Failed to read Subnet on delete", err.Error())
 				return
 			}
 
-			expectedStatusCode := 200
-			if res.StatusCode() != expectedStatusCode {
+			if res.StatusCode() != http.StatusOK {
 				apiError := utils.HandleError(res.Body)
 				if match, _ := regexp.MatchString("No .* found", apiError.Error()); match {
 					return data, "deleted", nil

@@ -21,7 +21,7 @@ var (
 )
 
 type DirectLinkResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewDirectLinkResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *DirectLinkResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -43,7 +43,7 @@ func (r *DirectLinkResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *DirectLinkResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -64,7 +64,7 @@ func (r *DirectLinkResource) Create(ctx context.Context, request resource.Create
 
 	res := utils.ExecuteRequest(func() (*api.CreateDirectLinkResponse, error) {
 		body := DirectLinkFromTfToCreateRequest(&data)
-		return r.client.CreateDirectLinkWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateDirectLinkWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -79,7 +79,7 @@ func (r *DirectLinkResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadDirectLinksByIdResponse, error) {
-		return r.client.ReadDirectLinksByIdWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.ReadDirectLinksByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -98,7 +98,7 @@ func (r *DirectLinkResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteDirectLinkResponse, error) {
-		return r.client.DeleteDirectLinkWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.DeleteDirectLinkWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

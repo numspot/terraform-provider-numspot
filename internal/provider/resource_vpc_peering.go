@@ -16,7 +16,7 @@ var _ resource.Resource = &VpcPeeringResource{}
 var _ resource.ResourceWithConfigure = &VpcPeeringResource{}
 
 type VpcPeeringResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewVpcPeeringResource() resource.Resource {
@@ -28,7 +28,7 @@ func (r *VpcPeeringResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -38,7 +38,7 @@ func (r *VpcPeeringResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *VpcPeeringResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
@@ -55,7 +55,7 @@ func (r *VpcPeeringResource) Create(ctx context.Context, request resource.Create
 
 	res := utils.ExecuteRequest(func() (*api.CreateVpcPeeringResponse, error) {
 		body := VpcPeeringFromTfToCreateRequest(data)
-		return r.client.CreateVpcPeeringWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateVpcPeeringWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -75,7 +75,7 @@ func (r *VpcPeeringResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpcPeeringsByIdResponse, error) {
-		return r.client.ReadVpcPeeringsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -107,7 +107,7 @@ func (r *VpcPeeringResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVpcPeeringResponse, error) {
-		return r.client.DeleteVpcPeeringWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteVpcPeeringWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

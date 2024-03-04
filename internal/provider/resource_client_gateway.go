@@ -21,7 +21,7 @@ var (
 )
 
 type ClientGatewayResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewClientGatewayResource() resource.Resource {
@@ -33,8 +33,8 @@ func (r *ClientGatewayResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
-	if !ok || client == nil {
+	provider, ok := request.ProviderData.(Provider)
+	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
 			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
@@ -43,7 +43,7 @@ func (r *ClientGatewayResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *ClientGatewayResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -64,8 +64,8 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 
 	res := utils.ExecuteRequest(func() (*api.CreateClientGatewayResponse, error) {
 		body := ClientGatewayFromTfToCreateRequest(&data)
-		return r.client.CreateClientGatewayWithResponse(ctx, spaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
+		return r.provider.ApiClient.CreateClientGatewayWithResponse(ctx, r.provider.SpaceID, body)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}
@@ -79,7 +79,7 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadClientGatewaysByIdResponse, error) {
-		return r.client.ReadClientGatewaysByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadClientGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -99,8 +99,8 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteClientGatewayResponse, error) {
-		return r.client.DeleteClientGatewayWithResponse(ctx, spaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+		return r.provider.ApiClient.DeleteClientGatewayWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
 	}

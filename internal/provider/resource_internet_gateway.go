@@ -21,7 +21,7 @@ var (
 )
 
 type InternetGatewayResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewInternetGatewayResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *InternetGatewayResource) Configure(ctx context.Context, request resourc
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -43,7 +43,7 @@ func (r *InternetGatewayResource) Configure(ctx context.Context, request resourc
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *InternetGatewayResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -63,7 +63,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.CreateInternetGatewayResponse, error) {
-		return r.client.CreateInternetGatewayWithResponse(ctx, spaceID)
+		return r.provider.ApiClient.CreateInternetGatewayWithResponse(ctx, r.provider.SpaceID)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil || res.JSON201 == nil {
 		return
@@ -75,9 +75,9 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	vpcId := data.VpcIp
 	if !vpcId.IsNull() {
 		linRes := utils.ExecuteRequest(func() (*api.LinkInternetGatewayResponse, error) {
-			return r.client.LinkInternetGatewayWithResponse(
+			return r.provider.ApiClient.LinkInternetGatewayWithResponse(
 				ctx,
-				spaceID,
+				r.provider.SpaceID,
 				*createdId,
 				api.LinkInternetGatewayJSONRequestBody{
 					VpcId: data.VpcIp.ValueString(),
@@ -91,7 +91,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 
 	// Update state
 	readRes := utils.ExecuteRequest(func() (*api.ReadInternetGatewaysByIdResponse, error) {
-		return r.client.ReadInternetGatewaysByIdWithResponse(ctx, spaceID, *createdId)
+		return r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, *createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -107,7 +107,7 @@ func (r *InternetGatewayResource) Read(ctx context.Context, request resource.Rea
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadInternetGatewaysByIdResponse, error) {
-		return r.client.ReadInternetGatewaysByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -127,9 +127,9 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 
 	if !data.VpcIp.IsNull() {
 		res := utils.ExecuteRequest(func() (*api.UnlinkInternetGatewayResponse, error) {
-			return r.client.UnlinkInternetGatewayWithResponse(
+			return r.provider.ApiClient.UnlinkInternetGatewayWithResponse(
 				ctx,
-				spaceID,
+				r.provider.SpaceID,
 				data.Id.ValueString(),
 				api.UnlinkInternetGatewayJSONRequestBody{
 					VpcId: data.VpcIp.ValueString(),
@@ -140,7 +140,7 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 		}
 	}
 
-	res, err := r.client.DeleteInternetGatewayWithResponse(ctx, spaceID, data.Id.ValueString())
+	res, err := r.provider.ApiClient.DeleteInternetGatewayWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete InternetService", err.Error())
 		return
