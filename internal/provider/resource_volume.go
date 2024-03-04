@@ -23,7 +23,7 @@ var (
 )
 
 type VolumeResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewVolumeResource() resource.Resource {
@@ -35,7 +35,7 @@ func (r *VolumeResource) Configure(ctx context.Context, request resource.Configu
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -45,7 +45,7 @@ func (r *VolumeResource) Configure(ctx context.Context, request resource.Configu
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *VolumeResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -66,7 +66,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 
 	res := utils.ExecuteRequest(func() (*api.CreateVolumeResponse, error) {
 		body := VolumeFromTfToCreateRequest(&data)
-		return r.client.CreateVolumeWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateVolumeWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -77,7 +77,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
 			readRes := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
-				return r.client.ReadVolumesByIdWithResponse(ctx, spaceID, *res.JSON201.Id)
+				return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, *res.JSON201.Id)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
 				return
@@ -110,7 +110,7 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
-		return r.client.ReadVolumesByIdWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -131,7 +131,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 
 	updatedRes := utils.ExecuteRequest(func() (*api.UpdateVolumeResponse, error) {
 		body := ValueFromTfToUpdaterequest(&plan)
-		return r.client.UpdateVolumeWithResponse(ctx, spaceID, state.Id.ValueString(), body)
+		return r.provider.ApiClient.UpdateVolumeWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString(), body)
 	}, http.StatusOK, &response.Diagnostics)
 	if updatedRes == nil {
 		return
@@ -143,7 +143,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
 			readRes := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
-				return r.client.ReadVolumesByIdWithResponse(ctx, spaceID, volumeId)
+				return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, volumeId)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
 				return
@@ -177,6 +177,6 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteVolumeResponse, error) {
-		return r.client.DeleteVolumeWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteVolumeWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

@@ -22,7 +22,7 @@ var (
 )
 
 type SnapshotResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewSnapshotResource() resource.Resource {
@@ -34,7 +34,7 @@ func (r *SnapshotResource) Configure(ctx context.Context, request resource.Confi
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -44,7 +44,7 @@ func (r *SnapshotResource) Configure(ctx context.Context, request resource.Confi
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *SnapshotResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -65,7 +65,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 
 	res := utils.ExecuteRequest(func() (*api.CreateSnapshotResponse, error) {
 		body := SnapshotFromTfToCreateRequest(&data)
-		return r.client.CreateSnapshotWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateSnapshotWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -92,7 +92,7 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadSnapshotsByIdResponse, error) {
-		return r.client.ReadSnapshotsByIdWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -123,6 +123,6 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSnapshotResponse, error) {
-		return r.client.DeleteSnapshotWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.DeleteSnapshotWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

@@ -21,7 +21,7 @@ var (
 )
 
 type PublicIpResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewPublicIpResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *PublicIpResource) Configure(ctx context.Context, request resource.Confi
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -43,7 +43,7 @@ func (r *PublicIpResource) Configure(ctx context.Context, request resource.Confi
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *PublicIpResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -63,7 +63,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
 	createRes := utils.ExecuteRequest(func() (*api.CreatePublicIpResponse, error) {
-		return r.client.CreatePublicIpWithResponse(ctx, spaceID)
+		return r.provider.ApiClient.CreatePublicIpWithResponse(ctx, r.provider.SpaceID)
 	}, http.StatusCreated, &response.Diagnostics)
 	if createRes == nil {
 		return
@@ -80,14 +80,14 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	state.NicId = plan.NicId
 
 	// Call Link publicIP
-	linkPublicIP, err := invokeLinkPublicIP(ctx, r.client, &state)
+	linkPublicIP, err := invokeLinkPublicIP(ctx, r.provider, &state)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to link public IP", err.Error())
 	}
 	state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
 
 	// Refresh state
-	data, err := refreshState(ctx, r.client, &state)
+	data, err := refreshState(ctx, r.provider, &state)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
 	}
@@ -99,7 +99,7 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	readRes := utils.ExecuteRequest(func() (*api.ReadPublicIpsByIdResponse, error) {
-		return r.client.ReadPublicIpsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadPublicIpsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
 		return
@@ -133,12 +133,12 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 	}
 
 	if chgSet.Unlink {
-		if err := invokeUnlinkPublicIP(ctx, r.client, &state); err != nil {
+		if err := invokeUnlinkPublicIP(ctx, r.provider, &state); err != nil {
 			response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
 			return
 		}
 		state.LinkPublicIP = types.StringNull()
-		data, err := refreshState(ctx, r.client, &state)
+		data, err := refreshState(ctx, r.provider, &state)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
 			return
@@ -147,14 +147,14 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 	}
 	if chgSet.Link {
 		plan.Id = state.Id
-		linkPublicIP, err = invokeLinkPublicIP(ctx, r.client, &plan)
+		linkPublicIP, err = invokeLinkPublicIP(ctx, r.provider, &plan)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to link public IP", err.Error())
 			return
 		}
 		state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
 	}
-	data, err := refreshState(ctx, r.client, &state)
+	data, err := refreshState(ctx, r.provider, &state)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
 		return
@@ -167,12 +167,12 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
 	if !state.LinkPublicIP.IsNull() {
-		if err := invokeUnlinkPublicIP(ctx, r.client, &state); err != nil {
+		if err := invokeUnlinkPublicIP(ctx, r.provider, &state); err != nil {
 			response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
 			return
 		}
 	}
 	utils.ExecuteRequest(func() (*api.DeletePublicIpResponse, error) {
-		return r.client.DeletePublicIpWithResponse(ctx, spaceID, state.Id.ValueString())
+		return r.provider.ApiClient.DeletePublicIpWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

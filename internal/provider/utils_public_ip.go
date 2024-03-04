@@ -47,7 +47,7 @@ func PublicIpFromHttpToTf(elt *api.PublicIp, model *resource_public_ip.PublicIpM
 	model.VmId = types.StringPointerValue(elt.VmId)
 }
 
-func invokeLinkPublicIP(ctx context.Context, client *api.ClientWithResponses, data *resource_public_ip.PublicIpModel) (*string, error) {
+func invokeLinkPublicIP(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) (*string, error) {
 	var payload api.LinkPublicIpJSONRequestBody
 	if !data.VmId.IsNull() {
 		payload = api.LinkPublicIpJSONRequestBody{VmId: data.VmId.ValueStringPointer()}
@@ -57,7 +57,7 @@ func invokeLinkPublicIP(ctx context.Context, client *api.ClientWithResponses, da
 			PrivateIp: data.PrivateIp.ValueStringPointer(),
 		}
 	}
-	res, err := client.LinkPublicIpWithResponse(ctx, spaceID, data.Id.ValueString(), payload)
+	res, err := provider.ApiClient.LinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -68,9 +68,9 @@ func invokeLinkPublicIP(ctx context.Context, client *api.ClientWithResponses, da
 	return res.JSON200.LinkPublicIpId, nil
 }
 
-func invokeUnlinkPublicIP(ctx context.Context, client *api.ClientWithResponses, data *resource_public_ip.PublicIpModel) error {
+func invokeUnlinkPublicIP(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) error {
 	payload := api.UnlinkPublicIpJSONRequestBody{}
-	res, err := client.UnlinkPublicIpWithResponse(ctx, spaceID, data.LinkPublicIP.ValueString(), payload)
+	res, err := provider.ApiClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.LinkPublicIP.ValueString(), payload)
 	if err != nil {
 		return err
 	}
@@ -81,9 +81,9 @@ func invokeUnlinkPublicIP(ctx context.Context, client *api.ClientWithResponses, 
 	return nil
 }
 
-func refreshState(ctx context.Context, client *api.ClientWithResponses, data *resource_public_ip.PublicIpModel) (*resource_public_ip.PublicIpModel, error) {
+func refreshState(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) (*resource_public_ip.PublicIpModel, error) {
 	// Refresh state
-	res, err := client.ReadPublicIpsByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+	res, err := provider.ApiClient.ReadPublicIpsByIdWithResponse(ctx, provider.SpaceID, data.Id.ValueString())
 	if err != nil {
 		return nil, err
 	}

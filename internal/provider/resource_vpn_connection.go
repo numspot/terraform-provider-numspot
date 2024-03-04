@@ -21,7 +21,7 @@ var (
 )
 
 type VpnConnectionResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewVpnConnectionResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *VpnConnectionResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	client, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -43,7 +43,7 @@ func (r *VpnConnectionResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	r.client = client
+	r.provider = client
 }
 
 func (r *VpnConnectionResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -64,7 +64,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 
 	res := utils.ExecuteRequest(func() (*api.CreateVpnConnectionResponse, error) {
 		body := VpnConnectionFromTfToCreateRequest(&data)
-		return r.client.CreateVpnConnectionWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateVpnConnectionWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -79,7 +79,7 @@ func (r *VpnConnectionResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpnConnectionsByIdResponse, error) {
-		return r.client.ReadVpnConnectionsByIdWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.ReadVpnConnectionsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -99,7 +99,7 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVpnConnectionResponse, error) {
-		return r.client.DeleteVpnConnectionWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.DeleteVpnConnectionWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

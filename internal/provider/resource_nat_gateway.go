@@ -18,7 +18,7 @@ var _ resource.ResourceWithConfigure = &NatGatewayResource{}
 var _ resource.ResourceWithImportState = &NatGatewayResource{}
 
 type NatGatewayResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewNatGatewayResource() resource.Resource {
@@ -30,7 +30,7 @@ func (r *NatGatewayResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -40,7 +40,7 @@ func (r *NatGatewayResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *NatGatewayResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -61,7 +61,7 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 
 	res := utils.ExecuteRequest(func() (*api.CreateNatGatewayResponse, error) {
 		body := NatGatewayFromTfToCreateRequest(data)
-		return r.client.CreateNatGatewayWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateNatGatewayWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -80,7 +80,7 @@ func (r *NatGatewayResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadNatGatewayByIdResponse, error) {
-		return r.client.ReadNatGatewayByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -95,7 +95,6 @@ func (r *NatGatewayResource) Read(ctx context.Context, request resource.ReadRequ
 }
 
 func (r *NatGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
 	panic("implement me")
 }
 
@@ -104,7 +103,7 @@ func (r *NatGatewayResource) Delete(ctx context.Context, request resource.Delete
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteNatGatewayResponse, error) {
-		return r.client.DeleteNatGatewayWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteNatGatewayWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

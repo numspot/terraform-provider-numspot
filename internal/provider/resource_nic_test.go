@@ -45,12 +45,12 @@ func TestAccNicResource(t *testing.T) {
 
 func testNicConfig() string {
 	return `
-resource "numspot_net" "net" {
+resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
 resource "numspot_subnet" "subnet" {
-	net_id 		= numspot_net.net.id
+	vpc_id 		= numspot_vpc.vpc.id
 	ip_range 	= "10.101.1.0/24"
 }
 

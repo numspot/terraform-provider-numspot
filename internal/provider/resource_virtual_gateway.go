@@ -18,7 +18,7 @@ var _ resource.ResourceWithConfigure = &VirtualGatewayResource{}
 var _ resource.ResourceWithImportState = &VirtualGatewayResource{}
 
 type VirtualGatewayResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewVirtualGatewayResource() resource.Resource {
@@ -30,7 +30,7 @@ func (r *VirtualGatewayResource) Configure(ctx context.Context, request resource
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	client, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -40,7 +40,7 @@ func (r *VirtualGatewayResource) Configure(ctx context.Context, request resource
 		return
 	}
 
-	r.client = client
+	r.provider = client
 }
 
 func (r *VirtualGatewayResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -61,7 +61,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 
 	res := utils.ExecuteRequest(func() (*api.CreateVirtualGatewayResponse, error) {
 		body := VirtualGatewayFromTfToCreateRequest(data)
-		return r.client.CreateVirtualGatewayWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateVirtualGatewayWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -80,7 +80,7 @@ func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.Read
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVirtualGatewaysByIdResponse, error) {
-		return r.client.ReadVirtualGatewaysByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -103,7 +103,7 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVirtualGatewayResponse, error) {
-		return r.client.DeleteVirtualGatewayWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.DeleteVirtualGatewayWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

@@ -27,8 +27,8 @@ func (d *vpnConnectionsDataSource) Configure(_ context.Context, request datasour
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
-	if !ok || client == nil {
+	provider, ok := request.ProviderData.(Provider)
+	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
 			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
@@ -37,7 +37,7 @@ func (d *vpnConnectionsDataSource) Configure(_ context.Context, request datasour
 		return
 	}
 
-	d.client = client
+	d.provider = provider
 }
 
 // NewCoffeesDataSource is a helper function to simplify the provider implementation.
@@ -47,7 +47,7 @@ func NewVPNDataSource() datasource.DataSource {
 
 // coffeesDataSource is the data source implementation.
 type vpnConnectionsDataSource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 // Metadata returns the data source type name.
@@ -65,13 +65,13 @@ func (d *vpnConnectionsDataSource) Schema(ctx context.Context, _ datasource.Sche
 					Attributes: map[string]schema.Attribute{
 						"client_gateway_configuration": schema.StringAttribute{
 							Computed:            true,
-							Description:         "Example configuration for the client gateway.",
-							MarkdownDescription: "Example configuration for the client gateway.",
+							Description:         "Example configuration for the provider gateway.",
+							MarkdownDescription: "Example configuration for the provider gateway.",
 						},
 						"client_gateway_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the client gateway.",
-							MarkdownDescription: "The ID of the client gateway.",
+							Description:         "The ID of the provider gateway.",
+							MarkdownDescription: "The ID of the provider gateway.",
 						},
 						"connection_type": schema.StringAttribute{
 							Computed:            true,
@@ -256,8 +256,8 @@ func (d *vpnConnectionsDataSource) Schema(ctx context.Context, _ datasource.Sche
 										},
 										"pre_shared_key": schema.StringAttribute{
 											Computed:            true,
-											Description:         "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (&quot;).",
-											MarkdownDescription: "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (&quot;).",
+											Description:         "The pre-shared key to establish the initial authentication between the provider gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (&quot;).",
+											MarkdownDescription: "The pre-shared key to establish the initial authentication between the provider gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (&quot;).",
 										},
 									},
 									CustomType: resource_vpn_connection.Phase2optionsType{
@@ -297,7 +297,7 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 	state.ID = types.StringValue("placeholder")
 
 	res := utils.ExecuteRequest(func() (*api.ReadVpnConnectionsResponse, error) {
-		return d.client.ReadVpnConnectionsWithResponse(ctx, spaceID, &api.ReadVpnConnectionsParams{})
+		return d.provider.ApiClient.ReadVpnConnectionsWithResponse(ctx, d.provider.SpaceID, &api.ReadVpnConnectionsParams{})
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

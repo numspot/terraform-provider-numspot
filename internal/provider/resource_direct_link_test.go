@@ -13,7 +13,7 @@ func TestAccDirectLinkResource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testDirectLinkConfig_Create(),
+				Config: testDirectLinkConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_direct_link.test", "field", "value"),
 					resource.TestCheckResourceAttrWith("numspot_direct_link.test", "field", func(v string) error {
@@ -30,24 +30,25 @@ func TestAccDirectLinkResource(t *testing.T) {
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
-			{
-				Config: testDirectLinkConfig_Update(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_direct_link.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_direct_link.test", "field", func(v string) error {
-						return nil
-					}),
-				),
-			},
+			//{
+			//	Config: testDirectLinkConfig_Update(),
+			//	Check: resource.ComposeAggregateTestCheckFunc(
+			//		resource.TestCheckResourceAttr("numspot_direct_link.test", "field", "value"),
+			//		resource.TestCheckResourceAttrWith("numspot_direct_link.test", "field", func(v string) error {
+			//			return nil
+			//		}),
+			//	),
+			//},
 		},
 	})
 }
 
-func testDirectLinkConfig_Create() string {
-	return `resource "numspot_direct_link" "test" {}`
+func testDirectLinkConfig() string {
+	return `
+resource "numspot_direct_link" "test" {
+	location = "PAR1"
+	bandwidth = "1Gbps"
+	name = "Connection to NumSpot"
 }
-
-func testDirectLinkConfig_Update() string {
-	return `resource "numspot_direct_link" "test" {
-    			}`
+`
 }

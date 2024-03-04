@@ -25,7 +25,7 @@ var (
 )
 
 type VmResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewVmResource() resource.Resource {
@@ -37,7 +37,7 @@ func (r *VmResource) Configure(ctx context.Context, request resource.ConfigureRe
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -46,7 +46,7 @@ func (r *VmResource) Configure(ctx context.Context, request resource.ConfigureRe
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *VmResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -67,7 +67,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 
 	res := utils.ExecuteRequest(func() (*api.CreateVmsResponse, error) {
 		body := VmFromTfToCreateRequest(ctx, &data)
-		return r.client.CreateVmsWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateVmsWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
@@ -110,7 +110,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 }
 
 func (r *VmResource) readVmById(ctx context.Context, id *string, diagnostics diag.Diagnostics) *api.Vm {
-	res, err := r.client.ReadVmsByIdWithResponse(ctx, spaceID, *id)
+	res, err := r.provider.ApiClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -131,7 +131,7 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 
 	res := utils.ExecuteRequest(func() (*api.ReadVmsByIdResponse, error) {
 		id := data.Id.ValueStringPointer()
-		return r.client.ReadVmsByIdWithResponse(ctx, spaceID, *id)
+		return r.provider.ApiClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -157,7 +157,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	res := utils.ExecuteRequest(func() (*api.DeleteVmsResponse, error) {
 		idsSlice := make([]interface{}, 1)
 		idsSlice[0] = data.Id.ValueString()
-		return r.client.DeleteVmsWithResponse(ctx, spaceID, idsSlice)
+		return r.provider.ApiClient.DeleteVmsWithResponse(ctx, r.provider.SpaceID, idsSlice)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

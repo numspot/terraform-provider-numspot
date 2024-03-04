@@ -21,7 +21,7 @@ var (
 )
 
 type DirectLinkInterfaceResource struct {
-	client *api.ClientWithResponses
+	provider Provider
 }
 
 func NewDirectLinkInterfaceResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *DirectLinkInterfaceResource) Configure(ctx context.Context, request res
 		return
 	}
 
-	client, ok := request.ProviderData.(*api.ClientWithResponses)
+	provider, ok := request.ProviderData.(Provider)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -43,7 +43,7 @@ func (r *DirectLinkInterfaceResource) Configure(ctx context.Context, request res
 		return
 	}
 
-	r.client = client
+	r.provider = provider
 }
 
 func (r *DirectLinkInterfaceResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -64,7 +64,7 @@ func (r *DirectLinkInterfaceResource) Create(ctx context.Context, request resour
 
 	res := utils.ExecuteRequest(func() (*api.CreateDirectLinkInterfaceResponse, error) {
 		body := DirectLinkInterfaceFromTfToCreateRequest(&data)
-		return r.client.CreateDirectLinkInterfaceWithResponse(ctx, spaceID, body)
+		return r.provider.ApiClient.CreateDirectLinkInterfaceWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -79,7 +79,7 @@ func (r *DirectLinkInterfaceResource) Read(ctx context.Context, request resource
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadDirectLinkInterfacesByIdResponse, error) {
-		return r.client.ReadDirectLinkInterfacesByIdWithResponse(ctx, spaceID, data.Id.ValueString())
+		return r.provider.ApiClient.ReadDirectLinkInterfacesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -99,6 +99,6 @@ func (r *DirectLinkInterfaceResource) Delete(ctx context.Context, request resour
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	utils.ExecuteRequest(func() (*api.DeleteDirectLinkInterfaceResponse, error) {
-		return r.client.DeleteDirectLinkInterfaceWithResponse(ctx, spaceID, data.Id.String())
+		return r.provider.ApiClient.DeleteDirectLinkInterfaceWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

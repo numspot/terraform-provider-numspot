@@ -13,6 +13,11 @@ import (
 func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"availability_zone_name": schema.StringAttribute{
+				Required:            true,
+				Description:         "The Subregion in which you want to create the fGPU.",
+				MarkdownDescription: "The Subregion in which you want to create the fGPU.",
+			},
 			"delete_on_vm_deletion": schema.BoolAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -36,18 +41,19 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The model of fGPU you want to allocate. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).",
 				MarkdownDescription: "The model of fGPU you want to allocate. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).",
 			},
+			"space_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "space identifier",
+				MarkdownDescription: "space identifier",
+			},
 			"state": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The state of the fGPU (`allocated` \\| `attaching` \\| `attached` \\| `detaching`).",
 				MarkdownDescription: "The state of the fGPU (`allocated` \\| `attaching` \\| `attached` \\| `detaching`).",
 			},
-			"subregion_name": schema.StringAttribute{
-				Required:            true,
-				Description:         "The Subregion in which you want to create the fGPU.",
-				MarkdownDescription: "The Subregion in which you want to create the fGPU.",
-			},
 			"vm_id": schema.StringAttribute{
-				Optional:            true,
+				Computed:            true,
 				Description:         "The ID of the VM the fGPU is attached to, if any.",
 				MarkdownDescription: "The ID of the VM the fGPU is attached to, if any.",
 			},
@@ -56,11 +62,12 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type FlexibleGpuModel struct {
-	DeleteOnVmDeletion types.Bool   `tfsdk:"delete_on_vm_deletion"`
-	Generation         types.String `tfsdk:"generation"`
-	Id                 types.String `tfsdk:"id"`
-	ModelName          types.String `tfsdk:"model_name"`
-	State              types.String `tfsdk:"state"`
-	SubregionName      types.String `tfsdk:"subregion_name"`
-	VmId               types.String `tfsdk:"vm_id"`
+	AvailabilityZoneName types.String `tfsdk:"availability_zone_name"`
+	DeleteOnVmDeletion   types.Bool   `tfsdk:"delete_on_vm_deletion"`
+	Generation           types.String `tfsdk:"generation"`
+	Id                   types.String `tfsdk:"id"`
+	ModelName            types.String `tfsdk:"model_name"`
+	SpaceId              types.String `tfsdk:"space_id"`
+	State                types.String `tfsdk:"state"`
+	VmId                 types.String `tfsdk:"vm_id"`
 }

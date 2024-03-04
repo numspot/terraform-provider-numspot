@@ -8,13 +8,13 @@ import (
 
 func FlexibleGpuFromHttpToTf(http *api.FlexibleGpu) resource_flexible_gpu.FlexibleGpuModel {
 	return resource_flexible_gpu.FlexibleGpuModel{
-		DeleteOnVmDeletion: types.BoolPointerValue(http.DeleteOnVmDeletion),
-		Generation:         types.StringPointerValue(http.Generation),
-		Id:                 types.StringPointerValue(http.Id),
-		ModelName:          types.StringPointerValue(http.ModelName),
-		State:              types.StringPointerValue(http.State),
-		SubregionName:      types.StringPointerValue(http.AvailabilityZoneName),
-		VmId:               types.StringPointerValue(http.VmId),
+		DeleteOnVmDeletion:   types.BoolPointerValue(http.DeleteOnVmDeletion),
+		Generation:           types.StringPointerValue(http.Generation),
+		Id:                   types.StringPointerValue(http.Id),
+		ModelName:            types.StringPointerValue(http.ModelName),
+		State:                types.StringPointerValue(http.State),
+		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
+		VmId:                 types.StringPointerValue(http.VmId),
 	}
 }
 
@@ -23,6 +23,6 @@ func FlexibleGpuFromTfToCreateRequest(tf *resource_flexible_gpu.FlexibleGpuModel
 		DeleteOnVmDeletion:   tf.DeleteOnVmDeletion.ValueBoolPointer(),
 		Generation:           tf.Generation.ValueStringPointer(),
 		ModelName:            tf.ModelName.ValueString(),
-		AvailabilityZoneName: tf.SubregionName.ValueString(),
+		AvailabilityZoneName: tf.AvailabilityZoneName.ValueString(),
 	}
 }

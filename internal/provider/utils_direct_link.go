@@ -7,26 +7,14 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_direct_link"
 )
 
-func DirectLinkFromTfToHttp(tf *resource_direct_link.DirectLinkModel) *api.DirectLink {
-	return &api.DirectLink{
-		Bandwidth:  tf.Bandwidth.ValueStringPointer(),
-		Id:         tf.Id.ValueStringPointer(),
-		Location:   tf.Location.ValueStringPointer(),
-		Name:       tf.Name.ValueStringPointer(),
-		RegionName: tf.RegionName.ValueStringPointer(),
-		State:      tf.Bandwidth.ValueStringPointer(),
-	}
-}
-
 func DirectLinkFromHttpToTf(http *api.DirectLink) resource_direct_link.DirectLinkModel {
 	return resource_direct_link.DirectLinkModel{
-		Bandwidth:      types.StringPointerValue(http.Bandwidth),
-		DirectLinkName: types.StringPointerValue(http.Name),
-		Id:             types.StringPointerValue(http.Id),
-		Location:       types.StringPointerValue(http.Location),
-		Name:           types.StringPointerValue(http.Name),
-		RegionName:     types.StringPointerValue(http.RegionName),
-		State:          types.StringPointerValue(http.State),
+		Bandwidth:  types.StringPointerValue(http.Bandwidth),
+		Name:       types.StringPointerValue(http.Name),
+		Id:         types.StringPointerValue(http.Id),
+		Location:   types.StringPointerValue(http.Location),
+		RegionName: types.StringPointerValue(http.RegionName),
+		State:      types.StringPointerValue(http.State),
 	}
 }
 
