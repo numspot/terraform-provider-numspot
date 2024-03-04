@@ -1,54 +1,49 @@
 package provider
 
 import (
+	"fmt"
+	"math/rand"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
 )
 
-func TestAccImageResource(t *testing.T) {
+func TestAccImageResource_FromImage(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
+
+	randint := rand.Intn(9999-1000) + 1000
+	imageName := fmt.Sprintf("terraform-generated-volume-%d", randint)
+	sourceImageId := "ami-00b0c39a"
+	region := "eu-west-2"
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testImageConfig_Create(),
+				Config: testImageConfig_Create_FromImage(imageName, sourceImageId, region),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_image.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_image.test", "field", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
+					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
+					resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", sourceImageId),
+					resource.TestCheckResourceAttr("numspot_image.test", "source_region_name", region),
 				),
+				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
 				ResourceName:            "numspot_image.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
-			},
-			// Update testing
-			{
-				Config: testImageConfig_Update(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_image.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_image.test", "field", func(v string) error {
-						return nil
-					}),
-				),
+				ImportStateVerifyIgnore: []string{"source_image_id", "source_region_name"},
 			},
 		},
 	})
 }
 
-func testImageConfig_Create() string {
-	return `resource "numspot_image" "test" {
-  			}`
-}
-
-func testImageConfig_Update() string {
-	return `resource "numspot_image" "test" {
-    			}`
+func testImageConfig_Create_FromImage(name, sourceImageId, region string) string {
+	return fmt.Sprintf(`
+resource "numspot_image" "test" {
+	name 				= %[1]q
+	source_image_id 	= %[2]q
+	source_region_name	= %[3]q
+}`, name, sourceImageId, region)
 }

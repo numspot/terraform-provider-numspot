@@ -2,12 +2,27 @@ package utils
 
 import (
 	"context"
-
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
+
+func FromTfStringToStringPtr(str types.String) *string {
+	if str.IsUnknown() || str.IsNull() {
+		return nil
+	}
+
+	return str.ValueStringPointer()
+}
+
+func FromTfBoolToBoolPtr(bl types.Bool) *bool {
+	if bl.IsUnknown() || bl.IsNull() {
+		return nil
+	}
+
+	return bl.ValueBoolPointer()
+}
 
 func FromTfInt64ToIntPtr(tfInt types.Int64) *int {
 	if tfInt.ValueInt64Pointer() != nil {
@@ -123,4 +138,25 @@ func StringListToTfListValue(ctx context.Context, from []string) (types.List, di
 		},
 		from,
 	)
+}
+
+type TFType interface {
+	IsNull() bool
+	IsUnknown() bool
+}
+
+func FromTfStringValueToTfOrNull(element basetypes.StringValue) basetypes.StringValue {
+	if element.IsNull() || element.IsUnknown() {
+		return types.StringNull()
+	}
+
+	return element
+}
+
+func FromTfBoolValueToTfOrNull(element basetypes.BoolValue) basetypes.BoolValue {
+	if element.IsNull() || element.IsUnknown() {
+		return types.BoolNull()
+	}
+
+	return element
 }
