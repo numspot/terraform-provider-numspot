@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -101,6 +102,67 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancer) resou
 	azNames, _ := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames)
 
 	return resource_load_balancer.LoadBalancerModel{
+		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciestypes,
+		BackendIps:                      backendIps,
+		BackendVmIds:                    backendVmIds,
+		DnsName:                         types.StringPointerValue(http.DnsName),
+		HealthCheck:                     healthCheck,
+		Id:                              types.StringPointerValue(http.Name),
+		Listeners:                       listeners,
+		Name:                            types.StringPointerValue(http.Name),
+		VpcId:                           types.StringPointerValue(http.VpcId),
+		PublicIp:                        types.StringPointerValue(http.PublicIp),
+		SecuredCookies:                  types.BoolPointerValue(http.SecuredCookies),
+		SecurityGroups:                  securityGroups,
+		SourceSecurityGroup:             sourceSecurityGroup,
+		StickyCookiePolicies:            stickyCookiePolicies,
+		Subnets:                         subnets,
+		AvailabilityZoneNames:           azNames,
+		Type:                            types.StringPointerValue(http.Type),
+	}
+}
+
+func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *api.LoadBalancer) datasource_load_balancer.LoadBalancerModel {
+	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
+	if diags.HasError() {
+		return datasource_load_balancer.LoadBalancerModel{}
+	}
+
+	listeners, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ListenersValue{}, listenersFromHTTP, *http.Listeners)
+	if diags.HasError() {
+		return datasource_load_balancer.LoadBalancerModel{}
+	}
+
+	stickyCookiePolicies, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies)
+	if diags.HasError() {
+		return datasource_load_balancer.LoadBalancerModel{}
+	}
+
+	backendIps, _ := utils.FromStringListPointerToTfStringList(ctx, http.BackendIps)
+	backendVmIds, _ := utils.FromStringListPointerToTfStringList(ctx, http.BackendVmIds)
+	healthCheck, err := datasource_load_balancer.NewHealthCheckValue(resource_load_balancer.HealthCheckValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"check_interval":      utils.FromIntToTfInt64(http.HealthCheck.CheckInterval),
+			"healthy_threshold":   utils.FromIntToTfInt64(http.HealthCheck.HealthyThreshold),
+			"path":                types.StringPointerValue(http.HealthCheck.Path),
+			"port":                utils.FromIntToTfInt64(http.HealthCheck.Port),
+			"protocol":            types.StringValue(http.HealthCheck.Protocol),
+			"timeout":             utils.FromIntToTfInt64(http.HealthCheck.Timeout),
+			"unhealthy_threshold": utils.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
+		})
+	if err != nil {
+		return datasource_load_balancer.LoadBalancerModel{}
+	}
+	//httpListeners := *http.Listeners
+	securityGroups, _ := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
+	sourceSecurityGroup := datasource_load_balancer.SourceSecurityGroupValue{
+		SecurityGroupAccountId: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupAccountId),
+		SecurityGroupName:      types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
+	}
+	subnets, _ := utils.FromStringListPointerToTfStringList(ctx, http.Subnets)
+	azNames, _ := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames)
+
+	return datasource_load_balancer.LoadBalancerModel{
 		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciestypes,
 		BackendIps:                      backendIps,
 		BackendVmIds:                    backendVmIds,

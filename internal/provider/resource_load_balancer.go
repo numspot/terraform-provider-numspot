@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"net/http"
+	"time"
 )
 
 var (
@@ -155,4 +157,38 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 	if res == nil {
 		return
 	}
+
+	deleteStateConf := &retry.StateChangeConf{
+		Pending: []string{"pending", "available", "deleting"},
+		Target:  []string{"deleted"},
+		Refresh: func() (result interface{}, state string, err error) {
+			// Do not use utils.ExecuteRequest to access error response to know if it's a 404 Not Found expected response
+			readLbRes, err := r.provider.ApiClient.ReadLoadBalancersByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+			if err != nil {
+				response.Diagnostics.AddError("Failed to read Net on delete", err.Error())
+				return
+			}
+
+			if readLbRes.StatusCode() != http.StatusOK {
+				if readLbRes.StatusCode() == http.StatusNotFound {
+					return data, "deleted", nil
+				}
+				apiError := utils.HandleError(readLbRes.Body)
+				response.Diagnostics.AddError("Failed to read load balancer on delete", apiError.Error())
+				return
+			}
+
+			return data, "pending", nil
+		},
+		Timeout: 5 * time.Minute,
+		Delay:   5 * time.Second,
+	}
+
+	_, err := deleteStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Net", fmt.Sprintf("Error waiting for instance (%s) to be deleted: %s", data.Id.ValueString(), err))
+		return
+	}
+
+	response.State.RemoveResource(ctx)
 }
