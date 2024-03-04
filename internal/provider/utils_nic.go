@@ -2,6 +2,8 @@ package provider
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -13,12 +15,24 @@ import (
 
 func privatesIpFromApi(ctx context.Context, elt api.PrivateIp) (resource_nic.PrivateIpsValue, diag.Diagnostics) {
 	var (
-		linkPublicIpTf resource_nic.LinkPublicIpValue
-		diagnostics    diag.Diagnostics
+		linkPublicIpTf  resource_nic.LinkPublicIpValue
+		linkPublicIpObj basetypes.ObjectValue
+		diagnostics     diag.Diagnostics
 	)
 
 	if elt.LinkPublicIp != nil {
 		linkPublicIpTf, diagnostics = linkPublicIpFromApi(ctx, *elt.LinkPublicIp)
+		if diagnostics.HasError() {
+			return resource_nic.PrivateIpsValue{}, diagnostics
+		}
+
+		linkPublicIpObj, diagnostics = linkPublicIpTf.ToObjectValue(ctx)
+		if diagnostics.HasError() {
+			return resource_nic.PrivateIpsValue{}, diagnostics
+		}
+	} else {
+		linkPublicIpTf = resource_nic.NewLinkPublicIpValueNull()
+		linkPublicIpObj, diagnostics = linkPublicIpTf.ToObjectValue(ctx)
 		if diagnostics.HasError() {
 			return resource_nic.PrivateIpsValue{}, diagnostics
 		}
@@ -28,7 +42,7 @@ func privatesIpFromApi(ctx context.Context, elt api.PrivateIp) (resource_nic.Pri
 		resource_nic.PrivateIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"is_primary":       types.BoolPointerValue(elt.IsPrimary),
-			"link_public_ip":   linkPublicIpTf,
+			"link_public_ip":   linkPublicIpObj,
 			"private_dns_name": types.StringPointerValue(elt.PrivateDnsName),
 			"private_ip":       types.StringPointerValue(elt.PrivateIp),
 		},
@@ -59,6 +73,9 @@ func linkPublicIpFromApi(ctx context.Context, elt api.LinkPublicIp) (resource_ni
 }
 
 func NicFromHttpToTf(ctx context.Context, http *api.Nic) (*resource_nic.NicModel, diag.Diagnostics) {
+	var (
+		linkPublicIpTf resource_nic.LinkPublicIpValue
+	)
 	// Private IPs
 	privateIps, diagnostics := utils.GenericListToTfListValue(ctx, resource_nic.PrivateIpsValue{}, privatesIpFromApi, *http.PrivateIps)
 	if diagnostics.HasError() {
@@ -84,27 +101,37 @@ func NicFromHttpToTf(ctx context.Context, http *api.Nic) (*resource_nic.NicModel
 	}
 
 	// Link Public Ip
-	linkPublicIpTf, diagnostics := linkPublicIpFromApi(ctx, *http.LinkPublicIp)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	if http.LinkPublicIp != nil {
+		linkPublicIpTf, diagnostics = linkPublicIpFromApi(ctx, *http.LinkPublicIp)
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
+	} else {
+		linkPublicIpTf = resource_nic.NewLinkPublicIpValueNull()
+	}
+
+	var macAddress *string
+	if http.MacAddress != nil {
+		lowerMacAddr := strings.ToLower(*http.MacAddress)
+		macAddress = &lowerMacAddr
 	}
 
 	return &resource_nic.NicModel{
-		AccountId:           types.StringPointerValue(http.AccountId),
-		Description:         types.StringPointerValue(http.AccountId),
-		Id:                  types.StringPointerValue(http.Id),
-		IsSourceDestChecked: types.BoolPointerValue(http.IsSourceDestChecked),
-		LinkPublicIp:        linkPublicIpTf,
-		MacAddress:          types.StringPointerValue(http.MacAddress),
-		NetId:               types.StringPointerValue(http.VpcId),
-		PrivateDnsName:      types.StringPointerValue(http.PrivateDnsName),
-		PrivateIps:          privateIps,
-		SecurityGroupIds:    securityGroupsIdTf,
-		SecurityGroups:      securityGroupsTf,
-		State:               types.StringPointerValue(http.State),
-		SubnetId:            types.StringPointerValue(http.SubnetId),
-		SubregionName:       types.StringPointerValue(http.AvailabilityZoneName),
-	}, nil
+		AccountId:            types.StringPointerValue(http.AccountId),
+		Description:          types.StringPointerValue(http.AccountId),
+		Id:                   types.StringPointerValue(http.Id),
+		IsSourceDestChecked:  types.BoolPointerValue(http.IsSourceDestChecked),
+		LinkPublicIp:         linkPublicIpTf,
+		MacAddress:           types.StringPointerValue(macAddress),
+		VpcId:                types.StringPointerValue(http.VpcId),
+		PrivateDnsName:       types.StringPointerValue(http.PrivateDnsName),
+		PrivateIps:           privateIps,
+		SecurityGroupIds:     securityGroupsIdTf,
+		SecurityGroups:       securityGroupsTf,
+		State:                types.StringPointerValue(http.State),
+		SubnetId:             types.StringPointerValue(http.SubnetId),
+		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
+	}, diagnostics
 }
 
 func NicFromTfToCreateRequest(ctx context.Context, tf *resource_nic.NicModel) api.CreateNicJSONRequestBody {

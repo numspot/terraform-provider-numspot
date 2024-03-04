@@ -8,6 +8,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -22,8 +26,11 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 			"architecture": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The architecture of the OMI (by default, `i386` if you specified the `FileLocation` or `RootDeviceName` parameter).",
-				MarkdownDescription: "The architecture of the OMI (by default, `i386` if you specified the `FileLocation` or `RootDeviceName` parameter).",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Description:         "**(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the OMI (`i386` or `x84_64`).",
+				MarkdownDescription: "**(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the OMI (`i386` or `x84_64`).",
 			},
 			"block_device_mappings": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -93,8 +100,11 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				},
 				Optional:            true,
 				Computed:            true,
-				Description:         "One or more block device mappings.",
-				MarkdownDescription: "One or more block device mappings.",
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplace(),
+				},
+				Description:         "**(when registering from a snapshot, or from a bucket without using a manifest file)** One or more block device mappings.",
+				MarkdownDescription: "**(when registering from a snapshot, or from a bucket without using a manifest file)** One or more block device mappings.",
 			},
 			"creation_date": schema.StringAttribute{
 				Computed:            true,
@@ -104,6 +114,9 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 			"description": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 				Description:         "A description for the new OMI.",
 				MarkdownDescription: "A description for the new OMI.",
 			},
@@ -112,22 +125,23 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the OMI.",
 				MarkdownDescription: "The ID of the OMI.",
 			},
-			"image_name": schema.StringAttribute{
+			"name": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "A unique name for the new OMI.<br />\nConstraints: 3-128 alphanumeric characters, underscores (_), spaces ( ), parentheses (()), slashes (/), periods (.), or dashes (-).",
-				MarkdownDescription: "A unique name for the new OMI.<br />\nConstraints: 3-128 alphanumeric characters, underscores (_), spaces ( ), parentheses (()), slashes (/), periods (.), or dashes (-).",
-			},
-			"name": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The name of the OMI.",
-				MarkdownDescription: "The name of the OMI.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Description:         "A unique name for the new OMI.<br />\nConstraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), parentheses (`()`), slashes (`/`), periods (`.`), or dashes (`-`).",
+				MarkdownDescription: "A unique name for the new OMI.<br />\nConstraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), parentheses (`()`), slashes (`/`), periods (`.`), or dashes (`-`).",
 			},
 			"no_reboot": schema.BoolAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.",
-				MarkdownDescription: "If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.",
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.RequiresReplace(),
+				},
+				Description:         "**(when creating from a VM)** If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.",
+				MarkdownDescription: "**(when creating from a VM)** If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.",
 			},
 			"product_codes": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -139,8 +153,11 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 			"root_device_name": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The name of the root device. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.",
-				MarkdownDescription: "The name of the root device. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Description:         "**(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new OMI.",
+				MarkdownDescription: "**(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new OMI.",
 			},
 			"root_device_type": schema.StringAttribute{
 				Computed:            true,
@@ -150,14 +167,29 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 			"source_image_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The ID of the OMI you want to copy. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.",
-				MarkdownDescription: "The ID of the OMI you want to copy. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Description:         "**(when copying an OMI)** The ID of the OMI you want to copy.",
+				MarkdownDescription: "**(when copying an OMI)** The ID of the OMI you want to copy.",
 			},
 			"source_region_name": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The name of the source Region, which must be the same as the Region of your account.",
-				MarkdownDescription: "The name of the source Region, which must be the same as the Region of your account.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Description:         "**(when copying an OMI)** The name of the source Region (always the same as the Region of your account).",
+				MarkdownDescription: "**(when copying an OMI)** The name of the source Region (always the same as the Region of your account).",
+			},
+			"space_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Description:         "space identifier",
+				MarkdownDescription: "space identifier",
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,
@@ -194,8 +226,11 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 			"vm_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The ID of the VM from which you want to create the OMI. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.",
-				MarkdownDescription: "The ID of the VM from which you want to create the OMI. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+				Description:         "**(when creating from a VM)** The ID of the VM from which you want to create the OMI.",
+				MarkdownDescription: "**(when creating from a VM)** The ID of the VM from which you want to create the OMI.",
 			},
 		},
 	}
@@ -207,7 +242,6 @@ type ImageModel struct {
 	CreationDate        types.String      `tfsdk:"creation_date"`
 	Description         types.String      `tfsdk:"description"`
 	Id                  types.String      `tfsdk:"id"`
-	ImageName           types.String      `tfsdk:"image_name"`
 	Name                types.String      `tfsdk:"name"`
 	NoReboot            types.Bool        `tfsdk:"no_reboot"`
 	ProductCodes        types.List        `tfsdk:"product_codes"`
@@ -215,6 +249,7 @@ type ImageModel struct {
 	RootDeviceType      types.String      `tfsdk:"root_device_type"`
 	SourceImageId       types.String      `tfsdk:"source_image_id"`
 	SourceRegionName    types.String      `tfsdk:"source_region_name"`
+	SpaceId             types.String      `tfsdk:"space_id"`
 	State               types.String      `tfsdk:"state"`
 	StateComment        StateCommentValue `tfsdk:"state_comment"`
 	Type                types.String      `tfsdk:"type"`

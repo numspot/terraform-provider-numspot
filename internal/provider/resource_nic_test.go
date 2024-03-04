@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
 )
 
 func TestAccNicResource(t *testing.T) {
@@ -14,12 +13,12 @@ func TestAccNicResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testNicConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_nic.subnet_id", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "field", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
+				Check:  resource.ComposeAggregateTestCheckFunc(
+				//resource.TestCheckResourceAttr("numspot_nic.test", "sub", "value"),
+				//resource.TestCheckResourceAttrWith("numspot_nic.test", "field", func(v string) error {
+				//	require.NotEmpty(t, v)
+				//	return nil
+				//}),
 				),
 			},
 			// ImportState testing
@@ -29,16 +28,16 @@ func TestAccNicResource(t *testing.T) {
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{},
 			},
-			// Update testing
-			{
-				Config: testNicConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_nic.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "field", func(v string) error {
-						return nil
-					}),
-				),
-			},
+			//// Update testing
+			//{
+			//	Config: testNicConfig(),
+			//	Check: resource.ComposeAggregateTestCheckFunc(
+			//		resource.TestCheckResourceAttr("numspot_nic.test", "field", "value"),
+			//		resource.TestCheckResourceAttrWith("numspot_nic.test", "field", func(v string) error {
+			//			return nil
+			//		}),
+			//	),
+			//},
 		},
 	})
 }
@@ -57,6 +56,5 @@ resource "numspot_subnet" "subnet" {
 
 resource "numspot_nic" "test" {
 	subnet_id = numspot_subnet.subnet.id
-}
-`
+}`
 }

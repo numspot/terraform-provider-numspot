@@ -62,15 +62,31 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
+	body := ImageFromTfToCreateRequest(ctx, &data, &response.Diagnostics)
+	if response.Diagnostics.HasError() || body == nil {
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*api.CreateImageResponse, error) {
-		body := ImageFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateImageWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
+		return r.provider.ApiClient.CreateImageWithResponse(ctx, r.provider.SpaceID, *body)
+	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf := ImageFromHttpToTf(res.JSON201)
+	tf, diagnostics := ImageFromHttpToTf(ctx, res.JSON201)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
+	// Must set those values to keep it:
+	tf.SourceImageId = utils.FromTfStringValueToTfOrNull(data.SourceImageId)
+	tf.SourceRegionName = utils.FromTfStringValueToTfOrNull(data.SourceRegionName)
+	tf.VmId = utils.FromTfStringValueToTfOrNull(data.VmId)
+	tf.NoReboot = utils.FromTfBoolValueToTfOrNull(data.NoReboot)
+	//
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -82,7 +98,12 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 		return r.provider.ApiClient.ReadImagesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
-	tf := ImageFromHttpToTf(res.JSON200)
+	tf, diagnostics := ImageFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -97,5 +118,5 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 
 	utils.ExecuteRequest(func() (*api.DeleteImageResponse, error) {
 		return r.provider.ApiClient.DeleteImageWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 }
