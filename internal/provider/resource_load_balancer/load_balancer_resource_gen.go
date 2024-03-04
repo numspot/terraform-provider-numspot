@@ -44,6 +44,12 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The stickiness policies defined for the load balancer.",
 				MarkdownDescription: "The stickiness policies defined for the load balancer.",
 			},
+			"availability_zone_names": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Computed:            true,
+				Description:         "The ID of the Subregion in which the load balancer was created.",
+				MarkdownDescription: "The ID of the Subregion in which the load balancer was created.",
+			},
 			"backend_ips": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Computed:            true,
@@ -68,20 +74,20 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 					"check_interval": schema.Int64Attribute{
 						Computed:            true,
 						Optional:            true,
-						Description:         "The number of seconds between two pings (between `5` and `600` both included).",
-						MarkdownDescription: "The number of seconds between two pings (between `5` and `600` both included).",
+						Description:         "The number of seconds between two requests (between `5` and `600` both included).",
+						MarkdownDescription: "The number of seconds between two requests (between `5` and `600` both included).",
 					},
 					"healthy_threshold": schema.Int64Attribute{
 						Computed:            true,
 						Optional:            true,
-						Description:         "The number of consecutive successful pings before considering the VM as healthy (between `2` and `10` both included).",
-						MarkdownDescription: "The number of consecutive successful pings before considering the VM as healthy (between `2` and `10` both included).",
+						Description:         "The number of consecutive successful requests before considering the VM as healthy (between `2` and `10` both included).",
+						MarkdownDescription: "The number of consecutive successful requests before considering the VM as healthy (between `2` and `10` both included).",
 					},
 					"path": schema.StringAttribute{
 						Computed:            true,
 						Optional:            true,
-						Description:         "If you use the HTTP or HTTPS protocols, the ping path.",
-						MarkdownDescription: "If you use the HTTP or HTTPS protocols, the ping path.",
+						Description:         "If you use the HTTP or HTTPS protocols, the request URL path.",
+						MarkdownDescription: "If you use the HTTP or HTTPS protocols, the request URL path.",
 					},
 					"port": schema.Int64Attribute{
 						Computed:            true,
@@ -104,8 +110,8 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 					"unhealthy_threshold": schema.Int64Attribute{
 						Computed:            true,
 						Optional:            true,
-						Description:         "The number of consecutive failed pings before considering the VM as unhealthy (between `2` and `10` both included).",
-						MarkdownDescription: "The number of consecutive failed pings before considering the VM as unhealthy (between `2` and `10` both included).",
+						Description:         "The number of consecutive failed requests before considering the VM as unhealthy (between `2` and `10` both included).",
+						MarkdownDescription: "The number of consecutive failed requests before considering the VM as unhealthy (between `2` and `10` both included).",
 					},
 				},
 				CustomType: HealthCheckType{
@@ -121,8 +127,8 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 			"id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "ID for /loadBalancers",
-				MarkdownDescription: "ID for /loadBalancers",
+				Description:         "ID for ReadLoadBalancers",
+				MarkdownDescription: "ID for ReadLoadBalancers",
 			},
 			"listeners": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -178,11 +184,6 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"net_id": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The ID of the Net for the load balancer.",
-				MarkdownDescription: "The ID of the Net for the load balancer.",
-			},
 			"public_ip": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -223,6 +224,12 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about the source security group of the load balancer, which you can use as part of your inbound rules for your registered VMs.<br />\nTo only allow traffic from load balancers, add a security group rule that specifies this source security group as the inbound source.",
 				MarkdownDescription: "Information about the source security group of the load balancer, which you can use as part of your inbound rules for your registered VMs.<br />\nTo only allow traffic from load balancers, add a security group rule that specifies this source security group as the inbound source.",
 			},
+			"space_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "space identifier",
+				MarkdownDescription: "space identifier",
+			},
 			"sticky_cookie_policies": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -254,18 +261,16 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "(Net only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Net.",
 				MarkdownDescription: "(Net only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Net.",
 			},
-			"subregion_names": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Computed:            true,
-				Description:         "The ID of the Subregion in which the load balancer was created.",
-				MarkdownDescription: "The ID of the Subregion in which the load balancer was created.",
-			},
 			"type": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
 				Description:         "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.",
 				MarkdownDescription: "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.",
+			},
+			"vpc_id": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The ID of the Net for the load balancer.",
+				MarkdownDescription: "The ID of the Net for the load balancer.",
 			},
 		},
 	}
@@ -273,6 +278,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 
 type LoadBalancerModel struct {
 	ApplicationStickyCookiePolicies types.List               `tfsdk:"application_sticky_cookie_policies"`
+	AvailabilityZoneNames           types.List               `tfsdk:"availability_zone_names"`
 	BackendIps                      types.List               `tfsdk:"backend_ips"`
 	BackendVmIds                    types.List               `tfsdk:"backend_vm_ids"`
 	DnsName                         types.String             `tfsdk:"dns_name"`
@@ -280,15 +286,15 @@ type LoadBalancerModel struct {
 	Id                              types.String             `tfsdk:"id"`
 	Listeners                       types.List               `tfsdk:"listeners"`
 	Name                            types.String             `tfsdk:"name"`
-	NetId                           types.String             `tfsdk:"net_id"`
 	PublicIp                        types.String             `tfsdk:"public_ip"`
 	SecuredCookies                  types.Bool               `tfsdk:"secured_cookies"`
 	SecurityGroups                  types.List               `tfsdk:"security_groups"`
 	SourceSecurityGroup             SourceSecurityGroupValue `tfsdk:"source_security_group"`
+	SpaceId                         types.String             `tfsdk:"space_id"`
 	StickyCookiePolicies            types.List               `tfsdk:"sticky_cookie_policies"`
 	Subnets                         types.List               `tfsdk:"subnets"`
-	SubregionNames                  types.List               `tfsdk:"subregion_names"`
 	Type                            types.String             `tfsdk:"type"`
+	VpcId                           types.String             `tfsdk:"vpc_id"`
 }
 
 var _ basetypes.ObjectTypable = ApplicationStickyCookiePoliciesType{}

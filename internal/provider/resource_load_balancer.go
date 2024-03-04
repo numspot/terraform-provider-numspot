@@ -128,7 +128,7 @@ func (r *LoadBalancerResource) LinkBackendMachines(ctx context.Context, request 
 
 	res := utils.ExecuteRequest(func() (*api.LinkLoadBalancerBackendMachinesResponse, error) {
 		return r.client.LinkLoadBalancerBackendMachinesWithResponse(ctx, spaceID, plan.Name.ValueString(), payload)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
 	}
@@ -149,7 +149,7 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 
 	res := utils.ExecuteRequest(func() (*api.DeleteLoadBalancerResponse, error) {
 		return r.client.DeleteLoadBalancerWithResponse(ctx, spaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
 	}

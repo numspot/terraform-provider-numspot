@@ -2,7 +2,6 @@ package provider
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"strconv"
@@ -38,7 +37,7 @@ func TestAccLoadBalancerResource(t *testing.T) {
 				ResourceName:            "numspot_load_balancer.testlb",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
+				ImportStateVerifyIgnore: []string{"availability_zone_names"},
 			},
 			//Update testing
 			{
@@ -59,12 +58,7 @@ func TestAccLoadBalancerResource(t *testing.T) {
 			{
 				Config: linkBackendMachinesToLbConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_load_balancer.testlb", "backend_vm_ids", func(v string) error {
-						if assert.Empty(t, v) {
-							return fmt.Errorf("backend_vm_ids attr empty after link to backend machines call")
-						}
-						return nil
-					}),
+					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "backend_vm_ids.#", "1"),
 				),
 			},
 		},
@@ -73,12 +67,12 @@ func TestAccLoadBalancerResource(t *testing.T) {
 
 func createLbConfig(name string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
 resource "numspot_subnet" "subnet" {
-	net_id 		= numspot_net.net.id
+	vpc_id 		= numspot_vpc.vpc.id
 	ip_range 	= "10.101.1.0/24"
 }
 
@@ -99,12 +93,12 @@ resource "numspot_load_balancer" "testlb" {
 
 func updateLbConfig(hc api.HealthCheck) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
 resource "numspot_subnet" "subnet" {
-	net_id 		= numspot_net.net.id
+	vpc_id 		= numspot_vpc.vpc.id
 	ip_range 	= "10.101.1.0/24"
 }
 
@@ -134,17 +128,17 @@ resource "numspot_load_balancer" "testlb" {
 
 func linkBackendMachinesToLbConfig() string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
 resource "numspot_subnet" "subnet" {
-	net_id 		= numspot_net.net.id
+	vpc_id 		= numspot_vpc.vpc.id
 	ip_range 	= "10.101.1.0/24"
 }
 
 resource "numspot_security_group" "sg" {
-	net_id 		= numspot_net.net.id
+	net_id 		= numspot_vpc.vpc.id
 	name 		= "terraform-vm-tests-sg-name"
 	description = "terraform-vm-tests-sg-description"
 
@@ -158,18 +152,18 @@ resource "numspot_security_group" "sg" {
 	]
 }
 
-resource "numspot_internet_service" "is" {
-  net_id = numspot_net.net.id
+resource "numspot_internet_gateway" "igw" {
+  vpc_id = numspot_vpc.vpc.id
 }
 
 resource "numspot_route_table" "rt" {
-  net_id    = numspot_net.net.id
+  net_id    = numspot_vpc.vpc.id
   subnet_id = numspot_subnet.subnet.id
 
   routes = [
     {
       destination_ip_range = "0.0.0.0/0"
-      gateway_id           = numspot_internet_service.is.id
+      gateway_id           = numspot_internet_gateway.igw.id
     }
   ]
 }

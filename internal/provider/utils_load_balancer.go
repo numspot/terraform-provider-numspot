@@ -109,14 +109,14 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancer) resou
 		Id:                              types.StringPointerValue(http.Name),
 		Listeners:                       listeners,
 		Name:                            types.StringPointerValue(http.Name),
-		NetId:                           types.StringPointerValue(http.VpcId),
+		VpcId:                           types.StringPointerValue(http.VpcId),
 		PublicIp:                        types.StringPointerValue(http.PublicIp),
 		SecuredCookies:                  types.BoolPointerValue(http.SecuredCookies),
 		SecurityGroups:                  securityGroups,
 		SourceSecurityGroup:             sourceSecurityGroup,
 		StickyCookiePolicies:            stickyCookiePolicies,
 		Subnets:                         subnets,
-		SubregionNames:                  azNames,
+		AvailabilityZoneNames:           azNames,
 		Type:                            types.StringPointerValue(http.Type),
 	}
 }
