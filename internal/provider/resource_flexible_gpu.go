@@ -68,7 +68,10 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	res := utils.ExecuteRequest(func() (*api.CreateFlexibleGpuResponse, error) {
 		body := FlexibleGpuFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateFlexibleGpuWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
+	}, http.StatusCreated, &response.Diagnostics)
+	if res == nil {
+		return
+	}
 
 	createStateConf := &retry.StateChangeConf{
 		Pending: []string{"attaching", "detaching"},

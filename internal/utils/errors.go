@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"net/http"
@@ -14,12 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
-type NSError struct {
-	Type    string `json:"Type"`
-	Details string `json:"Details"`
-	Code    string `json:"Code"`
-}
-
 func HandleError(httpResponseBody []byte) error {
 	var apiError api.ErrorResponse
 	err := json.Unmarshal(httpResponseBody, &apiError)
@@ -27,7 +22,12 @@ func HandleError(httpResponseBody []byte) error {
 		return err
 	}
 
-	return apiError
+	errorString := apiError.Title
+	if apiError.Detail != nil && *apiError.Detail != "" {
+		errorString = errorString + ": " + *apiError.Detail
+	}
+
+	return errors.New(errorString)
 }
 
 func getCallerFunctionName() string {

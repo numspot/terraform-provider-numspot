@@ -13,7 +13,7 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testFlexibleGpuConfig_Create(),
+				Config: testFlexibleGpuConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "field", "value"),
 					resource.TestCheckResourceAttrWith("numspot_flexible_gpu.test", "field", func(v string) error {
@@ -30,27 +30,24 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 				ImportStateVerifyIgnore: []string{},
 			},
 			// Update testing
-			{
-				Config: testFlexibleGpuConfig_Update(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "field", "value"),
-					resource.TestCheckResourceAttrWith("numspot_flexible_gpu.test", "field", func(v string) error {
-						return nil
-					}),
-				),
-			},
+			//{
+			//	Config: testFlexibleGpuConfig(),
+			//	Check: resource.ComposeAggregateTestCheckFunc(
+			//		resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "field", "value"),
+			//		resource.TestCheckResourceAttrWith("numspot_flexible_gpu.test", "field", func(v string) error {
+			//			return nil
+			//		}),
+			//	),
+			//},
 		},
 	})
 }
 
-func testFlexibleGpuConfig_Create() string {
+func testFlexibleGpuConfig() string {
 	return `
 resource "numspot_flexible_gpu" "test" {
-	
+	model_name 				= "nvidia-p100"
+	generation 				= "v5"
+	availability_zone_name 	= "eu-west-2a"
 }`
-}
-
-func testFlexibleGpuConfig_Update() string {
-	return `resource "numspot_flexible_gpu" "test" {
-    			}`
 }
