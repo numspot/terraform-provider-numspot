@@ -13,9 +13,10 @@ func TestAccLoadBalancerDatasource(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fetchLoadBalancersConfig(),
-				//Check:  resource.ComposeAggregateTestCheckFunc(),
-				//resource.TestCheckResourceAttrSet(),
-				//resource.TestCheckResourceAttr("hashicups_order.test", "items.#", "1")),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_load_balancers.test", "load_balancers.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_load_balancers.test", "load_balancers.0.name", "elb-test"),
+				),
 			},
 		},
 	})
