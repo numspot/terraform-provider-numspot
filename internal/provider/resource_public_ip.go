@@ -69,8 +69,8 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	PublicIpFromHttpToTf(createRes.JSON201, &state)
-	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
+	tf := PublicIpFromHttpToTf(createRes.JSON201)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 
 	if plan.VmId.IsNull() && plan.NicId.IsUnknown() {
 		return
@@ -87,7 +87,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
 
 	// Refresh state
-	data, err := refreshState(ctx, r.provider, &state)
+	data, err := refreshState(ctx, r.provider, state.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
 	}
@@ -105,8 +105,8 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 		return
 	}
 
-	PublicIpFromHttpToTf(readRes.JSON200, &data)
-	response.Diagnostics.Append(response.State.Set(ctx, data)...)
+	tf := PublicIpFromHttpToTf(readRes.JSON200)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
@@ -125,7 +125,13 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 		return
 	}
 
-	chgSet := ComputePublicIPChangeSet(&plan, &state)
+	data, err := refreshState(ctx, r.provider, state.Id.ValueString())
+	if err != nil {
+		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
+		return
+	}
+
+	chgSet := ComputePublicIPChangeSet(&plan, data)
 
 	if chgSet.Err != nil {
 		response.Diagnostics.AddError("Failed to update public IP", err.Error()) // err ??
@@ -138,7 +144,7 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 			return
 		}
 		state.LinkPublicIP = types.StringNull()
-		data, err := refreshState(ctx, r.provider, &state)
+		data, err := refreshState(ctx, r.provider, state.Id.ValueString())
 		if err != nil {
 			response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
 			return
@@ -154,7 +160,7 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 		}
 		state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
 	}
-	data, err := refreshState(ctx, r.provider, &state)
+	data, err = refreshState(ctx, r.provider, state.Id.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
 		return

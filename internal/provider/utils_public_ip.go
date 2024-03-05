@@ -38,13 +38,16 @@ func ComputePublicIPChangeSet(plan, state *resource_public_ip.PublicIpModel) Pub
 	return c
 }
 
-func PublicIpFromHttpToTf(elt *api.PublicIp, model *resource_public_ip.PublicIpModel) {
-	model.Id = types.StringPointerValue(elt.Id)
-	model.NicAccountId = types.StringPointerValue(elt.NicAccountId)
-	model.NicId = types.StringPointerValue(elt.NicId)
-	model.PrivateIp = types.StringPointerValue(elt.PrivateIp)
-	model.PublicIp = types.StringPointerValue(elt.PublicIp)
-	model.VmId = types.StringPointerValue(elt.VmId)
+func PublicIpFromHttpToTf(elt *api.PublicIp) resource_public_ip.PublicIpModel {
+	return resource_public_ip.PublicIpModel{
+		Id:           types.StringPointerValue(elt.Id),
+		NicAccountId: types.StringPointerValue(elt.NicAccountId),
+		NicId:        types.StringPointerValue(elt.NicId),
+		PrivateIp:    types.StringPointerValue(elt.PrivateIp),
+		PublicIp:     types.StringPointerValue(elt.PublicIp),
+		VmId:         types.StringPointerValue(elt.VmId),
+		LinkPublicIP: types.StringPointerValue(elt.LinkPublicIpId),
+	}
 }
 
 func invokeLinkPublicIP(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) (*string, error) {
@@ -83,9 +86,9 @@ func invokeUnlinkPublicIP(ctx context.Context, provider Provider, data *resource
 	return nil
 }
 
-func refreshState(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) (*resource_public_ip.PublicIpModel, error) {
+func refreshState(ctx context.Context, provider Provider, id string) (*resource_public_ip.PublicIpModel, error) {
 	// Refresh state
-	res, err := provider.ApiClient.ReadPublicIpsByIdWithResponse(ctx, provider.SpaceID, data.Id.ValueString())
+	res, err := provider.ApiClient.ReadPublicIpsByIdWithResponse(ctx, provider.SpaceID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +98,6 @@ func refreshState(ctx context.Context, provider Provider, data *resource_public_
 		return nil, apiError
 	}
 
-	PublicIpFromHttpToTf(res.JSON200, data)
-	return data, nil
+	tf := PublicIpFromHttpToTf(res.JSON200)
+	return &tf, nil
 }
