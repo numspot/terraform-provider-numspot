@@ -59,12 +59,20 @@ func testPublicIpConfig() string {
 	return `resource "numspot_public_ip" "test" {}`
 }
 
-func testPublicIpConfig_Update(vmid string) string {
-	return fmt.Sprintf(`resource "numspot_public_ip" "test" {
-                        vm_id="%s"
-}`, vmid)
+func testPublicIpConfig_Update(_ string) string {
+	return fmt.Sprintf(`
+resource "numspot_vm" "vm" {
+	image_id = "ami-00b0c39a"
+	vm_type = "t2.small"
+}
+
+resource "numspot_public_ip" "test" {
+	vm_id = numspot_vm.vm.id
+}`)
 }
 
 func testPublicIpConfig_UpdateUnlink() string {
-	return `resource "numspot_public_ip" "test" {}`
+	return `
+resource "numspot_public_ip" "test" {}
+`
 }
