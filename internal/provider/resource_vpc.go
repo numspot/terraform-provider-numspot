@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
@@ -144,7 +143,7 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 
 			if readNetRes.StatusCode() != http.StatusOK {
 				apiError := utils.HandleError(readNetRes.Body)
-				if strings.Contains(apiError.Error(), "No Nets found") {
+				if readNetRes.StatusCode() == http.StatusNotFound {
 					return data, "deleted", nil
 				}
 				response.Diagnostics.AddError("Failed to read Net on delete", apiError.Error())

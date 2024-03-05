@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"regexp"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
@@ -166,7 +165,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 
 			if res.StatusCode() != http.StatusOK {
 				apiError := utils.HandleError(res.Body)
-				if match, _ := regexp.MatchString("No .* found", apiError.Error()); match {
+				if res.StatusCode() == http.StatusNotFound {
 					return data, "deleted", nil
 				}
 				response.Diagnostics.AddError("Failed to read Subnet on delete", apiError.Error())
