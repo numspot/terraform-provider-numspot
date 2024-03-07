@@ -1,7 +1,11 @@
 package provider
 
 import (
+	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vpc"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
@@ -32,4 +36,24 @@ func NetFromTfToCreateRequest(tf *resource_vpc.VpcModel) api.CreateVpcJSONReques
 		IpRange: tf.IpRange.ValueString(),
 		Tenancy: tf.Tenancy.ValueStringPointer(),
 	}
+}
+
+func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) api.ReadVpcsParams {
+	return api.ReadVpcsParams{
+		DhcpOptionsSetIds: utils.TfStringListToStringPtrList(ctx, tf.DHCPOptionsSetIds),
+		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges),
+		IsDefault:         tf.IsDefault.ValueBoolPointer(),
+		States:            utils.TfStringListToStringPtrList(ctx, tf.States),
+		Ids:               utils.TfStringListToStringPtrList(ctx, tf.IDs),
+	}
+}
+
+func VPCsFromHttpToTfDatasource(ctx context.Context, http *api.Vpc) (*datasource_vpc.VpcModel, diag.Diagnostics) {
+	return &datasource_vpc.VpcModel{
+		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
+		Id:               types.StringPointerValue(http.Id),
+		IpRange:          types.StringPointerValue(http.IpRange),
+		State:            types.StringPointerValue(http.State),
+		Tenancy:          types.StringPointerValue(http.Tenancy),
+	}, nil
 }

@@ -386,6 +386,7 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewLoadBalancersDataSource,
 		NewDHCPOptionsDataSource,
 		NewVolumesDataSource,
+		NewVPCsDataSource,
 	}
 }
 
