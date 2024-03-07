@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"time"
 )
 
 func FromTfStringToStringPtr(str types.String) *string {
@@ -78,6 +79,12 @@ func FromIntListPointerToTfInt64List(ctx context.Context, arr *[]int) (types.Lis
 	return types.ListValueFrom(ctx, types.Int64Type, *arr)
 }
 
+func TFInt64ListToIntList(ctx context.Context, list types.List) []int {
+	return TfListToGenericList(func(a types.Int64) int {
+		return int(a.ValueInt64())
+	}, ctx, list)
+}
+
 func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list types.List) []B {
 	if len(list.Elements()) == 0 {
 		return nil
@@ -105,6 +112,17 @@ func TfStringListToStringPtrList(ctx context.Context, list types.List) *[]string
 		return a.ValueString()
 	}, ctx, list)
 	return &slice
+}
+
+func TfStringListToTimeList(ctx context.Context, list types.List, format string) []time.Time {
+	slice := TfListToGenericList(func(a types.String) time.Time {
+		t, err := time.Parse(format, a.ValueString())
+		if err != nil {
+			return time.Time{}
+		}
+		return t
+	}, ctx, list)
+	return slice
 }
 
 type ITFValue interface {
