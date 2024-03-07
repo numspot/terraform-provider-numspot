@@ -123,6 +123,6 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*api.DeleteSnapshotResponse, error) {
-		return r.provider.ApiClient.DeleteSnapshotWithResponse(ctx, r.provider.SpaceID, data.Id.String())
+		return r.provider.ApiClient.DeleteSnapshotWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }
