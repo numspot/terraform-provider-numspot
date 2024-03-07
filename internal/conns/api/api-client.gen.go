@@ -630,7 +630,7 @@ type CreateVolume struct {
 	Size *int `json:"size,omitempty"`
 
 	// SnapshotId The ID of the snapshot from which you want to create the volume.
-	SnapshotId string `json:"snapshotId,omitempty"`
+	SnapshotId *string `json:"snapshotId,omitempty"`
 
 	// Type The type of volume you want to create (`io1` \| `gp2` \ | `standard`). If not specified, a `standard` volume is created.<br />
 	//  For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
@@ -2115,12 +2115,6 @@ type SourceVpc struct {
 	VpcId *string `json:"vpcId,omitempty"`
 }
 
-// StartVms defines model for StartVms.
-type StartVms struct {
-	// Vms Information about one or more started VMs.
-	Vms *[]VmState `json:"vms,omitempty"`
-}
-
 // StateComment Information about the change of state.
 type StateComment struct {
 	// StateCode The code of the change of state.
@@ -2132,8 +2126,8 @@ type StateComment struct {
 
 // StopVms defines model for StopVms.
 type StopVms struct {
-	// Vms Information about one or more stopped VMs.
-	Vms *[]VmState `json:"vms,omitempty"`
+	// ForceStop Forces the VM to stop.
+	ForceStop *bool `json:"forceStop,omitempty"`
 }
 
 // Subnet Information about the Subnet.
@@ -3048,11 +3042,11 @@ type ReadVpnConnectionsByIdResponseSchema = VpnConnection
 // ReadVpnConnectionsResponseSchema defines model for ReadVpnConnectionsResponse.
 type ReadVpnConnectionsResponseSchema = ReadVpnConnections
 
-// StartVmsResponseSchema defines model for StartVmsResponse.
-type StartVmsResponseSchema = StartVms
+// StartVmsResponseSchema Information about the state of the VM.
+type StartVmsResponseSchema = VmState
 
-// StopVmsResponseSchema defines model for StopVmsResponse.
-type StopVmsResponseSchema = StopVms
+// StopVmsResponseSchema Information about the state of the VM.
+type StopVmsResponseSchema = VmState
 
 // UpdateDirectLinkInterfaceResponseSchema Information about the DirectLink interfaces.
 type UpdateDirectLinkInterfaceResponseSchema = DirectLinkInterfaces
@@ -3279,10 +3273,7 @@ type ReadVmsHealthRequest struct {
 }
 
 // StopVmsRequest defines model for StopVmsRequest.
-type StopVmsRequest struct {
-	// ForceStop Forces the VM to stop.
-	ForceStop *bool `json:"forceStop,omitempty"`
-}
+type StopVmsRequest = StopVms
 
 // UnlinkInternetGatewayRequest defines model for UnlinkInternetGatewayRequest.
 type UnlinkInternetGatewayRequest = UnlinkInternetGateway
@@ -4249,12 +4240,6 @@ type ReadVmsStateParams struct {
 	Ids *[]string `form:"ids,omitempty" json:"ids,omitempty"`
 }
 
-// StopVmsJSONBody defines parameters for StopVms.
-type StopVmsJSONBody struct {
-	// ForceStop Forces the VM to stop.
-	ForceStop *bool `json:"forceStop,omitempty"`
-}
-
 // ReadVolumesParams defines parameters for ReadVolumes.
 type ReadVolumesParams struct {
 	// CreationDates The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`).
@@ -4552,6 +4537,9 @@ type UnlinkPublicIpJSONRequestBody = UnlinkPublicIp
 // CreateRouteTableJSONRequestBody defines body for CreateRouteTable for application/json ContentType.
 type CreateRouteTableJSONRequestBody = CreateRouteTable
 
+// UpdateRouteTableRoutePropagationJSONRequestBody defines body for UpdateRouteTableRoutePropagation for application/json ContentType.
+type UpdateRouteTableRoutePropagationJSONRequestBody = UpdateRouteTableRoutePropagation
+
 // DeleteRouteJSONRequestBody defines body for DeleteRoute for application/json ContentType.
 type DeleteRouteJSONRequestBody = DeleteRoute
 
@@ -4566,9 +4554,6 @@ type LinkRouteTableJSONRequestBody LinkRouteTableJSONBody
 
 // UnlinkRouteTableJSONRequestBody defines body for UnlinkRouteTable for application/json ContentType.
 type UnlinkRouteTableJSONRequestBody = UnlinkRouteTable
-
-// UpdateRouteTableRoutePropagationJSONRequestBody defines body for UpdateRouteTableRoutePropagation for application/json ContentType.
-type UpdateRouteTableRoutePropagationJSONRequestBody = UpdateRouteTableRoutePropagation
 
 // CreateSecurityGroupJSONRequestBody defines body for CreateSecurityGroup for application/json ContentType.
 type CreateSecurityGroupJSONRequestBody = CreateSecurityGroup
@@ -4604,7 +4589,7 @@ type CreateVmsJSONRequestBody = CreateVms
 type UpdateVmJSONRequestBody = UpdateVm
 
 // StopVmsJSONRequestBody defines body for StopVms for application/json ContentType.
-type StopVmsJSONRequestBody StopVmsJSONBody
+type StopVmsJSONRequestBody = StopVms
 
 // CreateVolumeJSONRequestBody defines body for CreateVolume for application/json ContentType.
 type CreateVolumeJSONRequestBody = CreateVolume
@@ -5068,6 +5053,11 @@ type ClientInterface interface {
 	// ReadRouteTablesById request
 	ReadRouteTablesById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// UpdateRouteTableRoutePropagationWithBody request with any body
+	UpdateRouteTableRoutePropagationWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateRouteTableRoutePropagation(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// DeleteRouteWithBody request with any body
 	DeleteRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -5092,11 +5082,6 @@ type ClientInterface interface {
 	UnlinkRouteTableWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UnlinkRouteTable(ctx context.Context, spaceId SpaceId, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// UpdateRouteTableRoutePropagationWithBody request with any body
-	UpdateRouteTableRoutePropagationWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	UpdateRouteTableRoutePropagation(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadSecurityGroups request
 	ReadSecurityGroups(ctx context.Context, spaceId SpaceId, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -6898,6 +6883,30 @@ func (c *Client) ReadRouteTablesById(ctx context.Context, spaceId SpaceId, id st
 	return c.Client.Do(req)
 }
 
+func (c *Client) UpdateRouteTableRoutePropagationWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRouteTableRoutePropagationRequestWithBody(c.Server, spaceId, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRouteTableRoutePropagation(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRouteTableRoutePropagationRequest(c.Server, spaceId, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) DeleteRouteWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteRouteRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
@@ -7008,30 +7017,6 @@ func (c *Client) UnlinkRouteTableWithBody(ctx context.Context, spaceId SpaceId, 
 
 func (c *Client) UnlinkRouteTable(ctx context.Context, spaceId SpaceId, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUnlinkRouteTableRequest(c.Server, spaceId, id, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpdateRouteTableRoutePropagationWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRouteTableRoutePropagationRequestWithBody(c.Server, spaceId, id, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpdateRouteTableRoutePropagation(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRouteTableRoutePropagationRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -14084,6 +14069,60 @@ func NewReadRouteTablesByIdRequest(server string, spaceId SpaceId, id string) (*
 	return req, nil
 }
 
+// NewUpdateRouteTableRoutePropagationRequest calls the generic UpdateRouteTableRoutePropagation builder with application/json body
+func NewUpdateRouteTableRoutePropagationRequest(server string, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateRouteTableRoutePropagationRequestWithBody(server, spaceId, id, "application/json", bodyReader)
+}
+
+// NewUpdateRouteTableRoutePropagationRequestWithBody generates requests for UpdateRouteTableRoutePropagation with any type of body
+func NewUpdateRouteTableRoutePropagationRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/routePropagation", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewDeleteRouteRequest calls the generic DeleteRoute builder with application/json body
 func NewDeleteRouteRequest(server string, spaceId SpaceId, id string, body DeleteRouteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -14335,60 +14374,6 @@ func NewUnlinkRouteTableRequestWithBody(server string, spaceId SpaceId, id strin
 	}
 
 	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/subnets/unlink", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewUpdateRouteTableRoutePropagationRequest calls the generic UpdateRouteTableRoutePropagation builder with application/json body
-func NewUpdateRouteTableRoutePropagationRequest(server string, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewUpdateRouteTableRoutePropagationRequestWithBody(server, spaceId, id, "application/json", bodyReader)
-}
-
-// NewUpdateRouteTableRoutePropagationRequestWithBody generates requests for UpdateRouteTableRoutePropagation with any type of body
-func NewUpdateRouteTableRoutePropagationRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/updateRoutePropagation", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -20491,6 +20476,11 @@ type ClientWithResponsesInterface interface {
 	// ReadRouteTablesByIdWithResponse request
 	ReadRouteTablesByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadRouteTablesByIdResponse, error)
 
+	// UpdateRouteTableRoutePropagationWithBodyWithResponse request with any body
+	UpdateRouteTableRoutePropagationWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error)
+
+	UpdateRouteTableRoutePropagationWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error)
+
 	// DeleteRouteWithBodyWithResponse request with any body
 	DeleteRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error)
 
@@ -20515,11 +20505,6 @@ type ClientWithResponsesInterface interface {
 	UnlinkRouteTableWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error)
 
 	UnlinkRouteTableWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkRouteTableJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkRouteTableResponse, error)
-
-	// UpdateRouteTableRoutePropagationWithBodyWithResponse request with any body
-	UpdateRouteTableRoutePropagationWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error)
-
-	UpdateRouteTableRoutePropagationWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error)
 
 	// ReadSecurityGroupsWithResponse request
 	ReadSecurityGroupsWithResponse(ctx context.Context, spaceId SpaceId, params *ReadSecurityGroupsParams, reqEditors ...RequestEditorFn) (*ReadSecurityGroupsResponse, error)
@@ -22832,6 +22817,28 @@ func (r ReadRouteTablesByIdResponse) StatusCode() int {
 	return 0
 }
 
+type UpdateRouteTableRoutePropagationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *UpdateRouteTableRoutePropagationResponseSchema
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateRouteTableRoutePropagationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateRouteTableRoutePropagationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type DeleteRouteResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -22949,28 +22956,6 @@ func (r UnlinkRouteTableResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UnlinkRouteTableResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type UpdateRouteTableRoutePropagationResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *UpdateRouteTableRoutePropagationResponseSchema
-}
-
-// Status returns HTTPResponse.Status
-func (r UpdateRouteTableRoutePropagationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r UpdateRouteTableRoutePropagationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -25618,6 +25603,23 @@ func (c *ClientWithResponses) ReadRouteTablesByIdWithResponse(ctx context.Contex
 	return ParseReadRouteTablesByIdResponse(rsp)
 }
 
+// UpdateRouteTableRoutePropagationWithBodyWithResponse request with arbitrary body returning *UpdateRouteTableRoutePropagationResponse
+func (c *ClientWithResponses) UpdateRouteTableRoutePropagationWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error) {
+	rsp, err := c.UpdateRouteTableRoutePropagationWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRouteTableRoutePropagationResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateRouteTableRoutePropagationWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error) {
+	rsp, err := c.UpdateRouteTableRoutePropagation(ctx, spaceId, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRouteTableRoutePropagationResponse(rsp)
+}
+
 // DeleteRouteWithBodyWithResponse request with arbitrary body returning *DeleteRouteResponse
 func (c *ClientWithResponses) DeleteRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteRouteResponse, error) {
 	rsp, err := c.DeleteRouteWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
@@ -25701,23 +25703,6 @@ func (c *ClientWithResponses) UnlinkRouteTableWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParseUnlinkRouteTableResponse(rsp)
-}
-
-// UpdateRouteTableRoutePropagationWithBodyWithResponse request with arbitrary body returning *UpdateRouteTableRoutePropagationResponse
-func (c *ClientWithResponses) UpdateRouteTableRoutePropagationWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error) {
-	rsp, err := c.UpdateRouteTableRoutePropagationWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpdateRouteTableRoutePropagationResponse(rsp)
-}
-
-func (c *ClientWithResponses) UpdateRouteTableRoutePropagationWithResponse(ctx context.Context, spaceId SpaceId, id string, body UpdateRouteTableRoutePropagationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRouteTableRoutePropagationResponse, error) {
-	rsp, err := c.UpdateRouteTableRoutePropagation(ctx, spaceId, id, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpdateRouteTableRoutePropagationResponse(rsp)
 }
 
 // ReadSecurityGroupsWithResponse request returning *ReadSecurityGroupsResponse
@@ -29419,6 +29404,32 @@ func ParseReadRouteTablesByIdResponse(rsp *http.Response) (*ReadRouteTablesByIdR
 	return response, nil
 }
 
+// ParseUpdateRouteTableRoutePropagationResponse parses an HTTP response from a UpdateRouteTableRoutePropagationWithResponse call
+func ParseUpdateRouteTableRoutePropagationResponse(rsp *http.Response) (*UpdateRouteTableRoutePropagationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateRouteTableRoutePropagationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UpdateRouteTableRoutePropagationResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseDeleteRouteResponse parses an HTTP response from a DeleteRouteWithResponse call
 func ParseDeleteRouteResponse(rsp *http.Response) (*DeleteRouteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -29634,32 +29645,6 @@ func ParseUnlinkRouteTableResponse(rsp *http.Response) (*UnlinkRouteTableRespons
 			return nil, err
 		}
 		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseUpdateRouteTableRoutePropagationResponse parses an HTTP response from a UpdateRouteTableRoutePropagationWithResponse call
-func ParseUpdateRouteTableRoutePropagationResponse(rsp *http.Response) (*UpdateRouteTableRoutePropagationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &UpdateRouteTableRoutePropagationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest UpdateRouteTableRoutePropagationResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
 
 	}
 
