@@ -85,6 +85,14 @@ func TFInt64ListToIntList(ctx context.Context, list types.List) []int {
 	}, ctx, list)
 }
 
+func TFInt64ListToIntListPointer(ctx context.Context, list types.List) *[]int {
+	arr := TfListToGenericList(func(a types.Int64) int {
+		return int(a.ValueInt64())
+	}, ctx, list)
+
+	return &arr
+}
+
 func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list types.List) []B {
 	if len(list.Elements()) == 0 {
 		return nil
