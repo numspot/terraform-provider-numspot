@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"strconv"
 	"testing"
 )
 
@@ -18,9 +19,9 @@ func TestAccVolumesDatasource(t *testing.T) {
 				Config: fetchVolumesConfigById(volumeType, volumeSize, volumeAZ),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "volumes.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "volumes.0.id", "numspot_volume.test.id"),
-					//resource.TestCheckResourceAttr("data.numspot_dhcp_options.testdatabyid", "dhcp_options.#", "1"),
-					//resource.TestCheckResourceAttr("data.numspot_dhcp_options.testdatabyid", "dhcp_options.0.domain_name", "foo.bar"),
+					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "volumes.0.type", volumeType),
+					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "volumes.0.size", strconv.Itoa(volumeSize)),
+					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "volumes.0.availability_zone_name", volumeAZ),
 				),
 			},
 		},

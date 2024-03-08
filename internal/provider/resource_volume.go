@@ -110,7 +110,7 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
-		return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
+		return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
