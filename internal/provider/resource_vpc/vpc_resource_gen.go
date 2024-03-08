@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -18,6 +19,7 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The ID of the DHCP options set (or `default` if you want to associate the default one).",
 				MarkdownDescription: "The ID of the DHCP options set (or `default` if you want to associate the default one).",
+
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
@@ -46,6 +48,7 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -56,4 +59,5 @@ type VpcModel struct {
 	IpRange          types.String `tfsdk:"ip_range"`
 	State            types.String `tfsdk:"state"`
 	Tenancy          types.String `tfsdk:"tenancy"`
+	Tags  			 types.List   `tfsdk:"tags"`
 }

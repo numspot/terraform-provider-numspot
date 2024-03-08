@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
@@ -72,7 +74,15 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
+	// Handle tags
 	createdId := *res.JSON201.Id
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	createStateConf := &retry.StateChangeConf{
 		Pending: []string{"pending"},
 		Target:  []string{"available"},
@@ -96,7 +106,12 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	tf := NetFromHttpToTf(res.JSON201)
+	tf := NetFromHttpToTf(ctx, res.JSON201)
+	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, createdId)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -111,12 +126,53 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 		return
 	}
 
-	tf := NetFromHttpToTf(res.JSON200)
+	tf := NetFromHttpToTf(ctx, res.JSON200)
+	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, data.Id.ValueString())
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var (
+		state resource_vpc.VpcModel
+		plan  resource_vpc.VpcModel
+	)
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	res := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
+		return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf := NetFromHttpToTf(ctx, res.JSON200)
+	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, state.Id.ValueString())
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
