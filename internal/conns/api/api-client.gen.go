@@ -1000,8 +1000,8 @@ type Image struct {
 	Type *string `json:"type,omitempty"`
 }
 
-// InternetService Information about the Internet service.
-type InternetService struct {
+// InternetGateway Information about the Internet service.
+type InternetGateway struct {
 	// Id The ID of the Internet service.
 	Id *string `json:"id,omitempty"`
 
@@ -1751,7 +1751,7 @@ type ReadImages struct {
 // ReadInternetGateways defines model for ReadInternetGateways.
 type ReadInternetGateways struct {
 	// Items Information about one or more Internet services.
-	Items *[]InternetService `json:"items,omitempty"`
+	Items *[]InternetGateway `json:"items,omitempty"`
 }
 
 // ReadKeypairs defines model for ReadKeypairs.
@@ -2776,7 +2776,7 @@ type CreateFlexibleGpuResponseSchema = FlexibleGpu
 type CreateImageResponseSchema = Image
 
 // CreateInternetGatewayResponseSchema Information about the Internet service.
-type CreateInternetGatewayResponseSchema = InternetService
+type CreateInternetGatewayResponseSchema = InternetGateway
 
 // CreateKeypairResponseSchema Information about the created keypair.
 type CreateKeypairResponseSchema = CreateKeypair
@@ -2911,7 +2911,7 @@ type ReadImagesByIdResponseSchema = Image
 type ReadImagesResponseSchema = ReadImages
 
 // ReadInternetGatewaysByIdResponseSchema Information about the Internet service.
-type ReadInternetGatewaysByIdResponseSchema = InternetService
+type ReadInternetGatewaysByIdResponseSchema = InternetGateway
 
 // ReadInternetGatewaysResponseSchema defines model for ReadInternetGatewaysResponse.
 type ReadInternetGatewaysResponseSchema = ReadInternetGateways
@@ -5035,9 +5035,9 @@ type ClientInterface interface {
 	LinkPublicIp(ctx context.Context, spaceId SpaceId, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UnlinkPublicIpWithBody request with any body
-	UnlinkPublicIpWithBody(ctx context.Context, spaceId SpaceId, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkPublicIpWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UnlinkPublicIp(ctx context.Context, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UnlinkPublicIp(ctx context.Context, spaceId SpaceId, id string, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadRouteTables request
 	ReadRouteTables(ctx context.Context, spaceId SpaceId, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -6799,7 +6799,7 @@ func (c *Client) LinkPublicIp(ctx context.Context, spaceId SpaceId, id string, b
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkPublicIpWithBody(ctx context.Context, spaceId SpaceId, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UnlinkPublicIpWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUnlinkPublicIpRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
@@ -6811,7 +6811,7 @@ func (c *Client) UnlinkPublicIpWithBody(ctx context.Context, spaceId SpaceId, id
 	return c.Client.Do(req)
 }
 
-func (c *Client) UnlinkPublicIp(ctx context.Context, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UnlinkPublicIp(ctx context.Context, spaceId SpaceId, id string, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUnlinkPublicIpRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
@@ -8110,7 +8110,7 @@ func NewDeleteLoadBalancerTagsRequestWithBody(server string, spaceId SpaceId, co
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/bulk/loadBalancersTags", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/bulk/loadBalancersTags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8157,7 +8157,7 @@ func NewCreateLoadBalancerTagsRequestWithBody(server string, spaceId SpaceId, co
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/bulk/loadBalancersTags", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/bulk/loadBalancersTags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8204,7 +8204,7 @@ func NewDeleteTagsRequestWithBody(server string, spaceId SpaceId, contentType st
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/bulk/tags", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/bulk/tags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8251,7 +8251,7 @@ func NewCreateTagsRequestWithBody(server string, spaceId SpaceId, contentType st
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/bulk/tags", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/bulk/tags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8287,7 +8287,7 @@ func NewReadClientGatewaysRequest(server string, spaceId SpaceId, params *ReadCl
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/clientGateways", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/clientGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8466,7 +8466,7 @@ func NewCreateClientGatewayRequestWithBody(server string, spaceId SpaceId, conte
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/clientGateways", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/clientGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8509,7 +8509,7 @@ func NewDeleteClientGatewayRequest(server string, spaceId SpaceId, id string) (*
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/clientGateways/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/clientGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8550,7 +8550,7 @@ func NewReadClientGatewaysByIdRequest(server string, spaceId SpaceId, id string)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/clientGateways/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/clientGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8584,7 +8584,7 @@ func NewReadDhcpOptionsRequest(server string, spaceId SpaceId, params *ReadDhcpO
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/dhcpOptions", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/dhcpOptions", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8779,7 +8779,7 @@ func NewCreateDhcpOptionsRequestWithBody(server string, spaceId SpaceId, content
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/dhcpOptions", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/dhcpOptions", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8822,7 +8822,7 @@ func NewDeleteDhcpOptionsRequest(server string, spaceId SpaceId, id string) (*ht
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/dhcpOptions/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/dhcpOptions/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8863,7 +8863,7 @@ func NewReadDhcpOptionsByIdRequest(server string, spaceId SpaceId, id string) (*
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/dhcpOptions/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/dhcpOptions/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8897,7 +8897,7 @@ func NewReadDirectLinkInterfacesRequest(server string, spaceId SpaceId, params *
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/directLinkInterfaces", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -8980,7 +8980,7 @@ func NewCreateDirectLinkInterfaceRequestWithBody(server string, spaceId SpaceId,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/directLinkInterfaces", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9023,7 +9023,7 @@ func NewDeleteDirectLinkInterfaceRequest(server string, spaceId SpaceId, id stri
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/directLinkInterfaces/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9064,7 +9064,7 @@ func NewReadDirectLinkInterfacesByIdRequest(server string, spaceId SpaceId, id s
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/directLinkInterfaces/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9116,7 +9116,7 @@ func NewUpdateDirectLinkInterfaceRequestWithBody(server string, spaceId SpaceId,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/directLinkInterfaces/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/directLinkInterfaces/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9152,7 +9152,7 @@ func NewReadDirectLinksRequest(server string, spaceId SpaceId, params *ReadDirec
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/directLinks", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/directLinks", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9219,7 +9219,7 @@ func NewCreateDirectLinkRequestWithBody(server string, spaceId SpaceId, contentT
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/directLinks", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/directLinks", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9262,7 +9262,7 @@ func NewDeleteDirectLinkRequest(server string, spaceId SpaceId, id string) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/directLinks/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/directLinks/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9303,7 +9303,7 @@ func NewReadDirectLinksByIdRequest(server string, spaceId SpaceId, id string) (*
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/directLinks/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/directLinks/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9337,7 +9337,7 @@ func NewReadFlexibleGpuCatalogRequest(server string, spaceId SpaceId) (*http.Req
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpuCatalogs", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/flexibleGpuCatalogs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9371,7 +9371,7 @@ func NewReadFlexibleGpusRequest(server string, spaceId SpaceId, params *ReadFlex
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/flexibleGpus", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9534,7 +9534,7 @@ func NewCreateFlexibleGpuRequestWithBody(server string, spaceId SpaceId, content
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/flexibleGpus", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9577,7 +9577,7 @@ func NewDeleteFlexibleGpuRequest(server string, spaceId SpaceId, id string) (*ht
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/flexibleGpus/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9618,7 +9618,7 @@ func NewReadFlexibleGpusByIdRequest(server string, spaceId SpaceId, id string) (
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/flexibleGpus/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9670,7 +9670,7 @@ func NewUpdateFlexibleGpuRequestWithBody(server string, spaceId SpaceId, id stri
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/flexibleGpus/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9724,7 +9724,7 @@ func NewLinkFlexibleGpuRequestWithBody(server string, spaceId SpaceId, id string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s/vms/link", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/flexibleGpus/%s/vms/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9767,7 +9767,7 @@ func NewUnlinkFlexibleGpuRequest(server string, spaceId SpaceId, id string) (*ht
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/flexibleGpus/%s/vms/unlink", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/flexibleGpus/%s/vms/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -9801,7 +9801,7 @@ func NewReadImagesRequest(server string, spaceId SpaceId, params *ReadImagesPara
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/images", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/images", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10236,7 +10236,7 @@ func NewCreateImageRequestWithBody(server string, spaceId SpaceId, contentType s
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/images", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/images", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10279,7 +10279,7 @@ func NewDeleteImageRequest(server string, spaceId SpaceId, id string) (*http.Req
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/images/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/images/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10320,7 +10320,7 @@ func NewReadImagesByIdRequest(server string, spaceId SpaceId, id string) (*http.
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/images/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/images/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10372,7 +10372,7 @@ func NewUpdateImageRequestWithBody(server string, spaceId SpaceId, id string, co
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/images/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/images/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10408,7 +10408,7 @@ func NewReadInternetGatewaysRequest(server string, spaceId SpaceId, params *Read
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/internetGateways", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/internetGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10544,7 +10544,7 @@ func NewCreateInternetGatewayRequest(server string, spaceId SpaceId) (*http.Requ
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/internetGateways", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/internetGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10585,7 +10585,7 @@ func NewDeleteInternetGatewayRequest(server string, spaceId SpaceId, id string) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/internetGateways/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/internetGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10626,7 +10626,7 @@ func NewReadInternetGatewaysByIdRequest(server string, spaceId SpaceId, id strin
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/internetGateways/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/internetGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10678,7 +10678,7 @@ func NewLinkInternetGatewayRequestWithBody(server string, spaceId SpaceId, id st
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/internetGateways/%s/vpcs/link", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/internetGateways/%s/vpcs/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10732,7 +10732,7 @@ func NewUnlinkInternetGatewayRequestWithBody(server string, spaceId SpaceId, id 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/internetGateways/%s/vpcs/unlink", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/internetGateways/%s/vpcs/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10768,7 +10768,7 @@ func NewReadKeypairsRequest(server string, spaceId SpaceId, params *ReadKeypairs
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/keypairs", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/keypairs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10867,7 +10867,7 @@ func NewCreateKeypairRequestWithBody(server string, spaceId SpaceId, contentType
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/keypairs", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/keypairs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10910,7 +10910,7 @@ func NewDeleteKeypairRequest(server string, spaceId SpaceId, id string) (*http.R
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/keypairs/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/keypairs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10951,7 +10951,7 @@ func NewReadKeypairsByIdRequest(server string, spaceId SpaceId, id string) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/keypairs/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/keypairs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -10985,7 +10985,7 @@ func NewReadListenerRulesRequest(server string, spaceId SpaceId, params *ReadLis
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/listenerRules", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/listenerRules", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11052,7 +11052,7 @@ func NewCreateListenerRuleRequestWithBody(server string, spaceId SpaceId, conten
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/listenerRules", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/listenerRules", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11095,7 +11095,7 @@ func NewDeleteListenerRuleRequest(server string, spaceId SpaceId, id string) (*h
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/listenerRules/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/listenerRules/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11136,7 +11136,7 @@ func NewReadListenerRulesByIdRequest(server string, spaceId SpaceId, id string) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/listenerRules/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/listenerRules/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11188,7 +11188,7 @@ func NewUpdateListenerRuleRequestWithBody(server string, spaceId SpaceId, id str
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/listenerRules/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/listenerRules/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11224,7 +11224,7 @@ func NewReadLoadBalancersRequest(server string, spaceId SpaceId, params *ReadLoa
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11291,7 +11291,7 @@ func NewCreateLoadBalancerRequestWithBody(server string, spaceId SpaceId, conten
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11334,7 +11334,7 @@ func NewDeleteLoadBalancerRequest(server string, spaceId SpaceId, id string) (*h
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11375,7 +11375,7 @@ func NewReadLoadBalancersByIdRequest(server string, spaceId SpaceId, id string) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11427,7 +11427,7 @@ func NewUpdateLoadBalancerRequestWithBody(server string, spaceId SpaceId, id str
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11481,7 +11481,7 @@ func NewLinkLoadBalancerBackendMachinesRequestWithBody(server string, spaceId Sp
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/backendMachines/link", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s/backendMachines/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11535,7 +11535,7 @@ func NewUnlinkLoadBalancerBackendMachinesRequestWithBody(server string, spaceId 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/backendMachines/unlink", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s/backendMachines/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11589,7 +11589,7 @@ func NewDeleteLoadBalancerListenersRequestWithBody(server string, spaceId SpaceI
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/listeners", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s/listeners", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11643,7 +11643,7 @@ func NewCreateLoadBalancerListenersRequestWithBody(server string, spaceId SpaceI
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/listeners", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s/listeners", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11697,7 +11697,7 @@ func NewDeleteLoadBalancerPolicyRequestWithBody(server string, spaceId SpaceId, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/policies", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s/policies", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11751,7 +11751,7 @@ func NewCreateLoadBalancerPolicyRequestWithBody(server string, spaceId SpaceId, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/policies", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s/policies", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11805,7 +11805,7 @@ func NewReadVmsHealthRequestWithBody(server string, spaceId SpaceId, id string, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancers/%s/vmsHealth", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancers/%s/vmsHealth", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11852,7 +11852,7 @@ func NewReadLoadBalancerTagsRequestWithBody(server string, spaceId SpaceId, cont
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/loadBalancersTags", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/loadBalancersTags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11888,7 +11888,7 @@ func NewReadLocationsRequest(server string, spaceId SpaceId) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/locations", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/locations", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -11922,7 +11922,7 @@ func NewReadNatGatewayRequest(server string, spaceId SpaceId, params *ReadNatGat
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/natGateways", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/natGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12085,7 +12085,7 @@ func NewCreateNatGatewayRequestWithBody(server string, spaceId SpaceId, contentT
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/natGateways", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/natGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12128,7 +12128,7 @@ func NewDeleteNatGatewayRequest(server string, spaceId SpaceId, id string) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/natGateways/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/natGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12169,7 +12169,7 @@ func NewReadNatGatewayByIdRequest(server string, spaceId SpaceId, id string) (*h
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/natGateways/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/natGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12203,7 +12203,7 @@ func NewReadNicsRequest(server string, spaceId SpaceId, params *ReadNicsParams) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/nics", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/nics", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12686,7 +12686,7 @@ func NewCreateNicRequestWithBody(server string, spaceId SpaceId, contentType str
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/nics", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/nics", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12729,7 +12729,7 @@ func NewDeleteNicRequest(server string, spaceId SpaceId, id string) (*http.Reque
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/nics/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/nics/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12770,7 +12770,7 @@ func NewReadNicsByIdRequest(server string, spaceId SpaceId, id string) (*http.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/nics/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/nics/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12822,7 +12822,7 @@ func NewUpdateNicRequestWithBody(server string, spaceId SpaceId, id string, cont
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/nics/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/nics/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12876,7 +12876,7 @@ func NewLinkPrivateIpsRequestWithBody(server string, spaceId SpaceId, id string,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/nics/%s/privateIps/link", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/nics/%s/privateIps/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12930,7 +12930,7 @@ func NewUnlinkPrivateIpsRequestWithBody(server string, spaceId SpaceId, id strin
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/nics/%s/privateIps/unlink", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/nics/%s/privateIps/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -12984,7 +12984,7 @@ func NewLinkNicRequestWithBody(server string, spaceId SpaceId, id string, conten
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/nics/%s/vms/link", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/nics/%s/vms/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13038,7 +13038,7 @@ func NewUnlinkNicRequestWithBody(server string, spaceId SpaceId, id string, cont
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/nics/%s/vms/unlink", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/nics/%s/vms/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13074,7 +13074,7 @@ func NewReadProductTypesRequest(server string, spaceId SpaceId, params *ReadProd
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/productTypes", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/productTypes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13141,7 +13141,7 @@ func NewCreateProductTypeRequestWithBody(server string, spaceId SpaceId, content
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/productTypes", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/productTypes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13184,7 +13184,7 @@ func NewReadProductTypesByIdRequest(server string, spaceId SpaceId, id string) (
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/productTypes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/productTypes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13218,7 +13218,7 @@ func NewReadPublicIpRangesRequest(server string, spaceId SpaceId) (*http.Request
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/publicIpRanges", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/publicIpRanges", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13252,7 +13252,7 @@ func NewReadPublicIpsRequest(server string, spaceId SpaceId, params *ReadPublicI
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/publicIps", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/publicIps", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13420,7 +13420,7 @@ func NewCreatePublicIpRequest(server string, spaceId SpaceId) (*http.Request, er
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/publicIps", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/publicIps", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13461,7 +13461,7 @@ func NewDeletePublicIpRequest(server string, spaceId SpaceId, id string) (*http.
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/publicIps/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/publicIps/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13502,7 +13502,7 @@ func NewReadPublicIpsByIdRequest(server string, spaceId SpaceId, id string) (*ht
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/publicIps/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/publicIps/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13554,7 +13554,7 @@ func NewLinkPublicIpRequestWithBody(server string, spaceId SpaceId, id string, c
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/publicIps/%s/link", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/publicIps/%s/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13575,7 +13575,7 @@ func NewLinkPublicIpRequestWithBody(server string, spaceId SpaceId, id string, c
 }
 
 // NewUnlinkPublicIpRequest calls the generic UnlinkPublicIp builder with application/json body
-func NewUnlinkPublicIpRequest(server string, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody) (*http.Request, error) {
+func NewUnlinkPublicIpRequest(server string, spaceId SpaceId, id string, body UnlinkPublicIpJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -13586,7 +13586,7 @@ func NewUnlinkPublicIpRequest(server string, spaceId SpaceId, id interface{}, bo
 }
 
 // NewUnlinkPublicIpRequestWithBody generates requests for UnlinkPublicIp with any type of body
-func NewUnlinkPublicIpRequestWithBody(server string, spaceId SpaceId, id interface{}, contentType string, body io.Reader) (*http.Request, error) {
+func NewUnlinkPublicIpRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -13608,7 +13608,7 @@ func NewUnlinkPublicIpRequestWithBody(server string, spaceId SpaceId, id interfa
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/publicIps/%s/unlink", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/publicIps/%s/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13644,7 +13644,7 @@ func NewReadRouteTablesRequest(server string, spaceId SpaceId, params *ReadRoute
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -13967,7 +13967,7 @@ func NewCreateRouteTableRequestWithBody(server string, spaceId SpaceId, contentT
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14010,7 +14010,7 @@ func NewDeleteRouteTableRequest(server string, spaceId SpaceId, id string) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14051,7 +14051,7 @@ func NewReadRouteTablesByIdRequest(server string, spaceId SpaceId, id string) (*
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14103,7 +14103,7 @@ func NewUpdateRouteTableRoutePropagationRequestWithBody(server string, spaceId S
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/routePropagation", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables/%s/routePropagation", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14157,7 +14157,7 @@ func NewDeleteRouteRequestWithBody(server string, spaceId SpaceId, id string, co
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/routes", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14211,7 +14211,7 @@ func NewCreateRouteRequestWithBody(server string, spaceId SpaceId, id string, co
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/routes", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14265,7 +14265,7 @@ func NewUpdateRouteRequestWithBody(server string, spaceId SpaceId, id string, co
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/routes", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14319,7 +14319,7 @@ func NewLinkRouteTableRequestWithBody(server string, spaceId SpaceId, id string,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/subnets/link", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables/%s/subnets/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14373,7 +14373,7 @@ func NewUnlinkRouteTableRequestWithBody(server string, spaceId SpaceId, id strin
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/routeTables/%s/subnets/unlink", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/routeTables/%s/subnets/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14409,7 +14409,7 @@ func NewReadSecurityGroupsRequest(server string, spaceId SpaceId, params *ReadSe
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/securityGroups", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/securityGroups", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14796,7 +14796,7 @@ func NewCreateSecurityGroupRequestWithBody(server string, spaceId SpaceId, conte
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/securityGroups", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/securityGroups", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14839,7 +14839,7 @@ func NewDeleteSecurityGroupRequest(server string, spaceId SpaceId, id string) (*
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/securityGroups/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/securityGroups/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14880,7 +14880,7 @@ func NewReadSecurityGroupsByIdRequest(server string, spaceId SpaceId, id string)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/securityGroups/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/securityGroups/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14932,7 +14932,7 @@ func NewDeleteSecurityGroupRuleRequestWithBody(server string, spaceId SpaceId, i
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/securityGroups/%s/rules", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/securityGroups/%s/rules", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -14986,7 +14986,7 @@ func NewCreateSecurityGroupRuleRequestWithBody(server string, spaceId SpaceId, i
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/securityGroups/%s/rules", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/securityGroups/%s/rules", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15022,7 +15022,7 @@ func NewReadSnapshotsRequest(server string, spaceId SpaceId, params *ReadSnapsho
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/snapshots", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/snapshots", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15265,7 +15265,7 @@ func NewCreateSnapshotRequestWithBody(server string, spaceId SpaceId, contentTyp
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/snapshots", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/snapshots", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15308,7 +15308,7 @@ func NewDeleteSnapshotRequest(server string, spaceId SpaceId, id string) (*http.
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/snapshots/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/snapshots/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15349,7 +15349,7 @@ func NewReadSnapshotsByIdRequest(server string, spaceId SpaceId, id string) (*ht
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/snapshots/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/snapshots/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15383,7 +15383,7 @@ func NewReadSubnetsRequest(server string, spaceId SpaceId, params *ReadSubnetsPa
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/subnets", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/subnets", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15578,7 +15578,7 @@ func NewCreateSubnetRequestWithBody(server string, spaceId SpaceId, contentType 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/subnets", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/subnets", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15621,7 +15621,7 @@ func NewDeleteSubnetRequest(server string, spaceId SpaceId, id string) (*http.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/subnets/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/subnets/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15662,7 +15662,7 @@ func NewReadSubnetsByIdRequest(server string, spaceId SpaceId, id string) (*http
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/subnets/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/subnets/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15714,7 +15714,7 @@ func NewUpdateSubnetRequestWithBody(server string, spaceId SpaceId, id string, c
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/subnets/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/subnets/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15750,7 +15750,7 @@ func NewReadTagsRequest(server string, spaceId SpaceId, params *ReadTagsParams) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/tags", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/tags", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -15854,7 +15854,7 @@ func NewReadVirtualGatewaysRequest(server string, spaceId SpaceId, params *ReadV
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/virtualGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16033,7 +16033,7 @@ func NewCreateVirtualGatewayRequestWithBody(server string, spaceId SpaceId, cont
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/virtualGateways", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16076,7 +16076,7 @@ func NewDeleteVirtualGatewayRequest(server string, spaceId SpaceId, id string) (
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/virtualGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16117,7 +16117,7 @@ func NewReadVirtualGatewaysByIdRequest(server string, spaceId SpaceId, id string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/virtualGateways/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16169,7 +16169,7 @@ func NewLinkVirtualGatewayToVpcRequestWithBody(server string, spaceId SpaceId, i
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways/%s/vpcs/link", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/virtualGateways/%s/vpcs/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16223,7 +16223,7 @@ func NewUnlinkVirtualGatewayToVpcRequestWithBody(server string, spaceId SpaceId,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/virtualGateways/%s/vpcs/unlink", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/virtualGateways/%s/vpcs/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -16259,7 +16259,7 @@ func NewReadVmsRequest(server string, spaceId SpaceId, params *ReadVmsParams) (*
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17334,7 +17334,7 @@ func NewCreateVmsRequestWithBody(server string, spaceId SpaceId, contentType str
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17370,7 +17370,7 @@ func NewReadVmsStateRequest(server string, spaceId SpaceId, params *ReadVmsState
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms/states", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms/states", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17529,7 +17529,7 @@ func NewDeleteVmsRequest(server string, spaceId SpaceId, id []interface{}) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17570,7 +17570,7 @@ func NewReadVmsByIdRequest(server string, spaceId SpaceId, id string) (*http.Req
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17622,7 +17622,7 @@ func NewUpdateVmRequestWithBody(server string, spaceId SpaceId, id string, conte
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17665,7 +17665,7 @@ func NewReadAdminPasswordRequest(server string, spaceId SpaceId, id string) (*ht
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/adminPasswords", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms/%s/adminPasswords", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17706,7 +17706,7 @@ func NewReadConsoleOutputRequest(server string, spaceId SpaceId, id string) (*ht
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/consoleOutputs", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms/%s/consoleOutputs", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17747,7 +17747,7 @@ func NewRebootVmsRequest(server string, spaceId SpaceId, id []interface{}) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/reboot", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms/%s/reboot", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17788,7 +17788,7 @@ func NewStartVmsRequest(server string, spaceId SpaceId, id []interface{}) (*http
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/start", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms/%s/start", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17840,7 +17840,7 @@ func NewStopVmsRequestWithBody(server string, spaceId SpaceId, id []interface{},
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vms/%s/stop", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vms/%s/stop", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -17876,7 +17876,7 @@ func NewReadVolumesRequest(server string, spaceId SpaceId, params *ReadVolumesPa
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/volumes", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/volumes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18167,7 +18167,7 @@ func NewCreateVolumeRequestWithBody(server string, spaceId SpaceId, contentType 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/volumes", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/volumes", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18210,7 +18210,7 @@ func NewDeleteVolumeRequest(server string, spaceId SpaceId, id string) (*http.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/volumes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18251,7 +18251,7 @@ func NewReadVolumesByIdRequest(server string, spaceId SpaceId, id string) (*http
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/volumes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18303,7 +18303,7 @@ func NewUpdateVolumeRequestWithBody(server string, spaceId SpaceId, id string, c
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/volumes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18357,7 +18357,7 @@ func NewLinkVolumeRequestWithBody(server string, spaceId SpaceId, id string, con
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s/vms/link", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/volumes/%s/vms/link", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18411,7 +18411,7 @@ func NewUnlinkVolumeRequestWithBody(server string, spaceId SpaceId, id string, c
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/volumes/%s/vms/unlink", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/volumes/%s/vms/unlink", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18447,7 +18447,7 @@ func NewReadVpcAccessPointsRequest(server string, spaceId SpaceId, params *ReadV
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcAccessPoints", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18610,7 +18610,7 @@ func NewCreateVpcAccessPointRequestWithBody(server string, spaceId SpaceId, cont
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcAccessPoints", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18653,7 +18653,7 @@ func NewDeleteVpcAccessPointRequest(server string, spaceId SpaceId, id string) (
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcAccessPoints/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18694,7 +18694,7 @@ func NewReadVpcAccessPointsByIdRequest(server string, spaceId SpaceId, id string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcAccessPoints/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18746,7 +18746,7 @@ func NewUpdateVpcAccessPointRequestWithBody(server string, spaceId SpaceId, id s
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcAccessPoints/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcAccessPoints/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -18782,7 +18782,7 @@ func NewReadVpcPeeringsRequest(server string, spaceId SpaceId, params *ReadVpcPe
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcPeerings", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19041,7 +19041,7 @@ func NewCreateVpcPeeringRequestWithBody(server string, spaceId SpaceId, contentT
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcPeerings", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19084,7 +19084,7 @@ func NewDeleteVpcPeeringRequest(server string, spaceId SpaceId, id string) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcPeerings/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19125,7 +19125,7 @@ func NewReadVpcPeeringsByIdRequest(server string, spaceId SpaceId, id string) (*
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcPeerings/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19166,7 +19166,7 @@ func NewAcceptVpcPeeringRequest(server string, spaceId SpaceId, id string) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings/%s/accept", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcPeerings/%s/accept", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19207,7 +19207,7 @@ func NewRejectVpcPeeringRequest(server string, spaceId SpaceId, id string) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcPeerings/%s/reject", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcPeerings/%s/reject", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19241,7 +19241,7 @@ func NewReadVpcsRequest(server string, spaceId SpaceId, params *ReadVpcsParams) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcs", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19420,7 +19420,7 @@ func NewCreateVpcRequestWithBody(server string, spaceId SpaceId, contentType str
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcs", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19463,7 +19463,7 @@ func NewDeleteVpcRequest(server string, spaceId SpaceId, id string) (*http.Reque
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcs/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19504,7 +19504,7 @@ func NewReadVpcsByIdRequest(server string, spaceId SpaceId, id string) (*http.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcs/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19556,7 +19556,7 @@ func NewUpdateVpcRequestWithBody(server string, spaceId SpaceId, id string, cont
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpcs/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpcs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19592,7 +19592,7 @@ func NewReadVpnConnectionsRequest(server string, spaceId SpaceId, params *ReadVp
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpnConnections", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19819,7 +19819,7 @@ func NewCreateVpnConnectionRequestWithBody(server string, spaceId SpaceId, conte
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections", pathParam0)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpnConnections", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19862,7 +19862,7 @@ func NewDeleteVpnConnectionRequest(server string, spaceId SpaceId, id string) (*
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19903,7 +19903,7 @@ func NewReadVpnConnectionsByIdRequest(server string, spaceId SpaceId, id string)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -19955,7 +19955,7 @@ func NewUpdateVpnConnectionRequestWithBody(server string, spaceId SpaceId, id st
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -20009,7 +20009,7 @@ func NewDeleteVpnConnectionRouteRequestWithBody(server string, spaceId SpaceId, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s/routes", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpnConnections/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -20063,7 +20063,7 @@ func NewCreateVpnConnectionRouteRequestWithBody(server string, spaceId SpaceId, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/spaces/%s/vpnConnections/%s/routes", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/compute/spaces/%s/vpnConnections/%s/routes", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -20458,9 +20458,9 @@ type ClientWithResponsesInterface interface {
 	LinkPublicIpWithResponse(ctx context.Context, spaceId SpaceId, id string, body LinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*LinkPublicIpResponse, error)
 
 	// UnlinkPublicIpWithBodyWithResponse request with any body
-	UnlinkPublicIpWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error)
+	UnlinkPublicIpWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error)
 
-	UnlinkPublicIpWithResponse(ctx context.Context, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error)
+	UnlinkPublicIpWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error)
 
 	// ReadRouteTablesWithResponse request
 	ReadRouteTablesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadRouteTablesParams, reqEditors ...RequestEditorFn) (*ReadRouteTablesResponse, error)
@@ -25543,7 +25543,7 @@ func (c *ClientWithResponses) LinkPublicIpWithResponse(ctx context.Context, spac
 }
 
 // UnlinkPublicIpWithBodyWithResponse request with arbitrary body returning *UnlinkPublicIpResponse
-func (c *ClientWithResponses) UnlinkPublicIpWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error) {
+func (c *ClientWithResponses) UnlinkPublicIpWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error) {
 	rsp, err := c.UnlinkPublicIpWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -25551,7 +25551,7 @@ func (c *ClientWithResponses) UnlinkPublicIpWithBodyWithResponse(ctx context.Con
 	return ParseUnlinkPublicIpResponse(rsp)
 }
 
-func (c *ClientWithResponses) UnlinkPublicIpWithResponse(ctx context.Context, spaceId SpaceId, id interface{}, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error) {
+func (c *ClientWithResponses) UnlinkPublicIpWithResponse(ctx context.Context, spaceId SpaceId, id string, body UnlinkPublicIpJSONRequestBody, reqEditors ...RequestEditorFn) (*UnlinkPublicIpResponse, error) {
 	rsp, err := c.UnlinkPublicIp(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
