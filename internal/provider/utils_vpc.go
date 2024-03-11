@@ -2,24 +2,15 @@ package provider
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vpc"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
 )
-
-func NetFromTfToHttp(tf *resource_vpc.VpcModel) *api.Vpc {
-	return &api.Vpc{
-		DhcpOptionsSetId: tf.DhcpOptionsSetId.ValueStringPointer(),
-		Id:               tf.Id.ValueStringPointer(),
-		IpRange:          tf.IpRange.ValueStringPointer(),
-		State:            tf.State.ValueStringPointer(),
-		Tenancy:          tf.Tenancy.ValueStringPointer(),
-	}
-}
 
 func NetFromHttpToTf(ctx context.Context, http *api.Vpc) resource_vpc.VpcModel {
 	return resource_vpc.VpcModel{
