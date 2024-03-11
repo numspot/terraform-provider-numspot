@@ -2,8 +2,9 @@ package provider
 
 import (
 	"context"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -73,9 +74,7 @@ func linkPublicIpFromApi(ctx context.Context, elt api.LinkPublicIp) (resource_ni
 }
 
 func NicFromHttpToTf(ctx context.Context, http *api.Nic) (*resource_nic.NicModel, diag.Diagnostics) {
-	var (
-		linkPublicIpTf resource_nic.LinkPublicIpValue
-	)
+	var linkPublicIpTf resource_nic.LinkPublicIpValue
 	// Private IPs
 	privateIps, diagnostics := utils.GenericListToTfListValue(ctx, resource_nic.PrivateIpsValue{}, privatesIpFromApi, *http.PrivateIps)
 	if diagnostics.HasError() {

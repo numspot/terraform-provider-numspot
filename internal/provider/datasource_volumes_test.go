@@ -2,9 +2,10 @@ package provider
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"strconv"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccVolumesDatasource(t *testing.T) {
@@ -40,5 +41,4 @@ data "numspot_volumes" "datasource_test" {
 	ids = [numspot_volume.test.id]
 }
 `, volumeType, volumeSize, volumeAZ)
-
 }

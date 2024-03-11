@@ -12,8 +12,10 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-var _ resource.Resource = &VpcPeeringResource{}
-var _ resource.ResourceWithConfigure = &VpcPeeringResource{}
+var (
+	_ resource.Resource              = &VpcPeeringResource{}
+	_ resource.ResourceWithConfigure = &VpcPeeringResource{}
+)
 
 type VpcPeeringResource struct {
 	provider Provider

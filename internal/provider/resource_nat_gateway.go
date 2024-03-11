@@ -13,9 +13,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-var _ resource.Resource = &NatGatewayResource{}
-var _ resource.ResourceWithConfigure = &NatGatewayResource{}
-var _ resource.ResourceWithImportState = &NatGatewayResource{}
+var (
+	_ resource.Resource                = &NatGatewayResource{}
+	_ resource.ResourceWithConfigure   = &NatGatewayResource{}
+	_ resource.ResourceWithImportState = &NatGatewayResource{}
+)
 
 type NatGatewayResource struct {
 	provider Provider

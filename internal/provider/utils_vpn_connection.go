@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -83,7 +84,6 @@ func phase2OptionsFromHTTP(ctx context.Context, elt *api.Phase2Options) (resourc
 }
 
 func vpnOptionsFromHTTP(ctx context.Context, elt *api.VpnOptions) (resource_vpn_connection.VpnOptionsValue, diag.Diagnostics) {
-
 	if elt == nil {
 		return resource_vpn_connection.VpnOptionsValue{}, diag.Diagnostics{}
 	}
@@ -133,7 +133,6 @@ func VGWTelemetryFromHTTPToTF(ctx context.Context, http api.VgwTelemetry) (resou
 }
 
 func VpnConnectionFromHttpToTf(ctx context.Context, http *api.VpnConnection) resource_vpn_connection.VpnConnectionModel {
-
 	vpnOptions, diags := vpnOptionsFromHTTP(ctx, http.VpnOptions)
 	if diags.HasError() {
 		return resource_vpn_connection.VpnConnectionModel{}

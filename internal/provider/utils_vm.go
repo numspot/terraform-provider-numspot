@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -30,7 +31,6 @@ func vmBsuFromApi(ctx context.Context, elt api.BsuCreated) (basetypes.ObjectValu
 		return basetypes.ObjectValue{}, diags
 	}
 	return obj.ToObjectValue(ctx)
-
 }
 
 func vmBlockDeviceMappingFromApi(ctx context.Context, elt api.BlockDeviceMappingCreated) (resource_vm.BlockDeviceMappingsValue, diag.Diagnostics) {

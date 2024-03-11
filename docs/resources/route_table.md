@@ -17,11 +17,12 @@ description: |-
 
 ### Required
 
-- `net_id` (String) The ID of the Net for which you want to create a route table.
+- `vpc_id` (String) The ID of the Net for which you want to create a route table.
 
 ### Optional
 
 - `routes` (Attributes List) One or more routes in the route table. (see [below for nested schema](#nestedatt--routes))
+- `space_id` (String) space identifier
 - `subnet_id` (String) The ID of the SubNet for which you want to link the route table.
 
 ### Read-Only
@@ -39,19 +40,19 @@ Required:
 
 Optional:
 
-- `destination_service_id` (String) The ID of the OUTSCALE service.
 - `gateway_id` (String) The ID of the Internet service or virtual gateway attached to the Net.
-- `nat_service_id` (String) The ID of a NAT service attached to the Net.
-- `net_access_point_id` (String) The ID of the Net access point.
-- `net_peering_id` (String) The ID of the Net peering.
+- `nat_gateway_id` (String) The ID of a NAT service attached to the Net.
 - `nic_id` (String) The ID of the NIC.
-- `vm_account_id` (String) The account ID of the owner of the VM.
 - `vm_id` (String) The ID of a VM specified in a route in the table.
+- `vpc_peering_id` (String) The ID of the Net peering.
 
 Read-Only:
 
 - `creation_method` (String) The method used to create the route.
+- `destination_service_id` (String) The ID of the OUTSCALE service.
 - `state` (String) The state of a route in the route table (always `active`).
+- `vm_account_id` (String) The account ID of the owner of the VM.
+- `vpc_access_point_id` (String) The ID of the Net access point.
 
 
 <a id="nestedatt--link_route_tables"></a>
@@ -63,6 +64,7 @@ Read-Only:
 - `main` (Boolean) If true, the route table is the main one.
 - `route_table_id` (String) The ID of the route table.
 - `subnet_id` (String) The ID of the Subnet.
+- `vpc_id` (String) The ID of the Net.
 
 
 <a id="nestedatt--route_propagating_virtual_gateways"></a>

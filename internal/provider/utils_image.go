@@ -2,8 +2,9 @@ package provider
 
 import (
 	"context"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
@@ -145,10 +146,10 @@ func ImageFromHttpToTf(ctx context.Context, http *api.Image) (*resource_image.Im
 		Type:           types.StringPointerValue(http.Type),
 
 		// TODO: Handle those fields after this function call
-		//SourceImageId:    types.StringPointerValue(http.S),
-		//SourceRegionName: types.StringPointerValue(http.),
-		//VmId:  types.StringPointerValue(http.),
-		//NoReboot:       types.BoolPointerValue(http.),
+		// SourceImageId:    types.StringPointerValue(http.S),
+		// SourceRegionName: types.StringPointerValue(http.),
+		// VmId:  types.StringPointerValue(http.),
+		// NoReboot:       types.BoolPointerValue(http.),
 
 		//
 		StateComment: stateCommentTf,

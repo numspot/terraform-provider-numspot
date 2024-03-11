@@ -25,22 +25,23 @@ description: |-
 - `backend_ips` (List of String) One or more public IPs of back-end VMs.
 - `backend_vm_ids` (List of String) One or more IDs of back-end VMs for the load balancer.
 - `health_check` (Attributes) Information about the health check configuration. (see [below for nested schema](#nestedatt--health_check))
-- `id` (String) ID for /loadBalancers
+- `id` (String) ID for ReadLoadBalancers
 - `public_ip` (String) (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by 3DS OUTSCALE is associated.
 - `security_groups` (List of String) (Net only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Net is assigned to the load balancer.
+- `space_id` (String) space identifier
 - `subnets` (List of String) (Net only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Net.
-- `subregion_names` (List of String) The ID of the Subregion in which the load balancer was created.
 - `type` (String) The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.
 
 ### Read-Only
 
 - `application_sticky_cookie_policies` (Attributes List) The stickiness policies defined for the load balancer. (see [below for nested schema](#nestedatt--application_sticky_cookie_policies))
+- `availability_zone_names` (List of String) The ID of the Subregion in which the load balancer was created.
 - `dns_name` (String) The DNS name of the load balancer.
-- `net_id` (String) The ID of the Net for the load balancer.
 - `secured_cookies` (Boolean) Whether secure cookies are enabled for the load balancer.
 - `source_security_group` (Attributes) Information about the source security group of the load balancer, which you can use as part of your inbound rules for your registered VMs.<br />
 To only allow traffic from load balancers, add a security group rule that specifies this source security group as the inbound source. (see [below for nested schema](#nestedatt--source_security_group))
 - `sticky_cookie_policies` (Attributes List) The policies defined for the load balancer. (see [below for nested schema](#nestedatt--sticky_cookie_policies))
+- `vpc_id` (String) The ID of the Net for the load balancer.
 
 <a id="nestedatt--listeners"></a>
 ### Nested Schema for `listeners`
@@ -66,13 +67,13 @@ Read-Only:
 
 Optional:
 
-- `check_interval` (Number) The number of seconds between two pings (between `5` and `600` both included).
-- `healthy_threshold` (Number) The number of consecutive successful pings before considering the VM as healthy (between `2` and `10` both included).
-- `path` (String) If you use the HTTP or HTTPS protocols, the ping path.
+- `check_interval` (Number) The number of seconds between two requests (between `5` and `600` both included).
+- `healthy_threshold` (Number) The number of consecutive successful requests before considering the VM as healthy (between `2` and `10` both included).
+- `path` (String) If you use the HTTP or HTTPS protocols, the request URL path.
 - `port` (Number) The port number (between `1` and `65535`, both included).
 - `protocol` (String) The protocol for the URL of the VM (`HTTP` \| `HTTPS` \| `TCP` \| `SSL`).
 - `timeout` (Number) The maximum waiting time for a response before considering the VM as unhealthy, in seconds (between `2` and `60` both included).
-- `unhealthy_threshold` (Number) The number of consecutive failed pings before considering the VM as unhealthy (between `2` and `10` both included).
+- `unhealthy_threshold` (Number) The number of consecutive failed requests before considering the VM as unhealthy (between `2` and `10` both included).
 
 
 <a id="nestedatt--application_sticky_cookie_policies"></a>

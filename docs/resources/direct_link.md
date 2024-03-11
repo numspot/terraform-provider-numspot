@@ -18,13 +18,16 @@ description: |-
 ### Required
 
 - `bandwidth` (String) The bandwidth of the DirectLink (`1Gbps` \| `10Gbps`).
-- `direct_link_name` (String) The name of the DirectLink.
 - `location` (String) The code of the requested location for the DirectLink, returned by the [ReadLocations](#readlocations) method.
+- `name` (String) The name of the DirectLink.
+
+### Optional
+
+- `space_id` (String) space identifier
 
 ### Read-Only
 
 - `id` (String) The ID of the DirectLink (for example, `dxcon-xxxxxxxx`).
-- `name` (String) The name of the DirectLink.
 - `region_name` (String) The Region in which the DirectLink has been created.
 - `state` (String) The state of the DirectLink.<br />
 * `requested`: The DirectLink is requested but the request has not been validated yet.<br />

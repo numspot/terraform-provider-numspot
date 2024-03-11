@@ -269,14 +269,12 @@ func (t TagsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 	val := map[string]tftypes.Value{}
 
 	err := in.As(&val)
-
 	if err != nil {
 		return nil, err
 	}
 
 	for k, v := range val {
 		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
 		if err != nil {
 			return nil, err
 		}
@@ -315,7 +313,6 @@ func (v TagsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 		vals := make(map[string]tftypes.Value, 2)
 
 		val, err = v.Key.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -323,7 +320,6 @@ func (v TagsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 		vals["key"] = val
 
 		val, err = v.Value.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -475,7 +471,6 @@ func CreateTags(
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})
-
 	if err != nil {
 		diagnostics.AddError("Failed to create tags", err.Error())
 		return
@@ -509,7 +504,6 @@ func ReadTags(
 	res, err := apiClient.ReadTagsWithResponse(ctx, spaceId, &api.ReadTagsParams{
 		ResourceIds: &resourceIds,
 	})
-
 	if err != nil {
 		diagnostics.AddError("Failed to read Tags", err.Error())
 		return types.List{}

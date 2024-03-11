@@ -13,9 +13,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-var _ resource.Resource = &DhcpOptionsResource{}
-var _ resource.ResourceWithConfigure = &DhcpOptionsResource{}
-var _ resource.ResourceWithImportState = &DhcpOptionsResource{}
+var (
+	_ resource.Resource                = &DhcpOptionsResource{}
+	_ resource.ResourceWithConfigure   = &DhcpOptionsResource{}
+	_ resource.ResourceWithImportState = &DhcpOptionsResource{}
+)
 
 type DhcpOptionsResource struct {
 	provider Provider
@@ -96,7 +98,7 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 }
 
 func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 

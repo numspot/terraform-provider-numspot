@@ -17,23 +17,23 @@ description: |-
 
 ### Optional
 
-- `architecture` (String) The architecture of the OMI (by default, `i386` if you specified the `FileLocation` or `RootDeviceName` parameter).
-- `block_device_mappings` (Attributes List) One or more block device mappings. (see [below for nested schema](#nestedatt--block_device_mappings))
+- `architecture` (String) **(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the OMI (`i386` or `x84_64`).
+- `block_device_mappings` (Attributes List) **(when registering from a snapshot, or from a bucket without using a manifest file)** One or more block device mappings. (see [below for nested schema](#nestedatt--block_device_mappings))
 - `description` (String) A description for the new OMI.
-- `image_name` (String) A unique name for the new OMI.<br />
-Constraints: 3-128 alphanumeric characters, underscores (_), spaces ( ), parentheses (()), slashes (/), periods (.), or dashes (-).
-- `no_reboot` (Boolean) If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.
+- `name` (String) A unique name for the new OMI.<br />
+Constraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), parentheses (`()`), slashes (`/`), periods (`.`), or dashes (`-`).
+- `no_reboot` (Boolean) **(when creating from a VM)** If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.
 - `product_codes` (List of String) The product codes associated with the OMI.
-- `root_device_name` (String) The name of the root device. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.
-- `source_image_id` (String) The ID of the OMI you want to copy. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.
-- `source_region_name` (String) The name of the source Region, which must be the same as the Region of your account.
-- `vm_id` (String) The ID of the VM from which you want to create the OMI. You must specify only one of the following parameters: `FileLocation`, `RootDeviceName`, `SourceImageId` or `VmId`.
+- `root_device_name` (String) **(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new OMI.
+- `source_image_id` (String) **(when copying an OMI)** The ID of the OMI you want to copy.
+- `source_region_name` (String) **(when copying an OMI)** The name of the source Region (always the same as the Region of your account).
+- `space_id` (String) space identifier
+- `vm_id` (String) **(when creating from a VM)** The ID of the VM from which you want to create the OMI.
 
 ### Read-Only
 
 - `creation_date` (String) The date and time of creation of the OMI, in ISO 8601 date-time format.
 - `id` (String) The ID of the OMI.
-- `name` (String) The name of the OMI.
 - `root_device_type` (String) The type of root device used by the OMI (always `bsu`).
 - `state` (String) The state of the OMI (`pending` \| `available` \| `failed`).
 - `state_comment` (Attributes) Information about the change of state. (see [below for nested schema](#nestedatt--state_comment))

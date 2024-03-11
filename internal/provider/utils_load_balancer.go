@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -57,6 +58,7 @@ func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStick
 			"policy_name":              types.StringPointerValue(elt.PolicyName),
 		})
 }
+
 func LoadBalancerFromTfToHttp(tf *resource_load_balancer.LoadBalancerModel) *api.LoadBalancer {
 	return &api.LoadBalancer{}
 }
@@ -92,7 +94,7 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancer) resou
 	if err != nil {
 		return resource_load_balancer.LoadBalancerModel{}
 	}
-	//httpListeners := *http.Listeners
+	// httpListeners := *http.Listeners
 	securityGroups, _ := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
 	sourceSecurityGroup := resource_load_balancer.SourceSecurityGroupValue{
 		SecurityGroupAccountId: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupAccountId),
@@ -153,7 +155,7 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *api.LoadBalan
 	if err != nil {
 		return datasource_load_balancer.LoadBalancerModel{}
 	}
-	//httpListeners := *http.Listeners
+	// httpListeners := *http.Listeners
 	securityGroups, _ := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
 	sourceSecurityGroup := datasource_load_balancer.SourceSecurityGroupValue{
 		SecurityGroupAccountId: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupAccountId),
@@ -184,7 +186,6 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *api.LoadBalan
 }
 
 func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) api.CreateLoadBalancerJSONRequestBody {
-
 	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
 	subnets := utils.TfStringListToStringList(ctx, tf.Subnets)
 	listeners := utils.TfListToGenericList(func(a resource_load_balancer.ListenersValue) api.ListenerForCreation {
@@ -202,13 +203,12 @@ func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_ba
 		PublicIp:       tf.PublicIp.ValueStringPointer(),
 		SecurityGroups: &securityGroups,
 		Subnets:        &subnets,
-		//Tags:           nil,
+		// Tags:           nil,
 		Type: tf.Type.ValueStringPointer(),
 	}
 }
 
 func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) api.UpdateLoadBalancerJSONRequestBody {
-
 	var (
 		loadBalancerPort *int             = nil
 		policyNames      *[]string        = nil

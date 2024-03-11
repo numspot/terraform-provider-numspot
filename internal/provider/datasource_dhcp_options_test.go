@@ -1,8 +1,9 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccDHCPOptionsDatasource(t *testing.T) {
@@ -37,5 +38,4 @@ data "numspot_dhcp_options" "testdata" {
 data "numspot_dhcp_options" "testdatabyid" {
 	ids = [numspot_dhcp_options.test.id]
 }`
-
 }

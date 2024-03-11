@@ -101,19 +101,19 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"gateway_id": schema.StringAttribute{
 							Computed:            true,
-							Optional: true,
+							Optional:            true,
 							Description:         "The ID of the Internet service or virtual gateway attached to the Net.",
 							MarkdownDescription: "The ID of the Internet service or virtual gateway attached to the Net.",
 						},
 						"nat_gateway_id": schema.StringAttribute{
 							Computed:            true,
-							Optional: true,
+							Optional:            true,
 							Description:         "The ID of a NAT service attached to the Net.",
 							MarkdownDescription: "The ID of a NAT service attached to the Net.",
 						},
 						"nic_id": schema.StringAttribute{
 							Computed:            true,
-							Optional: true,
+							Optional:            true,
 							Description:         "The ID of the NIC.",
 							MarkdownDescription: "The ID of the NIC.",
 						},
@@ -129,7 +129,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"vm_id": schema.StringAttribute{
 							Computed:            true,
-							Optional: true,
+							Optional:            true,
 							Description:         "The ID of a VM specified in a route in the table.",
 							MarkdownDescription: "The ID of a VM specified in a route in the table.",
 						},
@@ -140,7 +140,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"vpc_peering_id": schema.StringAttribute{
 							Computed:            true,
-							Optional: true,
+							Optional:            true,
 							Description:         "The ID of the Net peering.",
 							MarkdownDescription: "The ID of the Net peering.",
 						},
@@ -152,7 +152,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Optional: 			 true,
+				Optional:            true,
 				Description:         "One or more routes in the route table.",
 				MarkdownDescription: "One or more routes in the route table.",
 			},
@@ -183,7 +183,7 @@ type RouteTableModel struct {
 	Routes                          types.List   `tfsdk:"routes"`
 	SpaceId                         types.String `tfsdk:"space_id"`
 	VpcId                           types.String `tfsdk:"vpc_id"`
-	SubnetId						types.String `tfsdk:"subnet_id"`
+	SubnetId                        types.String `tfsdk:"subnet_id"`
 }
 
 var _ basetypes.ObjectTypable = LinkRouteTablesType{}
