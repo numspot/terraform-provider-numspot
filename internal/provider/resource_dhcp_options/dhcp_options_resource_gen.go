@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -64,6 +65,7 @@ func DhcpOptionsResourceSchema(ctx context.Context) schema.Schema {
 					listplanmodifier.RequiresReplace(),
 				},
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -75,4 +77,5 @@ type DhcpOptionsModel struct {
 	Id                types.String `tfsdk:"id"`
 	LogServers        types.List   `tfsdk:"log_servers"`
 	NtpServers        types.List   `tfsdk:"ntp_servers"`
+	Tags              types.List   `tfsdk:"tags"`
 }

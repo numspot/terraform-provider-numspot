@@ -498,6 +498,16 @@ func tagFromAPI(ctx context.Context, tag api.Tag) (TagsValue, diag.Diagnostics) 
 	)
 }
 
+func ResourceTagFromAPI(ctx context.Context, tag api.ResourceTag) (TagsValue, diag.Diagnostics) {
+	return NewTagsValue(
+		TagsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"key":   types.StringValue(tag.Key),
+			"value": types.StringValue(tag.Value),
+		},
+	)
+}
+
 func ReadTags(
 	ctx context.Context,
 	apiClient *api.ClientWithResponses,

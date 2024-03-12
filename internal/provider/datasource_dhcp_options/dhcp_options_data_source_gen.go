@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -55,6 +56,7 @@ func DhcpOptionsDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "One or more IPs for the NTP servers.",
 							MarkdownDescription: "One or more IPs for the NTP servers.",
 						},
+						"tags": tags.TagsSchema(ctx),
 					},
 				},
 			},
@@ -93,6 +95,24 @@ func DhcpOptionsDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IPs of the Network Time Protocol (NTP) servers used for the DHCP options sets.",
 				MarkdownDescription: "The IPs of the Network Time Protocol (NTP) servers used for the DHCP options sets.",
 			},
+			"tag_keys": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The keys of the tags associated with the DHCP options sets.",
+				MarkdownDescription: "The keys of the tags associated with the DHCP options sets.",
+			},
+			"tag_values": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The values of the tags associated with the DHCP options sets.",
+				MarkdownDescription: "The values of the tags associated with the DHCP options sets.",
+			},
+			"tags": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The key/value combination of the tags associated with the DHCP options sets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				MarkdownDescription: "The key/value combination of the tags associated with the DHCP options sets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+			},
 		},
 	}
 }
@@ -104,6 +124,7 @@ type DhcpOptionsModel struct {
 	Id                types.String `tfsdk:"id"`
 	LogServers        types.List   `tfsdk:"log_servers"`
 	NtpServers        types.List   `tfsdk:"ntp_servers"`
+	Tags              types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = TagsType{}

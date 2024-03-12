@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -67,7 +68,16 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 		return
 	}
 
+	createdId := *res.JSON201.Id
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	tf, diagnostics := DhcpOptionsFromHttpToTf(ctx, res.JSON201)
+	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, createdId)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -88,6 +98,7 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 	}
 
 	tf, diagnostics := DhcpOptionsFromHttpToTf(ctx, res.JSON200)
+	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, data.Id.ValueString())
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -96,8 +107,44 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 }
 
 func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
-	panic("implement me")
+	var plan, state resource_dhcp_options.DhcpOptionsModel
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	res := utils.ExecuteRequest(func() (*api.ReadDhcpOptionsByIdResponse, error) {
+		return r.provider.ApiClient.ReadDhcpOptionsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf, diags := DhcpOptionsFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		return
+	}
+	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, state.Id.ValueString())
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+
 }
 
 func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

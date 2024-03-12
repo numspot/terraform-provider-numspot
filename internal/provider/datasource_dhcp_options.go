@@ -19,6 +19,9 @@ type DHCPOptionsDataSourceModel struct {
 	DomainNames       types.List                                 `tfsdk:"domain_names"`
 	LogServers        types.List                                 `tfsdk:"log_servers"`
 	NTPServers        types.List                                 `tfsdk:"ntp_servers"`
+	TagKeys           types.List                                 `tfsdk:"tag_keys"`
+	TagValues         types.List                                 `tfsdk:"tag_values"`
+	Tags              types.List                                 `tfsdk:"tags"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -93,5 +96,8 @@ func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.Rea
 	state.DomainNameServers = plan.DomainNameServers
 	state.LogServers = plan.LogServers
 	state.Default = plan.Default
+	state.Tags = plan.Tags
+	state.TagKeys = plan.TagKeys
+	state.TagValues = plan.TagValues
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

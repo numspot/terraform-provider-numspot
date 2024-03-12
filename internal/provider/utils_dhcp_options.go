@@ -7,6 +7,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_dhcp_options"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_dhcp_options"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -71,6 +72,9 @@ func DhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSou
 	dnsServers := utils.TfStringListToStringPtrList(ctx, tf.DomainNameServers)
 	logServers := utils.TfStringListToStringPtrList(ctx, tf.LogServers)
 	ntpServers := utils.TfStringListToStringPtrList(ctx, tf.NTPServers)
+	tagKeys := utils.TfStringListToStringPtrList(ctx, tf.TagKeys)
+	tagValues := utils.TfStringListToStringPtrList(ctx, tf.TagValues)
+	tags := utils.TfStringListToStringPtrList(ctx, tf.Tags)
 
 	return api.ReadDhcpOptionsParams{
 		Default:           tf.Default.ValueBoolPointer(),
@@ -78,11 +82,15 @@ func DhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSou
 		DomainNames:       domainNames,
 		LogServers:        logServers,
 		NtpServers:        ntpServers,
+		TagKeys:           tagKeys,
+		TagValues:         tagValues,
+		Tags:              tags,
 		Ids:               ids,
 	}
 }
 
 func DHCPOptionsFromHttpToTfDatasource(ctx context.Context, http *api.DhcpOptionsSet) (*datasource_dhcp_options.DhcpOptionsModel, diag.Diagnostics) {
+	var tagsList types.List
 	dnsServers, diags := utils.FromStringListPointerToTfStringList(ctx, http.DomainNameServers)
 	if diags.HasError() {
 		return nil, diags
@@ -95,6 +103,9 @@ func DHCPOptionsFromHttpToTfDatasource(ctx context.Context, http *api.DhcpOption
 	if diags.HasError() {
 		return nil, diags
 	}
+	if http.Tags != nil {
+		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+	}
 	return &datasource_dhcp_options.DhcpOptionsModel{
 		Default:           types.BoolPointerValue(http.Default),
 		DomainName:        types.StringPointerValue(http.DomainName),
@@ -102,5 +113,6 @@ func DHCPOptionsFromHttpToTfDatasource(ctx context.Context, http *api.DhcpOption
 		Id:                types.StringPointerValue(http.Id),
 		LogServers:        logServers,
 		NtpServers:        ntpServers,
+		Tags:              tagsList,
 	}, nil
 }
