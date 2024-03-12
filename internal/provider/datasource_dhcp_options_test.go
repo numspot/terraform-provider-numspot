@@ -54,7 +54,7 @@ func TestAccDHCPOptionsDatasource_WithTags(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDHCPOptionsDatasourceConfig_WithTags(),
+				Config: testAccDHCPOptionsDatasourceConfig_WithTags(domainName, tagName, tagValue),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.#", "1"),
 					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.0.domain_name", domainName),
@@ -91,20 +91,20 @@ data "numspot_dhcp_options" "test" {
 }`, domainName1, domainName2)
 }
 
-func testAccDHCPOptionsDatasourceConfig_WithTags() string {
-	return `
+func testAccDHCPOptionsDatasourceConfig_WithTags(domainName, tagName, tagValue string) string {
+	return fmt.Sprintf(`
 resource "numspot_dhcp_options" "test" {
-	domain_name = "numspot.dev"
+	domain_name = %[1]q
 	tags = [
 		{
-			key = "Name"
-			value = "dhcp_numspot"
+			key = %[2]q
+			value = %[3]q
 		}
 	]
 }
 data "numspot_dhcp_options" "test" {
 	tags = [
-format("%s=%s", numspot_dhcp_options.test.tags[0].key, numspot_dhcp_options.test.tags[0].value)
+format("%%s=%%s", numspot_dhcp_options.test.tags[0].key, numspot_dhcp_options.test.tags[0].value)
 ]
-}`
+}`, domainName, tagName, tagValue)
 }
