@@ -106,13 +106,16 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	tf := NetFromHttpToTf(ctx, res.JSON201)
+	tf, diags := NetFromHttpToTf(ctx, res.JSON201)
+	if diags.HasError() {
+		return
+	}
 	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, createdId)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
@@ -127,14 +130,16 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 	}
 
 	// TODO: read Nets returns tags in response, do not need to relist tags
-	tf := NetFromHttpToTf(ctx, res.JSON200)
-	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, data.Id.ValueString())
+	tf, diags := NetFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		return
+	}
 
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
@@ -168,13 +173,15 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 		return
 	}
 
-	tf := NetFromHttpToTf(ctx, res.JSON200)
-	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, state.Id.ValueString())
+	tf, diags := NetFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		return
+	}
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

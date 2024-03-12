@@ -101,7 +101,6 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 	}
 
 	tf, diagnostics := DhcpOptionsFromHttpToTf(ctx, res.JSON200)
-	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, data.Id.ValueString())
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -141,7 +140,6 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 	if diags.HasError() {
 		return
 	}
-	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, state.Id.ValueString())
 	if response.Diagnostics.HasError() {
 		return
 	}

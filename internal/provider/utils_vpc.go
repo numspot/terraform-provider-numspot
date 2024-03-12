@@ -13,15 +13,25 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
 )
 
-func NetFromHttpToTf(ctx context.Context, http *api.Vpc) resource_vpc.VpcModel {
-	return resource_vpc.VpcModel{
+func NetFromHttpToTf(ctx context.Context, http *api.Vpc) (*resource_vpc.VpcModel, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+	return &resource_vpc.VpcModel{
 		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
 		Id:               types.StringPointerValue(http.Id),
 		IpRange:          types.StringPointerValue(http.IpRange),
 		State:            types.StringPointerValue(http.State),
 		Tenancy:          types.StringPointerValue(http.Tenancy),
-		Tags:             types.ListNull(tags.TagsValue{}.Type(ctx)),
-	}
+		Tags:             tagsTf,
+	}, nil
 }
 
 func NetFromTfToCreateRequest(tf *resource_vpc.VpcModel) api.CreateVpcJSONRequestBody {

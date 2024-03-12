@@ -107,15 +107,11 @@ func testNetConfig_Tags(name string) string {
 resource "numspot_vpc" "test" {
 	ip_range = "10.101.0.0/16"
 	tenancy = "default"
-
-	tags {
+	tags = [
+	{
 			key = "Name"
 			value = %[1]q
 	}
-
-	tags {
-			key = "foo"
-			value = "bar"
-	}
+	]
 }`, name)
 }

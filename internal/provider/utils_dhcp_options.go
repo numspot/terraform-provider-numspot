@@ -14,7 +14,7 @@ import (
 
 func DhcpOptionsFromHttpToTf(ctx context.Context, http *api.DhcpOptionsSet) (*resource_dhcp_options.DhcpOptionsModel, diag.Diagnostics) {
 	var diagnostics diag.Diagnostics
-	var domainNameServersTf, logServersTf, ntpServersTf types.List
+	var domainNameServersTf, logServersTf, ntpServersTf, tagsTf types.List
 
 	if http.DomainNameServers != nil {
 		domainNameServersTf, diagnostics = utils.StringListToTfListValue(ctx, *http.DomainNameServers)
@@ -37,6 +37,13 @@ func DhcpOptionsFromHttpToTf(ctx context.Context, http *api.DhcpOptionsSet) (*re
 		}
 	}
 
+	if http.Tags != nil {
+		tagsTf, diagnostics = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diagnostics.HasError() {
+			return nil, diagnostics
+		}
+	}
+
 	return &resource_dhcp_options.DhcpOptionsModel{
 		Default:           types.BoolPointerValue(http.Default),
 		DomainName:        types.StringPointerValue(http.DomainName),
@@ -44,6 +51,7 @@ func DhcpOptionsFromHttpToTf(ctx context.Context, http *api.DhcpOptionsSet) (*re
 		DomainNameServers: domainNameServersTf,
 		LogServers:        logServersTf,
 		NtpServers:        ntpServersTf,
+		Tags:              tagsTf,
 	}, nil
 }
 
