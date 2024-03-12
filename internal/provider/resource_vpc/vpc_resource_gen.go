@@ -19,7 +19,6 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The ID of the DHCP options set (or `default` if you want to associate the default one).",
 				MarkdownDescription: "The ID of the DHCP options set (or `default` if you want to associate the default one).",
-
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
@@ -59,5 +58,5 @@ type VpcModel struct {
 	IpRange          types.String `tfsdk:"ip_range"`
 	State            types.String `tfsdk:"state"`
 	Tenancy          types.String `tfsdk:"tenancy"`
-	Tags  			 types.List   `tfsdk:"tags"`
+	Tags             types.List   `tfsdk:"tags"`
 }

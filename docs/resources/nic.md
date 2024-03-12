@@ -26,19 +26,21 @@ description: |-
 This IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.<br />
 If you do not specify this attribute, a random private IP is selected within the IP range of the Subnet. (see [below for nested schema](#nestedatt--private_ips))
 - `security_group_ids` (List of String) One or more IDs of security groups for the NIC.
+- `space_id` (String) space identifier
 
 ### Read-Only
 
 - `account_id` (String) The account ID of the owner of the NIC.
+- `availability_zone_name` (String) The Subregion in which the NIC is located.
 - `id` (String) The ID of the NIC.
 - `is_source_dest_checked` (Boolean) (Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.
+- `link_nic` (Attributes) Information about the NIC attachment. (see [below for nested schema](#nestedatt--link_nic))
 - `link_public_ip` (Attributes) Information about the public IP association. (see [below for nested schema](#nestedatt--link_public_ip))
 - `mac_address` (String) The Media Access Control (MAC) address of the NIC.
-- `net_id` (String) The ID of the Net for the NIC.
 - `private_dns_name` (String) The name of the private DNS.
 - `security_groups` (Attributes List) One or more IDs of security groups for the NIC. (see [below for nested schema](#nestedatt--security_groups))
 - `state` (String) The state of the NIC (`available` \| `attaching` \| `in-use` \| `detaching`).
-- `subregion_name` (String) The Subregion in which the NIC is located.
+- `vpc_id` (String) The ID of the Net for the NIC.
 
 <a id="nestedatt--private_ips"></a>
 ### Nested Schema for `private_ips`
@@ -64,6 +66,19 @@ Read-Only:
 - `public_ip_account_id` (String) The account ID of the owner of the public IP.
 - `public_ip_id` (String) The allocation ID of the public IP.
 
+
+
+<a id="nestedatt--link_nic"></a>
+### Nested Schema for `link_nic`
+
+Read-Only:
+
+- `delete_on_vm_deletion` (Boolean) If true, the NIC is deleted when the VM is terminated.
+- `device_number` (Number) The device index for the NIC attachment (between `1` and `7`, both included).
+- `id` (String) The ID of the NIC to attach.
+- `state` (String) The state of the attachment (`attaching` \| `attached` \| `detaching` \| `detached`).
+- `vm_account_id` (String) The account ID of the owner of the VM.
+- `vm_id` (String) The ID of the VM.
 
 
 <a id="nestedatt--link_public_ip"></a>

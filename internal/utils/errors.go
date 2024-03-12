@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"net/http"
 	"reflect"
 	"regexp"
 	"runtime"
 	"strings"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/hashicorp/terraform-plugin-framework/diag"

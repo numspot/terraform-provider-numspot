@@ -1,8 +1,9 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccVPCsDatasource(t *testing.T) {
@@ -30,5 +31,4 @@ resource "numspot_vpc" "test" {
 data "numspot_vpcs" "testdata" {
 	ids = [numspot_vpc.test.id]
 }`
-
 }

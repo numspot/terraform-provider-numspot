@@ -22,7 +22,7 @@ func TestAccVolumeResource(t *testing.T) {
 				Config: createVolumeConfig(volumeType, volumeSize, volumeAZ),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_volume.test", "type", volumeType),
-					//resource.TestCheckResourceAttr("numspot_volume.test", "size", fmt.Sprintf("%d", volumeSize)),
+					// resource.TestCheckResourceAttr("numspot_volume.test", "size", fmt.Sprintf("%d", volumeSize)),
 					resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", volumeAZ),
 				),
 			},

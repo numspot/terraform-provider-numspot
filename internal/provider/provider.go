@@ -5,9 +5,10 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
-	"github.com/google/uuid"
 	"net/http"
 	"os"
+
+	"github.com/google/uuid"
 
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"

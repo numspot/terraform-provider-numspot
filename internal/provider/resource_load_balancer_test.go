@@ -2,10 +2,11 @@ package provider
 
 import (
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	"strconv"
 	"testing"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
@@ -39,7 +40,7 @@ func TestAccLoadBalancerResource(t *testing.T) {
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"availability_zone_names"},
 			},
-			//Update testing
+			// Update testing
 			{
 				Config: updateLbConfig(hc),
 				Check: resource.ComposeAggregateTestCheckFunc(

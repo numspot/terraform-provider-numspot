@@ -252,7 +252,7 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 			},
-			"load_balancer_names" : schema.ListAttribute{
+			"load_balancer_names": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Description:         "Load balancer names to filter with.",

@@ -24,8 +24,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"architecture": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -98,8 +98,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.List{
 					listplanmodifier.RequiresReplace(),
 				},
@@ -112,8 +112,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The date and time of creation of the OMI, in ISO 8601 date-time format.",
 			},
 			"description": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -126,8 +126,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the OMI.",
 			},
 			"name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -135,8 +135,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "A unique name for the new OMI.<br />\nConstraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), parentheses (`()`), slashes (`/`), periods (`.`), or dashes (`-`).",
 			},
 			"no_reboot": schema.BoolAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.RequiresReplace(),
 				},
@@ -151,8 +151,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The product codes associated with the OMI.",
 			},
 			"root_device_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -165,8 +165,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The type of root device used by the OMI (always `bsu`).",
 			},
 			"source_image_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -174,8 +174,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "**(when copying an OMI)** The ID of the OMI you want to copy.",
 			},
 			"source_region_name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -183,8 +183,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "**(when copying an OMI)** The name of the source Region (always the same as the Region of your account).",
 			},
 			"space_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -224,8 +224,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The type of the OMI.",
 			},
 			"vm_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},

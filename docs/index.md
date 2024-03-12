@@ -30,3 +30,4 @@ provider "numspot" {
 - `client_secret` (String) Client secret to authenticate user.
 - `host` (String) Numspot API host
 - `iam_host` (String) Numspot IAM host
+- `space_id` (String) Space ID.

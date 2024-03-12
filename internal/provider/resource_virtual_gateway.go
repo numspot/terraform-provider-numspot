@@ -13,9 +13,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-var _ resource.Resource = &VirtualGatewayResource{}
-var _ resource.ResourceWithConfigure = &VirtualGatewayResource{}
-var _ resource.ResourceWithImportState = &VirtualGatewayResource{}
+var (
+	_ resource.Resource                = &VirtualGatewayResource{}
+	_ resource.ResourceWithConfigure   = &VirtualGatewayResource{}
+	_ resource.ResourceWithImportState = &VirtualGatewayResource{}
+)
 
 type VirtualGatewayResource struct {
 	provider Provider
@@ -94,7 +96,7 @@ func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.Read
 }
 
 func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 

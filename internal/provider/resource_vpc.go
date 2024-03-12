@@ -126,8 +126,10 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 		return
 	}
 
+	// TODO: read Nets returns tags in response, do not need to relist tags
 	tf := NetFromHttpToTf(ctx, res.JSON200)
 	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, data.Id.ValueString())
+
 	if response.Diagnostics.HasError() {
 		return
 	}
