@@ -3,8 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,9 +15,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-var _ resource.Resource = &DhcpOptionsResource{}
-var _ resource.ResourceWithConfigure = &DhcpOptionsResource{}
-var _ resource.ResourceWithImportState = &DhcpOptionsResource{}
+var (
+	_ resource.Resource                = &DhcpOptionsResource{}
+	_ resource.ResourceWithConfigure   = &DhcpOptionsResource{}
+	_ resource.ResourceWithImportState = &DhcpOptionsResource{}
+)
 
 type DhcpOptionsResource struct {
 	provider Provider
@@ -144,7 +147,6 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
-
 }
 
 func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

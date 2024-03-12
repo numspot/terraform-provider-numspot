@@ -2,8 +2,9 @@ package provider
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccDHCPOptionsDatasource_Basic(t *testing.T) {
@@ -74,7 +75,6 @@ resource "numspot_dhcp_options" "test" {
 data "numspot_dhcp_options" "test" {
 	domain_names = [numspot_dhcp_options.test.domain_name]
 }`, domainName)
-
 }
 
 func testAccDHCPOptionsDatasourceConfig_ByID(domainName1, domainName2 string) string {
@@ -89,7 +89,6 @@ resource "numspot_dhcp_options" "obj2" {
 data "numspot_dhcp_options" "test" {
 	ids = [numspot_dhcp_options.obj1.id, numspot_dhcp_options.obj2.id]
 }`, domainName1, domainName2)
-
 }
 
 func testAccDHCPOptionsDatasourceConfig_WithTags() string {
@@ -108,5 +107,4 @@ data "numspot_dhcp_options" "test" {
 format("%s=%s", numspot_dhcp_options.test.tags[0].key, numspot_dhcp_options.test.tags[0].value)
 ]
 }`
-
 }
