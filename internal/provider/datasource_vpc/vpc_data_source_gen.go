@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -47,6 +48,7 @@ func VpcDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The VM tenancy in a Net.",
 							MarkdownDescription: "The VM tenancy in a Net.",
 						},
+						"tags": tags.TagsSchema(ctx),
 					},
 				},
 			},
@@ -79,6 +81,24 @@ func VpcDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the Nets.",
 				MarkdownDescription: "The IDs of the Nets.",
 			},
+			"tag_keys": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The keys of the tags associated with the DHCP options sets.",
+				MarkdownDescription: "The keys of the tags associated with the DHCP options sets.",
+			},
+			"tag_values": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The values of the tags associated with the DHCP options sets.",
+				MarkdownDescription: "The values of the tags associated with the DHCP options sets.",
+			},
+			"tags": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The key/value combination of the tags associated with the DHCP options sets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				MarkdownDescription: "The key/value combination of the tags associated with the DHCP options sets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+			},
 		},
 	}
 }
@@ -89,6 +109,7 @@ type VpcModel struct {
 	IpRange          types.String `tfsdk:"ip_range"`
 	State            types.String `tfsdk:"state"`
 	Tenancy          types.String `tfsdk:"tenancy"`
+	Tags             types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = TagsType{}

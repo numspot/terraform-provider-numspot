@@ -37,16 +37,30 @@ func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) api.
 		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges),
 		IsDefault:         tf.IsDefault.ValueBoolPointer(),
 		States:            utils.TfStringListToStringPtrList(ctx, tf.States),
+		TagKeys:           utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
+		TagValues:         utils.TfStringListToStringPtrList(ctx, tf.TagValues),
+		Tags:              utils.TfStringListToStringPtrList(ctx, tf.Tags),
 		Ids:               utils.TfStringListToStringPtrList(ctx, tf.IDs),
 	}
 }
 
 func VPCsFromHttpToTfDatasource(ctx context.Context, http *api.Vpc) (*datasource_vpc.VpcModel, diag.Diagnostics) {
+	var (
+		tagsList types.List
+		diags    diag.Diagnostics
+	)
+	if http.Tags != nil {
+		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
 	return &datasource_vpc.VpcModel{
 		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
 		Id:               types.StringPointerValue(http.Id),
 		IpRange:          types.StringPointerValue(http.IpRange),
 		State:            types.StringPointerValue(http.State),
 		Tenancy:          types.StringPointerValue(http.Tenancy),
+		Tags:             tagsList,
 	}, nil
 }

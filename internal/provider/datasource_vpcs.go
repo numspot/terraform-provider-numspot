@@ -19,6 +19,9 @@ type VPCsDataSourceModel struct {
 	IPRanges          types.List                `tfsdk:"ip_ranges"`
 	IsDefault         types.Bool                `tfsdk:"is_default"`
 	States            types.List                `tfsdk:"states"`
+	TagKeys           types.List                `tfsdk:"tag_keys"`
+	TagValues         types.List                `tfsdk:"tag_values"`
+	Tags              types.List                `tfsdk:"tags"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -92,6 +95,9 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 	state.IPRanges = plan.IPRanges
 	state.IsDefault = plan.IsDefault
 	state.DHCPOptionsSetIds = plan.DHCPOptionsSetIds
+	state.Tags = plan.Tags
+	state.TagKeys = plan.TagKeys
+	state.TagValues = plan.TagValues
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
