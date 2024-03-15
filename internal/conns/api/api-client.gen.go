@@ -5179,7 +5179,7 @@ type ClientInterface interface {
 	ReadVmsState(ctx context.Context, spaceId SpaceId, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVms request
-	DeleteVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVms(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVmsById request
 	ReadVmsById(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -5196,15 +5196,15 @@ type ClientInterface interface {
 	ReadConsoleOutput(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RebootVms request
-	RebootVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RebootVms(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// StartVms request
-	StartVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error)
+	StartVms(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// StopVmsWithBody request with any body
-	StopVmsWithBody(ctx context.Context, spaceId SpaceId, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	StopVmsWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	StopVms(ctx context.Context, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	StopVms(ctx context.Context, spaceId SpaceId, id string, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReadVolumes request
 	ReadVolumes(ctx context.Context, spaceId SpaceId, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -7447,7 +7447,7 @@ func (c *Client) ReadVmsState(ctx context.Context, spaceId SpaceId, params *Read
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteVms(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteVmsRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
@@ -7519,7 +7519,7 @@ func (c *Client) ReadConsoleOutput(ctx context.Context, spaceId SpaceId, id stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) RebootVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RebootVms(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRebootVmsRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
@@ -7531,7 +7531,7 @@ func (c *Client) RebootVms(ctx context.Context, spaceId SpaceId, id []interface{
 	return c.Client.Do(req)
 }
 
-func (c *Client) StartVms(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) StartVms(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewStartVmsRequest(c.Server, spaceId, id)
 	if err != nil {
 		return nil, err
@@ -7543,7 +7543,7 @@ func (c *Client) StartVms(ctx context.Context, spaceId SpaceId, id []interface{}
 	return c.Client.Do(req)
 }
 
-func (c *Client) StopVmsWithBody(ctx context.Context, spaceId SpaceId, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) StopVmsWithBody(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewStopVmsRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
 		return nil, err
@@ -7555,7 +7555,7 @@ func (c *Client) StopVmsWithBody(ctx context.Context, spaceId SpaceId, id []inte
 	return c.Client.Do(req)
 }
 
-func (c *Client) StopVms(ctx context.Context, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) StopVms(ctx context.Context, spaceId SpaceId, id string, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewStopVmsRequest(c.Server, spaceId, id, body)
 	if err != nil {
 		return nil, err
@@ -17507,7 +17507,7 @@ func NewReadVmsStateRequest(server string, spaceId SpaceId, params *ReadVmsState
 }
 
 // NewDeleteVmsRequest generates requests for DeleteVms
-func NewDeleteVmsRequest(server string, spaceId SpaceId, id []interface{}) (*http.Request, error) {
+func NewDeleteVmsRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -17725,7 +17725,7 @@ func NewReadConsoleOutputRequest(server string, spaceId SpaceId, id string) (*ht
 }
 
 // NewRebootVmsRequest generates requests for RebootVms
-func NewRebootVmsRequest(server string, spaceId SpaceId, id []interface{}) (*http.Request, error) {
+func NewRebootVmsRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -17766,7 +17766,7 @@ func NewRebootVmsRequest(server string, spaceId SpaceId, id []interface{}) (*htt
 }
 
 // NewStartVmsRequest generates requests for StartVms
-func NewStartVmsRequest(server string, spaceId SpaceId, id []interface{}) (*http.Request, error) {
+func NewStartVmsRequest(server string, spaceId SpaceId, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -17807,7 +17807,7 @@ func NewStartVmsRequest(server string, spaceId SpaceId, id []interface{}) (*http
 }
 
 // NewStopVmsRequest calls the generic StopVms builder with application/json body
-func NewStopVmsRequest(server string, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody) (*http.Request, error) {
+func NewStopVmsRequest(server string, spaceId SpaceId, id string, body StopVmsJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -17818,7 +17818,7 @@ func NewStopVmsRequest(server string, spaceId SpaceId, id []interface{}, body St
 }
 
 // NewStopVmsRequestWithBody generates requests for StopVms with any type of body
-func NewStopVmsRequestWithBody(server string, spaceId SpaceId, id []interface{}, contentType string, body io.Reader) (*http.Request, error) {
+func NewStopVmsRequestWithBody(server string, spaceId SpaceId, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -20602,7 +20602,7 @@ type ClientWithResponsesInterface interface {
 	ReadVmsStateWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVmsStateParams, reqEditors ...RequestEditorFn) (*ReadVmsStateResponse, error)
 
 	// DeleteVmsWithResponse request
-	DeleteVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error)
+	DeleteVmsWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error)
 
 	// ReadVmsByIdWithResponse request
 	ReadVmsByIdWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadVmsByIdResponse, error)
@@ -20619,15 +20619,15 @@ type ClientWithResponsesInterface interface {
 	ReadConsoleOutputWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*ReadConsoleOutputResponse, error)
 
 	// RebootVmsWithResponse request
-	RebootVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*RebootVmsResponse, error)
+	RebootVmsWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*RebootVmsResponse, error)
 
 	// StartVmsWithResponse request
-	StartVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*StartVmsResponse, error)
+	StartVmsWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*StartVmsResponse, error)
 
 	// StopVmsWithBodyWithResponse request with any body
-	StopVmsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*StopVmsResponse, error)
+	StopVmsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*StopVmsResponse, error)
 
-	StopVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*StopVmsResponse, error)
+	StopVmsWithResponse(ctx context.Context, spaceId SpaceId, id string, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*StopVmsResponse, error)
 
 	// ReadVolumesWithResponse request
 	ReadVolumesWithResponse(ctx context.Context, spaceId SpaceId, params *ReadVolumesParams, reqEditors ...RequestEditorFn) (*ReadVolumesResponse, error)
@@ -26011,7 +26011,7 @@ func (c *ClientWithResponses) ReadVmsStateWithResponse(ctx context.Context, spac
 }
 
 // DeleteVmsWithResponse request returning *DeleteVmsResponse
-func (c *ClientWithResponses) DeleteVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error) {
+func (c *ClientWithResponses) DeleteVmsWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*DeleteVmsResponse, error) {
 	rsp, err := c.DeleteVms(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -26064,7 +26064,7 @@ func (c *ClientWithResponses) ReadConsoleOutputWithResponse(ctx context.Context,
 }
 
 // RebootVmsWithResponse request returning *RebootVmsResponse
-func (c *ClientWithResponses) RebootVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*RebootVmsResponse, error) {
+func (c *ClientWithResponses) RebootVmsWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*RebootVmsResponse, error) {
 	rsp, err := c.RebootVms(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -26073,7 +26073,7 @@ func (c *ClientWithResponses) RebootVmsWithResponse(ctx context.Context, spaceId
 }
 
 // StartVmsWithResponse request returning *StartVmsResponse
-func (c *ClientWithResponses) StartVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, reqEditors ...RequestEditorFn) (*StartVmsResponse, error) {
+func (c *ClientWithResponses) StartVmsWithResponse(ctx context.Context, spaceId SpaceId, id string, reqEditors ...RequestEditorFn) (*StartVmsResponse, error) {
 	rsp, err := c.StartVms(ctx, spaceId, id, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -26082,7 +26082,7 @@ func (c *ClientWithResponses) StartVmsWithResponse(ctx context.Context, spaceId 
 }
 
 // StopVmsWithBodyWithResponse request with arbitrary body returning *StopVmsResponse
-func (c *ClientWithResponses) StopVmsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*StopVmsResponse, error) {
+func (c *ClientWithResponses) StopVmsWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*StopVmsResponse, error) {
 	rsp, err := c.StopVmsWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -26090,7 +26090,7 @@ func (c *ClientWithResponses) StopVmsWithBodyWithResponse(ctx context.Context, s
 	return ParseStopVmsResponse(rsp)
 }
 
-func (c *ClientWithResponses) StopVmsWithResponse(ctx context.Context, spaceId SpaceId, id []interface{}, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*StopVmsResponse, error) {
+func (c *ClientWithResponses) StopVmsWithResponse(ctx context.Context, spaceId SpaceId, id string, body StopVmsJSONRequestBody, reqEditors ...RequestEditorFn) (*StopVmsResponse, error) {
 	rsp, err := c.StopVms(ctx, spaceId, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
