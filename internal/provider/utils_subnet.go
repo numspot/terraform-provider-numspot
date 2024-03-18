@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -11,8 +12,19 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func SubnetFromHttpToTf(http *api.Subnet) resource_subnet.SubnetModel {
-	return resource_subnet.SubnetModel{
+func SubnetFromHttpToTf(ctx context.Context, http *api.Subnet) (*resource_subnet.SubnetModel, diag.Diagnostics) {
+	var (
+		tagsList types.List
+		diags    diag.Diagnostics
+	)
+	if http.Tags != nil {
+		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	return &resource_subnet.SubnetModel{
 		AvailableIpsCount:    utils.FromIntPtrToTfInt64(http.AvailableIpsCount),
 		Id:                   types.StringPointerValue(http.Id),
 		IpRange:              types.StringPointerValue(http.IpRange),
@@ -20,7 +32,8 @@ func SubnetFromHttpToTf(http *api.Subnet) resource_subnet.SubnetModel {
 		VpcId:                types.StringPointerValue(http.VpcId),
 		State:                types.StringPointerValue(http.State),
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
-	}
+		Tags:                 tagsList,
+	}, nil
 }
 
 func SubnetFromTfToCreateRequest(tf *resource_subnet.SubnetModel) api.CreateSubnetJSONRequestBody {

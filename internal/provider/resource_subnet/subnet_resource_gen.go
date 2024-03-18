@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -60,6 +61,7 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -72,4 +74,5 @@ type SubnetModel struct {
 	MapPublicIpOnLaunch  types.Bool   `tfsdk:"map_public_ip_on_launch"`
 	State                types.String `tfsdk:"state"`
 	VpcId                types.String `tfsdk:"vpc_id"`
+	Tags                 types.List   `tfsdk:"tags"`
 }

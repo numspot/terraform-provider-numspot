@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 	"time"
 
@@ -112,6 +113,13 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		}
 	}
 
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	readRes := utils.ExecuteRequest(func() (*api.ReadSubnetsByIdResponse, error) {
 		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
 	}, http.StatusOK, &response.Diagnostics)
@@ -119,7 +127,10 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	tf := SubnetFromHttpToTf(readRes.JSON200)
+	tf, diags := SubnetFromHttpToTf(ctx, readRes.JSON200)
+	if diags.HasError() {
+		return
+	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -134,12 +145,51 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 		return
 	}
 
-	tf := SubnetFromHttpToTf(res.JSON200)
+	tf, diags := SubnetFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		return
+	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var plan, state resource_subnet.SubnetModel
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	res := utils.ExecuteRequest(func() (*api.ReadSubnetsByIdResponse, error) {
+		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf, diags := SubnetFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		return
+	}
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+
 }
 
 func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
