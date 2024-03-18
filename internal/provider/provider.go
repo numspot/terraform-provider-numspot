@@ -8,9 +8,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/google/uuid"
-
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"

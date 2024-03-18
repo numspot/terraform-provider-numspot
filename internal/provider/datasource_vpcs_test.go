@@ -57,6 +57,7 @@ data "numspot_vpcs" "test" {
   ids = [numspot_vpc.test.id]
 }`, ipRange)
 }
+
 func testAccVPCsDatasourceConfig_WithTags(ipRange, tagName, tagValue string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "test" {

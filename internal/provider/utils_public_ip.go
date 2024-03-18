@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var errNicVmConflict = fmt.Errorf("couldn't have nicID and vmID at the same time")

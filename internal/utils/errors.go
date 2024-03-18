@@ -10,10 +10,10 @@ import (
 	"runtime"
 	"strings"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
-
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
 )
 
 func HandleError(httpResponseBody []byte) error {
