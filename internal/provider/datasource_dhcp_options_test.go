@@ -69,42 +69,42 @@ func TestAccDHCPOptionsDatasource_WithTags(t *testing.T) {
 func testAccDHCPOptionsDatasourceConfig_Basic(domainName string) string {
 	return fmt.Sprintf(`
 resource "numspot_dhcp_options" "test" {
-		domain_name = %[1]q
-	}
+  domain_name = %[1]q
+}
 
 data "numspot_dhcp_options" "test" {
-	domain_names = [numspot_dhcp_options.test.domain_name]
+  domain_names = [numspot_dhcp_options.test.domain_name]
 }`, domainName)
 }
 
 func testAccDHCPOptionsDatasourceConfig_ByID(domainName1, domainName2 string) string {
 	return fmt.Sprintf(`
 resource "numspot_dhcp_options" "obj1" {
-		domain_name = %[1]q
+  domain_name = %[1]q
 }
 resource "numspot_dhcp_options" "obj2" {
-		domain_name = %[2]q
+  domain_name = %[2]q
 }
 
 data "numspot_dhcp_options" "test" {
-	ids = [numspot_dhcp_options.obj1.id, numspot_dhcp_options.obj2.id]
+  ids = [numspot_dhcp_options.obj1.id, numspot_dhcp_options.obj2.id]
 }`, domainName1, domainName2)
 }
 
 func testAccDHCPOptionsDatasourceConfig_WithTags(domainName, tagName, tagValue string) string {
 	return fmt.Sprintf(`
 resource "numspot_dhcp_options" "test" {
-	domain_name = %[1]q
-	tags = [
-		{
-			key = %[2]q
-			value = %[3]q
-		}
-	]
+  domain_name = %[1]q
+  tags = [
+    {
+      key   = %[2]q
+      value = %[3]q
+    }
+  ]
 }
 data "numspot_dhcp_options" "test" {
-	tags = [
-format("%%s=%%s", numspot_dhcp_options.test.tags[0].key, numspot_dhcp_options.test.tags[0].value)
-]
+  tags = [
+    format("%%s=%%s", numspot_dhcp_options.test.tags[0].key, numspot_dhcp_options.test.tags[0].value)
+  ]
 }`, domainName, tagName, tagValue)
 }

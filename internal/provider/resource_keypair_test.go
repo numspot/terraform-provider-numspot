@@ -59,6 +59,6 @@ func TestAccKeyPairResource(t *testing.T) {
 func testKeyPairConfig(name string) string {
 	return fmt.Sprintf(`
 resource "numspot_keypair" "test" {
-	name = %[1]q
+  name = %[1]q
 }`, name)
 }

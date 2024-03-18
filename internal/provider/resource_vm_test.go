@@ -48,8 +48,8 @@ func TestAccVmResource(t *testing.T) {
 func testVmConfig_Create(imageId, vmType string) string {
 	return fmt.Sprintf(`
 resource "numspot_vm" "test" {
-	image_id = %[1]q
-	vm_type = %[2]q
+  image_id = %[1]q
+  vm_type  = %[2]q
 }
 `, imageId, vmType)
 }
@@ -93,14 +93,14 @@ resource "numspot_net" "net" {
 }
 
 resource "numspot_subnet" "subnet" {
-	net_id 		= numspot_net.net.id
-	ip_range 	= "10.101.1.0/24"
+  net_id   = numspot_net.net.id
+  ip_range = "10.101.1.0/24"
 }
 
 resource "numspot_vm" "test" {
-	image_id 	= %[1]q
-	vm_type 	= %[2]q
-	subnet_id	= numspot_subnet.subnet.id
+  image_id  = %[1]q
+  vm_type   = %[2]q
+  subnet_id = numspot_subnet.subnet.id
 }
 `, imageId, vmType)
 }
@@ -132,31 +132,31 @@ resource "numspot_net" "net" {
 }
 
 resource "numspot_subnet" "subnet" {
-	net_id 		= numspot_net.net.id
-	ip_range 	= "10.101.1.0/24"
+  net_id   = numspot_net.net.id
+  ip_range = "10.101.1.0/24"
 }
 
 resource "numspot_security_group" "sg" {
-	net_id 		= numspot_net.net.id
-	name 		= "terraform-vm-tests-sg-name"
-	description = "terraform-vm-tests-sg-description"
+  net_id      = numspot_net.net.id
+  name        = "terraform-vm-tests-sg-name"
+  description = "terraform-vm-tests-sg-description"
 
-	inbound_rules = [
-		{
-			from_port_range = 80
-			to_port_range = 80
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		}
-	]
+  inbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
 }
 
 resource "numspot_vm" "test" {
-	image_id 			= %[1]q
-	vm_type 			= %[2]q
-	subnet_id			= numspot_subnet.subnet.id
-	security_group_ids 	= [ numspot_security_group.sg.id ]
-	depends_on 			= [ numspot_security_group.sg ]
+  image_id           = %[1]q
+  vm_type            = %[2]q
+  subnet_id          = numspot_subnet.subnet.id
+  security_group_ids = [numspot_security_group.sg.id]
+  depends_on         = [numspot_security_group.sg]
 }
 `, imageId, vmType)
 }
@@ -188,23 +188,23 @@ resource "numspot_vpc" "net" {
 }
 
 resource "numspot_subnet" "subnet" {
-	net_id 		= numspot_net.net.id
-	ip_range 	= "10.101.1.0/24"
+  net_id   = numspot_net.net.id
+  ip_range = "10.101.1.0/24"
 }
 
 resource "numspot_security_group" "sg" {
-	net_id 		= numspot_net.net.id
-	name 		= "terraform-vm-tests-sg-name"
-	description = "terraform-vm-tests-sg-description"
+  net_id      = numspot_net.net.id
+  name        = "terraform-vm-tests-sg-name"
+  description = "terraform-vm-tests-sg-description"
 
-	inbound_rules = [
-		{
-			from_port_range = 80
-			to_port_range = 80
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		}
-	]
+  inbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
 }
 
 resource "numspot_internet_service" "is" {
@@ -224,16 +224,16 @@ resource "numspot_route_table" "rt" {
 }
 
 resource "numspot_public_ip" "public_ip" {
-	vm_id 		= numspot_vm.test.id
-	depends_on 	= [ numspot_route_table.rt ]
+  vm_id      = numspot_vm.test.id
+  depends_on = [numspot_route_table.rt]
 }
 
 resource "numspot_vm" "test" {
-	image_id 			= %[1]q
-	vm_type 			= %[2]q
-	subnet_id			= numspot_subnet.subnet.id
-	security_group_ids 	= [ numspot_security_group.sg.id ]
-	depends_on 			= [ numspot_security_group.sg ]
+  image_id           = %[1]q
+  vm_type            = %[2]q
+  subnet_id          = numspot_subnet.subnet.id
+  security_group_ids = [numspot_security_group.sg.id]
+  depends_on         = [numspot_security_group.sg]
 }
 `, imageId, vmType)
 }

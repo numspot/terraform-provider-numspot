@@ -68,8 +68,8 @@ func TestAccClientGatewayResource(t *testing.T) {
 
 func testClientGatewayConfig(connectionType, publicIp string, bgpAsn int) string {
 	return fmt.Sprintf(`resource "numspot_client_gateway" "test" {
-		connection_type = %[1]q
-		public_ip = %[2]q
-		bgp_asn = %d
-	}`, connectionType, publicIp, bgpAsn)
+  connection_type = %[1]q
+  public_ip       = %[2]q
+  bgp_asn         = %d
+}`, connectionType, publicIp, bgpAsn)
 }

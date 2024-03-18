@@ -49,5 +49,5 @@ func testNetAccessPointConfig_Create() string {
 
 func testNetAccessPointConfig_Update() string {
 	return `resource "numspot_net_access_point" "test" {
-    			}`
+}`
 }

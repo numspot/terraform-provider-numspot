@@ -42,8 +42,8 @@ func TestAccImageResource_FromImage(t *testing.T) {
 func testImageConfig_Create_FromImage(name, sourceImageId, region string) string {
 	return fmt.Sprintf(`
 resource "numspot_image" "test" {
-	name 				= %[1]q
-	source_image_id 	= %[2]q
-	source_region_name	= %[3]q
+  name               = %[1]q
+  source_image_id    = %[2]q
+  source_region_name = %[3]q
 }`, name, sourceImageId, region)
 }

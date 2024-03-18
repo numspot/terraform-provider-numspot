@@ -49,5 +49,5 @@ func testListenerRuleConfig_Create() string {
 
 func testListenerRuleConfig_Update() string {
 	return `resource "numspot_listener_rule" "test" {
-    			}`
+}`
 }

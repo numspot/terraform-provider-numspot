@@ -49,5 +49,5 @@ func testVpnConnectionConfig_Create() string {
 
 func testVpnConnectionConfig_Update() string {
 	return `resource "numspot_vpn_connection" "test" {
-    			}`
+}`
 }

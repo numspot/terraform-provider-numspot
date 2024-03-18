@@ -55,17 +55,17 @@ resource "numspot_net" "net" {
 }
 
 resource "numspot_security_group" "test" {
-	net_id = numspot_net.net.id
-	name = %[2]q
-	description = %[3]q
-	inbound_rules = [
-		{
-			from_port_range = 80
-			to_port_range = 80
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		}
-	]
+  net_id      = numspot_net.net.id
+  name        = %[2]q
+  description = %[3]q
+  inbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
 }`, netIpRange, name, description)
 }
 
@@ -115,23 +115,23 @@ resource "numspot_net" "net" {
 }
 
 resource "numspot_security_group" "test" {
-	net_id = numspot_net.net.id
-	name = %[2]q
-	description = %[3]q
-	inbound_rules = [
-		{
-			from_port_range = 80
-			to_port_range = 80
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		},
-		{
-			from_port_range = 22
-			to_port_range = 22
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		},
-	]
+  net_id      = numspot_net.net.id
+  name        = %[2]q
+  description = %[3]q
+  inbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 22
+      to_port_range   = 22
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+  ]
 }`, netIpRange, name, description)
 }
 
@@ -181,17 +181,17 @@ resource "numspot_net" "net" {
 }
 
 resource "numspot_security_group" "test" {
-	net_id = numspot_net.net.id
-	name = %[2]q
-	description = %[3]q
-	outbound_rules = [
-		{
-			from_port_range = 80
-			to_port_range = 80
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		}
-	]
+  net_id      = numspot_net.net.id
+  name        = %[2]q
+  description = %[3]q
+  outbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
 }`, netIpRange, name, description)
 }
 
@@ -241,23 +241,23 @@ resource "numspot_net" "net" {
 }
 
 resource "numspot_security_group" "test" {
-	net_id = numspot_net.net.id
-	name = %[2]q
-	description = %[3]q
-	outbound_rules = [
-		{
-			from_port_range = 80
-			to_port_range = 80
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		},
-		{
-			from_port_range = 443
-			to_port_range = 443
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		}		
-	]
+  net_id      = numspot_net.net.id
+  name        = %[2]q
+  description = %[3]q
+  outbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 443
+      to_port_range   = 443
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
 }`, netIpRange, name, description)
 }
 
@@ -307,38 +307,38 @@ resource "numspot_net" "net" {
 }
 
 resource "numspot_security_group" "test" {
-	net_id = numspot_net.net.id
-	name = %[2]q
-	description = %[3]q
+  net_id      = numspot_net.net.id
+  name        = %[2]q
+  description = %[3]q
 
-	inbound_rules = [
-		{
-			from_port_range = 80
-			to_port_range = 80
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		},
-		{
-			from_port_range = 443
-			to_port_range = 443
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		},
-	]
+  inbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 443
+      to_port_range   = 443
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+  ]
 
-	outbound_rules = [
-		{
-			from_port_range = 80
-			to_port_range = 80
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		},
-		{
-			from_port_range = 443
-			to_port_range = 443
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		}		
-	]
+  outbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 443
+      to_port_range   = 443
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
 }`, netIpRange, name, description)
 }

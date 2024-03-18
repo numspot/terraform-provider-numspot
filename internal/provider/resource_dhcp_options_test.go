@@ -49,14 +49,13 @@ func TestDhcpOptionsResource(t *testing.T) {
 }
 
 func testDhcpOptionsConfig(domainName, tagValue string) string {
-	return fmt.Sprintf(
-		`resource "numspot_dhcp_options" "test" {
-	domain_name = %[1]q
-	tags = [
-		{
-			key = "Name"
-			value = %[2]q
-		}
-	]
+	return fmt.Sprintf(`resource "numspot_dhcp_options" "test" {
+  domain_name = %[1]q
+  tags = [
+    {
+      key   = "Name"
+      value = %[2]q
+    }
+  ]
 }`, domainName, tagValue)
 }

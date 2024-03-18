@@ -32,13 +32,13 @@ func TestAccVolumesDatasource(t *testing.T) {
 func fetchVolumesConfigById(volumeType string, volumeSize int, volumeAZ string) string {
 	return fmt.Sprintf(`
 resource "numspot_volume" "test" {
-	type 					= %[1]q
-	size 					= %[2]d
-	availability_zone_name 	= %[3]q
+  type                   = %[1]q
+  size                   = %[2]d
+  availability_zone_name = %[3]q
 }
 
 data "numspot_volumes" "datasource_test" {
-	ids = [numspot_volume.test.id]
+  ids = [numspot_volume.test.id]
 }
 `, volumeType, volumeSize, volumeAZ)
 }

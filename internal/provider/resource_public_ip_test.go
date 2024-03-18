@@ -58,12 +58,12 @@ func createPublicIPConfig() string {
 func linkPublicIPToVMConfig() string {
 	return fmt.Sprintf(`
 resource "numspot_vm" "vm" {
-	image_id = "ami-00b0c39a"
-	vm_type = "t2.small"
+  image_id = "ami-00b0c39a"
+  vm_type  = "t2.small"
 }
 
 resource "numspot_public_ip" "test" {
-	vm_id = numspot_vm.vm.id
+  vm_id = numspot_vm.vm.id
 }`)
 }
 

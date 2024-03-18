@@ -50,28 +50,28 @@ func TestAccVPCsDatasource_WithTags(t *testing.T) {
 func testAccVPCsDatasourceConfig_Basic(ipRange string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "test" {
-	ip_range = %[1]q
+  ip_range = %[1]q
 }
 
 data "numspot_vpcs" "test" {
-	ids = [numspot_vpc.test.id]
+  ids = [numspot_vpc.test.id]
 }`, ipRange)
 }
 func testAccVPCsDatasourceConfig_WithTags(ipRange, tagName, tagValue string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "test" {
-	ip_range = %[1]q
-	tags = [
-			{
-				key = %[2]q
-				value = %[3]q
-			}
-		]
+  ip_range = %[1]q
+  tags = [
+    {
+      key   = %[2]q
+      value = %[3]q
+    }
+  ]
 }
 
 data "numspot_vpcs" "test" {
-	tags = [
-format("%%s=%%s", numspot_vpc.test.tags[0].key, numspot_vpc.test.tags[0].value)
-]
+  tags = [
+    format("%%s=%%s", numspot_vpc.test.tags[0].key, numspot_vpc.test.tags[0].value)
+  ]
 }`, ipRange, tagName, tagValue)
 }

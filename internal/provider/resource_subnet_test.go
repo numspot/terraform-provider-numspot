@@ -159,43 +159,43 @@ func TestAccSubnetResource_WithTags(t *testing.T) {
 func testSubnetConfig(netIpRange, subnetIpRange string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "main" {
-	ip_range = %[1]q
+  ip_range = %[1]q
 }
 
 resource "numspot_subnet" "test" {
-	vpc_id 		= numspot_vpc.main.id
-	ip_range 	= %[2]q
+  vpc_id   = numspot_vpc.main.id
+  ip_range = %[2]q
 }`, netIpRange, subnetIpRange)
 }
 
 func testSubnetConfig_MapPublicIp(netIpRange, subnetIpRange string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "main" {
-	ip_range = %[1]q
+  ip_range = %[1]q
 }
 
 resource "numspot_subnet" "test" {
-	vpc_id 		= numspot_vpc.main.id
-	ip_range 	= %[2]q
-	map_public_ip_on_launch = true
+  vpc_id                  = numspot_vpc.main.id
+  ip_range                = %[2]q
+  map_public_ip_on_launch = true
 }`, netIpRange, subnetIpRange)
 }
 
 func testSubnetConfig_WithTags(netIpRange, subnetIpRange, tagName, tagValue string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "main" {
-	ip_range = %[1]q
+  ip_range = %[1]q
 }
 
 resource "numspot_subnet" "test" {
-	vpc_id 		= numspot_vpc.main.id
-	ip_range 	= %[2]q
-	tags = [
-		{
-			key = %[3]q
-			value = %[4]q
-		}
-	]
+  vpc_id   = numspot_vpc.main.id
+  ip_range = %[2]q
+  tags = [
+    {
+      key   = %[3]q
+      value = %[4]q
+    }
+  ]
 
 }`, netIpRange, subnetIpRange, tagName, tagValue)
 }

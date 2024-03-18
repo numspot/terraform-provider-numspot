@@ -46,12 +46,12 @@ func TestAccSnapshotResource(t *testing.T) {
 func testSnapshotConfig() string {
 	return `
 resource "numspot_volume" "test" {
-	type 					= "standard"
-	size 					= 11
-	availability_zone_name 	= "eu-west-2a"
+  type                   = "standard"
+  size                   = 11
+  availability_zone_name = "eu-west-2a"
 }
 
 resource "numspot_snapshot" "test" {
-	volume_id = numspot_volume.test.id
+  volume_id = numspot_volume.test.id
 }`
 }

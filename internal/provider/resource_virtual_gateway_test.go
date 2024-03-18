@@ -34,6 +34,6 @@ func TestAccVirtualGatewayResource(t *testing.T) {
 
 func testVirtualGatewayConfig(connectionType string) string {
 	return fmt.Sprintf(`resource "numspot_virtual_gateway" "test" {
-	connection_type = %[1]q
+  connection_type = %[1]q
 }`, connectionType)
 }

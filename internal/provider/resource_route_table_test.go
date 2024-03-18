@@ -55,22 +55,22 @@ resource "numspot_vpc" "net" {
 }
 
 resource "numspot_subnet" "subnet" {
-  vpc_id                  = numspot_vpc.net.id
-  ip_range                = %[2]q
+  vpc_id   = numspot_vpc.net.id
+  ip_range = %[2]q
 }
 
 resource "numspot_internet_gateway" "test" {
-	vpc_id = numspot_vpc.net.id
+  vpc_id = numspot_vpc.net.id
 }
 
 resource "numspot_route_table" "test" {
-	vpc_id =  numspot_vpc.net.id
-	subnet_id = numspot_subnet.subnet.id
-	routes = [
-		{
-			destination_ip_range 	= "0.0.0.0/0"
-			gateway_id 	 			= numspot_internet_gateway.test.id
-		}
-	]
+  vpc_id    = numspot_vpc.net.id
+  subnet_id = numspot_subnet.subnet.id
+  routes = [
+    {
+      destination_ip_range = "0.0.0.0/0"
+      gateway_id           = numspot_internet_gateway.test.id
+    }
+  ]
 }`, netIpRange, subnetIpRange)
 }

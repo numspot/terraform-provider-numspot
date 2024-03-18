@@ -73,22 +73,22 @@ resource "numspot_vpc" "vpc" {
 }
 
 resource "numspot_subnet" "subnet" {
-	vpc_id 		= numspot_vpc.vpc.id
-	ip_range 	= "10.101.1.0/24"
+  vpc_id   = numspot_vpc.vpc.id
+  ip_range = "10.101.1.0/24"
 }
 
 resource "numspot_load_balancer" "testlb" {
-	name = "%s"
-	listeners = [
-		{
-			backend_port = 80
-			load_balancer_port = 80
-			load_balancer_protocol = "TCP"
-					
-		}
-	]
-	subnets = [numspot_subnet.subnet.id]
-	type = "internal"
+  name = "%s"
+  listeners = [
+    {
+      backend_port           = 80
+      load_balancer_port     = 80
+      load_balancer_protocol = "TCP"
+
+    }
+  ]
+  subnets = [numspot_subnet.subnet.id]
+  type    = "internal"
 }`, name)
 }
 
@@ -99,31 +99,31 @@ resource "numspot_vpc" "vpc" {
 }
 
 resource "numspot_subnet" "subnet" {
-	vpc_id 		= numspot_vpc.vpc.id
-	ip_range 	= "10.101.1.0/24"
+  vpc_id   = numspot_vpc.vpc.id
+  ip_range = "10.101.1.0/24"
 }
 
 resource "numspot_load_balancer" "testlb" {
-	name = "elb-test"
-	listeners = [
-		{
-			backend_port = 80
-			load_balancer_port = 80
-			load_balancer_protocol = "TCP"
-					
-		}
-	]
-	subnets = [numspot_subnet.subnet.id]
-	type = "internal"
-	health_check = {
-		check_interval = %d
-		healthy_threshold = %d
-		path = "%s"
-		port = %d
-		protocol = "%s"
-		timeout = %d
-		unhealthy_threshold = %d
-	}
+  name = "elb-test"
+  listeners = [
+    {
+      backend_port           = 80
+      load_balancer_port     = 80
+      load_balancer_protocol = "TCP"
+
+    }
+  ]
+  subnets = [numspot_subnet.subnet.id]
+  type    = "internal"
+  health_check = {
+    check_interval      = %d
+    healthy_threshold   = %d
+    path                = "%s"
+    port                = %d
+    protocol            = "%s"
+    timeout             = %d
+    unhealthy_threshold = %d
+  }
 }`, hc.CheckInterval, hc.HealthyThreshold, *hc.Path, hc.Port, hc.Protocol, hc.Timeout, hc.UnhealthyThreshold)
 }
 
@@ -134,23 +134,23 @@ resource "numspot_vpc" "vpc" {
 }
 
 resource "numspot_subnet" "subnet" {
-	vpc_id 		= numspot_vpc.vpc.id
-	ip_range 	= "10.101.1.0/24"
+  vpc_id   = numspot_vpc.vpc.id
+  ip_range = "10.101.1.0/24"
 }
 
 resource "numspot_security_group" "sg" {
-	net_id 		= numspot_vpc.vpc.id
-	name 		= "terraform-vm-tests-sg-name"
-	description = "terraform-vm-tests-sg-description"
+  net_id      = numspot_vpc.vpc.id
+  name        = "terraform-vm-tests-sg-name"
+  description = "terraform-vm-tests-sg-description"
 
-	inbound_rules = [
-		{
-			from_port_range = 80
-			to_port_range = 80
-			ip_ranges = ["0.0.0.0/0"]
-			ip_protocol = "tcp"
-		}
-	]
+  inbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
 }
 
 resource "numspot_internet_gateway" "igw" {
@@ -170,34 +170,34 @@ resource "numspot_route_table" "rt" {
 }
 
 resource "numspot_vm" "test" {
-	image_id 			= "ami-00b0c39a"
-	vm_type 			= "t2.small"
-	subnet_id			= numspot_subnet.subnet.id
-	security_group_ids 	= [ numspot_security_group.sg.id ]
-	depends_on 			= [ numspot_security_group.sg ]
+  image_id           = "ami-00b0c39a"
+  vm_type            = "t2.small"
+  subnet_id          = numspot_subnet.subnet.id
+  security_group_ids = [numspot_security_group.sg.id]
+  depends_on         = [numspot_security_group.sg]
 }
 
 resource "numspot_load_balancer" "testlb" {
-	name = "elb-test"
-	listeners = [
-		{
-			backend_port = 80
-			load_balancer_port = 80
-			load_balancer_protocol = "TCP"
-					
-		}
-	]
-	subnets = [numspot_subnet.subnet.id]
-	type = "internal"
-	health_check = {
-		check_interval = 30
-		healthy_threshold = 10
-		path = "/index.html"
-		port = 8080
-		protocol = "HTTPS"
-		timeout = 5
-		unhealthy_threshold = 5
-	}
-	backend_vm_ids = [numspot_vm.test.id]
+  name = "elb-test"
+  listeners = [
+    {
+      backend_port           = 80
+      load_balancer_port     = 80
+      load_balancer_protocol = "TCP"
+
+    }
+  ]
+  subnets = [numspot_subnet.subnet.id]
+  type    = "internal"
+  health_check = {
+    check_interval      = 30
+    healthy_threshold   = 10
+    path                = "/index.html"
+    port                = 8080
+    protocol            = "HTTPS"
+    timeout             = 5
+    unhealthy_threshold = 5
+  }
+  backend_vm_ids = [numspot_vm.test.id]
 }`)
 }

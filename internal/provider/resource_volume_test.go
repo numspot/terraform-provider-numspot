@@ -50,9 +50,9 @@ func TestAccVolumeResource(t *testing.T) {
 func createVolumeConfig(volumeType string, volumeSize int, volumeAZ string) string {
 	t := fmt.Sprintf(`
 resource "numspot_volume" "test" {
-	type 					= %[1]q
-	size 					= %[2]d
-	availability_zone_name 	= %[3]q
+  type                   = %[1]q
+  size                   = %[2]d
+  availability_zone_name = %[3]q
 }`, volumeType, volumeSize, volumeAZ)
 	return t
 }

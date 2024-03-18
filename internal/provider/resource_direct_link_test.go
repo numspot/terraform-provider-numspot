@@ -46,9 +46,9 @@ func TestAccDirectLinkResource(t *testing.T) {
 func testDirectLinkConfig() string {
 	return `
 resource "numspot_direct_link" "test" {
-	location = "PAR1"
-	bandwidth = "1Gbps"
-	name = "Connection to NumSpot"
+  location  = "PAR1"
+  bandwidth = "1Gbps"
+  name      = "Connection to NumSpot"
 }
 `
 }

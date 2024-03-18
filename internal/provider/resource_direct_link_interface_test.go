@@ -49,5 +49,5 @@ func testDirectLinkInterfaceConfig_Create() string {
 
 func testDirectLinkInterfaceConfig_Update() string {
 	return `resource "numspot_direct_link_interface" "test" {
-    			}`
+}`
 }

@@ -46,8 +46,8 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 func testFlexibleGpuConfig() string {
 	return `
 resource "numspot_flexible_gpu" "test" {
-	model_name 				= "nvidia-p100"
-	generation 				= "v5"
-	availability_zone_name 	= "eu-west-2a"
+  model_name             = "nvidia-p100"
+  generation             = "v5"
+  availability_zone_name = "eu-west-2a"
 }`
 }
