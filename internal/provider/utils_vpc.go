@@ -24,6 +24,7 @@ func NetFromHttpToTf(ctx context.Context, http *api.Vpc) (*resource_vpc.VpcModel
 			return nil, diags
 		}
 	}
+
 	return &resource_vpc.VpcModel{
 		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
 		Id:               types.StringPointerValue(http.Id),
