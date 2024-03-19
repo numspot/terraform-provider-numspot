@@ -64,11 +64,16 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateVpcResponse, error) {
-		body := NetFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateVpcWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	requestBody := NetFromTfToCreateRequest(&data)
+	res, err := r.provider.ApiClient.CreateVpcWithResponse(ctx, r.provider.SpaceID, requestBody)
+	if err != nil {
+		response.Diagnostics.AddError("Failed", err.Error())
+		return
+	}
+
+	if res.StatusCode() != http.StatusCreated {
+		apiError := utils.HandleError(res.Body)
+		response.Diagnostics.AddError("Failed to create VPC", apiError.Error())
 		return
 	}
 
@@ -98,7 +103,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		Delay:   3 * time.Second,
 	}
 
-	_, err := createStateConf.WaitForStateContext(ctx)
+	_, err = createStateConf.WaitForStateContext(ctx)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", createdId, err))
 		return
