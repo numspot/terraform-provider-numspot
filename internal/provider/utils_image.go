@@ -27,7 +27,7 @@ func bsuFromTf(bsu resource_image.BsuValue) *api.BsuToCreate {
 	}
 }
 
-func blockDeviceMappingFromTf(ctx context.Context, bdm resource_image.BlockDeviceMappingsValue) api.BlockDeviceMappingImage {
+func blockDeviceMappingFromTf(bdm resource_image.BlockDeviceMappingsValue) api.BlockDeviceMappingImage {
 	bsuTf := resource_image.BsuValue{}
 	bsu := bsuFromTf(bsuTf)
 
@@ -167,7 +167,7 @@ func ImageFromTfToCreateRequest(ctx context.Context, tf *resource_image.ImageMod
 			return nil
 		}
 
-		bdmApi := blockDeviceMappingFromTf(ctx, bdmTfRes)
+		bdmApi := blockDeviceMappingFromTf(bdmTfRes)
 		blockDevicesMappingApi = append(blockDevicesMappingApi, bdmApi)
 	}
 

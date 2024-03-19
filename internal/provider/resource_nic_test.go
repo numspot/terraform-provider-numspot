@@ -7,6 +7,7 @@ import (
 )
 
 func TestAccNicResource(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,

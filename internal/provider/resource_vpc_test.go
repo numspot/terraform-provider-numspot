@@ -9,6 +9,7 @@ import (
 )
 
 func TestAccNetResource(t *testing.T) {
+	t.Parallel()
 	ipRange := "10.101.0.0/16"
 	ipRangeUpdated := "10.102.0.0/16"
 
@@ -59,6 +60,7 @@ resource "numspot_vpc" "test" {
 }
 
 func TestAccNetResource_Tags(t *testing.T) {
+	t.Parallel()
 	tagName := "Terraform Provider VPC"
 	updatedTagName := "Terraform Provider VPC - 2"
 

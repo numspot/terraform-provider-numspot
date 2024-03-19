@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccLoadBalancerResource(t *testing.T) {
+	t.Parallel()
 	lbName := "elb-test"
 	hc := api.HealthCheck{
 		CheckInterval:      30,
@@ -128,7 +129,7 @@ resource "numspot_load_balancer" "testlb" {
 }
 
 func linkBackendMachinesToLbConfig() string {
-	return fmt.Sprintf(`
+	return `
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
@@ -199,5 +200,5 @@ resource "numspot_load_balancer" "testlb" {
     unhealthy_threshold = 5
   }
   backend_vm_ids = [numspot_vm.test.id]
-}`)
+}`
 }

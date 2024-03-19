@@ -10,6 +10,7 @@ import (
 )
 
 func TestAccKeyPairResource(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	randName := rand.Intn(9999-1000) + 1000

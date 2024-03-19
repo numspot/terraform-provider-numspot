@@ -9,6 +9,7 @@ import (
 )
 
 func TestAccImageResource_FromImage(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	randint := rand.Intn(9999-1000) + 1000

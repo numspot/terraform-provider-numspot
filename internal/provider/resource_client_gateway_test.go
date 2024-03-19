@@ -9,6 +9,7 @@ import (
 )
 
 func TestAccClientGatewayResource(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	connectionType := "ipsec.1"

@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -9,6 +8,7 @@ import (
 )
 
 func TestAccPublicIpResource(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -56,7 +56,7 @@ func createPublicIPConfig() string {
 }
 
 func linkPublicIPToVMConfig() string {
-	return fmt.Sprintf(`
+	return `
 resource "numspot_vm" "vm" {
   image_id = "ami-00b0c39a"
   vm_type  = "t2.small"
@@ -64,7 +64,7 @@ resource "numspot_vm" "vm" {
 
 resource "numspot_public_ip" "test" {
   vm_id = numspot_vm.vm.id
-}`)
+}`
 }
 
 func UnlinkPublicIPConfig() string {

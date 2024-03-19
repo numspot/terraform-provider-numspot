@@ -90,11 +90,15 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 
 	read, err := createStateConf.WaitForStateContext(ctx)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", *res.JSON201.Id, err))
+		response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", *res.JSON201.Id, err))
 		return
 	}
 
-	rr := read.(*api.Volume)
+	rr, ok := read.(*api.Volume)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create volume", "object conversion error")
+		return
+	}
 	tf, diags := VolumeFromHttpToTf(ctx, rr)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
@@ -156,11 +160,15 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 
 	read, err := updateStateConf.WaitForStateContext(ctx)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
+		response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
 		return
 	}
 
-	rr := read.(*api.Volume)
+	rr, ok := read.(*api.Volume)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create volume", "object conversion error")
+		return
+	}
 	tf, diags := VolumeFromHttpToTf(ctx, rr)
 
 	if diags.HasError() {

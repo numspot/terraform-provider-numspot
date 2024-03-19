@@ -115,6 +115,9 @@ func DHCPOptionsFromHttpToTfDatasource(ctx context.Context, http *api.DhcpOption
 	}
 	if http.Tags != nil {
 		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 	return &datasource_dhcp_options.DhcpOptionsModel{
 		Default:           types.BoolPointerValue(http.Default),

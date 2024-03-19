@@ -9,6 +9,7 @@ import (
 )
 
 func TestAccSubnetResource(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
@@ -56,6 +57,7 @@ func TestAccSubnetResource(t *testing.T) {
 }
 
 func TestAccSubnetResource_MapPublicIp(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
@@ -103,6 +105,7 @@ func TestAccSubnetResource_MapPublicIp(t *testing.T) {
 }
 
 func TestAccSubnetResource_WithTags(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required

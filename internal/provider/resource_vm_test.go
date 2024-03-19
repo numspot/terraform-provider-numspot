@@ -14,6 +14,7 @@ var (
 )
 
 func TestAccVmResource(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -55,6 +56,7 @@ resource "numspot_vm" "test" {
 }
 
 func TestAccVmResource_NetSubnet(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -106,6 +108,7 @@ resource "numspot_vm" "test" {
 }
 
 func TestAccVmResource_NetSubnetSG(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -162,6 +165,7 @@ resource "numspot_vm" "test" {
 }
 
 func TestAccVmResource_NetSubnetSGRouteTable(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{

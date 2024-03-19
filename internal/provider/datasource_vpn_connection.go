@@ -253,8 +253,8 @@ func (d *vpnConnectionsDataSource) Schema(ctx context.Context, _ datasource.Sche
 										},
 										"phase2lifetime_seconds": schema.Int64Attribute{
 											Computed:            true,
-											Description:         "The lifetime for phase 2 of the Internet Key Exchange (IKE) negociation process, in seconds.",
-											MarkdownDescription: "The lifetime for phase 2 of the Internet Key Exchange (IKE) negociation process, in seconds.",
+											Description:         "The lifetime for phase 2 of the Internet Key Exchange (IKE) negotiation process, in seconds.",
+											MarkdownDescription: "The lifetime for phase 2 of the Internet Key Exchange (IKE) negotiation process, in seconds.",
 										},
 										"pre_shared_key": schema.StringAttribute{
 											Computed:            true,

@@ -8,6 +8,7 @@ import (
 )
 
 func TestAccVolumeResource(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	volumeType := "standard"

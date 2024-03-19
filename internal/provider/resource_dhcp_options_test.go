@@ -8,6 +8,7 @@ import (
 )
 
 func TestDhcpOptionsResource(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	domainName := "foo.bar"

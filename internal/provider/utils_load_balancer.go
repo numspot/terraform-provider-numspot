@@ -39,18 +39,6 @@ func listenersFromHTTP(ctx context.Context, elt api.Listener) (resource_load_bal
 		})
 }
 
-func listenersFromTF(ctx context.Context, elt resource_load_balancer.ListenersValue) api.Listener {
-	policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames)
-	return api.Listener{
-		BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
-		BackendProtocol:      elt.BackendProtocol.ValueStringPointer(),
-		LoadBalancerPort:     utils.FromTfInt64ToIntPtr(elt.LoadBalancerPort),
-		LoadBalancerProtocol: elt.BackendProtocol.ValueStringPointer(),
-		PolicyNames:          &policyNames,
-		ServerCertificateId:  elt.ServerCertificateId.ValueStringPointer(),
-	}
-}
-
 func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStickyCookiePolicy) (resource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
 	return resource_load_balancer.NewStickyCookiePoliciesValue(
 		resource_load_balancer.StickyCookiePoliciesValue{}.AttributeTypes(ctx),

@@ -10,6 +10,7 @@ import (
 )
 
 func TestAccSecurityGroupResource_SingleInboundRule(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	netIpRange := "10.101.0.0/16"
@@ -70,6 +71,7 @@ resource "numspot_security_group" "test" {
 }
 
 func TestAccSecurityGroupResource_CoupleInboundRule(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	netIpRange := "10.101.0.0/16"
@@ -136,6 +138,7 @@ resource "numspot_security_group" "test" {
 }
 
 func TestAccSecurityGroupResource_SingleOutboundRule(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	netIpRange := "10.101.0.0/16"
@@ -196,6 +199,7 @@ resource "numspot_security_group" "test" {
 }
 
 func TestAccSecurityGroupResource_CoupleOutboundRule(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	netIpRange := "10.101.0.0/16"
@@ -262,6 +266,7 @@ resource "numspot_security_group" "test" {
 }
 
 func TestAccSecurityGroupResource_MultipleRules(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	netIpRange := "10.101.0.0/16"

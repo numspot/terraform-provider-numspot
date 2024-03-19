@@ -96,7 +96,10 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	vmSchema := read.(api.Vm)
+	vmSchema, ok := read.(api.Vm)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create VM", "object conversion error")
+	}
 	tf, diagnostics := VmFromHttpToTf(ctx, &vmSchema)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
@@ -154,9 +157,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*api.DeleteVmsResponse, error) {
-		idsSlice := make([]interface{}, 1)
-		idsSlice[0] = data.Id.ValueString()
-		return r.provider.ApiClient.DeleteVmsWithResponse(ctx, r.provider.SpaceID, idsSlice[0].(string))
+		return r.provider.ApiClient.DeleteVmsWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

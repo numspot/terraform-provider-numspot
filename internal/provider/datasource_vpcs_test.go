@@ -8,6 +8,7 @@ import (
 )
 
 func TestAccVPCsDatasource_Basic(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 	ipRange := "10.101.0.0/16"
 
@@ -26,6 +27,7 @@ func TestAccVPCsDatasource_Basic(t *testing.T) {
 }
 
 func TestAccVPCsDatasource_WithTags(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 	ipRange := "10.101.0.0/16"
 	tagName := "Name"

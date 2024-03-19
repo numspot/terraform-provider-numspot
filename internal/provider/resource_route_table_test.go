@@ -9,6 +9,7 @@ import (
 )
 
 func TestAccRouteTableResource(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required

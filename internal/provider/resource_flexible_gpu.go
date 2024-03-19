@@ -89,11 +89,16 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 
 	read, err := createStateConf.WaitForStateContext(ctx)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", data.Id.ValueString(), err))
+		response.Diagnostics.AddError("Failed to create Flexible GPU", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", data.Id.ValueString(), err))
 		return
 	}
 
-	tf := FlexibleGpuFromHttpToTf(read.(*api.FlexibleGpu))
+	flexGPU, ok := read.(*api.FlexibleGpu)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create Flexible GPU", "object conversion error")
+		return
+	}
+	tf := FlexibleGpuFromHttpToTf(flexGPU)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 

@@ -29,13 +29,11 @@ type Key string
 var (
 	clientIdKey     = Key("client_id")
 	clientSecretKey = Key("client_secret")
-	spaceIdKey      = Key("space_id")
 )
 
 var (
 	errClientIdNotFound     = errors.New("can't find client_id")
 	errClientSecretNotFound = errors.New("can't find client_secret")
-	errSpaceIdNotFound      = errors.New("can't find space_id")
 )
 
 func New(version string, development bool) func() provider.Provider {
@@ -186,10 +184,7 @@ func (p *numspotProvider) apiClientWithFakeAuth(data *NumspotProviderModel, diag
 }
 
 func faker(_ context.Context, req *http.Request) error {
-	if _, ok := req.Header["Authorization"]; ok {
-		// Si le header existe, le supprimer
-		delete(req.Header, "Authorization")
-	}
+	delete(req.Header, "Authorization")
 
 	req.Header.Add("Authorization", "Bearer token_200")
 	return nil

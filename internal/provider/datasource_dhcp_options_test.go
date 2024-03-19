@@ -8,6 +8,7 @@ import (
 )
 
 func TestAccDHCPOptionsDatasource_Basic(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 	domainName := "foo.bar"
 	resource.Test(t, resource.TestCase{
@@ -25,6 +26,7 @@ func TestAccDHCPOptionsDatasource_Basic(t *testing.T) {
 }
 
 func TestAccDHCPOptionsDatasource_ByID(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 	domainName1 := "foo.bar"
 	domainName2 := "null.local"
@@ -45,6 +47,7 @@ func TestAccDHCPOptionsDatasource_ByID(t *testing.T) {
 }
 
 func TestAccDHCPOptionsDatasource_WithTags(t *testing.T) {
+	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 	domainName := "numspot.dev"
 	tagName := "Name"
