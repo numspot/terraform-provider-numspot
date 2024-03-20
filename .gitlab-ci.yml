@@ -1,32 +1,28 @@
-stages:
-  - test
+include:
+  - remote: 'https://api.r2devops.numspot.dev/job/r/gitlab/cloud/ci-templates/jobs/go_lint@0.3.0.yaml'
+  - remote: 'https://api.r2devops.numspot.dev/job/r/gitlab/cloud/ci-templates/jobs/go_unit-tests@0.1.0.yaml'
 
-test:
+go_lint:
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+
+go_unit-tests:
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+
+acc-tests:
   image: golang:1.20.10
   stage: test
   before_script:
     - go mod download
   variables:
+    NUMSPOT_API_HOST: $NUMSPOT_API_HOST
+    NUMSPOT_IAM_HOST: $NUMSPOT_IAM_HOST
+    NUMSPOT_CLIENT_ID: $NUMSPOT_CLIENT_ID
+    NUMSPOT_CLIENT_SECRET: $NUMSPOT_CLIENT_SECRET
+    NUMSPOT_SPACE_ID: $NUMSPOT_SPACE_ID
     TF_ACC: "1"
-    NUMSPOT_API_HOST: "https://numspot-services.integration.numspot.dev"
-    NUMSPOT_IAM_HOST: "https://numspot-iaas.integration.numspot.dev"
-    NUMSPOT_CLIENT_ID: $CLIENT_ID
-    NUMSPOT_CLIENT_SECRET: $CLIENT_SECRET
   script:
     - go test ./...
-
-lint:
-  image: registry.gitlab.com/gitlab-org/gitlab-build-images:golangci-lint-alpine
-  stage: test
-  script:
-    # Use default .golangci.yml file from the image if one is not present in the project root.
-    - '[ -e .golangci.yml ] || cp /golangci/.golangci.yml .'
-    # Write the code coverage report to gl-code-quality-report.json
-    # and print linting issues to stdout in the format: path/to/file:line description
-    # remove `--issues-exit-code 0` or set to non-zero to fail the job if linting issues are detected
-    - golangci-lint run --out-format code-climate:gl-code-quality-report.json,line-number --timeout 10m
-  artifacts:
-    reports:
-      codequality: gl-code-quality-report.json
-    paths:
-      - gl-code-quality-report.json
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
