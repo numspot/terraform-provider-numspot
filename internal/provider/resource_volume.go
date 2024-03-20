@@ -158,6 +158,8 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		Delay:   3 * time.Second,
 	}
 
+	time.Sleep(3 * time.Second) // TODO remove when outscale fixes the State field => https://numsproduct.atlassian.net/browse/CLSEXP-612
+
 	read, err := updateStateConf.WaitForStateContext(ctx)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
@@ -169,6 +171,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		response.Diagnostics.AddError("Failed to create volume", "object conversion error")
 		return
 	}
+
 	tf, diags := VolumeFromHttpToTf(ctx, rr)
 
 	if diags.HasError() {
