@@ -5,7 +5,8 @@ package resource_snapshot
 import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
@@ -22,6 +23,9 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "A description for the snapshot.",
 				MarkdownDescription: "A description for the snapshot.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
@@ -38,12 +42,18 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "**(when copying a snapshot)** The name of the source Region, which must be the same as the Region of your account.",
 				MarkdownDescription: "**(when copying a snapshot)** The name of the source Region, which must be the same as the Region of your account.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"source_snapshot_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
 				Description:         "**(when copying a snapshot)** The ID of the snapshot you want to copy.",
 				MarkdownDescription: "**(when copying a snapshot)** The ID of the snapshot you want to copy.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,
@@ -55,6 +65,9 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "**(when creating from a volume)** The ID of the volume you want to create a snapshot of.",
 				MarkdownDescription: "**(when creating from a volume)** The ID of the volume you want to create a snapshot of.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"volume_size": schema.Int64Attribute{
 				Computed:            true,
