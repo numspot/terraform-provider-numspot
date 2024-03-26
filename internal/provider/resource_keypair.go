@@ -117,5 +117,4 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	utils.ExecuteRequest(func() (*iaas.DeleteKeypairResponse, error) {
 		return r.provider.ApiClient.DeleteKeypairWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
-
 }

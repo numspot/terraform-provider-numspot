@@ -4,11 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
@@ -153,42 +151,9 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.DeleteLoadBalancerResponse, error) {
-		return r.provider.ApiClient.DeleteLoadBalancerWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	deleteStateConf := &retry.StateChangeConf{
-		Pending: []string{"pending", "available", "deleting"},
-		Target:  []string{"deleted"},
-		Refresh: func() (result interface{}, state string, err error) {
-			// Do not use utils.ExecuteRequest to access error response to know if it's a 404 Not Found expected response
-			readLbRes, err := r.provider.ApiClient.ReadLoadBalancersByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-			if err != nil {
-				response.Diagnostics.AddError("Failed to read Net on delete", err.Error())
-				return
-			}
-
-			if readLbRes.StatusCode() != http.StatusOK {
-				if readLbRes.StatusCode() == http.StatusNotFound {
-					return data, "deleted", nil
-				}
-				apiError := utils.HandleError(readLbRes.Body)
-				response.Diagnostics.AddError("Failed to read load balancer on delete", apiError.Error())
-				return
-			}
-
-			return data, "pending", nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   5 * time.Second,
-	}
-
-	_, err := deleteStateConf.WaitForStateContext(ctx)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteLoadBalancerWithResponse)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to delete Net", fmt.Sprintf("Error waiting for instance (%s) to be deleted: %s", data.Id.ValueString(), err))
+		response.Diagnostics.AddError("Failed to delete load balancer", err.Error())
 		return
 	}
 

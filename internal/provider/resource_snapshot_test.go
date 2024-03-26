@@ -68,7 +68,7 @@ resource "numspot_volume" "test" {
 }
 
 resource "numspot_snapshot" "test" {
-  volume_id = numspot_volume.test.id
+  volume_id   = numspot_volume.test.id
   description = %[1]q
 }`, description)
 }
@@ -134,12 +134,12 @@ resource "numspot_volume" "test" {
 }
 
 resource "numspot_snapshot" "snapshot_from_volume" {
-  volume_id = numspot_volume.test.id
+  volume_id   = numspot_volume.test.id
   description = %[1]q
 }
 
 resource "numspot_snapshot" "test" {
-	source_snapshot_id = numspot_snapshot.snapshot_from_volume.id
-	source_region_name = "eu-west-2"
-  }`, description)
+  source_snapshot_id = numspot_snapshot.snapshot_from_volume.id
+  source_region_name = "eu-west-2"
+}`, description)
 }

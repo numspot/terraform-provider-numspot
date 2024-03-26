@@ -156,31 +156,11 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.DeleteVmsResponse, error) {
-		return r.provider.ApiClient.DeleteVmsWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	createStateConf := &retry.StateChangeConf{
-		Pending: []string{"pending", "running", "stopping", "shutting-down"},
-		Target:  []string{"terminated"},
-		Refresh: func() (result interface{}, state string, err error) {
-			readed := r.readVmById(ctx, data.Id.ValueStringPointer(), response.Diagnostics)
-			if readed == nil {
-				return nil, "", nil
-			}
-
-			return *readed, *readed.State, nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   5 * time.Second,
-	}
-
-	_, err := createStateConf.WaitForStateContext(ctx)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVmsWithResponse)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to delete VM", fmt.Sprintf("Error waiting for instance (%s) to be deleted: %s", data.Id.ValueString(), err))
+		response.Diagnostics.AddError("Failed to delete VM", err.Error())
 		return
 	}
+
+	response.State.RemoveResource(ctx)
 }

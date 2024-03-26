@@ -194,41 +194,9 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.DeleteSubnetResponse, error) {
-		return r.provider.ApiClient.DeleteSubnetWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	deleteStateConf := &retry.StateChangeConf{
-		Pending: []string{"pending", "available"},
-		Target:  []string{"deleted"},
-		Refresh: func() (result interface{}, state string, err error) {
-			res, err := r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-			if err != nil {
-				response.Diagnostics.AddError("Failed to read Subnet on delete", err.Error())
-				return
-			}
-
-			if res.StatusCode() != http.StatusOK {
-				apiError := utils.HandleError(res.Body)
-				if res.StatusCode() == http.StatusNotFound {
-					return data, "deleted", nil
-				}
-				response.Diagnostics.AddError("Failed to read Subnet on delete", apiError.Error())
-				return
-			}
-
-			return data, *res.JSON200.State, nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   5 * time.Second,
-	}
-
-	_, err := deleteStateConf.WaitForStateContext(ctx)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteSubnetWithResponse)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to delete Net", fmt.Sprintf("Error waiting for instance (%s) to be deleted: %s", data.Id.ValueString(), err))
+		response.Diagnostics.AddError("Failed to delete subnet", err.Error())
 		return
 	}
 

@@ -1,9 +1,10 @@
 package utils
 
 import (
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestFromTfStringToStringPtr(t *testing.T) {

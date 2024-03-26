@@ -2,13 +2,35 @@ package utils
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 )
+
+type (
+	DeleteResp interface {
+		StatusCode() int
+	}
+
+	ITFValue interface {
+		Type(ctx context.Context) attr.Type
+	}
+
+	TFType interface {
+		IsNull() bool
+		IsUnknown() bool
+	}
+)
+
+const DeleteResourceRetryTimeout = 5 * time.Minute
 
 func FromTfStringToStringPtr(str types.String) *string {
 	if str.IsUnknown() || str.IsNull() {
@@ -134,10 +156,6 @@ func TfStringListToTimeList(ctx context.Context, list types.List, format string)
 	return slice
 }
 
-type ITFValue interface {
-	Type(ctx context.Context) attr.Type
-}
-
 func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, tfListInnerObjType A, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.ListValue, diag.Diagnostics) {
 	if len(from) == 0 {
 		return types.ListNull(tfListInnerObjType.Type(ctx)), diag.Diagnostics{}
@@ -167,11 +185,6 @@ func StringListToTfListValue(ctx context.Context, from []string) (types.List, di
 	)
 }
 
-type TFType interface {
-	IsNull() bool
-	IsUnknown() bool
-}
-
 func FromTfStringValueToTfOrNull(element basetypes.StringValue) basetypes.StringValue {
 	if element.IsNull() || element.IsUnknown() {
 		return types.StringNull()
@@ -186,4 +199,26 @@ func FromTfBoolValueToTfOrNull(element basetypes.BoolValue) basetypes.BoolValue 
 	}
 
 	return element
+}
+
+func RetryDeleteUntilResourceAvailable[R DeleteResp](
+	ctx context.Context,
+	spaceID iaas.SpaceId,
+	id string,
+	fun func(context.Context, iaas.SpaceId, string, ...iaas.RequestEditorFn) (R, error),
+) error {
+	return retry.RetryContext(ctx, DeleteResourceRetryTimeout, func() *retry.RetryError {
+		res, err := fun(ctx, spaceID, id)
+		if err != nil {
+			return retry.NonRetryableError(err)
+		}
+
+		if res.StatusCode() == http.StatusNoContent {
+			return nil
+		} else if res.StatusCode() == http.StatusConflict {
+			return retry.RetryableError(errors.New("still in use by other resources"))
+		} else {
+			return retry.NonRetryableError(fmt.Errorf("got %d while trying to delete the resource", res.StatusCode()))
+		}
+	})
 }

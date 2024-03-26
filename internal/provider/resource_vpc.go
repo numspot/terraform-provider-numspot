@@ -191,42 +191,9 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.DeleteVpcResponse, error) {
-		return r.provider.ApiClient.DeleteVpcWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	deleteStateConf := &retry.StateChangeConf{
-		Pending: []string{"pending", "available", "deleting"},
-		Target:  []string{"deleted"},
-		Refresh: func() (result interface{}, state string, err error) {
-			// Do not use utils.ExecuteRequest to access error response to know if it's a 404 Not Found expected response
-			readNetRes, err := r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-			if err != nil {
-				response.Diagnostics.AddError("Failed to read Net on delete", err.Error())
-				return
-			}
-
-			if readNetRes.StatusCode() != http.StatusOK {
-				apiError := utils.HandleError(readNetRes.Body)
-				if readNetRes.StatusCode() == http.StatusNotFound {
-					return data, "deleted", nil
-				}
-				response.Diagnostics.AddError("Failed to read Net on delete", apiError.Error())
-				return
-			}
-
-			return data, *readNetRes.JSON200.State, nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   5 * time.Second,
-	}
-
-	_, err := deleteStateConf.WaitForStateContext(ctx)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVpcWithResponse)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to delete Net", fmt.Sprintf("Error waiting for instance (%s) to be deleted: %s", data.Id.ValueString(), err))
+		response.Diagnostics.AddError("Failed to delete VPC", err.Error())
 		return
 	}
 
