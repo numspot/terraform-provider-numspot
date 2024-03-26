@@ -7,19 +7,19 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_virtual_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func vpcToVGLinkFromApi(ctx context.Context, from api.VpcToVirtualGatewayLink) (resource_virtual_gateway.NetToVirtualGatewayLinksValue, diag.Diagnostics) {
+func vpcToVGLinkFromApi(ctx context.Context, from iaas.VpcToVirtualGatewayLink) (resource_virtual_gateway.NetToVirtualGatewayLinksValue, diag.Diagnostics) {
 	return resource_virtual_gateway.NewNetToVirtualGatewayLinksValue(
 		resource_virtual_gateway.NetToVirtualGatewayLinksValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{},
 	)
 }
 
-func VirtualGatewayFromHttpToTf(ctx context.Context, http *api.VirtualGateway) (*resource_virtual_gateway.VirtualGatewayModel, diag.Diagnostics) {
+func VirtualGatewayFromHttpToTf(ctx context.Context, http *iaas.VirtualGateway) (*resource_virtual_gateway.VirtualGatewayModel, diag.Diagnostics) {
 	var netToVirtualGatewaysLinkTd types.List
 	var diagnostics diag.Diagnostics
 
@@ -45,8 +45,8 @@ func VirtualGatewayFromHttpToTf(ctx context.Context, http *api.VirtualGateway) (
 	}, diagnostics
 }
 
-func VirtualGatewayFromTfToCreateRequest(tf resource_virtual_gateway.VirtualGatewayModel) api.CreateVirtualGatewayJSONRequestBody {
-	return api.CreateVirtualGatewayJSONRequestBody{
+func VirtualGatewayFromTfToCreateRequest(tf resource_virtual_gateway.VirtualGatewayModel) iaas.CreateVirtualGatewayJSONRequestBody {
+	return iaas.CreateVirtualGatewayJSONRequestBody{
 		ConnectionType: tf.ConnectionType.ValueString(),
 	}
 }

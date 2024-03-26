@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -38,7 +38,7 @@ func ComputePublicIPChangeSet(plan, state *resource_public_ip.PublicIpModel) Pub
 	return c
 }
 
-func PublicIpFromHttpToTf(elt *api.PublicIp) resource_public_ip.PublicIpModel {
+func PublicIpFromHttpToTf(elt *iaas.PublicIp) resource_public_ip.PublicIpModel {
 	return resource_public_ip.PublicIpModel{
 		Id:           types.StringPointerValue(elt.Id),
 		NicAccountId: types.StringPointerValue(elt.NicAccountId),
@@ -51,11 +51,11 @@ func PublicIpFromHttpToTf(elt *api.PublicIp) resource_public_ip.PublicIpModel {
 }
 
 func invokeLinkPublicIP(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) (*string, error) {
-	var payload api.LinkPublicIpJSONRequestBody
+	var payload iaas.LinkPublicIpJSONRequestBody
 	if !data.VmId.IsNull() {
-		payload = api.LinkPublicIpJSONRequestBody{VmId: data.VmId.ValueStringPointer()}
+		payload = iaas.LinkPublicIpJSONRequestBody{VmId: data.VmId.ValueStringPointer()}
 	} else {
-		payload = api.LinkPublicIpJSONRequestBody{
+		payload = iaas.LinkPublicIpJSONRequestBody{
 			NicId:     data.NicId.ValueStringPointer(),
 			PrivateIp: data.PrivateIp.ValueStringPointer(),
 		}
@@ -72,7 +72,7 @@ func invokeLinkPublicIP(ctx context.Context, provider Provider, data *resource_p
 }
 
 func invokeUnlinkPublicIP(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) error {
-	payload := api.UnlinkPublicIpJSONRequestBody{
+	payload := iaas.UnlinkPublicIpJSONRequestBody{
 		LinkPublicIpId: data.LinkPublicIP.ValueStringPointer(),
 	}
 	res, err := provider.ApiClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.LinkPublicIP.ValueString(), payload)

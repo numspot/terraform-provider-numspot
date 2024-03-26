@@ -7,17 +7,17 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_route_table"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTable, defaultRouteDestination string, subnetId *string) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
+func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable, defaultRouteDestination string, subnetId *string) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
 	// Routes
-	var routes []api.Route
+	var routes []iaas.Route
 	if len(*http.Routes) > 0 {
 		// Remove "defaulted" route to prevent inconsistent state
-		routes = make([]api.Route, 0, len(*http.Routes)-1)
+		routes = make([]iaas.Route, 0, len(*http.Routes)-1)
 		for _, e := range *http.Routes {
 			if *e.DestinationIpRange != defaultRouteDestination {
 				routes = append(routes, e)
@@ -50,7 +50,7 @@ func RouteTableFromHttpToTf(ctx context.Context, http *api.RouteTable, defaultRo
 	return &res, nil
 }
 
-func routeTableLinkFromAPI(ctx context.Context, link api.LinkRouteTable) (resource_route_table.LinkRouteTablesValue, diag.Diagnostics) {
+func routeTableLinkFromAPI(ctx context.Context, link iaas.LinkRouteTable) (resource_route_table.LinkRouteTablesValue, diag.Diagnostics) {
 	return resource_route_table.NewLinkRouteTablesValue(
 		resource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -63,7 +63,7 @@ func routeTableLinkFromAPI(ctx context.Context, link api.LinkRouteTable) (resour
 	)
 }
 
-func routeTableRouteFromAPI(ctx context.Context, route api.Route) (resource_route_table.RoutesValue, diag.Diagnostics) {
+func routeTableRouteFromAPI(ctx context.Context, route iaas.Route) (resource_route_table.RoutesValue, diag.Diagnostics) {
 	return resource_route_table.NewRoutesValue(
 		resource_route_table.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -82,8 +82,8 @@ func routeTableRouteFromAPI(ctx context.Context, route api.Route) (resource_rout
 	)
 }
 
-func RouteTableFromTfToCreateRequest(tf *resource_route_table.RouteTableModel) api.CreateRouteTableJSONRequestBody {
-	return api.CreateRouteTableJSONRequestBody{
+func RouteTableFromTfToCreateRequest(tf *resource_route_table.RouteTableModel) iaas.CreateRouteTableJSONRequestBody {
+	return iaas.CreateRouteTableJSONRequestBody{
 		VpcId: tf.VpcId.ValueString(),
 	}
 }

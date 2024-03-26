@@ -7,11 +7,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc_peering"
 )
 
-func accepterVpcFromApi(ctx context.Context, http *api.AccepterVpc) (resource_vpc_peering.AccepterVpcValue, diag.Diagnostics) {
+func accepterVpcFromApi(ctx context.Context, http *iaas.AccepterVpc) (resource_vpc_peering.AccepterVpcValue, diag.Diagnostics) {
 	if http == nil {
 		return resource_vpc_peering.NewAccepterVpcValueNull(), nil
 	}
@@ -26,7 +26,7 @@ func accepterVpcFromApi(ctx context.Context, http *api.AccepterVpc) (resource_vp
 	)
 }
 
-func sourceVpcFromApi(ctx context.Context, http *api.SourceVpc) (resource_vpc_peering.SourceVpcValue, diag.Diagnostics) {
+func sourceVpcFromApi(ctx context.Context, http *iaas.SourceVpc) (resource_vpc_peering.SourceVpcValue, diag.Diagnostics) {
 	if http == nil {
 		return resource_vpc_peering.NewSourceVpcValueNull(), nil
 	}
@@ -41,7 +41,7 @@ func sourceVpcFromApi(ctx context.Context, http *api.SourceVpc) (resource_vpc_pe
 	)
 }
 
-func vpcPeeringStateFromApi(ctx context.Context, http *api.VpcPeeringState) (resource_vpc_peering.StateValue, diag.Diagnostics) {
+func vpcPeeringStateFromApi(ctx context.Context, http *iaas.VpcPeeringState) (resource_vpc_peering.StateValue, diag.Diagnostics) {
 	if http == nil {
 		return resource_vpc_peering.NewStateValueNull(), nil
 	}
@@ -55,7 +55,7 @@ func vpcPeeringStateFromApi(ctx context.Context, http *api.VpcPeeringState) (res
 	)
 }
 
-func VpcPeeringFromHttpToTf(ctx context.Context, http *api.VpcPeering) (*resource_vpc_peering.VpcPeeringModel, diag.Diagnostics) {
+func VpcPeeringFromHttpToTf(ctx context.Context, http *iaas.VpcPeering) (*resource_vpc_peering.VpcPeeringModel, diag.Diagnostics) {
 	// In the event that the creation of VPC peering fails, the error message might be found in
 	// the "state" field. If the state's name is "failed", then the error message will be contained
 	// in the state's message. We must address this particular scenario.
@@ -113,8 +113,8 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *api.VpcPeering) (*resourc
 	}, diagnostics
 }
 
-func VpcPeeringFromTfToCreateRequest(tf resource_vpc_peering.VpcPeeringModel) api.CreateVpcPeeringJSONRequestBody {
-	return api.CreateVpcPeeringJSONRequestBody{
+func VpcPeeringFromTfToCreateRequest(tf resource_vpc_peering.VpcPeeringModel) iaas.CreateVpcPeeringJSONRequestBody {
+	return iaas.CreateVpcPeeringJSONRequestBody{
 		AccepterVpcId: tf.AccepterVpcId.ValueString(),
 		SourceVpcId:   tf.SourceVpcId.ValueString(),
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_route_table"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -70,7 +70,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateRouteTableResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateRouteTableResponse, error) {
 		body := RouteTableFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateRouteTableWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -89,8 +89,8 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	data.Routes.ElementsAs(ctx, &routes, false)
 	for i := range routes {
 		route := &routes[i]
-		createdRoute := utils.ExecuteRequest(func() (*api.CreateRouteResponse, error) {
-			return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, *createdId, api.CreateRouteJSONRequestBody{
+		createdRoute := utils.ExecuteRequest(func() (*iaas.CreateRouteResponse, error) {
+			return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, *createdId, iaas.CreateRouteJSONRequestBody{
 				DestinationIpRange: route.DestinationIpRange.ValueString(),
 				GatewayId:          route.GatewayId.ValueStringPointer(),
 				NatGatewayId:       route.NatGatewayId.ValueStringPointer(),
@@ -105,8 +105,8 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	}
 
 	if !data.SubnetId.IsNull() {
-		linkRes := utils.ExecuteRequest(func() (*api.LinkRouteTableResponse, error) {
-			return r.provider.ApiClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, *createdId, api.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
+		linkRes := utils.ExecuteRequest(func() (*iaas.LinkRouteTableResponse, error) {
+			return r.provider.ApiClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, *createdId, iaas.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
 		}, http.StatusOK, &response.Diagnostics)
 		if linkRes == nil {
 			return
@@ -205,7 +205,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag diag.Diagnostics) *api.ReadRouteTablesByIdResponse {
+func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag diag.Diagnostics) *iaas.ReadRouteTablesByIdResponse {
 	res, err := r.provider.ApiClient.ReadRouteTablesByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diag.AddError("Failed to read RouteTable", err.Error())
@@ -238,12 +238,12 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 	}
 
 	for _, link := range links {
-		unlinkRes := utils.ExecuteRequest(func() (*api.UnlinkRouteTableResponse, error) {
+		unlinkRes := utils.ExecuteRequest(func() (*iaas.UnlinkRouteTableResponse, error) {
 			return r.provider.ApiClient.UnlinkRouteTableWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				data.Id.ValueString(),
-				api.UnlinkRouteTableJSONRequestBody{
+				iaas.UnlinkRouteTableJSONRequestBody{
 					LinkRouteTableId: link.Id.ValueString(),
 				},
 			)
@@ -253,7 +253,7 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 		}
 	}
 
-	utils.ExecuteRequest(func() (*api.DeleteRouteTableResponse, error) {
+	utils.ExecuteRequest(func() (*iaas.DeleteRouteTableResponse, error) {
 		return r.provider.ApiClient.DeleteRouteTableWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

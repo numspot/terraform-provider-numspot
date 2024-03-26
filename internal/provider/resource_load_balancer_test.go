@@ -7,14 +7,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 func TestAccLoadBalancerResource(t *testing.T) {
 	t.Parallel()
 	lbName := "elb-test"
-	hc := api.HealthCheck{
+	hc := iaas.HealthCheck{
 		CheckInterval:      30,
 		HealthyThreshold:   10,
 		Path:               utils.PointerOf("/index.html"),
@@ -93,7 +93,7 @@ resource "numspot_load_balancer" "testlb" {
 }`, name)
 }
 
-func updateLbConfig(hc api.HealthCheck) string {
+func updateLbConfig(hc iaas.HealthCheck) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"

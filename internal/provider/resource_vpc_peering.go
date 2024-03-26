@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc_peering"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -55,7 +55,7 @@ func (r *VpcPeeringResource) Create(ctx context.Context, request resource.Create
 	var data resource_vpc_peering.VpcPeeringModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateVpcPeeringResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateVpcPeeringResponse, error) {
 		body := VpcPeeringFromTfToCreateRequest(data)
 		return r.provider.ApiClient.CreateVpcPeeringWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -76,7 +76,7 @@ func (r *VpcPeeringResource) Read(ctx context.Context, request resource.ReadRequ
 	var data resource_vpc_peering.VpcPeeringModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadVpcPeeringsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadVpcPeeringsByIdResponse, error) {
 		return r.provider.ApiClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -108,7 +108,7 @@ func (r *VpcPeeringResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_vpc_peering.VpcPeeringModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteVpcPeeringResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteVpcPeeringResponse, error) {
 		return r.provider.ApiClient.DeleteVpcPeeringWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {

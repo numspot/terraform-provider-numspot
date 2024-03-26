@@ -6,14 +6,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vpc"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func NetFromHttpToTf(ctx context.Context, http *api.Vpc) (*resource_vpc.VpcModel, diag.Diagnostics) {
+func NetFromHttpToTf(ctx context.Context, http *iaas.Vpc) (*resource_vpc.VpcModel, diag.Diagnostics) {
 	var (
 		tagsTf types.List
 		diags  diag.Diagnostics
@@ -35,15 +35,15 @@ func NetFromHttpToTf(ctx context.Context, http *api.Vpc) (*resource_vpc.VpcModel
 	}, nil
 }
 
-func NetFromTfToCreateRequest(tf *resource_vpc.VpcModel) api.CreateVpcJSONRequestBody {
-	return api.CreateVpcJSONRequestBody{
+func NetFromTfToCreateRequest(tf *resource_vpc.VpcModel) iaas.CreateVpcJSONRequestBody {
+	return iaas.CreateVpcJSONRequestBody{
 		IpRange: tf.IpRange.ValueString(),
 		Tenancy: tf.Tenancy.ValueStringPointer(),
 	}
 }
 
-func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) api.ReadVpcsParams {
-	return api.ReadVpcsParams{
+func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) iaas.ReadVpcsParams {
+	return iaas.ReadVpcsParams{
 		DhcpOptionsSetIds: utils.TfStringListToStringPtrList(ctx, tf.DHCPOptionsSetIds),
 		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges),
 		IsDefault:         tf.IsDefault.ValueBoolPointer(),
@@ -55,7 +55,7 @@ func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) api.
 	}
 }
 
-func VPCsFromHttpToTfDatasource(ctx context.Context, http *api.Vpc) (*datasource_vpc.VpcModel, diag.Diagnostics) {
+func VPCsFromHttpToTfDatasource(ctx context.Context, http *iaas.Vpc) (*datasource_vpc.VpcModel, diag.Diagnostics) {
 	var (
 		tagsList types.List
 		diags    diag.Diagnostics

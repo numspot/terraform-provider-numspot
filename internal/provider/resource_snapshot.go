@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_snapshot"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -62,7 +62,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	var data resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateSnapshotResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateSnapshotResponse, error) {
 		body := SnapshotFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateSnapshotWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -90,7 +90,7 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	var data resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadSnapshotsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadSnapshotsByIdResponse, error) {
 		return r.provider.ApiClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -121,7 +121,7 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	var data resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.ExecuteRequest(func() (*api.DeleteSnapshotResponse, error) {
+	_ = utils.ExecuteRequest(func() (*iaas.DeleteSnapshotResponse, error) {
 		return r.provider.ApiClient.DeleteSnapshotWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

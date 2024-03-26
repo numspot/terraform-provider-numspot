@@ -3,12 +3,12 @@ package provider
 import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_snapshot"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func SnapshotFromHttpToTf(http *api.Snapshot) resource_snapshot.SnapshotModel {
+func SnapshotFromHttpToTf(http *iaas.Snapshot) resource_snapshot.SnapshotModel {
 	var creationDateStr *string
 
 	if http.CreationDate != nil {
@@ -27,8 +27,8 @@ func SnapshotFromHttpToTf(http *api.Snapshot) resource_snapshot.SnapshotModel {
 	}
 }
 
-func SnapshotFromTfToCreateRequest(tf *resource_snapshot.SnapshotModel) api.CreateSnapshotJSONRequestBody {
-	return api.CreateSnapshotJSONRequestBody{
+func SnapshotFromTfToCreateRequest(tf *resource_snapshot.SnapshotModel) iaas.CreateSnapshotJSONRequestBody {
+	return iaas.CreateSnapshotJSONRequestBody{
 		Description:      tf.Description.ValueStringPointer(),
 		SourceRegionName: tf.SourceRegionName.ValueStringPointer(),
 		SourceSnapshotId: tf.SourceSnapshotId.ValueStringPointer(),

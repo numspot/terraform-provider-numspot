@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_direct_link_interface"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *DirectLinkInterfaceResource) Create(ctx context.Context, request resour
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateDirectLinkInterfaceResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateDirectLinkInterfaceResponse, error) {
 		body := DirectLinkInterfaceFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateDirectLinkInterfaceWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -77,7 +77,7 @@ func (r *DirectLinkInterfaceResource) Read(ctx context.Context, request resource
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadDirectLinkInterfacesByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadDirectLinkInterfacesByIdResponse, error) {
 		return r.provider.ApiClient.ReadDirectLinkInterfacesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -97,7 +97,7 @@ func (r *DirectLinkInterfaceResource) Delete(ctx context.Context, request resour
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*api.DeleteDirectLinkInterfaceResponse, error) {
+	utils.ExecuteRequest(func() (*iaas.DeleteDirectLinkInterfaceResponse, error) {
 		return r.provider.ApiClient.DeleteDirectLinkInterfaceWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

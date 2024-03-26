@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_image"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -66,7 +66,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*api.CreateImageResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateImageResponse, error) {
 		return r.provider.ApiClient.CreateImageWithResponse(ctx, r.provider.SpaceID, *body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
@@ -93,7 +93,7 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadImagesByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadImagesByIdResponse, error) {
 		return r.provider.ApiClient.ReadImagesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
@@ -115,7 +115,7 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*api.DeleteImageResponse, error) {
+	utils.ExecuteRequest(func() (*iaas.DeleteImageResponse, error) {
 		return r.provider.ApiClient.DeleteImageWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vpc"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -74,7 +74,7 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 	request.Config.Get(ctx, &plan)
 
 	params := VPCsFromTfToAPIReadParams(ctx, plan)
-	res := utils.ExecuteRequest(func() (*api.ReadVpcsResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsResponse, error) {
 		return d.provider.ApiClient.ReadVpcsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {

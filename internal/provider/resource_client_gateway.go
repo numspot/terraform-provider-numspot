@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_client_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateClientGatewayResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateClientGatewayResponse, error) {
 		body := ClientGatewayFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateClientGatewayWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -77,7 +77,7 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadClientGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadClientGatewaysByIdResponse, error) {
 		return r.provider.ApiClient.ReadClientGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -97,7 +97,7 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteClientGatewayResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteClientGatewayResponse, error) {
 		return r.provider.ApiClient.DeleteClientGatewayWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {

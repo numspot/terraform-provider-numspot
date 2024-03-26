@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -62,7 +62,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	var plan, state resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
-	createRes := utils.ExecuteRequest(func() (*api.CreatePublicIpResponse, error) {
+	createRes := utils.ExecuteRequest(func() (*iaas.CreatePublicIpResponse, error) {
 		return r.provider.ApiClient.CreatePublicIpWithResponse(ctx, r.provider.SpaceID)
 	}, http.StatusCreated, &response.Diagnostics)
 	if createRes == nil {
@@ -98,7 +98,7 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 	var data resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	readRes := utils.ExecuteRequest(func() (*api.ReadPublicIpsByIdResponse, error) {
+	readRes := utils.ExecuteRequest(func() (*iaas.ReadPublicIpsByIdResponse, error) {
 		return r.provider.ApiClient.ReadPublicIpsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
@@ -178,7 +178,7 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 			return
 		}
 	}
-	utils.ExecuteRequest(func() (*api.DeletePublicIpResponse, error) {
+	utils.ExecuteRequest(func() (*iaas.DeletePublicIpResponse, error) {
 		return r.provider.ApiClient.DeletePublicIpWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

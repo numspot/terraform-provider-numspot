@@ -17,9 +17,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/iam"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iam"
 )
 
 var _ provider.Provider = (*numspotProvider)(nil)
@@ -140,7 +139,7 @@ func AddSecurityCredentialsToRequestHeaders(ctx context.Context, req *http.Reque
 	return nil
 }
 
-func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag *diag.Diagnostics, data *NumspotProviderModel) *api.ClientWithResponses {
+func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag *diag.Diagnostics, data *NumspotProviderModel) *iaas.ClientWithResponses {
 	err, accessToken := p.authenticateUser(ctx, data)
 	if err != nil {
 		diag.AddError("Failed to authenticate", err.Error())
@@ -153,8 +152,8 @@ func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag *diag.Diag
 		return nil
 	}
 
-	numspotClient, err := api.NewClientWithResponses(data.Host.ValueString(), api.WithRequestEditorFn(bearerProvider.Intercept),
-		api.WithHTTPClient(&http.Client{
+	numspotClient, err := iaas.NewClientWithResponses(data.Host.ValueString(), iaas.WithRequestEditorFn(bearerProvider.Intercept),
+		iaas.WithHTTPClient(&http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
@@ -168,9 +167,9 @@ func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag *diag.Diag
 	return numspotClient
 }
 
-func (p *numspotProvider) apiClientWithFakeAuth(data *NumspotProviderModel, diag diag.Diagnostics) *api.ClientWithResponses {
-	numspotClient, err := api.NewClientWithResponses(data.Host.ValueString(), api.WithRequestEditorFn(faker),
-		api.WithHTTPClient(&http.Client{
+func (p *numspotProvider) apiClientWithFakeAuth(data *NumspotProviderModel, diag diag.Diagnostics) *iaas.ClientWithResponses {
+	numspotClient, err := iaas.NewClientWithResponses(data.Host.ValueString(), iaas.WithRequestEditorFn(faker),
+		iaas.WithHTTPClient(&http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
@@ -191,8 +190,8 @@ func faker(_ context.Context, req *http.Request) error {
 }
 
 type Provider struct {
-	SpaceID   api.SpaceId
-	ApiClient *api.ClientWithResponses
+	SpaceID   iaas.SpaceId
+	ApiClient *iaas.ClientWithResponses
 }
 
 func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -339,7 +338,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	config.ClientSecret = types.StringValue(clientSecret)
 
 	// Create a new Numspot provider using the configuration values
-	var client *api.ClientWithResponses
+	var client *iaas.ClientWithResponses
 	if p.development {
 		client = p.apiClientWithFakeAuth(&config, resp.Diagnostics)
 	} else {

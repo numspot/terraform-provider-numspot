@@ -7,17 +7,17 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_volume"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_volume"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func VolumeFromTfToHttp(tf *resource_volume.VolumeModel) *api.Volume {
-	return &api.Volume{}
+func VolumeFromTfToHttp(tf *resource_volume.VolumeModel) *iaas.Volume {
+	return &iaas.Volume{}
 }
 
-func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http api.LinkedVolume) (resource_volume.LinkedVolumesValue, diag.Diagnostics) {
+func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http iaas.LinkedVolume) (resource_volume.LinkedVolumesValue, diag.Diagnostics) {
 	return resource_volume.NewLinkedVolumesValue(
 		resource_volume.LinkedVolumesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -29,7 +29,7 @@ func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http api.LinkedV
 		})
 }
 
-func VolumeFromHttpToTf(ctx context.Context, http *api.Volume) (resource_volume.VolumeModel, diag.Diagnostics) {
+func VolumeFromHttpToTf(ctx context.Context, http *iaas.Volume) (resource_volume.VolumeModel, diag.Diagnostics) {
 	volumes, diags := utils.GenericListToTfListValue(
 		ctx,
 		resource_volume.LinkedVolumesValue{},
@@ -53,7 +53,7 @@ func VolumeFromHttpToTf(ctx context.Context, http *api.Volume) (resource_volume.
 	}, diags
 }
 
-func VolumeFromTfToCreateRequest(tf *resource_volume.VolumeModel) api.CreateVolumeJSONRequestBody {
+func VolumeFromTfToCreateRequest(tf *resource_volume.VolumeModel) iaas.CreateVolumeJSONRequestBody {
 	var (
 		httpIops   *int
 		snapshotId *string
@@ -65,7 +65,7 @@ func VolumeFromTfToCreateRequest(tf *resource_volume.VolumeModel) api.CreateVolu
 		snapshotId = tf.SnapshotId.ValueStringPointer()
 	}
 
-	return api.CreateVolumeJSONRequestBody{
+	return iaas.CreateVolumeJSONRequestBody{
 		Iops:                 httpIops,
 		Size:                 utils.FromTfInt64ToIntPtr(tf.Size),
 		SnapshotId:           snapshotId,
@@ -74,25 +74,25 @@ func VolumeFromTfToCreateRequest(tf *resource_volume.VolumeModel) api.CreateVolu
 	}
 }
 
-func ValueFromTfToUpdaterequest(tf *resource_volume.VolumeModel) api.UpdateVolumeJSONRequestBody {
+func ValueFromTfToUpdaterequest(tf *resource_volume.VolumeModel) iaas.UpdateVolumeJSONRequestBody {
 	var httpIops *int
 	if !tf.Iops.IsUnknown() && !tf.Iops.IsNull() {
 		httpIops = utils.FromTfInt64ToIntPtr(tf.Iops)
 	}
 
-	return api.UpdateVolumeJSONRequestBody{
+	return iaas.UpdateVolumeJSONRequestBody{
 		Iops:       httpIops,
 		Size:       utils.FromTfInt64ToIntPtr(tf.Size),
 		VolumeType: tf.Type.ValueStringPointer(),
 	}
 }
 
-func VolumeFromTfToAPIReadParams(ctx context.Context, tf VolumesDataSourceModel) api.ReadVolumesParams {
+func VolumeFromTfToAPIReadParams(ctx context.Context, tf VolumesDataSourceModel) iaas.ReadVolumesParams {
 	creationDates := utils.TfStringListToTimeList(ctx, tf.CreationDates, "2020-06-30T00:00:00.000Z")
 	linkVolumeLinkDates := utils.TfStringListToTimeList(ctx, tf.LinkVolumeLinkDates, "2020-06-30T00:00:00.000Z")
 	volumeSizes := utils.TFInt64ListToIntList(ctx, tf.VolumeSizes)
 
-	return api.ReadVolumesParams{
+	return iaas.ReadVolumesParams{
 		CreationDates:                &creationDates,
 		LinkVolumeDeleteOnVmDeletion: tf.LinkVolumeDeleteOnVmDeletion.ValueBoolPointer(),
 		LinkVolumeDeviceNames:        utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeDeviceNames),
@@ -108,7 +108,7 @@ func VolumeFromTfToAPIReadParams(ctx context.Context, tf VolumesDataSourceModel)
 	}
 }
 
-func VolumesFromHttpToTfDatasource(ctx context.Context, http *api.Volume) (*datasource_volume.VolumeModel, diag.Diagnostics) {
+func VolumesFromHttpToTfDatasource(ctx context.Context, http *iaas.Volume) (*datasource_volume.VolumeModel, diag.Diagnostics) {
 	var (
 		linkedVolumes = types.ListNull(resource_volume.LinkedVolumesValue{}.Type(ctx))
 		diags         diag.Diagnostics

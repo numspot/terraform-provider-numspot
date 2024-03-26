@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpn_connection"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -298,8 +298,8 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 	var state vpnConnectionsDataSourceModel
 	state.ID = types.StringValue("placeholder")
 
-	res := utils.ExecuteRequest(func() (*api.ReadVpnConnectionsResponse, error) {
-		return d.provider.ApiClient.ReadVpnConnectionsWithResponse(ctx, d.provider.SpaceID, &api.ReadVpnConnectionsParams{})
+	res := utils.ExecuteRequest(func() (*iaas.ReadVpnConnectionsResponse, error) {
+		return d.provider.ApiClient.ReadVpnConnectionsWithResponse(ctx, d.provider.SpaceID, &iaas.ReadVpnConnectionsParams{})
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

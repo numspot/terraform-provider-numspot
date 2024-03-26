@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_direct_link"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *DirectLinkResource) Create(ctx context.Context, request resource.Create
 	var data resource_direct_link.DirectLinkModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateDirectLinkResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateDirectLinkResponse, error) {
 		body := DirectLinkFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateDirectLinkWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -77,7 +77,7 @@ func (r *DirectLinkResource) Read(ctx context.Context, request resource.ReadRequ
 	var data resource_direct_link.DirectLinkModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadDirectLinksByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadDirectLinksByIdResponse, error) {
 		return r.provider.ApiClient.ReadDirectLinksByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -96,7 +96,7 @@ func (r *DirectLinkResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_direct_link.DirectLinkModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteDirectLinkResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteDirectLinkResponse, error) {
 		return r.provider.ApiClient.DeleteDirectLinkWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {

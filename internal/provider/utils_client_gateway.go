@@ -3,13 +3,13 @@ package provider
 import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_client_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *api.ClientGateway {
-	return &api.ClientGateway{
+func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *iaas.ClientGateway {
+	return &iaas.ClientGateway{
 		BgpAsn:         utils.FromTfInt64ToIntPtr(tf.BgpAsn),
 		ConnectionType: tf.ConnectionType.ValueStringPointer(),
 		Id:             tf.Id.ValueStringPointer(),
@@ -18,7 +18,7 @@ func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *
 	}
 }
 
-func ClientGatewayFromHttpToTf(http *api.ClientGateway) resource_client_gateway.ClientGatewayModel {
+func ClientGatewayFromHttpToTf(http *iaas.ClientGateway) resource_client_gateway.ClientGatewayModel {
 	tmp := resource_client_gateway.ClientGatewayModel{
 		BgpAsn:         utils.FromIntPtrToTfInt64(http.BgpAsn),
 		ConnectionType: types.StringPointerValue(http.ConnectionType),
@@ -29,8 +29,8 @@ func ClientGatewayFromHttpToTf(http *api.ClientGateway) resource_client_gateway.
 	return tmp
 }
 
-func ClientGatewayFromTfToCreateRequest(tf *resource_client_gateway.ClientGatewayModel) api.CreateClientGatewayJSONRequestBody {
-	return api.CreateClientGatewayJSONRequestBody{
+func ClientGatewayFromTfToCreateRequest(tf *resource_client_gateway.ClientGatewayModel) iaas.CreateClientGatewayJSONRequestBody {
+	return iaas.CreateClientGatewayJSONRequestBody{
 		BgpAsn:         utils.FromTfInt64ToInt(tf.BgpAsn),
 		ConnectionType: tf.ConnectionType.ValueString(),
 		PublicIp:       tf.PublicIp.ValueString(),

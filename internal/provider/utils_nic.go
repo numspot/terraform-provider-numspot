@@ -9,12 +9,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_nic"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func privatesIpFromApi(ctx context.Context, elt api.PrivateIp) (resource_nic.PrivateIpsValue, diag.Diagnostics) {
+func privatesIpFromApi(ctx context.Context, elt iaas.PrivateIp) (resource_nic.PrivateIpsValue, diag.Diagnostics) {
 	var (
 		linkPublicIpTf  resource_nic.LinkPublicIpValue
 		linkPublicIpObj basetypes.ObjectValue
@@ -50,7 +50,7 @@ func privatesIpFromApi(ctx context.Context, elt api.PrivateIp) (resource_nic.Pri
 	)
 }
 
-func securityGroupLightFromApi(ctx context.Context, elt api.SecurityGroupLight) (resource_nic.SecurityGroupsValue, diag.Diagnostics) {
+func securityGroupLightFromApi(ctx context.Context, elt iaas.SecurityGroupLight) (resource_nic.SecurityGroupsValue, diag.Diagnostics) {
 	return resource_nic.NewSecurityGroupsValue(
 		resource_nic.SecurityGroupsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -60,7 +60,7 @@ func securityGroupLightFromApi(ctx context.Context, elt api.SecurityGroupLight) 
 	)
 }
 
-func linkPublicIpFromApi(ctx context.Context, elt api.LinkPublicIp) (resource_nic.LinkPublicIpValue, diag.Diagnostics) {
+func linkPublicIpFromApi(ctx context.Context, elt iaas.LinkPublicIp) (resource_nic.LinkPublicIpValue, diag.Diagnostics) {
 	return resource_nic.NewLinkPublicIpValue(
 		resource_nic.LinkPublicIpValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -73,7 +73,7 @@ func linkPublicIpFromApi(ctx context.Context, elt api.LinkPublicIp) (resource_ni
 	)
 }
 
-func NicFromHttpToTf(ctx context.Context, http *api.Nic) (*resource_nic.NicModel, diag.Diagnostics) {
+func NicFromHttpToTf(ctx context.Context, http *iaas.Nic) (*resource_nic.NicModel, diag.Diagnostics) {
 	var linkPublicIpTf resource_nic.LinkPublicIpValue
 	// Private IPs
 	privateIps, diagnostics := utils.GenericListToTfListValue(ctx, resource_nic.PrivateIpsValue{}, privatesIpFromApi, *http.PrivateIps)
@@ -133,16 +133,16 @@ func NicFromHttpToTf(ctx context.Context, http *api.Nic) (*resource_nic.NicModel
 	}, diagnostics
 }
 
-func NicFromTfToCreateRequest(ctx context.Context, tf *resource_nic.NicModel) api.CreateNicJSONRequestBody {
-	privateIps := utils.TfListToGenericList(func(a resource_nic.PrivateIpsValue) api.PrivateIpLight {
-		return api.PrivateIpLight{
+func NicFromTfToCreateRequest(ctx context.Context, tf *resource_nic.NicModel) iaas.CreateNicJSONRequestBody {
+	privateIps := utils.TfListToGenericList(func(a resource_nic.PrivateIpsValue) iaas.PrivateIpLight {
+		return iaas.PrivateIpLight{
 			IsPrimary: a.IsPrimary.ValueBoolPointer(),
 			PrivateIp: a.PrivateIp.ValueStringPointer(),
 		}
 	}, ctx, tf.PrivateIps)
 	securityGroupIds := utils.TfStringListToStringList(ctx, tf.SecurityGroupIds)
 
-	return api.CreateNicJSONRequestBody{
+	return iaas.CreateNicJSONRequestBody{
 		Description:      tf.Description.ValueStringPointer(),
 		PrivateIps:       &privateIps,
 		SecurityGroupIds: &securityGroupIds,

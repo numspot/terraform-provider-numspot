@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -66,12 +66,12 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 	var state, plan loadBalancersDataSourceModel
 	request.Config.Get(ctx, &plan)
 
-	params := api.ReadLoadBalancersParams{}
+	params := iaas.ReadLoadBalancersParams{}
 	if !plan.LoadBalancerNames.IsNull() {
 		lbNames := utils.TfStringListToStringList(ctx, plan.LoadBalancerNames)
 		params.LoadBalancerNames = &lbNames
 	}
-	res := utils.ExecuteRequest(func() (*api.ReadLoadBalancersResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadLoadBalancersResponse, error) {
 		return d.provider.ApiClient.ReadLoadBalancersWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {

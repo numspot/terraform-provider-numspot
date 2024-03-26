@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_nic"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateNicResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateNicResponse, error) {
 		body := NicFromTfToCreateRequest(ctx, &data)
 		return r.provider.ApiClient.CreateNicWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -82,7 +82,7 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadNicsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadNicsByIdResponse, error) {
 		return r.provider.ApiClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -107,7 +107,7 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.ExecuteRequest(func() (*api.DeleteNicResponse, error) {
+	_ = utils.ExecuteRequest(func() (*iaas.DeleteNicResponse, error) {
 		return r.provider.ApiClient.DeleteNicWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

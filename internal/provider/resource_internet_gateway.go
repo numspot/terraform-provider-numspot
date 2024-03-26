@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_internet_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	var data resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateInternetGatewayResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateInternetGatewayResponse, error) {
 		return r.provider.ApiClient.CreateInternetGatewayWithResponse(ctx, r.provider.SpaceID)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil || res.JSON201 == nil {
@@ -73,12 +73,12 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	// Call Link Internet Service to VPC
 	vpcId := data.VpcIp
 	if !vpcId.IsNull() {
-		linRes := utils.ExecuteRequest(func() (*api.LinkInternetGatewayResponse, error) {
+		linRes := utils.ExecuteRequest(func() (*iaas.LinkInternetGatewayResponse, error) {
 			return r.provider.ApiClient.LinkInternetGatewayWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				*createdId,
-				api.LinkInternetGatewayJSONRequestBody{
+				iaas.LinkInternetGatewayJSONRequestBody{
 					VpcId: data.VpcIp.ValueString(),
 				},
 			)
@@ -89,7 +89,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	}
 
 	// Update state
-	readRes := utils.ExecuteRequest(func() (*api.ReadInternetGatewaysByIdResponse, error) {
+	readRes := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysByIdResponse, error) {
 		return r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, *createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -105,7 +105,7 @@ func (r *InternetGatewayResource) Read(ctx context.Context, request resource.Rea
 	var data resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadInternetGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysByIdResponse, error) {
 		return r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -125,12 +125,12 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	if !data.VpcIp.IsNull() {
-		res := utils.ExecuteRequest(func() (*api.UnlinkInternetGatewayResponse, error) {
+		res := utils.ExecuteRequest(func() (*iaas.UnlinkInternetGatewayResponse, error) {
 			return r.provider.ApiClient.UnlinkInternetGatewayWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				data.Id.ValueString(),
-				api.UnlinkInternetGatewayJSONRequestBody{
+				iaas.UnlinkInternetGatewayJSONRequestBody{
 					VpcId: data.VpcIp.ValueString(),
 				})
 		}, http.StatusNoContent, &response.Diagnostics)

@@ -7,16 +7,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpn_connection"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func VpnConnectionFromTfToHttp(tf *resource_vpn_connection.VpnConnectionModel) *api.VpnConnection {
-	return &api.VpnConnection{}
+func VpnConnectionFromTfToHttp(tf *resource_vpn_connection.VpnConnectionModel) *iaas.VpnConnection {
+	return &iaas.VpnConnection{}
 }
 
-func routeFromHTTP(ctx context.Context, elt api.RouteLight) (resource_vpn_connection.RoutesValue, diag.Diagnostics) {
+func routeFromHTTP(ctx context.Context, elt iaas.RouteLight) (resource_vpn_connection.RoutesValue, diag.Diagnostics) {
 	return resource_vpn_connection.NewRoutesValue(
 		resource_vpn_connection.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -26,7 +26,7 @@ func routeFromHTTP(ctx context.Context, elt api.RouteLight) (resource_vpn_connec
 		})
 }
 
-func phase1OptionsFromHTTP(ctx context.Context, elt *api.Phase1Options) (resource_vpn_connection.Phase1optionsValue, diag.Diagnostics) {
+func phase1OptionsFromHTTP(ctx context.Context, elt *iaas.Phase1Options) (resource_vpn_connection.Phase1optionsValue, diag.Diagnostics) {
 	phase1IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase1optionsValue{}, diags
@@ -59,7 +59,7 @@ func phase1OptionsFromHTTP(ctx context.Context, elt *api.Phase1Options) (resourc
 		})
 }
 
-func phase2OptionsFromHTTP(ctx context.Context, elt *api.Phase2Options) (resource_vpn_connection.Phase2optionsValue, diag.Diagnostics) {
+func phase2OptionsFromHTTP(ctx context.Context, elt *iaas.Phase2Options) (resource_vpn_connection.Phase2optionsValue, diag.Diagnostics) {
 	phase2IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase2optionsValue{}, diags
@@ -84,7 +84,7 @@ func phase2OptionsFromHTTP(ctx context.Context, elt *api.Phase2Options) (resourc
 		})
 }
 
-func vpnOptionsFromHTTP(ctx context.Context, elt *api.VpnOptions) (resource_vpn_connection.VpnOptionsValue, diag.Diagnostics) {
+func vpnOptionsFromHTTP(ctx context.Context, elt *iaas.VpnOptions) (resource_vpn_connection.VpnOptionsValue, diag.Diagnostics) {
 	if elt == nil {
 		return resource_vpn_connection.VpnOptionsValue{}, diag.Diagnostics{}
 	}
@@ -115,7 +115,7 @@ func vpnOptionsFromHTTP(ctx context.Context, elt *api.VpnOptions) (resource_vpn_
 	return vpnOptions, diags
 }
 
-func VGWTelemetryFromHTTPToTF(ctx context.Context, http api.VgwTelemetry) (resource_vpn_connection.VgwTelemetriesValue, diag.Diagnostics) {
+func VGWTelemetryFromHTTPToTF(ctx context.Context, http iaas.VgwTelemetry) (resource_vpn_connection.VgwTelemetriesValue, diag.Diagnostics) {
 	var lastStateChangeDate string
 	if http.LastStateChangeDate != nil {
 		lastStateChangeDate = http.LastStateChangeDate.String()
@@ -133,7 +133,7 @@ func VGWTelemetryFromHTTPToTF(ctx context.Context, http api.VgwTelemetry) (resou
 		})
 }
 
-func VpnConnectionFromHttpToTf(ctx context.Context, http *api.VpnConnection) resource_vpn_connection.VpnConnectionModel {
+func VpnConnectionFromHttpToTf(ctx context.Context, http *iaas.VpnConnection) resource_vpn_connection.VpnConnectionModel {
 	vpnOptions, diags := vpnOptionsFromHTTP(ctx, http.VpnOptions)
 	if diags.HasError() {
 		return resource_vpn_connection.VpnConnectionModel{}
@@ -169,6 +169,6 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *api.VpnConnection) res
 	return vpnConnectionModel
 }
 
-func VpnConnectionFromTfToCreateRequest(tf *resource_vpn_connection.VpnConnectionModel) api.CreateVpnConnectionJSONRequestBody {
-	return api.CreateVpnConnectionJSONRequestBody{}
+func VpnConnectionFromTfToCreateRequest(tf *resource_vpn_connection.VpnConnectionModel) iaas.CreateVpnConnectionJSONRequestBody {
+	return iaas.CreateVpnConnectionJSONRequestBody{}
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -64,7 +64,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	body := LoadBalancerFromTfToCreateRequest(ctx, &data)
-	res := utils.ExecuteRequest(func() (*api.CreateLoadBalancerResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateLoadBalancerResponse, error) {
 		return r.provider.ApiClient.CreateLoadBalancerWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
 	if res == nil {
@@ -79,7 +79,7 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadLoadBalancersByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadLoadBalancersByIdResponse, error) {
 		return r.provider.ApiClient.ReadLoadBalancersByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -107,7 +107,7 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 
 	payload := LoadBalancerFromTfToUpdateRequest(ctx, &plan)
 
-	res := utils.ExecuteRequest(func() (*api.UpdateLoadBalancerResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.UpdateLoadBalancerResponse, error) {
 		return r.provider.ApiClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), payload)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -123,7 +123,7 @@ func (r *LoadBalancerResource) LinkBackendMachines(ctx context.Context, request 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
-	payload := api.LinkLoadBalancerBackendMachinesJSONRequestBody{}
+	payload := iaas.LinkLoadBalancerBackendMachinesJSONRequestBody{}
 	if !plan.BackendIps.IsUnknown() {
 		payload.BackendIps = utils.TfStringListToStringPtrList(ctx, plan.BackendIps)
 	}
@@ -131,14 +131,14 @@ func (r *LoadBalancerResource) LinkBackendMachines(ctx context.Context, request 
 		payload.BackendVmIds = utils.TfStringListToStringPtrList(ctx, plan.BackendVmIds)
 	}
 
-	res := utils.ExecuteRequest(func() (*api.LinkLoadBalancerBackendMachinesResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.LinkLoadBalancerBackendMachinesResponse, error) {
 		return r.provider.ApiClient.LinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), payload)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	resRead := utils.ExecuteRequest(func() (*api.ReadLoadBalancersByIdResponse, error) {
+	resRead := utils.ExecuteRequest(func() (*iaas.ReadLoadBalancersByIdResponse, error) {
 		return r.provider.ApiClient.ReadLoadBalancersByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if resRead == nil {
@@ -153,7 +153,7 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteLoadBalancerResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteLoadBalancerResponse, error) {
 		return r.provider.ApiClient.DeleteLoadBalancerWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {

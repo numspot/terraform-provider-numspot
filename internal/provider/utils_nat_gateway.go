@@ -7,12 +7,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_nat_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func publicIpFromApi(ctx context.Context, elt api.PublicIpLight) (resource_nat_gateway.PublicIpsValue, diag.Diagnostics) {
+func publicIpFromApi(ctx context.Context, elt iaas.PublicIpLight) (resource_nat_gateway.PublicIpsValue, diag.Diagnostics) {
 	return resource_nat_gateway.NewPublicIpsValue(
 		resource_nat_gateway.PublicIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -22,7 +22,7 @@ func publicIpFromApi(ctx context.Context, elt api.PublicIpLight) (resource_nat_g
 	)
 }
 
-func NatGatewayFromHttpToTf(ctx context.Context, http *api.NatGateway) (*resource_nat_gateway.NatGatewayModel, diag.Diagnostics) {
+func NatGatewayFromHttpToTf(ctx context.Context, http *iaas.NatGateway) (*resource_nat_gateway.NatGatewayModel, diag.Diagnostics) {
 	// Public Ips
 	publicIpsTf, diagnostics := utils.GenericListToTfListValue(
 		ctx,
@@ -47,8 +47,8 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *api.NatGateway) (*resourc
 	}, nil
 }
 
-func NatGatewayFromTfToCreateRequest(tf resource_nat_gateway.NatGatewayModel) api.CreateNatGatewayJSONRequestBody {
-	return api.CreateNatGatewayJSONRequestBody{
+func NatGatewayFromTfToCreateRequest(tf resource_nat_gateway.NatGatewayModel) iaas.CreateNatGatewayJSONRequestBody {
+	return iaas.CreateNatGatewayJSONRequestBody{
 		PublicIpId: tf.PublicIpId.ValueString(),
 		SubnetId:   tf.SubnetId.ValueString(),
 	}

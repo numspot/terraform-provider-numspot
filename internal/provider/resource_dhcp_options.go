@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_dhcp_options"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -62,7 +62,7 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 	var data resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateDhcpOptionsResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateDhcpOptionsResponse, error) {
 		body := DhcpOptionsFromTfToCreateRequest(ctx, data)
 		return r.provider.ApiClient.CreateDhcpOptionsWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -92,7 +92,7 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 	var data resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadDhcpOptionsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadDhcpOptionsByIdResponse, error) {
 		return r.provider.ApiClient.ReadDhcpOptionsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -128,7 +128,7 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 		}
 	}
 
-	res := utils.ExecuteRequest(func() (*api.ReadDhcpOptionsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadDhcpOptionsByIdResponse, error) {
 		return r.provider.ApiClient.ReadDhcpOptionsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -150,7 +150,7 @@ func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.Delet
 	var data resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteDhcpOptionsResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteDhcpOptionsResponse, error) {
 		return r.provider.ApiClient.DeleteDhcpOptionsWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {

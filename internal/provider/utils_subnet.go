@@ -6,14 +6,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_subnet"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_subnet"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func SubnetFromHttpToTf(ctx context.Context, http *api.Subnet) (*resource_subnet.SubnetModel, diag.Diagnostics) {
+func SubnetFromHttpToTf(ctx context.Context, http *iaas.Subnet) (*resource_subnet.SubnetModel, diag.Diagnostics) {
 	var (
 		tagsList types.List
 		diags    diag.Diagnostics
@@ -37,16 +37,16 @@ func SubnetFromHttpToTf(ctx context.Context, http *api.Subnet) (*resource_subnet
 	}, nil
 }
 
-func SubnetFromTfToCreateRequest(tf *resource_subnet.SubnetModel) api.CreateSubnetJSONRequestBody {
-	return api.CreateSubnetJSONRequestBody{
+func SubnetFromTfToCreateRequest(tf *resource_subnet.SubnetModel) iaas.CreateSubnetJSONRequestBody {
+	return iaas.CreateSubnetJSONRequestBody{
 		IpRange:              tf.IpRange.ValueString(),
 		VpcId:                tf.VpcId.ValueString(),
 		AvailabilityZoneName: tf.AvailabilityZoneName.ValueStringPointer(),
 	}
 }
 
-func SubnetsFromTfToAPIReadParams(ctx context.Context, tf SubnetsDataSourceModel) api.ReadSubnetsParams {
-	return api.ReadSubnetsParams{
+func SubnetsFromTfToAPIReadParams(ctx context.Context, tf SubnetsDataSourceModel) iaas.ReadSubnetsParams {
+	return iaas.ReadSubnetsParams{
 		AvailableIpsCounts:    utils.TFInt64ListToIntListPointer(ctx, tf.AvailableIpsCounts),
 		IpRanges:              utils.TfStringListToStringPtrList(ctx, tf.IpRanges),
 		States:                utils.TfStringListToStringPtrList(ctx, tf.States),
@@ -56,7 +56,7 @@ func SubnetsFromTfToAPIReadParams(ctx context.Context, tf SubnetsDataSourceModel
 	}
 }
 
-func SubnetsFromHttpToTfDatasource(ctx context.Context, http *api.Subnet) (*datasource_subnet.SubnetModel, diag.Diagnostics) {
+func SubnetsFromHttpToTfDatasource(ctx context.Context, http *iaas.Subnet) (*datasource_subnet.SubnetModel, diag.Diagnostics) {
 	return &datasource_subnet.SubnetModel{
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		AvailableIpsCount:    utils.FromIntPtrToTfInt64(http.AvailableIpsCount),

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_key_pair"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateKeypairResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateKeypairResponse, error) {
 		body := KeyPairFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateKeypairWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -84,7 +84,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadKeypairsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadKeypairsByIdResponse, error) {
 		return r.provider.ApiClient.ReadKeypairsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -114,7 +114,7 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*api.DeleteKeypairResponse, error) {
+	utils.ExecuteRequest(func() (*iaas.DeleteKeypairResponse, error) {
 		return r.provider.ApiClient.DeleteKeypairWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 

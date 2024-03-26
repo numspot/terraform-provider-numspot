@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -90,7 +90,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		Pending: []string{"pending"},
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
-			readRes := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
+			readRes := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
 				return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
@@ -125,7 +125,7 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
 		return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -169,7 +169,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 		}
 	}
 
-	res := utils.ExecuteRequest(func() (*api.ReadVpcsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
 		return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -191,7 +191,7 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteVpcResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteVpcResponse, error) {
 		return r.provider.ApiClient.DeleteVpcWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {

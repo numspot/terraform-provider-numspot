@@ -23,6 +23,9 @@ description: |-
 - `ids` (List of String) The IDs of the DHCP options sets.
 - `log_servers` (List of String) The IPs of the log servers used for the DHCP options sets.
 - `ntp_servers` (List of String) The IPs of the Network Time Protocol (NTP) servers used for the DHCP options sets.
+- `tag_keys` (List of String) The keys of the tags associated with the DHCP options sets.
+- `tag_values` (List of String) The values of the tags associated with the DHCP options sets.
+- `tags` (List of String) The key/value combination of the tags associated with the DHCP options sets, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
 
 ### Read-Only
 
@@ -30,6 +33,10 @@ description: |-
 
 <a id="nestedatt--dhcp_options"></a>
 ### Nested Schema for `dhcp_options`
+
+Optional:
+
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--dhcp_options--tags))
 
 Read-Only:
 
@@ -39,3 +46,11 @@ Read-Only:
 - `id` (String) ID for ReadDhcpOptions
 - `log_servers` (List of String) One or more IPs for the log servers.
 - `ntp_servers` (List of String) One or more IPs for the NTP servers.
+
+<a id="nestedatt--dhcp_options--tags"></a>
+### Nested Schema for `dhcp_options.tags`
+
+Required:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

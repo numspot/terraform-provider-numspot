@@ -7,13 +7,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt api.ApplicationStickyCookiePolicy) (resource_load_balancer.ApplicationStickyCookiePoliciesValue, diag.Diagnostics) {
+func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt iaas.ApplicationStickyCookiePolicy) (resource_load_balancer.ApplicationStickyCookiePoliciesValue, diag.Diagnostics) {
 	return resource_load_balancer.NewApplicationStickyCookiePoliciesValue(
 		resource_load_balancer.ApplicationStickyCookiePoliciesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -22,7 +22,7 @@ func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt api.Applic
 		})
 }
 
-func listenersFromHTTP(ctx context.Context, elt api.Listener) (resource_load_balancer.ListenersValue, diag.Diagnostics) {
+func listenersFromHTTP(ctx context.Context, elt iaas.Listener) (resource_load_balancer.ListenersValue, diag.Diagnostics) {
 	tfPolicyNames, diags := utils.FromStringListPointerToTfStringList(ctx, elt.PolicyNames)
 	if diags.HasError() {
 		return resource_load_balancer.ListenersValue{}, diags
@@ -39,7 +39,7 @@ func listenersFromHTTP(ctx context.Context, elt api.Listener) (resource_load_bal
 		})
 }
 
-func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStickyCookiePolicy) (resource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
+func stickyCookiePoliciesFromHTTP(ctx context.Context, elt iaas.LoadBalancerStickyCookiePolicy) (resource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
 	return resource_load_balancer.NewStickyCookiePoliciesValue(
 		resource_load_balancer.StickyCookiePoliciesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -48,11 +48,11 @@ func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStick
 		})
 }
 
-func LoadBalancerFromTfToHttp(tf *resource_load_balancer.LoadBalancerModel) *api.LoadBalancer {
-	return &api.LoadBalancer{}
+func LoadBalancerFromTfToHttp(tf *resource_load_balancer.LoadBalancerModel) *iaas.LoadBalancer {
+	return &iaas.LoadBalancer{}
 }
 
-func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancer) resource_load_balancer.LoadBalancerModel {
+func LoadBalancerFromHttpToTf(ctx context.Context, http *iaas.LoadBalancer) resource_load_balancer.LoadBalancerModel {
 	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
 		return resource_load_balancer.LoadBalancerModel{}
@@ -113,7 +113,7 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *api.LoadBalancer) resou
 	}
 }
 
-func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *api.LoadBalancer) datasource_load_balancer.LoadBalancerModel {
+func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBalancer) datasource_load_balancer.LoadBalancerModel {
 	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
 		return datasource_load_balancer.LoadBalancerModel{}
@@ -174,11 +174,11 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *api.LoadBalan
 	}
 }
 
-func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) api.CreateLoadBalancerJSONRequestBody {
+func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) iaas.CreateLoadBalancerJSONRequestBody {
 	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
 	subnets := utils.TfStringListToStringList(ctx, tf.Subnets)
-	listeners := utils.TfListToGenericList(func(a resource_load_balancer.ListenersValue) api.ListenerForCreation {
-		return api.ListenerForCreation{
+	listeners := utils.TfListToGenericList(func(a resource_load_balancer.ListenersValue) iaas.ListenerForCreation {
+		return iaas.ListenerForCreation{
 			BackendPort:          utils.FromTfInt64ToInt(a.BackendPort),
 			BackendProtocol:      a.BackendProtocol.ValueStringPointer(),
 			LoadBalancerPort:     utils.FromTfInt64ToInt(a.LoadBalancerPort),
@@ -186,7 +186,7 @@ func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_ba
 		}
 	}, ctx, tf.Listeners)
 
-	return api.CreateLoadBalancerJSONRequestBody{
+	return iaas.CreateLoadBalancerJSONRequestBody{
 		Listeners:      listeners,
 		Name:           tf.Name.ValueString(),
 		PublicIp:       tf.PublicIp.ValueStringPointer(),
@@ -197,17 +197,17 @@ func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_ba
 	}
 }
 
-func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) api.UpdateLoadBalancerJSONRequestBody {
+func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) iaas.UpdateLoadBalancerJSONRequestBody {
 	var (
-		loadBalancerPort *int             = nil
-		policyNames      *[]string        = nil
-		hc               *api.HealthCheck = nil
-		publicIp         *string          = nil
-		securedCookies   *bool            = nil
+		loadBalancerPort *int              = nil
+		policyNames      *[]string         = nil
+		hc               *iaas.HealthCheck = nil
+		publicIp         *string           = nil
+		securedCookies   *bool             = nil
 	)
 
 	if !tf.HealthCheck.IsUnknown() {
-		hc = &api.HealthCheck{
+		hc = &iaas.HealthCheck{
 			CheckInterval:      utils.FromTfInt64ToInt(tf.HealthCheck.CheckInterval),
 			HealthyThreshold:   utils.FromTfInt64ToInt(tf.HealthCheck.HealthyThreshold),
 			Path:               tf.HealthCheck.Path.ValueStringPointer(),
@@ -224,9 +224,9 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_ba
 		securedCookies = tf.SecuredCookies.ValueBoolPointer()
 	}
 	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
-	listeners := utils.TfListToGenericList(func(elt resource_load_balancer.ListenersValue) api.Listener {
+	listeners := utils.TfListToGenericList(func(elt resource_load_balancer.ListenersValue) iaas.Listener {
 		policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames)
-		return api.Listener{
+		return iaas.Listener{
 			BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
 			BackendProtocol:      elt.BackendProtocol.ValueStringPointer(),
 			LoadBalancerPort:     utils.FromTfInt64ToIntPtr(elt.LoadBalancerPort),
@@ -241,7 +241,7 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_ba
 		policyNames = listeners[0].PolicyNames
 	}
 
-	return api.UpdateLoadBalancerJSONRequestBody{
+	return iaas.UpdateLoadBalancerJSONRequestBody{
 		HealthCheck:      hc,
 		LoadBalancerPort: loadBalancerPort,
 		PolicyNames:      policyNames,

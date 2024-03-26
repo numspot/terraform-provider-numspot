@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_flexible_gpu"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -64,7 +64,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateFlexibleGpuResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateFlexibleGpuResponse, error) {
 		body := FlexibleGpuFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateFlexibleGpuWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -93,7 +93,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 		return
 	}
 
-	flexGPU, ok := read.(*api.FlexibleGpu)
+	flexGPU, ok := read.(*iaas.FlexibleGpu)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create Flexible GPU", "object conversion error")
 		return
@@ -102,7 +102,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *api.FlexibleGpu {
+func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *iaas.FlexibleGpu {
 	res, err := r.provider.ApiClient.ReadFlexibleGpusByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -139,7 +139,7 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*api.DeleteFlexibleGpuResponse, error) {
+	utils.ExecuteRequest(func() (*iaas.DeleteFlexibleGpuResponse, error) {
 		return r.provider.ApiClient.DeleteFlexibleGpuWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 }

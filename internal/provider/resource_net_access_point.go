@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_net_access_point"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateVpcAccessPointResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateVpcAccessPointResponse, error) {
 		body := NetAccessPointFromTfToCreateRequest(ctx, &data)
 		return r.provider.ApiClient.CreateVpcAccessPointWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -81,7 +81,7 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadVpcAccessPointsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadVpcAccessPointsByIdResponse, error) {
 		return r.provider.ApiClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -104,7 +104,7 @@ func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.De
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.ExecuteRequest(func() (*api.DeleteVpcAccessPointResponse, error) {
+	_ = utils.ExecuteRequest(func() (*iaas.DeleteVpcAccessPointResponse, error) {
 		return r.provider.ApiClient.DeleteVpcAccessPointWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

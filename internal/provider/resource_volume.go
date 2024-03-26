@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_volume"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -63,7 +63,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateVolumeResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateVolumeResponse, error) {
 		body := VolumeFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateVolumeWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -75,7 +75,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		Pending: []string{"creating"},
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
-			readRes := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
+			readRes := utils.ExecuteRequest(func() (*iaas.ReadVolumesByIdResponse, error) {
 				return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, *res.JSON201.Id)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
@@ -94,7 +94,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	rr, ok := read.(*api.Volume)
+	rr, ok := read.(*iaas.Volume)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create volume", "object conversion error")
 		return
@@ -112,7 +112,7 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadVolumesByIdResponse, error) {
 		return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -132,7 +132,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
-	updatedRes := utils.ExecuteRequest(func() (*api.UpdateVolumeResponse, error) {
+	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVolumeResponse, error) {
 		body := ValueFromTfToUpdaterequest(&plan)
 		return r.provider.ApiClient.UpdateVolumeWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString(), body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -145,7 +145,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		Pending: []string{"creating", "updating"},
 		Target:  []string{"available"},
 		Refresh: func() (result interface{}, state string, err error) {
-			readRes := utils.ExecuteRequest(func() (*api.ReadVolumesByIdResponse, error) {
+			readRes := utils.ExecuteRequest(func() (*iaas.ReadVolumesByIdResponse, error) {
 				return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, volumeId)
 			}, http.StatusOK, &response.Diagnostics)
 			if readRes == nil {
@@ -166,7 +166,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		return
 	}
 
-	rr, ok := read.(*api.Volume)
+	rr, ok := read.(*iaas.Volume)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create volume", "object conversion error")
 		return
@@ -186,7 +186,7 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*api.DeleteVolumeResponse, error) {
+	utils.ExecuteRequest(func() (*iaas.DeleteVolumeResponse, error) {
 		return r.provider.ApiClient.DeleteVolumeWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

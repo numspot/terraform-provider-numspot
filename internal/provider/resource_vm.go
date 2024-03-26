@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vm"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -64,7 +64,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateVmsResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateVmsResponse, error) {
 		body := VmFromTfToCreateRequest(ctx, &data)
 		return r.provider.ApiClient.CreateVmsWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -96,7 +96,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	vmSchema, ok := read.(api.Vm)
+	vmSchema, ok := read.(iaas.Vm)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create VM", "object conversion error")
 	}
@@ -111,7 +111,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *VmResource) readVmById(ctx context.Context, id *string, diagnostics diag.Diagnostics) *api.Vm {
+func (r *VmResource) readVmById(ctx context.Context, id *string, diagnostics diag.Diagnostics) *iaas.Vm {
 	res, err := r.provider.ApiClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
@@ -131,7 +131,7 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadVmsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadVmsByIdResponse, error) {
 		id := data.Id.ValueStringPointer()
 		return r.provider.ApiClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
 	}, http.StatusOK, &response.Diagnostics)
@@ -156,7 +156,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteVmsResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteVmsResponse, error) {
 		return r.provider.ApiClient.DeleteVmsWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {

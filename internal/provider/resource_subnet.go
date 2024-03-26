@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_subnet"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -64,7 +64,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateSubnetResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateSubnetResponse, error) {
 		body := SubnetFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateSubnetWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -102,8 +102,8 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	}
 
 	if data.MapPublicIpOnLaunch.ValueBool() {
-		updateRes := utils.ExecuteRequest(func() (*api.UpdateSubnetResponse, error) {
-			return r.provider.ApiClient.UpdateSubnetWithResponse(ctx, r.provider.SpaceID, createdId, api.UpdateSubnetJSONRequestBody{
+		updateRes := utils.ExecuteRequest(func() (*iaas.UpdateSubnetResponse, error) {
+			return r.provider.ApiClient.UpdateSubnetWithResponse(ctx, r.provider.SpaceID, createdId, iaas.UpdateSubnetJSONRequestBody{
 				MapPublicIpOnLaunch: true,
 			})
 		}, http.StatusOK, &response.Diagnostics)
@@ -119,7 +119,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		}
 	}
 
-	readRes := utils.ExecuteRequest(func() (*api.ReadSubnetsByIdResponse, error) {
+	readRes := utils.ExecuteRequest(func() (*iaas.ReadSubnetsByIdResponse, error) {
 		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
@@ -137,7 +137,7 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadSubnetsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadSubnetsByIdResponse, error) {
 		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -172,7 +172,7 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 		}
 	}
 
-	res := utils.ExecuteRequest(func() (*api.ReadSubnetsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadSubnetsByIdResponse, error) {
 		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -194,7 +194,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteSubnetResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteSubnetResponse, error) {
 		return r.provider.ApiClient.DeleteSubnetWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {

@@ -44,9 +44,18 @@ The IP range of the Subnet can be either the same as the Net one if you create o
 
 - `availability_zone_name` (String) The name of the Subregion in which you want to create the Subnet.
 - `map_public_ip_on_launch` (Boolean) If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only
 
 - `available_ips_count` (Number) The number of available IPs in the Subnets.
 - `id` (String) The ID of the Subnet.
 - `state` (String) The state of the Subnet (`pending` \| `available` \| `deleted`).
+
+<a id="nestedatt--tags"></a>
+### Nested Schema for `tags`
+
+Required:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

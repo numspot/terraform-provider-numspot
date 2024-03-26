@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_virtual_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 	var data resource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateVirtualGatewayResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateVirtualGatewayResponse, error) {
 		body := VirtualGatewayFromTfToCreateRequest(data)
 		return r.provider.ApiClient.CreateVirtualGatewayWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusCreated, &response.Diagnostics)
@@ -81,7 +81,7 @@ func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.Read
 	var data resource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadVirtualGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadVirtualGatewaysByIdResponse, error) {
 		return r.provider.ApiClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -104,7 +104,7 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 	var data resource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteVirtualGatewayResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteVirtualGatewayResponse, error) {
 		return r.provider.ApiClient.DeleteVirtualGatewayWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {

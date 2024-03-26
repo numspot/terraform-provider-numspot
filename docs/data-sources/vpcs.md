@@ -22,6 +22,9 @@ description: |-
 - `ip_ranges` (List of String) The IP ranges for the Nets, in CIDR notation (for example, 10.0.0.0/16).
 - `is_default` (Boolean) If true, the Net used is the default one.
 - `states` (List of String) The states of the Nets (pending | available | deleting).
+- `tag_keys` (List of String) The keys of the tags associated with the DHCP options sets.
+- `tag_values` (List of String) The values of the tags associated with the DHCP options sets.
+- `tags` (List of String) The key/value combination of the tags associated with the DHCP options sets, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
 
 ### Read-Only
 
@@ -30,6 +33,10 @@ description: |-
 <a id="nestedatt--vpcs"></a>
 ### Nested Schema for `vpcs`
 
+Optional:
+
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--vpcs--tags))
+
 Read-Only:
 
 - `dhcp_options_set_id` (String) The ID of the DHCP options set (or `default` if you want to associate the default one).
@@ -37,3 +44,11 @@ Read-Only:
 - `ip_range` (String) The IP range for the Net, in CIDR notation (for example, `10.0.0.0/16`).
 - `state` (String) The state of the Net (`pending` \| `available` \| `deleting`).
 - `tenancy` (String) The VM tenancy in a Net.
+
+<a id="nestedatt--vpcs--tags"></a>
+### Nested Schema for `vpcs.tags`
+
+Required:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

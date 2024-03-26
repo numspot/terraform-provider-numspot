@@ -1,8 +1,26 @@
 include:
-  - remote: 'https://api.r2devops.numspot.dev/job/r/gitlab/cloud/ci-templates/jobs/go_lint@0.3.0.yaml'
-  - remote: 'https://api.r2devops.numspot.dev/job/r/gitlab/cloud/ci-templates/jobs/go_unit-tests@0.1.0.yaml'
+  - project: 'cloud/ci-templates'
+    ref: 'jobs/go_unit-tests@0.2.2'
+    file: 'jobs/go_unit-tests/go_unit-tests.yml'
+
+variables:
+  GOPRIVATE: gitlab.numspot.cloud/*
+before_script:
+  - echo "machine ${CI_SERVER_HOST} login gitlab-ci-token password
+    ${CI_JOB_TOKEN}" > ~/.netrc
 
 go_lint:
+  image: golangci/golangci-lint:v1.57.1-alpine
+  stage: test
+  script:
+    - golangci-lint run --out-format code-climate:gl-code-quality-report.json,line-number --timeout=10m
+  artifacts:
+    when: always
+    expire_in: 1 month
+    reports:
+      codequality: gl-code-quality-report.json
+    paths:
+      - gl-code-quality-report.json
   rules:
     - if: $CI_PIPELINE_SOURCE != "schedule"
 

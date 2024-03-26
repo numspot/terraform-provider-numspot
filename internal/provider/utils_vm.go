@@ -8,12 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vm"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func vmBsuFromApi(ctx context.Context, elt api.BsuCreated) (basetypes.ObjectValue, diag.Diagnostics) {
+func vmBsuFromApi(ctx context.Context, elt iaas.BsuCreated) (basetypes.ObjectValue, diag.Diagnostics) {
 	obj, diags := resource_vm.NewBsuValue(
 		resource_vm.BsuValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -33,7 +33,7 @@ func vmBsuFromApi(ctx context.Context, elt api.BsuCreated) (basetypes.ObjectValu
 	return obj.ToObjectValue(ctx)
 }
 
-func vmBlockDeviceMappingFromApi(ctx context.Context, elt api.BlockDeviceMappingCreated) (resource_vm.BlockDeviceMappingsValue, diag.Diagnostics) {
+func vmBlockDeviceMappingFromApi(ctx context.Context, elt iaas.BlockDeviceMappingCreated) (resource_vm.BlockDeviceMappingsValue, diag.Diagnostics) {
 	// Bsu
 	bsuTf, diagnostics := vmBsuFromApi(ctx, *elt.Bsu)
 	if diagnostics.HasError() {
@@ -51,7 +51,7 @@ func vmBlockDeviceMappingFromApi(ctx context.Context, elt api.BlockDeviceMapping
 	)
 }
 
-func VmFromHttpToTf(ctx context.Context, http *api.Vm) (*resource_vm.VmModel, diag.Diagnostics) {
+func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, diag.Diagnostics) {
 	vmsCount := utils.FromIntToTfInt64(1)
 
 	// Private Ips
@@ -161,7 +161,7 @@ func VmFromHttpToTf(ctx context.Context, http *api.Vm) (*resource_vm.VmModel, di
 	return &r, nil
 }
 
-func VmFromTfToCreateRequest(ctx context.Context, tf *resource_vm.VmModel) api.CreateVmsJSONRequestBody {
+func VmFromTfToCreateRequest(ctx context.Context, tf *resource_vm.VmModel) iaas.CreateVmsJSONRequestBody {
 	securityGroupIdsTf := make([]types.String, 0, len(tf.SecurityGroupIds.Elements()))
 	tf.SecurityGroupIds.ElementsAs(ctx, &securityGroupIdsTf, false)
 	securityGroupIds := []string{}
@@ -169,7 +169,7 @@ func VmFromTfToCreateRequest(ctx context.Context, tf *resource_vm.VmModel) api.C
 		securityGroupIds = append(securityGroupIds, sgid.ValueString())
 	}
 
-	return api.CreateVmsJSONRequestBody{
+	return iaas.CreateVmsJSONRequestBody{
 		BootOnCreation:              nil,
 		BsuOptimized:                nil,
 		ClientToken:                 nil,

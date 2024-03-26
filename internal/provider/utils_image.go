@@ -8,17 +8,17 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_image"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func bsuFromTf(bsu resource_image.BsuValue) *api.BsuToCreate {
+func bsuFromTf(bsu resource_image.BsuValue) *iaas.BsuToCreate {
 	if bsu.IsNull() || bsu.IsUnknown() {
 		return nil
 	}
 
-	return &api.BsuToCreate{
+	return &iaas.BsuToCreate{
 		DeleteOnVmDeletion: bsu.DeleteOnVmDeletion.ValueBoolPointer(),
 		Iops:               utils.FromTfInt64ToIntPtr(bsu.Iops),
 		SnapshotId:         bsu.SnapshotId.ValueStringPointer(),
@@ -27,18 +27,18 @@ func bsuFromTf(bsu resource_image.BsuValue) *api.BsuToCreate {
 	}
 }
 
-func blockDeviceMappingFromTf(bdm resource_image.BlockDeviceMappingsValue) api.BlockDeviceMappingImage {
+func blockDeviceMappingFromTf(bdm resource_image.BlockDeviceMappingsValue) iaas.BlockDeviceMappingImage {
 	bsuTf := resource_image.BsuValue{}
 	bsu := bsuFromTf(bsuTf)
 
-	return api.BlockDeviceMappingImage{
+	return iaas.BlockDeviceMappingImage{
 		Bsu:               bsu,
 		DeviceName:        bdm.DeviceName.ValueStringPointer(),
 		VirtualDeviceName: bdm.VirtualDeviceName.ValueStringPointer(),
 	}
 }
 
-func bsuFromApi(ctx context.Context, bsu *api.BsuToCreate) (resource_image.BsuValue, diag.Diagnostics) {
+func bsuFromApi(ctx context.Context, bsu *iaas.BsuToCreate) (resource_image.BsuValue, diag.Diagnostics) {
 	if bsu == nil {
 		return resource_image.NewBsuValueNull(), nil
 	}
@@ -55,7 +55,7 @@ func bsuFromApi(ctx context.Context, bsu *api.BsuToCreate) (resource_image.BsuVa
 	)
 }
 
-func blockDeviceMappingFromApi(ctx context.Context, bdm api.BlockDeviceMappingImage) (resource_image.BlockDeviceMappingsValue, diag.Diagnostics) {
+func blockDeviceMappingFromApi(ctx context.Context, bdm iaas.BlockDeviceMappingImage) (resource_image.BlockDeviceMappingsValue, diag.Diagnostics) {
 	bsu, diagnostics := bsuFromApi(ctx, bdm.Bsu)
 	if diagnostics.HasError() {
 		return resource_image.NewBlockDeviceMappingsValueNull(), diagnostics
@@ -76,7 +76,7 @@ func blockDeviceMappingFromApi(ctx context.Context, bdm api.BlockDeviceMappingIm
 	)
 }
 
-func stateCommentFromApi(ctx context.Context, state api.StateComment) (resource_image.StateCommentValue, diag.Diagnostics) {
+func stateCommentFromApi(ctx context.Context, state iaas.StateComment) (resource_image.StateCommentValue, diag.Diagnostics) {
 	return resource_image.NewStateCommentValue(
 		resource_image.StateCommentValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -86,7 +86,7 @@ func stateCommentFromApi(ctx context.Context, state api.StateComment) (resource_
 	)
 }
 
-func ImageFromHttpToTf(ctx context.Context, http *api.Image) (*resource_image.ImageModel, diag.Diagnostics) {
+func ImageFromHttpToTf(ctx context.Context, http *iaas.Image) (*resource_image.ImageModel, diag.Diagnostics) {
 	var (
 		creationDateTf        types.String
 		blockDeviceMappingsTf types.List
@@ -158,8 +158,8 @@ func ImageFromHttpToTf(ctx context.Context, http *api.Image) (*resource_image.Im
 	}, diagnostics
 }
 
-func ImageFromTfToCreateRequest(ctx context.Context, tf *resource_image.ImageModel, diag *diag.Diagnostics) *api.CreateImageJSONRequestBody {
-	blockDevicesMappingApi := make([]api.BlockDeviceMappingImage, 0, len(tf.BlockDeviceMappings.Elements()))
+func ImageFromTfToCreateRequest(ctx context.Context, tf *resource_image.ImageModel, diag *diag.Diagnostics) *iaas.CreateImageJSONRequestBody {
+	blockDevicesMappingApi := make([]iaas.BlockDeviceMappingImage, 0, len(tf.BlockDeviceMappings.Elements()))
 	for _, bdmTf := range tf.BlockDeviceMappings.Elements() {
 		bdmTfRes, ok := bdmTf.(resource_image.BlockDeviceMappingsValue)
 		if !ok {
@@ -184,7 +184,7 @@ func ImageFromTfToCreateRequest(ctx context.Context, tf *resource_image.ImageMod
 		productCodesApi = append(productCodesApi, pcTfStr.ValueString())
 	}
 
-	return &api.CreateImageJSONRequestBody{
+	return &iaas.CreateImageJSONRequestBody{
 		Architecture:        utils.FromTfStringToStringPtr(tf.Architecture),
 		BlockDeviceMappings: &blockDevicesMappingApi,
 		Description:         utils.FromTfStringToStringPtr(tf.Description),

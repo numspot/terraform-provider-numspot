@@ -3,11 +3,11 @@ package provider
 import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_direct_link"
 )
 
-func DirectLinkFromHttpToTf(http *api.DirectLink) resource_direct_link.DirectLinkModel {
+func DirectLinkFromHttpToTf(http *iaas.DirectLink) resource_direct_link.DirectLinkModel {
 	return resource_direct_link.DirectLinkModel{
 		Bandwidth:  types.StringPointerValue(http.Bandwidth),
 		Name:       types.StringPointerValue(http.Name),
@@ -18,8 +18,8 @@ func DirectLinkFromHttpToTf(http *api.DirectLink) resource_direct_link.DirectLin
 	}
 }
 
-func DirectLinkFromTfToCreateRequest(tf *resource_direct_link.DirectLinkModel) api.CreateDirectLinkJSONRequestBody {
-	return api.CreateDirectLinkJSONRequestBody{
+func DirectLinkFromTfToCreateRequest(tf *resource_direct_link.DirectLinkModel) iaas.CreateDirectLinkJSONRequestBody {
+	return iaas.CreateDirectLinkJSONRequestBody{
 		Bandwidth: tf.Bandwidth.ValueString(),
 		Name:      tf.Name.ValueString(),
 		Location:  tf.Location.ValueString(),

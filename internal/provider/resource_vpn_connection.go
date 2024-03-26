@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpn_connection"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateVpnConnectionResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateVpnConnectionResponse, error) {
 		body := VpnConnectionFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateVpnConnectionWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -77,7 +77,7 @@ func (r *VpnConnectionResource) Read(ctx context.Context, request resource.ReadR
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadVpnConnectionsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadVpnConnectionsByIdResponse, error) {
 		return r.provider.ApiClient.ReadVpnConnectionsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -97,7 +97,7 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.DeleteVpnConnectionResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.DeleteVpnConnectionResponse, error) {
 		return r.provider.ApiClient.DeleteVpnConnectionWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {

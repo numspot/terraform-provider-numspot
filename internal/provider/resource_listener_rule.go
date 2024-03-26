@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_listener_rule"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,7 +61,7 @@ func (r *ListenerRuleResource) Create(ctx context.Context, request resource.Crea
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.CreateListenerRuleResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.CreateListenerRuleResponse, error) {
 		body := ListenerRuleFromTfToCreateRequest(&data)
 		return r.provider.ApiClient.CreateListenerRuleWithResponse(ctx, r.provider.SpaceID, body)
 	}, http.StatusOK, &response.Diagnostics)
@@ -74,7 +74,7 @@ func (r *ListenerRuleResource) Read(ctx context.Context, request resource.ReadRe
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*api.ReadListenerRulesByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadListenerRulesByIdResponse, error) {
 		return r.provider.ApiClient.ReadListenerRulesByIdWithResponse(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()))
 	}, http.StatusOK, &response.Diagnostics)
 
@@ -90,7 +90,7 @@ func (r *ListenerRuleResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*api.DeleteListenerRuleResponse, error) {
+	utils.ExecuteRequest(func() (*iaas.DeleteListenerRuleResponse, error) {
 		return r.provider.ApiClient.DeleteListenerRuleWithResponse(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()))
 	}, http.StatusOK, &response.Diagnostics)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/conns/api"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_subnet"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -71,7 +71,7 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 	request.Config.Get(ctx, &plan)
 
 	params := SubnetsFromTfToAPIReadParams(ctx, plan)
-	res := utils.ExecuteRequest(func() (*api.ReadSubnetsResponse, error) {
+	res := utils.ExecuteRequest(func() (*iaas.ReadSubnetsResponse, error) {
 		return d.provider.ApiClient.ReadSubnetsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
