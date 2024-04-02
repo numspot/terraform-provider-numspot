@@ -170,5 +170,10 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *iaas.VpnConnection) re
 }
 
 func VpnConnectionFromTfToCreateRequest(tf *resource_vpn_connection.VpnConnectionModel) iaas.CreateVpnConnectionJSONRequestBody {
-	return iaas.CreateVpnConnectionJSONRequestBody{}
+	return iaas.CreateVpnConnectionJSONRequestBody{
+		ClientGatewayId:  tf.ClientGatewayId.ValueString(),
+		ConnectionType:   tf.ConnectionType.ValueString(),
+		StaticRoutesOnly: tf.StaticRoutesOnly.ValueBoolPointer(),
+		VirtualGatewayId: tf.VirtualGatewayId.ValueString(),
+	}
 }

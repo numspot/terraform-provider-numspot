@@ -5,14 +5,19 @@ package resource_vpn_connection
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
 func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
@@ -27,6 +32,9 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The ID of the client gateway.",
 				MarkdownDescription: "The ID of the client gateway.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"connection_type": schema.StringAttribute{
 				Required:            true,
@@ -77,6 +85,9 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
 				MarkdownDescription: "If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.RequiresReplace(),
+				},
 			},
 			"vgw_telemetries": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -121,6 +132,9 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The ID of the virtual gateway.",
 				MarkdownDescription: "The ID of the virtual gateway.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"vpn_options": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{

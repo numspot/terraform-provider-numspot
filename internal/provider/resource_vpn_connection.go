@@ -61,11 +61,13 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateVpnConnectionResponse, error) {
-		body := VpnConnectionFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateVpnConnectionWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	res, err := utils.RetryCreateUntilResourceAvailable(
+		ctx,
+		r.provider.SpaceID,
+		VpnConnectionFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateVpnConnectionWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VPN Connection", err.Error())
 		return
 	}
 
@@ -78,7 +80,7 @@ func (r *VpnConnectionResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpnConnectionsByIdResponse, error) {
-		return r.provider.ApiClient.ReadVpnConnectionsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
+		return r.provider.ApiClient.ReadVpnConnectionsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -89,18 +91,17 @@ func (r *VpnConnectionResource) Read(ctx context.Context, request resource.ReadR
 }
 
 func (r *VpnConnectionResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	// TODO implement me
-	panic("implement me")
+	panic("nothing to do")
 }
 
 func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.DeleteVpnConnectionResponse, error) {
-		return r.provider.ApiClient.DeleteVpnConnectionWithResponse(ctx, r.provider.SpaceID, data.Id.String())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVpnConnectionWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete VPN Connection", err.Error())
 		return
 	}
+
 }

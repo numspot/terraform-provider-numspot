@@ -97,10 +97,11 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.DeleteClientGatewayResponse, error) {
-		return r.provider.ApiClient.DeleteClientGatewayWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
-	if res == nil {
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteClientGatewayWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Client Gateway", err.Error())
 		return
 	}
+
+	response.State.RemoveResource(ctx)
 }

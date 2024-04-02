@@ -104,10 +104,11 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 	var data resource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.DeleteVirtualGatewayResponse, error) {
-		return r.provider.ApiClient.DeleteVirtualGatewayWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
-	if res == nil {
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVirtualGatewayWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Virtual Gateway", err.Error())
 		return
 	}
+
+	response.State.RemoveResource(ctx)
 }
