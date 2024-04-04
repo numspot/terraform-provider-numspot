@@ -1,6 +1,6 @@
 module gitlab.numspot.cloud/cloud/terraform-provider-numspot
 
-go 1.20
+go 1.21
 
 require (
 	github.com/deepmap/oapi-codegen v1.16.2

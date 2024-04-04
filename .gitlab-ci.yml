@@ -32,7 +32,7 @@ go_unit-tests:
     - if: $CI_PIPELINE_SOURCE != "schedule"
 
 acc-tests:
-  image: golang:1.20.10
+  image: golang:1.21.0
   stage: test
   before_script:
     - echo "machine ${CI_SERVER_HOST} login gitlab-ci-token password
