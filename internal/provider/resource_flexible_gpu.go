@@ -10,8 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_flexible_gpu"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )

@@ -7,13 +7,12 @@ import (
 	"slices"
 	"time"
 
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
-
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 )
 
 type (
@@ -31,8 +30,10 @@ type (
 	}
 )
 
-const TfRequestRetryTimeout = 5 * time.Minute
-const TfRequestRetryDelay = 5 * time.Second
+const (
+	TfRequestRetryTimeout = 5 * time.Minute
+	TfRequestRetryDelay   = 5 * time.Second
+)
 
 func FromTfStringToStringPtr(str types.String) *string {
 	if str.IsUnknown() || str.IsNull() {
@@ -244,7 +245,6 @@ func RetryCreateUntilResourceAvailable[R TfRequestResp](
 		res, err = fun(ctx, spaceID, body)
 
 		return checkRetryCondition(res, err, []int{http.StatusCreated}, []int{http.StatusConflict, http.StatusFailedDependency})
-
 	})
 
 	return res, retryError

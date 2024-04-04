@@ -1,3 +1,5 @@
+//go:build acc
+
 package provider
 
 import (
@@ -6,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 

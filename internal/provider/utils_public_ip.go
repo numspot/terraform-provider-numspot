@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
-
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )

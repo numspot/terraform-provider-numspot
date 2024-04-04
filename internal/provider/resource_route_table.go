@@ -9,8 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_route_table"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )

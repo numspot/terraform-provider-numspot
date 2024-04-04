@@ -1,3 +1,5 @@
+//go:build acc
+
 package provider
 
 import (
@@ -61,22 +63,24 @@ func TestAccVpnConnectionResource_UpdateStaticRouteOnly(t *testing.T) {
 func testVpnConnectionConfig_UpdateStaticRouteOnly(static_route_only string) string {
 	return fmt.Sprintf(`
 
-	resource "numspot_client_gateway" "test" {
-		connection_type = "ipsec.1"
-		public_ip = "192.0.2.0"
-		bgp_asn = 65000
-	}
 
-    resource "numspot_virtual_gateway" "test" {
-		connection_type = "ipsec.1"
-	}
+resource "numspot_client_gateway" "test" {
+  connection_type = "ipsec.1"
+  public_ip       = "192.0.2.0"
+  bgp_asn         = 65000
+}
 
-	resource "numspot_vpn_connection" "test" {
-		client_gateway_id = numspot_client_gateway.test.id
-		connection_type = "ipsec.1"
-		virtual_gateway_id = numspot_virtual_gateway.test.id
-		static_routes_only = %[1]q
-	}
+resource "numspot_virtual_gateway" "test" {
+  connection_type = "ipsec.1"
+}
+
+resource "numspot_vpn_connection" "test" {
+  client_gateway_id  = numspot_client_gateway.test.id
+  connection_type    = "ipsec.1"
+  virtual_gateway_id = numspot_virtual_gateway.test.id
+  static_routes_only = %[1]q
+}
+
 
 	`, static_route_only)
 }
@@ -168,31 +172,31 @@ func TestAccVpnConnectionResource_UpdateGateways(t *testing.T) {
 
 func testVpnConnectionConfig_UpdateGateways(clientGatewayName string, virtualGatewayName string) string {
 	return fmt.Sprintf(`
-	resource "numspot_client_gateway" "client_gateway_before" {
-		connection_type = "ipsec.1"
-		public_ip = "192.0.2.0"
-		bgp_asn = 65000
-	}
+resource "numspot_client_gateway" "client_gateway_before" {
+  connection_type = "ipsec.1"
+  public_ip       = "192.0.2.0"
+  bgp_asn         = 65000
+}
 
-	resource "numspot_virtual_gateway" "virtual_gateway_before" {
-		connection_type = "ipsec.1"
-	}
+resource "numspot_virtual_gateway" "virtual_gateway_before" {
+  connection_type = "ipsec.1"
+}
 
-	resource "numspot_client_gateway" "client_gateway_after" {
-		connection_type = "ipsec.1"
-		public_ip = "192.0.2.1"
-		bgp_asn = 65001
-	}
+resource "numspot_client_gateway" "client_gateway_after" {
+  connection_type = "ipsec.1"
+  public_ip       = "192.0.2.1"
+  bgp_asn         = 65001
+}
 
-	resource "numspot_virtual_gateway" "virtual_gateway_after" {
-		connection_type = "ipsec.1"
-	}
+resource "numspot_virtual_gateway" "virtual_gateway_after" {
+  connection_type = "ipsec.1"
+}
 
-	resource "numspot_vpn_connection" "test" {
-		client_gateway_id = numspot_client_gateway.%[1]s.id
-		connection_type = "ipsec.1"
-		virtual_gateway_id = numspot_virtual_gateway.%[2]s.id
-		static_routes_only = "false"
-	}
+resource "numspot_vpn_connection" "test" {
+  client_gateway_id  = numspot_client_gateway.%[1]s.id
+  connection_type    = "ipsec.1"
+  virtual_gateway_id = numspot_virtual_gateway.%[2]s.id
+  static_routes_only = "false"
+}
 	`, clientGatewayName, virtualGatewayName)
 }

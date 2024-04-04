@@ -5,8 +5,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_net_access_point"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
