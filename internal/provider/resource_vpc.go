@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -64,16 +63,14 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	requestBody := NetFromTfToCreateRequest(&data)
-	res, err := r.provider.ApiClient.CreateVpcWithResponse(ctx, r.provider.SpaceID, requestBody)
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		NetFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateVpcWithResponse)
 	if err != nil {
-		response.Diagnostics.AddError("Failed", err.Error())
-		return
-	}
-
-	if res.StatusCode() != http.StatusCreated {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to create VPC", apiError.Error())
+		response.Diagnostics.AddError("Failed to create VPC", err.Error())
 		return
 	}
 
@@ -86,26 +83,16 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		}
 	}
 
-	createStateConf := &retry.StateChangeConf{
-		Pending: []string{"pending"},
-		Target:  []string{"available"},
-		Refresh: func() (result interface{}, state string, err error) {
-			readRes := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
-				return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
-			}, http.StatusOK, &response.Diagnostics)
-			if readRes == nil {
-				return
-			}
-
-			return readRes.JSON200, *readRes.JSON200.State, nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   3 * time.Second,
-	}
-
-	_, err = createStateConf.WaitForStateContext(ctx)
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"pending"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadVpcsByIdWithResponse,
+	)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", createdId, err))
+		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
@@ -191,7 +178,7 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVpcWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVpcWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPC", err.Error())
 		return

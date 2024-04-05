@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_internet_gateway"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,10 +62,13 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	var data resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateInternetGatewayResponse, error) {
-		return r.provider.ApiClient.CreateInternetGatewayWithResponse(ctx, r.provider.SpaceID)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil || res.JSON201 == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailable(
+		ctx,
+		r.provider.SpaceID,
+		r.provider.ApiClient.CreateInternetGatewayWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Internet Gateway", err.Error())
 		return
 	}
 
@@ -93,6 +97,19 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 		return r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, *createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
+		return
+	}
+
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		*createdId,
+		r.provider.SpaceID,
+		[]string{},
+		[]string{"available"},
+		r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Internet Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", *createdId, err))
 		return
 	}
 
@@ -139,15 +156,13 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 		}
 	}
 
-	res, err := r.provider.ApiClient.DeleteInternetGatewayWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	err := retry_utils.RetryDeleteUntilResourceAvailable(
+		ctx,
+		r.provider.SpaceID,
+		data.Id.ValueString(),
+		r.provider.ApiClient.DeleteInternetGatewayWithResponse)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to delete InternetService", err.Error())
-		return
-	}
-
-	if res.StatusCode() != http.StatusNoContent {
-		apiError := utils.HandleError(res.Body)
-		response.Diagnostics.AddError("Failed to delete InternetService", apiError.Error())
+		response.Diagnostics.AddError("Failed to delete Internet Gateway", err.Error())
 		return
 	}
 }

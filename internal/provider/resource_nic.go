@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_nic"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,11 +62,29 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateNicResponse, error) {
-		body := NicFromTfToCreateRequest(ctx, &data)
-		return r.provider.ApiClient.CreateNicWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		NicFromTfToCreateRequest(ctx, &data),
+		r.provider.ApiClient.CreateNicWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create NIC", err.Error())
+		return
+	}
+
+	// Retries read on resource until state is OK
+	createdId := *res.JSON201.Id
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"attaching"},
+		[]string{"available", "in-use"},
+		r.provider.ApiClient.ReadNicsByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Nic", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
@@ -107,7 +126,9 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.ExecuteRequest(func() (*iaas.DeleteNicResponse, error) {
-		return r.provider.ApiClient.DeleteNicWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteNicWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Nic", err.Error())
+		return
+	}
 }

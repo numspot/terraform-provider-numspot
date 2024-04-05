@@ -11,6 +11,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_security_group"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -62,11 +63,14 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateSecurityGroupResponse, error) {
-		body := SecurityGroupFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateSecurityGroupWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		SecurityGroupFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateSecurityGroupWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Security Group", err.Error())
 		return
 	}
 
@@ -183,7 +187,9 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.ExecuteRequest(func() (*iaas.DeleteSecurityGroupResponse, error) {
-		return r.provider.ApiClient.DeleteSecurityGroupWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteSecurityGroupWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Security Group", err.Error())
+		return
+	}
 }

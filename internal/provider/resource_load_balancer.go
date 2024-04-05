@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,11 +62,14 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := LoadBalancerFromTfToCreateRequest(ctx, &data)
-	res := utils.ExecuteRequest(func() (*iaas.CreateLoadBalancerResponse, error) {
-		return r.provider.ApiClient.CreateLoadBalancerWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		LoadBalancerFromTfToCreateRequest(ctx, &data),
+		r.provider.ApiClient.CreateLoadBalancerWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Load Balancer", err.Error())
 		return
 	}
 
@@ -151,9 +155,9 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteLoadBalancerWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteLoadBalancerWithResponse)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to delete load balancer", err.Error())
+		response.Diagnostics.AddError("Failed to delete Load Balancer", err.Error())
 		return
 	}
 

@@ -11,6 +11,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_dhcp_options"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -62,11 +63,14 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 	var data resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateDhcpOptionsResponse, error) {
-		body := DhcpOptionsFromTfToCreateRequest(ctx, data)
-		return r.provider.ApiClient.CreateDhcpOptionsWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		DhcpOptionsFromTfToCreateRequest(ctx, data),
+		r.provider.ApiClient.CreateDhcpOptionsWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create DHCP Options", err.Error())
 		return
 	}
 
@@ -150,10 +154,9 @@ func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.Delet
 	var data resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.DeleteDhcpOptionsResponse, error) {
-		return r.provider.ApiClient.DeleteDhcpOptionsWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
-	if res == nil {
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteDhcpOptionsWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete DHCP Options", err.Error())
 		return
 	}
 }

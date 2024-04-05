@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_virtual_gateway"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,11 +62,29 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 	var data resource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateVirtualGatewayResponse, error) {
-		body := VirtualGatewayFromTfToCreateRequest(data)
-		return r.provider.ApiClient.CreateVirtualGatewayWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		VirtualGatewayFromTfToCreateRequest(data),
+		r.provider.ApiClient.CreateVirtualGatewayWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Virtual Gateway", err.Error())
+		return
+	}
+
+	// Retries read on resource until state is OK
+	createdId := *res.JSON201.Id
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"pending"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadVirtualGatewaysByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Virtual Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
@@ -104,11 +123,9 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 	var data resource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVirtualGatewayWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVirtualGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Virtual Gateway", err.Error())
 		return
 	}
-
-	response.State.RemoveResource(ctx)
 }

@@ -2,24 +2,15 @@ package utils
 
 import (
 	"context"
-	"fmt"
-	"net/http"
-	"slices"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 )
 
 type (
-	TfRequestResp interface {
-		StatusCode() int
-	}
-
 	ITFValue interface {
 		Type(ctx context.Context) attr.Type
 	}
@@ -28,11 +19,6 @@ type (
 		IsNull() bool
 		IsUnknown() bool
 	}
-)
-
-const (
-	TfRequestRetryTimeout = 5 * time.Minute
-	TfRequestRetryDelay   = 5 * time.Second
 )
 
 func FromTfStringToStringPtr(str types.String) *string {
@@ -202,50 +188,4 @@ func FromTfBoolValueToTfOrNull(element basetypes.BoolValue) basetypes.BoolValue 
 	}
 
 	return element
-}
-
-func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, retryCodes []int) *retry.RetryError {
-	if err != nil {
-		return retry.NonRetryableError(err)
-	}
-
-	if slices.Contains(stopRetryCodes, res.StatusCode()) {
-		return nil
-	} else if slices.Contains(retryCodes, res.StatusCode()) {
-		time.Sleep(TfRequestRetryDelay) // Delay not handled in RetryContext. Might find a better solution later
-		return retry.RetryableError(fmt.Errorf("got status code %v. Must retry request", res.StatusCode()))
-	} else {
-		return retry.NonRetryableError(fmt.Errorf("got %d status code that is not in stop status codes (%v)"+
-			" or retry status codes (%v)", res.StatusCode(), stopRetryCodes, retryCodes))
-	}
-}
-
-func RetryDeleteUntilResourceAvailable[R TfRequestResp](
-	ctx context.Context,
-	spaceID iaas.SpaceId,
-	id string,
-	fun func(context.Context, iaas.SpaceId, string, ...iaas.RequestEditorFn) (R, error),
-) error {
-	return retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
-		res, err := fun(ctx, spaceID, id)
-
-		return checkRetryCondition(res, err, []int{http.StatusNoContent}, []int{http.StatusConflict, http.StatusFailedDependency})
-	})
-}
-
-func RetryCreateUntilResourceAvailable[R TfRequestResp](
-	ctx context.Context,
-	spaceID iaas.SpaceId,
-	body iaas.CreateVpnConnectionJSONRequestBody,
-	fun func(context.Context, iaas.SpaceId, iaas.CreateVpnConnectionJSONRequestBody, ...iaas.RequestEditorFn) (R, error),
-) (R, error) {
-	var res R
-	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
-		var err error
-		res, err = fun(ctx, spaceID, body)
-
-		return checkRetryCondition(res, err, []int{http.StatusCreated}, []int{http.StatusConflict, http.StatusFailedDependency})
-	})
-
-	return res, retryError
 }

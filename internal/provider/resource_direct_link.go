@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_direct_link"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,11 +62,29 @@ func (r *DirectLinkResource) Create(ctx context.Context, request resource.Create
 	var data resource_direct_link.DirectLinkModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateDirectLinkResponse, error) {
-		body := DirectLinkFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateDirectLinkWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		DirectLinkFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateDirectLinkWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Direct Link", err.Error())
+		return
+	}
+
+	// Retries read on resource until state is OK
+	createdId := *res.JSON201.Id
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"pending", "requested"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadDirectLinksByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Direct Link", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
@@ -96,10 +115,9 @@ func (r *DirectLinkResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_direct_link.DirectLinkModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.DeleteDirectLinkResponse, error) {
-		return r.provider.ApiClient.DeleteDirectLinkWithResponse(ctx, r.provider.SpaceID, data.Id.String())
-	}, http.StatusNoContent, &response.Diagnostics)
-	if res == nil {
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteDirectLinkWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Direct Link", err.Error())
 		return
 	}
 }

@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_listener_rule"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,10 +62,16 @@ func (r *ListenerRuleResource) Create(ctx context.Context, request resource.Crea
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateListenerRuleResponse, error) {
-		body := ListenerRuleFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateListenerRuleWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		ListenerRuleFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateListenerRuleWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Listener Rule", err.Error())
+		return
+	}
 
 	tf := ListenerRuleFromHttpToTf(res.JSON201)
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -90,7 +97,9 @@ func (r *ListenerRuleResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*iaas.DeleteListenerRuleResponse, error) {
-		return r.provider.ApiClient.DeleteListenerRuleWithResponse(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()))
-	}, http.StatusOK, &response.Diagnostics)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()), r.provider.ApiClient.DeleteListenerRuleWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Listener Rule", err.Error())
+		return
+	}
 }

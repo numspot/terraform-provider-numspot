@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_image"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,15 +62,29 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	body := ImageFromTfToCreateRequest(ctx, &data, &response.Diagnostics)
-	if response.Diagnostics.HasError() || body == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		*ImageFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
+		r.provider.ApiClient.CreateImageWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Image", err.Error())
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateImageResponse, error) {
-		return r.provider.ApiClient.CreateImageWithResponse(ctx, r.provider.SpaceID, *body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries read on resource until state is OK
+	createdId := *res.JSON201.Id
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"pending"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadImagesByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Image", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
@@ -115,7 +130,9 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*iaas.DeleteImageResponse, error) {
-		return r.provider.ApiClient.DeleteImageWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteImageWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Image", err.Error())
+		return
+	}
 }

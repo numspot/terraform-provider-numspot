@@ -84,7 +84,7 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 	}
 }
 
-func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotProviderModel) (error, *string) {
+func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotProviderModel) (*string, error) {
 	ctx = context.WithValue(ctx, clientIdKey, data.ClientId.ValueString())
 	ctx = context.WithValue(ctx, clientSecretKey, data.ClientSecret.ValueString())
 
@@ -100,7 +100,7 @@ func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotPro
 
 	iamClient, err := iam.NewClientWithResponses(iamEndpoint, tmp)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
 	body := iam.Oauth2TokenExchangeFormdataRequestBody{
@@ -109,14 +109,14 @@ func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotPro
 
 	response, err := iamClient.Oauth2TokenExchangeWithFormdataBodyWithResponse(ctx, body, AddSecurityCredentialsToRequestHeaders)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
 	if response.JSON200 != nil {
-		return nil, response.JSON200.AccessToken
+		return response.JSON200.AccessToken, nil
 	}
 
-	return err, nil
+	return nil, err
 }
 
 func buildBasicAuth(username, password string) string {
@@ -140,7 +140,7 @@ func AddSecurityCredentialsToRequestHeaders(ctx context.Context, req *http.Reque
 }
 
 func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag *diag.Diagnostics, data *NumspotProviderModel) *iaas.ClientWithResponses {
-	err, accessToken := p.authenticateUser(ctx, data)
+	accessToken, err := p.authenticateUser(ctx, data)
 	if err != nil {
 		diag.AddError("Failed to authenticate", err.Error())
 		return nil

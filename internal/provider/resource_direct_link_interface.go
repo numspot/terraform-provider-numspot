@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_direct_link_interface"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,11 +62,29 @@ func (r *DirectLinkInterfaceResource) Create(ctx context.Context, request resour
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateDirectLinkInterfaceResponse, error) {
-		body := DirectLinkInterfaceFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateDirectLinkInterfaceWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		DirectLinkInterfaceFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateDirectLinkInterfaceWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Direct Link Interface", err.Error())
+		return
+	}
+
+	// Retries read on resource until state is OK
+	createdId := *res.JSON201.DirectLinkId
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"pending", "confirming"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadDirectLinkInterfacesByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Direct Link Interface", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
@@ -96,6 +115,12 @@ func (r *DirectLinkInterfaceResource) Update(ctx context.Context, request resour
 func (r *DirectLinkInterfaceResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteDirectLinkInterfaceWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Direct Link Interface", err.Error())
+		return
+	}
 
 	utils.ExecuteRequest(func() (*iaas.DeleteDirectLinkInterfaceResponse, error) {
 		return r.provider.ApiClient.DeleteDirectLinkInterfaceWithResponse(ctx, r.provider.SpaceID, data.Id.String())

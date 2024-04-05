@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_net_access_point"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,11 +62,29 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateVpcAccessPointResponse, error) {
-		body := NetAccessPointFromTfToCreateRequest(ctx, &data)
-		return r.provider.ApiClient.CreateVpcAccessPointWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		NetAccessPointFromTfToCreateRequest(ctx, &data),
+		r.provider.ApiClient.CreateVpcAccessPointWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VPC Access Point", err.Error())
+		return
+	}
+
+	// Retries read on resource until state is OK
+	createdId := *res.JSON201.Id
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"pending"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadVpcAccessPointsByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VPC Access Point", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 

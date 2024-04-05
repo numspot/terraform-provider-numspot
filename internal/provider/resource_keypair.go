@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_key_pair"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,11 +62,14 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateKeypairResponse, error) {
-		body := KeyPairFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateKeypairWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		KeyPairFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateKeypairWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create KeyPair", err.Error())
 		return
 	}
 
@@ -114,7 +118,9 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*iaas.DeleteKeypairResponse, error) {
-		return r.provider.ApiClient.DeleteKeypairWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteKeypairWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete KeyPair", err.Error())
+		return
+	}
 }

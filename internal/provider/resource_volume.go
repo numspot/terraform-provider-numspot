@@ -8,10 +8,10 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_volume"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -63,32 +63,28 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateVolumeResponse, error) {
-		body := VolumeFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateVolumeWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		VolumeFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateVolumeWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Volume", err.Error())
 		return
 	}
 
-	createStateConf := &retry.StateChangeConf{
-		Pending: []string{"creating"},
-		Target:  []string{"available"},
-		Refresh: func() (result interface{}, state string, err error) {
-			readRes := utils.ExecuteRequest(func() (*iaas.ReadVolumesByIdResponse, error) {
-				return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, *res.JSON201.Id)
-			}, http.StatusOK, &response.Diagnostics)
-			if readRes == nil {
-				return
-			}
-
-			return readRes.JSON200, *readRes.JSON200.State, nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   3 * time.Second,
-	}
-
-	read, err := createStateConf.WaitForStateContext(ctx)
+	// Retries read on resource until state is OK
+	createdId := *res.JSON201.Id
+	// Retries read on resource until state is OK
+	read, err := retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"creating"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadVolumesByIdWithResponse,
+	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", *res.JSON201.Id, err))
 		return
@@ -141,30 +137,21 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	}
 
 	volumeId := state.Id.ValueString()
-	updateStateConf := &retry.StateChangeConf{
-		Pending: []string{"creating", "updating"},
-		Target:  []string{"available"},
-		Refresh: func() (result interface{}, state string, err error) {
-			readRes := utils.ExecuteRequest(func() (*iaas.ReadVolumesByIdResponse, error) {
-				return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, volumeId)
-			}, http.StatusOK, &response.Diagnostics)
-			if readRes == nil {
-				return
-			}
-
-			return readRes.JSON200, *readRes.JSON200.State, nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   3 * time.Second,
-	}
-
-	time.Sleep(3 * time.Second) // TODO remove when outscale fixes the State field => https://numsproduct.atlassian.net/browse/CLSEXP-612
-
-	read, err := updateStateConf.WaitForStateContext(ctx)
+	// Retries read on resource until state is OK
+	read, err := retry_utils.RetryReadUntilStateValid(
+		ctx,
+		volumeId,
+		r.provider.SpaceID,
+		[]string{"creating", "updating"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadVolumesByIdWithResponse,
+	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
 		return
 	}
+
+	time.Sleep(3 * time.Second) // TODO remove when outscale fixes the State field => https://numsproduct.atlassian.net/browse/CLSEXP-612
 
 	rr, ok := read.(*iaas.Volume)
 	if !ok {
@@ -186,7 +173,9 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*iaas.DeleteVolumeResponse, error) {
-		return r.provider.ApiClient.DeleteVolumeWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVolumeWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Volume", err.Error())
+		return
+	}
 }

@@ -11,6 +11,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -62,10 +63,13 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	var plan, state resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
-	createRes := utils.ExecuteRequest(func() (*iaas.CreatePublicIpResponse, error) {
-		return r.provider.ApiClient.CreatePublicIpWithResponse(ctx, r.provider.SpaceID)
-	}, http.StatusCreated, &response.Diagnostics)
-	if createRes == nil {
+	// Retries create until request response is OK
+	createRes, err := retry_utils.RetryCreateUntilResourceAvailable(
+		ctx,
+		r.provider.SpaceID,
+		r.provider.ApiClient.CreatePublicIpWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Public IP", err.Error())
 		return
 	}
 
@@ -134,7 +138,7 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 	chgSet := ComputePublicIPChangeSet(&plan, data)
 
 	if chgSet.Err != nil {
-		response.Diagnostics.AddError("Failed to update public IP", err.Error()) // err ??
+		response.Diagnostics.AddError("Failed to update public IP", chgSet.Err.Error())
 		return
 	}
 
@@ -178,7 +182,10 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 			return
 		}
 	}
-	utils.ExecuteRequest(func() (*iaas.DeletePublicIpResponse, error) {
-		return r.provider.ApiClient.DeletePublicIpWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
-	}, http.StatusNoContent, &response.Diagnostics)
+
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, state.Id.ValueString(), r.provider.ApiClient.DeletePublicIpWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Public IP", err.Error())
+		return
+	}
 }

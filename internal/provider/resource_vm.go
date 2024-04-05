@@ -4,16 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vm"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -64,33 +62,27 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateVmsResponse, error) {
-		body := VmFromTfToCreateRequest(ctx, &data)
-		return r.provider.ApiClient.CreateVmsWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		VmFromTfToCreateRequest(ctx, &data),
+		r.provider.ApiClient.CreateVmsWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VM", err.Error())
 		return
 	}
 
 	vm := *res.JSON201
 	createdId := vm.Id
-
-	createStateConf := &retry.StateChangeConf{
-		Pending: []string{"pending"},
-		Target:  []string{"running"},
-		Refresh: func() (result interface{}, state string, err error) {
-			readed := r.readVmById(ctx, createdId, response.Diagnostics)
-			if readed == nil {
-				return nil, "", nil
-			}
-
-			return *readed, *readed.State, nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   3 * time.Second,
-	}
-
-	read, err := createStateConf.WaitForStateContext(ctx)
+	read, err := retry_utils.RetryReadUntilStateValid(
+		ctx,
+		*createdId,
+		r.provider.SpaceID,
+		[]string{"pending"},
+		[]string{"running"},
+		r.provider.ApiClient.ReadVmsByIdWithResponse,
+	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *createdId, err))
 		return
@@ -109,22 +101,6 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	tf.Id = types.StringPointerValue(createdId)
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
-}
-
-func (r *VmResource) readVmById(ctx context.Context, id *string, diagnostics diag.Diagnostics) *iaas.Vm {
-	res, err := r.provider.ApiClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
-	if err != nil {
-		diagnostics.AddError("Failed to read RouteTable", err.Error())
-		return nil
-	}
-
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		diagnostics.AddError("Failed to read Vm", apiError.Error())
-		return nil
-	}
-
-	return res.JSON200
 }
 
 func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
@@ -156,11 +132,9 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVmsWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVmsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VM", err.Error())
 		return
 	}
-
-	response.State.RemoveResource(ctx)
 }

@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_subnet"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -64,40 +63,28 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateSubnetResponse, error) {
-		body := SubnetFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateSubnetWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		SubnetFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateSubnetWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Subnet", err.Error())
 		return
 	}
 
 	createdId := *res.JSON201.Id
-	createStateConf := &retry.StateChangeConf{
-		Pending: []string{"pending"},
-		Target:  []string{"available"},
-		Refresh: func() (result interface{}, state string, err error) {
-			res, err := r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
-			if err != nil {
-				response.Diagnostics.AddError("Failed to read Subnet", err.Error())
-				return
-			}
-
-			if res.StatusCode() != http.StatusOK {
-				apiError := utils.HandleError(res.Body)
-				response.Diagnostics.AddError("Failed to read Subnet", apiError.Error())
-				return
-			}
-
-			return res.JSON200, *res.JSON200.State, nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   3 * time.Second,
-	}
-
-	_, err := createStateConf.WaitForStateContext(ctx)
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"pending"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadSubnetsByIdWithResponse,
+	)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *res.JSON201.Id, err))
+		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", *res.JSON201.Id, err))
 		return
 	}
 
@@ -194,7 +181,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteSubnetWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteSubnetWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete subnet", err.Error())
 		return

@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpn_connection"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,13 +62,29 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res, err := utils.RetryCreateUntilResourceAvailable(
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.SpaceID,
 		VpnConnectionFromTfToCreateRequest(&data),
 		r.provider.ApiClient.CreateVpnConnectionWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPN Connection", err.Error())
+		return
+	}
+
+	// Retries read on resource until state is OK
+	createdId := *res.JSON201.Id
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"pending"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadVpnConnectionsByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VpnConnection", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
@@ -98,7 +115,7 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVpnConnectionWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVpnConnectionWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPN Connection", err.Error())
 		return

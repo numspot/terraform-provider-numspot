@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_client_gateway"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -61,11 +62,29 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateClientGatewayResponse, error) {
-		body := ClientGatewayFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateClientGatewayWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		ClientGatewayFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateClientGatewayWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Client Gateway", err.Error())
+		return
+	}
+
+	// Retries read on resource until state is OK
+	createdId := *res.JSON201.Id
+	_, err = retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"pending"},
+		[]string{"available"},
+		r.provider.ApiClient.ReadClientGatewaysByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Client Gateways", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
@@ -97,7 +116,7 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteClientGatewayWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteClientGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Client Gateway", err.Error())
 		return

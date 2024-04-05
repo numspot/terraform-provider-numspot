@@ -4,15 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_flexible_gpu"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -64,32 +63,28 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.CreateFlexibleGpuResponse, error) {
-		body := FlexibleGpuFromTfToCreateRequest(&data)
-		return r.provider.ApiClient.CreateFlexibleGpuWithResponse(ctx, r.provider.SpaceID, body)
-	}, http.StatusCreated, &response.Diagnostics)
-	if res == nil {
+	// Retries create until request response is OK
+	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
+		ctx,
+		r.provider.SpaceID,
+		FlexibleGpuFromTfToCreateRequest(&data),
+		r.provider.ApiClient.CreateFlexibleGpuWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Flexible GPU", err.Error())
 		return
 	}
 
-	createStateConf := &retry.StateChangeConf{
-		Pending: []string{"attaching", "detaching"},
-		Target:  []string{"allocated", "attached"},
-		Refresh: func() (result interface{}, state string, err error) {
-			readed := r.read(ctx, *res.JSON201.Id, response.Diagnostics)
-			if readed == nil {
-				return nil, "", nil
-			}
-
-			return *readed, *readed.State, nil
-		},
-		Timeout: 5 * time.Minute,
-		Delay:   5 * time.Second,
-	}
-
-	read, err := createStateConf.WaitForStateContext(ctx)
+	createdId := *res.JSON201.Id
+	read, err := retry_utils.RetryReadUntilStateValid(
+		ctx,
+		createdId,
+		r.provider.SpaceID,
+		[]string{"attaching", "detaching"},
+		[]string{"allocated", "attached"},
+		r.provider.ApiClient.ReadFlexibleGpusByIdWithResponse,
+	)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Flexible GPU", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", data.Id.ValueString(), err))
+		response.Diagnostics.AddError("Failed to create Flexible GPU", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", data.Id.ValueString(), err))
 		return
 	}
 
@@ -139,7 +134,9 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	utils.ExecuteRequest(func() (*iaas.DeleteFlexibleGpuResponse, error) {
-		return r.provider.ApiClient.DeleteFlexibleGpuWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteFlexibleGpuWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete Flexible GPU", err.Error())
+		return
+	}
 }

@@ -38,7 +38,7 @@ func TestAccVpnConnectionResource_UpdateStaticRouteOnly(t *testing.T) {
 				ResourceName:            "numspot_vpn_connection.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
+				ImportStateVerifyIgnore: []string{"state"},
 			},
 			// Update testing
 			{
@@ -128,7 +128,7 @@ func TestAccVpnConnectionResource_UpdateGateways(t *testing.T) {
 				ResourceName:            "numspot_vpn_connection.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
+				ImportStateVerifyIgnore: []string{"state"},
 			},
 			// Update testing
 			{
