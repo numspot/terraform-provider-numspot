@@ -37,7 +37,7 @@ resource "numspot_subnet" "subnet" {
   ip_range = "10.101.1.0/24"
 }
 
-resource "numspot_load_balancer" "testlb" {
+resource "numspot_load_balancer" "lb-test" {
   name = "elb-test"
   listeners = [
     {
@@ -51,6 +51,6 @@ resource "numspot_load_balancer" "testlb" {
   type    = "internal"
 }
 data "numspot_load_balancers" "test" {
-  load_balancer_names = [numspot_load_balancer.testlb.name]
+  load_balancer_names = [numspot_load_balancer.lb-test.name]
 }`
 }

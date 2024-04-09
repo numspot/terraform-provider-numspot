@@ -92,12 +92,12 @@ func TestAccVmResource_NetSubnet(t *testing.T) {
 
 func testVmConfig_NetSubnet(imageId, vmType string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "net" {
   ip_range = "10.101.0.0/16"
 }
 
 resource "numspot_subnet" "subnet" {
-  net_id   = numspot_net.net.id
+  vpc_id   = numspot_vpc.net.id
   ip_range = "10.101.1.0/24"
 }
 
@@ -132,17 +132,17 @@ func TestAccVmResource_NetSubnetSG(t *testing.T) {
 
 func testVmConfig_NetSubnetSG(imageId, vmType string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "net" {
   ip_range = "10.101.0.0/16"
 }
 
 resource "numspot_subnet" "subnet" {
-  net_id   = numspot_net.net.id
+  vpc_id   = numspot_vpc.net.id
   ip_range = "10.101.1.0/24"
 }
 
 resource "numspot_security_group" "sg" {
-  net_id      = numspot_net.net.id
+  net_id      = numspot_vpc.net.id
   name        = "terraform-vm-tests-sg-name"
   description = "terraform-vm-tests-sg-description"
 
@@ -194,12 +194,12 @@ resource "numspot_vpc" "net" {
 }
 
 resource "numspot_subnet" "subnet" {
-  net_id   = numspot_net.net.id
+  vpc_id   = numspot_vpc.net.id
   ip_range = "10.101.1.0/24"
 }
 
 resource "numspot_security_group" "sg" {
-  net_id      = numspot_net.net.id
+  net_id      = numspot_vpc.net.id
   name        = "terraform-vm-tests-sg-name"
   description = "terraform-vm-tests-sg-description"
 
@@ -213,18 +213,18 @@ resource "numspot_security_group" "sg" {
   ]
 }
 
-resource "numspot_internet_service" "is" {
-  net_id = numspot_net.net.id
+resource "numspot_internet_gateway" "igw" {
+  net_id = numspot_vpc.net.id
 }
 
 resource "numspot_route_table" "rt" {
-  net_id    = numspot_net.net.id
+  net_id    = numspot_vpc.net.id
   subnet_id = numspot_subnet.subnet.id
 
   routes = [
     {
       destination_ip_range = "0.0.0.0/0"
-      gateway_id           = numspot_internet_service.is.id
+      gateway_id           = numspot_internet_gateway.igw.id
     }
   ]
 }

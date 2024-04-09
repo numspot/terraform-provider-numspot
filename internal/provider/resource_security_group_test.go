@@ -53,12 +53,12 @@ func TestAccSecurityGroupResource_SingleInboundRule(t *testing.T) {
 
 func testSecurityGroupConfig_SingleInboundRule(netIpRange, name, description string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "net" {
   ip_range = %[1]q
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_net.net.id
+  net_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
   inbound_rules = [
@@ -114,12 +114,12 @@ func TestAccSecurityGroupResource_CoupleInboundRule(t *testing.T) {
 
 func testSecurityGroupConfig_CoupleInboundRule(netIpRange, name, description string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "net" {
   ip_range = %[1]q
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_net.net.id
+  net_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
   inbound_rules = [
@@ -181,12 +181,12 @@ func TestAccSecurityGroupResource_SingleOutboundRule(t *testing.T) {
 
 func testSecurityGroupConfig_SingleOutboundRule(netIpRange, name, description string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "net" {
   ip_range = %[1]q
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_net.net.id
+  net_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
   outbound_rules = [
@@ -242,12 +242,12 @@ func TestAccSecurityGroupResource_CoupleOutboundRule(t *testing.T) {
 
 func testSecurityGroupConfig_CoupleOutboundRule(netIpRange, name, description string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "net" {
   ip_range = %[1]q
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_net.net.id
+  net_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
   outbound_rules = [
@@ -309,12 +309,12 @@ func TestAccSecurityGroupResource_MultipleRules(t *testing.T) {
 
 func testSecurityGroupConfig_MultipleRules(netIpRange, name, description string) string {
 	return fmt.Sprintf(`
-resource "numspot_net" "net" {
+resource "numspot_vpc" "net" {
   ip_range = %[1]q
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_net.net.id
+  net_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
 
