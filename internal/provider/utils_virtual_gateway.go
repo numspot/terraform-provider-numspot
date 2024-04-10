@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_virtual_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -23,12 +23,12 @@ func VirtualGatewayFromHttpToTf(ctx context.Context, http *iaas.VirtualGateway) 
 	var netToVirtualGatewaysLinkTd types.List
 	var diagnostics diag.Diagnostics
 
-	if http.NetToVirtualGatewayLinks != nil {
+	if http.VpcToVirtualGatewayLinks != nil {
 		netToVirtualGatewaysLinkTd, diagnostics = utils.GenericListToTfListValue(
 			ctx,
 			resource_virtual_gateway.NetToVirtualGatewayLinksValue{},
 			vpcToVGLinkFromApi,
-			*http.NetToVirtualGatewayLinks,
+			*http.VpcToVirtualGatewayLinks,
 		)
 		if diagnostics.HasError() {
 			return nil, diagnostics

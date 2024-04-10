@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_nic"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -64,11 +64,10 @@ func linkPublicIpFromApi(ctx context.Context, elt iaas.LinkPublicIp) (resource_n
 	return resource_nic.NewLinkPublicIpValue(
 		resource_nic.LinkPublicIpValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"id":                   types.StringPointerValue(elt.Id),
-			"public_dns_name":      types.StringPointerValue(elt.PublicDnsName),
-			"public_ip":            types.StringPointerValue(elt.PublicIp),
-			"public_ip_account_id": types.StringPointerValue(elt.PublicIpAccountId),
-			"public_ip_id":         types.StringPointerValue(elt.PublicIpId),
+			"id":              types.StringPointerValue(elt.Id),
+			"public_dns_name": types.StringPointerValue(elt.PublicDnsName),
+			"public_ip":       types.StringPointerValue(elt.PublicIp),
+			"public_ip_id":    types.StringPointerValue(elt.PublicIpId),
 		},
 	)
 }
@@ -116,8 +115,7 @@ func NicFromHttpToTf(ctx context.Context, http *iaas.Nic) (*resource_nic.NicMode
 	}
 
 	return &resource_nic.NicModel{
-		AccountId:            types.StringPointerValue(http.AccountId),
-		Description:          types.StringPointerValue(http.AccountId),
+		Description:          types.StringPointerValue(http.Description),
 		Id:                   types.StringPointerValue(http.Id),
 		IsSourceDestChecked:  types.BoolPointerValue(http.IsSourceDestChecked),
 		LinkPublicIp:         linkPublicIpTf,

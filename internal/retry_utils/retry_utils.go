@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 )
 
 type TfRequestResp interface {

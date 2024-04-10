@@ -12,7 +12,7 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 )
 
 func HandleError(httpResponseBody []byte) error {

@@ -18,11 +18,6 @@ import (
 func NicResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"account_id": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The account ID of the owner of the NIC.",
-				MarkdownDescription: "The account ID of the owner of the NIC.",
-			},
 			"availability_zone_name": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The Subregion in which the NIC is located.",
@@ -159,11 +154,6 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 									Description:         "The public IP associated with the NIC.",
 									MarkdownDescription: "The public IP associated with the NIC.",
 								},
-								"public_ip_account_id": schema.StringAttribute{
-									Computed:            true,
-									Description:         "The account ID of the owner of the public IP.",
-									MarkdownDescription: "The account ID of the owner of the public IP.",
-								},
 								"public_ip_id": schema.StringAttribute{
 									Computed:            true,
 									Description:         "The allocation ID of the public IP.",
@@ -259,7 +249,6 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type NicModel struct {
-	AccountId            types.String      `tfsdk:"account_id"`
 	AvailabilityZoneName types.String      `tfsdk:"availability_zone_name"`
 	Description          types.String      `tfsdk:"description"`
 	Id                   types.String      `tfsdk:"id"`
@@ -955,8 +944,6 @@ func (t LinkPublicIpType) ValueFromObject(ctx context.Context, in basetypes.Obje
 		return nil, diags
 	}
 
-	publicIpAccountIdVal, ok := publicIpAccountIdAttribute.(basetypes.StringValue)
-
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
@@ -986,12 +973,11 @@ func (t LinkPublicIpType) ValueFromObject(ctx context.Context, in basetypes.Obje
 	}
 
 	return LinkPublicIpValue{
-		Id:                idVal,
-		PublicDnsName:     publicDnsNameVal,
-		PublicIp:          publicIpVal,
-		PublicIpAccountId: publicIpAccountIdVal,
-		PublicIpId:        publicIpIdVal,
-		state:             attr.ValueStateKnown,
+		Id:            idVal,
+		PublicDnsName: publicDnsNameVal,
+		PublicIp:      publicIpVal,
+		PublicIpId:    publicIpIdVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1122,8 +1108,6 @@ func NewLinkPublicIpValue(attributeTypes map[string]attr.Type, attributes map[st
 		return NewLinkPublicIpValueUnknown(), diags
 	}
 
-	publicIpAccountIdVal, ok := publicIpAccountIdAttribute.(basetypes.StringValue)
-
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
@@ -1153,12 +1137,11 @@ func NewLinkPublicIpValue(attributeTypes map[string]attr.Type, attributes map[st
 	}
 
 	return LinkPublicIpValue{
-		Id:                idVal,
-		PublicDnsName:     publicDnsNameVal,
-		PublicIp:          publicIpVal,
-		PublicIpAccountId: publicIpAccountIdVal,
-		PublicIpId:        publicIpIdVal,
-		state:             attr.ValueStateKnown,
+		Id:            idVal,
+		PublicDnsName: publicDnsNameVal,
+		PublicIp:      publicIpVal,
+		PublicIpId:    publicIpIdVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1230,12 +1213,11 @@ func (t LinkPublicIpType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = LinkPublicIpValue{}
 
 type LinkPublicIpValue struct {
-	Id                basetypes.StringValue `tfsdk:"id"`
-	PublicDnsName     basetypes.StringValue `tfsdk:"public_dns_name"`
-	PublicIp          basetypes.StringValue `tfsdk:"public_ip"`
-	PublicIpAccountId basetypes.StringValue `tfsdk:"public_ip_account_id"`
-	PublicIpId        basetypes.StringValue `tfsdk:"public_ip_id"`
-	state             attr.ValueState
+	Id            basetypes.StringValue `tfsdk:"id"`
+	PublicDnsName basetypes.StringValue `tfsdk:"public_dns_name"`
+	PublicIp      basetypes.StringValue `tfsdk:"public_ip"`
+	PublicIpId    basetypes.StringValue `tfsdk:"public_ip_id"`
+	state         attr.ValueState
 }
 
 func (v LinkPublicIpValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
@@ -1279,8 +1261,6 @@ func (v LinkPublicIpValue) ToTerraformValue(ctx context.Context) (tftypes.Value,
 		}
 
 		vals["public_ip"] = val
-
-		val, err = v.PublicIpAccountId.ToTerraformValue(ctx)
 
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
@@ -1334,11 +1314,10 @@ func (v LinkPublicIpValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 			"public_ip_id":         basetypes.StringType{},
 		},
 		map[string]attr.Value{
-			"id":                   v.Id,
-			"public_dns_name":      v.PublicDnsName,
-			"public_ip":            v.PublicIp,
-			"public_ip_account_id": v.PublicIpAccountId,
-			"public_ip_id":         v.PublicIpId,
+			"id":              v.Id,
+			"public_dns_name": v.PublicDnsName,
+			"public_ip":       v.PublicIp,
+			"public_ip_id":    v.PublicIpId,
 		})
 
 	return objVal, diags
@@ -1368,10 +1347,6 @@ func (v LinkPublicIpValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.PublicIp.Equal(other.PublicIp) {
-		return false
-	}
-
-	if !v.PublicIpAccountId.Equal(other.PublicIpAccountId) {
 		return false
 	}
 

@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_security_group"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -15,7 +15,6 @@ import (
 func SecurityGroupFromTfToHttp(tf *resource_security_group.SecurityGroupModel) *iaas.SecurityGroup {
 	return &iaas.SecurityGroup{
 		Id:            tf.Id.ValueStringPointer(),
-		AccountId:     tf.AccountId.ValueStringPointer(),
 		Description:   tf.Description.ValueStringPointer(),
 		Name:          tf.Name.ValueStringPointer(),
 		VpcId:         tf.NetId.ValueStringPointer(),
@@ -187,7 +186,6 @@ func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_grou
 	}
 
 	res := resource_security_group.SecurityGroupModel{
-		AccountId:     types.StringPointerValue(http.AccountId),
 		Description:   types.StringPointerValue(http.Description),
 		Id:            types.StringPointerValue(http.Id),
 		Name:          types.StringPointerValue(http.Name),

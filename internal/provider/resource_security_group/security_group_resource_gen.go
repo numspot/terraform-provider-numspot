@@ -18,11 +18,6 @@ import (
 func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"account_id": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The account ID of a user that has been granted permission.",
-				MarkdownDescription: "The account ID of a user that has been granted permission.",
-			},
 			"description": schema.StringAttribute{
 				Required:            true,
 				Description:         "A description for the security group, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
@@ -195,7 +190,6 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type SecurityGroupModel struct {
-	AccountId     types.String `tfsdk:"account_id"`
 	Description   types.String `tfsdk:"description"`
 	Id            types.String `tfsdk:"id"`
 	InboundRules  types.List   `tfsdk:"inbound_rules"`
