@@ -2,6 +2,7 @@ package retry_utils
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type TfRequestResp interface {
@@ -28,6 +30,20 @@ var (
 	StatusCodeStopRetryOnCreate = []int{http.StatusNoContent, http.StatusCreated}
 )
 
+func getErrorMessage(res TfRequestResp) (string, error) {
+	errorResponse, err := getFieldFromReflectStructPtr(reflect.ValueOf(res), "Body")
+	if err != nil {
+		return "", err
+	}
+	concreteErrorResponse, ok := errorResponse.Interface().([]byte)
+
+	if !ok {
+		return "", fmt.Errorf("failed to parse %v to byte array", errorResponse)
+	}
+
+	return utils.HandleError(concreteErrorResponse).Error(), err
+}
+
 func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, retryCodes []int) *retry.RetryError {
 	if err != nil {
 		return retry.NonRetryableError(err)
@@ -39,8 +55,11 @@ func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, ret
 		time.Sleep(TfRequestRetryDelay) // Delay not handled in RetryContext. Might find a better solution later
 		return retry.RetryableError(fmt.Errorf("got status code %v. Must retry request", res.StatusCode()))
 	} else {
-		return retry.NonRetryableError(fmt.Errorf("got %d status code that is not in stop status codes (%v)"+
-			" or retry status codes (%v)", res.StatusCode(), stopRetryCodes, retryCodes))
+		errorMessage, err := getErrorMessage(res)
+		if err != nil {
+			return retry.NonRetryableError(fmt.Errorf("error : got http status code %v but failed to parse error message. Reason : %v", res.StatusCode(), err))
+		}
+		return retry.NonRetryableError(errors.New(errorMessage))
 	}
 }
 
