@@ -76,7 +76,6 @@ func routeTableRouteFromAPI(ctx context.Context, route iaas.Route) (resource_rou
 			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
 			"nic_id":                 types.StringPointerValue(route.NicId),
 			"state":                  types.StringPointerValue(route.State),
-			"vm_account_id":          types.StringPointerValue(route.VmAccountId),
 			"vm_id":                  types.StringPointerValue(route.VmId),
 		},
 	)

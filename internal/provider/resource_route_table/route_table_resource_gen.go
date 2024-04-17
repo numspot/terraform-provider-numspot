@@ -122,11 +122,6 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The state of a route in the route table (always `active`). ",
 							MarkdownDescription: "The state of a route in the route table (always `active`). ",
 						},
-						"vm_account_id": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The account ID of the owner of the VM.",
-							MarkdownDescription: "The account ID of the owner of the VM.",
-						},
 						"vm_id": schema.StringAttribute{
 							Computed:            true,
 							Optional:            true,
@@ -1185,24 +1180,6 @@ func (t RoutesType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
 	}
 
-	vmAccountIdAttribute, ok := attributes["vm_account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`vm_account_id is missing from object`)
-
-		return nil, diags
-	}
-
-	vmAccountIdVal, ok := vmAccountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`vm_account_id expected to be basetypes.StringValue, was: %T`, vmAccountIdAttribute))
-	}
-
 	vmIdAttribute, ok := attributes["vm_id"]
 
 	if !ok {
@@ -1269,7 +1246,6 @@ func (t RoutesType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 		NatGatewayId:         natGatewayIdVal,
 		NicId:                nicIdVal,
 		State:                stateVal,
-		VmAccountId:          vmAccountIdVal,
 		VmId:                 vmIdVal,
 		VpcAccessPointId:     vpcAccessPointIdVal,
 		VpcPeeringId:         vpcPeeringIdVal,
@@ -1466,24 +1442,6 @@ func NewRoutesValue(attributeTypes map[string]attr.Type, attributes map[string]a
 			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
 	}
 
-	vmAccountIdAttribute, ok := attributes["vm_account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`vm_account_id is missing from object`)
-
-		return NewRoutesValueUnknown(), diags
-	}
-
-	vmAccountIdVal, ok := vmAccountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`vm_account_id expected to be basetypes.StringValue, was: %T`, vmAccountIdAttribute))
-	}
-
 	vmIdAttribute, ok := attributes["vm_id"]
 
 	if !ok {
@@ -1550,7 +1508,6 @@ func NewRoutesValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		NatGatewayId:         natGatewayIdVal,
 		NicId:                nicIdVal,
 		State:                stateVal,
-		VmAccountId:          vmAccountIdVal,
 		VmId:                 vmIdVal,
 		VpcAccessPointId:     vpcAccessPointIdVal,
 		VpcPeeringId:         vpcPeeringIdVal,
@@ -1633,7 +1590,6 @@ type RoutesValue struct {
 	NatGatewayId         basetypes.StringValue `tfsdk:"nat_gateway_id"`
 	NicId                basetypes.StringValue `tfsdk:"nic_id"`
 	State                basetypes.StringValue `tfsdk:"state"`
-	VmAccountId          basetypes.StringValue `tfsdk:"vm_account_id"`
 	VmId                 basetypes.StringValue `tfsdk:"vm_id"`
 	VpcAccessPointId     basetypes.StringValue `tfsdk:"vpc_access_point_id"`
 	VpcPeeringId         basetypes.StringValue `tfsdk:"vpc_peering_id"`
@@ -1653,7 +1609,6 @@ func (v RoutesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 	attrTypes["nat_gateway_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["nic_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["vm_account_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vm_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vpc_access_point_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vpc_peering_id"] = basetypes.StringType{}.TerraformType(ctx)
@@ -1720,14 +1675,6 @@ func (v RoutesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 		vals["state"] = val
 
-		val, err = v.VmAccountId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["vm_account_id"] = val
-
 		val, err = v.VmId.ToTerraformValue(ctx)
 
 		if err != nil {
@@ -1790,7 +1737,6 @@ func (v RoutesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"nat_gateway_id":         basetypes.StringType{},
 			"nic_id":                 basetypes.StringType{},
 			"state":                  basetypes.StringType{},
-			"vm_account_id":          basetypes.StringType{},
 			"vm_id":                  basetypes.StringType{},
 			"vpc_access_point_id":    basetypes.StringType{},
 			"vpc_peering_id":         basetypes.StringType{},
@@ -1803,7 +1749,6 @@ func (v RoutesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 			"nat_gateway_id":         v.NatGatewayId,
 			"nic_id":                 v.NicId,
 			"state":                  v.State,
-			"vm_account_id":          v.VmAccountId,
 			"vm_id":                  v.VmId,
 			"vpc_access_point_id":    v.VpcAccessPointId,
 			"vpc_peering_id":         v.VpcPeeringId,
@@ -1855,10 +1800,6 @@ func (v RoutesValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.VmAccountId.Equal(other.VmAccountId) {
-		return false
-	}
-
 	if !v.VmId.Equal(other.VmId) {
 		return false
 	}
@@ -1891,7 +1832,6 @@ func (v RoutesValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"nat_gateway_id":         basetypes.StringType{},
 		"nic_id":                 basetypes.StringType{},
 		"state":                  basetypes.StringType{},
-		"vm_account_id":          basetypes.StringType{},
 		"vm_id":                  basetypes.StringType{},
 		"vpc_access_point_id":    basetypes.StringType{},
 		"vpc_peering_id":         basetypes.StringType{},

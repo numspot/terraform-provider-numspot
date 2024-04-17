@@ -19,9 +19,8 @@ func accepterVpcFromApi(ctx context.Context, http *iaas.AccepterVpc) (resource_v
 	return resource_vpc_peering.NewAccepterVpcValue(
 		resource_vpc_peering.AccepterVpcValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"account_id": types.StringPointerValue(http.AccountId),
-			"ip_range":   types.StringPointerValue(http.IpRange),
-			"vpc_id":     types.StringPointerValue(http.VpcId),
+			"ip_range": types.StringPointerValue(http.IpRange),
+			"vpc_id":   types.StringPointerValue(http.VpcId),
 		},
 	)
 }
@@ -34,9 +33,8 @@ func sourceVpcFromApi(ctx context.Context, http *iaas.SourceVpc) (resource_vpc_p
 	return resource_vpc_peering.NewSourceVpcValue(
 		resource_vpc_peering.SourceVpcValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"account_id": types.StringPointerValue(http.AccountId),
-			"ip_range":   types.StringPointerValue(http.IpRange),
-			"vpc_id":     types.StringPointerValue(http.VpcId),
+			"ip_range": types.StringPointerValue(http.IpRange),
+			"vpc_id":   types.StringPointerValue(http.VpcId),
 		},
 	)
 }

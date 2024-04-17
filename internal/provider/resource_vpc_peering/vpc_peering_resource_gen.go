@@ -22,11 +22,6 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"accepter_vpc": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
-					"account_id": schema.StringAttribute{
-						Computed:            true,
-						Description:         "The account ID of the owner of the accepter Net.",
-						MarkdownDescription: "The account ID of the owner of the accepter Net.",
-					},
 					"ip_range": schema.StringAttribute{
 						Computed:            true,
 						Description:         "The IP range for the accepter Net, in CIDR notation (for example, `10.0.0.0/16`).",
@@ -67,11 +62,6 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"source_vpc": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
-					"account_id": schema.StringAttribute{
-						Computed:            true,
-						Description:         "The account ID of the owner of the source Net.",
-						MarkdownDescription: "The account ID of the owner of the source Net.",
-					},
 					"ip_range": schema.StringAttribute{
 						Computed:            true,
 						Description:         "The IP range for the source Net, in CIDR notation (for example, `10.0.0.0/16`).",
@@ -161,24 +151,6 @@ func (t AccepterVpcType) ValueFromObject(ctx context.Context, in basetypes.Objec
 
 	attributes := in.Attributes()
 
-	accountIdAttribute, ok := attributes["account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`account_id is missing from object`)
-
-		return nil, diags
-	}
-
-	accountIdVal, ok := accountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`account_id expected to be basetypes.StringValue, was: %T`, accountIdAttribute))
-	}
-
 	ipRangeAttribute, ok := attributes["ip_range"]
 
 	if !ok {
@@ -220,10 +192,9 @@ func (t AccepterVpcType) ValueFromObject(ctx context.Context, in basetypes.Objec
 	}
 
 	return AccepterVpcValue{
-		AccountId: accountIdVal,
-		IpRange:   ipRangeVal,
-		VpcId:     vpcIdVal,
-		state:     attr.ValueStateKnown,
+		IpRange: ipRangeVal,
+		VpcId:   vpcIdVal,
+		state:   attr.ValueStateKnown,
 	}, diags
 }
 
@@ -290,24 +261,6 @@ func NewAccepterVpcValue(attributeTypes map[string]attr.Type, attributes map[str
 		return NewAccepterVpcValueUnknown(), diags
 	}
 
-	accountIdAttribute, ok := attributes["account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`account_id is missing from object`)
-
-		return NewAccepterVpcValueUnknown(), diags
-	}
-
-	accountIdVal, ok := accountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`account_id expected to be basetypes.StringValue, was: %T`, accountIdAttribute))
-	}
-
 	ipRangeAttribute, ok := attributes["ip_range"]
 
 	if !ok {
@@ -349,10 +302,9 @@ func NewAccepterVpcValue(attributeTypes map[string]attr.Type, attributes map[str
 	}
 
 	return AccepterVpcValue{
-		AccountId: accountIdVal,
-		IpRange:   ipRangeVal,
-		VpcId:     vpcIdVal,
-		state:     attr.ValueStateKnown,
+		IpRange: ipRangeVal,
+		VpcId:   vpcIdVal,
+		state:   attr.ValueStateKnown,
 	}, diags
 }
 
@@ -424,10 +376,9 @@ func (t AccepterVpcType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = AccepterVpcValue{}
 
 type AccepterVpcValue struct {
-	AccountId basetypes.StringValue `tfsdk:"account_id"`
-	IpRange   basetypes.StringValue `tfsdk:"ip_range"`
-	VpcId     basetypes.StringValue `tfsdk:"vpc_id"`
-	state     attr.ValueState
+	IpRange basetypes.StringValue `tfsdk:"ip_range"`
+	VpcId   basetypes.StringValue `tfsdk:"vpc_id"`
+	state   attr.ValueState
 }
 
 func (v AccepterVpcValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
@@ -436,7 +387,6 @@ func (v AccepterVpcValue) ToTerraformValue(ctx context.Context) (tftypes.Value, 
 	var val tftypes.Value
 	var err error
 
-	attrTypes["account_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["ip_range"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vpc_id"] = basetypes.StringType{}.TerraformType(ctx)
 
@@ -445,14 +395,6 @@ func (v AccepterVpcValue) ToTerraformValue(ctx context.Context) (tftypes.Value, 
 	switch v.state {
 	case attr.ValueStateKnown:
 		vals := make(map[string]tftypes.Value, 3)
-
-		val, err = v.AccountId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["account_id"] = val
 
 		val, err = v.IpRange.ToTerraformValue(ctx)
 
@@ -501,14 +443,12 @@ func (v AccepterVpcValue) ToObjectValue(ctx context.Context) (basetypes.ObjectVa
 
 	objVal, diags := types.ObjectValue(
 		map[string]attr.Type{
-			"account_id": basetypes.StringType{},
-			"ip_range":   basetypes.StringType{},
-			"vpc_id":     basetypes.StringType{},
+			"ip_range": basetypes.StringType{},
+			"vpc_id":   basetypes.StringType{},
 		},
 		map[string]attr.Value{
-			"account_id": v.AccountId,
-			"ip_range":   v.IpRange,
-			"vpc_id":     v.VpcId,
+			"ip_range": v.IpRange,
+			"vpc_id":   v.VpcId,
 		})
 
 	return objVal, diags
@@ -527,10 +467,6 @@ func (v AccepterVpcValue) Equal(o attr.Value) bool {
 
 	if v.state != attr.ValueStateKnown {
 		return true
-	}
-
-	if !v.AccountId.Equal(other.AccountId) {
-		return false
 	}
 
 	if !v.IpRange.Equal(other.IpRange) {
@@ -554,9 +490,8 @@ func (v AccepterVpcValue) Type(ctx context.Context) attr.Type {
 
 func (v AccepterVpcValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"account_id": basetypes.StringType{},
-		"ip_range":   basetypes.StringType{},
-		"vpc_id":     basetypes.StringType{},
+		"ip_range": basetypes.StringType{},
+		"vpc_id":   basetypes.StringType{},
 	}
 }
 
@@ -584,24 +519,6 @@ func (t SourceVpcType) ValueFromObject(ctx context.Context, in basetypes.ObjectV
 	var diags diag.Diagnostics
 
 	attributes := in.Attributes()
-
-	accountIdAttribute, ok := attributes["account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`account_id is missing from object`)
-
-		return nil, diags
-	}
-
-	accountIdVal, ok := accountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`account_id expected to be basetypes.StringValue, was: %T`, accountIdAttribute))
-	}
 
 	ipRangeAttribute, ok := attributes["ip_range"]
 
@@ -644,10 +561,9 @@ func (t SourceVpcType) ValueFromObject(ctx context.Context, in basetypes.ObjectV
 	}
 
 	return SourceVpcValue{
-		AccountId: accountIdVal,
-		IpRange:   ipRangeVal,
-		VpcId:     vpcIdVal,
-		state:     attr.ValueStateKnown,
+		IpRange: ipRangeVal,
+		VpcId:   vpcIdVal,
+		state:   attr.ValueStateKnown,
 	}, diags
 }
 
@@ -714,24 +630,6 @@ func NewSourceVpcValue(attributeTypes map[string]attr.Type, attributes map[strin
 		return NewSourceVpcValueUnknown(), diags
 	}
 
-	accountIdAttribute, ok := attributes["account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`account_id is missing from object`)
-
-		return NewSourceVpcValueUnknown(), diags
-	}
-
-	accountIdVal, ok := accountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`account_id expected to be basetypes.StringValue, was: %T`, accountIdAttribute))
-	}
-
 	ipRangeAttribute, ok := attributes["ip_range"]
 
 	if !ok {
@@ -773,10 +671,9 @@ func NewSourceVpcValue(attributeTypes map[string]attr.Type, attributes map[strin
 	}
 
 	return SourceVpcValue{
-		AccountId: accountIdVal,
-		IpRange:   ipRangeVal,
-		VpcId:     vpcIdVal,
-		state:     attr.ValueStateKnown,
+		IpRange: ipRangeVal,
+		VpcId:   vpcIdVal,
+		state:   attr.ValueStateKnown,
 	}, diags
 }
 
@@ -848,10 +745,9 @@ func (t SourceVpcType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = SourceVpcValue{}
 
 type SourceVpcValue struct {
-	AccountId basetypes.StringValue `tfsdk:"account_id"`
-	IpRange   basetypes.StringValue `tfsdk:"ip_range"`
-	VpcId     basetypes.StringValue `tfsdk:"vpc_id"`
-	state     attr.ValueState
+	IpRange basetypes.StringValue `tfsdk:"ip_range"`
+	VpcId   basetypes.StringValue `tfsdk:"vpc_id"`
+	state   attr.ValueState
 }
 
 func (v SourceVpcValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
@@ -860,7 +756,6 @@ func (v SourceVpcValue) ToTerraformValue(ctx context.Context) (tftypes.Value, er
 	var val tftypes.Value
 	var err error
 
-	attrTypes["account_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["ip_range"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vpc_id"] = basetypes.StringType{}.TerraformType(ctx)
 
@@ -869,14 +764,6 @@ func (v SourceVpcValue) ToTerraformValue(ctx context.Context) (tftypes.Value, er
 	switch v.state {
 	case attr.ValueStateKnown:
 		vals := make(map[string]tftypes.Value, 3)
-
-		val, err = v.AccountId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["account_id"] = val
 
 		val, err = v.IpRange.ToTerraformValue(ctx)
 
@@ -925,14 +812,12 @@ func (v SourceVpcValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValu
 
 	objVal, diags := types.ObjectValue(
 		map[string]attr.Type{
-			"account_id": basetypes.StringType{},
-			"ip_range":   basetypes.StringType{},
-			"vpc_id":     basetypes.StringType{},
+			"ip_range": basetypes.StringType{},
+			"vpc_id":   basetypes.StringType{},
 		},
 		map[string]attr.Value{
-			"account_id": v.AccountId,
-			"ip_range":   v.IpRange,
-			"vpc_id":     v.VpcId,
+			"ip_range": v.IpRange,
+			"vpc_id":   v.VpcId,
 		})
 
 	return objVal, diags
@@ -951,10 +836,6 @@ func (v SourceVpcValue) Equal(o attr.Value) bool {
 
 	if v.state != attr.ValueStateKnown {
 		return true
-	}
-
-	if !v.AccountId.Equal(other.AccountId) {
-		return false
 	}
 
 	if !v.IpRange.Equal(other.IpRange) {
@@ -978,9 +859,8 @@ func (v SourceVpcValue) Type(ctx context.Context) attr.Type {
 
 func (v SourceVpcValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"account_id": basetypes.StringType{},
-		"ip_range":   basetypes.StringType{},
-		"vpc_id":     basetypes.StringType{},
+		"ip_range": basetypes.StringType{},
+		"vpc_id":   basetypes.StringType{},
 	}
 }
 

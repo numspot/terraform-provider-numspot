@@ -17,11 +17,6 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The allocation ID of the public IP.",
 				MarkdownDescription: "The allocation ID of the public IP.",
 			},
-			"nic_account_id": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The account ID of the owner of the NIC.",
-				MarkdownDescription: "The account ID of the owner of the NIC.",
-			},
 			"nic_id": schema.StringAttribute{
 				Computed:            true,
 				Optional:            true,
@@ -54,7 +49,6 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 
 type PublicIpModel struct {
 	Id           types.String `tfsdk:"id"`
-	NicAccountId types.String `tfsdk:"nic_account_id"`
 	NicId        types.String `tfsdk:"nic_id"`
 	PrivateIp    types.String `tfsdk:"private_ip"`
 	PublicIp     types.String `tfsdk:"public_ip"`

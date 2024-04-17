@@ -86,8 +86,7 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *iaas.LoadBalancer) reso
 	// httpListeners := *http.Listeners
 	securityGroups, _ := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
 	sourceSecurityGroup := resource_load_balancer.SourceSecurityGroupValue{
-		SecurityGroupAccountId: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupAccountId),
-		SecurityGroupName:      types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
+		SecurityGroupName: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
 	}
 	subnets, _ := utils.FromStringListPointerToTfStringList(ctx, http.Subnets)
 	azNames, _ := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames)
@@ -147,8 +146,7 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBala
 	// httpListeners := *http.Listeners
 	securityGroups, _ := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
 	sourceSecurityGroup := datasource_load_balancer.SourceSecurityGroupValue{
-		SecurityGroupAccountId: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupAccountId),
-		SecurityGroupName:      types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
+		SecurityGroupName: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
 	}
 	subnets, _ := utils.FromStringListPointerToTfStringList(ctx, http.Subnets)
 	azNames, _ := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames)

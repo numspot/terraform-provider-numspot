@@ -61,11 +61,6 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 						Description:         "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
 						MarkdownDescription: "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
 					},
-					"vm_account_id": schema.StringAttribute{
-						Computed:            true,
-						Description:         "The account ID of the owner of the VM.",
-						MarkdownDescription: "The account ID of the owner of the VM.",
-					},
 					"vm_id": schema.StringAttribute{
 						Computed:            true,
 						Description:         "The ID of the VM.",
@@ -97,11 +92,6 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 						Computed:            true,
 						Description:         "The public IP associated with the NIC.",
 						MarkdownDescription: "The public IP associated with the NIC.",
-					},
-					"public_ip_account_id": schema.StringAttribute{
-						Computed:            true,
-						Description:         "The account ID of the owner of the public IP.",
-						MarkdownDescription: "The account ID of the owner of the public IP.",
 					},
 					"public_ip_id": schema.StringAttribute{
 						Computed:            true,
@@ -363,24 +353,6 @@ func (t LinkNicType) ValueFromObject(ctx context.Context, in basetypes.ObjectVal
 			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
 	}
 
-	vmAccountIdAttribute, ok := attributes["vm_account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`vm_account_id is missing from object`)
-
-		return nil, diags
-	}
-
-	vmAccountIdVal, ok := vmAccountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`vm_account_id expected to be basetypes.StringValue, was: %T`, vmAccountIdAttribute))
-	}
-
 	vmIdAttribute, ok := attributes["vm_id"]
 
 	if !ok {
@@ -408,7 +380,6 @@ func (t LinkNicType) ValueFromObject(ctx context.Context, in basetypes.ObjectVal
 		DeviceNumber:       deviceNumberVal,
 		Id:                 idVal,
 		State:              stateVal,
-		VmAccountId:        vmAccountIdVal,
 		VmId:               vmIdVal,
 		state:              attr.ValueStateKnown,
 	}, diags
@@ -549,24 +520,6 @@ func NewLinkNicValue(attributeTypes map[string]attr.Type, attributes map[string]
 			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
 	}
 
-	vmAccountIdAttribute, ok := attributes["vm_account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`vm_account_id is missing from object`)
-
-		return NewLinkNicValueUnknown(), diags
-	}
-
-	vmAccountIdVal, ok := vmAccountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`vm_account_id expected to be basetypes.StringValue, was: %T`, vmAccountIdAttribute))
-	}
-
 	vmIdAttribute, ok := attributes["vm_id"]
 
 	if !ok {
@@ -594,7 +547,6 @@ func NewLinkNicValue(attributeTypes map[string]attr.Type, attributes map[string]
 		DeviceNumber:       deviceNumberVal,
 		Id:                 idVal,
 		State:              stateVal,
-		VmAccountId:        vmAccountIdVal,
 		VmId:               vmIdVal,
 		state:              attr.ValueStateKnown,
 	}, diags
@@ -672,7 +624,6 @@ type LinkNicValue struct {
 	DeviceNumber       basetypes.Int64Value  `tfsdk:"device_number"`
 	Id                 basetypes.StringValue `tfsdk:"id"`
 	State              basetypes.StringValue `tfsdk:"state"`
-	VmAccountId        basetypes.StringValue `tfsdk:"vm_account_id"`
 	VmId               basetypes.StringValue `tfsdk:"vm_id"`
 	state              attr.ValueState
 }
@@ -687,7 +638,6 @@ func (v LinkNicValue) ToTerraformValue(ctx context.Context) (tftypes.Value, erro
 	attrTypes["device_number"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["vm_account_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vm_id"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
@@ -727,14 +677,6 @@ func (v LinkNicValue) ToTerraformValue(ctx context.Context) (tftypes.Value, erro
 		}
 
 		vals["state"] = val
-
-		val, err = v.VmAccountId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["vm_account_id"] = val
 
 		val, err = v.VmId.ToTerraformValue(ctx)
 
@@ -779,7 +721,6 @@ func (v LinkNicValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue,
 			"device_number":         basetypes.Int64Type{},
 			"id":                    basetypes.StringType{},
 			"state":                 basetypes.StringType{},
-			"vm_account_id":         basetypes.StringType{},
 			"vm_id":                 basetypes.StringType{},
 		},
 		map[string]attr.Value{
@@ -787,7 +728,6 @@ func (v LinkNicValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue,
 			"device_number":         v.DeviceNumber,
 			"id":                    v.Id,
 			"state":                 v.State,
-			"vm_account_id":         v.VmAccountId,
 			"vm_id":                 v.VmId,
 		})
 
@@ -825,10 +765,6 @@ func (v LinkNicValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.VmAccountId.Equal(other.VmAccountId) {
-		return false
-	}
-
 	if !v.VmId.Equal(other.VmId) {
 		return false
 	}
@@ -850,7 +786,6 @@ func (v LinkNicValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"device_number":         basetypes.Int64Type{},
 		"id":                    basetypes.StringType{},
 		"state":                 basetypes.StringType{},
-		"vm_account_id":         basetypes.StringType{},
 		"vm_id":                 basetypes.StringType{},
 	}
 }
@@ -932,22 +867,6 @@ func (t LinkPublicIpType) ValueFromObject(ctx context.Context, in basetypes.Obje
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
-	}
-
-	publicIpAccountIdAttribute, ok := attributes["public_ip_account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_ip_account_id is missing from object`)
-
-		return nil, diags
-	}
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_ip_account_id expected to be basetypes.StringValue, was: %T`, publicIpAccountIdAttribute))
 	}
 
 	publicIpIdAttribute, ok := attributes["public_ip_id"]
@@ -1098,22 +1017,6 @@ func NewLinkPublicIpValue(attributeTypes map[string]attr.Type, attributes map[st
 			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
 	}
 
-	publicIpAccountIdAttribute, ok := attributes["public_ip_account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_ip_account_id is missing from object`)
-
-		return NewLinkPublicIpValueUnknown(), diags
-	}
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_ip_account_id expected to be basetypes.StringValue, was: %T`, publicIpAccountIdAttribute))
-	}
-
 	publicIpIdAttribute, ok := attributes["public_ip_id"]
 
 	if !ok {
@@ -1229,7 +1132,6 @@ func (v LinkPublicIpValue) ToTerraformValue(ctx context.Context) (tftypes.Value,
 	attrTypes["id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["public_dns_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["public_ip"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["public_ip_account_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["public_ip_id"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
@@ -1265,8 +1167,6 @@ func (v LinkPublicIpValue) ToTerraformValue(ctx context.Context) (tftypes.Value,
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
-
-		vals["public_ip_account_id"] = val
 
 		val, err = v.PublicIpId.ToTerraformValue(ctx)
 
@@ -1307,11 +1207,10 @@ func (v LinkPublicIpValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 
 	objVal, diags := types.ObjectValue(
 		map[string]attr.Type{
-			"id":                   basetypes.StringType{},
-			"public_dns_name":      basetypes.StringType{},
-			"public_ip":            basetypes.StringType{},
-			"public_ip_account_id": basetypes.StringType{},
-			"public_ip_id":         basetypes.StringType{},
+			"id":              basetypes.StringType{},
+			"public_dns_name": basetypes.StringType{},
+			"public_ip":       basetypes.StringType{},
+			"public_ip_id":    basetypes.StringType{},
 		},
 		map[string]attr.Value{
 			"id":              v.Id,
@@ -1367,11 +1266,10 @@ func (v LinkPublicIpValue) Type(ctx context.Context) attr.Type {
 
 func (v LinkPublicIpValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"id":                   basetypes.StringType{},
-		"public_dns_name":      basetypes.StringType{},
-		"public_ip":            basetypes.StringType{},
-		"public_ip_account_id": basetypes.StringType{},
-		"public_ip_id":         basetypes.StringType{},
+		"id":              basetypes.StringType{},
+		"public_dns_name": basetypes.StringType{},
+		"public_ip":       basetypes.StringType{},
+		"public_ip_id":    basetypes.StringType{},
 	}
 }
 

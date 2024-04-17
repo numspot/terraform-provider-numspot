@@ -53,12 +53,6 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 						"security_groups_members": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
-									"account_id": schema.StringAttribute{
-										Computed:            true,
-										Optional:            true,
-										Description:         "The account ID that owns the source or destination security group.",
-										MarkdownDescription: "The account ID that owns the source or destination security group.",
-									},
 									"security_group_id": schema.StringAttribute{
 										Computed:            true,
 										Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
@@ -137,11 +131,6 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 						"security_groups_members": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
-									"account_id": schema.StringAttribute{
-										Computed:            true,
-										Description:         "The account ID that owns the source or destination security group.",
-										MarkdownDescription: "The account ID that owns the source or destination security group.",
-									},
 									"security_group_id": schema.StringAttribute{
 										Computed:            true,
 										Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
@@ -901,24 +890,6 @@ func (t SecurityGroupsMembersType) ValueFromObject(ctx context.Context, in baset
 
 	attributes := in.Attributes()
 
-	accountIdAttribute, ok := attributes["account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`account_id is missing from object`)
-
-		return nil, diags
-	}
-
-	accountIdVal, ok := accountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`account_id expected to be basetypes.StringValue, was: %T`, accountIdAttribute))
-	}
-
 	securityGroupIdAttribute, ok := attributes["security_group_id"]
 
 	if !ok {
@@ -942,7 +913,6 @@ func (t SecurityGroupsMembersType) ValueFromObject(ctx context.Context, in baset
 	}
 
 	return SecurityGroupsMembersValue{
-		AccountId:       accountIdVal,
 		SecurityGroupId: securityGroupIdVal,
 		state:           attr.ValueStateKnown,
 	}, diags
@@ -1011,24 +981,6 @@ func NewSecurityGroupsMembersValue(attributeTypes map[string]attr.Type, attribut
 		return NewSecurityGroupsMembersValueUnknown(), diags
 	}
 
-	accountIdAttribute, ok := attributes["account_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`account_id is missing from object`)
-
-		return NewSecurityGroupsMembersValueUnknown(), diags
-	}
-
-	accountIdVal, ok := accountIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`account_id expected to be basetypes.StringValue, was: %T`, accountIdAttribute))
-	}
-
 	securityGroupIdAttribute, ok := attributes["security_group_id"]
 
 	if !ok {
@@ -1052,7 +1004,6 @@ func NewSecurityGroupsMembersValue(attributeTypes map[string]attr.Type, attribut
 	}
 
 	return SecurityGroupsMembersValue{
-		AccountId:       accountIdVal,
 		SecurityGroupId: securityGroupIdVal,
 		state:           attr.ValueStateKnown,
 	}, diags
@@ -1126,7 +1077,6 @@ func (t SecurityGroupsMembersType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = SecurityGroupsMembersValue{}
 
 type SecurityGroupsMembersValue struct {
-	AccountId       basetypes.StringValue `tfsdk:"account_id"`
 	SecurityGroupId basetypes.StringValue `tfsdk:"security_group_id"`
 	state           attr.ValueState
 }
@@ -1137,7 +1087,6 @@ func (v SecurityGroupsMembersValue) ToTerraformValue(ctx context.Context) (tftyp
 	var val tftypes.Value
 	var err error
 
-	attrTypes["account_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["security_group_id"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
@@ -1145,14 +1094,6 @@ func (v SecurityGroupsMembersValue) ToTerraformValue(ctx context.Context) (tftyp
 	switch v.state {
 	case attr.ValueStateKnown:
 		vals := make(map[string]tftypes.Value, 2)
-
-		val, err = v.AccountId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["account_id"] = val
 
 		val, err = v.SecurityGroupId.ToTerraformValue(ctx)
 
@@ -1193,11 +1134,9 @@ func (v SecurityGroupsMembersValue) ToObjectValue(ctx context.Context) (basetype
 
 	objVal, diags := types.ObjectValue(
 		map[string]attr.Type{
-			"account_id":        basetypes.StringType{},
 			"security_group_id": basetypes.StringType{},
 		},
 		map[string]attr.Value{
-			"account_id":        v.AccountId,
 			"security_group_id": v.SecurityGroupId,
 		})
 
@@ -1219,10 +1158,6 @@ func (v SecurityGroupsMembersValue) Equal(o attr.Value) bool {
 		return true
 	}
 
-	if !v.AccountId.Equal(other.AccountId) {
-		return false
-	}
-
 	if !v.SecurityGroupId.Equal(other.SecurityGroupId) {
 		return false
 	}
@@ -1240,7 +1175,6 @@ func (v SecurityGroupsMembersValue) Type(ctx context.Context) attr.Type {
 
 func (v SecurityGroupsMembersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"account_id":        basetypes.StringType{},
 		"security_group_id": basetypes.StringType{},
 	}
 }
