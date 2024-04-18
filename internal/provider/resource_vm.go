@@ -88,11 +88,11 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	vmSchema, ok := read.(iaas.Vm)
+	vmSchema, ok := read.(*iaas.Vm)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create VM", "object conversion error")
 	}
-	tf, diagnostics := VmFromHttpToTf(ctx, &vmSchema)
+	tf, diagnostics := VmFromHttpToTf(ctx, vmSchema)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return

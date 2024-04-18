@@ -55,50 +55,69 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 	vmsCount := utils.FromIntToTfInt64(1)
 
 	// Private Ips
-	privateIpsTf, diagnostics := utils.StringListToTfListValue(ctx, []string{*http.PrivateIp})
+	var privateIps []string
+	if http.PrivateIp != nil {
+		privateIps = []string{*http.PrivateIp}
+	}
+	privateIpsTf, diagnostics := utils.StringListToTfListValue(ctx, privateIps)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
 
 	// Product Code
-	productCodesTf, diagnostics := utils.StringListToTfListValue(ctx, *http.ProductCodes)
+	var productCodes []string
+	if http.ProductCodes != nil {
+		productCodes = *http.ProductCodes
+	}
+	productCodesTf, diagnostics := utils.StringListToTfListValue(ctx, productCodes)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
 
-	// Security Group Ids
-	securityGroupIds := make([]string, 0, len(*http.SecurityGroups))
-	for _, e := range *http.SecurityGroups {
-		securityGroupIds = append(securityGroupIds, *e.SecurityGroupId)
+	// Security Group Ids & names
+	var securityGroupIds []string
+	var securityGroupNames []string
+
+	if http.SecurityGroups != nil {
+		securityGroupIds = make([]string, 0, len(*http.SecurityGroups))
+		securityGroupNames = make([]string, 0, len(*http.SecurityGroups))
+		for _, e := range *http.SecurityGroups {
+			securityGroupIds = append(securityGroupIds, *e.SecurityGroupId)
+			securityGroupNames = append(securityGroupNames, *e.SecurityGroupName)
+		}
 	}
 
+	// Security Group Ids
 	securityGroupIdsTf, diagnostics := utils.StringListToTfListValue(ctx, securityGroupIds)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
 
 	// Security Groups names
-	securityGroupNames := make([]string, 0, len(*http.SecurityGroups))
-	for _, e := range *http.SecurityGroups {
-		securityGroupNames = append(securityGroupNames, *e.SecurityGroupName)
-	}
-
 	securityGroupsTf, diagnostics := utils.StringListToTfListValue(ctx, securityGroupNames)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
 
 	// Block Device Mapping
+	var blockDeviceMappings []iaas.BlockDeviceMappingCreated
+	if http.BlockDeviceMappings != nil {
+		blockDeviceMappings = *http.BlockDeviceMappings
+	}
 	blockDeviceMappingTf, diagnostics := utils.GenericListToTfListValue(
 		ctx,
 		resource_vm.BlockDeviceMappingsValue{},
 		vmBlockDeviceMappingFromApi,
-		*http.BlockDeviceMappings,
+		blockDeviceMappings,
 	)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
 
+	var creationDate string
+	if http.CreationDate != nil {
+		creationDate = http.CreationDate.String()
+	}
 	r := resource_vm.VmModel{
 		//
 		Architecture:        types.StringPointerValue(http.Architecture),
@@ -106,7 +125,7 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		BootOnCreation:      types.BoolValue(true), // FIXME Set value
 		BsuOptimized:        types.BoolPointerValue(http.BsuOptimized),
 		ClientToken:         types.StringPointerValue(http.ClientToken),
-		CreationDate:        types.StringValue(http.CreationDate.String()),
+		CreationDate:        types.StringValue(creationDate),
 		//
 		DeletionProtection:        types.BoolPointerValue(http.DeletionProtection),
 		Hypervisor:                types.StringPointerValue(http.Hypervisor),
@@ -149,12 +168,15 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		r.LaunchNumber = launchNumber
 	}
 
+	var securityGroups []string
 	if http.SecurityGroups != nil {
-		sg := make([]string, 0, len(*http.SecurityGroups))
+		securityGroups = make([]string, 0, len(*http.SecurityGroups))
 		for _, e := range *http.SecurityGroups {
-			sg = append(sg, *e.SecurityGroupId)
+			securityGroups = append(securityGroups, *e.SecurityGroupId)
 		}
-		listValue, _ := types.ListValueFrom(ctx, types.StringType, sg)
+	}
+	if http.SecurityGroups != nil {
+		listValue, _ := types.ListValueFrom(ctx, types.StringType, securityGroups)
 		r.SecurityGroupIds = listValue
 	}
 

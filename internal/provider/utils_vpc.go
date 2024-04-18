@@ -9,12 +9,11 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vpc"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 func NetFromHttpToTf(ctx context.Context, http *iaas.Vpc) (*resource_vpc.VpcModel, diag.Diagnostics) {
-	var (
+	/*var (
 		tagsTf types.List
 		diags  diag.Diagnostics
 	)
@@ -23,7 +22,7 @@ func NetFromHttpToTf(ctx context.Context, http *iaas.Vpc) (*resource_vpc.VpcMode
 		if diags.HasError() {
 			return nil, diags
 		}
-	}
+	}*/
 
 	return &resource_vpc.VpcModel{
 		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
@@ -31,7 +30,7 @@ func NetFromHttpToTf(ctx context.Context, http *iaas.Vpc) (*resource_vpc.VpcMode
 		IpRange:          types.StringPointerValue(http.IpRange),
 		State:            types.StringPointerValue(http.State),
 		Tenancy:          types.StringPointerValue(http.Tenancy),
-		Tags:             tagsTf,
+		//Tags:             tagsTf,
 	}, nil
 }
 
@@ -48,15 +47,15 @@ func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) iaas
 		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges),
 		IsDefault:         tf.IsDefault.ValueBoolPointer(),
 		States:            utils.TfStringListToStringPtrList(ctx, tf.States),
-		TagKeys:           utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:         utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:              utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:               utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		//TagKeys:           utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
+		//TagValues:         utils.TfStringListToStringPtrList(ctx, tf.TagValues),
+		//Tags:              utils.TfStringListToStringPtrList(ctx, tf.Tags),
+		Ids: utils.TfStringListToStringPtrList(ctx, tf.IDs),
 	}
 }
 
 func VPCsFromHttpToTfDatasource(ctx context.Context, http *iaas.Vpc) (*datasource_vpc.VpcModel, diag.Diagnostics) {
-	var (
+	/*var (
 		tagsList types.List
 		diags    diag.Diagnostics
 	)
@@ -65,13 +64,13 @@ func VPCsFromHttpToTfDatasource(ctx context.Context, http *iaas.Vpc) (*datasourc
 		if diags.HasError() {
 			return nil, diags
 		}
-	}
+	}*/
 	return &datasource_vpc.VpcModel{
 		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
 		Id:               types.StringPointerValue(http.Id),
 		IpRange:          types.StringPointerValue(http.IpRange),
 		State:            types.StringPointerValue(http.State),
 		Tenancy:          types.StringPointerValue(http.Tenancy),
-		Tags:             tagsList,
+		//Tags:             tagsList,
 	}, nil
 }

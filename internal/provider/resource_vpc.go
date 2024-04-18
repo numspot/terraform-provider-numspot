@@ -10,7 +10,6 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -76,12 +75,12 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 
 	// Handle tags
 	createdId := *res.JSON201.Id
-	if len(data.Tags.Elements()) > 0 {
+	/*if len(data.Tags.Elements()) > 0 {
 		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
-	}
+	}*/
 
 	_, err = retry_utils.RetryReadUntilStateValid(
 		ctx,
@@ -100,10 +99,10 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	if diags.HasError() {
 		return
 	}
-	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, createdId)
-	if response.Diagnostics.HasError() {
-		return
-	}
+	//	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, createdId)
+	//	if response.Diagnostics.HasError() {
+	//		return
+	//	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
@@ -141,7 +140,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
-	if !state.Tags.Equal(plan.Tags) {
+	/*if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
 			ctx,
 			state.Tags,
@@ -154,7 +153,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 		if response.Diagnostics.HasError() {
 			return
 		}
-	}
+	}*/
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
 		return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
