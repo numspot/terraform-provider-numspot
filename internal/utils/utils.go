@@ -21,6 +21,14 @@ type (
 	}
 )
 
+func GetPtrValue[R any](val *R) R {
+	var value R
+	if val != nil {
+		value = *val
+	}
+	return value
+}
+
 func FromTfStringToStringPtr(str types.String) *string {
 	if str.IsUnknown() || str.IsNull() {
 		return nil
