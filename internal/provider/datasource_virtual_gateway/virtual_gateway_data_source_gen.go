@@ -5,12 +5,14 @@ package datasource_virtual_gateway
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	"strings"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
@@ -18,68 +20,100 @@ import (
 func VirtualGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"connection_type": schema.StringAttribute{
-				Computed:            true,
+			"virtual_gateways": schema.ListNestedAttribute{
+				Computed: true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"connection_type": schema.StringAttribute{
+							Computed:            true,
+							Description:         "The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).",
+							MarkdownDescription: "The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).",
+						},
+						"id": schema.StringAttribute{
+							Required:            true,
+							Description:         "ID for ReadVirtualGateways",
+							MarkdownDescription: "ID for ReadVirtualGateways",
+						},
+						"net_to_virtual_gateway_links": schema.ListNestedAttribute{
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"state": schema.StringAttribute{
+										Computed:            true,
+										Description:         "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
+										MarkdownDescription: "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
+									},
+									"vpc_id": schema.StringAttribute{
+										Computed:            true,
+										Description:         "The ID of the Net to which the virtual gateway is attached.",
+										MarkdownDescription: "The ID of the Net to which the virtual gateway is attached.",
+									},
+								},
+								CustomType: NetToVirtualGatewayLinksType{
+									ObjectType: types.ObjectType{
+										AttrTypes: NetToVirtualGatewayLinksValue{}.AttributeTypes(ctx),
+									},
+								},
+							},
+							Computed:            true,
+							Description:         "The Net to which the virtual gateway is attached.",
+							MarkdownDescription: "The Net to which the virtual gateway is attached.",
+						},
+						"state": schema.StringAttribute{
+							Computed:            true,
+							Description:         "The state of the virtual gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
+							MarkdownDescription: "The state of the virtual gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
+						},
+						"tags": tags.TagsSchema(ctx),
+					},
+				},
+			},
+			"link_states": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
+				MarkdownDescription: "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
+			},
+			"link_vpc_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The ID of the Net to which the virtual gateway is attached.",
+				MarkdownDescription: "The ID of the Net to which the virtual gateway is attached.",
+			},
+			"connection_types": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
 				Description:         "The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).",
 				MarkdownDescription: "The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).",
 			},
-			"id": schema.StringAttribute{
-				Required:            true,
+			"ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
 				Description:         "ID for ReadVirtualGateways",
 				MarkdownDescription: "ID for ReadVirtualGateways",
 			},
-			"net_to_virtual_gateway_links": schema.ListNestedAttribute{
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"state": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
-							MarkdownDescription: "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
-						},
-						"vpc_id": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The ID of the Net to which the virtual gateway is attached.",
-							MarkdownDescription: "The ID of the Net to which the virtual gateway is attached.",
-						},
-					},
-					CustomType: NetToVirtualGatewayLinksType{
-						ObjectType: types.ObjectType{
-							AttrTypes: NetToVirtualGatewayLinksValue{}.AttributeTypes(ctx),
-						},
-					},
-				},
-				Computed:            true,
-				Description:         "The Net to which the virtual gateway is attached.",
-				MarkdownDescription: "The Net to which the virtual gateway is attached.",
-			},
-			"state": schema.StringAttribute{
-				Computed:            true,
+			"states": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
 				Description:         "The state of the virtual gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 				MarkdownDescription: "The state of the virtual gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 			},
-			"tags": schema.ListNestedAttribute{
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"key": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The key of the tag, with a minimum of 1 character.",
-							MarkdownDescription: "The key of the tag, with a minimum of 1 character.",
-						},
-						"value": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The value of the tag, between 0 and 255 characters.",
-							MarkdownDescription: "The value of the tag, between 0 and 255 characters.",
-						},
-					},
-					CustomType: TagsType{
-						ObjectType: types.ObjectType{
-							AttrTypes: TagsValue{}.AttributeTypes(ctx),
-						},
-					},
-				},
-				Computed:            true,
-				Description:         "One or more tags associated with the virtual gateway.",
-				MarkdownDescription: "One or more tags associated with the virtual gateway.",
+			"tag_keys": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The keys of the tags associated with the virtual gateways.",
+				MarkdownDescription: "The keys of the tags associated with the virtual gateways.",
+			},
+			"tag_values": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The values of the tags associated with the virtual gateways.",
+				MarkdownDescription: "The values of the tags associated with the virtual gateways.",
+			},
+			"tags": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "The key/value combination of the tags associated with the virtual gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				MarkdownDescription: "The key/value combination of the tags associated with the virtual gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
 			},
 		},
 	}
