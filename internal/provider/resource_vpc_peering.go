@@ -3,10 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"net/http"
-
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"net/http"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc_peering"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
@@ -67,20 +66,9 @@ func (r *VpcPeeringResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	// Retries read on resource until state is OK
-	createdId := *res.JSON201.Id
-	_, err = retry_utils.RetryReadUntilStateValid(
-		ctx,
-		createdId,
-		r.provider.SpaceID,
-		[]string{"pending-acceptance"},
-		[]string{"active"},
-		r.provider.ApiClient.ReadVpcPeeringsByIdWithResponse,
-	)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create VPC Peering", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
-		return
-	}
+	// Retries can't success with retry_utils.RetryReadUntilStateValid because vpc_peering state is an object but a string.
+	// Also, VPC Peering resource State is used to provided status of the peering process, not the creation process
+	// So we do not need to implement specific retry process here.
 
 	tf, diagnostics := VpcPeeringFromHttpToTf(ctx, res.JSON201)
 	if diagnostics.HasError() {
