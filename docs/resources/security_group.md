@@ -13,8 +13,19 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource "numspot_security_group" "example" {
+resource "numspot_security_group" "test" {
+  net_id      = numspot_vpc.net.id
+  name        = "name"
+  description = "description"
 
+  inbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
 }
 ```
 
@@ -36,7 +47,6 @@ This name must be unique and contain between 1 and 255 ASCII characters. Accente
 
 ### Read-Only
 
-- `account_id` (String) The account ID of a user that has been granted permission.
 - `id` (String) The ID of the security group.
 
 <a id="nestedatt--inbound_rules"></a>
@@ -56,10 +66,6 @@ Read-Only:
 
 <a id="nestedatt--inbound_rules--security_groups_members"></a>
 ### Nested Schema for `inbound_rules.security_groups_members`
-
-Optional:
-
-- `account_id` (String) The account ID that owns the source or destination security group.
 
 Read-Only:
 
@@ -84,5 +90,4 @@ Optional:
 
 Read-Only:
 
-- `account_id` (String) The account ID that owns the source or destination security group.
 - `security_group_id` (String) The ID of a source or destination security group that you want to link to the security group of the rule.

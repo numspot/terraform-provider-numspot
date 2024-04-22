@@ -126,7 +126,6 @@ Optional:
 
 Read-Only:
 
-- `account_id` (String) The account ID of the owner of the NIC.
 - `is_source_dest_checked` (Boolean) (Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.
 - `link_nic` (Attributes) Information about the network interface card (NIC). (see [below for nested schema](#nestedatt--nics--link_nic))
 - `link_public_ip` (Attributes) Information about the public IP associated with the NIC. (see [below for nested schema](#nestedatt--nics--link_public_ip))
@@ -156,7 +155,6 @@ Read-Only:
 
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP associated with the NIC.
-- `public_ip_account_id` (String) The account ID of the owner of the public IP.
 
 
 
@@ -178,7 +176,6 @@ Read-Only:
 
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP associated with the NIC.
-- `public_ip_account_id` (String) The account ID of the owner of the public IP.
 
 
 <a id="nestedatt--nics--security_groups"></a>

@@ -51,7 +51,6 @@ Read-Only:
 - `creation_method` (String) The method used to create the route.
 - `destination_service_id` (String) The ID of the OUTSCALE service.
 - `state` (String) The state of a route in the route table (always `active`).
-- `vm_account_id` (String) The account ID of the owner of the VM.
 - `vpc_access_point_id` (String) The ID of the Net access point.
 
 

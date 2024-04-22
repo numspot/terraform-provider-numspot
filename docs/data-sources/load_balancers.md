@@ -90,7 +90,6 @@ Read-Only:
 
 Read-Only:
 
-- `security_group_account_id` (String) The account ID of the owner of the security group.
 - `security_group_name` (String) The name of the security group.
 
 

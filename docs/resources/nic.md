@@ -30,7 +30,6 @@ If you do not specify this attribute, a random private IP is selected within the
 
 ### Read-Only
 
-- `account_id` (String) The account ID of the owner of the NIC.
 - `availability_zone_name` (String) The Subregion in which the NIC is located.
 - `id` (String) The ID of the NIC.
 - `is_source_dest_checked` (Boolean) (Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.
@@ -63,7 +62,6 @@ Read-Only:
 - `id` (String) (Required in a Net) The ID representing the association of the public IP with the VM or the NIC.
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP associated with the NIC.
-- `public_ip_account_id` (String) The account ID of the owner of the public IP.
 - `public_ip_id` (String) The allocation ID of the public IP.
 
 
@@ -77,7 +75,6 @@ Read-Only:
 - `device_number` (Number) The device index for the NIC attachment (between `1` and `7`, both included).
 - `id` (String) The ID of the NIC to attach.
 - `state` (String) The state of the attachment (`attaching` \| `attached` \| `detaching` \| `detached`).
-- `vm_account_id` (String) The account ID of the owner of the VM.
 - `vm_id` (String) The ID of the VM.
 
 
@@ -89,7 +86,6 @@ Read-Only:
 - `id` (String) (Required in a Net) The ID representing the association of the public IP with the VM or the NIC.
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP associated with the NIC.
-- `public_ip_account_id` (String) The account ID of the owner of the public IP.
 - `public_ip_id` (String) The allocation ID of the public IP.
 
 

@@ -24,6 +24,5 @@ description: |-
 
 - `id` (String) The allocation ID of the public IP.
 - `link_public_ip` (String) The ID of the association between the public IP and VM/NIC (if any).
-- `nic_account_id` (String) The account ID of the owner of the NIC.
 - `private_ip` (String) The private IP associated with the public IP.
 - `public_ip` (String) The public IP.
