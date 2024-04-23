@@ -7,7 +7,7 @@ testacc:
 
 fmt: fmt-tf-conf
 	 gofumpt -l -w .
-	 gci write --skip-generated -s standard -s default -s "prefix(gitlab.numspot.cloud/cloud/terraform-provider-numspot)" -s blank -s dot .
+	 gci write --skip-generated --skip-vendor -s standard -s default -s "prefix(gitlab.numspot.cloud/cloud/terraform-provider-numspot)" -s blank -s dot .
 
 fmt-tf-conf:
 	find . | egrep "test.go" | sort | while read f; do terrafmt fmt -fv $$f; done
