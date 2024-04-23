@@ -63,8 +63,8 @@ resource "numspot_vpc" "test" {
 
 func TestAccNetResource_Tags(t *testing.T) {
 	t.Parallel()
-	//tagName := "Terraform Provider VPC"
-	//updatedTagName := "Terraform Provider VPC - 2"
+	// tagName := "Terraform Provider VPC"
+	// updatedTagName := "Terraform Provider VPC - 2"
 
 	previousId := ""
 
@@ -74,16 +74,16 @@ func TestAccNetResource_Tags(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testNetConfig_Tags(),
-				//Config: testNetConfig_Tags(tagName),
+				// Config: testNetConfig_Tags(tagName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
 						previousId = v
 						return nil
 					}),
-					//resource.TestCheckResourceAttr("numspot_vpc.test", "tags.0.key", "Name"),
-					//resource.TestCheckResourceAttr("numspot_vpc.test", "tags.0.value", tagName),
-					//resource.TestCheckResourceAttr("numspot_vpc.test", "tags.#", "1"),
+					// resource.TestCheckResourceAttr("numspot_vpc.test", "tags.0.key", "Name"),
+					// resource.TestCheckResourceAttr("numspot_vpc.test", "tags.0.value", tagName),
+					// resource.TestCheckResourceAttr("numspot_vpc.test", "tags.#", "1"),
 				),
 			},
 			// ImportState testing
@@ -96,7 +96,7 @@ func TestAccNetResource_Tags(t *testing.T) {
 			// Update testing
 			{
 				Config: testNetConfig_Tags(),
-				//Config: testNetConfig_Tags(updatedTagName),
+				// Config: testNetConfig_Tags(updatedTagName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
 						require.Equal(t, previousId, v)

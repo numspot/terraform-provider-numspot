@@ -283,7 +283,7 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the VM.",
 				MarkdownDescription: "The ID of the VM.",
 			},
-				
+
 			"link_public_ip_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
@@ -1918,27 +1918,6 @@ func (v PrivateIpsValue) AttributeTypes(ctx context.Context) map[string]attr.Typ
 		"private_ip":       basetypes.StringType{},
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 var _ basetypes.ObjectTypable = SecurityGroupsType{}
 

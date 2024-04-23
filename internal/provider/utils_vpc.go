@@ -30,7 +30,7 @@ func NetFromHttpToTf(ctx context.Context, http *iaas.Vpc) (*resource_vpc.VpcMode
 		IpRange:          types.StringPointerValue(http.IpRange),
 		State:            types.StringPointerValue(http.State),
 		Tenancy:          types.StringPointerValue(http.Tenancy),
-		//Tags:             tagsTf,
+		// Tags:             tagsTf,
 	}, nil
 }
 
@@ -47,9 +47,9 @@ func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) iaas
 		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges),
 		IsDefault:         tf.IsDefault.ValueBoolPointer(),
 		States:            utils.TfStringListToStringPtrList(ctx, tf.States),
-		//TagKeys:           utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		//TagValues:         utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		//Tags:              utils.TfStringListToStringPtrList(ctx, tf.Tags),
+		// TagKeys:           utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
+		// TagValues:         utils.TfStringListToStringPtrList(ctx, tf.TagValues),
+		// Tags:              utils.TfStringListToStringPtrList(ctx, tf.Tags),
 		Ids: utils.TfStringListToStringPtrList(ctx, tf.IDs),
 	}
 }
@@ -71,6 +71,6 @@ func VPCsFromHttpToTfDatasource(ctx context.Context, http *iaas.Vpc) (*datasourc
 		IpRange:          types.StringPointerValue(http.IpRange),
 		State:            types.StringPointerValue(http.State),
 		Tenancy:          types.StringPointerValue(http.Tenancy),
-		//Tags:             tagsList,
+		// Tags:             tagsList,
 	}, nil
 }

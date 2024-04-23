@@ -3,9 +3,10 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
-	"net/http"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc_peering"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"

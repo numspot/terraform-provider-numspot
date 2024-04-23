@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
-	"slices"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"slices"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
