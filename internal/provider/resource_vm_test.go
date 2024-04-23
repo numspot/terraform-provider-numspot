@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	imageId = "ami-00b0c39a"
+	imageId = "ami-060e019f"
 	vmType  = "t2.small"
 )
 

@@ -382,6 +382,7 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewVolumesDataSource,
 		NewVPCsDataSource,
 		NewSubnetsDataSource,
+		NewPublicIpsDataSource,
 		NewVirtualGatewaysDataSource,
 		NewNicsDataSource,
 		NewNatGatewaysDataSource,

@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_public_ip"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -99,4 +102,41 @@ func refreshState(ctx context.Context, provider Provider, id string) (*resource_
 
 	tf := PublicIpFromHttpToTf(res.JSON200)
 	return &tf, nil
+}
+
+func PublicIpsFromTfToAPIReadParams(ctx context.Context, tf PublicIpsDataSourceModel) iaas.ReadPublicIpsParams {
+	return iaas.ReadPublicIpsParams{
+		LinkPublicIpIds: utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpIds),
+		NicIds:          utils.TfStringListToStringPtrList(ctx, tf.NicIds),
+		PrivateIps:      utils.TfStringListToStringPtrList(ctx, tf.PrivateIps),
+		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
+		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues),
+		Tags:            utils.TfStringListToStringPtrList(ctx, tf.Tags),
+		Ids:             utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		VmIds:           utils.TfStringListToStringPtrList(ctx, tf.VmIds),
+	}
+}
+
+func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *iaas.PublicIp) (*datasource_public_ip.PublicIpModel, diag.Diagnostics) {
+	var (
+		tagsList types.List
+		diag     diag.Diagnostics
+	)
+
+	if http.Tags != nil {
+		tagsList, diag = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diag.HasError() {
+			return nil, diag
+		}
+	}
+
+	return &datasource_public_ip.PublicIpModel{
+		Id:             types.StringPointerValue(http.Id),
+		NicId:          types.StringPointerValue(http.NicId),
+		PrivateIp:      types.StringPointerValue(http.PrivateIp),
+		PublicIp:       types.StringPointerValue(http.PublicIp),
+		VmId:           types.StringPointerValue(http.VmId),
+		LinkPublicIpId: types.StringPointerValue(http.LinkPublicIpId),
+		Tags:           tagsList,
+	}, nil
 }

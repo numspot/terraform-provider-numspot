@@ -95,6 +95,11 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	if err != nil {
 		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
 	}
+
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, *data)...)
 }
 

@@ -50,7 +50,6 @@ func NewSubnetsDataSource() datasource.DataSource {
 	return &subnetsDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type subnetsDataSource struct {
 	provider Provider
 }

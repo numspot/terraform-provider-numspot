@@ -49,12 +49,10 @@ func (d *dhcpOptionsDataSource) Configure(_ context.Context, request datasource.
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewDHCPOptionsDataSource() datasource.DataSource {
 	return &dhcpOptionsDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type dhcpOptionsDataSource struct {
 	provider Provider
 }

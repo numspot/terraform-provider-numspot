@@ -48,12 +48,10 @@ func (d *virtualGatewaysDataSource) Configure(_ context.Context, request datasou
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewVirtualGatewaysDataSource() datasource.DataSource {
 	return &virtualGatewaysDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type virtualGatewaysDataSource struct {
 	provider Provider
 }

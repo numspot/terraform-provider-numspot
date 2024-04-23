@@ -42,12 +42,10 @@ func (d *vpnConnectionsDataSource) Configure(_ context.Context, request datasour
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewVPNDataSource() datasource.DataSource {
 	return &vpnConnectionsDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type vpnConnectionsDataSource struct {
 	provider Provider
 }

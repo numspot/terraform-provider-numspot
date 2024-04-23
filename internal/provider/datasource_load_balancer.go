@@ -41,12 +41,10 @@ func (d *loadBalancersDataSource) Configure(_ context.Context, request datasourc
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewLoadBalancersDataSource() datasource.DataSource {
 	return &loadBalancersDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type loadBalancersDataSource struct {
 	provider Provider
 }

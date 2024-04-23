@@ -48,12 +48,10 @@ func (d *vpcsDataSource) Configure(_ context.Context, request datasource.Configu
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewVPCsDataSource() datasource.DataSource {
 	return &vpcsDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type vpcsDataSource struct {
 	provider Provider
 }

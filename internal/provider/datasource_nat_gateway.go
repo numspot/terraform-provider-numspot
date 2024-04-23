@@ -47,12 +47,10 @@ func (d *natGatewaysDataSource) Configure(_ context.Context, request datasource.
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewNatGatewaysDataSource() datasource.DataSource {
 	return &natGatewaysDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type natGatewaysDataSource struct {
 	provider Provider
 }

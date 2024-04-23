@@ -52,12 +52,10 @@ func (d *volumesDataSource) Configure(_ context.Context, request datasource.Conf
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewVolumesDataSource() datasource.DataSource {
 	return &volumesDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type volumesDataSource struct {
 	provider Provider
 }

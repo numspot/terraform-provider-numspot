@@ -65,12 +65,10 @@ func (d *nicsDataSource) Configure(_ context.Context, request datasource.Configu
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewNicsDataSource() datasource.DataSource {
 	return &nicsDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type nicsDataSource struct {
 	provider Provider
 }
