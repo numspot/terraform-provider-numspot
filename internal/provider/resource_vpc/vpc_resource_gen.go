@@ -7,6 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
+
 	//"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -47,7 +49,7 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			//"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -58,5 +60,5 @@ type VpcModel struct {
 	IpRange          types.String `tfsdk:"ip_range"`
 	State            types.String `tfsdk:"state"`
 	Tenancy          types.String `tfsdk:"tenancy"`
-	//Tags             types.List   `tfsdk:"tags"`
+	Tags             types.List   `tfsdk:"tags"`
 }
