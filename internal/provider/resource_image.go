@@ -75,7 +75,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 
 	// Retries read on resource until state is OK
 	createdId := *res.JSON201.Id
-	_, err = retry_utils.RetryReadUntilStateValid(
+	waitedImage, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.SpaceID,
@@ -88,7 +88,12 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 
-	tf, diagnostics := ImageFromHttpToTf(ctx, res.JSON201)
+	image, ok := waitedImage.(*iaas.Image)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create Image", fmt.Sprintf("Error waiting for instance (%s) to be created", createdId))
+	}
+
+	tf, diagnostics := ImageFromHttpToTf(ctx, image)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return

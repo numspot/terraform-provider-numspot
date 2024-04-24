@@ -16,8 +16,8 @@ func TestAccImageResource_FromImage(t *testing.T) {
 
 	randint := rand.Intn(9999-1000) + 1000
 	imageName := fmt.Sprintf("terraform-generated-volume-%d", randint)
-	sourceImageId := "ami-00b0c39a"
-	region := "eu-west-2"
+	sourceImageId := "ami-026ce760"
+	region := "cloudgouv-eu-west-1"
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
@@ -28,6 +28,7 @@ func TestAccImageResource_FromImage(t *testing.T) {
 					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
 					resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", sourceImageId),
 					resource.TestCheckResourceAttr("numspot_image.test", "source_region_name", region),
+					resource.TestCheckResourceAttr("numspot_image.test", "state", "available"),
 				),
 				ExpectNonEmptyPlan: true,
 			},
@@ -49,4 +50,47 @@ resource "numspot_image" "test" {
   source_image_id    = %[2]q
   source_region_name = %[3]q
 }`, name, sourceImageId, region)
+}
+
+func TestAccImageResource_FromVm(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	randint := rand.Intn(9999-1000) + 1000
+	imageName := fmt.Sprintf("terraform-generated-volume-%d", randint)
+	sourceImageId := "ami-026ce760"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: testImageConfig_Create_FromVm(sourceImageId, imageName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
+					resource.TestCheckResourceAttr("numspot_image.test", "state", "available"),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_image.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"vm_id"},
+			},
+		},
+	})
+}
+
+func testImageConfig_Create_FromVm(imageId, name string) string {
+	return fmt.Sprintf(`
+resource "numspot_vm" "vm" {
+	image_id 	= %[1]q
+	vm_type		= "tinav6.c1r1p3"
+}
+
+resource "numspot_image" "test" {
+  	name	= %[2]q
+	vm_id	= numspot_vm.vm.id
+}`, imageId, name)
 }
