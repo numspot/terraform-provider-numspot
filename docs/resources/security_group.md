@@ -41,9 +41,9 @@ This name must be unique and contain between 1 and 255 ASCII characters. Accente
 
 ### Optional
 
-- `inbound_rules` (Attributes List) The inbound rules associated with the security group. (see [below for nested schema](#nestedatt--inbound_rules))
+- `inbound_rules` (Attributes Set) The inbound rules associated with the security group. (see [below for nested schema](#nestedatt--inbound_rules))
 - `net_id` (String) The ID of the Net for the security group.
-- `outbound_rules` (Attributes List) The outbound rules associated with the security group. (see [below for nested schema](#nestedatt--outbound_rules))
+- `outbound_rules` (Attributes Set) The outbound rules associated with the security group. (see [below for nested schema](#nestedatt--outbound_rules))
 
 ### Read-Only
 

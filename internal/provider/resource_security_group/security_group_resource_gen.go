@@ -28,7 +28,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the security group.",
 				MarkdownDescription: "The ID of the security group.",
 			},
-			"inbound_rules": schema.ListNestedAttribute{
+			"inbound_rules": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"from_port_range": schema.Int64Attribute{
@@ -106,7 +106,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Net for the security group.",
 				MarkdownDescription: "The ID of the Net for the security group.",
 			},
-			"outbound_rules": schema.ListNestedAttribute{
+			"outbound_rules": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"from_port_range": schema.Int64Attribute{
@@ -181,10 +181,10 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 type SecurityGroupModel struct {
 	Description   types.String `tfsdk:"description"`
 	Id            types.String `tfsdk:"id"`
-	InboundRules  types.List   `tfsdk:"inbound_rules"`
+	InboundRules  types.Set    `tfsdk:"inbound_rules"`
 	Name          types.String `tfsdk:"name"`
 	NetId         types.String `tfsdk:"net_id"`
-	OutboundRules types.List   `tfsdk:"outbound_rules"`
+	OutboundRules types.Set    `tfsdk:"outbound_rules"`
 }
 
 var _ basetypes.ObjectTypable = InboundRulesType{}

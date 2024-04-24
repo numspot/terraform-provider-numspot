@@ -106,81 +106,12 @@ func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_grou
 		obd = append(obd, value)
 	}
 
-	// Reordering rules, to match state because osc is reordering security group rules
-	if len(model.InboundRules.Elements()) > 0 {
-		modelIbd := make([]resource_security_group.InboundRulesValue, 0, len(model.InboundRules.Elements()))
-		if diagnostics := model.InboundRules.ElementsAs(ctx, &modelIbd, false); diagnostics.HasError() {
-			return nil, diagnostics
-		}
-
-		m := true
-		for m {
-			m = false
-
-			posA := -1
-			posB := -1
-
-			for i := range ibd {
-				eA := &ibd[i]
-				for j := range modelIbd {
-					eB := &modelIbd[j]
-					if eA.FromPortRange.Equal(eB.FromPortRange) &&
-						eA.ToPortRange.Equal(eB.ToPortRange) &&
-						eA.IpProtocol.Equal(eB.IpProtocol) &&
-						eA.IpRanges.Equal(eB.IpRanges) {
-						posA = i
-						posB = j
-					}
-				}
-			}
-
-			if posA != -1 && posA != posB {
-				ibd[posA], ibd[posB] = ibd[posB], ibd[posA]
-				m = true
-			}
-		}
-	}
-
-	if len(model.OutboundRules.Elements()) > 0 {
-		modelObd := make([]resource_security_group.OutboundRulesValue, 0, len(model.OutboundRules.Elements()))
-		if diagnostics := model.OutboundRules.ElementsAs(ctx, &modelObd, false); diagnostics.HasError() {
-			return nil, diagnostics
-		}
-
-		m := true
-		for m {
-			m = false
-
-			posA := -1
-			posB := -1
-
-			for i := range obd {
-				eA := &obd[i]
-				for j := range modelObd {
-					eB := &modelObd[j]
-					if eA.FromPortRange.Equal(eB.FromPortRange) &&
-						eA.ToPortRange.Equal(eB.ToPortRange) &&
-						eA.IpProtocol.Equal(eB.IpProtocol) &&
-						eA.IpRanges.Equal(eB.IpRanges) {
-						posA = i
-						posB = j
-					}
-				}
-			}
-
-			if posA != -1 && posA != posB {
-				obd[posA], obd[posB] = obd[posB], obd[posA]
-				m = true
-			}
-		}
-	}
-
-	ibdsTf, diagnostics := types.ListValueFrom(ctx, resource_security_group.InboundRulesValue{}.Type(ctx), ibd)
+	ibdsTf, diagnostics := types.SetValueFrom(ctx, resource_security_group.InboundRulesValue{}.Type(ctx), ibd)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}
 
-	obdsTf, diagnostics := types.ListValueFrom(ctx, resource_security_group.OutboundRulesValue{}.Type(ctx), obd)
+	obdsTf, diagnostics := types.SetValueFrom(ctx, resource_security_group.OutboundRulesValue{}.Type(ctx), obd)
 	if diagnostics.HasError() {
 		return nil, diagnostics
 	}

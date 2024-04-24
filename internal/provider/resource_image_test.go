@@ -85,12 +85,12 @@ func TestAccImageResource_FromVm(t *testing.T) {
 func testImageConfig_Create_FromVm(imageId, name string) string {
 	return fmt.Sprintf(`
 resource "numspot_vm" "vm" {
-	image_id 	= %[1]q
-	vm_type		= "tinav6.c1r1p3"
+  image_id = %[1]q
+  vm_type  = "tinav6.c1r1p3"
 }
 
 resource "numspot_image" "test" {
-  	name	= %[2]q
-	vm_id	= numspot_vm.vm.id
+  name  = %[2]q
+  vm_id = numspot_vm.vm.id
 }`, imageId, name)
 }
