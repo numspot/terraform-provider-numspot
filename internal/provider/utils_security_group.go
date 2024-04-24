@@ -155,7 +155,7 @@ func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_grou
 			posB := -1
 
 			for i := range obd {
-				eA := &ibd[i]
+				eA := &obd[i]
 				for j := range modelObd {
 					eB := &modelObd[j]
 					if eA.FromPortRange.Equal(eB.FromPortRange) &&
