@@ -73,8 +73,8 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	tf := PublicIpFromHttpToTf(createRes.JSON201)
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+	state = PublicIpFromHttpToTf(createRes.JSON201)
+	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 
 	if plan.VmId.IsNull() && plan.NicId.IsUnknown() {
 		return
@@ -148,10 +148,7 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 	}
 
 	if chgSet.Unlink {
-		if err := invokeUnlinkPublicIP(ctx, r.provider, &state); err != nil {
-			response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
-			return
-		}
+		_ = invokeUnlinkPublicIP(ctx, r.provider, &state) // We still want to try delete resource even if the unlink didn't work (ressource has been unlinked before for example)
 		state.LinkPublicIP = types.StringNull()
 		data, err := refreshState(ctx, r.provider, state.Id.ValueString())
 		if err != nil {
@@ -182,10 +179,7 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
 	if !state.LinkPublicIP.IsNull() {
-		if err := invokeUnlinkPublicIP(ctx, r.provider, &state); err != nil {
-			response.Diagnostics.AddError("Failed to unlink public IP", err.Error())
-			return
-		}
+		_ = invokeUnlinkPublicIP(ctx, r.provider, &state) // We still want to try delete resource even if the unlink didn't work (ressource has been unlinked before for example)
 	}
 
 	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, state.Id.ValueString(), r.provider.ApiClient.DeletePublicIpWithResponse)

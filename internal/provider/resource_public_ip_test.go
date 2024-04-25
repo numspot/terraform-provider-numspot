@@ -60,8 +60,8 @@ func createPublicIPConfig() string {
 func linkPublicIPToVMConfig() string {
 	return `
 resource "numspot_vm" "vm" {
-  image_id = "ami-00b0c39a"
-  vm_type  = "t2.small"
+  image_id = "ami-060e019f"
+  vm_type  = "tinav6.c1r1p3"
 }
 
 resource "numspot_public_ip" "test" {
@@ -70,7 +70,5 @@ resource "numspot_public_ip" "test" {
 }
 
 func UnlinkPublicIPConfig() string {
-	return `
-resource "numspot_public_ip" "test" {}
-`
+	return `resource "numspot_public_ip" "test" {}`
 }

@@ -77,7 +77,7 @@ func invokeUnlinkPublicIP(ctx context.Context, provider Provider, data *resource
 	payload := iaas.UnlinkPublicIpJSONRequestBody{
 		LinkPublicIpId: data.LinkPublicIP.ValueStringPointer(),
 	}
-	res, err := provider.ApiClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.LinkPublicIP.ValueString(), payload)
+	res, err := provider.ApiClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
 	if err != nil {
 		return err
 	}
