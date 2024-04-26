@@ -52,15 +52,18 @@ func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, ret
 
 	if slices.Contains(stopRetryCodes, res.StatusCode()) {
 		return nil
-	} else if slices.Contains(retryCodes, res.StatusCode()) {
-		time.Sleep(TfRequestRetryDelay) // Delay not handled in RetryContext. Might find a better solution later
-		return retry.RetryableError(fmt.Errorf("got status code %v. Must retry request", res.StatusCode()))
 	} else {
 		errorMessage, err := getErrorMessage(res)
 		if err != nil {
 			return retry.NonRetryableError(fmt.Errorf("error : got http status code %v but failed to parse error message. Reason : %v", res.StatusCode(), err))
 		}
-		return retry.NonRetryableError(errors.New(errorMessage))
+
+		if slices.Contains(retryCodes, res.StatusCode()) {
+			time.Sleep(TfRequestRetryDelay) // Delay not handled in RetryContext. Might find a better solution later
+			return retry.RetryableError(fmt.Errorf("error : retry timeout reached (%v). Error message : %v", TfRequestRetryTimeout, errorMessage))
+		} else {
+			return retry.NonRetryableError(errors.New(errorMessage))
+		}
 	}
 }
 
