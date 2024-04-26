@@ -171,6 +171,24 @@ func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, tfListInne
 	return types.ListValueFrom(ctx, to[0].Type(ctx), to)
 }
 
+func GenericSetToTfSetValue[A ITFValue, B any](ctx context.Context, tfListInnerObjType A, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.SetValue, diag.Diagnostics) {
+	if len(from) == 0 {
+		return types.SetNull(tfListInnerObjType.Type(ctx)), diag.Diagnostics{}
+	}
+
+	to := make([]A, 0, len(from))
+	for i := range from {
+		res, diags := fn(ctx, from[i])
+		if diags.HasError() {
+			return types.Set{}, diags
+		}
+
+		to = append(to, res)
+	}
+
+	return types.SetValueFrom(ctx, to[0].Type(ctx), to)
+}
+
 func StringListToTfListValue(ctx context.Context, from []string) (types.List, diag.Diagnostics) {
 	return GenericListToTfListValue(
 		ctx,

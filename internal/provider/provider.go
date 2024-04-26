@@ -391,6 +391,7 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewSnapshotDataSource,
 		NewKeypairDataSource,
 		NewClientGatewaysDataSource,
+		NewSecurityGroupsDataSource,
 		NewRouteTablesDataSource,
 		NewVpnConnectionsDataSource,
 	}
