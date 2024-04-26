@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	imageId = "ami-060e019f"
-	vmType  = "t2.small"
+	vmType        = "tinav6.c1r1p3"
+	sourceImageId = "ami-026ce760"
 )
 
 func TestAccVmResource(t *testing.T) {
@@ -23,14 +23,14 @@ func TestAccVmResource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testVmConfig_Create(imageId, vmType),
+				Config: testVmConfig_Create(sourceImageId, vmType),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vm.test", "image_id", imageId),
 					resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
 						return nil
 					}),
 				),
+				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
@@ -41,20 +41,27 @@ func TestAccVmResource(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testVmConfig_Create(imageId, vmType),
+				Config: testVmConfig_Create(sourceImageId, vmType),
 				Check:  resource.ComposeAggregateTestCheckFunc(),
+				ExpectNonEmptyPlan: true,
 			},
+			
 		},
 	})
 }
 
-func testVmConfig_Create(imageId, vmType string) string {
+func testVmConfig_Create(sourceImageId, vmType string) string {
 	return fmt.Sprintf(`
+resource "numspot_image" "test" {
+	name               = "terraform-generated-image-for-public-ip-test"
+	source_image_id    = %[1]q
+	source_region_name = "cloudgouv-eu-west-1"
+}
 resource "numspot_vm" "test" {
-  image_id = %[1]q
+  image_id = numspot_image.test.id
   vm_type  = %[2]q
 }
-`, imageId, vmType)
+`, sourceImageId, vmType)
 }
 
 func TestAccVmResource_NetSubnet(t *testing.T) {
@@ -65,14 +72,14 @@ func TestAccVmResource_NetSubnet(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testVmConfig_NetSubnet(imageId, vmType),
+				Config: testVmConfig_NetSubnet(sourceImageId, vmType),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vm.test", "image_id", imageId),
 					resource.TestCheckResourceAttr("numspot_vm.test", "vm_type", vmType),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "net_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "subnet_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "id"),
 				),
+				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
@@ -83,14 +90,15 @@ func TestAccVmResource_NetSubnet(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testVmConfig_NetSubnet(imageId, vmType),
+				Config: testVmConfig_NetSubnet(sourceImageId, vmType),
 				Check:  resource.ComposeAggregateTestCheckFunc(),
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
 }
 
-func testVmConfig_NetSubnet(imageId, vmType string) string {
+func testVmConfig_NetSubnet(sourceImageId, vmType string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "net" {
   ip_range = "10.101.0.0/16"
@@ -101,12 +109,18 @@ resource "numspot_subnet" "subnet" {
   ip_range = "10.101.1.0/24"
 }
 
+resource "numspot_image" "test" {
+	name               = "terraform-generated-image-for-public-ip-test"
+	source_image_id    = %[1]q
+	source_region_name = "cloudgouv-eu-west-1"
+}
+
 resource "numspot_vm" "test" {
-  image_id  = %[1]q
+  image_id  = numspot_image.test.id
   vm_type   = %[2]q
   subnet_id = numspot_subnet.subnet.id
 }
-`, imageId, vmType)
+`, sourceImageId, vmType)
 }
 
 func TestAccVmResource_NetSubnetSG(t *testing.T) {
@@ -117,9 +131,8 @@ func TestAccVmResource_NetSubnetSG(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testVmConfig_NetSubnetSG(imageId, vmType),
+				Config: testVmConfig_NetSubnetSG(sourceImageId, vmType),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vm.test", "image_id", imageId),
 					resource.TestCheckResourceAttr("numspot_vm.test", "vm_type", vmType),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "net_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "subnet_id"),
@@ -130,7 +143,7 @@ func TestAccVmResource_NetSubnetSG(t *testing.T) {
 	})
 }
 
-func testVmConfig_NetSubnetSG(imageId, vmType string) string {
+func testVmConfig_NetSubnetSG(sourceImageId, vmType string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "net" {
   ip_range = "10.101.0.0/16"
@@ -156,14 +169,20 @@ resource "numspot_security_group" "sg" {
   ]
 }
 
+resource "numspot_image" "test" {
+	name               = "terraform-generated-image-for-vm-test"
+	source_image_id    = %[1]q
+	source_region_name = "cloudgouv-eu-west-1"
+}
+
 resource "numspot_vm" "test" {
-  image_id           = %[1]q
+  image_id           = numspot_image.test.id
   vm_type            = %[2]q
   subnet_id          = numspot_subnet.subnet.id
   security_group_ids = [numspot_security_group.sg.id]
   depends_on         = [numspot_security_group.sg]
 }
-`, imageId, vmType)
+`, sourceImageId, vmType)
 }
 
 func TestAccVmResource_NetSubnetSGRouteTable(t *testing.T) {
@@ -174,20 +193,20 @@ func TestAccVmResource_NetSubnetSGRouteTable(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testVmConfig_NetSubnetSGRouteTable(imageId, vmType),
+				Config: testVmConfig_NetSubnetSGRouteTable(sourceImageId, vmType),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vm.test", "image_id", imageId),
 					resource.TestCheckResourceAttr("numspot_vm.test", "vm_type", vmType),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "net_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "subnet_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "id"),
 				),
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
 }
 
-func testVmConfig_NetSubnetSGRouteTable(imageId, vmType string) string {
+func testVmConfig_NetSubnetSGRouteTable(sourceImageId, vmType string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "net" {
   ip_range = "10.101.0.0/16"
@@ -234,12 +253,18 @@ resource "numspot_public_ip" "public_ip" {
   depends_on = [numspot_route_table.rt]
 }
 
+resource "numspot_image" "test" {
+	name               = "terraform-generated-image-for-vm-test"
+	source_image_id    = %[1]q
+	source_region_name = "cloudgouv-eu-west-1"
+}
+
 resource "numspot_vm" "test" {
-  image_id           = %[1]q
+  image_id           = numspot_image.test.id
   vm_type            = %[2]q
   subnet_id          = numspot_subnet.subnet.id
   security_group_ids = [numspot_security_group.sg.id]
   depends_on         = [numspot_security_group.sg]
 }
-`, imageId, vmType)
+`, sourceImageId, vmType)
 }

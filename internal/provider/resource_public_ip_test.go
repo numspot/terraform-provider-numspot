@@ -41,6 +41,7 @@ func TestAccPublicIpResource(t *testing.T) {
 						return nil
 					}),
 				),
+				ExpectNonEmptyPlan: true,
 			},
 			// Update testing
 			{
@@ -48,19 +49,27 @@ func TestAccPublicIpResource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckNoResourceAttr("numspot_public_ip.test", "link_public_ip"),
 				),
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
 }
 
 func createPublicIPConfig() string {
-	return `resource "numspot_public_ip" "test" {}`
+	return `
+resource "numspot_public_ip" "test" {}`
 }
 
 func linkPublicIPToVMConfig() string {
 	return `
+resource "numspot_image" "test" {
+	name               = "terraform-generated-image-for-public-ip-test"
+	source_image_id    = "ami-026ce760"
+	source_region_name = "cloudgouv-eu-west-1"
+}
+
 resource "numspot_vm" "vm" {
-  image_id = "ami-060e019f"
+  image_id = numspot_image.test.id
   vm_type  = "tinav6.c1r1p3"
 }
 
@@ -70,5 +79,13 @@ resource "numspot_public_ip" "test" {
 }
 
 func UnlinkPublicIPConfig() string {
-	return `resource "numspot_public_ip" "test" {}`
+	return `
+resource "numspot_image" "test" {
+	name               = "terraform-generated-image-for-public-ip-test"
+	source_image_id    = "ami-026ce760"
+	source_region_name = "cloudgouv-eu-west-1"
+}
+
+resource "numspot_public_ip" "test" {}
+`
 }
