@@ -57,7 +57,7 @@ func KeyPairFromTfToCreateRequest(tf *resource_key_pair.KeyPairModel) iaas.Creat
 	}
 }
 
-func KeypairFromTfToAPIReadParams(ctx context.Context, tf KeypairDataSourceModel) iaas.ReadKeypairsParams {
+func KeypairsFromTfToAPIReadParams(ctx context.Context, tf KeypairsDataSourceModel) iaas.ReadKeypairsParams {
 	return iaas.ReadKeypairsParams{
 		KeypairFingerprints: utils.TfStringListToStringPtrList(ctx, tf.Fingerprints),
 		KeypairNames:        utils.TfStringListToStringPtrList(ctx, tf.Names),
@@ -65,7 +65,7 @@ func KeypairFromTfToAPIReadParams(ctx context.Context, tf KeypairDataSourceModel
 	}
 }
 
-func KeypairFromHttpToTfDatasource(ctx context.Context, http *iaas.Keypair) *datasource_key_pair.KeyPairModel {
+func KeypairsFromHttpToTfDatasource(ctx context.Context, http *iaas.Keypair) *datasource_key_pair.KeyPairModel {
 	return &datasource_key_pair.KeyPairModel{
 		Fingerprint: types.StringPointerValue(http.Fingerprint),
 		Name:        types.StringPointerValue(http.Name),

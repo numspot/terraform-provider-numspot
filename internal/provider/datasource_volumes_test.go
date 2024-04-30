@@ -15,7 +15,7 @@ func TestAccVolumesDatasource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 	volumeType := "standard"
 	volumeSize := 11
-	volumeAZ := "eu-west-2a"
+	volumeAZ := "cloudgouv-eu-west-1a"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
