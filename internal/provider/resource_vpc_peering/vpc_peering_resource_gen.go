@@ -126,7 +126,7 @@ type VpcPeeringModel struct {
 	SourceVpc      SourceVpcValue   `tfsdk:"source_vpc"`
 	SourceVpcId    types.String     `tfsdk:"source_vpc_id"`
 	State          StateValue       `tfsdk:"state"`
-	Tags		   types.List		`tfsdk:"tags"`
+	Tags           types.List       `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = AccepterVpcType{}

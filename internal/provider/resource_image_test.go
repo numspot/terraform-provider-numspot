@@ -158,10 +158,10 @@ resource "numspot_image" "test" {
   source_region_name = %[3]q
 
   tags = [
-	{
-	  key 		= %[4]q
-	  value	 	= %[5]q
-	}
+    {
+      key   = %[4]q
+      value = %[5]q
+    }
   ]
 }`, name, sourceImageId, region, tagKey, tagValue)
 }

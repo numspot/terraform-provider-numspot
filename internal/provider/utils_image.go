@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -11,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_image"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 

@@ -112,13 +112,13 @@ func TestAccNetResource_Tags(t *testing.T) {
 func testNetConfig_Tags(name string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "test" {
- ip_range = "10.101.0.0/16"
- tenancy  = "default"
- tags = [
-   {
-     key   = "Name"
-     value = %[1]q
-   }
- ]
+  ip_range = "10.101.0.0/16"
+  tenancy  = "default"
+  tags = [
+    {
+      key   = "Name"
+      value = %[1]q
+    }
+  ]
 }`, name)
 }

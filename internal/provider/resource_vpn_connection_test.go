@@ -276,10 +276,10 @@ resource "numspot_vpn_connection" "test" {
   static_routes_only = %[1]q
 
   tags = [
-	{
-	  key 		= %[2]q
-	  value	 	= %[3]q
-	}
+    {
+      key   = %[2]q
+      value = %[3]q
+    }
   ]
 }`, static_route_only, tagKey, tagValue)
 }

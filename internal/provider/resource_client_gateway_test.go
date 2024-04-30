@@ -153,10 +153,10 @@ resource "numspot_client_gateway" "test" {
   bgp_asn         = %d
 
   tags = [
-	{
-	  key 		= %[4]q
-	  value	 	= %[5]q
-	}
+    {
+      key   = %[4]q
+      value = %[5]q
+    }
   ]
 }`, connectionType, publicIp, bgpAsn, tagKey, tagValue)
 }

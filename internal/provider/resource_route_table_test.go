@@ -144,10 +144,10 @@ resource "numspot_route_table" "test" {
   subnet_id = numspot_subnet.subnet.id
 
   tags = [
-	{
-	  key 		= %[3]q
-	  value	 	= %[4]q
-	}
+    {
+      key   = %[3]q
+      value = %[4]q
+    }
   ]
 }`, netIpRange, subnetIpRange, tagKey, tagValue)
 }

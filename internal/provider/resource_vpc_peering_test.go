@@ -103,10 +103,10 @@ resource "numspot_vpc_peering" "test" {
   source_vpc_id   = numspot_vpc.source.id
 
   tags = [
-	{
-	  key 		= %[1]q
-	  value	 	= %[2]q
-	}
+    {
+      key   = %[1]q
+      value = %[2]q
+    }
   ]
 }`, key, value)
 }

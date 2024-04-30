@@ -201,7 +201,7 @@ resource "numspot_snapshot" "test" {
   description = %[1]q
   tags = [
     {
-      key 	= %[2]q
+      key   = %[2]q
       value = %[3]q
     }
   ]

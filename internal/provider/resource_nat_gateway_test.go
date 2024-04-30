@@ -148,10 +148,10 @@ resource "numspot_nat_gateway" "test" {
   public_ip_id = numspot_public_ip.test.id
 
   tags = [
-	{
-	  key 		= %[1]q
-	  value	 	= %[2]q
-	}
+    {
+      key   = %[1]q
+      value = %[2]q
+    }
   ]
 }`, key, value)
 }

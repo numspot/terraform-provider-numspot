@@ -113,10 +113,10 @@ resource "numspot_volume" "test" {
   size                   = %[2]d
   availability_zone_name = %[3]q
   tags = [
-	{
-	  key 		= %[4]q
-	  value	 	= %[5]q
-	}
+    {
+      key   = %[4]q
+      value = %[5]q
+    }
   ]
 }`, volumeType, volumeSize, volumeAZ, tagKey, tagValue)
 	return t

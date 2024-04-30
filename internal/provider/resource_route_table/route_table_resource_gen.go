@@ -181,7 +181,7 @@ type RouteTableModel struct {
 	SpaceId                         types.String `tfsdk:"space_id"`
 	VpcId                           types.String `tfsdk:"vpc_id"`
 	SubnetId                        types.String `tfsdk:"subnet_id"`
-	Tags                          	types.List   `tfsdk:"tags"`
+	Tags                            types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = LinkRouteTablesType{}

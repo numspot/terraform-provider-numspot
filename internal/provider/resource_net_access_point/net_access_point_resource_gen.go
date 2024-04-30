@@ -51,5 +51,5 @@ type NetAccessPointModel struct {
 	RouteTableIds types.List   `tfsdk:"route_table_ids"`
 	ServiceName   types.String `tfsdk:"service_name"`
 	State         types.String `tfsdk:"state"`
-	Tags 		  types.List   `tfsdk:"tags"`
+	Tags          types.List   `tfsdk:"tags"`
 }

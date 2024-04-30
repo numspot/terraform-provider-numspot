@@ -64,9 +64,9 @@ resource "numspot_public_ip" "test" {}`
 func linkPublicIPToVMConfig() string {
 	return `
 resource "numspot_image" "test" {
-	name               = "terraform-generated-image-for-public-ip-test"
-	source_image_id    = "ami-026ce760"
-	source_region_name = "cloudgouv-eu-west-1"
+  name               = "terraform-generated-image-for-public-ip-test"
+  source_image_id    = "ami-026ce760"
+  source_region_name = "cloudgouv-eu-west-1"
 }
 
 resource "numspot_vm" "vm" {
@@ -82,9 +82,9 @@ resource "numspot_public_ip" "test" {
 func UnlinkPublicIPConfig() string {
 	return `
 resource "numspot_image" "test" {
-	name               = "terraform-generated-image-for-public-ip-test"
-	source_image_id    = "ami-026ce760"
-	source_region_name = "cloudgouv-eu-west-1"
+  name               = "terraform-generated-image-for-public-ip-test"
+  source_image_id    = "ami-026ce760"
+  source_region_name = "cloudgouv-eu-west-1"
 }
 
 resource "numspot_public_ip" "test" {}
@@ -133,12 +133,12 @@ func TestAccPublicIpResource_Tags(t *testing.T) {
 func PublicIPConfig_Tags(key, value string) string {
 	return fmt.Sprintf(`
 resource "numspot_public_ip" "test" {
-	tags = [
-		{
-			key 	= %[1]q
-			value 	= %[2]q
-		}
-	]
+  tags = [
+    {
+      key   = %[1]q
+      value = %[2]q
+    }
+  ]
 }
 `, key, value)
 }

@@ -61,5 +61,5 @@ type ClientGatewayModel struct {
 	Id             types.String `tfsdk:"id"`
 	PublicIp       types.String `tfsdk:"public_ip"`
 	State          types.String `tfsdk:"state"`
-	Tags		   types.List	`tfsdk:"tags"`
+	Tags           types.List   `tfsdk:"tags"`
 }

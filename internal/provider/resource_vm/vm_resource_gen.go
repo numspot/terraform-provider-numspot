@@ -609,7 +609,7 @@ type VmModel struct {
 	VmInitiatedShutdownBehavior types.String   `tfsdk:"vm_initiated_shutdown_behavior"`
 	VmType                      types.String   `tfsdk:"vm_type"`
 	VmsCount                    types.Int64    `tfsdk:"vms_count"`
-	Tags              			types.List     `tfsdk:"tags"`
+	Tags                        types.List     `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = BlockDeviceMappingsType{}

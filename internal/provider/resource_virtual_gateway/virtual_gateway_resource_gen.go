@@ -68,7 +68,7 @@ type VirtualGatewayModel struct {
 	Id                       types.String `tfsdk:"id"`
 	NetToVirtualGatewayLinks types.List   `tfsdk:"net_to_virtual_gateway_links"`
 	State                    types.String `tfsdk:"state"`
-	Tags 					 types.List   `tfsdk:"tags"`
+	Tags                     types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = NetToVirtualGatewayLinksType{}

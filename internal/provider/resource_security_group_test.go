@@ -412,10 +412,10 @@ resource "numspot_security_group" "test" {
   name        = %[2]q
   description = %[3]q
   tags = [
-	{
-	  key 		= %[4]q
-	  value	 	= %[5]q
-	}
+    {
+      key   = %[4]q
+      value = %[5]q
+    }
   ]
 }`, netIpRange, name, description, tagKey, tagValue)
 }

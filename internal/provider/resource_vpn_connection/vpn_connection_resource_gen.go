@@ -271,7 +271,7 @@ type VpnConnectionModel struct {
 	VgwTelemetries             types.List      `tfsdk:"vgw_telemetries"`
 	VirtualGatewayId           types.String    `tfsdk:"virtual_gateway_id"`
 	VpnOptions                 VpnOptionsValue `tfsdk:"vpn_options"`
-	Tags  					   types.List	   `tfsdk:"tags"`
+	Tags                       types.List      `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = RoutesType{}

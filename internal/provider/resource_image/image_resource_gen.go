@@ -256,7 +256,7 @@ type ImageModel struct {
 	StateComment        StateCommentValue `tfsdk:"state_comment"`
 	Type                types.String      `tfsdk:"type"`
 	VmId                types.String      `tfsdk:"vm_id"`
-	Tags				types.List		  `tfsdk:"tags"`
+	Tags                types.List        `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = BlockDeviceMappingsType{}

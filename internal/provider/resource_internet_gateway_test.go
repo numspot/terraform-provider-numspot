@@ -81,10 +81,10 @@ resource "numspot_internet_gateway" "test" {
   vpc_id = numspot_vpc.test.id
 
   tags = [
-	{
-	  key 		= %[1]q
-	  value	 	= %[2]q
-	}
+    {
+      key   = %[1]q
+      value = %[2]q
+    }
   ]
 }`, key, value)
 }

@@ -187,7 +187,7 @@ type SecurityGroupModel struct {
 	Name          types.String `tfsdk:"name"`
 	NetId         types.String `tfsdk:"net_id"`
 	OutboundRules types.Set    `tfsdk:"outbound_rules"`
-	Tags		  types.List   `tfsdk:"tags"`
+	Tags          types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = InboundRulesType{}

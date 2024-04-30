@@ -256,7 +256,7 @@ type NicModel struct {
 	State                types.String      `tfsdk:"state"`
 	SubnetId             types.String      `tfsdk:"subnet_id"`
 	VpcId                types.String      `tfsdk:"vpc_id"`
-	Tags		       	 types.List        `tfsdk:"tags"`
+	Tags                 types.List        `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = LinkNicType{}

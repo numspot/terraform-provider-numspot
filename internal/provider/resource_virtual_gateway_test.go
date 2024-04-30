@@ -88,10 +88,10 @@ resource "numspot_virtual_gateway" "test" {
   connection_type = %[1]q
 
   tags = [
-	{
-	  key 		= %[2]q
-	  value	 	= %[3]q
-	}
+    {
+      key   = %[2]q
+      value = %[3]q
+    }
   ]
 }`, connectionType, tagKey, tagValue)
 }

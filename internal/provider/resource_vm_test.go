@@ -52,9 +52,9 @@ func TestAccVmResource(t *testing.T) {
 func testVmConfig_Create(sourceImageId, vmType string) string {
 	return fmt.Sprintf(`
 resource "numspot_image" "test" {
-	name               = "terraform-generated-image-for-public-ip-test"
-	source_image_id    = %[1]q
-	source_region_name = "cloudgouv-eu-west-1"
+  name               = "terraform-generated-image-for-public-ip-test"
+  source_image_id    = %[1]q
+  source_region_name = "cloudgouv-eu-west-1"
 }
 resource "numspot_vm" "test" {
   image_id = numspot_image.test.id
@@ -109,9 +109,9 @@ resource "numspot_subnet" "subnet" {
 }
 
 resource "numspot_image" "test" {
-	name               = "terraform-generated-image-for-public-ip-test"
-	source_image_id    = %[1]q
-	source_region_name = "cloudgouv-eu-west-1"
+  name               = "terraform-generated-image-for-public-ip-test"
+  source_image_id    = %[1]q
+  source_region_name = "cloudgouv-eu-west-1"
 }
 
 resource "numspot_vm" "test" {
@@ -169,9 +169,9 @@ resource "numspot_security_group" "sg" {
 }
 
 resource "numspot_image" "test" {
-	name               = "terraform-generated-image-for-vm-test"
-	source_image_id    = %[1]q
-	source_region_name = "cloudgouv-eu-west-1"
+  name               = "terraform-generated-image-for-vm-test"
+  source_image_id    = %[1]q
+  source_region_name = "cloudgouv-eu-west-1"
 }
 
 resource "numspot_vm" "test" {
@@ -253,9 +253,9 @@ resource "numspot_public_ip" "public_ip" {
 }
 
 resource "numspot_image" "test" {
-	name               = "terraform-generated-image-for-vm-test"
-	source_image_id    = %[1]q
-	source_region_name = "cloudgouv-eu-west-1"
+  name               = "terraform-generated-image-for-vm-test"
+  source_image_id    = %[1]q
+  source_region_name = "cloudgouv-eu-west-1"
 }
 
 resource "numspot_vm" "test" {
@@ -315,10 +315,10 @@ resource "numspot_vm" "test" {
   vm_type  = %[2]q
 
   tags = [
-	{
-	  key 		= %[3]q
-	  value	 	= %[4]q
-	}
+    {
+      key   = %[3]q
+      value = %[4]q
+    }
   ]
 }
 `, imageId, vmType, tagKey, tagValue)

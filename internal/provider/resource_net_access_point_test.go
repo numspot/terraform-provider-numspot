@@ -98,18 +98,18 @@ func TestAccNetAccessPointResource_Tags(t *testing.T) {
 func testNetAccessPointConfig_Tags(tagKey, tagValue string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "test" {
-	ip_range = "10.101.0.0/24"
+  ip_range = "10.101.0.0/24"
 }
 
 resource "numspot_net_access_point" "test" {
-  net_id = numspot_vpc.test.id
+  net_id       = numspot_vpc.test.id
   service_name = "com.outscale.cloudgouv-eu-west-1.oos"
 
   tags = [
-	{
-	  key 		= %[1]q
-	  value	 	= %[2]q
-	}
+    {
+      key   = %[1]q
+      value = %[2]q
+    }
   ]
 }
 `, tagKey, tagValue)

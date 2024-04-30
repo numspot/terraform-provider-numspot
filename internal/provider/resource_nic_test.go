@@ -115,10 +115,10 @@ resource "numspot_subnet" "subnet" {
 resource "numspot_nic" "test" {
   subnet_id = numspot_subnet.subnet.id
   tags = [
-	{
-	  key 		= %[1]q
-	  value	 	= %[2]q
-	}
+    {
+      key   = %[1]q
+      value = %[2]q
+    }
   ]
 }`, key, value)
 }
