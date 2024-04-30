@@ -61,7 +61,10 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *iaas.VpcPeering) (*resour
 	// In the event that the creation of VPC peering fails, the error message might be found in
 	// the "state" field. If the state's name is "failed", then the error message will be contained
 	// in the state's message. We must address this particular scenario.
-	var diagnostics diag.Diagnostics
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
 	vpcPeeringStateHttp := http.State
 
 	if vpcPeeringStateHttp != nil {
@@ -69,24 +72,24 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *iaas.VpcPeering) (*resour
 		name := vpcPeeringStateHttp.Name
 
 		if name != nil && *name == "failed" {
-			diagnostics.AddError("Failed to create vpc peering", *message)
-			return nil, diagnostics
+			diags.AddError("Failed to create vpc peering", *message)
+			return nil, diags
 		}
 	}
 
-	vpcPeeringState, diagnostics := vpcPeeringStateFromApi(ctx, vpcPeeringStateHttp)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	vpcPeeringState, diags := vpcPeeringStateFromApi(ctx, vpcPeeringStateHttp)
+	if diags.HasError() {
+		return nil, diags
 	}
 
-	accepterVpcTf, diagnostics := accepterVpcFromApi(ctx, http.AccepterVpc)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	accepterVpcTf, diags := accepterVpcFromApi(ctx, http.AccepterVpc)
+	if diags.HasError() {
+		return nil, diags
 	}
 
-	sourceVpcTf, diagnostics := sourceVpcFromApi(ctx, http.SourceVpc)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	sourceVpcTf, diags := sourceVpcFromApi(ctx, http.SourceVpc)
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	var httpExpirationDate, accepterVpcId, sourceVpcId *string
@@ -104,6 +107,13 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *iaas.VpcPeering) (*resour
 		sourceVpcId = tmp.VpcId
 	}
 
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
 	return &resource_vpc_peering.VpcPeeringModel{
 		AccepterVpc:    accepterVpcTf,
 		AccepterVpcId:  types.StringPointerValue(accepterVpcId),
@@ -112,7 +122,8 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *iaas.VpcPeering) (*resour
 		SourceVpc:      sourceVpcTf,
 		SourceVpcId:    types.StringPointerValue(sourceVpcId),
 		State:          vpcPeeringState,
-	}, diagnostics
+		Tags:           tagsTf,
+	}, diags
 }
 
 func VpcPeeringFromTfToCreateRequest(tf resource_vpc_peering.VpcPeeringModel) iaas.CreateVpcPeeringJSONRequestBody {

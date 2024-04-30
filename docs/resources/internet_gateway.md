@@ -17,9 +17,18 @@ description: |-
 
 ### Optional
 
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
 - `vpc_id` (String) The ID of the Net attached to the Internet service.
 
 ### Read-Only
 
 - `id` (String) The ID of the Internet service.
 - `state` (String) The state of the attachment of the Internet service to the Net (always `available`).
+
+<a id="nestedatt--tags"></a>
+### Nested Schema for `tags`
+
+Required:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

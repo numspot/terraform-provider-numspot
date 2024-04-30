@@ -41,11 +41,10 @@ func TestAccVmResource(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testVmConfig_Create(sourceImageId, vmType),
-				Check:  resource.ComposeAggregateTestCheckFunc(),
+				Config:             testVmConfig_Create(sourceImageId, vmType),
+				Check:              resource.ComposeAggregateTestCheckFunc(),
 				ExpectNonEmptyPlan: true,
 			},
-			
 		},
 	})
 }
@@ -90,8 +89,8 @@ func TestAccVmResource_NetSubnet(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testVmConfig_NetSubnet(sourceImageId, vmType),
-				Check:  resource.ComposeAggregateTestCheckFunc(),
+				Config:             testVmConfig_NetSubnet(sourceImageId, vmType),
+				Check:              resource.ComposeAggregateTestCheckFunc(),
 				ExpectNonEmptyPlan: true,
 			},
 		},
@@ -267,4 +266,60 @@ resource "numspot_vm" "test" {
   depends_on         = [numspot_security_group.sg]
 }
 `, sourceImageId, vmType)
+}
+
+func TestAccVmResource_Tags(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	tagKey := "Name"
+	tagValue := "terraform-vm"
+	tagValueUpdated := tagValue + "-Updated"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: testVmConfig_Tags(sourceImageId, vmType, tagKey, tagValue),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", tagValue),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1")),
+				ExpectNonEmptyPlan: true,
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_vm.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{},
+			},
+			// Update testing
+			{
+				Config: testVmConfig_Tags(sourceImageId, vmType, tagKey, tagValueUpdated),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", tagValueUpdated),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1"),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+func testVmConfig_Tags(imageId, vmType, tagKey, tagValue string) string {
+	return fmt.Sprintf(`
+resource "numspot_vm" "test" {
+  image_id = %[1]q
+  vm_type  = %[2]q
+
+  tags = [
+	{
+	  key 		= %[3]q
+	  value	 	= %[4]q
+	}
+  ]
+}
+`, imageId, vmType, tagKey, tagValue)
 }

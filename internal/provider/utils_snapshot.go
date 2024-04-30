@@ -14,15 +14,26 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func SnapshotFromHttpToTf(http *iaas.Snapshot) resource_snapshot.SnapshotModel {
-	var creationDateStr *string
+func SnapshotFromHttpToTf(ctx context.Context, http *iaas.Snapshot) (*resource_snapshot.SnapshotModel, diag.Diagnostics) {
+	var (
+		tagsTf          types.List
+		diags           diag.Diagnostics
+		creationDateStr *string
+	)
 
 	if http.CreationDate != nil {
 		tmp := (*http.CreationDate).String()
 		creationDateStr = &tmp
 	}
 
-	return resource_snapshot.SnapshotModel{
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	return &resource_snapshot.SnapshotModel{
 		CreationDate: types.StringPointerValue(creationDateStr),
 		Description:  types.StringPointerValue(http.Description),
 		Id:           types.StringPointerValue(http.Id),
@@ -30,7 +41,8 @@ func SnapshotFromHttpToTf(http *iaas.Snapshot) resource_snapshot.SnapshotModel {
 		State:        types.StringPointerValue(http.State),
 		VolumeId:     types.StringPointerValue(http.VolumeId),
 		VolumeSize:   utils.FromIntPtrToTfInt64(http.VolumeSize),
-	}
+		Tags:         tagsTf,
+	}, nil
 }
 
 func SnapshotFromTfToCreateRequest(tf *resource_snapshot.SnapshotModel) iaas.CreateSnapshotJSONRequestBody {
@@ -67,6 +79,7 @@ func SnapshotsFromHttpToTfDatasource(ctx context.Context, http *iaas.Snapshot) (
 		progressTf     types.Int64
 		volumeSizeTf   types.Int64
 	)
+
 	if http.Tags != nil {
 		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
 		if diags.HasError() {

@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -49,6 +50,7 @@ func ClientGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the client gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 				MarkdownDescription: "The state of the client gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -59,4 +61,5 @@ type ClientGatewayModel struct {
 	Id             types.String `tfsdk:"id"`
 	PublicIp       types.String `tfsdk:"public_ip"`
 	State          types.String `tfsdk:"state"`
+	Tags		   types.List	`tfsdk:"tags"`
 }

@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -91,8 +92,9 @@ func ImageFromHttpToTf(ctx context.Context, http *iaas.Image) (*resource_image.I
 		creationDateTf        types.String
 		blockDeviceMappingsTf types.List
 		productCodesTf        types.List
-		diagnostics           diag.Diagnostics
+		diags                 diag.Diagnostics
 		stateCommentTf        resource_image.StateCommentValue
+		tagsTf                types.List
 	)
 
 	// Creation Date
@@ -103,14 +105,14 @@ func ImageFromHttpToTf(ctx context.Context, http *iaas.Image) (*resource_image.I
 
 	// Block Device Mapping
 	if http.BlockDeviceMappings != nil {
-		blockDeviceMappingsTf, diagnostics = utils.GenericListToTfListValue(
+		blockDeviceMappingsTf, diags = utils.GenericListToTfListValue(
 			ctx,
 			resource_image.BlockDeviceMappingsValue{},
 			blockDeviceMappingFromApi,
 			*http.BlockDeviceMappings,
 		)
-		if diagnostics.HasError() {
-			return nil, diagnostics
+		if diags.HasError() {
+			return nil, diags
 		}
 	} else {
 		blockDeviceMappingsTf = types.ListNull(resource_image.BlockDeviceMappingsValue{}.Type(ctx))
@@ -118,19 +120,27 @@ func ImageFromHttpToTf(ctx context.Context, http *iaas.Image) (*resource_image.I
 
 	// Product Codes
 	if http.ProductCodes != nil {
-		productCodesTf, diagnostics = utils.StringListToTfListValue(ctx, *http.ProductCodes)
+		productCodesTf, diags = utils.StringListToTfListValue(ctx, *http.ProductCodes)
 	} else {
 		productCodesTf = types.ListNull(types.StringType)
 	}
 
 	// State Comment
 	if http.StateComment != nil {
-		stateCommentTf, diagnostics = stateCommentFromApi(ctx, *http.StateComment)
-		if diagnostics.HasError() {
-			return nil, diagnostics
+		stateCommentTf, diags = stateCommentFromApi(ctx, *http.StateComment)
+		if diags.HasError() {
+			return nil, diags
 		}
 	} else {
 		stateCommentTf = resource_image.NewStateCommentValueNull()
+	}
+
+	// Tags
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 
 	return &resource_image.ImageModel{
@@ -155,7 +165,8 @@ func ImageFromHttpToTf(ctx context.Context, http *iaas.Image) (*resource_image.I
 		//
 		ProductCodes:        productCodesTf,
 		BlockDeviceMappings: blockDeviceMappingsTf,
-	}, diagnostics
+		Tags:                tagsTf,
+	}, diags
 }
 
 func ImageFromTfToCreateRequest(ctx context.Context, tf *resource_image.ImageModel, diag *diag.Diagnostics) *iaas.CreateImageJSONRequestBody {

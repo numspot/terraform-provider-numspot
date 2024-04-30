@@ -21,12 +21,25 @@ description: |-
 If the public IP is already associated with another resource, you must first disassociate it.
 - `subnet_id` (String) The ID of the Subnet in which you want to create the NAT service.
 
+### Optional
+
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+
 ### Read-Only
 
 - `id` (String) The ID of the NAT service.
 - `public_ips` (Attributes List) Information about the public IP or IPs associated with the NAT service. (see [below for nested schema](#nestedatt--public_ips))
 - `state` (String) The state of the NAT service (`pending` \| `available` \| `deleting` \| `deleted`).
 - `vpc_id` (String) The ID of the Net in which the NAT service is.
+
+<a id="nestedatt--tags"></a>
+### Nested Schema for `tags`
+
+Required:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.
+
 
 <a id="nestedatt--public_ips"></a>
 ### Nested Schema for `public_ips`

@@ -5,6 +5,7 @@ package resource_vpn_connection
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -254,6 +255,7 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about the VPN options.",
 				MarkdownDescription: "Information about the VPN options.",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -269,6 +271,7 @@ type VpnConnectionModel struct {
 	VgwTelemetries             types.List      `tfsdk:"vgw_telemetries"`
 	VirtualGatewayId           types.String    `tfsdk:"virtual_gateway_id"`
 	VpnOptions                 VpnOptionsValue `tfsdk:"vpn_options"`
+	Tags  					   types.List	   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = RoutesType{}

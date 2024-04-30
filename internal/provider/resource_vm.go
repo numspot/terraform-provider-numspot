@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -74,17 +75,26 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	}
 
 	vm := *res.JSON201
-	createdId := vm.Id
+	createdId := *vm.Id
+
+	// Create tags
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	read, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
-		*createdId,
+		createdId,
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running"},
 		r.provider.ApiClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", *createdId, err))
+		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
@@ -98,7 +108,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	tf.Id = types.StringPointerValue(createdId)
+	tf.Id = types.StringValue(createdId)
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
@@ -125,7 +135,47 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 }
 
 func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var state, plan resource_vm.VmModel
+	modifications := false
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+		modifications = true
+	}
+
+	if !modifications {
+		return
+	}
+
+	res := utils.ExecuteRequest(func() (*iaas.ReadVmsByIdResponse, error) {
+		id := state.Id.ValueStringPointer()
+		return r.provider.ApiClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf, diagnostics := VmFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

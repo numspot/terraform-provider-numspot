@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -57,6 +58,7 @@ func VirtualGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the virtual gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 				MarkdownDescription: "The state of the virtual gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -66,6 +68,7 @@ type VirtualGatewayModel struct {
 	Id                       types.String `tfsdk:"id"`
 	NetToVirtualGatewayLinks types.List   `tfsdk:"net_to_virtual_gateway_links"`
 	State                    types.String `tfsdk:"state"`
+	Tags 					 types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = NetToVirtualGatewayLinksType{}

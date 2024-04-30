@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -73,9 +74,16 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	// Retries read on resource until state is OK
 	createdId := *res.JSON201.Id
-	_, err = retry_utils.RetryReadUntilStateValid(
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	// Retries read on resource until state is OK
+	read, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.SpaceID,
@@ -88,7 +96,13 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf, diagnostics := NatGatewayFromHttpToTf(ctx, res.JSON201)
+	rr, ok := read.(*iaas.NatGateway)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create nat gateway", "object conversion error")
+		return
+	}
+
+	tf, diagnostics := NatGatewayFromHttpToTf(ctx, rr)
 	if diagnostics.HasError() {
 		return
 	}
@@ -116,7 +130,43 @@ func (r *NatGatewayResource) Read(ctx context.Context, request resource.ReadRequ
 }
 
 func (r *NatGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var state, plan resource_nat_gateway.NatGatewayModel
+	modifications := false
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	if !modifications {
+		return
+	}
+
+	res := utils.ExecuteRequest(func() (*iaas.ReadNatGatewayByIdResponse, error) {
+		return r.provider.ApiClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf, diagnostics := NatGatewayFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *NatGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

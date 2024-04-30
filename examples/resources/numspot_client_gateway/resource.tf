@@ -3,3 +3,4 @@ resource "numspot_client_gateway" "example" {
   bgp_asn         = "192.0.2.0"
   public_ip       = 65000
 }
+

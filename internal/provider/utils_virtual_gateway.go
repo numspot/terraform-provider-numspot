@@ -22,21 +22,31 @@ func vpcToVGLinkFromApi(ctx context.Context, from iaas.VpcToVirtualGatewayLink) 
 }
 
 func VirtualGatewayFromHttpToTf(ctx context.Context, http *iaas.VirtualGateway) (*resource_virtual_gateway.VirtualGatewayModel, diag.Diagnostics) {
-	var netToVirtualGatewaysLinkTd types.List
-	var diagnostics diag.Diagnostics
+	var (
+		diags                      diag.Diagnostics
+		tagsTf                     types.List
+		netToVirtualGatewaysLinkTd types.List
+	)
 
 	if http.VpcToVirtualGatewayLinks != nil {
-		netToVirtualGatewaysLinkTd, diagnostics = utils.GenericListToTfListValue(
+		netToVirtualGatewaysLinkTd, diags = utils.GenericListToTfListValue(
 			ctx,
 			resource_virtual_gateway.NetToVirtualGatewayLinksValue{},
 			vpcToVGLinkFromApi,
 			*http.VpcToVirtualGatewayLinks,
 		)
-		if diagnostics.HasError() {
-			return nil, diagnostics
+		if diags.HasError() {
+			return nil, diags
 		}
 	} else {
 		netToVirtualGatewaysLinkTd = types.ListNull(resource_virtual_gateway.NetToVirtualGatewayLinksValue{}.Type(ctx))
+	}
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 
 	return &resource_virtual_gateway.VirtualGatewayModel{
@@ -44,7 +54,8 @@ func VirtualGatewayFromHttpToTf(ctx context.Context, http *iaas.VirtualGateway) 
 		Id:                       types.StringPointerValue(http.Id),
 		NetToVirtualGatewayLinks: netToVirtualGatewaysLinkTd,
 		State:                    types.StringPointerValue(http.State),
-	}, diagnostics
+		Tags:                     tagsTf,
+	}, diags
 }
 
 func VirtualGatewayFromTfToCreateRequest(tf resource_virtual_gateway.VirtualGatewayModel) iaas.CreateVirtualGatewayJSONRequestBody {

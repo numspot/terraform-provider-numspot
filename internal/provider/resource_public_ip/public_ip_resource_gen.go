@@ -4,7 +4,11 @@ package resource_public_ip
 
 import (
 	"context"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -22,6 +26,9 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				Optional:            true,
 				Description:         "The ID of the NIC the public IP is associated with (if any).",
 				MarkdownDescription: "The ID of the NIC the public IP is associated with (if any).",
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(path.MatchRoot("vm_id")),
+				},
 			},
 			"private_ip": schema.StringAttribute{
 				Computed:            true,
@@ -37,12 +44,16 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				Optional:            true,
 				Description:         "The ID of the VM the public IP is associated with (if any).",
 				MarkdownDescription: "The ID of the VM the public IP is associated with (if any).",
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(path.MatchRoot("nic_id")),
+				},
 			},
 			"link_public_ip": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The ID of the association between the public IP and VM/NIC (if any).",
 				MarkdownDescription: "The ID of the association between the public IP and VM/NIC (if any).",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -54,4 +65,5 @@ type PublicIpModel struct {
 	PublicIp     types.String `tfsdk:"public_ip"`
 	VmId         types.String `tfsdk:"vm_id"`
 	LinkPublicIP types.String `tfsdk:"link_public_ip"`
+	Tags         types.List   `tfsdk:"tags"`
 }

@@ -88,11 +88,16 @@ func OutboundRuleFromHttpToTf(ctx context.Context, rules iaas.SecurityGroupRule)
 }
 
 func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_group.SecurityGroupModel, http *iaas.SecurityGroup) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+
 	ibd := make([]resource_security_group.InboundRulesValue, 0, len(*http.InboundRules))
 	for _, e := range *http.InboundRules {
-		value, diagnostics := InboundRuleFromHttpToTf(ctx, e)
-		if diagnostics.HasError() {
-			return nil, diagnostics
+		value, diags := InboundRuleFromHttpToTf(ctx, e)
+		if diags.HasError() {
+			return nil, diags
 		}
 
 		ibd = append(ibd, value)
@@ -100,22 +105,29 @@ func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_grou
 
 	obd := make([]resource_security_group.OutboundRulesValue, 0, len(*http.OutboundRules))
 	for _, e := range *http.OutboundRules {
-		value, diagnostics := OutboundRuleFromHttpToTf(ctx, e)
-		if diagnostics.HasError() {
-			return nil, diagnostics
+		value, diags := OutboundRuleFromHttpToTf(ctx, e)
+		if diags.HasError() {
+			return nil, diags
 		}
 
 		obd = append(obd, value)
 	}
 
-	ibdsTf, diagnostics := types.SetValueFrom(ctx, resource_security_group.InboundRulesValue{}.Type(ctx), ibd)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	ibdsTf, diags := types.SetValueFrom(ctx, resource_security_group.InboundRulesValue{}.Type(ctx), ibd)
+	if diags.HasError() {
+		return nil, diags
 	}
 
-	obdsTf, diagnostics := types.SetValueFrom(ctx, resource_security_group.OutboundRulesValue{}.Type(ctx), obd)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	obdsTf, diags := types.SetValueFrom(ctx, resource_security_group.OutboundRulesValue{}.Type(ctx), obd)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 
 	res := resource_security_group.SecurityGroupModel{
@@ -125,9 +137,10 @@ func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_grou
 		NetId:         types.StringPointerValue(http.VpcId),
 		InboundRules:  ibdsTf,
 		OutboundRules: obdsTf,
+		Tags:          tagsTf,
 	}
 
-	return &res, nil
+	return &res, diags
 }
 
 func SecurityGroupFromTfToCreateRequest(tf *resource_security_group.SecurityGroupModel) iaas.CreateSecurityGroupJSONRequestBody {

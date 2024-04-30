@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -73,9 +74,16 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	// Retries read on resource until state is OK
 	createdId := *res.JSON201.Id
-	_, err = retry_utils.RetryReadUntilStateValid(
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	// Retries read on resource until state is OK
+	read, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.SpaceID,
@@ -88,7 +96,18 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	tf := ClientGatewayFromHttpToTf(res.JSON201)
+	rr, ok := read.(*iaas.ClientGateway)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create client-gateway", "object conversion error")
+		return
+	}
+
+	tf, diags := ClientGatewayFromHttpToTf(ctx, rr)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
@@ -103,13 +122,56 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 		return
 	}
 
-	tf := ClientGatewayFromHttpToTf(res.JSON200)
+	tf, diags := ClientGatewayFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *ClientGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	// TODO implement me
-	panic("implement me")
+	var state, plan resource_client_gateway.ClientGatewayModel
+	modifications := false
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+		modifications = true
+	}
+
+	if !modifications {
+		return
+	}
+
+	res := utils.ExecuteRequest(func() (*iaas.ReadClientGatewaysByIdResponse, error) {
+		return r.provider.ApiClient.ReadClientGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf, diags := ClientGatewayFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
 func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

@@ -23,15 +23,27 @@ func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *
 	}
 }
 
-func ClientGatewayFromHttpToTf(http *iaas.ClientGateway) resource_client_gateway.ClientGatewayModel {
-	tmp := resource_client_gateway.ClientGatewayModel{
+func ClientGatewayFromHttpToTf(ctx context.Context, http *iaas.ClientGateway) (*resource_client_gateway.ClientGatewayModel, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	return &resource_client_gateway.ClientGatewayModel{
 		BgpAsn:         utils.FromIntPtrToTfInt64(http.BgpAsn),
 		ConnectionType: types.StringPointerValue(http.ConnectionType),
 		Id:             types.StringPointerValue(http.Id),
 		PublicIp:       types.StringPointerValue(http.PublicIp),
 		State:          types.StringPointerValue(http.State),
-	}
-	return tmp
+		Tags:           tagsTf,
+	}, diags
 }
 
 func ClientGatewayFromTfToCreateRequest(tf *resource_client_gateway.ClientGatewayModel) iaas.CreateClientGatewayJSONRequestBody {

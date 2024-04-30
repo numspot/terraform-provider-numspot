@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -232,6 +233,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "**(when creating from a VM)** The ID of the VM from which you want to create the OMI.",
 				MarkdownDescription: "**(when creating from a VM)** The ID of the VM from which you want to create the OMI.",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -254,6 +256,7 @@ type ImageModel struct {
 	StateComment        StateCommentValue `tfsdk:"state_comment"`
 	Type                types.String      `tfsdk:"type"`
 	VmId                types.String      `tfsdk:"vm_id"`
+	Tags				types.List		  `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = BlockDeviceMappingsType{}

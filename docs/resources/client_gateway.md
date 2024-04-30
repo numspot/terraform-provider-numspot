@@ -29,7 +29,19 @@ resource "numspot_client_gateway" "example" {
 - `connection_type` (String) The communication protocol used to establish tunnel with your client gateway (only `ipsec.1` is supported).
 - `public_ip` (String) The public fixed IPv4 address of your client gateway.
 
+### Optional
+
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+
 ### Read-Only
 
 - `id` (String) The ID of the client gateway.
 - `state` (String) The state of the client gateway (`pending` \| `available` \| `deleting` \| `deleted`).
+
+<a id="nestedatt--tags"></a>
+### Nested Schema for `tags`
+
+Required:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

@@ -5,6 +5,7 @@ package resource_net_access_point
 import (
 	"context"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -39,6 +40,7 @@ func NetAccessPointResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the Net access point (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 				MarkdownDescription: "The state of the Net access point (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -49,4 +51,5 @@ type NetAccessPointModel struct {
 	RouteTableIds types.List   `tfsdk:"route_table_ids"`
 	ServiceName   types.String `tfsdk:"service_name"`
 	State         types.String `tfsdk:"state"`
+	Tags 		  types.List   `tfsdk:"tags"`
 }

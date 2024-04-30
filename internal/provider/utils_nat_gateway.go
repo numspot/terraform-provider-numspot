@@ -25,19 +25,24 @@ func publicIpFromApi(ctx context.Context, elt iaas.PublicIpLight) (resource_nat_
 }
 
 func NatGatewayFromHttpToTf(ctx context.Context, http *iaas.NatGateway) (*resource_nat_gateway.NatGatewayModel, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+
 	var publicIp []iaas.PublicIpLight
 	if http.PublicIps != nil {
 		publicIp = *http.PublicIps
 	}
 	// Public Ips
-	publicIpsTf, diagnostics := utils.GenericListToTfListValue(
+	publicIpsTf, diags := utils.GenericListToTfListValue(
 		ctx,
 		resource_nat_gateway.PublicIpsValue{},
 		publicIpFromApi,
 		publicIp,
 	)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	// PublicIpId must be the id of the first public io
@@ -48,6 +53,13 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *iaas.NatGateway) (*resour
 		publicIpId = nil
 	}
 
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
 	return &resource_nat_gateway.NatGatewayModel{
 		Id:         types.StringPointerValue(http.Id),
 		PublicIpId: types.StringPointerValue(publicIpId),
@@ -55,7 +67,8 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *iaas.NatGateway) (*resour
 		State:      types.StringPointerValue(http.State),
 		SubnetId:   types.StringPointerValue(http.SubnetId),
 		VpcId:      types.StringPointerValue(http.VpcId),
-	}, nil
+		Tags:       tagsTf,
+	}, diags
 }
 
 func NatGatewayFromTfToCreateRequest(tf resource_nat_gateway.NatGatewayModel) iaas.CreateNatGatewayJSONRequestBody {

@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -74,7 +75,13 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	createdId := res.JSON201.Id
+	createdId := *res.JSON201.Id
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
 
 	// Inbound
 	if len(data.InboundRules.Elements()) > 0 {
@@ -82,8 +89,8 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		data.InboundRules.ElementsAs(ctx, &inboundRules, false)
 
 		createdIbdRules := utils.ExecuteRequest(func() (*iaas.CreateSecurityGroupRuleResponse, error) {
-			body := CreateInboundRulesRequest(ctx, *createdId, inboundRules)
-			return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, *createdId, body)
+			body := CreateInboundRulesRequest(ctx, createdId, inboundRules)
+			return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, createdId, body)
 		}, http.StatusCreated, &response.Diagnostics)
 		if createdIbdRules == nil {
 			return
@@ -111,7 +118,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 				Flow:  "Outbound",
 				Rules: &rules,
 			}
-			return r.provider.ApiClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, *createdId, body)
+			return r.provider.ApiClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, createdId, body)
 		}, http.StatusNoContent, &response.Diagnostics)
 
 		// Create SG rules:
@@ -119,8 +126,8 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		data.OutboundRules.ElementsAs(ctx, &outboundRules, false)
 
 		createdObdRules := utils.ExecuteRequest(func() (*iaas.CreateSecurityGroupRuleResponse, error) {
-			body := CreateOutboundRulesRequest(ctx, *createdId, outboundRules)
-			return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, *createdId, body)
+			body := CreateOutboundRulesRequest(ctx, createdId, outboundRules)
+			return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, createdId, body)
 		}, http.StatusCreated, &response.Diagnostics)
 		if createdObdRules == nil {
 			return
@@ -128,7 +135,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	}
 
 	// Read before store
-	read := r.readSecurityGroup(ctx, *createdId, response.Diagnostics)
+	read := r.readSecurityGroup(ctx, createdId, response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -180,7 +187,24 @@ func (r *SecurityGroupResource) readSecurityGroup(
 }
 
 func (r *SecurityGroupResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var state, plan resource_security_group.SecurityGroupModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
 }
 
 func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

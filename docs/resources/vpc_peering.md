@@ -35,6 +35,10 @@ resource "numspot_vpc_peering" "test" {
 - `accepter_vpc_id` (String) The ID of the Net you want to connect with.
 - `source_vpc_id` (String) The ID of the Net you send the peering request from.
 
+### Optional
+
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+
 ### Read-Only
 
 - `accepter_vpc` (Attributes) Information about the accepter Net. (see [below for nested schema](#nestedatt--accepter_vpc))
@@ -42,6 +46,15 @@ resource "numspot_vpc_peering" "test" {
 - `id` (String) The ID of the Net peering.
 - `source_vpc` (Attributes) Information about the source Net. (see [below for nested schema](#nestedatt--source_vpc))
 - `state` (Attributes) Information about the state of the Net peering. (see [below for nested schema](#nestedatt--state))
+
+<a id="nestedatt--tags"></a>
+### Nested Schema for `tags`
+
+Required:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.
+
 
 <a id="nestedatt--accepter_vpc"></a>
 ### Nested Schema for `accepter_vpc`

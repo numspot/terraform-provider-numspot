@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -90,11 +91,18 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the snapshot from which you want to create the volume.",
 				MarkdownDescription: "The ID of the snapshot from which you want to create the volume.",
 			},
+			"space_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "space identifier",
+				MarkdownDescription: "space identifier",
+			},
 			"state": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 				MarkdownDescription: "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 			},
+			"tags": tags.TagsSchema(ctx),
 			"type": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -113,7 +121,9 @@ type VolumeModel struct {
 	LinkedVolumes        types.List   `tfsdk:"linked_volumes"`
 	Size                 types.Int64  `tfsdk:"size"`
 	SnapshotId           types.String `tfsdk:"snapshot_id"`
+	SpaceId              types.String `tfsdk:"space_id"`
 	State                types.String `tfsdk:"state"`
+	Tags                 types.List   `tfsdk:"tags"`
 	Type                 types.String `tfsdk:"type"`
 }
 

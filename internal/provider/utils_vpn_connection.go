@@ -135,10 +135,22 @@ func VGWTelemetryFromHTTPToTF(ctx context.Context, http iaas.VgwTelemetry) (reso
 		})
 }
 
-func VpnConnectionFromHttpToTf(ctx context.Context, http *iaas.VpnConnection) resource_vpn_connection.VpnConnectionModel {
+func VpnConnectionFromHttpToTf(ctx context.Context, http *iaas.VpnConnection) (*resource_vpn_connection.VpnConnectionModel, diag.Diagnostics) {
+	var (
+		diags  diag.Diagnostics
+		tagsTf types.List
+	)
+
 	vpnOptions, diags := vpnOptionsFromHTTP(ctx, http.VpnOptions)
 	if diags.HasError() {
-		return resource_vpn_connection.VpnConnectionModel{}
+		return nil, diags
+	}
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 
 	vpnConnectionModel := resource_vpn_connection.VpnConnectionModel{
@@ -150,12 +162,13 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *iaas.VpnConnection) re
 		StaticRoutesOnly:           types.BoolPointerValue(http.StaticRoutesOnly),
 		VirtualGatewayId:           types.StringPointerValue(http.VirtualGatewayId),
 		VpnOptions:                 vpnOptions,
+		Tags:                       tagsTf,
 	}
 
 	if http.Routes != nil {
 		routes, diags := utils.GenericListToTfListValue(ctx, resource_vpn_connection.RoutesValue{}, routeFromHTTP, *http.Routes)
 		if diags.HasError() {
-			return resource_vpn_connection.VpnConnectionModel{}
+			return nil, diags
 		}
 		vpnConnectionModel.Routes = routes
 	}
@@ -163,12 +176,12 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *iaas.VpnConnection) re
 	if http.VgwTelemetries != nil {
 		vgwTelemetries, diags := utils.GenericListToTfListValue(ctx, resource_vpn_connection.VgwTelemetriesValue{}, VGWTelemetryFromHTTPToTF, *http.VgwTelemetries)
 		if diags.HasError() {
-			return resource_vpn_connection.VpnConnectionModel{}
+			return nil, diags
 		}
 		vpnConnectionModel.VgwTelemetries = vgwTelemetries
 	}
 
-	return vpnConnectionModel
+	return &vpnConnectionModel, nil
 }
 
 func VpnConnectionFromTfToCreateRequest(tf *resource_vpn_connection.VpnConnectionModel) iaas.CreateVpnConnectionJSONRequestBody {

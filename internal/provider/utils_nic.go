@@ -75,11 +75,15 @@ func linkPublicIpFromApi(ctx context.Context, elt iaas.LinkPublicIp) (resource_n
 }
 
 func NicFromHttpToTf(ctx context.Context, http *iaas.Nic) (*resource_nic.NicModel, diag.Diagnostics) {
-	var linkPublicIpTf resource_nic.LinkPublicIpValue
+	var (
+		linkPublicIpTf resource_nic.LinkPublicIpValue
+		tagsTf         types.List
+		diags          diag.Diagnostics
+	)
 	// Private IPs
-	privateIps, diagnostics := utils.GenericListToTfListValue(ctx, resource_nic.PrivateIpsValue{}, privatesIpFromApi, utils.GetPtrValue(http.PrivateIps))
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	privateIps, diags := utils.GenericListToTfListValue(ctx, resource_nic.PrivateIpsValue{}, privatesIpFromApi, utils.GetPtrValue(http.PrivateIps))
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	// Retrieve security groups id
@@ -89,22 +93,22 @@ func NicFromHttpToTf(ctx context.Context, http *iaas.Nic) (*resource_nic.NicMode
 	}
 
 	// Security Group Ids
-	securityGroupsIdTf, diagnostics := utils.StringListToTfListValue(ctx, securityGroupIds)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	securityGroupsIdTf, diags := utils.StringListToTfListValue(ctx, securityGroupIds)
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	// Security Groups
-	securityGroupsTf, diagnostics := utils.GenericListToTfListValue(ctx, resource_nic.SecurityGroupsValue{}, securityGroupLightFromApi, utils.GetPtrValue(http.SecurityGroups))
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	securityGroupsTf, diags := utils.GenericListToTfListValue(ctx, resource_nic.SecurityGroupsValue{}, securityGroupLightFromApi, utils.GetPtrValue(http.SecurityGroups))
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	// Link Public Ip
 	if http.LinkPublicIp != nil {
-		linkPublicIpTf, diagnostics = linkPublicIpFromApi(ctx, *http.LinkPublicIp)
-		if diagnostics.HasError() {
-			return nil, diagnostics
+		linkPublicIpTf, diags = linkPublicIpFromApi(ctx, *http.LinkPublicIp)
+		if diags.HasError() {
+			return nil, diags
 		}
 	} else {
 		linkPublicIpTf = resource_nic.NewLinkPublicIpValueNull()
@@ -114,6 +118,13 @@ func NicFromHttpToTf(ctx context.Context, http *iaas.Nic) (*resource_nic.NicMode
 	if http.MacAddress != nil {
 		lowerMacAddr := strings.ToLower(*http.MacAddress)
 		macAddress = &lowerMacAddr
+	}
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 
 	return &resource_nic.NicModel{
@@ -130,7 +141,8 @@ func NicFromHttpToTf(ctx context.Context, http *iaas.Nic) (*resource_nic.NicMode
 		State:                types.StringPointerValue(http.State),
 		SubnetId:             types.StringPointerValue(http.SubnetId),
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
-	}, diagnostics
+		Tags:                 tagsTf,
+	}, diags
 }
 
 func NicFromTfToCreateRequest(ctx context.Context, tf *resource_nic.NicModel) iaas.CreateNicJSONRequestBody {

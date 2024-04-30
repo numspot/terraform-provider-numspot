@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 	"time"
 
@@ -63,7 +64,6 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
-	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.SpaceID,
@@ -76,6 +76,13 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 
 	// Retries read on resource until state is OK
 	createdId := *res.JSON201.Id
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	// Retries read on resource until state is OK
 	read, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
@@ -127,6 +134,21 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	var state, plan resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
 
 	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVolumeResponse, error) {
 		body := ValueFromTfToUpdaterequest(&plan)

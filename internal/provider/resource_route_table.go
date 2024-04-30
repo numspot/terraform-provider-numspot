@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -31,7 +32,7 @@ type PrivateState struct {
 	SubnetId             *string `json:"subnetId"`
 }
 
-var PrivateStateKey string = "private-state"
+var PrivateStateKey = "private-state"
 
 func NewRouteTableResource() resource.Resource {
 	return &RouteTableResource{}
@@ -83,7 +84,15 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	}
 
 	jsonRes := *res.JSON201
-	createdId := jsonRes.Id
+	createdId := *jsonRes.Id
+
+	// Tags
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
 
 	jsonRoutes := *jsonRes.Routes
 	defaultRoute := jsonRoutes[0]
@@ -94,7 +103,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	for i := range routes {
 		route := &routes[i]
 		createdRoute := utils.ExecuteRequest(func() (*iaas.CreateRouteResponse, error) {
-			return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, *createdId, iaas.CreateRouteJSONRequestBody{
+			return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, createdId, iaas.CreateRouteJSONRequestBody{
 				DestinationIpRange: route.DestinationIpRange.ValueString(),
 				GatewayId:          route.GatewayId.ValueStringPointer(),
 				NatGatewayId:       route.NatGatewayId.ValueStringPointer(),
@@ -110,7 +119,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 
 	if !data.SubnetId.IsNull() {
 		linkRes := utils.ExecuteRequest(func() (*iaas.LinkRouteTableResponse, error) {
-			return r.provider.ApiClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, *createdId, iaas.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
+			return r.provider.ApiClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, createdId, iaas.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
 		}, http.StatusOK, &response.Diagnostics)
 		if linkRes == nil {
 			return
@@ -119,7 +128,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		privateState.SubnetId = data.SubnetId.ValueStringPointer()
 	}
 
-	readed := r.readRouteTable(ctx, *createdId, response.Diagnostics)
+	readed := r.readRouteTable(ctx, createdId, response.Diagnostics)
 	if readed == nil {
 		return
 	}
@@ -226,7 +235,91 @@ func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag
 }
 
 func (r *RouteTableResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var (
+		state, plan resource_route_table.RouteTableModel
+		modifs      bool
+	)
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	modifs = false
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+
+		modifs = true
+	}
+
+	if modifs {
+		// Read and update the state
+		res := r.readRouteTable(ctx, state.Id.ValueString(), response.Diagnostics)
+		if response.Diagnostics.HasError() {
+			return
+		}
+
+		bytes, diagnostics := request.Private.GetKey(ctx, PrivateStateKey)
+		if diagnostics.HasError() {
+			response.Diagnostics.Append(diagnostics...)
+			return
+		}
+		var privateState PrivateState
+		if bytes != nil {
+			err := json.Unmarshal(bytes, &privateState)
+			if err != nil {
+				response.Diagnostics.AddError("Failed to read Route Table", err.Error())
+				return
+			}
+		} else {
+			// Retrieve Default Destination IP Range
+			readNetRes, err := r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, *res.JSON200.VpcId)
+			if err != nil {
+				response.Diagnostics.AddError("Failed to read associated Net", err.Error())
+				return
+			}
+
+			if readNetRes.StatusCode() != http.StatusOK {
+				apiError := utils.HandleError(readNetRes.Body)
+				response.Diagnostics.AddError("Failed to read associated Net", apiError.Error())
+				return
+			}
+
+			privateState.DefaultDestinationIp = *readNetRes.JSON200.IpRange
+		}
+
+		var subnetId *string
+		if privateState.SubnetId != nil {
+			subnetId = privateState.SubnetId
+		} else {
+			jsonSubnet := res.JSON200
+			if jsonSubnet != nil && jsonSubnet.LinkRouteTables != nil && len(*jsonSubnet.LinkRouteTables) > 0 {
+				subnets := *jsonSubnet.LinkRouteTables
+				subnetId = subnets[0].SubnetId
+			}
+		}
+
+		tf, diagnostics := RouteTableFromHttpToTf(
+			ctx,
+			res.JSON200,
+			privateState.DefaultDestinationIp,
+			subnetId,
+		)
+		if diagnostics.HasError() {
+			response.Diagnostics.Append(diagnostics...)
+			return
+		}
+
+		response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	}
 }
 
 func (r *RouteTableResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -73,9 +74,16 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	// Retries read on resource until state is OK
 	createdId := *res.JSON201.Id
-	_, err = retry_utils.RetryReadUntilStateValid(
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	// Retries read on resource until state is OK
+	readRes, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.SpaceID,
@@ -88,7 +96,13 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	tf, diagnostics := NicFromHttpToTf(ctx, res.JSON201)
+	read, ok := readRes.(*iaas.Nic)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create nic", "object conversion error")
+		return
+	}
+
+	tf, diagnostics := NicFromHttpToTf(ctx, read)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -118,8 +132,46 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 }
 
 func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	// TODO implement me
-	panic("implement me")
+	var state, plan resource_nic.NicModel
+	modifs := false
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+
+		modifs = true
+	}
+
+	// Read if modifs
+	if modifs {
+		res := utils.ExecuteRequest(func() (*iaas.ReadNicsByIdResponse, error) {
+			return r.provider.ApiClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		}, http.StatusOK, &response.Diagnostics)
+		if res == nil {
+			return
+		}
+
+		tf, diagnostics := NicFromHttpToTf(ctx, res.JSON200)
+		if diagnostics.HasError() {
+			response.Diagnostics.Append(diagnostics...)
+			return
+		}
+
+		response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	}
 }
 
 func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

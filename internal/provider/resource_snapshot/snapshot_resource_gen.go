@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 )
 
 func SnapshotResourceSchema(ctx context.Context) schema.Schema {
@@ -74,6 +75,7 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The size of the volume used to create the snapshot, in gibibytes (GiB).",
 				MarkdownDescription: "The size of the volume used to create the snapshot, in gibibytes (GiB).",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -88,4 +90,5 @@ type SnapshotModel struct {
 	State            types.String `tfsdk:"state"`
 	VolumeId         types.String `tfsdk:"volume_id"`
 	VolumeSize       types.Int64  `tfsdk:"volume_size"`
+	Tags             types.List   `tfsdk:"tags"`
 }

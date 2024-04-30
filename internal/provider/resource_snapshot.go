@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -74,9 +75,16 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	// Retries read on resource until state is OK
 	createdId := *res.JSON201.Id
-	_, err = retry_utils.RetryReadUntilStateValid(
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	// Retries read on resource until state is OK
+	readRes, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.SpaceID,
@@ -89,7 +97,18 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	tf := SnapshotFromHttpToTf(res.JSON201)
+	rr, ok := readRes.(*iaas.Snapshot)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create Snapshot", "object conversion error")
+		return
+	}
+
+	tf, diags := SnapshotFromHttpToTf(ctx, rr)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
 	if !data.SourceRegionName.IsUnknown() {
 		tf.SourceRegionName = data.SourceRegionName
 	} else {
@@ -116,7 +135,12 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 		return
 	}
 
-	tf := SnapshotFromHttpToTf(res.JSON200)
+	tf, diags := SnapshotFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
 	if !data.SourceRegionName.IsUnknown() {
 		tf.SourceRegionName = data.SourceRegionName
 	} else {
@@ -133,7 +157,59 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 }
 
 func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("nothing to do")
+	var state, plan resource_snapshot.SnapshotModel
+	modifications := false
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+
+		modifications = true
+	}
+
+	if !modifications {
+		return
+	}
+
+	res := utils.ExecuteRequest(func() (*iaas.ReadSnapshotsByIdResponse, error) {
+		return r.provider.ApiClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf, diags := SnapshotFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
+	if !state.SourceRegionName.IsUnknown() {
+		tf.SourceRegionName = state.SourceRegionName
+	} else {
+		tf.SourceRegionName = types.StringNull()
+	}
+
+	if !state.SourceSnapshotId.IsUnknown() {
+		tf.SourceSnapshotId = state.SourceSnapshotId
+	} else {
+		tf.SourceSnapshotId = types.StringNull()
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

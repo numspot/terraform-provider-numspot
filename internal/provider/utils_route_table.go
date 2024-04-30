@@ -15,6 +15,11 @@ import (
 )
 
 func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable, defaultRouteDestination string, subnetId *string) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+
 	// Routes
 	var routes []iaas.Route
 	if len(*http.Routes) > 0 {
@@ -29,15 +34,22 @@ func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable, defaultR
 		routes = *http.Routes
 	}
 
-	tfRoutes, diagnostics := utils.GenericListToTfListValue(ctx, resource_route_table.RoutesValue{}, routeTableRouteFromAPI, routes)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	tfRoutes, diags := utils.GenericListToTfListValue(ctx, resource_route_table.RoutesValue{}, routeTableRouteFromAPI, routes)
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	// Links
-	tfLinks, diagnostics := utils.GenericListToTfListValue(ctx, resource_route_table.LinkRouteTablesValue{}, routeTableLinkFromAPI, *http.LinkRouteTables)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	tfLinks, diags := utils.GenericListToTfListValue(ctx, resource_route_table.LinkRouteTablesValue{}, routeTableLinkFromAPI, *http.LinkRouteTables)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 
 	res := resource_route_table.RouteTableModel{
@@ -47,9 +59,10 @@ func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable, defaultR
 		RoutePropagatingVirtualGateways: types.ListNull(resource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(ctx)),
 		Routes:                          tfRoutes,
 		SubnetId:                        types.StringPointerValue(subnetId),
+		Tags:                            tagsTf,
 	}
 
-	return &res, nil
+	return &res, diags
 }
 
 func routeTableLinkFromAPI(ctx context.Context, link iaas.LinkRouteTable) (resource_route_table.LinkRouteTablesValue, diag.Diagnostics) {

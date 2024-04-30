@@ -3,6 +3,7 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -88,4 +89,56 @@ resource "numspot_image" "test" {
 
 resource "numspot_public_ip" "test" {}
 `
+}
+
+func TestAccPublicIpResource_Tags(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	tagKey := "name"
+	tagValue := "Terraform-Test-Public-Ip"
+	tagValueUpdated := "Terraform-Test-Public-Ip-Updated"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: PublicIPConfig_Tags(tagKey, tagValue),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_public_ip.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_public_ip.test", "tags.0.value", tagValue),
+					resource.TestCheckResourceAttr("numspot_public_ip.test", "tags.#", "1"),
+				),
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_public_ip.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{},
+			},
+			// Update testing
+			{
+				Config: PublicIPConfig_Tags(tagKey, tagValueUpdated),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_public_ip.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_public_ip.test", "tags.0.value", tagValueUpdated),
+					resource.TestCheckResourceAttr("numspot_public_ip.test", "tags.#", "1"),
+				),
+			},
+		},
+	})
+}
+
+func PublicIPConfig_Tags(key, value string) string {
+	return fmt.Sprintf(`
+resource "numspot_public_ip" "test" {
+	tags = [
+		{
+			key 	= %[1]q
+			value 	= %[2]q
+		}
+	]
+}
+`, key, value)
 }

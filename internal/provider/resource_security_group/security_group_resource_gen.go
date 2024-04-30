@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -174,6 +175,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The outbound rules associated with the security group.",
 				MarkdownDescription: "The outbound rules associated with the security group.",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -185,6 +187,7 @@ type SecurityGroupModel struct {
 	Name          types.String `tfsdk:"name"`
 	NetId         types.String `tfsdk:"net_id"`
 	OutboundRules types.Set    `tfsdk:"outbound_rules"`
+	Tags		  types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = InboundRulesType{}

@@ -349,3 +349,73 @@ resource "numspot_security_group" "test" {
   ]
 }`, netIpRange, name, description)
 }
+
+func TestAccSecurityGroupResource_Tags(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	netIpRange := "10.101.0.0/16"
+
+	randName := rand.Intn(9999-1000) + 1000
+	name := fmt.Sprintf("security-group-name-%d", randName)
+	descrition := fmt.Sprintf("security-group-description-%d", randName)
+
+	tagKey := "name"
+	tagValue := "Terraform-Test-SecurityGroup"
+	tagValueUpdate := "Terraform-Test-SecurityGroup-Updated"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: testSecurityGroupConfig_Tags(netIpRange, name, descrition, tagKey, tagValue),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_security_group.test", "name", name),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "description", descrition),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						return nil
+					}),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.0.value", tagValue),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.#", "1"),
+				),
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_security_group.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{},
+			},
+			// Update testing
+			{
+				Config: testSecurityGroupConfig_Tags(netIpRange, name, descrition, tagKey, tagValueUpdate),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.0.value", tagValueUpdate),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.#", "1"),
+				),
+			},
+		},
+	})
+}
+
+func testSecurityGroupConfig_Tags(netIpRange, name, description, tagKey, tagValue string) string {
+	return fmt.Sprintf(`
+resource "numspot_vpc" "net" {
+  ip_range = %[1]q
+}
+
+resource "numspot_security_group" "test" {
+  net_id      = numspot_vpc.net.id
+  name        = %[2]q
+  description = %[3]q
+  tags = [
+	{
+	  key 		= %[4]q
+	  value	 	= %[5]q
+	}
+  ]
+}`, netIpRange, name, description, tagKey, tagValue)
+}

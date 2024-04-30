@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -60,7 +61,7 @@ func (r *PublicIpResource) Schema(ctx context.Context, request resource.SchemaRe
 }
 
 func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan, state resource_public_ip.PublicIpModel
+	var plan resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
 	// Retries create until request response is OK
@@ -73,30 +74,39 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	state = PublicIpFromHttpToTf(createRes.JSON201)
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
-
-	if plan.VmId.IsNull() && plan.NicId.IsUnknown() {
+	publicIp, diags := PublicIpFromHttpToTf(ctx, createRes.JSON201)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 		return
 	}
 
-	state.VmId = plan.VmId
-	state.NicId = plan.NicId
-
-	// Call Link publicIP
-	linkPublicIP, err := invokeLinkPublicIP(ctx, r.provider, &state)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to link public IP", err.Error())
+	createdId := *createRes.JSON201.Id
+	if len(plan.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
 	}
-	state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
+
+	// Attach the public IP to a VM or NIC if their IDs are provided:
+	// Note: According to the resource schema, vmId and nicId cannot be set simultaneously.
+	// This constraint is enforced by the stringvalidator.ConflictsWith function.
+	if (!plan.VmId.IsNull() && !plan.VmId.IsUnknown()) || (!plan.NicId.IsNull() && !plan.NicId.IsUnknown()) {
+		publicIp.VmId = plan.VmId
+		publicIp.NicId = plan.NicId
+
+		// Call Link publicIP
+		linkPublicIP, err := invokeLinkPublicIP(ctx, r.provider, publicIp)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to link public IP", err.Error())
+		}
+		publicIp.LinkPublicIP = types.StringPointerValue(linkPublicIP)
+	}
 
 	// Refresh state
-	data, err := refreshState(ctx, r.provider, state.Id.ValueString())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
-	}
-
-	if response.Diagnostics.HasError() {
+	data, diags := refreshState(ctx, r.provider, publicIp.Id.ValueString())
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 		return
 	}
 
@@ -114,7 +124,12 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 		return
 	}
 
-	tf := PublicIpFromHttpToTf(readRes.JSON200)
+	tf, diags := PublicIpFromHttpToTf(ctx, readRes.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
@@ -134,9 +149,24 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 		return
 	}
 
-	data, err := refreshState(ctx, r.provider, state.Id.ValueString())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	data, diags := refreshState(ctx, r.provider, state.Id.ValueString())
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 		return
 	}
 
@@ -150,11 +180,12 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 	if chgSet.Unlink {
 		_ = invokeUnlinkPublicIP(ctx, r.provider, &state) // We still want to try delete resource even if the unlink didn't work (ressource has been unlinked before for example)
 		state.LinkPublicIP = types.StringNull()
-		data, err := refreshState(ctx, r.provider, state.Id.ValueString())
-		if err != nil {
-			response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
+		data, diags := refreshState(ctx, r.provider, state.Id.ValueString())
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
 			return
 		}
+
 		response.Diagnostics.Append(response.State.Set(ctx, *data)...)
 	}
 	if chgSet.Link {
@@ -166,11 +197,12 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 		}
 		state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
 	}
-	data, err = refreshState(ctx, r.provider, state.Id.ValueString())
-	if err != nil {
-		response.Diagnostics.AddError("Failed to read PublicIp", err.Error())
+	data, diags = refreshState(ctx, r.provider, state.Id.ValueString())
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 		return
 	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, *data)...)
 }
 

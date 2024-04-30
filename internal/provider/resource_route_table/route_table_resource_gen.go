@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -167,6 +168,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the SubNet for which you want to link the route table.",
 				MarkdownDescription: "The ID of the SubNet for which you want to link the route table.",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -179,6 +181,7 @@ type RouteTableModel struct {
 	SpaceId                         types.String `tfsdk:"space_id"`
 	VpcId                           types.String `tfsdk:"vpc_id"`
 	SubnetId                        types.String `tfsdk:"subnet_id"`
+	Tags                          	types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = LinkRouteTablesType{}

@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -112,6 +113,7 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about the state of the Net peering.",
 				MarkdownDescription: "Information about the state of the Net peering.",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -124,6 +126,7 @@ type VpcPeeringModel struct {
 	SourceVpc      SourceVpcValue   `tfsdk:"source_vpc"`
 	SourceVpcId    types.String     `tfsdk:"source_vpc_id"`
 	State          StateValue       `tfsdk:"state"`
+	Tags		   types.List		`tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = AccepterVpcType{}

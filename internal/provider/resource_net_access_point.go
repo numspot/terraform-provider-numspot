@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -73,9 +74,16 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	// Retries read on resource until state is OK
 	createdId := *res.JSON201.Id
-	_, err = retry_utils.RetryReadUntilStateValid(
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	// Retries read on resource until state is OK
+	read, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.SpaceID,
@@ -88,7 +96,17 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	tf := NetAccessPointFromHttpToTf(ctx, res.JSON201, response.Diagnostics)
+	rr, ok := read.(*iaas.VpcAccessPoint)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create vpc access point", "object conversion error")
+		return
+	}
+
+	tf, diags := NetAccessPointFromHttpToTf(ctx, rr)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -101,14 +119,15 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcAccessPointsByIdResponse, error) {
-		return r.provider.ApiClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
+		return r.provider.ApiClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf := NetAccessPointFromHttpToTf(ctx, res.JSON200, response.Diagnostics)
-	if response.Diagnostics.HasError() {
+	tf, diags := NetAccessPointFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 		return
 	}
 
@@ -116,7 +135,45 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 }
 
 func (r *NetAccessPointResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var state, plan resource_net_access_point.NetAccessPointModel
+	modifications := false
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+		modifications = true
+	}
+
+	if !modifications {
+		return
+	}
+
+	res := utils.ExecuteRequest(func() (*iaas.ReadVpcAccessPointsByIdResponse, error) {
+		return r.provider.ApiClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf, diags := NetAccessPointFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
@@ -124,6 +181,6 @@ func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.De
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*iaas.DeleteVpcAccessPointResponse, error) {
-		return r.provider.ApiClient.DeleteVpcAccessPointWithResponse(ctx, r.provider.SpaceID, data.Id.String())
-	}, http.StatusOK, &response.Diagnostics)
+		return r.provider.ApiClient.DeleteVpcAccessPointWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	}, http.StatusNoContent, &response.Diagnostics)
 }

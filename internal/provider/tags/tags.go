@@ -580,18 +580,23 @@ func UpdateTags(
 	var (
 		stateTags []TagsValue
 		planTags  []TagsValue
+		diags     diag.Diagnostics
 	)
 
-	diags := stateTagsTf.ElementsAs(ctx, &stateTags, false)
-	if diags.HasError() {
-		diagnostics.Append(diags...)
-		return
+	if len(stateTagsTf.Elements()) > 0 {
+		diags = stateTagsTf.ElementsAs(ctx, &stateTags, false)
+		if diags.HasError() {
+			diagnostics.Append(diags...)
+			return
+		}
 	}
 
-	diags = planTagsTf.ElementsAs(ctx, &planTags, false)
-	if diags.HasError() {
-		diagnostics.Append(diags...)
-		return
+	if len(planTagsTf.Elements()) > 0 {
+		diags = planTagsTf.ElementsAs(ctx, &planTags, false)
+		if diags.HasError() {
+			diagnostics.Append(diags...)
+			return
+		}
 	}
 
 	toCreate, toDelete, toUpdate := Diff(stateTags, planTags)
@@ -626,25 +631,28 @@ func UpdateTags(
 		})
 	}
 
-	DeleteTags(
-		ctx,
-		apiClient,
-		spaceId,
-		diagnostics,
-		resourceId,
-		toDeleteApiTags,
-	)
-
+	if len(toDeleteApiTags) > 0 {
+		DeleteTags(
+			ctx,
+			apiClient,
+			spaceId,
+			diagnostics,
+			resourceId,
+			toDeleteApiTags,
+		)
+	}
 	if diagnostics.HasError() {
 		return
 	}
 
-	CreateTags(
-		ctx,
-		apiClient,
-		spaceId,
-		diagnostics,
-		resourceId,
-		toCreateApiTags,
-	)
+	if len(toCreateApiTags) > 0 {
+		CreateTags(
+			ctx,
+			apiClient,
+			spaceId,
+			diagnostics,
+			resourceId,
+			toCreateApiTags,
+		)
+	}
 }

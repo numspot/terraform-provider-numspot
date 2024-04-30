@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -52,6 +53,11 @@ func vmBlockDeviceMappingFromApi(ctx context.Context, elt iaas.BlockDeviceMappin
 }
 
 func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+
 	vmsCount := utils.FromIntToTfInt64(1)
 
 	// Private Ips
@@ -59,9 +65,9 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 	if http.PrivateIp != nil {
 		privateIps = []string{*http.PrivateIp}
 	}
-	privateIpsTf, diagnostics := utils.StringListToTfListValue(ctx, privateIps)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	privateIpsTf, diags := utils.StringListToTfListValue(ctx, privateIps)
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	// Product Code
@@ -69,9 +75,9 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 	if http.ProductCodes != nil {
 		productCodes = *http.ProductCodes
 	}
-	productCodesTf, diagnostics := utils.StringListToTfListValue(ctx, productCodes)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	productCodesTf, diags := utils.StringListToTfListValue(ctx, productCodes)
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	// Security Group Ids & names
@@ -88,15 +94,15 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 	}
 
 	// Security Group Ids
-	securityGroupIdsTf, diagnostics := utils.StringListToTfListValue(ctx, securityGroupIds)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	securityGroupIdsTf, diags := utils.StringListToTfListValue(ctx, securityGroupIds)
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	// Security Groups names
-	securityGroupsTf, diagnostics := utils.StringListToTfListValue(ctx, securityGroupNames)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	securityGroupsTf, diags := utils.StringListToTfListValue(ctx, securityGroupNames)
+	if diags.HasError() {
+		return nil, diags
 	}
 
 	// Block Device Mapping
@@ -104,20 +110,30 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 	if http.BlockDeviceMappings != nil {
 		blockDeviceMappings = *http.BlockDeviceMappings
 	}
-	blockDeviceMappingTf, diagnostics := utils.GenericListToTfListValue(
+	blockDeviceMappingTf, diags := utils.GenericListToTfListValue(
 		ctx,
 		resource_vm.BlockDeviceMappingsValue{},
 		vmBlockDeviceMappingFromApi,
 		blockDeviceMappings,
 	)
-	if diagnostics.HasError() {
-		return nil, diagnostics
+	if diags.HasError() {
+		return nil, diags
 	}
 
+	// Creation Date
 	var creationDate string
 	if http.CreationDate != nil {
 		creationDate = http.CreationDate.String()
 	}
+
+	// Tags
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
 	r := resource_vm.VmModel{
 		//
 		Architecture:        types.StringPointerValue(http.Architecture),
@@ -161,6 +177,7 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		VmInitiatedShutdownBehavior: types.StringPointerValue(http.InitiatedShutdownBehavior),
 		VmType:                      types.StringPointerValue(http.Type),
 		VmsCount:                    vmsCount,
+		Tags:                        tagsTf,
 	}
 
 	if http.LaunchNumber != nil {
@@ -180,7 +197,7 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		r.SecurityGroupIds = listValue
 	}
 
-	return &r, nil
+	return &r, diags
 }
 
 func VmFromTfToCreateRequest(ctx context.Context, tf *resource_vm.VmModel) iaas.CreateVmsJSONRequestBody {

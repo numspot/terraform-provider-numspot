@@ -21,12 +21,25 @@ func InternetServiceFromTfToHttp(tf resource_internet_gateway.InternetGatewayMod
 	}
 }
 
-func InternetServiceFromHttpToTf(http *iaas.InternetGateway) resource_internet_gateway.InternetGatewayModel {
-	return resource_internet_gateway.InternetGatewayModel{
+func InternetServiceFromHttpToTf(ctx context.Context, http *iaas.InternetGateway) (*resource_internet_gateway.InternetGatewayModel, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	return &resource_internet_gateway.InternetGatewayModel{
 		Id:    types.StringPointerValue(http.Id),
 		VpcIp: types.StringPointerValue(http.VpcId),
 		State: types.StringPointerValue(http.State),
-	}
+		Tags:  tagsTf,
+	}, diags
 }
 
 func InternetGatewaysFromTfToAPIReadParams(ctx context.Context, tf InternetGatewaysDataSourceModel) iaas.ReadInternetGatewaysParams {

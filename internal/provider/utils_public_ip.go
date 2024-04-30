@@ -41,15 +41,28 @@ func ComputePublicIPChangeSet(plan, state *resource_public_ip.PublicIpModel) Pub
 	return c
 }
 
-func PublicIpFromHttpToTf(elt *iaas.PublicIp) resource_public_ip.PublicIpModel {
-	return resource_public_ip.PublicIpModel{
+func PublicIpFromHttpToTf(ctx context.Context, elt *iaas.PublicIp) (*resource_public_ip.PublicIpModel, diag.Diagnostics) {
+	var (
+		diags    diag.Diagnostics
+		tagsList types.List
+	)
+
+	if elt.Tags != nil {
+		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *elt.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	return &resource_public_ip.PublicIpModel{
 		Id:           types.StringPointerValue(elt.Id),
 		NicId:        types.StringPointerValue(elt.NicId),
 		PrivateIp:    types.StringPointerValue(elt.PrivateIp),
 		PublicIp:     types.StringPointerValue(elt.PublicIp),
 		VmId:         types.StringPointerValue(elt.VmId),
 		LinkPublicIP: types.StringPointerValue(elt.LinkPublicIpId),
-	}
+		Tags:         tagsList,
+	}, nil
 }
 
 func invokeLinkPublicIP(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) (*string, error) {
@@ -88,20 +101,28 @@ func invokeUnlinkPublicIP(ctx context.Context, provider Provider, data *resource
 	return nil
 }
 
-func refreshState(ctx context.Context, provider Provider, id string) (*resource_public_ip.PublicIpModel, error) {
+func refreshState(ctx context.Context, provider Provider, id string) (*resource_public_ip.PublicIpModel, diag.Diagnostics) {
 	// Refresh state
+	var diags diag.Diagnostics
+
 	res, err := provider.ApiClient.ReadPublicIpsByIdWithResponse(ctx, provider.SpaceID, id)
 	if err != nil {
-		return nil, err
+		diags.AddError("Failed to read public ip", err.Error())
+		return nil, diags
 	}
 
 	if res.StatusCode() != http.StatusOK {
 		apiError := utils.HandleError(res.Body)
-		return nil, apiError
+		diags.AddError("Failed to read public ip", apiError.Error())
+		return nil, diags
 	}
 
-	tf := PublicIpFromHttpToTf(res.JSON200)
-	return &tf, nil
+	tf, diags := PublicIpFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return tf, diags
 }
 
 func PublicIpsFromTfToAPIReadParams(ctx context.Context, tf PublicIpsDataSourceModel) iaas.ReadPublicIpsParams {

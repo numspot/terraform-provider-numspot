@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -75,6 +76,7 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Net in which the NAT service is.",
 				MarkdownDescription: "The ID of the Net in which the NAT service is.",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -86,6 +88,7 @@ type NatGatewayModel struct {
 	State      types.String `tfsdk:"state"`
 	SubnetId   types.String `tfsdk:"subnet_id"`
 	VpcId      types.String `tfsdk:"vpc_id"`
+	Tags  	   types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = PublicIpsType{}

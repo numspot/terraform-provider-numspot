@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -29,7 +30,12 @@ func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http iaas.Linked
 		})
 }
 
-func VolumeFromHttpToTf(ctx context.Context, http *iaas.Volume) (resource_volume.VolumeModel, diag.Diagnostics) {
+func VolumeFromHttpToTf(ctx context.Context, http *iaas.Volume) (*resource_volume.VolumeModel, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+
 	volumes, diags := utils.GenericListToTfListValue(
 		ctx,
 		resource_volume.LinkedVolumesValue{},
@@ -37,10 +43,17 @@ func VolumeFromHttpToTf(ctx context.Context, http *iaas.Volume) (resource_volume
 		*http.LinkedVolumes,
 	)
 	if diags.HasError() {
-		return resource_volume.VolumeModel{}, diags
+		return nil, diags
 	}
 
-	return resource_volume.VolumeModel{
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	return &resource_volume.VolumeModel{
 		CreationDate:         types.StringValue(http.CreationDate.String()),
 		Id:                   types.StringPointerValue(http.Id),
 		Iops:                 utils.FromIntPtrToTfInt64(http.Iops),
@@ -50,6 +63,7 @@ func VolumeFromHttpToTf(ctx context.Context, http *iaas.Volume) (resource_volume
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		Type:                 types.StringPointerValue(http.Type),
 		LinkedVolumes:        volumes,
+		Tags:                 tagsTf,
 	}, diags
 }
 

@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -72,7 +73,13 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 		return
 	}
 
-	createdId := res.JSON201.Id
+	createdId := *res.JSON201.Id
+	if len(data.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
 
 	// Call Link Internet Service to VPC
 	vpcId := data.VpcIp
@@ -81,7 +88,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 			return r.provider.ApiClient.LinkInternetGatewayWithResponse(
 				ctx,
 				r.provider.SpaceID,
-				*createdId,
+				createdId,
 				iaas.LinkInternetGatewayJSONRequestBody{
 					VpcId: data.VpcIp.ValueString(),
 				},
@@ -92,28 +99,31 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 		}
 	}
 
-	// Update state
-	readRes := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysByIdResponse, error) {
-		return r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, *createdId)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	_, err = retry_utils.RetryReadUntilStateValid(
+	read, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
-		*createdId,
+		createdId,
 		r.provider.SpaceID,
 		[]string{},
 		[]string{"available"},
 		r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse,
 	)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Internet Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", *createdId, err))
+		response.Diagnostics.AddError("Failed to create Internet Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
-	tf := InternetServiceFromHttpToTf(readRes.JSON200)
+	rr, ok := read.(*iaas.InternetGateway)
+	if !ok {
+		response.Diagnostics.AddError("Failed to create internet gateway", "object conversion error")
+		return
+	}
+
+	tf, diags := InternetServiceFromHttpToTf(ctx, rr)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
 	tf.VpcIp = data.VpcIp
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
@@ -129,12 +139,56 @@ func (r *InternetGatewayResource) Read(ctx context.Context, request resource.Rea
 		return
 	}
 
-	tf := InternetServiceFromHttpToTf(res.JSON200)
+	tf, diags := InternetServiceFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *InternetGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var state, plan resource_internet_gateway.InternetGatewayModel
+	modifications := false
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	if !state.Tags.Equal(plan.Tags) {
+		tags.UpdateTags(
+			ctx,
+			state.Tags,
+			plan.Tags,
+			&response.Diagnostics,
+			r.provider.ApiClient,
+			r.provider.SpaceID,
+			state.Id.ValueString(),
+		)
+		if response.Diagnostics.HasError() {
+			return
+		}
+		modifications = true
+	}
+
+	if !modifications {
+		return
+	}
+
+	res := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysByIdResponse, error) {
+		return r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf, diags := InternetServiceFromHttpToTf(ctx, res.JSON200)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

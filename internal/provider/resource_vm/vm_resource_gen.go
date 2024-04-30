@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -563,6 +564,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.",
 				MarkdownDescription: "The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -607,6 +609,7 @@ type VmModel struct {
 	VmInitiatedShutdownBehavior types.String   `tfsdk:"vm_initiated_shutdown_behavior"`
 	VmType                      types.String   `tfsdk:"vm_type"`
 	VmsCount                    types.Int64    `tfsdk:"vms_count"`
+	Tags              			types.List     `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = BlockDeviceMappingsType{}

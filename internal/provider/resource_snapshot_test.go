@@ -145,3 +145,65 @@ resource "numspot_snapshot" "test" {
   source_region_name = "eu-west-2"
 }`, description)
 }
+
+func TestAccSnapshotResourceFromVolume_Tags(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	description := "A beautiful snapshot"
+	tagKey := "name"
+	tagValue := "Snapshot-Terraform-Test"
+	tagValueUpdate := "Snapshot-Terraform-Test-Updated"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: testSnapshotFromVolumeConfig_Tags(description, tagKey, tagValue),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_snapshot.test", "description", description),
+					resource.TestCheckResourceAttr("numspot_snapshot.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_snapshot.test", "tags.0.value", tagValue),
+					resource.TestCheckResourceAttr("numspot_snapshot.test", "tags.#", "1"),
+				),
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_snapshot.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"progress", "state"},
+			},
+			// Update testing
+			{
+				Config: testSnapshotFromVolumeConfig_Tags(description, tagKey, tagValueUpdate),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_snapshot.test", "description", description),
+					resource.TestCheckResourceAttr("numspot_snapshot.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_snapshot.test", "tags.0.value", tagValueUpdate),
+					resource.TestCheckResourceAttr("numspot_snapshot.test", "tags.#", "1"),
+				),
+			},
+		},
+	})
+}
+
+func testSnapshotFromVolumeConfig_Tags(description, tagKey, tagValue string) string {
+	return fmt.Sprintf(`
+resource "numspot_volume" "test" {
+  type                   = "standard"
+  size                   = 11
+  availability_zone_name = "cloudgouv-eu-west-1a"
+}
+
+resource "numspot_snapshot" "test" {
+  volume_id   = numspot_volume.test.id
+  description = %[1]q
+  tags = [
+    {
+      key 	= %[2]q
+      value = %[3]q
+    }
+  ]
+}`, description, tagKey, tagValue)
+}
