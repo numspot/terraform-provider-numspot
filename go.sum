@@ -409,6 +409,12 @@ gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.13 h1:UFycGDvVge6PI9AvpjZ1nkAkcqA
 gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.13/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
 gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.14 h1:04ETbGNV1Cwm8CVXemL3BxQPPPCu9sq+L+gvGvyZd5U=
 gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.14/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
+gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.15 h1:+XcAlxthw0N21T2SVm/o3fxvSVAdaJTdts9RIz8pqVY=
+gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.15/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
+gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.16 h1:tpEZGhqiNj29YRmQrskvBvF5Zzstlo2rmyhicCjDleA=
+gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.16/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
+gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.17 h1:dyOKF8mrIvKlug77GLVLdO5k9FUElcxEd3+J1qCsKI4=
+gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.17/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=

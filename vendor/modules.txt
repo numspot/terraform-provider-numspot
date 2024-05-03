@@ -317,8 +317,6 @@ github.com/josharian/intern
 ## explicit; go 1.19
 # github.com/katbyte/sergi-go-diff v1.1.1
 ## explicit; go 1.18
-# github.com/katbyte/terrafmt v0.5.3
-## explicit; go 1.18
 # github.com/magiconair/properties v1.8.6
 ## explicit; go 1.13
 # github.com/mailru/easyjson v0.7.7
@@ -444,7 +442,7 @@ github.com/zclconf/go-cty/cty/function/stdlib
 github.com/zclconf/go-cty/cty/gocty
 github.com/zclconf/go-cty/cty/json
 github.com/zclconf/go-cty/cty/set
-# gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.14
+# gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.17
 ## explicit; go 1.20
 gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas
 gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam

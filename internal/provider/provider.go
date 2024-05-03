@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/base64"
-	"errors"
 	"net/http"
 	"os"
 
@@ -24,16 +23,6 @@ import (
 var _ provider.Provider = (*numspotProvider)(nil)
 
 type Key string
-
-var (
-	clientIdKey     = Key("client_id")
-	clientSecretKey = Key("client_secret")
-)
-
-var (
-	errClientIdNotFound     = errors.New("can't find client_id")
-	errClientSecretNotFound = errors.New("can't find client_secret")
-)
 
 func New(version string, development bool) func() provider.Provider {
 	return func() provider.Provider {
@@ -85,11 +74,8 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 }
 
 func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotProviderModel) (*string, error) {
-	ctx = context.WithValue(ctx, clientIdKey, data.ClientId.ValueString())
-	ctx = context.WithValue(ctx, clientSecretKey, data.ClientSecret.ValueString())
-
 	iamEndpoint := data.IAMHost.ValueString()
-	tmp := func(c *iam.Client) error {
+	httpClient := func(c *iam.Client) error {
 		c.Client = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -98,22 +84,27 @@ func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotPro
 		return nil
 	}
 
-	iamClient, err := iam.NewClientWithResponses(iamEndpoint, tmp)
+	iamClient, err := iam.NewClientWithResponses(iamEndpoint, httpClient)
 	if err != nil {
 		return nil, err
 	}
 
-	body := iam.Oauth2TokenExchangeFormdataRequestBody{
-		GrantType: "client_credentials",
+	body := iam.TokenReq{
+		GrantType:    "client_credentials",
+		ClientId:     data.ClientId.ValueStringPointer(),
+		ClientSecret: data.ClientSecret.ValueStringPointer(),
 	}
 
-	response, err := iamClient.Oauth2TokenExchangeWithFormdataBodyWithResponse(ctx, body, AddSecurityCredentialsToRequestHeaders)
+	basicAuth := buildBasicAuth(data.ClientId.ValueString(), data.ClientSecret.ValueString())
+	response, err := iamClient.TokenWithFormdataBodyWithResponse(ctx, &iam.TokenParams{
+		Authorization: &basicAuth,
+	}, body)
 	if err != nil {
 		return nil, err
 	}
 
 	if response.JSON200 != nil {
-		return response.JSON200.AccessToken, nil
+		return &response.JSON200.AccessToken, nil
 	}
 
 	return nil, err
@@ -124,25 +115,15 @@ func buildBasicAuth(username, password string) string {
 	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 }
 
-func AddSecurityCredentialsToRequestHeaders(ctx context.Context, req *http.Request) error {
-	clientId, ok := ctx.Value(clientIdKey).(string)
-	if !ok {
-		return errClientIdNotFound
-	}
-
-	clientSecret, ok := ctx.Value(clientSecretKey).(string)
-	if !ok {
-		return errClientSecretNotFound
-	}
-
-	req.Header.Add("Authorization", buildBasicAuth(clientId, clientSecret))
-	return nil
-}
-
 func (p *numspotProvider) apiClientWithAuth(ctx context.Context, diag *diag.Diagnostics, data *NumspotProviderModel) *iaas.ClientWithResponses {
 	accessToken, err := p.authenticateUser(ctx, data)
 	if err != nil {
 		diag.AddError("Failed to authenticate", err.Error())
+		return nil
+	}
+
+	if accessToken == nil {
+		diag.AddError("Failed to retrieve access token", "returned access token is nil")
 		return nil
 	}
 

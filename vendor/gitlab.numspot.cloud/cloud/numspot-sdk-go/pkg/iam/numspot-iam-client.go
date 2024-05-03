@@ -16,147 +16,122 @@ import (
 )
 
 const (
-	BasicScopes  = "basic.Scopes"
-	Oauth2Scopes = "oauth2.Scopes"
+	BasicAuthScopes = "BasicAuth.Scopes"
 )
 
-// ErrorOAuth2 Error
-type ErrorOAuth2 struct {
-	// Error Error
-	Error *string `json:"error,omitempty"`
+// ErrorOauth2 defines model for ErrorOauth2.
+type ErrorOauth2 struct {
+	// Error The error type.
+	Error string `json:"error"`
 
-	// ErrorDebug Error Debug Information
-	//
-	// Only available in dev mode.
-	ErrorDebug *string `json:"error_debug,omitempty"`
-
-	// ErrorDescription Error Description
+	// ErrorDescription A human-readable explanation specific to this occurrence of the problem.
 	ErrorDescription *string `json:"error_description,omitempty"`
-
-	// ErrorHint Error Hint
-	//
-	// Helps the user identify the error cause.
-	ErrorHint *string `json:"error_hint,omitempty"`
-
-	// StatusCode HTTP Status Code
-	StatusCode *int64 `json:"status_code,omitempty"`
 }
 
-// IntrospectedOAuth2Token Introspection contains an access token's session data as specified by
-// [IETF RFC 7662](https://tools.ietf.org/html/rfc7662)
-type IntrospectedOAuth2Token struct {
-	// Active Active is a boolean indicator of whether or not the presented token
-	// is currently active.  The specifics of a token's "active" state
-	// will vary depending on the implementation of the authorization
-	// server and the information it keeps about its tokens, but a "true"
-	// value return for the "active" property will generally indicate
-	// that a given token has been issued by this authorization server,
-	// has not been revoked by the resource owner, and is within its
-	// given time window of validity (e.g., after its issuance time and
-	// before its expiration time).
+// IntrospectResp defines model for IntrospectResp.
+type IntrospectResp struct {
+	// Active A boolean value indicating whether the token is active or not.
 	Active bool `json:"active"`
 
-	// Aud Audience contains a list of the token's intended audiences.
+	// Aud The intended audience of the token, specifying who the token is intended for.
 	Aud *[]string `json:"aud,omitempty"`
 
-	// ClientId ID is a client identifier for the OAuth 2.0 client that
-	// requested this token.
-	ClientId *string `json:"client_id,omitempty"`
+	// ClientId The unique identifier of the client application that requested the token.
+	ClientId *string `json:"clientId,omitempty"`
 
-	// Exp Expires at is an integer timestamp, measured in the number of seconds
-	// since January 1 1970 UTC, indicating when this token will expire.
-	Exp *int64 `json:"exp,omitempty"`
+	// Exp The expiration time of the token in seconds since the Unix epoch.
+	Exp *int `json:"exp,omitempty"`
 
-	// Iat Issued at is an integer timestamp, measured in the number of seconds
-	// since January 1 1970 UTC, indicating when this token was
-	// originally issued.
-	Iat *int64 `json:"iat,omitempty"`
+	// Iat The issued-at time of the token in seconds since the Unix epoch.
+	Iat *int `json:"iat,omitempty"`
 
-	// Iss IssuerURL is a string representing the issuer of this token
+	// Iss The issuer of the token, identify the authorization server that issued the token.
 	Iss *string `json:"iss,omitempty"`
 
-	// Nbf NotBefore is an integer timestamp, measured in the number of seconds
-	// since January 1 1970 UTC, indicating when this token is not to be
-	// used before.
-	Nbf *int64 `json:"nbf,omitempty"`
+	// Nbf The not-before time of the token in seconds since the Unix epoch, indicating the earliest time the token can be used.
+	Nbf *int `json:"nbf,omitempty"`
 
-	// Scope Scope is a JSON string containing a space-separated list of
-	// scopes associated with this token.
+	// Scope The scope of the token, defining the permissions it grants.
 	Scope *string `json:"scope,omitempty"`
 
-	// Sub Subject of the token, as defined in JWT [RFC7519].
-	// Usually a machine-readable identifier of the resource owner who
-	// authorized this token.
+	// Sub The subject of the token, typically the user or resource the token is issued for.
 	Sub *string `json:"sub,omitempty"`
 
-	// TokenType TokenType is the introspected token's type, typically `Bearer`.
-	TokenType *string `json:"token_type,omitempty"`
+	// TokenType Indicate the type of the token, such as "Bearer".
+	TokenType *string `json:"tokenType,omitempty"`
 
-	// TokenUse TokenUse is the introspected token's use, for example `access_token` or `refresh_token`.
-	TokenUse *string `json:"token_use,omitempty"`
+	// TokenUse Specify the intended use of the token, such as "access" or "refresh".
+	TokenUse *string `json:"tokenUse,omitempty"`
 }
 
-// OAuth2TokenExchange OAuth2 Token Exchange Result
-type OAuth2TokenExchange struct {
-	// AccessToken The access token issued by the authorization server.
-	AccessToken *string `json:"access_token,omitempty"`
+// TokenBody defines model for TokenBody.
+type TokenBody struct {
+	// Token The token to provide.
+	Token string `json:"token"`
+}
 
-	// ExpiresIn The lifetime in seconds of the access token. For
-	// example, the value "3600" denotes that the access token will
-	// expire in one hour from the time the response was generated.
-	ExpiresIn *int64 `json:"expires_in,omitempty"`
+// TokenReq defines model for TokenReq.
+type TokenReq struct {
+	// ClientId The client id.
+	ClientId *string `json:"client_id,omitempty"`
 
-	// IdToken To retrieve a refresh token request the id_token scope.
-	IdToken *string `json:"id_token,omitempty"`
+	// ClientSecret The client secret.
+	ClientSecret *string `json:"client_secret,omitempty"`
 
-	// RefreshToken The refresh token, which can be used to obtain new
-	// access tokens. To retrieve it add the scope "offline" to your access token request.
+	// Code The code authorization.
+	Code *string `json:"code,omitempty"`
+
+	// GrantType The grant type.
+	GrantType string `json:"grant_type"`
+
+	// RedirectUri The URLs redirection
+	RedirectUri *string `json:"redirect_uri,omitempty"`
+
+	// RefreshToken The refresh Token
 	RefreshToken *string `json:"refresh_token,omitempty"`
-
-	// Scope The scope of the access token
-	Scope *string `json:"scope,omitempty"`
-
-	// TokenType The type of the token issued
-	TokenType *string `json:"token_type,omitempty"`
 }
 
-// IntrospectOAuth2TokenFormdataBody defines parameters for IntrospectOAuth2Token.
-type IntrospectOAuth2TokenFormdataBody struct {
-	// Scope An optional, space separated list of required scopes. If the access token was not granted one of the
-	// scopes, the result of active will be false.
-	Scope *string `form:"scope,omitempty" json:"scope,omitempty"`
+// TokenResp defines model for TokenResp.
+type TokenResp struct {
+	// AccessToken The access token.
+	AccessToken string `json:"access_token"`
 
-	// Token The string value of the token. For access tokens, this
-	// is the "access_token" value returned from the token endpoint
-	// defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
-	// value returned.
-	Token string `form:"token" json:"token"`
+	// ExpiresIn The lifetime in seconds of the access token.
+	ExpiresIn int `json:"expires_in"`
+
+	// TokenType The type of the token issued.
+	TokenType string `json:"token_type"`
 }
 
-// RevokeOAuth2TokenFormdataBody defines parameters for RevokeOAuth2Token.
-type RevokeOAuth2TokenFormdataBody struct {
-	ClientId     *string `form:"client_id,omitempty" json:"client_id,omitempty"`
-	ClientSecret *string `form:"client_secret,omitempty" json:"client_secret,omitempty"`
-	Token        string  `form:"token" json:"token"`
+// Authorization defines model for Authorization.
+type Authorization = string
+
+// IntrospectResponseSchema defines model for IntrospectResponse.
+type IntrospectResponseSchema = IntrospectResp
+
+// TokenResponseSchema defines model for TokenResponse.
+type TokenResponseSchema = TokenResp
+
+// RevokeParams defines parameters for Revoke.
+type RevokeParams struct {
+	// Authorization The client identifier.
+	Authorization *Authorization `json:"Authorization,omitempty"`
 }
 
-// Oauth2TokenExchangeFormdataBody defines parameters for Oauth2TokenExchange.
-type Oauth2TokenExchangeFormdataBody struct {
-	ClientId     *string `form:"client_id,omitempty" json:"client_id,omitempty"`
-	Code         *string `form:"code,omitempty" json:"code,omitempty"`
-	GrantType    string  `form:"grant_type" json:"grant_type"`
-	RedirectUri  *string `form:"redirect_uri,omitempty" json:"redirect_uri,omitempty"`
-	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty"`
+// TokenParams defines parameters for Token.
+type TokenParams struct {
+	// Authorization The client identifier.
+	Authorization *Authorization `json:"Authorization,omitempty"`
 }
 
-// IntrospectOAuth2TokenFormdataRequestBody defines body for IntrospectOAuth2Token for application/x-www-form-urlencoded ContentType.
-type IntrospectOAuth2TokenFormdataRequestBody IntrospectOAuth2TokenFormdataBody
+// IntrospectFormdataRequestBody defines body for Introspect for application/x-www-form-urlencoded ContentType.
+type IntrospectFormdataRequestBody = TokenBody
 
-// RevokeOAuth2TokenFormdataRequestBody defines body for RevokeOAuth2Token for application/x-www-form-urlencoded ContentType.
-type RevokeOAuth2TokenFormdataRequestBody RevokeOAuth2TokenFormdataBody
+// RevokeFormdataRequestBody defines body for Revoke for application/x-www-form-urlencoded ContentType.
+type RevokeFormdataRequestBody = TokenBody
 
-// Oauth2TokenExchangeFormdataRequestBody defines body for Oauth2TokenExchange for application/x-www-form-urlencoded ContentType.
-type Oauth2TokenExchangeFormdataRequestBody Oauth2TokenExchangeFormdataBody
+// TokenFormdataRequestBody defines body for Token for application/x-www-form-urlencoded ContentType.
+type TokenFormdataRequestBody = TokenReq
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -231,27 +206,24 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// OAuth2Authorize request
-	OAuth2Authorize(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// IntrospectWithBody request with any body
+	IntrospectWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// IntrospectOAuth2TokenWithBody request with any body
-	IntrospectOAuth2TokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	IntrospectWithFormdataBody(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	IntrospectOAuth2TokenWithFormdataBody(ctx context.Context, body IntrospectOAuth2TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// RevokeWithBody request with any body
+	RevokeWithBody(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// RevokeOAuth2TokenWithBody request with any body
-	RevokeOAuth2TokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RevokeWithFormdataBody(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	RevokeOAuth2TokenWithFormdataBody(ctx context.Context, body RevokeOAuth2TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TokenWithBody request with any body
+	TokenWithBody(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// Oauth2TokenExchangeWithBody request with any body
-	Oauth2TokenExchangeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	Oauth2TokenExchangeWithFormdataBody(ctx context.Context, body Oauth2TokenExchangeFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	TokenWithFormdataBody(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) OAuth2Authorize(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewOAuth2AuthorizeRequest(c.Server)
+func (c *Client) IntrospectWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewIntrospectRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -262,8 +234,8 @@ func (c *Client) OAuth2Authorize(ctx context.Context, reqEditors ...RequestEdito
 	return c.Client.Do(req)
 }
 
-func (c *Client) IntrospectOAuth2TokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewIntrospectOAuth2TokenRequestWithBody(c.Server, contentType, body)
+func (c *Client) IntrospectWithFormdataBody(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewIntrospectRequestWithFormdataBody(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -274,8 +246,8 @@ func (c *Client) IntrospectOAuth2TokenWithBody(ctx context.Context, contentType 
 	return c.Client.Do(req)
 }
 
-func (c *Client) IntrospectOAuth2TokenWithFormdataBody(ctx context.Context, body IntrospectOAuth2TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewIntrospectOAuth2TokenRequestWithFormdataBody(c.Server, body)
+func (c *Client) RevokeWithBody(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRevokeRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -286,8 +258,8 @@ func (c *Client) IntrospectOAuth2TokenWithFormdataBody(ctx context.Context, body
 	return c.Client.Do(req)
 }
 
-func (c *Client) RevokeOAuth2TokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRevokeOAuth2TokenRequestWithBody(c.Server, contentType, body)
+func (c *Client) RevokeWithFormdataBody(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRevokeRequestWithFormdataBody(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -298,8 +270,8 @@ func (c *Client) RevokeOAuth2TokenWithBody(ctx context.Context, contentType stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) RevokeOAuth2TokenWithFormdataBody(ctx context.Context, body RevokeOAuth2TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRevokeOAuth2TokenRequestWithFormdataBody(c.Server, body)
+func (c *Client) TokenWithBody(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTokenRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -310,8 +282,8 @@ func (c *Client) RevokeOAuth2TokenWithFormdataBody(ctx context.Context, body Rev
 	return c.Client.Do(req)
 }
 
-func (c *Client) Oauth2TokenExchangeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewOauth2TokenExchangeRequestWithBody(c.Server, contentType, body)
+func (c *Client) TokenWithFormdataBody(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTokenRequestWithFormdataBody(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -322,58 +294,19 @@ func (c *Client) Oauth2TokenExchangeWithBody(ctx context.Context, contentType st
 	return c.Client.Do(req)
 }
 
-func (c *Client) Oauth2TokenExchangeWithFormdataBody(ctx context.Context, body Oauth2TokenExchangeFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewOauth2TokenExchangeRequestWithFormdataBody(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-// NewOAuth2AuthorizeRequest generates requests for OAuth2Authorize
-func NewOAuth2AuthorizeRequest(server string) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/authorize")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewIntrospectOAuth2TokenRequestWithFormdataBody calls the generic IntrospectOAuth2Token builder with application/x-www-form-urlencoded body
-func NewIntrospectOAuth2TokenRequestWithFormdataBody(server string, body IntrospectOAuth2TokenFormdataRequestBody) (*http.Request, error) {
+// NewIntrospectRequestWithFormdataBody calls the generic Introspect builder with application/x-www-form-urlencoded body
+func NewIntrospectRequestWithFormdataBody(server string, body IntrospectFormdataRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	bodyStr, err := runtime.MarshalForm(body, nil)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewIntrospectOAuth2TokenRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+	return NewIntrospectRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
 }
 
-// NewIntrospectOAuth2TokenRequestWithBody generates requests for IntrospectOAuth2Token with any type of body
-func NewIntrospectOAuth2TokenRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewIntrospectRequestWithBody generates requests for Introspect with any type of body
+func NewIntrospectRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -381,7 +314,7 @@ func NewIntrospectOAuth2TokenRequestWithBody(server string, contentType string, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/introspect")
+	operationPath := fmt.Sprintf("/iam/introspect")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -401,19 +334,19 @@ func NewIntrospectOAuth2TokenRequestWithBody(server string, contentType string, 
 	return req, nil
 }
 
-// NewRevokeOAuth2TokenRequestWithFormdataBody calls the generic RevokeOAuth2Token builder with application/x-www-form-urlencoded body
-func NewRevokeOAuth2TokenRequestWithFormdataBody(server string, body RevokeOAuth2TokenFormdataRequestBody) (*http.Request, error) {
+// NewRevokeRequestWithFormdataBody calls the generic Revoke builder with application/x-www-form-urlencoded body
+func NewRevokeRequestWithFormdataBody(server string, params *RevokeParams, body RevokeFormdataRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	bodyStr, err := runtime.MarshalForm(body, nil)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewRevokeOAuth2TokenRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+	return NewRevokeRequestWithBody(server, params, "application/x-www-form-urlencoded", bodyReader)
 }
 
-// NewRevokeOAuth2TokenRequestWithBody generates requests for RevokeOAuth2Token with any type of body
-func NewRevokeOAuth2TokenRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewRevokeRequestWithBody generates requests for Revoke with any type of body
+func NewRevokeRequestWithBody(server string, params *RevokeParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -421,7 +354,7 @@ func NewRevokeOAuth2TokenRequestWithBody(server string, contentType string, body
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/revoke")
+	operationPath := fmt.Sprintf("/iam/revoke")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -437,23 +370,38 @@ func NewRevokeOAuth2TokenRequestWithBody(server string, contentType string, body
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.Authorization != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, *params.Authorization)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("Authorization", headerParam0)
+		}
+
+	}
 
 	return req, nil
 }
 
-// NewOauth2TokenExchangeRequestWithFormdataBody calls the generic Oauth2TokenExchange builder with application/x-www-form-urlencoded body
-func NewOauth2TokenExchangeRequestWithFormdataBody(server string, body Oauth2TokenExchangeFormdataRequestBody) (*http.Request, error) {
+// NewTokenRequestWithFormdataBody calls the generic Token builder with application/x-www-form-urlencoded body
+func NewTokenRequestWithFormdataBody(server string, params *TokenParams, body TokenFormdataRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	bodyStr, err := runtime.MarshalForm(body, nil)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewOauth2TokenExchangeRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+	return NewTokenRequestWithBody(server, params, "application/x-www-form-urlencoded", bodyReader)
 }
 
-// NewOauth2TokenExchangeRequestWithBody generates requests for Oauth2TokenExchange with any type of body
-func NewOauth2TokenExchangeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewTokenRequestWithBody generates requests for Token with any type of body
+func NewTokenRequestWithBody(server string, params *TokenParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -461,7 +409,7 @@ func NewOauth2TokenExchangeRequestWithBody(server string, contentType string, bo
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/token")
+	operationPath := fmt.Sprintf("/iam/token")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -477,6 +425,21 @@ func NewOauth2TokenExchangeRequestWithBody(server string, contentType string, bo
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	if params != nil {
+
+		if params.Authorization != nil {
+			var headerParam0 string
+
+			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, *params.Authorization)
+			if err != nil {
+				return nil, err
+			}
+
+			req.Header.Set("Authorization", headerParam0)
+		}
+
+	}
 
 	return req, nil
 }
@@ -524,33 +487,31 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// OAuth2AuthorizeWithResponse request
-	OAuth2AuthorizeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuth2AuthorizeResponse, error)
+	// IntrospectWithBodyWithResponse request with any body
+	IntrospectWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectResponse, error)
 
-	// IntrospectOAuth2TokenWithBodyWithResponse request with any body
-	IntrospectOAuth2TokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectOAuth2TokenResponse, error)
+	IntrospectWithFormdataBodyWithResponse(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*IntrospectResponse, error)
 
-	IntrospectOAuth2TokenWithFormdataBodyWithResponse(ctx context.Context, body IntrospectOAuth2TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*IntrospectOAuth2TokenResponse, error)
+	// RevokeWithBodyWithResponse request with any body
+	RevokeWithBodyWithResponse(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RevokeResponse, error)
 
-	// RevokeOAuth2TokenWithBodyWithResponse request with any body
-	RevokeOAuth2TokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RevokeOAuth2TokenResponse, error)
+	RevokeWithFormdataBodyWithResponse(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*RevokeResponse, error)
 
-	RevokeOAuth2TokenWithFormdataBodyWithResponse(ctx context.Context, body RevokeOAuth2TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*RevokeOAuth2TokenResponse, error)
+	// TokenWithBodyWithResponse request with any body
+	TokenWithBodyWithResponse(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TokenResponse, error)
 
-	// Oauth2TokenExchangeWithBodyWithResponse request with any body
-	Oauth2TokenExchangeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*Oauth2TokenExchangeResponse, error)
-
-	Oauth2TokenExchangeWithFormdataBodyWithResponse(ctx context.Context, body Oauth2TokenExchangeFormdataRequestBody, reqEditors ...RequestEditorFn) (*Oauth2TokenExchangeResponse, error)
+	TokenWithFormdataBodyWithResponse(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*TokenResponse, error)
 }
 
-type OAuth2AuthorizeResponse struct {
+type IntrospectResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSONDefault  *ErrorOAuth2
+	JSON200      *IntrospectResponseSchema
+	JSON500      *ErrorOauth2
 }
 
 // Status returns HTTPResponse.Status
-func (r OAuth2AuthorizeResponse) Status() string {
+func (r IntrospectResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -558,22 +519,22 @@ func (r OAuth2AuthorizeResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r OAuth2AuthorizeResponse) StatusCode() int {
+func (r IntrospectResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type IntrospectOAuth2TokenResponse struct {
+type RevokeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *IntrospectedOAuth2Token
-	JSONDefault  *ErrorOAuth2
+	JSON400      *ErrorOauth2
+	JSON401      *ErrorOauth2
 }
 
 // Status returns HTTPResponse.Status
-func (r IntrospectOAuth2TokenResponse) Status() string {
+func (r RevokeResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -581,21 +542,24 @@ func (r IntrospectOAuth2TokenResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r IntrospectOAuth2TokenResponse) StatusCode() int {
+func (r RevokeResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type RevokeOAuth2TokenResponse struct {
+type TokenResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSONDefault  *ErrorOAuth2
+	JSON200      *TokenResponseSchema
+	JSON400      *ErrorOauth2
+	JSON401      *ErrorOauth2
+	JSON500      *ErrorOauth2
 }
 
 // Status returns HTTPResponse.Status
-func (r RevokeOAuth2TokenResponse) Status() string {
+func (r TokenResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -603,208 +567,171 @@ func (r RevokeOAuth2TokenResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r RevokeOAuth2TokenResponse) StatusCode() int {
+func (r TokenResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type Oauth2TokenExchangeResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *OAuth2TokenExchange
-	JSONDefault  *ErrorOAuth2
-}
-
-// Status returns HTTPResponse.Status
-func (r Oauth2TokenExchangeResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r Oauth2TokenExchangeResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// OAuth2AuthorizeWithResponse request returning *OAuth2AuthorizeResponse
-func (c *ClientWithResponses) OAuth2AuthorizeWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuth2AuthorizeResponse, error) {
-	rsp, err := c.OAuth2Authorize(ctx, reqEditors...)
+// IntrospectWithBodyWithResponse request with arbitrary body returning *IntrospectResponse
+func (c *ClientWithResponses) IntrospectWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectResponse, error) {
+	rsp, err := c.IntrospectWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseOAuth2AuthorizeResponse(rsp)
+	return ParseIntrospectResponse(rsp)
 }
 
-// IntrospectOAuth2TokenWithBodyWithResponse request with arbitrary body returning *IntrospectOAuth2TokenResponse
-func (c *ClientWithResponses) IntrospectOAuth2TokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectOAuth2TokenResponse, error) {
-	rsp, err := c.IntrospectOAuth2TokenWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) IntrospectWithFormdataBodyWithResponse(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*IntrospectResponse, error) {
+	rsp, err := c.IntrospectWithFormdataBody(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseIntrospectOAuth2TokenResponse(rsp)
+	return ParseIntrospectResponse(rsp)
 }
 
-func (c *ClientWithResponses) IntrospectOAuth2TokenWithFormdataBodyWithResponse(ctx context.Context, body IntrospectOAuth2TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*IntrospectOAuth2TokenResponse, error) {
-	rsp, err := c.IntrospectOAuth2TokenWithFormdataBody(ctx, body, reqEditors...)
+// RevokeWithBodyWithResponse request with arbitrary body returning *RevokeResponse
+func (c *ClientWithResponses) RevokeWithBodyWithResponse(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RevokeResponse, error) {
+	rsp, err := c.RevokeWithBody(ctx, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseIntrospectOAuth2TokenResponse(rsp)
+	return ParseRevokeResponse(rsp)
 }
 
-// RevokeOAuth2TokenWithBodyWithResponse request with arbitrary body returning *RevokeOAuth2TokenResponse
-func (c *ClientWithResponses) RevokeOAuth2TokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RevokeOAuth2TokenResponse, error) {
-	rsp, err := c.RevokeOAuth2TokenWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) RevokeWithFormdataBodyWithResponse(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*RevokeResponse, error) {
+	rsp, err := c.RevokeWithFormdataBody(ctx, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseRevokeOAuth2TokenResponse(rsp)
+	return ParseRevokeResponse(rsp)
 }
 
-func (c *ClientWithResponses) RevokeOAuth2TokenWithFormdataBodyWithResponse(ctx context.Context, body RevokeOAuth2TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*RevokeOAuth2TokenResponse, error) {
-	rsp, err := c.RevokeOAuth2TokenWithFormdataBody(ctx, body, reqEditors...)
+// TokenWithBodyWithResponse request with arbitrary body returning *TokenResponse
+func (c *ClientWithResponses) TokenWithBodyWithResponse(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TokenResponse, error) {
+	rsp, err := c.TokenWithBody(ctx, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseRevokeOAuth2TokenResponse(rsp)
+	return ParseTokenResponse(rsp)
 }
 
-// Oauth2TokenExchangeWithBodyWithResponse request with arbitrary body returning *Oauth2TokenExchangeResponse
-func (c *ClientWithResponses) Oauth2TokenExchangeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*Oauth2TokenExchangeResponse, error) {
-	rsp, err := c.Oauth2TokenExchangeWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) TokenWithFormdataBodyWithResponse(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*TokenResponse, error) {
+	rsp, err := c.TokenWithFormdataBody(ctx, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseOauth2TokenExchangeResponse(rsp)
+	return ParseTokenResponse(rsp)
 }
 
-func (c *ClientWithResponses) Oauth2TokenExchangeWithFormdataBodyWithResponse(ctx context.Context, body Oauth2TokenExchangeFormdataRequestBody, reqEditors ...RequestEditorFn) (*Oauth2TokenExchangeResponse, error) {
-	rsp, err := c.Oauth2TokenExchangeWithFormdataBody(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseOauth2TokenExchangeResponse(rsp)
-}
-
-// ParseOAuth2AuthorizeResponse parses an HTTP response from a OAuth2AuthorizeWithResponse call
-func ParseOAuth2AuthorizeResponse(rsp *http.Response) (*OAuth2AuthorizeResponse, error) {
+// ParseIntrospectResponse parses an HTTP response from a IntrospectWithResponse call
+func ParseIntrospectResponse(rsp *http.Response) (*IntrospectResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &OAuth2AuthorizeResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest ErrorOAuth2
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseIntrospectOAuth2TokenResponse parses an HTTP response from a IntrospectOAuth2TokenWithResponse call
-func ParseIntrospectOAuth2TokenResponse(rsp *http.Response) (*IntrospectOAuth2TokenResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &IntrospectOAuth2TokenResponse{
+	response := &IntrospectResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest IntrospectedOAuth2Token
+		var dest IntrospectResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest ErrorOAuth2
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorOauth2
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSONDefault = &dest
+		response.JSON500 = &dest
 
 	}
 
 	return response, nil
 }
 
-// ParseRevokeOAuth2TokenResponse parses an HTTP response from a RevokeOAuth2TokenWithResponse call
-func ParseRevokeOAuth2TokenResponse(rsp *http.Response) (*RevokeOAuth2TokenResponse, error) {
+// ParseRevokeResponse parses an HTTP response from a RevokeWithResponse call
+func ParseRevokeResponse(rsp *http.Response) (*RevokeResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &RevokeOAuth2TokenResponse{
+	response := &RevokeResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest ErrorOAuth2
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorOauth2
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSONDefault = &dest
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorOauth2
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
 
 	}
 
 	return response, nil
 }
 
-// ParseOauth2TokenExchangeResponse parses an HTTP response from a Oauth2TokenExchangeWithResponse call
-func ParseOauth2TokenExchangeResponse(rsp *http.Response) (*Oauth2TokenExchangeResponse, error) {
+// ParseTokenResponse parses an HTTP response from a TokenWithResponse call
+func ParseTokenResponse(rsp *http.Response) (*TokenResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &Oauth2TokenExchangeResponse{
+	response := &TokenResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest OAuth2TokenExchange
+		var dest TokenResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest ErrorOAuth2
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorOauth2
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
-		response.JSONDefault = &dest
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest ErrorOauth2
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorOauth2
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
 
 	}
 
