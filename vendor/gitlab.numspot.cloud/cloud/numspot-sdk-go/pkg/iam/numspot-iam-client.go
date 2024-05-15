@@ -4,6 +4,7 @@
 package iam
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,13 +12,119 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 const (
-	BasicAuthScopes = "BasicAuth.Scopes"
+	BasicAuthScopes  = "BasicAuth.Scopes"
+	BearerAuthScopes = "BearerAuth.Scopes"
 )
+
+// Defines values for ErrorDocumentationUrl.
+const (
+	HttpsdocsNumspotClouddocsdomainsclouderrorsAmbiguousGranularPermissionElements ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#ambiguous_granular_permission_elements"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsAmbiguousPermissionElements         ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#ambiguous_permission_elements"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsAmbiguousRoleElements               ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#ambiguous_role_elements"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsDuplicateResource                   ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#duplicate_resource"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsDuplicateRole                       ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#duplicate_role"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsForbidden                           ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#forbidden"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsForbiddenAccess                     ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#forbidden_access"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsIdentityNotFound                    ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#identity_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsInactiveToken                       ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#inactive_token"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsInternalServerError                 ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#internal_server_error"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsInvalidParameter                    ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsMethodNotAllowed                    ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#method_not_allowed"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsMissingRoles                        ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#missing_roles"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsNamespaceNotFound                   ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#namespace_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsNotInTenantRoles                    ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#not_in_tenant_roles"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsPermissionNotFound                  ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#permission_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsResourceNotFound                    ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#resource_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsRoleNotFound                        ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#role_not_found"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsUnauthenticatedAccess               ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#unauthenticated_access"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsUnexpectedTokenUsage                ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#unexpected_token_usage"
+	HttpsdocsNumspotClouddocsdomainsclouderrorsUriTooLong                          ErrorDocumentationUrl = "https://docs.numspot.cloud/docs/domains/cloud/errors#uri_too_long"
+)
+
+// Defines values for ImmutableSpaceStatus.
+const (
+	ImmutableSpaceStatusFAILED  ImmutableSpaceStatus = "FAILED"
+	ImmutableSpaceStatusQUEUED  ImmutableSpaceStatus = "QUEUED"
+	ImmutableSpaceStatusREADY   ImmutableSpaceStatus = "READY"
+	ImmutableSpaceStatusRUNNING ImmutableSpaceStatus = "RUNNING"
+)
+
+// Defines values for SpaceStatus.
+const (
+	SpaceStatusFAILED  SpaceStatus = "FAILED"
+	SpaceStatusQUEUED  SpaceStatus = "QUEUED"
+	SpaceStatusREADY   SpaceStatus = "READY"
+	SpaceStatusRUNNING SpaceStatus = "RUNNING"
+)
+
+// Defines values for SubjectType.
+const (
+	ServiceAccounts SubjectType = "serviceAccounts"
+	Users           SubjectType = "users"
+)
+
+// BadRequestError defines model for BadRequestError.
+type BadRequestError struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail   *string `json:"detail,omitempty"`
+	Instance *Url    `json:"instance,omitempty"`
+
+	// Title Human-readable summary of the problem type.
+	Title string `json:"title"`
+
+	// Type Documentation URL for the domain error
+	Type ErrorDocumentationUrl `json:"type"`
+
+	// Violations Array of violations to provide a per-field detail.
+	Violations *[]Violation `json:"violations,omitempty"`
+}
+
+// CreateSpace defines model for CreateSpace.
+type CreateSpace struct {
+	// Description Space description
+	Description string `json:"description"`
+
+	// Name Space name
+	Name string `json:"name"`
+}
+
+// CreatedServiceAccount defines model for CreatedServiceAccount.
+type CreatedServiceAccount struct {
+	// Id Service account ID
+	Id string `json:"id"`
+
+	// Name Service Accounts name
+	Name string `json:"name"`
+
+	// Secret Service account secret.
+	Secret string `json:"secret"`
+}
+
+// DateTime defines model for DateTime.
+type DateTime = time.Time
+
+// Error For HTTP errors, we implement the https://datatracker.ietf.org/doc/html/rfc9457
+type Error struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail   *string `json:"detail,omitempty"`
+	Instance *Url    `json:"instance,omitempty"`
+
+	// Title Human-readable summary of the problem type.
+	Title string `json:"title"`
+
+	// Type Documentation URL for the domain error
+	Type ErrorDocumentationUrl `json:"type"`
+}
+
+// ErrorDocumentationUrl Documentation URL for the domain error
+type ErrorDocumentationUrl string
 
 // ErrorOauth2 defines model for ErrorOauth2.
 type ErrorOauth2 struct {
@@ -27,6 +134,59 @@ type ErrorOauth2 struct {
 	// ErrorDescription A human-readable explanation specific to this occurrence of the problem.
 	ErrorDescription *string `json:"error_description,omitempty"`
 }
+
+// GranularPermission defines model for GranularPermission.
+type GranularPermission struct {
+	// Action Type of action (e.g., owners, editors, getters)
+	Action string `json:"action"`
+
+	// ObjectId ID of the object
+	ObjectId string `json:"objectId"`
+}
+
+// GranularPolicyList defines model for GranularPolicyList.
+type GranularPolicyList = []GranularPermission
+
+// IAMGranularPolicyList defines model for IAMGranularPolicyList.
+type IAMGranularPolicyList struct {
+	Items []GranularPermission `json:"items"`
+
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
+// IAMPolicy defines model for IAMPolicy.
+type IAMPolicy struct {
+	// Permissions List of permission UUIDs
+	Permissions *[]openapi_types.UUID `json:"permissions,omitempty"`
+
+	// Roles List of role UUIDs
+	Roles *[]openapi_types.UUID `json:"roles,omitempty"`
+}
+
+// ImmutableSpace defines model for ImmutableSpace.
+type ImmutableSpace struct {
+	CreatedOn DateTime `json:"createdOn"`
+
+	// Id Internal ID
+	Id openapi_types.UUID `json:"id"`
+
+	// OrganisationId Organisation_id
+	OrganisationId openapi_types.UUID `json:"organisationId"`
+
+	// Status status of the space, the space can only be used when the status is ready.
+	Status    ImmutableSpaceStatus `json:"status"`
+	UpdatedOn DateTime             `json:"updatedOn"`
+}
+
+// ImmutableSpaceStatus status of the space, the space can only be used when the status is ready.
+type ImmutableSpaceStatus string
+
+// Int Equivalent to int32
+type Int = int32
 
 // IntrospectResp defines model for IntrospectResp.
 type IntrospectResp struct {
@@ -63,6 +223,127 @@ type IntrospectResp struct {
 	// TokenUse Specify the intended use of the token, such as "access" or "refresh".
 	TokenUse *string `json:"tokenUse,omitempty"`
 }
+
+// MutableSpace defines model for MutableSpace.
+type MutableSpace struct {
+	// Description Space description
+	Description *string `json:"description,omitempty"`
+
+	// Name Space name
+	Name *string `json:"name,omitempty"`
+}
+
+// OrganisationSimple defines model for OrganisationSimple.
+type OrganisationSimple struct {
+	// Id Organisation identifier
+	Id openapi_types.UUID `json:"id"`
+}
+
+// OrganisationSimplePaginatedList defines model for OrganisationSimplePaginatedList.
+type OrganisationSimplePaginatedList struct {
+	Items []OrganisationSimple `json:"items"`
+
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
+// PaginatedList Represent the common attributes of a paginated list, to be used in an allOf with the specific items attribute of the desired type.
+type PaginatedList struct {
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
+// ServiceAccount defines model for ServiceAccount.
+type ServiceAccount struct {
+	// Name Service account name
+	Name string `json:"name"`
+}
+
+// ServiceAccountEdited defines model for ServiceAccountEdited.
+type ServiceAccountEdited struct {
+	// Id Service account ID
+	Id string `json:"id"`
+
+	// Name Service Accounts name
+	Name string `json:"name"`
+}
+
+// ServiceAccountPaginatedList defines model for ServiceAccountPaginatedList.
+type ServiceAccountPaginatedList struct {
+	Items []ServiceAccountEdited `json:"items"`
+
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
+// Space defines model for Space.
+type Space struct {
+	CreatedOn DateTime `json:"createdOn"`
+
+	// Description Space description
+	Description string `json:"description"`
+
+	// Id Internal ID
+	Id openapi_types.UUID `json:"id"`
+
+	// Name Space name
+	Name string `json:"name"`
+
+	// OrganisationId Organisation_id
+	OrganisationId openapi_types.UUID `json:"organisationId"`
+
+	// Status status of the space, the space can only be used when the status is ready.
+	Status    SpaceStatus `json:"status"`
+	UpdatedOn DateTime    `json:"updatedOn"`
+}
+
+// SpaceStatus status of the space, the space can only be used when the status is ready.
+type SpaceStatus string
+
+// SpaceIdsList defines model for SpaceIdsList.
+type SpaceIdsList struct {
+	Items []openapi_types.UUID `json:"items"`
+}
+
+// SpacePaginatedList defines model for SpacePaginatedList.
+type SpacePaginatedList struct {
+	Items []Space `json:"items"`
+
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
+// SpaceSimple defines model for SpaceSimple.
+type SpaceSimple struct {
+	// Id Space identifier
+	Id openapi_types.UUID `json:"id"`
+}
+
+// SpaceSimplePaginatedList defines model for SpaceSimplePaginatedList.
+type SpaceSimplePaginatedList struct {
+	Items []SpaceSimple `json:"items"`
+
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
+// SubjectType defines model for SubjectType.
+type SubjectType string
 
 // TokenBody defines model for TokenBody.
 type TokenBody struct {
@@ -103,19 +384,220 @@ type TokenResp struct {
 	TokenType string `json:"token_type"`
 }
 
+// Url defines model for Url.
+type Url = string
+
+// Violation defines model for Violation.
+type Violation struct {
+	// Description A description of why the field is violated.
+	Description string `json:"description"`
+
+	// Field The field impacted by the violation.
+	Field string `json:"field"`
+}
+
 // Authorization defines model for Authorization.
 type Authorization = string
+
+// ListServiceAccounts defines model for ListServiceAccounts.
+type ListServiceAccounts struct {
+	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
+	NextToken *string `json:"nextToken,omitempty"`
+
+	// Size The maximum number of items to return. The service may return fewer than this value.
+	Size *int32 `json:"size,omitempty"`
+}
+
+// ListSpacesIdentity defines model for ListSpacesIdentity.
+type ListSpacesIdentity struct {
+	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
+	NextToken *string `json:"nextToken,omitempty"`
+
+	// Size The maximum number of items to return. The service may return fewer than this value.
+	Size *int32 `json:"size,omitempty"`
+}
+
+// ListSpacesOfServiceAccount defines model for ListSpacesOfServiceAccount.
+type ListSpacesOfServiceAccount struct {
+	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
+	NextToken *string `json:"nextToken,omitempty"`
+
+	// Size The maximum number of items to return. The service may return fewer than this value.
+	Size *int32 `json:"size,omitempty"`
+}
+
+// ListSpacesPage defines model for ListSpacesPage.
+type ListSpacesPage struct {
+	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
+	NextToken *string `json:"nextToken,omitempty"`
+
+	// Size The maximum number of items to return. The service may return fewer than this value.
+	Size *int32 `json:"size,omitempty"`
+}
+
+// ListUserOrganisations defines model for ListUserOrganisations.
+type ListUserOrganisations struct {
+	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
+	NextToken *string `json:"nextToken,omitempty"`
+
+	// Size The maximum number of items to return. The service may return fewer than this value.
+	Size *int32 `json:"size,omitempty"`
+}
+
+// ObjectType defines model for ObjectType.
+type ObjectType = string
+
+// OrganisationId defines model for OrganisationId.
+type OrganisationId = openapi_types.UUID
+
+// ServiceAccountId defines model for ServiceAccountId.
+type ServiceAccountId = openapi_types.UUID
+
+// ServiceAccountName defines model for ServiceAccountName.
+type ServiceAccountName = string
+
+// SpaceId defines model for SpaceId.
+type SpaceId = openapi_types.UUID
+
+// SubjectTypeParam defines model for SubjectTypeParam.
+type SubjectTypeParam = SubjectType
+
+// SubjectUuid defines model for SubjectUuid.
+type SubjectUuid = openapi_types.UUID
+
+// CreateServiceAccountResponseSchema defines model for CreateServiceAccountResponse.
+type CreateServiceAccountResponseSchema = CreatedServiceAccount
+
+// CreateSpaceResponseSchema defines model for CreateSpaceResponse.
+type CreateSpaceResponseSchema = Space
+
+// GetIAMGranularPolicyResponseSchema defines model for GetIAMGranularPolicyResponse.
+type GetIAMGranularPolicyResponseSchema = IAMGranularPolicyList
+
+// GetIAMPolicyResponseSchema defines model for GetIAMPolicyResponse.
+type GetIAMPolicyResponseSchema = IAMPolicy
+
+// GetServiceAccountResponseSchema defines model for GetServiceAccountResponse.
+type GetServiceAccountResponseSchema = ServiceAccountEdited
+
+// GetSpaceByIdResponseSchema defines model for GetSpaceByIdResponse.
+type GetSpaceByIdResponseSchema = Space
 
 // IntrospectResponseSchema defines model for IntrospectResponse.
 type IntrospectResponseSchema = IntrospectResp
 
+// ListServiceAccountResponseSchema defines model for ListServiceAccountResponse.
+type ListServiceAccountResponseSchema = ServiceAccountPaginatedList
+
+// ListSpacesIdentityResponseSchema defines model for ListSpacesIdentityResponse.
+type ListSpacesIdentityResponseSchema = SpaceSimplePaginatedList
+
+// ListSpacesResponseSchema defines model for ListSpacesResponse.
+type ListSpacesResponseSchema = SpacePaginatedList
+
+// ListSpacesServiceAccountResponseSchema defines model for ListSpacesServiceAccountResponse.
+type ListSpacesServiceAccountResponseSchema = SpaceSimplePaginatedList
+
+// ListUserOrganisationsResponseSchema defines model for ListUserOrganisationsResponse.
+type ListUserOrganisationsResponseSchema = OrganisationSimplePaginatedList
+
 // TokenResponseSchema defines model for TokenResponse.
 type TokenResponseSchema = TokenResp
+
+// UpdateServiceAccountResponseSchema defines model for UpdateServiceAccountResponse.
+type UpdateServiceAccountResponseSchema = ServiceAccountEdited
+
+// CreateServiceAccountRequest defines model for CreateServiceAccountRequest.
+type CreateServiceAccountRequest = ServiceAccount
+
+// CreateSpaceRequest defines model for CreateSpaceRequest.
+type CreateSpaceRequest = CreateSpace
+
+// ListSpaceIdsRequest defines model for ListSpaceIdsRequest.
+type ListSpaceIdsRequest = SpaceIdsList
+
+// SetIAMGranularPolicyRequest Defines the structure for modification instructions for roles and permissions
+type SetIAMGranularPolicyRequest struct {
+	Add    *GranularPolicyList `json:"add,omitempty"`
+	Delete *GranularPolicyList `json:"delete,omitempty"`
+}
+
+// SetIAMPolicyRequest Defines the structure for modification instructions for roles and permissions
+type SetIAMPolicyRequest struct {
+	Add    *IAMPolicy `json:"add,omitempty"`
+	Delete *IAMPolicy `json:"delete,omitempty"`
+}
+
+// UpdateServiceAccountRequest defines model for UpdateServiceAccountRequest.
+type UpdateServiceAccountRequest = ServiceAccount
+
+// UpdateSpaceRequest defines model for UpdateSpaceRequest.
+type UpdateSpaceRequest = MutableSpace
+
+// ListOrganisationsIdentityParams defines parameters for ListOrganisationsIdentity.
+type ListOrganisationsIdentityParams struct {
+	// Page Paginated request
+	Page *ListUserOrganisations `json:"page,omitempty"`
+}
+
+// SetIAMGranularPolicyOrganisationJSONBody defines parameters for SetIAMGranularPolicyOrganisation.
+type SetIAMGranularPolicyOrganisationJSONBody struct {
+	Add    *GranularPolicyList `json:"add,omitempty"`
+	Delete *GranularPolicyList `json:"delete,omitempty"`
+}
+
+// SetIAMPolicyOrganisationJSONBody defines parameters for SetIAMPolicyOrganisation.
+type SetIAMPolicyOrganisationJSONBody struct {
+	Add    *IAMPolicy `json:"add,omitempty"`
+	Delete *IAMPolicy `json:"delete,omitempty"`
+}
+
+// ListServiceAccountOrganisationParams defines parameters for ListServiceAccountOrganisation.
+type ListServiceAccountOrganisationParams struct {
+	// Name Service account name
+	Name *ServiceAccountName `form:"name,omitempty" json:"name,omitempty"`
+
+	// Page Paginated request
+	Page *ListServiceAccounts `json:"page,omitempty"`
+}
+
+// ListSpacesOfServiceAccountParams defines parameters for ListSpacesOfServiceAccount.
+type ListSpacesOfServiceAccountParams struct {
+	// Page Paginated request
+	Page *ListSpacesOfServiceAccount `json:"page,omitempty"`
+}
+
+// ListSpacesIdentityParams defines parameters for ListSpacesIdentity.
+type ListSpacesIdentityParams struct {
+	// Page Paginated request
+	Page *ListSpacesIdentity `json:"page,omitempty"`
+}
 
 // RevokeParams defines parameters for Revoke.
 type RevokeParams struct {
 	// Authorization The client identifier.
 	Authorization *Authorization `json:"Authorization,omitempty"`
+}
+
+// SetIAMGranularPolicySpaceJSONBody defines parameters for SetIAMGranularPolicySpace.
+type SetIAMGranularPolicySpaceJSONBody struct {
+	Add    *GranularPolicyList `json:"add,omitempty"`
+	Delete *GranularPolicyList `json:"delete,omitempty"`
+}
+
+// SetIAMPolicySpaceJSONBody defines parameters for SetIAMPolicySpace.
+type SetIAMPolicySpaceJSONBody struct {
+	Add    *IAMPolicy `json:"add,omitempty"`
+	Delete *IAMPolicy `json:"delete,omitempty"`
+}
+
+// ListServiceAccountSpaceParams defines parameters for ListServiceAccountSpace.
+type ListServiceAccountSpaceParams struct {
+	// Name Service account name
+	Name *ServiceAccountName `form:"name,omitempty" json:"name,omitempty"`
+
+	// Page Paginated request
+	Page *ListServiceAccounts `json:"page,omitempty"`
 }
 
 // TokenParams defines parameters for Token.
@@ -124,14 +606,53 @@ type TokenParams struct {
 	Authorization *Authorization `json:"Authorization,omitempty"`
 }
 
+// ListSpacesParams defines parameters for ListSpaces.
+type ListSpacesParams struct {
+	// Page list spaces paginated request
+	Page *ListSpacesPage `json:"page,omitempty"`
+}
+
 // IntrospectFormdataRequestBody defines body for Introspect for application/x-www-form-urlencoded ContentType.
 type IntrospectFormdataRequestBody = TokenBody
+
+// SetIAMGranularPolicyOrganisationJSONRequestBody defines body for SetIAMGranularPolicyOrganisation for application/json ContentType.
+type SetIAMGranularPolicyOrganisationJSONRequestBody SetIAMGranularPolicyOrganisationJSONBody
+
+// SetIAMPolicyOrganisationJSONRequestBody defines body for SetIAMPolicyOrganisation for application/json ContentType.
+type SetIAMPolicyOrganisationJSONRequestBody SetIAMPolicyOrganisationJSONBody
+
+// CreateServiceAccountOrganisationJSONRequestBody defines body for CreateServiceAccountOrganisation for application/json ContentType.
+type CreateServiceAccountOrganisationJSONRequestBody = ServiceAccount
+
+// UpdateServiceAccountOrganisationJSONRequestBody defines body for UpdateServiceAccountOrganisation for application/json ContentType.
+type UpdateServiceAccountOrganisationJSONRequestBody = ServiceAccount
 
 // RevokeFormdataRequestBody defines body for Revoke for application/x-www-form-urlencoded ContentType.
 type RevokeFormdataRequestBody = TokenBody
 
+// SetIAMGranularPolicySpaceJSONRequestBody defines body for SetIAMGranularPolicySpace for application/json ContentType.
+type SetIAMGranularPolicySpaceJSONRequestBody SetIAMGranularPolicySpaceJSONBody
+
+// SetIAMPolicySpaceJSONRequestBody defines body for SetIAMPolicySpace for application/json ContentType.
+type SetIAMPolicySpaceJSONRequestBody SetIAMPolicySpaceJSONBody
+
+// CreateServiceAccountSpaceJSONRequestBody defines body for CreateServiceAccountSpace for application/json ContentType.
+type CreateServiceAccountSpaceJSONRequestBody = ServiceAccount
+
+// UpdateServiceAccountSpaceJSONRequestBody defines body for UpdateServiceAccountSpace for application/json ContentType.
+type UpdateServiceAccountSpaceJSONRequestBody = ServiceAccount
+
 // TokenFormdataRequestBody defines body for Token for application/x-www-form-urlencoded ContentType.
 type TokenFormdataRequestBody = TokenReq
+
+// UpdateSpaceJSONRequestBody defines body for UpdateSpace for application/json ContentType.
+type UpdateSpaceJSONRequestBody = MutableSpace
+
+// ListSpacesJSONRequestBody defines body for ListSpaces for application/json ContentType.
+type ListSpacesJSONRequestBody = SpaceIdsList
+
+// CreateSpaceJSONRequestBody defines body for CreateSpace for application/json ContentType.
+type CreateSpaceJSONRequestBody = CreateSpace
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -211,15 +732,118 @@ type ClientInterface interface {
 
 	IntrospectWithFormdataBody(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListOrganisationsIdentity request
+	ListOrganisationsIdentity(ctx context.Context, params *ListOrganisationsIdentityParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetIAMGranularPolicyOrganisation request
+	GetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SetIAMGranularPolicyOrganisationWithBody request with any body
+	SetIAMGranularPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	SetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetIAMPolicyOrganisation request
+	GetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SetIAMPolicyOrganisationWithBody request with any body
+	SetIAMPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	SetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListServiceAccountOrganisation request
+	ListServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateServiceAccountOrganisationWithBody request with any body
+	CreateServiceAccountOrganisationWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, body CreateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteServiceAccountOrganisation request
+	DeleteServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetServiceAccountOrganisation request
+	GetServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateServiceAccountOrganisationWithBody request with any body
+	UpdateServiceAccountOrganisationWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body UpdateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListSpacesOfServiceAccount request
+	ListSpacesOfServiceAccount(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListSpacesIdentity request
+	ListSpacesIdentity(ctx context.Context, organisationId OrganisationId, params *ListSpacesIdentityParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RevokeWithBody request with any body
 	RevokeWithBody(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	RevokeWithFormdataBody(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetIAMGranularPolicySpace request
+	GetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SetIAMGranularPolicySpaceWithBody request with any body
+	SetIAMGranularPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	SetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetIAMPolicySpace request
+	GetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// SetIAMPolicySpaceWithBody request with any body
+	SetIAMPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	SetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListServiceAccountSpace request
+	ListServiceAccountSpace(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateServiceAccountSpaceWithBody request with any body
+	CreateServiceAccountSpaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateServiceAccountSpace(ctx context.Context, spaceId SpaceId, body CreateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteServiceAccountSpace request
+	DeleteServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetServiceAccountSpace request
+	GetServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AssignServiceAccountToSpace request
+	AssignServiceAccountToSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateServiceAccountSpaceWithBody request with any body
+	UpdateServiceAccountSpaceWithBody(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body UpdateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// TokenWithBody request with any body
 	TokenWithBody(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	TokenWithFormdataBody(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteSpace request
+	DeleteSpace(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetSpaceById request
+	GetSpaceById(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateSpaceWithBody request with any body
+	UpdateSpaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateSpace(ctx context.Context, spaceId SpaceId, body UpdateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListSpacesWithBody request with any body
+	ListSpacesWithBody(ctx context.Context, organisationId OrganisationId, params *ListSpacesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ListSpaces(ctx context.Context, organisationId OrganisationId, params *ListSpacesParams, body ListSpacesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateSpaceWithBody request with any body
+	CreateSpaceWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateSpace(ctx context.Context, organisationId OrganisationId, body CreateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) IntrospectWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -236,6 +860,198 @@ func (c *Client) IntrospectWithBody(ctx context.Context, contentType string, bod
 
 func (c *Client) IntrospectWithFormdataBody(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewIntrospectRequestWithFormdataBody(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListOrganisationsIdentity(ctx context.Context, params *ListOrganisationsIdentityParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListOrganisationsIdentityRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetIAMGranularPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectUuid, objectType)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SetIAMGranularPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMGranularPolicyOrganisationRequestWithBody(c.Server, organisationId, subjectType, subjectUuid, objectType, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMGranularPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectUuid, objectType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetIAMPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SetIAMPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMPolicyOrganisationRequestWithBody(c.Server, organisationId, subjectType, subjectUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListServiceAccountOrganisationRequest(c.Server, organisationId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateServiceAccountOrganisationWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateServiceAccountOrganisationRequestWithBody(c.Server, organisationId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, body CreateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateServiceAccountOrganisationRequest(c.Server, organisationId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteServiceAccountOrganisationRequest(c.Server, organisationId, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetServiceAccountOrganisationRequest(c.Server, organisationId, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateServiceAccountOrganisationWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateServiceAccountOrganisationRequestWithBody(c.Server, organisationId, serviceAccountId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body UpdateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateServiceAccountOrganisationRequest(c.Server, organisationId, serviceAccountId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListSpacesOfServiceAccount(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSpacesOfServiceAccountRequest(c.Server, organisationId, serviceAccountId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListSpacesIdentity(ctx context.Context, organisationId OrganisationId, params *ListSpacesIdentityParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSpacesIdentityRequest(c.Server, organisationId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -270,6 +1086,174 @@ func (c *Client) RevokeWithFormdataBody(ctx context.Context, params *RevokeParam
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetIAMGranularPolicySpaceRequest(c.Server, spaceId, subjectType, subjectUuid, objectType)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SetIAMGranularPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMGranularPolicySpaceRequestWithBody(c.Server, spaceId, subjectType, subjectUuid, objectType, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMGranularPolicySpaceRequest(c.Server, spaceId, subjectType, subjectUuid, objectType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetIAMPolicySpaceRequest(c.Server, spaceId, subjectType, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SetIAMPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMPolicySpaceRequestWithBody(c.Server, spaceId, subjectType, subjectUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) SetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMPolicySpaceRequest(c.Server, spaceId, subjectType, subjectUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListServiceAccountSpace(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListServiceAccountSpaceRequest(c.Server, spaceId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateServiceAccountSpaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateServiceAccountSpaceRequestWithBody(c.Server, spaceId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateServiceAccountSpace(ctx context.Context, spaceId SpaceId, body CreateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateServiceAccountSpaceRequest(c.Server, spaceId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteServiceAccountSpaceRequest(c.Server, spaceId, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetServiceAccountSpaceRequest(c.Server, spaceId, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AssignServiceAccountToSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAssignServiceAccountToSpaceRequest(c.Server, spaceId, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateServiceAccountSpaceWithBody(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateServiceAccountSpaceRequestWithBody(c.Server, spaceId, serviceAccountId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body UpdateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateServiceAccountSpaceRequest(c.Server, spaceId, serviceAccountId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) TokenWithBody(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTokenRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
@@ -284,6 +1268,102 @@ func (c *Client) TokenWithBody(ctx context.Context, params *TokenParams, content
 
 func (c *Client) TokenWithFormdataBody(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTokenRequestWithFormdataBody(c.Server, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteSpace(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteSpaceRequest(c.Server, spaceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetSpaceById(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSpaceByIdRequest(c.Server, spaceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateSpaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateSpaceRequestWithBody(c.Server, spaceId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateSpace(ctx context.Context, spaceId SpaceId, body UpdateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateSpaceRequest(c.Server, spaceId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListSpacesWithBody(ctx context.Context, organisationId OrganisationId, params *ListSpacesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSpacesRequestWithBody(c.Server, organisationId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListSpaces(ctx context.Context, organisationId OrganisationId, params *ListSpacesParams, body ListSpacesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListSpacesRequest(c.Server, organisationId, params, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSpaceWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSpaceRequestWithBody(c.Server, organisationId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateSpace(ctx context.Context, organisationId OrganisationId, body CreateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateSpaceRequest(c.Server, organisationId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -330,6 +1410,661 @@ func NewIntrospectRequestWithBody(server string, contentType string, body io.Rea
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListOrganisationsIdentityRequest generates requests for ListOrganisationsIdentity
+func NewListOrganisationsIdentityRequest(server string, params *ListOrganisationsIdentityParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetIAMGranularPolicyOrganisationRequest generates requests for GetIAMGranularPolicyOrganisation
+func NewGetIAMGranularPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam3 string
+
+	pathParam3, err = runtime.StyleParamWithLocation("simple", false, "objectType", runtime.ParamLocationPath, objectType)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/iamgranularPolicy/%s/%s/%s", pathParam0, pathParam1, pathParam2, pathParam3)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewSetIAMGranularPolicyOrganisationRequest calls the generic SetIAMGranularPolicyOrganisation builder with application/json body
+func NewSetIAMGranularPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewSetIAMGranularPolicyOrganisationRequestWithBody(server, organisationId, subjectType, subjectUuid, objectType, "application/json", bodyReader)
+}
+
+// NewSetIAMGranularPolicyOrganisationRequestWithBody generates requests for SetIAMGranularPolicyOrganisation with any type of body
+func NewSetIAMGranularPolicyOrganisationRequestWithBody(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam3 string
+
+	pathParam3, err = runtime.StyleParamWithLocation("simple", false, "objectType", runtime.ParamLocationPath, objectType)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/iamgranularPolicy/%s/%s/%s", pathParam0, pathParam1, pathParam2, pathParam3)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetIAMPolicyOrganisationRequest generates requests for GetIAMPolicyOrganisation
+func NewGetIAMPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/iampolicy/%s/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewSetIAMPolicyOrganisationRequest calls the generic SetIAMPolicyOrganisation builder with application/json body
+func NewSetIAMPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewSetIAMPolicyOrganisationRequestWithBody(server, organisationId, subjectType, subjectUuid, "application/json", bodyReader)
+}
+
+// NewSetIAMPolicyOrganisationRequestWithBody generates requests for SetIAMPolicyOrganisation with any type of body
+func NewSetIAMPolicyOrganisationRequestWithBody(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/iampolicy/%s/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListServiceAccountOrganisationRequest generates requests for ListServiceAccountOrganisation
+func NewListServiceAccountOrganisationRequest(server string, organisationId OrganisationId, params *ListServiceAccountOrganisationParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Name != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "name", runtime.ParamLocationQuery, *params.Name); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateServiceAccountOrganisationRequest calls the generic CreateServiceAccountOrganisation builder with application/json body
+func NewCreateServiceAccountOrganisationRequest(server string, organisationId OrganisationId, body CreateServiceAccountOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateServiceAccountOrganisationRequestWithBody(server, organisationId, "application/json", bodyReader)
+}
+
+// NewCreateServiceAccountOrganisationRequestWithBody generates requests for CreateServiceAccountOrganisation with any type of body
+func NewCreateServiceAccountOrganisationRequestWithBody(server string, organisationId OrganisationId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteServiceAccountOrganisationRequest generates requests for DeleteServiceAccountOrganisation
+func NewDeleteServiceAccountOrganisationRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetServiceAccountOrganisationRequest generates requests for GetServiceAccountOrganisation
+func NewGetServiceAccountOrganisationRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateServiceAccountOrganisationRequest calls the generic UpdateServiceAccountOrganisation builder with application/json body
+func NewUpdateServiceAccountOrganisationRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, body UpdateServiceAccountOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateServiceAccountOrganisationRequestWithBody(server, organisationId, serviceAccountId, "application/json", bodyReader)
+}
+
+// NewUpdateServiceAccountOrganisationRequestWithBody generates requests for UpdateServiceAccountOrganisation with any type of body
+func NewUpdateServiceAccountOrganisationRequestWithBody(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListSpacesOfServiceAccountRequest generates requests for ListSpacesOfServiceAccount
+func NewListSpacesOfServiceAccountRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s/spaces", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListSpacesIdentityRequest generates requests for ListSpacesIdentity
+func NewListSpacesIdentityRequest(server string, organisationId OrganisationId, params *ListSpacesIdentityParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/spaces", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -389,6 +2124,534 @@ func NewRevokeRequestWithBody(server string, params *RevokeParams, contentType s
 	return req, nil
 }
 
+// NewGetIAMGranularPolicySpaceRequest generates requests for GetIAMGranularPolicySpace
+func NewGetIAMGranularPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam3 string
+
+	pathParam3, err = runtime.StyleParamWithLocation("simple", false, "objectType", runtime.ParamLocationPath, objectType)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/iamgranularPolicy/%s/%s/%s", pathParam0, pathParam1, pathParam2, pathParam3)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewSetIAMGranularPolicySpaceRequest calls the generic SetIAMGranularPolicySpace builder with application/json body
+func NewSetIAMGranularPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewSetIAMGranularPolicySpaceRequestWithBody(server, spaceId, subjectType, subjectUuid, objectType, "application/json", bodyReader)
+}
+
+// NewSetIAMGranularPolicySpaceRequestWithBody generates requests for SetIAMGranularPolicySpace with any type of body
+func NewSetIAMGranularPolicySpaceRequestWithBody(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam3 string
+
+	pathParam3, err = runtime.StyleParamWithLocation("simple", false, "objectType", runtime.ParamLocationPath, objectType)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/iamgranularPolicy/%s/%s/%s", pathParam0, pathParam1, pathParam2, pathParam3)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetIAMPolicySpaceRequest generates requests for GetIAMPolicySpace
+func NewGetIAMPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/iampolicy/%s/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewSetIAMPolicySpaceRequest calls the generic SetIAMPolicySpace builder with application/json body
+func NewSetIAMPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewSetIAMPolicySpaceRequestWithBody(server, spaceId, subjectType, subjectUuid, "application/json", bodyReader)
+}
+
+// NewSetIAMPolicySpaceRequestWithBody generates requests for SetIAMPolicySpace with any type of body
+func NewSetIAMPolicySpaceRequestWithBody(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/iampolicy/%s/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListServiceAccountSpaceRequest generates requests for ListServiceAccountSpace
+func NewListServiceAccountSpaceRequest(server string, spaceId SpaceId, params *ListServiceAccountSpaceParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/serviceAccounts", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Name != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "name", runtime.ParamLocationQuery, *params.Name); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateServiceAccountSpaceRequest calls the generic CreateServiceAccountSpace builder with application/json body
+func NewCreateServiceAccountSpaceRequest(server string, spaceId SpaceId, body CreateServiceAccountSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateServiceAccountSpaceRequestWithBody(server, spaceId, "application/json", bodyReader)
+}
+
+// NewCreateServiceAccountSpaceRequestWithBody generates requests for CreateServiceAccountSpace with any type of body
+func NewCreateServiceAccountSpaceRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/serviceAccounts", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteServiceAccountSpaceRequest generates requests for DeleteServiceAccountSpace
+func NewDeleteServiceAccountSpaceRequest(server string, spaceId SpaceId, serviceAccountId ServiceAccountId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/serviceAccounts/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetServiceAccountSpaceRequest generates requests for GetServiceAccountSpace
+func NewGetServiceAccountSpaceRequest(server string, spaceId SpaceId, serviceAccountId ServiceAccountId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/serviceAccounts/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAssignServiceAccountToSpaceRequest generates requests for AssignServiceAccountToSpace
+func NewAssignServiceAccountToSpaceRequest(server string, spaceId SpaceId, serviceAccountId ServiceAccountId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/serviceAccounts/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateServiceAccountSpaceRequest calls the generic UpdateServiceAccountSpace builder with application/json body
+func NewUpdateServiceAccountSpaceRequest(server string, spaceId SpaceId, serviceAccountId ServiceAccountId, body UpdateServiceAccountSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateServiceAccountSpaceRequestWithBody(server, spaceId, serviceAccountId, "application/json", bodyReader)
+}
+
+// NewUpdateServiceAccountSpaceRequestWithBody generates requests for UpdateServiceAccountSpace with any type of body
+func NewUpdateServiceAccountSpaceRequestWithBody(server string, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/serviceAccounts/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewTokenRequestWithFormdataBody calls the generic Token builder with application/x-www-form-urlencoded body
 func NewTokenRequestWithFormdataBody(server string, params *TokenParams, body TokenFormdataRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -444,6 +2707,237 @@ func NewTokenRequestWithBody(server string, params *TokenParams, contentType str
 	return req, nil
 }
 
+// NewDeleteSpaceRequest generates requests for DeleteSpace
+func NewDeleteSpaceRequest(server string, spaceId SpaceId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/organisations/spaces/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetSpaceByIdRequest generates requests for GetSpaceById
+func NewGetSpaceByIdRequest(server string, spaceId SpaceId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/organisations/spaces/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateSpaceRequest calls the generic UpdateSpace builder with application/json body
+func NewUpdateSpaceRequest(server string, spaceId SpaceId, body UpdateSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateSpaceRequestWithBody(server, spaceId, "application/json", bodyReader)
+}
+
+// NewUpdateSpaceRequestWithBody generates requests for UpdateSpace with any type of body
+func NewUpdateSpaceRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/organisations/spaces/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListSpacesRequest calls the generic ListSpaces builder with application/json body
+func NewListSpacesRequest(server string, organisationId OrganisationId, params *ListSpacesParams, body ListSpacesJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewListSpacesRequestWithBody(server, organisationId, params, "application/json", bodyReader)
+}
+
+// NewListSpacesRequestWithBody generates requests for ListSpaces with any type of body
+func NewListSpacesRequestWithBody(server string, organisationId OrganisationId, params *ListSpacesParams, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/organisations/%s/spaces", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateSpaceRequest calls the generic CreateSpace builder with application/json body
+func NewCreateSpaceRequest(server string, organisationId OrganisationId, body CreateSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateSpaceRequestWithBody(server, organisationId, "application/json", bodyReader)
+}
+
+// NewCreateSpaceRequestWithBody generates requests for CreateSpace with any type of body
+func NewCreateSpaceRequestWithBody(server string, organisationId OrganisationId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/organisations/%s/spaces", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -492,15 +2986,118 @@ type ClientWithResponsesInterface interface {
 
 	IntrospectWithFormdataBodyWithResponse(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*IntrospectResponse, error)
 
+	// ListOrganisationsIdentityWithResponse request
+	ListOrganisationsIdentityWithResponse(ctx context.Context, params *ListOrganisationsIdentityParams, reqEditors ...RequestEditorFn) (*ListOrganisationsIdentityResponse, error)
+
+	// GetIAMGranularPolicyOrganisationWithResponse request
+	GetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicyOrganisationResponse, error)
+
+	// SetIAMGranularPolicyOrganisationWithBodyWithResponse request with any body
+	SetIAMGranularPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error)
+
+	SetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error)
+
+	// GetIAMPolicyOrganisationWithResponse request
+	GetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*GetIAMPolicyOrganisationResponse, error)
+
+	// SetIAMPolicyOrganisationWithBodyWithResponse request with any body
+	SetIAMPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error)
+
+	SetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error)
+
+	// ListServiceAccountOrganisationWithResponse request
+	ListServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error)
+
+	// CreateServiceAccountOrganisationWithBodyWithResponse request with any body
+	CreateServiceAccountOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountOrganisationResponse, error)
+
+	CreateServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, body CreateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountOrganisationResponse, error)
+
+	// DeleteServiceAccountOrganisationWithResponse request
+	DeleteServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*DeleteServiceAccountOrganisationResponse, error)
+
+	// GetServiceAccountOrganisationWithResponse request
+	GetServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*GetServiceAccountOrganisationResponse, error)
+
+	// UpdateServiceAccountOrganisationWithBodyWithResponse request with any body
+	UpdateServiceAccountOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountOrganisationResponse, error)
+
+	UpdateServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body UpdateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountOrganisationResponse, error)
+
+	// ListSpacesOfServiceAccountWithResponse request
+	ListSpacesOfServiceAccountWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams, reqEditors ...RequestEditorFn) (*ListSpacesOfServiceAccountResponse, error)
+
+	// ListSpacesIdentityWithResponse request
+	ListSpacesIdentityWithResponse(ctx context.Context, organisationId OrganisationId, params *ListSpacesIdentityParams, reqEditors ...RequestEditorFn) (*ListSpacesIdentityResponse, error)
+
 	// RevokeWithBodyWithResponse request with any body
 	RevokeWithBodyWithResponse(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RevokeResponse, error)
 
 	RevokeWithFormdataBodyWithResponse(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*RevokeResponse, error)
 
+	// GetIAMGranularPolicySpaceWithResponse request
+	GetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicySpaceResponse, error)
+
+	// SetIAMGranularPolicySpaceWithBodyWithResponse request with any body
+	SetIAMGranularPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error)
+
+	SetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error)
+
+	// GetIAMPolicySpaceWithResponse request
+	GetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*GetIAMPolicySpaceResponse, error)
+
+	// SetIAMPolicySpaceWithBodyWithResponse request with any body
+	SetIAMPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error)
+
+	SetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error)
+
+	// ListServiceAccountSpaceWithResponse request
+	ListServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error)
+
+	// CreateServiceAccountSpaceWithBodyWithResponse request with any body
+	CreateServiceAccountSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountSpaceResponse, error)
+
+	CreateServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, body CreateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountSpaceResponse, error)
+
+	// DeleteServiceAccountSpaceWithResponse request
+	DeleteServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*DeleteServiceAccountSpaceResponse, error)
+
+	// GetServiceAccountSpaceWithResponse request
+	GetServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*GetServiceAccountSpaceResponse, error)
+
+	// AssignServiceAccountToSpaceWithResponse request
+	AssignServiceAccountToSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*AssignServiceAccountToSpaceResponse, error)
+
+	// UpdateServiceAccountSpaceWithBodyWithResponse request with any body
+	UpdateServiceAccountSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountSpaceResponse, error)
+
+	UpdateServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body UpdateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountSpaceResponse, error)
+
 	// TokenWithBodyWithResponse request with any body
 	TokenWithBodyWithResponse(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TokenResponse, error)
 
 	TokenWithFormdataBodyWithResponse(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*TokenResponse, error)
+
+	// DeleteSpaceWithResponse request
+	DeleteSpaceWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*DeleteSpaceResponse, error)
+
+	// GetSpaceByIdWithResponse request
+	GetSpaceByIdWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*GetSpaceByIdResponse, error)
+
+	// UpdateSpaceWithBodyWithResponse request with any body
+	UpdateSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSpaceResponse, error)
+
+	UpdateSpaceWithResponse(ctx context.Context, spaceId SpaceId, body UpdateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSpaceResponse, error)
+
+	// ListSpacesWithBodyWithResponse request with any body
+	ListSpacesWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, params *ListSpacesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListSpacesResponse, error)
+
+	ListSpacesWithResponse(ctx context.Context, organisationId OrganisationId, params *ListSpacesParams, body ListSpacesJSONRequestBody, reqEditors ...RequestEditorFn) (*ListSpacesResponse, error)
+
+	// CreateSpaceWithBodyWithResponse request with any body
+	CreateSpaceWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSpaceResponse, error)
+
+	CreateSpaceWithResponse(ctx context.Context, organisationId OrganisationId, body CreateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSpaceResponse, error)
 }
 
 type IntrospectResponse struct {
@@ -526,6 +3123,327 @@ func (r IntrospectResponse) StatusCode() int {
 	return 0
 }
 
+type ListOrganisationsIdentityResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListUserOrganisationsResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListOrganisationsIdentityResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListOrganisationsIdentityResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetIAMGranularPolicyOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetIAMGranularPolicyResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetIAMGranularPolicyOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetIAMGranularPolicyOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type SetIAMGranularPolicyOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r SetIAMGranularPolicyOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SetIAMGranularPolicyOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetIAMPolicyOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetIAMPolicyResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetIAMPolicyOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetIAMPolicyOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type SetIAMPolicyOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r SetIAMPolicyOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SetIAMPolicyOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListServiceAccountOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListServiceAccountResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListServiceAccountOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListServiceAccountOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateServiceAccountOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateServiceAccountResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON409 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateServiceAccountOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateServiceAccountOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteServiceAccountOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteServiceAccountOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteServiceAccountOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetServiceAccountOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetServiceAccountResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetServiceAccountOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetServiceAccountOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateServiceAccountOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *UpdateServiceAccountResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON409 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateServiceAccountOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateServiceAccountOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListSpacesOfServiceAccountResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListSpacesServiceAccountResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListSpacesOfServiceAccountResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListSpacesOfServiceAccountResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListSpacesIdentityResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListSpacesIdentityResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListSpacesIdentityResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListSpacesIdentityResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RevokeResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -543,6 +3461,272 @@ func (r RevokeResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r RevokeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetIAMGranularPolicySpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetIAMGranularPolicyResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetIAMGranularPolicySpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetIAMGranularPolicySpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type SetIAMGranularPolicySpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r SetIAMGranularPolicySpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SetIAMGranularPolicySpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetIAMPolicySpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetIAMPolicyResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetIAMPolicySpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetIAMPolicySpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type SetIAMPolicySpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r SetIAMPolicySpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r SetIAMPolicySpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListServiceAccountSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListServiceAccountResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListServiceAccountSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListServiceAccountSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateServiceAccountSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateServiceAccountResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON409 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateServiceAccountSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateServiceAccountSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteServiceAccountSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteServiceAccountSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteServiceAccountSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetServiceAccountSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetServiceAccountResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetServiceAccountSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetServiceAccountSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AssignServiceAccountToSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r AssignServiceAccountToSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AssignServiceAccountToSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateServiceAccountSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *UpdateServiceAccountResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON409 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateServiceAccountSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateServiceAccountSpaceResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -574,6 +3758,136 @@ func (r TokenResponse) StatusCode() int {
 	return 0
 }
 
+type DeleteSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetSpaceByIdResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetSpaceByIdResponseSchema
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSpaceByIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSpaceByIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListSpacesResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListSpacesResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListSpacesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListSpacesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *CreateSpaceResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // IntrospectWithBodyWithResponse request with arbitrary body returning *IntrospectResponse
 func (c *ClientWithResponses) IntrospectWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectResponse, error) {
 	rsp, err := c.IntrospectWithBody(ctx, contentType, body, reqEditors...)
@@ -589,6 +3903,146 @@ func (c *ClientWithResponses) IntrospectWithFormdataBodyWithResponse(ctx context
 		return nil, err
 	}
 	return ParseIntrospectResponse(rsp)
+}
+
+// ListOrganisationsIdentityWithResponse request returning *ListOrganisationsIdentityResponse
+func (c *ClientWithResponses) ListOrganisationsIdentityWithResponse(ctx context.Context, params *ListOrganisationsIdentityParams, reqEditors ...RequestEditorFn) (*ListOrganisationsIdentityResponse, error) {
+	rsp, err := c.ListOrganisationsIdentity(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListOrganisationsIdentityResponse(rsp)
+}
+
+// GetIAMGranularPolicyOrganisationWithResponse request returning *GetIAMGranularPolicyOrganisationResponse
+func (c *ClientWithResponses) GetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicyOrganisationResponse, error) {
+	rsp, err := c.GetIAMGranularPolicyOrganisation(ctx, organisationId, subjectType, subjectUuid, objectType, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetIAMGranularPolicyOrganisationResponse(rsp)
+}
+
+// SetIAMGranularPolicyOrganisationWithBodyWithResponse request with arbitrary body returning *SetIAMGranularPolicyOrganisationResponse
+func (c *ClientWithResponses) SetIAMGranularPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error) {
+	rsp, err := c.SetIAMGranularPolicyOrganisationWithBody(ctx, organisationId, subjectType, subjectUuid, objectType, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetIAMGranularPolicyOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) SetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error) {
+	rsp, err := c.SetIAMGranularPolicyOrganisation(ctx, organisationId, subjectType, subjectUuid, objectType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetIAMGranularPolicyOrganisationResponse(rsp)
+}
+
+// GetIAMPolicyOrganisationWithResponse request returning *GetIAMPolicyOrganisationResponse
+func (c *ClientWithResponses) GetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*GetIAMPolicyOrganisationResponse, error) {
+	rsp, err := c.GetIAMPolicyOrganisation(ctx, organisationId, subjectType, subjectUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetIAMPolicyOrganisationResponse(rsp)
+}
+
+// SetIAMPolicyOrganisationWithBodyWithResponse request with arbitrary body returning *SetIAMPolicyOrganisationResponse
+func (c *ClientWithResponses) SetIAMPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error) {
+	rsp, err := c.SetIAMPolicyOrganisationWithBody(ctx, organisationId, subjectType, subjectUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetIAMPolicyOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) SetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error) {
+	rsp, err := c.SetIAMPolicyOrganisation(ctx, organisationId, subjectType, subjectUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetIAMPolicyOrganisationResponse(rsp)
+}
+
+// ListServiceAccountOrganisationWithResponse request returning *ListServiceAccountOrganisationResponse
+func (c *ClientWithResponses) ListServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error) {
+	rsp, err := c.ListServiceAccountOrganisation(ctx, organisationId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListServiceAccountOrganisationResponse(rsp)
+}
+
+// CreateServiceAccountOrganisationWithBodyWithResponse request with arbitrary body returning *CreateServiceAccountOrganisationResponse
+func (c *ClientWithResponses) CreateServiceAccountOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountOrganisationResponse, error) {
+	rsp, err := c.CreateServiceAccountOrganisationWithBody(ctx, organisationId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateServiceAccountOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, body CreateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountOrganisationResponse, error) {
+	rsp, err := c.CreateServiceAccountOrganisation(ctx, organisationId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateServiceAccountOrganisationResponse(rsp)
+}
+
+// DeleteServiceAccountOrganisationWithResponse request returning *DeleteServiceAccountOrganisationResponse
+func (c *ClientWithResponses) DeleteServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*DeleteServiceAccountOrganisationResponse, error) {
+	rsp, err := c.DeleteServiceAccountOrganisation(ctx, organisationId, serviceAccountId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteServiceAccountOrganisationResponse(rsp)
+}
+
+// GetServiceAccountOrganisationWithResponse request returning *GetServiceAccountOrganisationResponse
+func (c *ClientWithResponses) GetServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*GetServiceAccountOrganisationResponse, error) {
+	rsp, err := c.GetServiceAccountOrganisation(ctx, organisationId, serviceAccountId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetServiceAccountOrganisationResponse(rsp)
+}
+
+// UpdateServiceAccountOrganisationWithBodyWithResponse request with arbitrary body returning *UpdateServiceAccountOrganisationResponse
+func (c *ClientWithResponses) UpdateServiceAccountOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountOrganisationResponse, error) {
+	rsp, err := c.UpdateServiceAccountOrganisationWithBody(ctx, organisationId, serviceAccountId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateServiceAccountOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body UpdateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountOrganisationResponse, error) {
+	rsp, err := c.UpdateServiceAccountOrganisation(ctx, organisationId, serviceAccountId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateServiceAccountOrganisationResponse(rsp)
+}
+
+// ListSpacesOfServiceAccountWithResponse request returning *ListSpacesOfServiceAccountResponse
+func (c *ClientWithResponses) ListSpacesOfServiceAccountWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams, reqEditors ...RequestEditorFn) (*ListSpacesOfServiceAccountResponse, error) {
+	rsp, err := c.ListSpacesOfServiceAccount(ctx, organisationId, serviceAccountId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListSpacesOfServiceAccountResponse(rsp)
+}
+
+// ListSpacesIdentityWithResponse request returning *ListSpacesIdentityResponse
+func (c *ClientWithResponses) ListSpacesIdentityWithResponse(ctx context.Context, organisationId OrganisationId, params *ListSpacesIdentityParams, reqEditors ...RequestEditorFn) (*ListSpacesIdentityResponse, error) {
+	rsp, err := c.ListSpacesIdentity(ctx, organisationId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListSpacesIdentityResponse(rsp)
 }
 
 // RevokeWithBodyWithResponse request with arbitrary body returning *RevokeResponse
@@ -608,6 +4062,128 @@ func (c *ClientWithResponses) RevokeWithFormdataBodyWithResponse(ctx context.Con
 	return ParseRevokeResponse(rsp)
 }
 
+// GetIAMGranularPolicySpaceWithResponse request returning *GetIAMGranularPolicySpaceResponse
+func (c *ClientWithResponses) GetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicySpaceResponse, error) {
+	rsp, err := c.GetIAMGranularPolicySpace(ctx, spaceId, subjectType, subjectUuid, objectType, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetIAMGranularPolicySpaceResponse(rsp)
+}
+
+// SetIAMGranularPolicySpaceWithBodyWithResponse request with arbitrary body returning *SetIAMGranularPolicySpaceResponse
+func (c *ClientWithResponses) SetIAMGranularPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error) {
+	rsp, err := c.SetIAMGranularPolicySpaceWithBody(ctx, spaceId, subjectType, subjectUuid, objectType, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetIAMGranularPolicySpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) SetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error) {
+	rsp, err := c.SetIAMGranularPolicySpace(ctx, spaceId, subjectType, subjectUuid, objectType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetIAMGranularPolicySpaceResponse(rsp)
+}
+
+// GetIAMPolicySpaceWithResponse request returning *GetIAMPolicySpaceResponse
+func (c *ClientWithResponses) GetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*GetIAMPolicySpaceResponse, error) {
+	rsp, err := c.GetIAMPolicySpace(ctx, spaceId, subjectType, subjectUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetIAMPolicySpaceResponse(rsp)
+}
+
+// SetIAMPolicySpaceWithBodyWithResponse request with arbitrary body returning *SetIAMPolicySpaceResponse
+func (c *ClientWithResponses) SetIAMPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error) {
+	rsp, err := c.SetIAMPolicySpaceWithBody(ctx, spaceId, subjectType, subjectUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetIAMPolicySpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) SetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error) {
+	rsp, err := c.SetIAMPolicySpace(ctx, spaceId, subjectType, subjectUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseSetIAMPolicySpaceResponse(rsp)
+}
+
+// ListServiceAccountSpaceWithResponse request returning *ListServiceAccountSpaceResponse
+func (c *ClientWithResponses) ListServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error) {
+	rsp, err := c.ListServiceAccountSpace(ctx, spaceId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListServiceAccountSpaceResponse(rsp)
+}
+
+// CreateServiceAccountSpaceWithBodyWithResponse request with arbitrary body returning *CreateServiceAccountSpaceResponse
+func (c *ClientWithResponses) CreateServiceAccountSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountSpaceResponse, error) {
+	rsp, err := c.CreateServiceAccountSpaceWithBody(ctx, spaceId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateServiceAccountSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, body CreateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateServiceAccountSpaceResponse, error) {
+	rsp, err := c.CreateServiceAccountSpace(ctx, spaceId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateServiceAccountSpaceResponse(rsp)
+}
+
+// DeleteServiceAccountSpaceWithResponse request returning *DeleteServiceAccountSpaceResponse
+func (c *ClientWithResponses) DeleteServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*DeleteServiceAccountSpaceResponse, error) {
+	rsp, err := c.DeleteServiceAccountSpace(ctx, spaceId, serviceAccountId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteServiceAccountSpaceResponse(rsp)
+}
+
+// GetServiceAccountSpaceWithResponse request returning *GetServiceAccountSpaceResponse
+func (c *ClientWithResponses) GetServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*GetServiceAccountSpaceResponse, error) {
+	rsp, err := c.GetServiceAccountSpace(ctx, spaceId, serviceAccountId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetServiceAccountSpaceResponse(rsp)
+}
+
+// AssignServiceAccountToSpaceWithResponse request returning *AssignServiceAccountToSpaceResponse
+func (c *ClientWithResponses) AssignServiceAccountToSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, reqEditors ...RequestEditorFn) (*AssignServiceAccountToSpaceResponse, error) {
+	rsp, err := c.AssignServiceAccountToSpace(ctx, spaceId, serviceAccountId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAssignServiceAccountToSpaceResponse(rsp)
+}
+
+// UpdateServiceAccountSpaceWithBodyWithResponse request with arbitrary body returning *UpdateServiceAccountSpaceResponse
+func (c *ClientWithResponses) UpdateServiceAccountSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateServiceAccountSpaceResponse, error) {
+	rsp, err := c.UpdateServiceAccountSpaceWithBody(ctx, spaceId, serviceAccountId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateServiceAccountSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body UpdateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountSpaceResponse, error) {
+	rsp, err := c.UpdateServiceAccountSpace(ctx, spaceId, serviceAccountId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateServiceAccountSpaceResponse(rsp)
+}
+
 // TokenWithBodyWithResponse request with arbitrary body returning *TokenResponse
 func (c *ClientWithResponses) TokenWithBodyWithResponse(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TokenResponse, error) {
 	rsp, err := c.TokenWithBody(ctx, params, contentType, body, reqEditors...)
@@ -623,6 +4199,75 @@ func (c *ClientWithResponses) TokenWithFormdataBodyWithResponse(ctx context.Cont
 		return nil, err
 	}
 	return ParseTokenResponse(rsp)
+}
+
+// DeleteSpaceWithResponse request returning *DeleteSpaceResponse
+func (c *ClientWithResponses) DeleteSpaceWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*DeleteSpaceResponse, error) {
+	rsp, err := c.DeleteSpace(ctx, spaceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteSpaceResponse(rsp)
+}
+
+// GetSpaceByIdWithResponse request returning *GetSpaceByIdResponse
+func (c *ClientWithResponses) GetSpaceByIdWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*GetSpaceByIdResponse, error) {
+	rsp, err := c.GetSpaceById(ctx, spaceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSpaceByIdResponse(rsp)
+}
+
+// UpdateSpaceWithBodyWithResponse request with arbitrary body returning *UpdateSpaceResponse
+func (c *ClientWithResponses) UpdateSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSpaceResponse, error) {
+	rsp, err := c.UpdateSpaceWithBody(ctx, spaceId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateSpaceWithResponse(ctx context.Context, spaceId SpaceId, body UpdateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSpaceResponse, error) {
+	rsp, err := c.UpdateSpace(ctx, spaceId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateSpaceResponse(rsp)
+}
+
+// ListSpacesWithBodyWithResponse request with arbitrary body returning *ListSpacesResponse
+func (c *ClientWithResponses) ListSpacesWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, params *ListSpacesParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListSpacesResponse, error) {
+	rsp, err := c.ListSpacesWithBody(ctx, organisationId, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListSpacesResponse(rsp)
+}
+
+func (c *ClientWithResponses) ListSpacesWithResponse(ctx context.Context, organisationId OrganisationId, params *ListSpacesParams, body ListSpacesJSONRequestBody, reqEditors ...RequestEditorFn) (*ListSpacesResponse, error) {
+	rsp, err := c.ListSpaces(ctx, organisationId, params, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListSpacesResponse(rsp)
+}
+
+// CreateSpaceWithBodyWithResponse request with arbitrary body returning *CreateSpaceResponse
+func (c *ClientWithResponses) CreateSpaceWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSpaceResponse, error) {
+	rsp, err := c.CreateSpaceWithBody(ctx, organisationId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateSpaceWithResponse(ctx context.Context, organisationId OrganisationId, body CreateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSpaceResponse, error) {
+	rsp, err := c.CreateSpace(ctx, organisationId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateSpaceResponse(rsp)
 }
 
 // ParseIntrospectResponse parses an HTTP response from a IntrospectWithResponse call
@@ -658,6 +4303,717 @@ func ParseIntrospectResponse(rsp *http.Response) (*IntrospectResponse, error) {
 	return response, nil
 }
 
+// ParseListOrganisationsIdentityResponse parses an HTTP response from a ListOrganisationsIdentityWithResponse call
+func ParseListOrganisationsIdentityResponse(rsp *http.Response) (*ListOrganisationsIdentityResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListOrganisationsIdentityResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListUserOrganisationsResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetIAMGranularPolicyOrganisationResponse parses an HTTP response from a GetIAMGranularPolicyOrganisationWithResponse call
+func ParseGetIAMGranularPolicyOrganisationResponse(rsp *http.Response) (*GetIAMGranularPolicyOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetIAMGranularPolicyOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetIAMGranularPolicyResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseSetIAMGranularPolicyOrganisationResponse parses an HTTP response from a SetIAMGranularPolicyOrganisationWithResponse call
+func ParseSetIAMGranularPolicyOrganisationResponse(rsp *http.Response) (*SetIAMGranularPolicyOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SetIAMGranularPolicyOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetIAMPolicyOrganisationResponse parses an HTTP response from a GetIAMPolicyOrganisationWithResponse call
+func ParseGetIAMPolicyOrganisationResponse(rsp *http.Response) (*GetIAMPolicyOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetIAMPolicyOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetIAMPolicyResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseSetIAMPolicyOrganisationResponse parses an HTTP response from a SetIAMPolicyOrganisationWithResponse call
+func ParseSetIAMPolicyOrganisationResponse(rsp *http.Response) (*SetIAMPolicyOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SetIAMPolicyOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListServiceAccountOrganisationResponse parses an HTTP response from a ListServiceAccountOrganisationWithResponse call
+func ParseListServiceAccountOrganisationResponse(rsp *http.Response) (*ListServiceAccountOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListServiceAccountOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListServiceAccountResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateServiceAccountOrganisationResponse parses an HTTP response from a CreateServiceAccountOrganisationWithResponse call
+func ParseCreateServiceAccountOrganisationResponse(rsp *http.Response) (*CreateServiceAccountOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateServiceAccountOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateServiceAccountResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteServiceAccountOrganisationResponse parses an HTTP response from a DeleteServiceAccountOrganisationWithResponse call
+func ParseDeleteServiceAccountOrganisationResponse(rsp *http.Response) (*DeleteServiceAccountOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteServiceAccountOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetServiceAccountOrganisationResponse parses an HTTP response from a GetServiceAccountOrganisationWithResponse call
+func ParseGetServiceAccountOrganisationResponse(rsp *http.Response) (*GetServiceAccountOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetServiceAccountOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetServiceAccountResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateServiceAccountOrganisationResponse parses an HTTP response from a UpdateServiceAccountOrganisationWithResponse call
+func ParseUpdateServiceAccountOrganisationResponse(rsp *http.Response) (*UpdateServiceAccountOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateServiceAccountOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UpdateServiceAccountResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListSpacesOfServiceAccountResponse parses an HTTP response from a ListSpacesOfServiceAccountWithResponse call
+func ParseListSpacesOfServiceAccountResponse(rsp *http.Response) (*ListSpacesOfServiceAccountResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListSpacesOfServiceAccountResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListSpacesServiceAccountResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListSpacesIdentityResponse parses an HTTP response from a ListSpacesIdentityWithResponse call
+func ParseListSpacesIdentityResponse(rsp *http.Response) (*ListSpacesIdentityResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListSpacesIdentityResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListSpacesIdentityResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseRevokeResponse parses an HTTP response from a RevokeWithResponse call
 func ParseRevokeResponse(rsp *http.Response) (*RevokeResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -685,6 +5041,588 @@ func ParseRevokeResponse(rsp *http.Response) (*RevokeResponse, error) {
 			return nil, err
 		}
 		response.JSON401 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetIAMGranularPolicySpaceResponse parses an HTTP response from a GetIAMGranularPolicySpaceWithResponse call
+func ParseGetIAMGranularPolicySpaceResponse(rsp *http.Response) (*GetIAMGranularPolicySpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetIAMGranularPolicySpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetIAMGranularPolicyResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseSetIAMGranularPolicySpaceResponse parses an HTTP response from a SetIAMGranularPolicySpaceWithResponse call
+func ParseSetIAMGranularPolicySpaceResponse(rsp *http.Response) (*SetIAMGranularPolicySpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SetIAMGranularPolicySpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetIAMPolicySpaceResponse parses an HTTP response from a GetIAMPolicySpaceWithResponse call
+func ParseGetIAMPolicySpaceResponse(rsp *http.Response) (*GetIAMPolicySpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetIAMPolicySpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetIAMPolicyResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseSetIAMPolicySpaceResponse parses an HTTP response from a SetIAMPolicySpaceWithResponse call
+func ParseSetIAMPolicySpaceResponse(rsp *http.Response) (*SetIAMPolicySpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &SetIAMPolicySpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListServiceAccountSpaceResponse parses an HTTP response from a ListServiceAccountSpaceWithResponse call
+func ParseListServiceAccountSpaceResponse(rsp *http.Response) (*ListServiceAccountSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListServiceAccountSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListServiceAccountResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateServiceAccountSpaceResponse parses an HTTP response from a CreateServiceAccountSpaceWithResponse call
+func ParseCreateServiceAccountSpaceResponse(rsp *http.Response) (*CreateServiceAccountSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateServiceAccountSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateServiceAccountResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteServiceAccountSpaceResponse parses an HTTP response from a DeleteServiceAccountSpaceWithResponse call
+func ParseDeleteServiceAccountSpaceResponse(rsp *http.Response) (*DeleteServiceAccountSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteServiceAccountSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetServiceAccountSpaceResponse parses an HTTP response from a GetServiceAccountSpaceWithResponse call
+func ParseGetServiceAccountSpaceResponse(rsp *http.Response) (*GetServiceAccountSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetServiceAccountSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetServiceAccountResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAssignServiceAccountToSpaceResponse parses an HTTP response from a AssignServiceAccountToSpaceWithResponse call
+func ParseAssignServiceAccountToSpaceResponse(rsp *http.Response) (*AssignServiceAccountToSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AssignServiceAccountToSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateServiceAccountSpaceResponse parses an HTTP response from a UpdateServiceAccountSpaceWithResponse call
+func ParseUpdateServiceAccountSpaceResponse(rsp *http.Response) (*UpdateServiceAccountSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateServiceAccountSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UpdateServiceAccountResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
@@ -732,6 +5670,276 @@ func ParseTokenResponse(rsp *http.Response) (*TokenResponse, error) {
 			return nil, err
 		}
 		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteSpaceResponse parses an HTTP response from a DeleteSpaceWithResponse call
+func ParseDeleteSpaceResponse(rsp *http.Response) (*DeleteSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetSpaceByIdResponse parses an HTTP response from a GetSpaceByIdWithResponse call
+func ParseGetSpaceByIdResponse(rsp *http.Response) (*GetSpaceByIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSpaceByIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetSpaceByIdResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateSpaceResponse parses an HTTP response from a UpdateSpaceWithResponse call
+func ParseUpdateSpaceResponse(rsp *http.Response) (*UpdateSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListSpacesResponse parses an HTTP response from a ListSpacesWithResponse call
+func ParseListSpacesResponse(rsp *http.Response) (*ListSpacesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListSpacesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListSpacesResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateSpaceResponse parses an HTTP response from a CreateSpaceWithResponse call
+func ParseCreateSpaceResponse(rsp *http.Response) (*CreateSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CreateSpaceResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
 
 	}
 
