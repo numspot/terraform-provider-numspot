@@ -69,7 +69,7 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 	res := utils.ExecuteRequest(func() (*iam.CreateSpaceResponse, error) {
-		return r.provider.IAMClient.CreateSpaceWithResponse(
+		return r.provider.IAMSpaceManagerClient.CreateSpaceWithResponse(
 			ctx,
 			organisationId,
 			SpaceFromTfToCreateRequest(&plan),
@@ -78,7 +78,7 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 	if res == nil {
 		return
 	}
-	readRes, err := RetryReadSpaceUntilReady(ctx, r.provider.IAMClient, res.JSON200.Id)
+	readRes, err := RetryReadSpaceUntilReady(ctx, r.provider.IAMSpaceManagerClient, res.JSON200.Id)
 	if err != nil {
 		response.Diagnostics.AddError("failed to read space", err.Error())
 		return
@@ -104,7 +104,7 @@ func (r *SpaceResource) Read(ctx context.Context, request resource.ReadRequest, 
 		return
 	}
 	res := utils.ExecuteRequest(func() (*iam.GetSpaceByIdResponse, error) {
-		return r.provider.IAMClient.GetSpaceByIdWithResponse(ctx, spaceId)
+		return r.provider.IAMSpaceManagerClient.GetSpaceByIdWithResponse(ctx, spaceId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -128,7 +128,7 @@ func (r *SpaceResource) Delete(ctx context.Context, request resource.DeleteReque
 		return
 	}
 	res := utils.ExecuteRequest(func() (*iam.DeleteSpaceResponse, error) {
-		return r.provider.IAMClient.DeleteSpaceWithResponse(ctx, spaceId)
+		return r.provider.IAMSpaceManagerClient.DeleteSpaceWithResponse(ctx, spaceId)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

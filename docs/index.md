@@ -32,5 +32,6 @@ provider "numspot" {
 - `client_secret` (String) Client secret to authenticate user.
 - `iaas_host` (String) Numspot API IAAS Host
 - `iam_auth_manager_host` (String) Numspot IAM auth manager host
+- `iam_identity_manager_host` (String) Numspot IAM identity manager host
 - `iam_space_manager_host` (String) Numspot IAM space manager host
 - `space_id` (String) Space ID.

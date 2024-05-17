@@ -39,12 +39,13 @@ type numspotProvider struct {
 }
 
 type NumspotProviderModel struct {
-	IAASHost         types.String `tfsdk:"iaas_host"`
-	AuthManagerHost  types.String `tfsdk:"iam_auth_manager_host"`
-	SpaceManagerHost types.String `tfsdk:"iam_space_manager_host"`
-	ClientId         types.String `tfsdk:"client_id"`
-	ClientSecret     types.String `tfsdk:"client_secret"`
-	SpaceId          types.String `tfsdk:"space_id"`
+	IAASHost            types.String `tfsdk:"iaas_host"`
+	AuthManagerHost     types.String `tfsdk:"iam_auth_manager_host"`
+	SpaceManagerHost    types.String `tfsdk:"iam_space_manager_host"`
+	IdentityManagerHost types.String `tfsdk:"iam_identity_manager_host"`
+	ClientId            types.String `tfsdk:"client_id"`
+	ClientSecret        types.String `tfsdk:"client_secret"`
+	SpaceId             types.String `tfsdk:"space_id"`
 }
 
 func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
@@ -60,6 +61,10 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 			},
 			"iam_space_manager_host": schema.StringAttribute{
 				MarkdownDescription: "Numspot IAM space manager host",
+				Optional:            true,
+			},
+			"iam_identity_manager_host": schema.StringAttribute{
+				MarkdownDescription: "Numspot IAM identity manager host",
 				Optional:            true,
 			},
 			"client_id": schema.StringAttribute{
@@ -120,14 +125,14 @@ func buildBasicAuth(username, password string) string {
 	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 }
 
-func (p *numspotProvider) iamClient(accessToken string, diag *diag.Diagnostics, data *NumspotProviderModel) *iam.ClientWithResponses {
+func (p *numspotProvider) iamClient(host, accessToken string, diag *diag.Diagnostics) *iam.ClientWithResponses {
 	bearerProvider, err := securityprovider.NewSecurityProviderBearerToken(accessToken)
 	if err != nil {
 		diag.AddError("Failed to create bearer provider token", err.Error())
 		return nil
 	}
 
-	iamClient, err := iam.NewClientWithResponses(data.SpaceManagerHost.ValueString(), iam.WithRequestEditorFn(bearerProvider.Intercept),
+	iamClient, err := iam.NewClientWithResponses(host, iam.WithRequestEditorFn(bearerProvider.Intercept),
 		iam.WithHTTPClient(&http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -187,9 +192,10 @@ func faker(_ context.Context, req *http.Request) error {
 }
 
 type Provider struct {
-	SpaceID   iaas.SpaceId
-	ApiClient *iaas.ClientWithResponses
-	IAMClient *iam.ClientWithResponses
+	SpaceID                  iaas.SpaceId
+	ApiClient                *iaas.ClientWithResponses
+	IAMSpaceManagerClient    *iam.ClientWithResponses
+	IAMIdentityManagerClient *iam.ClientWithResponses
 }
 
 func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -231,6 +237,15 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 	}
 
+	if config.IdentityManagerHost.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("iam_identity_manager_host"),
+			"Unknown IAM Space Manager Host",
+			"The provider cannot create the IAM API provider as there is an unknown configuration value for the IAM Space Manager host. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_IAM_SPACE_MANAGER_HOST environment variable.",
+		)
+	}
+
 	if config.ClientId.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_id"),
@@ -259,6 +274,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	iaasHost := os.Getenv("NUMSPOT_IAAS_HOST")
 	authManagerHost := os.Getenv("NUMSPOT_IAM_AUTH_MANAGER_HOST")
 	spaceManagerHost := os.Getenv("NUMSPOT_IAM_SPACE_MANAGER_HOST")
+	identityManagerHost := os.Getenv("NUMSPOT_IAM_IDENTITY_MANAGER_HOST")
 	clientID := os.Getenv("NUMSPOT_CLIENT_ID")
 	clientSecret := os.Getenv("NUMSPOT_CLIENT_SECRET")
 	spaceId := os.Getenv("NUMSPOT_SPACE_ID")
@@ -273,6 +289,10 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	if !config.SpaceManagerHost.IsNull() {
 		spaceManagerHost = config.SpaceManagerHost.ValueString()
+	}
+
+	if !config.IdentityManagerHost.IsNull() {
+		identityManagerHost = config.IdentityManagerHost.ValueString()
 	}
 
 	if !config.ClientId.IsNull() {
@@ -292,7 +312,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	if iaasHost == "" {
 		resp.Diagnostics.AddAttributeError(
-			path.Root("host"),
+			path.Root("iaas_host"),
 			"Missing Numspot API Host",
 			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot IAAS host. "+
 				"Set the host value in the configuration or use the NUMSPOT_IAAS_HOST environment variable. "+
@@ -302,7 +322,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	if authManagerHost == "" {
 		resp.Diagnostics.AddAttributeError(
-			path.Root("auth_manager_host"),
+			path.Root("iam_auth_manager_host"),
 			"Missing Numspot IAM Auth Manager Host",
 			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot IAM Auth Manager host. "+
 				"Set the auth_manager_host value in the configuration or use the NUMSPOT_IAM_AUTH_MANAGER_HOST environment variable. "+
@@ -312,10 +332,20 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	if spaceManagerHost == "" {
 		resp.Diagnostics.AddAttributeError(
-			path.Root("space_manager_host"),
+			path.Root("iam_space_manager_host"),
 			"Missing Numspot IAM Space Manager Host",
 			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot IAM Space Manager host. "+
-				"Set the space_manager_host value in the configuration or use the NUMSPOT_IAM_SPACE_MANAGER_HOST environment variable. "+
+				"Set the iam_space_manager_host value in the configuration or use the NUMSPOT_IAM_SPACE_MANAGER_HOST environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
+	if identityManagerHost == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("iam_identity_manager_host"),
+			"Missing Numspot IAM Identity Manager Host",
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot IAM Identity Manager host. "+
+				"Set the iam_identity_manager_host value in the configuration or use the NUMSPOT_IAM_Identity_MANAGER_HOST environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
 	}
@@ -356,14 +386,16 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	config.AuthManagerHost = types.StringValue(authManagerHost)
 	config.SpaceManagerHost = types.StringValue(spaceManagerHost)
+	config.IdentityManagerHost = types.StringValue(identityManagerHost)
 	config.IAASHost = types.StringValue(iaasHost)
 	config.ClientId = types.StringValue(clientID)
 	config.ClientSecret = types.StringValue(clientSecret)
 
 	// Create a new Numspot provider using the configuration values
 	var (
-		iaasClient *iaas.ClientWithResponses
-		iamClient  *iam.ClientWithResponses
+		iaasClient            *iaas.ClientWithResponses
+		spaceManagerClient    *iam.ClientWithResponses
+		identityManagerClient *iam.ClientWithResponses
 	)
 	accessToken, err := p.authenticateUser(ctx, &config)
 	if err != nil {
@@ -379,7 +411,8 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	iamClient = p.iamClient(*accessToken, &resp.Diagnostics, &config)
+	spaceManagerClient = p.iamClient(config.SpaceManagerHost.ValueString(), *accessToken, &resp.Diagnostics)
+	identityManagerClient = p.iamClient(config.IdentityManagerHost.ValueString(), *accessToken, &resp.Diagnostics)
 
 	if p.development {
 		iaasClient = p.apiClientWithFakeAuth(&config, resp.Diagnostics)
@@ -404,9 +437,10 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	}
 
 	providerData := Provider{
-		ApiClient: iaasClient,
-		IAMClient: iamClient,
-		SpaceID:   spaceUuid,
+		SpaceID:                  spaceUuid,
+		ApiClient:                iaasClient,
+		IAMSpaceManagerClient:    spaceManagerClient,
+		IAMIdentityManagerClient: identityManagerClient,
 	}
 
 	resp.DataSourceData = providerData
@@ -467,5 +501,6 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewVirtualGatewayResource,
 		NewVpcPeeringResource,
 		NewSpaceResource,
+		NewServiceAccountResource,
 	}
 }
