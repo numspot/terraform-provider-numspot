@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -97,11 +99,23 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 	}
 	tf := CreateServiceAccountResponseFromHTTPToTF(*res.JSON201)
 	tf.SpaceId = plan.SpaceId
+
+	// Attach permissions
+	if len(plan.GlobalPermissions.Elements()) > 0 {
+		globalPermissions := utils.FromTfStringListToStringList(ctx, plan.GlobalPermissions)
+		diags := r.addGlobalPermissions(ctx, res.JSON201.Id, globalPermissions)
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
+			return
+		}
+	}
+
 	// Read operation requires space_id and service_account_id to be able to fetch data from the API
 	// As the import state operation will take into consideration only one ID attribute,
 	// We have to combine the two attributes in a single ID attribute
 	// Convention for combined ID is: space_id, service_account_id
 	tf.Id = types.StringValue(fmt.Sprintf("%s,%s", tf.SpaceId.ValueString(), tf.Id.ValueString()))
+	tf.GlobalPermissions = plan.GlobalPermissions
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -176,6 +190,20 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 		state.SpaceId = plan.SpaceId
 		response.Diagnostics.Append(response.State.Set(ctx, state)...)
 	}
+
+	if !plan.GlobalPermissions.Equal(state.GlobalPermissions) {
+		statePermissions := utils.FromTfStringListToStringList(ctx, state.GlobalPermissions)
+		planPermissions := utils.FromTfStringListToStringList(ctx, plan.GlobalPermissions)
+
+		diags := r.updateGlobalPermissions(ctx, state.ServiceAccountId.ValueString(), statePermissions, planPermissions)
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
+			return
+		}
+
+		state.GlobalPermissions = plan.GlobalPermissions
+		response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	}
 }
 
 func (r *ServiceAccountResource) updateServiceAccount(
@@ -239,4 +267,135 @@ func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.De
 	}
 
 	response.State.RemoveResource(ctx)
+}
+
+func (r *ServiceAccountResource) addGlobalPermissions(
+	ctx context.Context,
+	serviceAccountID string,
+	permissions []string,
+) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Convert service account id in UUID
+	serviceAccountUUID, err := uuid.Parse(serviceAccountID)
+	if err != nil {
+		diags.AddError("Failed to parse service account id", err.Error())
+		return diags
+	}
+
+	// Transform permission argument in tf string arr:
+	uuidPermissions := make([]uuid.UUID, 0, len(permissions))
+	for _, permission := range permissions {
+		parsedPermission, err := uuid.Parse(permission)
+		if err != nil {
+			diags.AddError("Failed to parse permission", err.Error())
+			return diags
+		}
+
+		uuidPermissions = append(uuidPermissions, parsedPermission)
+	}
+
+	utils.ExecuteRequest(func() (*iam.SetIAMPolicySpaceResponse, error) {
+		return r.provider.IAMAccessManagerClient.SetIAMPolicySpaceWithResponse(
+			ctx,
+			r.provider.SpaceID,
+			iam.ServiceAccounts,
+			serviceAccountUUID,
+			iam.SetIAMPolicySpaceJSONRequestBody{
+				Add: &iam.IAMPolicy{
+					Permissions: &uuidPermissions,
+				},
+			},
+		)
+	}, http.StatusNoContent, &diags)
+
+	return diags
+}
+
+func (r *ServiceAccountResource) deleteGlobalPermissions(
+	ctx context.Context,
+	serviceAccountID string,
+	permissions []string,
+) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Convert service account id in UUID
+	serviceAccountUUID, err := uuid.Parse(serviceAccountID)
+	if err != nil {
+		diags.AddError("Failed to parse service account id", err.Error())
+		return diags
+	}
+
+	// Transform permission argument in tf string arr:
+	uuidPermissions := make([]uuid.UUID, 0, len(permissions))
+	for _, permission := range permissions {
+		parsedPermission, err := uuid.Parse(permission)
+		if err != nil {
+			diags.AddError("Failed to parse permission", err.Error())
+			return diags
+		}
+
+		uuidPermissions = append(uuidPermissions, parsedPermission)
+	}
+
+	utils.ExecuteRequest(func() (*iam.SetIAMPolicySpaceResponse, error) {
+		return r.provider.IAMAccessManagerClient.SetIAMPolicySpaceWithResponse(
+			ctx,
+			r.provider.SpaceID,
+			iam.ServiceAccounts,
+			serviceAccountUUID,
+			iam.SetIAMPolicySpaceJSONRequestBody{
+				Delete: &iam.IAMPolicy{
+					Permissions: &uuidPermissions,
+				},
+			},
+		)
+	}, http.StatusNoContent, &diags)
+
+	return diags
+}
+
+func (r *ServiceAccountResource) updateGlobalPermissions(
+	ctx context.Context,
+	serviceAccountID string,
+	statePermissions, planPermissions []string,
+) diag.Diagnostics {
+	if len(statePermissions) == 0 && len(planPermissions) > 0 {
+		return r.addGlobalPermissions(ctx, serviceAccountID, planPermissions)
+	}
+	if len(planPermissions) == 0 && len(statePermissions) > 0 {
+		return r.deleteGlobalPermissions(ctx, serviceAccountID, statePermissions)
+	}
+
+	permissionsToAdd := make([]string, 0)
+	permissionsToRemove := make([]string, 0)
+
+	for _, planPermission := range planPermissions {
+		if !slices.Contains(statePermissions, planPermission) {
+			permissionsToAdd = append(permissionsToAdd, planPermission)
+		}
+	}
+
+	for _, statePermission := range statePermissions {
+		if !slices.Contains(planPermissions, statePermission) {
+			permissionsToRemove = append(permissionsToRemove, statePermission)
+		}
+	}
+
+	var diags diag.Diagnostics
+	if len(permissionsToRemove) > 0 {
+		diags = r.deleteGlobalPermissions(ctx, serviceAccountID, permissionsToRemove)
+		if diags.HasError() {
+			return diags
+		}
+	}
+
+	if len(permissionsToAdd) > 0 {
+		diags = r.addGlobalPermissions(ctx, serviceAccountID, permissionsToAdd)
+		if diags.HasError() {
+			return diags
+		}
+	}
+
+	return diags
 }

@@ -14,18 +14,24 @@ func ServiceAccountFromTFToCreateRequest(tf resource_service_account.ServiceAcco
 }
 
 func CreateServiceAccountResponseFromHTTPToTF(http iam.CreateServiceAccountResponseSchema) resource_service_account.ServiceAccountModel {
+	permissions := types.ListNull(types.StringType)
+
 	return resource_service_account.ServiceAccountModel{
-		Id:               types.StringValue(http.Id),
-		Name:             types.StringValue(http.Name),
-		Secret:           types.StringValue(http.Secret),
-		ServiceAccountId: types.StringValue(http.Id),
+		Id:                types.StringValue(http.Id),
+		Name:              types.StringValue(http.Name),
+		Secret:            types.StringValue(http.Secret),
+		ServiceAccountId:  types.StringValue(http.Id),
+		GlobalPermissions: permissions,
 	}
 }
 
 func ServiceAccountEditedResponseFromHTTPToTF(http iam.ServiceAccountEdited) resource_service_account.ServiceAccountModel {
+	permissions := types.ListNull(types.StringType)
+
 	return resource_service_account.ServiceAccountModel{
-		Id:               types.StringValue(http.Id),
-		Name:             types.StringValue(http.Name),
-		ServiceAccountId: types.StringValue(http.Id),
+		Id:                types.StringValue(http.Id),
+		Name:              types.StringValue(http.Name),
+		ServiceAccountId:  types.StringValue(http.Id),
+		GlobalPermissions: permissions,
 	}
 }

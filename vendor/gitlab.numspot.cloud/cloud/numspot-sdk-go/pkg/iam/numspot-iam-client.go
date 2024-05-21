@@ -259,6 +259,83 @@ type PaginatedList struct {
 	TotalSize *Int `json:"totalSize,omitempty"`
 }
 
+// Permission A permission in the <service>[.<resource>.[<subResource>](0,1)](0,1).<action> form
+type Permission struct {
+	// Action Allowed operation type
+	Action string `json:"action"`
+
+	// Description Human-readable description
+	Description string `json:"description"`
+
+	// Name Human-readable name
+	Name     string  `json:"name"`
+	Resource *string `json:"resource,omitempty"`
+
+	// Service Service name
+	Service     string  `json:"service"`
+	SubResource *string `json:"subResource,omitempty"`
+}
+
+// PermissionsPaginatedList defines model for PermissionsPaginatedList.
+type PermissionsPaginatedList struct {
+	Items []RegisteredPermission `json:"items"`
+
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
+// Registered defines model for Registered.
+type Registered struct {
+	// CreatedOn creation date
+	CreatedOn time.Time `json:"createdOn"`
+
+	// UpdatedOn last update
+	UpdatedOn time.Time `json:"updatedOn"`
+
+	// Uuid Internal ID
+	Uuid openapi_types.UUID `json:"uuid"`
+}
+
+// RegisteredPermission defines model for RegisteredPermission.
+type RegisteredPermission struct {
+	// Action Allowed operation type
+	Action string `json:"action"`
+
+	// CreatedOn creation date
+	CreatedOn time.Time `json:"createdOn"`
+
+	// Description Human-readable description
+	Description string `json:"description"`
+
+	// Name Human-readable name
+	Name     string  `json:"name"`
+	Resource *string `json:"resource,omitempty"`
+
+	// Service Service name
+	Service     string  `json:"service"`
+	SubResource *string `json:"subResource,omitempty"`
+
+	// UpdatedOn last update
+	UpdatedOn time.Time `json:"updatedOn"`
+
+	// Uuid Internal ID
+	Uuid openapi_types.UUID `json:"uuid"`
+}
+
+// RegisteredPermissionList defines model for RegisteredPermissionList.
+type RegisteredPermissionList struct {
+	Items []RegisteredPermission `json:"items"`
+
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
 // ServiceAccount defines model for ServiceAccount.
 type ServiceAccount struct {
 	// Name Service account name
@@ -396,8 +473,20 @@ type Violation struct {
 	Field string `json:"field"`
 }
 
+// Action defines model for Action.
+type Action = string
+
 // Authorization defines model for Authorization.
 type Authorization = string
+
+// ListPermissionsPage defines model for ListPermissionsPage.
+type ListPermissionsPage struct {
+	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
+	NextToken *string `json:"nextToken"`
+
+	// Size The maximum number of items to return. The service may return fewer than this value.
+	Size *int32 `json:"size"`
+}
 
 // ListServiceAccounts defines model for ListServiceAccounts.
 type ListServiceAccounts struct {
@@ -450,6 +539,15 @@ type ObjectType = string
 // OrganisationId defines model for OrganisationId.
 type OrganisationId = openapi_types.UUID
 
+// PermissionUuid defines model for PermissionUuid.
+type PermissionUuid = openapi_types.UUID
+
+// Resource defines model for Resource.
+type Resource = string
+
+// Service defines model for Service.
+type Service = string
+
 // ServiceAccountId defines model for ServiceAccountId.
 type ServiceAccountId = openapi_types.UUID
 
@@ -458,6 +556,9 @@ type ServiceAccountName = string
 
 // SpaceId defines model for SpaceId.
 type SpaceId = openapi_types.UUID
+
+// SubResource defines model for SubResource.
+type SubResource = string
 
 // SubjectTypeParam defines model for SubjectTypeParam.
 type SubjectTypeParam = SubjectType
@@ -477,6 +578,9 @@ type GetIAMGranularPolicyResponseSchema = IAMGranularPolicyList
 // GetIAMPolicyResponseSchema defines model for GetIAMPolicyResponse.
 type GetIAMPolicyResponseSchema = IAMPolicy
 
+// GetPermissionResponseSchema defines model for GetPermissionResponse.
+type GetPermissionResponseSchema = RegisteredPermission
+
 // GetServiceAccountResponseSchema defines model for GetServiceAccountResponse.
 type GetServiceAccountResponseSchema = ServiceAccountEdited
 
@@ -485,6 +589,9 @@ type GetSpaceByIdResponseSchema = Space
 
 // IntrospectResponseSchema defines model for IntrospectResponse.
 type IntrospectResponseSchema = IntrospectResp
+
+// ListPermissionsResponseSchema defines model for ListPermissionsResponse.
+type ListPermissionsResponseSchema = PermissionsPaginatedList
 
 // ListServiceAccountResponseSchema defines model for ListServiceAccountResponse.
 type ListServiceAccountResponseSchema = ServiceAccountPaginatedList
@@ -501,6 +608,12 @@ type ListSpacesServiceAccountResponseSchema = SpaceSimplePaginatedList
 // ListUserOrganisationsResponseSchema defines model for ListUserOrganisationsResponse.
 type ListUserOrganisationsResponseSchema = OrganisationSimplePaginatedList
 
+// PermissionCreatedResponseSchema defines model for PermissionCreatedResponse.
+type PermissionCreatedResponseSchema = RegisteredPermission
+
+// PermissionsResponseSchema defines model for PermissionsResponse.
+type PermissionsResponseSchema = RegisteredPermissionList
+
 // TokenResponseSchema defines model for TokenResponse.
 type TokenResponseSchema = TokenResp
 
@@ -515,6 +628,26 @@ type CreateSpaceRequest = CreateSpace
 
 // ListSpaceIdsRequest defines model for ListSpaceIdsRequest.
 type ListSpaceIdsRequest = SpaceIdsList
+
+// PatchPermissionRequest defines model for PatchPermissionRequest.
+type PatchPermissionRequest struct {
+	// Action Allowed operation type
+	Action *string `json:"action,omitempty"`
+
+	// Description Human-readable description
+	Description *string `json:"description,omitempty"`
+
+	// Name Human-readable name
+	Name     *string `json:"name,omitempty"`
+	Resource *string `json:"resource,omitempty"`
+
+	// Service Service name
+	Service     *string `json:"service,omitempty"`
+	SubResource *string `json:"subResource,omitempty"`
+}
+
+// PermissionRequest A permission in the <service>[.<resource>.[<subResource>](0,1)](0,1).<action> form
+type PermissionRequest = Permission
 
 // SetIAMGranularPolicyRequest Defines the structure for modification instructions for roles and permissions
 type SetIAMGranularPolicyRequest struct {
@@ -534,6 +667,29 @@ type UpdateServiceAccountRequest = ServiceAccount
 // UpdateSpaceRequest defines model for UpdateSpaceRequest.
 type UpdateSpaceRequest = MutableSpace
 
+// ListPermissionsParams defines parameters for ListPermissions.
+type ListPermissionsParams struct {
+	// Page Paginated request
+	Page *ListPermissionsPage `json:"page,omitempty"`
+}
+
+// UpdatePermissionJSONBody defines parameters for UpdatePermission.
+type UpdatePermissionJSONBody struct {
+	// Action Allowed operation type
+	Action *string `json:"action,omitempty"`
+
+	// Description Human-readable description
+	Description *string `json:"description,omitempty"`
+
+	// Name Human-readable name
+	Name     *string `json:"name,omitempty"`
+	Resource *string `json:"resource,omitempty"`
+
+	// Service Service name
+	Service     *string `json:"service,omitempty"`
+	SubResource *string `json:"subResource,omitempty"`
+}
+
 // ListOrganisationsIdentityParams defines parameters for ListOrganisationsIdentity.
 type ListOrganisationsIdentityParams struct {
 	// Page Paginated request
@@ -550,6 +706,24 @@ type SetIAMGranularPolicyOrganisationJSONBody struct {
 type SetIAMPolicyOrganisationJSONBody struct {
 	Add    *IAMPolicy `json:"add,omitempty"`
 	Delete *IAMPolicy `json:"delete,omitempty"`
+}
+
+// ListPermissionsOrganisationParams defines parameters for ListPermissionsOrganisation.
+type ListPermissionsOrganisationParams struct {
+	// Service service the permission is related to
+	Service *Service `form:"service,omitempty" json:"service,omitempty"`
+
+	// Resource resource the permission is related to
+	Resource *Resource `form:"resource,omitempty" json:"resource,omitempty"`
+
+	// Subresource subresource the permission is related to
+	Subresource *SubResource `form:"subresource,omitempty" json:"subresource,omitempty"`
+
+	// Action action the permission allows to perform
+	Action *Action `form:"action,omitempty" json:"action,omitempty"`
+
+	// Page Paginated request
+	Page *ListPermissionsPage `json:"page,omitempty"`
 }
 
 // ListServiceAccountOrganisationParams defines parameters for ListServiceAccountOrganisation.
@@ -591,6 +765,24 @@ type SetIAMPolicySpaceJSONBody struct {
 	Delete *IAMPolicy `json:"delete,omitempty"`
 }
 
+// ListPermissionsSpaceParams defines parameters for ListPermissionsSpace.
+type ListPermissionsSpaceParams struct {
+	// Service service the permission is related to
+	Service *Service `form:"service,omitempty" json:"service,omitempty"`
+
+	// Resource resource the permission is related to
+	Resource *Resource `form:"resource,omitempty" json:"resource,omitempty"`
+
+	// Subresource subresource the permission is related to
+	Subresource *SubResource `form:"subresource,omitempty" json:"subresource,omitempty"`
+
+	// Action action the permission allows to perform
+	Action *Action `form:"action,omitempty" json:"action,omitempty"`
+
+	// Page Paginated request
+	Page *ListPermissionsPage `json:"page,omitempty"`
+}
+
 // ListServiceAccountSpaceParams defines parameters for ListServiceAccountSpace.
 type ListServiceAccountSpaceParams struct {
 	// Name Service account name
@@ -611,6 +803,12 @@ type ListSpacesParams struct {
 	// Page list spaces paginated request
 	Page *ListSpacesPage `json:"page,omitempty"`
 }
+
+// CreatePermissionJSONRequestBody defines body for CreatePermission for application/json ContentType.
+type CreatePermissionJSONRequestBody = Permission
+
+// UpdatePermissionJSONRequestBody defines body for UpdatePermission for application/json ContentType.
+type UpdatePermissionJSONRequestBody UpdatePermissionJSONBody
 
 // IntrospectFormdataRequestBody defines body for Introspect for application/x-www-form-urlencoded ContentType.
 type IntrospectFormdataRequestBody = TokenBody
@@ -727,6 +925,25 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// ListPermissions request
+	ListPermissions(ctx context.Context, params *ListPermissionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreatePermissionWithBody request with any body
+	CreatePermissionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreatePermission(ctx context.Context, body CreatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeletePermission request
+	DeletePermission(ctx context.Context, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetPermission request
+	GetPermission(ctx context.Context, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdatePermissionWithBody request with any body
+	UpdatePermissionWithBody(ctx context.Context, permissionUuid PermissionUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdatePermission(ctx context.Context, permissionUuid PermissionUuid, body UpdatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// IntrospectWithBody request with any body
 	IntrospectWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -750,6 +967,12 @@ type ClientInterface interface {
 	SetIAMPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	SetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListPermissionsOrganisation request
+	ListPermissionsOrganisation(ctx context.Context, organisationId OrganisationId, params *ListPermissionsOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetPermissionOrganisation request
+	GetPermissionOrganisation(ctx context.Context, organisationId OrganisationId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListServiceAccountOrganisation request
 	ListServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -796,6 +1019,12 @@ type ClientInterface interface {
 	SetIAMPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	SetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListPermissionsSpace request
+	ListPermissionsSpace(ctx context.Context, spaceId SpaceId, params *ListPermissionsSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetPermissionSpace request
+	GetPermissionSpace(ctx context.Context, spaceId SpaceId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListServiceAccountSpace request
 	ListServiceAccountSpace(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -844,6 +1073,90 @@ type ClientInterface interface {
 	CreateSpaceWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateSpace(ctx context.Context, organisationId OrganisationId, body CreateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) ListPermissions(ctx context.Context, params *ListPermissionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListPermissionsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreatePermissionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreatePermissionRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreatePermission(ctx context.Context, body CreatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreatePermissionRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeletePermission(ctx context.Context, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeletePermissionRequest(c.Server, permissionUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetPermission(ctx context.Context, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetPermissionRequest(c.Server, permissionUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdatePermissionWithBody(ctx context.Context, permissionUuid PermissionUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdatePermissionRequestWithBody(c.Server, permissionUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdatePermission(ctx context.Context, permissionUuid PermissionUuid, body UpdatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdatePermissionRequest(c.Server, permissionUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) IntrospectWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -944,6 +1257,30 @@ func (c *Client) SetIAMPolicyOrganisationWithBody(ctx context.Context, organisat
 
 func (c *Client) SetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSetIAMPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListPermissionsOrganisation(ctx context.Context, organisationId OrganisationId, params *ListPermissionsOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListPermissionsOrganisationRequest(c.Server, organisationId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetPermissionOrganisation(ctx context.Context, organisationId OrganisationId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetPermissionOrganisationRequest(c.Server, organisationId, permissionUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -1148,6 +1485,30 @@ func (c *Client) SetIAMPolicySpaceWithBody(ctx context.Context, spaceId SpaceId,
 
 func (c *Client) SetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSetIAMPolicySpaceRequest(c.Server, spaceId, subjectType, subjectUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListPermissionsSpace(ctx context.Context, spaceId SpaceId, params *ListPermissionsSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListPermissionsSpaceRequest(c.Server, spaceId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetPermissionSpace(ctx context.Context, spaceId SpaceId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetPermissionSpaceRequest(c.Server, spaceId, permissionUuid)
 	if err != nil {
 		return nil, err
 	}
@@ -1372,6 +1733,210 @@ func (c *Client) CreateSpace(ctx context.Context, organisationId OrganisationId,
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewListPermissionsRequest generates requests for ListPermissions
+func NewListPermissionsRequest(server string, params *ListPermissionsParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/permissions")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreatePermissionRequest calls the generic CreatePermission builder with application/json body
+func NewCreatePermissionRequest(server string, body CreatePermissionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreatePermissionRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreatePermissionRequestWithBody generates requests for CreatePermission with any type of body
+func NewCreatePermissionRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/permissions")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeletePermissionRequest generates requests for DeletePermission
+func NewDeletePermissionRequest(server string, permissionUuid PermissionUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "permissionUuid", runtime.ParamLocationPath, permissionUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/permissions/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetPermissionRequest generates requests for GetPermission
+func NewGetPermissionRequest(server string, permissionUuid PermissionUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "permissionUuid", runtime.ParamLocationPath, permissionUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/permissions/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdatePermissionRequest calls the generic UpdatePermission builder with application/json body
+func NewUpdatePermissionRequest(server string, permissionUuid PermissionUuid, body UpdatePermissionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdatePermissionRequestWithBody(server, permissionUuid, "application/json", bodyReader)
+}
+
+// NewUpdatePermissionRequestWithBody generates requests for UpdatePermission with any type of body
+func NewUpdatePermissionRequestWithBody(server string, permissionUuid PermissionUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "permissionUuid", runtime.ParamLocationPath, permissionUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/permissions/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
 }
 
 // NewIntrospectRequestWithFormdataBody calls the generic Introspect builder with application/x-www-form-urlencoded body
@@ -1691,6 +2256,167 @@ func NewSetIAMPolicyOrganisationRequestWithBody(server string, organisationId Or
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListPermissionsOrganisationRequest generates requests for ListPermissionsOrganisation
+func NewListPermissionsOrganisationRequest(server string, organisationId OrganisationId, params *ListPermissionsOrganisationParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/permissions", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Service != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "service", runtime.ParamLocationQuery, *params.Service); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Resource != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resource", runtime.ParamLocationQuery, *params.Resource); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Subresource != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "subresource", runtime.ParamLocationQuery, *params.Subresource); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Action != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "action", runtime.ParamLocationQuery, *params.Action); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetPermissionOrganisationRequest generates requests for GetPermissionOrganisation
+func NewGetPermissionOrganisationRequest(server string, organisationId OrganisationId, permissionUuid PermissionUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "permissionUuid", runtime.ParamLocationPath, permissionUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/permissions/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -2356,6 +3082,167 @@ func NewSetIAMPolicySpaceRequestWithBody(server string, spaceId SpaceId, subject
 	return req, nil
 }
 
+// NewListPermissionsSpaceRequest generates requests for ListPermissionsSpace
+func NewListPermissionsSpaceRequest(server string, spaceId SpaceId, params *ListPermissionsSpaceParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/permissions", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Service != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "service", runtime.ParamLocationQuery, *params.Service); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Resource != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resource", runtime.ParamLocationQuery, *params.Resource); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Subresource != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "subresource", runtime.ParamLocationQuery, *params.Subresource); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Action != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "action", runtime.ParamLocationQuery, *params.Action); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetPermissionSpaceRequest generates requests for GetPermissionSpace
+func NewGetPermissionSpaceRequest(server string, spaceId SpaceId, permissionUuid PermissionUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "permissionUuid", runtime.ParamLocationPath, permissionUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/permissions/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewListServiceAccountSpaceRequest generates requests for ListServiceAccountSpace
 func NewListServiceAccountSpaceRequest(server string, spaceId SpaceId, params *ListServiceAccountSpaceParams) (*http.Request, error) {
 	var err error
@@ -2981,6 +3868,25 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// ListPermissionsWithResponse request
+	ListPermissionsWithResponse(ctx context.Context, params *ListPermissionsParams, reqEditors ...RequestEditorFn) (*ListPermissionsResponse, error)
+
+	// CreatePermissionWithBodyWithResponse request with any body
+	CreatePermissionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreatePermissionResponse, error)
+
+	CreatePermissionWithResponse(ctx context.Context, body CreatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreatePermissionResponse, error)
+
+	// DeletePermissionWithResponse request
+	DeletePermissionWithResponse(ctx context.Context, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*DeletePermissionResponse, error)
+
+	// GetPermissionWithResponse request
+	GetPermissionWithResponse(ctx context.Context, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*GetPermissionResponse, error)
+
+	// UpdatePermissionWithBodyWithResponse request with any body
+	UpdatePermissionWithBodyWithResponse(ctx context.Context, permissionUuid PermissionUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdatePermissionResponse, error)
+
+	UpdatePermissionWithResponse(ctx context.Context, permissionUuid PermissionUuid, body UpdatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdatePermissionResponse, error)
+
 	// IntrospectWithBodyWithResponse request with any body
 	IntrospectWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectResponse, error)
 
@@ -3004,6 +3910,12 @@ type ClientWithResponsesInterface interface {
 	SetIAMPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error)
 
 	SetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error)
+
+	// ListPermissionsOrganisationWithResponse request
+	ListPermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListPermissionsOrganisationParams, reqEditors ...RequestEditorFn) (*ListPermissionsOrganisationResponse, error)
+
+	// GetPermissionOrganisationWithResponse request
+	GetPermissionOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*GetPermissionOrganisationResponse, error)
 
 	// ListServiceAccountOrganisationWithResponse request
 	ListServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error)
@@ -3050,6 +3962,12 @@ type ClientWithResponsesInterface interface {
 	SetIAMPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error)
 
 	SetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error)
+
+	// ListPermissionsSpaceWithResponse request
+	ListPermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListPermissionsSpaceParams, reqEditors ...RequestEditorFn) (*ListPermissionsSpaceResponse, error)
+
+	// GetPermissionSpaceWithResponse request
+	GetPermissionSpaceWithResponse(ctx context.Context, spaceId SpaceId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*GetPermissionSpaceResponse, error)
 
 	// ListServiceAccountSpaceWithResponse request
 	ListServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error)
@@ -3098,6 +4016,123 @@ type ClientWithResponsesInterface interface {
 	CreateSpaceWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSpaceResponse, error)
 
 	CreateSpaceWithResponse(ctx context.Context, organisationId OrganisationId, body CreateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSpaceResponse, error)
+}
+
+type ListPermissionsResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *PermissionsResponseSchema
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListPermissionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListPermissionsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreatePermissionResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *PermissionCreatedResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreatePermissionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreatePermissionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeletePermissionResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeletePermissionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeletePermissionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetPermissionResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *PermissionCreatedResponseSchema
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetPermissionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetPermissionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdatePermissionResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdatePermissionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdatePermissionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type IntrospectResponse struct {
@@ -3250,6 +4285,58 @@ func (r SetIAMPolicyOrganisationResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r SetIAMPolicyOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListPermissionsOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListPermissionsResponseSchema
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListPermissionsOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListPermissionsOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetPermissionOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetPermissionResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetPermissionOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetPermissionOrganisationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -3573,6 +4660,58 @@ func (r SetIAMPolicySpaceResponse) StatusCode() int {
 	return 0
 }
 
+type ListPermissionsSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListPermissionsResponseSchema
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListPermissionsSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListPermissionsSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetPermissionSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetPermissionResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetPermissionSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetPermissionSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListServiceAccountSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -3888,6 +5027,67 @@ func (r CreateSpaceResponse) StatusCode() int {
 	return 0
 }
 
+// ListPermissionsWithResponse request returning *ListPermissionsResponse
+func (c *ClientWithResponses) ListPermissionsWithResponse(ctx context.Context, params *ListPermissionsParams, reqEditors ...RequestEditorFn) (*ListPermissionsResponse, error) {
+	rsp, err := c.ListPermissions(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListPermissionsResponse(rsp)
+}
+
+// CreatePermissionWithBodyWithResponse request with arbitrary body returning *CreatePermissionResponse
+func (c *ClientWithResponses) CreatePermissionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreatePermissionResponse, error) {
+	rsp, err := c.CreatePermissionWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreatePermissionResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreatePermissionWithResponse(ctx context.Context, body CreatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*CreatePermissionResponse, error) {
+	rsp, err := c.CreatePermission(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreatePermissionResponse(rsp)
+}
+
+// DeletePermissionWithResponse request returning *DeletePermissionResponse
+func (c *ClientWithResponses) DeletePermissionWithResponse(ctx context.Context, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*DeletePermissionResponse, error) {
+	rsp, err := c.DeletePermission(ctx, permissionUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeletePermissionResponse(rsp)
+}
+
+// GetPermissionWithResponse request returning *GetPermissionResponse
+func (c *ClientWithResponses) GetPermissionWithResponse(ctx context.Context, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*GetPermissionResponse, error) {
+	rsp, err := c.GetPermission(ctx, permissionUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetPermissionResponse(rsp)
+}
+
+// UpdatePermissionWithBodyWithResponse request with arbitrary body returning *UpdatePermissionResponse
+func (c *ClientWithResponses) UpdatePermissionWithBodyWithResponse(ctx context.Context, permissionUuid PermissionUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdatePermissionResponse, error) {
+	rsp, err := c.UpdatePermissionWithBody(ctx, permissionUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdatePermissionResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdatePermissionWithResponse(ctx context.Context, permissionUuid PermissionUuid, body UpdatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdatePermissionResponse, error) {
+	rsp, err := c.UpdatePermission(ctx, permissionUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdatePermissionResponse(rsp)
+}
+
 // IntrospectWithBodyWithResponse request with arbitrary body returning *IntrospectResponse
 func (c *ClientWithResponses) IntrospectWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectResponse, error) {
 	rsp, err := c.IntrospectWithBody(ctx, contentType, body, reqEditors...)
@@ -3964,6 +5164,24 @@ func (c *ClientWithResponses) SetIAMPolicyOrganisationWithResponse(ctx context.C
 		return nil, err
 	}
 	return ParseSetIAMPolicyOrganisationResponse(rsp)
+}
+
+// ListPermissionsOrganisationWithResponse request returning *ListPermissionsOrganisationResponse
+func (c *ClientWithResponses) ListPermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListPermissionsOrganisationParams, reqEditors ...RequestEditorFn) (*ListPermissionsOrganisationResponse, error) {
+	rsp, err := c.ListPermissionsOrganisation(ctx, organisationId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListPermissionsOrganisationResponse(rsp)
+}
+
+// GetPermissionOrganisationWithResponse request returning *GetPermissionOrganisationResponse
+func (c *ClientWithResponses) GetPermissionOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*GetPermissionOrganisationResponse, error) {
+	rsp, err := c.GetPermissionOrganisation(ctx, organisationId, permissionUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetPermissionOrganisationResponse(rsp)
 }
 
 // ListServiceAccountOrganisationWithResponse request returning *ListServiceAccountOrganisationResponse
@@ -4112,6 +5330,24 @@ func (c *ClientWithResponses) SetIAMPolicySpaceWithResponse(ctx context.Context,
 		return nil, err
 	}
 	return ParseSetIAMPolicySpaceResponse(rsp)
+}
+
+// ListPermissionsSpaceWithResponse request returning *ListPermissionsSpaceResponse
+func (c *ClientWithResponses) ListPermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListPermissionsSpaceParams, reqEditors ...RequestEditorFn) (*ListPermissionsSpaceResponse, error) {
+	rsp, err := c.ListPermissionsSpace(ctx, spaceId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListPermissionsSpaceResponse(rsp)
+}
+
+// GetPermissionSpaceWithResponse request returning *GetPermissionSpaceResponse
+func (c *ClientWithResponses) GetPermissionSpaceWithResponse(ctx context.Context, spaceId SpaceId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*GetPermissionSpaceResponse, error) {
+	rsp, err := c.GetPermissionSpace(ctx, spaceId, permissionUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetPermissionSpaceResponse(rsp)
 }
 
 // ListServiceAccountSpaceWithResponse request returning *ListServiceAccountSpaceResponse
@@ -4268,6 +5504,185 @@ func (c *ClientWithResponses) CreateSpaceWithResponse(ctx context.Context, organ
 		return nil, err
 	}
 	return ParseCreateSpaceResponse(rsp)
+}
+
+// ParseListPermissionsResponse parses an HTTP response from a ListPermissionsWithResponse call
+func ParseListPermissionsResponse(rsp *http.Response) (*ListPermissionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListPermissionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PermissionsResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreatePermissionResponse parses an HTTP response from a CreatePermissionWithResponse call
+func ParseCreatePermissionResponse(rsp *http.Response) (*CreatePermissionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreatePermissionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PermissionCreatedResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeletePermissionResponse parses an HTTP response from a DeletePermissionWithResponse call
+func ParseDeletePermissionResponse(rsp *http.Response) (*DeletePermissionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeletePermissionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetPermissionResponse parses an HTTP response from a GetPermissionWithResponse call
+func ParseGetPermissionResponse(rsp *http.Response) (*GetPermissionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetPermissionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PermissionCreatedResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdatePermissionResponse parses an HTTP response from a UpdatePermissionWithResponse call
+func ParseUpdatePermissionResponse(rsp *http.Response) (*UpdatePermissionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdatePermissionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseIntrospectResponse parses an HTTP response from a IntrospectWithResponse call
@@ -4554,6 +5969,114 @@ func ParseSetIAMPolicyOrganisationResponse(rsp *http.Response) (*SetIAMPolicyOrg
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListPermissionsOrganisationResponse parses an HTTP response from a ListPermissionsOrganisationWithResponse call
+func ParseListPermissionsOrganisationResponse(rsp *http.Response) (*ListPermissionsOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListPermissionsOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListPermissionsResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetPermissionOrganisationResponse parses an HTTP response from a GetPermissionOrganisationWithResponse call
+func ParseGetPermissionOrganisationResponse(rsp *http.Response) (*GetPermissionOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetPermissionOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetPermissionResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest BadRequestError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -5237,6 +6760,114 @@ func ParseSetIAMPolicySpaceResponse(rsp *http.Response) (*SetIAMPolicySpaceRespo
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListPermissionsSpaceResponse parses an HTTP response from a ListPermissionsSpaceWithResponse call
+func ParseListPermissionsSpaceResponse(rsp *http.Response) (*ListPermissionsSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListPermissionsSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListPermissionsResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetPermissionSpaceResponse parses an HTTP response from a GetPermissionSpaceWithResponse call
+func ParseGetPermissionSpaceResponse(rsp *http.Response) (*GetPermissionSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetPermissionSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetPermissionResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest BadRequestError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {

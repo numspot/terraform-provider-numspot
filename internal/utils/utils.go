@@ -215,3 +215,9 @@ func FromTfBoolValueToTfOrNull(element basetypes.BoolValue) basetypes.BoolValue 
 
 	return element
 }
+
+func FromTfStringListToStringList(ctx context.Context, list types.List) []string {
+	return TfListToGenericList(func(a types.String) string {
+		return a.ValueString()
+	}, ctx, list)
+}
