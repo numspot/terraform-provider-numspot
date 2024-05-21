@@ -178,9 +178,8 @@ func VpcPeeringsFromHttpToTfDatasource(ctx context.Context, http *iaas.VpcPeerin
 	if http.AccepterVpc != nil {
 		accepterVpc, diags = datasource_vpc_peering.NewAccepterVpcValue(datasource_vpc_peering.AccepterVpcValue{}.AttributeTypes(ctx),
 			map[string]attr.Value{
-				"account_id": types.StringPointerValue(http.AccepterVpc.AccountId),
-				"ip_range":   types.StringPointerValue(http.AccepterVpc.IpRange),
-				"vpc_id":     types.StringPointerValue(http.AccepterVpc.VpcId),
+				"ip_range": types.StringPointerValue(http.AccepterVpc.IpRange),
+				"vpc_id":   types.StringPointerValue(http.AccepterVpc.VpcId),
 			})
 		if diags.HasError() {
 			return nil, diags
@@ -190,9 +189,8 @@ func VpcPeeringsFromHttpToTfDatasource(ctx context.Context, http *iaas.VpcPeerin
 	if http.SourceVpc != nil {
 		sourceVpc, diags = datasource_vpc_peering.NewSourceVpcValue(datasource_vpc_peering.SourceVpcValue{}.AttributeTypes(ctx),
 			map[string]attr.Value{
-				"account_id": types.StringPointerValue(http.SourceVpc.AccountId),
-				"ip_range":   types.StringPointerValue(http.SourceVpc.IpRange),
-				"vpc_id":     types.StringPointerValue(http.SourceVpc.VpcId),
+				"ip_range": types.StringPointerValue(http.SourceVpc.IpRange),
+				"vpc_id":   types.StringPointerValue(http.SourceVpc.VpcId),
 			})
 		if diags.HasError() {
 			return nil, diags

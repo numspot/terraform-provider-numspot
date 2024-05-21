@@ -174,7 +174,7 @@ resource "numspot_route_table" "rt" {
 
 resource "numspot_vm" "test" {
   image_id           = "ami-00b0c39a"
-  vm_type            = "t2.small"
+  vm_type            = "ns-cus6-2c4r"
   subnet_id          = numspot_subnet.subnet.id
   security_group_ids = [numspot_security_group.sg.id]
   depends_on         = [numspot_security_group.sg]

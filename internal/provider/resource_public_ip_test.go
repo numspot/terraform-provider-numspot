@@ -71,7 +71,7 @@ resource "numspot_image" "test" {
 
 resource "numspot_vm" "vm" {
   image_id = numspot_image.test.id
-  vm_type  = "tinav6.c1r1p3"
+  vm_type  = "ns-cus6-2c4r"
 }
 
 resource "numspot_public_ip" "test" {

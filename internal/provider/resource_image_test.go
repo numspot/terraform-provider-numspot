@@ -86,7 +86,7 @@ func testImageConfig_Create_FromVm(imageId, name string) string {
 	return fmt.Sprintf(`
 resource "numspot_vm" "vm" {
   image_id = %[1]q
-  vm_type  = "tinav6.c1r1p3"
+  vm_type  = "ns-cus6-2c4r"
 }
 
 resource "numspot_image" "test" {

@@ -58,16 +58,16 @@ func SnapshotsFromTfToAPIReadParams(ctx context.Context, tf SnapshotsDataSourceM
 	return iaas.ReadSnapshotsParams{
 		Descriptions:     utils.TfStringListToStringPtrList(ctx, tf.Descriptions),
 		FromCreationDate: utils.FromTfStringToStringPtr(tf.FromCreationDate),
-		PermissionsToCreateVolumeGlobalPermission: utils.FromTfBoolToBoolPtr(tf.PermissionsToCreateVolumeGlobalPermission),
-		Progresses:     utils.TFInt64ListToIntListPointer(ctx, tf.Progresses),
-		States:         utils.TfStringListToStringPtrList(ctx, tf.States),
-		ToCreationDate: utils.FromTfStringToStringPtr(tf.ToCreationDate),
-		VolumeIds:      utils.TfStringListToStringPtrList(ctx, tf.VolumeIds),
-		VolumeSizes:    utils.TFInt64ListToIntListPointer(ctx, tf.VolumeSizes),
-		TagKeys:        utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:      utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:           utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:            utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		IsPublic:         utils.FromTfBoolToBoolPtr(tf.PermissionsToCreateVolumeGlobalPermission),
+		Progresses:       utils.TFInt64ListToIntListPointer(ctx, tf.Progresses),
+		States:           utils.TfStringListToStringPtrList(ctx, tf.States),
+		ToCreationDate:   utils.FromTfStringToStringPtr(tf.ToCreationDate),
+		VolumeIds:        utils.TfStringListToStringPtrList(ctx, tf.VolumeIds),
+		VolumeSizes:      utils.TFInt64ListToIntListPointer(ctx, tf.VolumeSizes),
+		TagKeys:          utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
+		TagValues:        utils.TfStringListToStringPtrList(ctx, tf.TagValues),
+		Tags:             utils.TfStringListToStringPtrList(ctx, tf.Tags),
+		Ids:              utils.TfStringListToStringPtrList(ctx, tf.IDs),
 	}
 }
 

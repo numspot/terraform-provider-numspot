@@ -16,7 +16,8 @@ import (
 )
 
 func HandleError(httpResponseBody []byte) error {
-	var apiError iaas.ErrorResponse
+	var apiError iaas.Error
+
 	err := json.Unmarshal(httpResponseBody, &apiError)
 	if err != nil {
 		return err

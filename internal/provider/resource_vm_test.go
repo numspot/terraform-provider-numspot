@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	vmType        = "tinav6.c1r1p3"
+	vmType        = "ns-cus6-2c4r"
 	sourceImageId = "ami-026ce760"
 )
 

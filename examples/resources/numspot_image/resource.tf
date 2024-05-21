@@ -8,7 +8,7 @@ resource "numspot_image" "image" {
 # Image from VM
 resource "numspot_vm" "vm" {
   image_id = numspot_image.image.id
-  vm_type  = "tinav6.c1r1p3"
+  vm_type  = "ns-cus6-2c4r"
 }
 
 resource "numspot_image" "image_from_vm" {

@@ -553,8 +553,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Default:             stringdefault.StaticString("stop"),
 			},
 			"vm_type": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional: true,
+				Computed: true,
+				// TODO : Update description in IaaS OAS, only numspot types should be used and not TINA types
 				Description:         "The type of VM. You can specify a TINA type (in the `tinavW.cXrYpZ` or `tinavW.cXrY` format), or an AWS type (for example, `t2.small`, which is the default value).<br />\nIf you specify an AWS type, it is converted in the background to its corresponding TINA type, but the AWS type is still returned. If the specified or converted TINA type includes a performance flag, this performance flag is applied regardless of the value you may have provided in the `Performance` parameter. For more information, see [Instance Types](https://docs.outscale.com/en/userguide/Instance-Types.html).",
 				MarkdownDescription: "The type of VM. You can specify a TINA type (in the `tinavW.cXrYpZ` or `tinavW.cXrY` format), or an AWS type (for example, `t2.small`, which is the default value).<br />\nIf you specify an AWS type, it is converted in the background to its corresponding TINA type, but the AWS type is still returned. If the specified or converted TINA type includes a performance flag, this performance flag is applied regardless of the value you may have provided in the `Performance` parameter. For more information, see [Instance Types](https://docs.outscale.com/en/userguide/Instance-Types.html).",
 			},
