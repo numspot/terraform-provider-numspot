@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_space"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_space"
 )
 
@@ -54,4 +56,17 @@ func RetryReadSpaceUntilReady(ctx context.Context, client *iam.ClientWithRespons
 	}
 
 	return createStateConf.WaitForStateContext(ctx)
+}
+
+func SpaceFromHttpToTfDatasource(ctx context.Context, http *iam.Space) (*datasource_space.SpaceModel, diag.Diagnostics) {
+	return &datasource_space.SpaceModel{
+		Id:             types.StringValue(http.Id.String()),
+		Name:           types.StringValue(http.Name),
+		Description:    types.StringValue(http.Description),
+		OrganisationId: types.StringValue(http.OrganisationId.String()),
+		Status:         types.StringValue(string(http.Status)),
+		CreatedOn:      types.StringValue(http.CreatedOn.String()),
+		UpdatedOn:      types.StringValue(http.UpdatedOn.String()),
+		SpaceId:        types.StringValue(http.Id.String()),
+	}, nil
 }
