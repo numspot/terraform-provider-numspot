@@ -35,11 +35,17 @@ func ServiceAccountResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"global_permissions": schema.ListAttribute{
+			"global_permissions": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Description:         "List of global permission UUIDs attached to this service account.",
 				MarkdownDescription: "List of global permission UUIDs attached to this service account.",
+			},
+			"roles": schema.SetAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Description:         "List of role attached to this service account.",
+				MarkdownDescription: "List of roles attached to this service account.",
 			},
 			"service_account_id": schema.StringAttribute{
 				Computed:            true,
@@ -56,5 +62,6 @@ type ServiceAccountModel struct {
 	Secret            types.String `tfsdk:"secret"`
 	SpaceId           types.String `tfsdk:"space_id"`
 	ServiceAccountId  types.String `tfsdk:"service_account_id"`
-	GlobalPermissions types.List   `tfsdk:"global_permissions"`
+	GlobalPermissions types.Set    `tfsdk:"global_permissions"`
+	Roles             types.Set    `tfsdk:"roles"`
 }

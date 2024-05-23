@@ -2,12 +2,23 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+)
+
+type EntityType string
+
+var (
+	EntityTypePermission     EntityType = "permission"
+	EntityTypeRole           EntityType = "role"
+	EntityTypeSpace          EntityType = "space"
+	EntityTypeServiceAccount EntityType = "service account"
 )
 
 type (
@@ -78,6 +89,19 @@ func IsTfValueNull(val attr.Value) bool {
 	return val.IsNull() || val.IsUnknown()
 }
 
+func FromUUIDListToTfStringSet(ctx context.Context, arr []uuid.UUID) (types.Set, diag.Diagnostics) {
+	if arr == nil {
+		arr = make([]uuid.UUID, 0)
+	}
+
+	nArr := make([]string, 0, len(arr))
+	for _, id := range arr {
+		nArr = append(nArr, id.String())
+	}
+
+	return types.SetValueFrom(ctx, types.StringType, nArr)
+}
+
 func FromStringListToTfStringList(ctx context.Context, arr []string) (types.List, diag.Diagnostics) {
 	if arr == nil {
 		arr = make([]string, 0)
@@ -122,6 +146,22 @@ func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list type
 	res := make([]B, 0, len(list.Elements()))
 
 	list.ElementsAs(ctx, &tfList, false)
+	for _, e := range tfList {
+		res = append(res, fun(e))
+	}
+
+	return res
+}
+
+func TfSetToGenericList[A, B any](fun func(A) B, ctx context.Context, set types.Set) []B {
+	if len(set.Elements()) == 0 {
+		return nil
+	}
+
+	tfList := make([]A, 0, len(set.Elements()))
+	res := make([]B, 0, len(set.Elements()))
+
+	set.ElementsAs(ctx, &tfList, false)
 	for _, e := range tfList {
 		res = append(res, fun(e))
 	}
@@ -220,4 +260,19 @@ func FromTfStringListToStringList(ctx context.Context, list types.List) []string
 	return TfListToGenericList(func(a types.String) string {
 		return a.ValueString()
 	}, ctx, list)
+}
+
+func FromTfStringSetToStringList(ctx context.Context, set types.Set) []string {
+	return TfSetToGenericList(func(a types.String) string {
+		return a.ValueString()
+	}, ctx, set)
+}
+
+func ParseUUID(id string, entityType EntityType) (uuid.UUID, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	parsedUUID, err := uuid.Parse(id)
+	if err != nil {
+		diags.AddError(fmt.Sprintf("Failed to parse %s id", entityType), err.Error())
+	}
+	return parsedUUID, diags
 }

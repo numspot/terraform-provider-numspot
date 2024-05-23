@@ -129,3 +129,93 @@ resource "numspot_service_account" "test" {
   global_permissions = %[3]s
 }`, spaceID, name, permissionsList)
 }
+
+func TestAccServiceAccountResource_Roles(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	// Required
+	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
+	name := "My Service Account"
+	updatedName := "My New Service Account"
+
+	roles := []string{
+		"8d9706cc-c77a-499c-bb67-3597644f6d27",
+		"fd4c0997-157a-42ba-89ac-241e54c05124",
+	}
+
+	updatedRoles := roles[:len(roles)-1]
+	updatedRoles2 := []string{}
+	updatedRoles3 := []string{
+		"3a3afcfb-555c-4495-943a-70973940cc17",
+		"44541946-1310-49c0-b43a-e1c64aa3925c",
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: testServiceAccountConfig_Roles(spaceID, name, roles),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_service_account.test", "name", name),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "space_id", spaceID),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.#", strconv.Itoa(len(roles))),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.0", roles[0]),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.1", roles[1]),
+				),
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_service_account.test",
+				ImportState:             true,
+				ImportStateVerify:       false,
+				ImportStateVerifyIgnore: []string{"id"},
+			},
+			// Update testing
+			{
+				Config: testServiceAccountConfig_Roles(spaceID, updatedName, updatedRoles),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_service_account.test", "name", updatedName),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.#", strconv.Itoa(len(updatedRoles))),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.0", updatedRoles[0]),
+				),
+			},
+			// Update testing
+			{
+				Config: testServiceAccountConfig_Roles(spaceID, updatedName, updatedRoles2),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_service_account.test", "name", updatedName),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.#", strconv.Itoa(len(updatedRoles2))),
+				),
+			},
+			// Update testing
+			{
+				Config: testServiceAccountConfig_Roles(spaceID, updatedName, updatedRoles3),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_service_account.test", "name", updatedName),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.#", strconv.Itoa(len(updatedRoles3))),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.0", updatedRoles3[0]),
+					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.1", updatedRoles3[1]),
+				),
+			},
+		},
+	})
+}
+
+func testServiceAccountConfig_Roles(spaceID, name string, roles []string) string {
+	var rolesList string
+
+	if len(roles) > 0 {
+		rolesList = fmt.Sprintf(`["%s"]`, strings.Join(roles, `", "`))
+	} else {
+		rolesList = fmt.Sprintf(`[]`)
+	}
+
+	return fmt.Sprintf(`
+resource "numspot_service_account" "test" {
+  space_id = %[1]q
+  name     = %[2]q
+
+  roles = %[3]s
+}`, spaceID, name, rolesList)
+}

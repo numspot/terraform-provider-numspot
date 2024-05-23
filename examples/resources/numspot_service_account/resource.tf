@@ -5,4 +5,8 @@ resource "numspot_service_account" "test" {
   global_permissions = [
     "aaa-bbb-ccc",
   ]
+
+  roles = [
+    "aaa-xxx-zzz",
+  ]
 }

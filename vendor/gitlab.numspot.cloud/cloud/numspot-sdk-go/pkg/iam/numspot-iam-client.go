@@ -336,6 +336,61 @@ type RegisteredPermissionList struct {
 	TotalSize *Int `json:"totalSize,omitempty"`
 }
 
+// RegisteredRole defines model for RegisteredRole.
+type RegisteredRole struct {
+	// CreatedOn creation date
+	CreatedOn time.Time `json:"createdOn"`
+
+	// Description Human-readable description
+	Description string `json:"description"`
+
+	// Name Human-readable name
+	Name string `json:"name"`
+
+	// UpdatedOn last update
+	UpdatedOn time.Time `json:"updatedOn"`
+
+	// Uuid Internal ID
+	Uuid openapi_types.UUID `json:"uuid"`
+}
+
+// RegisteredRoleList defines model for RegisteredRoleList.
+type RegisteredRoleList struct {
+	Items []RegisteredRole `json:"items"`
+
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
+// Role A role, linked to 1 or more permissions
+type Role struct {
+	// Description Human-readable description
+	Description string `json:"description"`
+
+	// Name Human-readable name
+	Name string `json:"name"`
+}
+
+// RolePermission defines model for RolePermission.
+type RolePermission struct {
+	// Permissions List of permissions UUIDs
+	Permissions []openapi_types.UUID `json:"permissions"`
+}
+
+// RolesPaginatedList defines model for RolesPaginatedList.
+type RolesPaginatedList struct {
+	Items []RegisteredRole `json:"items"`
+
+	// NextPageToken This token is used to retrieve the next page. If this field is omitted, there are no subsequent pages.
+	NextPageToken *string `json:"nextPageToken,omitempty"`
+
+	// TotalSize Equivalent to int32
+	TotalSize *Int `json:"totalSize,omitempty"`
+}
+
 // ServiceAccount defines model for ServiceAccount.
 type ServiceAccount struct {
 	// Name Service account name
@@ -488,6 +543,15 @@ type ListPermissionsPage struct {
 	Size *int32 `json:"size"`
 }
 
+// ListRolesPage defines model for ListRolesPage.
+type ListRolesPage struct {
+	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
+	NextToken *string `json:"nextToken"`
+
+	// Size The maximum number of items to return. The service may return fewer than this value.
+	Size *int32 `json:"size"`
+}
+
 // ListServiceAccounts defines model for ListServiceAccounts.
 type ListServiceAccounts struct {
 	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
@@ -545,6 +609,12 @@ type PermissionUuid = openapi_types.UUID
 // Resource defines model for Resource.
 type Resource = string
 
+// RoleName defines model for RoleName.
+type RoleName = string
+
+// RoleUuid defines model for RoleUuid.
+type RoleUuid = openapi_types.UUID
+
 // Service defines model for Service.
 type Service = string
 
@@ -566,6 +636,9 @@ type SubjectTypeParam = SubjectType
 // SubjectUuid defines model for SubjectUuid.
 type SubjectUuid = openapi_types.UUID
 
+// CreateRoleResponseSchema defines model for CreateRoleResponse.
+type CreateRoleResponseSchema = RegisteredRole
+
 // CreateServiceAccountResponseSchema defines model for CreateServiceAccountResponse.
 type CreateServiceAccountResponseSchema = CreatedServiceAccount
 
@@ -581,6 +654,12 @@ type GetIAMPolicyResponseSchema = IAMPolicy
 // GetPermissionResponseSchema defines model for GetPermissionResponse.
 type GetPermissionResponseSchema = RegisteredPermission
 
+// GetRolePermissionsResponseSchema defines model for GetRolePermissionsResponse.
+type GetRolePermissionsResponseSchema = PermissionsPaginatedList
+
+// GetRoleResponseSchema defines model for GetRoleResponse.
+type GetRoleResponseSchema = RegisteredRole
+
 // GetServiceAccountResponseSchema defines model for GetServiceAccountResponse.
 type GetServiceAccountResponseSchema = ServiceAccountEdited
 
@@ -592,6 +671,9 @@ type IntrospectResponseSchema = IntrospectResp
 
 // ListPermissionsResponseSchema defines model for ListPermissionsResponse.
 type ListPermissionsResponseSchema = PermissionsPaginatedList
+
+// ListRolesResponseSchema defines model for ListRolesResponse.
+type ListRolesResponseSchema = RolesPaginatedList
 
 // ListServiceAccountResponseSchema defines model for ListServiceAccountResponse.
 type ListServiceAccountResponseSchema = ServiceAccountPaginatedList
@@ -614,11 +696,29 @@ type PermissionCreatedResponseSchema = RegisteredPermission
 // PermissionsResponseSchema defines model for PermissionsResponse.
 type PermissionsResponseSchema = RegisteredPermissionList
 
+// RoleCreatedResponseSchema defines model for RoleCreatedResponse.
+type RoleCreatedResponseSchema = RegisteredRole
+
+// RoleListResponseSchema defines model for RoleListResponse.
+type RoleListResponseSchema = RegisteredRoleList
+
 // TokenResponseSchema defines model for TokenResponse.
 type TokenResponseSchema = TokenResp
 
 // UpdateServiceAccountResponseSchema defines model for UpdateServiceAccountResponse.
 type UpdateServiceAccountResponseSchema = ServiceAccountEdited
+
+// AddGlobalRolePermissionsRequest defines model for AddGlobalRolePermissionsRequest.
+type AddGlobalRolePermissionsRequest struct {
+	// Permissions List of permissions UUIDs to add
+	Permissions []openapi_types.UUID `json:"permissions"`
+}
+
+// AddRolePermissionsRequest defines model for AddRolePermissionsRequest.
+type AddRolePermissionsRequest = RolePermission
+
+// CreateRoleRequest A role, linked to 1 or more permissions
+type CreateRoleRequest = Role
 
 // CreateServiceAccountRequest defines model for CreateServiceAccountRequest.
 type CreateServiceAccountRequest = ServiceAccount
@@ -646,8 +746,29 @@ type PatchPermissionRequest struct {
 	SubResource *string `json:"subResource,omitempty"`
 }
 
+// PatchRoleRequest defines model for PatchRoleRequest.
+type PatchRoleRequest struct {
+	// Description Human-readable description
+	Description *string `json:"description,omitempty"`
+
+	// Name Human-readable name
+	Name *string `json:"name,omitempty"`
+}
+
 // PermissionRequest A permission in the <service>[.<resource>.[<subResource>](0,1)](0,1).<action> form
 type PermissionRequest = Permission
+
+// RemoveGlobalRolePermissionsRequest defines model for RemoveGlobalRolePermissionsRequest.
+type RemoveGlobalRolePermissionsRequest struct {
+	// Permissions List of permissions UUIDs to remove
+	Permissions []openapi_types.UUID `json:"permissions"`
+}
+
+// RemoveRolePermissionsRequest defines model for RemoveRolePermissionsRequest.
+type RemoveRolePermissionsRequest = RolePermission
+
+// RoleRequest A role, linked to 1 or more permissions
+type RoleRequest = Role
 
 // SetIAMGranularPolicyRequest Defines the structure for modification instructions for roles and permissions
 type SetIAMGranularPolicyRequest struct {
@@ -659,6 +780,15 @@ type SetIAMGranularPolicyRequest struct {
 type SetIAMPolicyRequest struct {
 	Add    *IAMPolicy `json:"add,omitempty"`
 	Delete *IAMPolicy `json:"delete,omitempty"`
+}
+
+// UpdateRoleRequest defines model for UpdateRoleRequest.
+type UpdateRoleRequest struct {
+	// Description Human-readable description
+	Description *string `json:"description,omitempty"`
+
+	// Name Human-readable name
+	Name *string `json:"name,omitempty"`
 }
 
 // UpdateServiceAccountRequest defines model for UpdateServiceAccountRequest.
@@ -688,6 +818,33 @@ type UpdatePermissionJSONBody struct {
 	// Service Service name
 	Service     *string `json:"service,omitempty"`
 	SubResource *string `json:"subResource,omitempty"`
+}
+
+// ListRolesParams defines parameters for ListRoles.
+type ListRolesParams struct {
+	// Page Paginated request
+	Page *ListRolesPage `json:"page,omitempty"`
+}
+
+// UpdateRoleJSONBody defines parameters for UpdateRole.
+type UpdateRoleJSONBody struct {
+	// Description Human-readable description
+	Description *string `json:"description,omitempty"`
+
+	// Name Human-readable name
+	Name *string `json:"name,omitempty"`
+}
+
+// RemoveRolePermissionsJSONBody defines parameters for RemoveRolePermissions.
+type RemoveRolePermissionsJSONBody struct {
+	// Permissions List of permissions UUIDs to remove
+	Permissions []openapi_types.UUID `json:"permissions"`
+}
+
+// AddRolePermissionsJSONBody defines parameters for AddRolePermissions.
+type AddRolePermissionsJSONBody struct {
+	// Permissions List of permissions UUIDs to add
+	Permissions []openapi_types.UUID `json:"permissions"`
 }
 
 // ListOrganisationsIdentityParams defines parameters for ListOrganisationsIdentity.
@@ -724,6 +881,24 @@ type ListPermissionsOrganisationParams struct {
 
 	// Page Paginated request
 	Page *ListPermissionsPage `json:"page,omitempty"`
+}
+
+// ListRolesOrganisationParams defines parameters for ListRolesOrganisation.
+type ListRolesOrganisationParams struct {
+	// Name Role name
+	Name *RoleName `form:"name,omitempty" json:"name,omitempty"`
+
+	// Page Paginated request
+	Page *ListRolesPage `json:"page,omitempty"`
+}
+
+// UpdateRoleOrganisationJSONBody defines parameters for UpdateRoleOrganisation.
+type UpdateRoleOrganisationJSONBody struct {
+	// Description Human-readable description
+	Description *string `json:"description,omitempty"`
+
+	// Name Human-readable name
+	Name *string `json:"name,omitempty"`
 }
 
 // ListServiceAccountOrganisationParams defines parameters for ListServiceAccountOrganisation.
@@ -783,6 +958,24 @@ type ListPermissionsSpaceParams struct {
 	Page *ListPermissionsPage `json:"page,omitempty"`
 }
 
+// ListRolesSpaceParams defines parameters for ListRolesSpace.
+type ListRolesSpaceParams struct {
+	// Name Role name
+	Name *RoleName `form:"name,omitempty" json:"name,omitempty"`
+
+	// Page Paginated request
+	Page *ListRolesPage `json:"page,omitempty"`
+}
+
+// UpdateRoleSpaceJSONBody defines parameters for UpdateRoleSpace.
+type UpdateRoleSpaceJSONBody struct {
+	// Description Human-readable description
+	Description *string `json:"description,omitempty"`
+
+	// Name Human-readable name
+	Name *string `json:"name,omitempty"`
+}
+
 // ListServiceAccountSpaceParams defines parameters for ListServiceAccountSpace.
 type ListServiceAccountSpaceParams struct {
 	// Name Service account name
@@ -810,6 +1003,18 @@ type CreatePermissionJSONRequestBody = Permission
 // UpdatePermissionJSONRequestBody defines body for UpdatePermission for application/json ContentType.
 type UpdatePermissionJSONRequestBody UpdatePermissionJSONBody
 
+// CreateRoleJSONRequestBody defines body for CreateRole for application/json ContentType.
+type CreateRoleJSONRequestBody = Role
+
+// UpdateRoleJSONRequestBody defines body for UpdateRole for application/json ContentType.
+type UpdateRoleJSONRequestBody UpdateRoleJSONBody
+
+// RemoveRolePermissionsJSONRequestBody defines body for RemoveRolePermissions for application/json ContentType.
+type RemoveRolePermissionsJSONRequestBody RemoveRolePermissionsJSONBody
+
+// AddRolePermissionsJSONRequestBody defines body for AddRolePermissions for application/json ContentType.
+type AddRolePermissionsJSONRequestBody AddRolePermissionsJSONBody
+
 // IntrospectFormdataRequestBody defines body for Introspect for application/x-www-form-urlencoded ContentType.
 type IntrospectFormdataRequestBody = TokenBody
 
@@ -818,6 +1023,18 @@ type SetIAMGranularPolicyOrganisationJSONRequestBody SetIAMGranularPolicyOrganis
 
 // SetIAMPolicyOrganisationJSONRequestBody defines body for SetIAMPolicyOrganisation for application/json ContentType.
 type SetIAMPolicyOrganisationJSONRequestBody SetIAMPolicyOrganisationJSONBody
+
+// CreateRoleOrganisationJSONRequestBody defines body for CreateRoleOrganisation for application/json ContentType.
+type CreateRoleOrganisationJSONRequestBody = Role
+
+// UpdateRoleOrganisationJSONRequestBody defines body for UpdateRoleOrganisation for application/json ContentType.
+type UpdateRoleOrganisationJSONRequestBody UpdateRoleOrganisationJSONBody
+
+// RemoveRolePermissionsOrganisationJSONRequestBody defines body for RemoveRolePermissionsOrganisation for application/json ContentType.
+type RemoveRolePermissionsOrganisationJSONRequestBody = RolePermission
+
+// AddRolePermissionsOrganisationJSONRequestBody defines body for AddRolePermissionsOrganisation for application/json ContentType.
+type AddRolePermissionsOrganisationJSONRequestBody = RolePermission
 
 // CreateServiceAccountOrganisationJSONRequestBody defines body for CreateServiceAccountOrganisation for application/json ContentType.
 type CreateServiceAccountOrganisationJSONRequestBody = ServiceAccount
@@ -833,6 +1050,18 @@ type SetIAMGranularPolicySpaceJSONRequestBody SetIAMGranularPolicySpaceJSONBody
 
 // SetIAMPolicySpaceJSONRequestBody defines body for SetIAMPolicySpace for application/json ContentType.
 type SetIAMPolicySpaceJSONRequestBody SetIAMPolicySpaceJSONBody
+
+// CreateRoleSpaceJSONRequestBody defines body for CreateRoleSpace for application/json ContentType.
+type CreateRoleSpaceJSONRequestBody = Role
+
+// UpdateRoleSpaceJSONRequestBody defines body for UpdateRoleSpace for application/json ContentType.
+type UpdateRoleSpaceJSONRequestBody UpdateRoleSpaceJSONBody
+
+// RemoveRolePermissionsSpaceJSONRequestBody defines body for RemoveRolePermissionsSpace for application/json ContentType.
+type RemoveRolePermissionsSpaceJSONRequestBody = RolePermission
+
+// AddRolePermissionsSpaceJSONRequestBody defines body for AddRolePermissionsSpace for application/json ContentType.
+type AddRolePermissionsSpaceJSONRequestBody = RolePermission
 
 // CreateServiceAccountSpaceJSONRequestBody defines body for CreateServiceAccountSpace for application/json ContentType.
 type CreateServiceAccountSpaceJSONRequestBody = ServiceAccount
@@ -944,6 +1173,38 @@ type ClientInterface interface {
 
 	UpdatePermission(ctx context.Context, permissionUuid PermissionUuid, body UpdatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListRoles request
+	ListRoles(ctx context.Context, params *ListRolesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateRoleWithBody request with any body
+	CreateRoleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateRole(ctx context.Context, body CreateRoleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteRole request
+	DeleteRole(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetRole request
+	GetRole(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateRoleWithBody request with any body
+	UpdateRoleWithBody(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateRole(ctx context.Context, roleUuid RoleUuid, body UpdateRoleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RemoveRolePermissionsWithBody request with any body
+	RemoveRolePermissionsWithBody(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RemoveRolePermissions(ctx context.Context, roleUuid RoleUuid, body RemoveRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetRolePermissions request
+	GetRolePermissions(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AddRolePermissionsWithBody request with any body
+	AddRolePermissionsWithBody(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AddRolePermissions(ctx context.Context, roleUuid RoleUuid, body AddRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// IntrospectWithBody request with any body
 	IntrospectWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -973,6 +1234,38 @@ type ClientInterface interface {
 
 	// GetPermissionOrganisation request
 	GetPermissionOrganisation(ctx context.Context, organisationId OrganisationId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListRolesOrganisation request
+	ListRolesOrganisation(ctx context.Context, organisationId OrganisationId, params *ListRolesOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateRoleOrganisationWithBody request with any body
+	CreateRoleOrganisationWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateRoleOrganisation(ctx context.Context, organisationId OrganisationId, body CreateRoleOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteRoleOrganisation request
+	DeleteRoleOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetRoleOrganisation request
+	GetRoleOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateRoleOrganisationWithBody request with any body
+	UpdateRoleOrganisationWithBody(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateRoleOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body UpdateRoleOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RemoveRolePermissionsOrganisationWithBody request with any body
+	RemoveRolePermissionsOrganisationWithBody(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RemoveRolePermissionsOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body RemoveRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetRolePermissionsOrganisation request
+	GetRolePermissionsOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AddRolePermissionsOrganisationWithBody request with any body
+	AddRolePermissionsOrganisationWithBody(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AddRolePermissionsOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body AddRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListServiceAccountOrganisation request
 	ListServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1025,6 +1318,38 @@ type ClientInterface interface {
 
 	// GetPermissionSpace request
 	GetPermissionSpace(ctx context.Context, spaceId SpaceId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListRolesSpace request
+	ListRolesSpace(ctx context.Context, spaceId SpaceId, params *ListRolesSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateRoleSpaceWithBody request with any body
+	CreateRoleSpaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateRoleSpace(ctx context.Context, spaceId SpaceId, body CreateRoleSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteRoleSpace request
+	DeleteRoleSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetRoleSpace request
+	GetRoleSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateRoleSpaceWithBody request with any body
+	UpdateRoleSpaceWithBody(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateRoleSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body UpdateRoleSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RemoveRolePermissionsSpaceWithBody request with any body
+	RemoveRolePermissionsSpaceWithBody(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RemoveRolePermissionsSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body RemoveRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetRolePermissionsSpace request
+	GetRolePermissionsSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AddRolePermissionsSpaceWithBody request with any body
+	AddRolePermissionsSpaceWithBody(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AddRolePermissionsSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body AddRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListServiceAccountSpace request
 	ListServiceAccountSpace(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1159,6 +1484,150 @@ func (c *Client) UpdatePermission(ctx context.Context, permissionUuid Permission
 	return c.Client.Do(req)
 }
 
+func (c *Client) ListRoles(ctx context.Context, params *ListRolesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRolesRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRoleWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRoleRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRole(ctx context.Context, body CreateRoleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRoleRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteRole(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRoleRequest(c.Server, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetRole(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRoleRequest(c.Server, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRoleWithBody(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRoleRequestWithBody(c.Server, roleUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRole(ctx context.Context, roleUuid RoleUuid, body UpdateRoleJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRoleRequest(c.Server, roleUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RemoveRolePermissionsWithBody(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveRolePermissionsRequestWithBody(c.Server, roleUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RemoveRolePermissions(ctx context.Context, roleUuid RoleUuid, body RemoveRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveRolePermissionsRequest(c.Server, roleUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetRolePermissions(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRolePermissionsRequest(c.Server, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRolePermissionsWithBody(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRolePermissionsRequestWithBody(c.Server, roleUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRolePermissions(ctx context.Context, roleUuid RoleUuid, body AddRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRolePermissionsRequest(c.Server, roleUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) IntrospectWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewIntrospectRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -1281,6 +1750,150 @@ func (c *Client) ListPermissionsOrganisation(ctx context.Context, organisationId
 
 func (c *Client) GetPermissionOrganisation(ctx context.Context, organisationId OrganisationId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetPermissionOrganisationRequest(c.Server, organisationId, permissionUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListRolesOrganisation(ctx context.Context, organisationId OrganisationId, params *ListRolesOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRolesOrganisationRequest(c.Server, organisationId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRoleOrganisationWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRoleOrganisationRequestWithBody(c.Server, organisationId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRoleOrganisation(ctx context.Context, organisationId OrganisationId, body CreateRoleOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRoleOrganisationRequest(c.Server, organisationId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteRoleOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRoleOrganisationRequest(c.Server, organisationId, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetRoleOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRoleOrganisationRequest(c.Server, organisationId, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRoleOrganisationWithBody(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRoleOrganisationRequestWithBody(c.Server, organisationId, roleUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRoleOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body UpdateRoleOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRoleOrganisationRequest(c.Server, organisationId, roleUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RemoveRolePermissionsOrganisationWithBody(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveRolePermissionsOrganisationRequestWithBody(c.Server, organisationId, roleUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RemoveRolePermissionsOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body RemoveRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveRolePermissionsOrganisationRequest(c.Server, organisationId, roleUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetRolePermissionsOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRolePermissionsOrganisationRequest(c.Server, organisationId, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRolePermissionsOrganisationWithBody(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRolePermissionsOrganisationRequestWithBody(c.Server, organisationId, roleUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRolePermissionsOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body AddRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRolePermissionsOrganisationRequest(c.Server, organisationId, roleUuid, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1509,6 +2122,150 @@ func (c *Client) ListPermissionsSpace(ctx context.Context, spaceId SpaceId, para
 
 func (c *Client) GetPermissionSpace(ctx context.Context, spaceId SpaceId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetPermissionSpaceRequest(c.Server, spaceId, permissionUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListRolesSpace(ctx context.Context, spaceId SpaceId, params *ListRolesSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRolesSpaceRequest(c.Server, spaceId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRoleSpaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRoleSpaceRequestWithBody(c.Server, spaceId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRoleSpace(ctx context.Context, spaceId SpaceId, body CreateRoleSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRoleSpaceRequest(c.Server, spaceId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteRoleSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRoleSpaceRequest(c.Server, spaceId, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetRoleSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRoleSpaceRequest(c.Server, spaceId, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRoleSpaceWithBody(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRoleSpaceRequestWithBody(c.Server, spaceId, roleUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateRoleSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body UpdateRoleSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRoleSpaceRequest(c.Server, spaceId, roleUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RemoveRolePermissionsSpaceWithBody(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveRolePermissionsSpaceRequestWithBody(c.Server, spaceId, roleUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RemoveRolePermissionsSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body RemoveRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRemoveRolePermissionsSpaceRequest(c.Server, spaceId, roleUuid, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetRolePermissionsSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRolePermissionsSpaceRequest(c.Server, spaceId, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRolePermissionsSpaceWithBody(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRolePermissionsSpaceRequestWithBody(c.Server, spaceId, roleUuid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AddRolePermissionsSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body AddRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddRolePermissionsSpaceRequest(c.Server, spaceId, roleUuid, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1920,6 +2677,338 @@ func NewUpdatePermissionRequestWithBody(server string, permissionUuid Permission
 	}
 
 	operationPath := fmt.Sprintf("/iam/internal/admin/permissions/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListRolesRequest generates requests for ListRoles
+func NewListRolesRequest(server string, params *ListRolesParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/roles")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateRoleRequest calls the generic CreateRole builder with application/json body
+func NewCreateRoleRequest(server string, body CreateRoleJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateRoleRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateRoleRequestWithBody generates requests for CreateRole with any type of body
+func NewCreateRoleRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/roles")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteRoleRequest generates requests for DeleteRole
+func NewDeleteRoleRequest(server string, roleUuid RoleUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/roles/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetRoleRequest generates requests for GetRole
+func NewGetRoleRequest(server string, roleUuid RoleUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/roles/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateRoleRequest calls the generic UpdateRole builder with application/json body
+func NewUpdateRoleRequest(server string, roleUuid RoleUuid, body UpdateRoleJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateRoleRequestWithBody(server, roleUuid, "application/json", bodyReader)
+}
+
+// NewUpdateRoleRequestWithBody generates requests for UpdateRole with any type of body
+func NewUpdateRoleRequestWithBody(server string, roleUuid RoleUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/roles/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRemoveRolePermissionsRequest calls the generic RemoveRolePermissions builder with application/json body
+func NewRemoveRolePermissionsRequest(server string, roleUuid RoleUuid, body RemoveRolePermissionsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRemoveRolePermissionsRequestWithBody(server, roleUuid, "application/json", bodyReader)
+}
+
+// NewRemoveRolePermissionsRequestWithBody generates requests for RemoveRolePermissions with any type of body
+func NewRemoveRolePermissionsRequestWithBody(server string, roleUuid RoleUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/roles/%s/permissions", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetRolePermissionsRequest generates requests for GetRolePermissions
+func NewGetRolePermissionsRequest(server string, roleUuid RoleUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/roles/%s/permissions", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAddRolePermissionsRequest calls the generic AddRolePermissions builder with application/json body
+func NewAddRolePermissionsRequest(server string, roleUuid RoleUuid, body AddRolePermissionsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAddRolePermissionsRequestWithBody(server, roleUuid, "application/json", bodyReader)
+}
+
+// NewAddRolePermissionsRequestWithBody generates requests for AddRolePermissions with any type of body
+func NewAddRolePermissionsRequestWithBody(server string, roleUuid RoleUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/internal/admin/roles/%s/permissions", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -2417,6 +3506,410 @@ func NewGetPermissionOrganisationRequest(server string, organisationId Organisat
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewListRolesOrganisationRequest generates requests for ListRolesOrganisation
+func NewListRolesOrganisationRequest(server string, organisationId OrganisationId, params *ListRolesOrganisationParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/roles", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Name != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "name", runtime.ParamLocationQuery, *params.Name); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateRoleOrganisationRequest calls the generic CreateRoleOrganisation builder with application/json body
+func NewCreateRoleOrganisationRequest(server string, organisationId OrganisationId, body CreateRoleOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateRoleOrganisationRequestWithBody(server, organisationId, "application/json", bodyReader)
+}
+
+// NewCreateRoleOrganisationRequestWithBody generates requests for CreateRoleOrganisation with any type of body
+func NewCreateRoleOrganisationRequestWithBody(server string, organisationId OrganisationId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/roles", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteRoleOrganisationRequest generates requests for DeleteRoleOrganisation
+func NewDeleteRoleOrganisationRequest(server string, organisationId OrganisationId, roleUuid RoleUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/roles/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetRoleOrganisationRequest generates requests for GetRoleOrganisation
+func NewGetRoleOrganisationRequest(server string, organisationId OrganisationId, roleUuid RoleUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/roles/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateRoleOrganisationRequest calls the generic UpdateRoleOrganisation builder with application/json body
+func NewUpdateRoleOrganisationRequest(server string, organisationId OrganisationId, roleUuid RoleUuid, body UpdateRoleOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateRoleOrganisationRequestWithBody(server, organisationId, roleUuid, "application/json", bodyReader)
+}
+
+// NewUpdateRoleOrganisationRequestWithBody generates requests for UpdateRoleOrganisation with any type of body
+func NewUpdateRoleOrganisationRequestWithBody(server string, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/roles/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRemoveRolePermissionsOrganisationRequest calls the generic RemoveRolePermissionsOrganisation builder with application/json body
+func NewRemoveRolePermissionsOrganisationRequest(server string, organisationId OrganisationId, roleUuid RoleUuid, body RemoveRolePermissionsOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRemoveRolePermissionsOrganisationRequestWithBody(server, organisationId, roleUuid, "application/json", bodyReader)
+}
+
+// NewRemoveRolePermissionsOrganisationRequestWithBody generates requests for RemoveRolePermissionsOrganisation with any type of body
+func NewRemoveRolePermissionsOrganisationRequestWithBody(server string, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/roles/%s/permissions", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetRolePermissionsOrganisationRequest generates requests for GetRolePermissionsOrganisation
+func NewGetRolePermissionsOrganisationRequest(server string, organisationId OrganisationId, roleUuid RoleUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/roles/%s/permissions", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAddRolePermissionsOrganisationRequest calls the generic AddRolePermissionsOrganisation builder with application/json body
+func NewAddRolePermissionsOrganisationRequest(server string, organisationId OrganisationId, roleUuid RoleUuid, body AddRolePermissionsOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAddRolePermissionsOrganisationRequestWithBody(server, organisationId, roleUuid, "application/json", bodyReader)
+}
+
+// NewAddRolePermissionsOrganisationRequestWithBody generates requests for AddRolePermissionsOrganisation with any type of body
+func NewAddRolePermissionsOrganisationRequestWithBody(server string, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/roles/%s/permissions", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -3243,6 +4736,410 @@ func NewGetPermissionSpaceRequest(server string, spaceId SpaceId, permissionUuid
 	return req, nil
 }
 
+// NewListRolesSpaceRequest generates requests for ListRolesSpace
+func NewListRolesSpaceRequest(server string, spaceId SpaceId, params *ListRolesSpaceParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/roles", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Name != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "name", runtime.ParamLocationQuery, *params.Name); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateRoleSpaceRequest calls the generic CreateRoleSpace builder with application/json body
+func NewCreateRoleSpaceRequest(server string, spaceId SpaceId, body CreateRoleSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateRoleSpaceRequestWithBody(server, spaceId, "application/json", bodyReader)
+}
+
+// NewCreateRoleSpaceRequestWithBody generates requests for CreateRoleSpace with any type of body
+func NewCreateRoleSpaceRequestWithBody(server string, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/roles", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteRoleSpaceRequest generates requests for DeleteRoleSpace
+func NewDeleteRoleSpaceRequest(server string, spaceId SpaceId, roleUuid RoleUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/roles/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetRoleSpaceRequest generates requests for GetRoleSpace
+func NewGetRoleSpaceRequest(server string, spaceId SpaceId, roleUuid RoleUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/roles/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateRoleSpaceRequest calls the generic UpdateRoleSpace builder with application/json body
+func NewUpdateRoleSpaceRequest(server string, spaceId SpaceId, roleUuid RoleUuid, body UpdateRoleSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateRoleSpaceRequestWithBody(server, spaceId, roleUuid, "application/json", bodyReader)
+}
+
+// NewUpdateRoleSpaceRequestWithBody generates requests for UpdateRoleSpace with any type of body
+func NewUpdateRoleSpaceRequestWithBody(server string, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/roles/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRemoveRolePermissionsSpaceRequest calls the generic RemoveRolePermissionsSpace builder with application/json body
+func NewRemoveRolePermissionsSpaceRequest(server string, spaceId SpaceId, roleUuid RoleUuid, body RemoveRolePermissionsSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRemoveRolePermissionsSpaceRequestWithBody(server, spaceId, roleUuid, "application/json", bodyReader)
+}
+
+// NewRemoveRolePermissionsSpaceRequestWithBody generates requests for RemoveRolePermissionsSpace with any type of body
+func NewRemoveRolePermissionsSpaceRequestWithBody(server string, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/roles/%s/permissions", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetRolePermissionsSpaceRequest generates requests for GetRolePermissionsSpace
+func NewGetRolePermissionsSpaceRequest(server string, spaceId SpaceId, roleUuid RoleUuid) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/roles/%s/permissions", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAddRolePermissionsSpaceRequest calls the generic AddRolePermissionsSpace builder with application/json body
+func NewAddRolePermissionsSpaceRequest(server string, spaceId SpaceId, roleUuid RoleUuid, body AddRolePermissionsSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAddRolePermissionsSpaceRequestWithBody(server, spaceId, roleUuid, "application/json", bodyReader)
+}
+
+// NewAddRolePermissionsSpaceRequestWithBody generates requests for AddRolePermissionsSpace with any type of body
+func NewAddRolePermissionsSpaceRequestWithBody(server string, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "roleUuid", runtime.ParamLocationPath, roleUuid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/roles/%s/permissions", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewListServiceAccountSpaceRequest generates requests for ListServiceAccountSpace
 func NewListServiceAccountSpaceRequest(server string, spaceId SpaceId, params *ListServiceAccountSpaceParams) (*http.Request, error) {
 	var err error
@@ -3887,6 +5784,38 @@ type ClientWithResponsesInterface interface {
 
 	UpdatePermissionWithResponse(ctx context.Context, permissionUuid PermissionUuid, body UpdatePermissionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdatePermissionResponse, error)
 
+	// ListRolesWithResponse request
+	ListRolesWithResponse(ctx context.Context, params *ListRolesParams, reqEditors ...RequestEditorFn) (*ListRolesResponse, error)
+
+	// CreateRoleWithBodyWithResponse request with any body
+	CreateRoleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRoleResponse, error)
+
+	CreateRoleWithResponse(ctx context.Context, body CreateRoleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRoleResponse, error)
+
+	// DeleteRoleWithResponse request
+	DeleteRoleWithResponse(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*DeleteRoleResponse, error)
+
+	// GetRoleWithResponse request
+	GetRoleWithResponse(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRoleResponse, error)
+
+	// UpdateRoleWithBodyWithResponse request with any body
+	UpdateRoleWithBodyWithResponse(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRoleResponse, error)
+
+	UpdateRoleWithResponse(ctx context.Context, roleUuid RoleUuid, body UpdateRoleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRoleResponse, error)
+
+	// RemoveRolePermissionsWithBodyWithResponse request with any body
+	RemoveRolePermissionsWithBodyWithResponse(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsResponse, error)
+
+	RemoveRolePermissionsWithResponse(ctx context.Context, roleUuid RoleUuid, body RemoveRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsResponse, error)
+
+	// GetRolePermissionsWithResponse request
+	GetRolePermissionsWithResponse(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRolePermissionsResponse, error)
+
+	// AddRolePermissionsWithBodyWithResponse request with any body
+	AddRolePermissionsWithBodyWithResponse(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRolePermissionsResponse, error)
+
+	AddRolePermissionsWithResponse(ctx context.Context, roleUuid RoleUuid, body AddRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolePermissionsResponse, error)
+
 	// IntrospectWithBodyWithResponse request with any body
 	IntrospectWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectResponse, error)
 
@@ -3916,6 +5845,38 @@ type ClientWithResponsesInterface interface {
 
 	// GetPermissionOrganisationWithResponse request
 	GetPermissionOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*GetPermissionOrganisationResponse, error)
+
+	// ListRolesOrganisationWithResponse request
+	ListRolesOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListRolesOrganisationParams, reqEditors ...RequestEditorFn) (*ListRolesOrganisationResponse, error)
+
+	// CreateRoleOrganisationWithBodyWithResponse request with any body
+	CreateRoleOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRoleOrganisationResponse, error)
+
+	CreateRoleOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, body CreateRoleOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRoleOrganisationResponse, error)
+
+	// DeleteRoleOrganisationWithResponse request
+	DeleteRoleOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*DeleteRoleOrganisationResponse, error)
+
+	// GetRoleOrganisationWithResponse request
+	GetRoleOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRoleOrganisationResponse, error)
+
+	// UpdateRoleOrganisationWithBodyWithResponse request with any body
+	UpdateRoleOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRoleOrganisationResponse, error)
+
+	UpdateRoleOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body UpdateRoleOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRoleOrganisationResponse, error)
+
+	// RemoveRolePermissionsOrganisationWithBodyWithResponse request with any body
+	RemoveRolePermissionsOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsOrganisationResponse, error)
+
+	RemoveRolePermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body RemoveRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsOrganisationResponse, error)
+
+	// GetRolePermissionsOrganisationWithResponse request
+	GetRolePermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRolePermissionsOrganisationResponse, error)
+
+	// AddRolePermissionsOrganisationWithBodyWithResponse request with any body
+	AddRolePermissionsOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRolePermissionsOrganisationResponse, error)
+
+	AddRolePermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body AddRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolePermissionsOrganisationResponse, error)
 
 	// ListServiceAccountOrganisationWithResponse request
 	ListServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error)
@@ -3968,6 +5929,38 @@ type ClientWithResponsesInterface interface {
 
 	// GetPermissionSpaceWithResponse request
 	GetPermissionSpaceWithResponse(ctx context.Context, spaceId SpaceId, permissionUuid PermissionUuid, reqEditors ...RequestEditorFn) (*GetPermissionSpaceResponse, error)
+
+	// ListRolesSpaceWithResponse request
+	ListRolesSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListRolesSpaceParams, reqEditors ...RequestEditorFn) (*ListRolesSpaceResponse, error)
+
+	// CreateRoleSpaceWithBodyWithResponse request with any body
+	CreateRoleSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRoleSpaceResponse, error)
+
+	CreateRoleSpaceWithResponse(ctx context.Context, spaceId SpaceId, body CreateRoleSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRoleSpaceResponse, error)
+
+	// DeleteRoleSpaceWithResponse request
+	DeleteRoleSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*DeleteRoleSpaceResponse, error)
+
+	// GetRoleSpaceWithResponse request
+	GetRoleSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRoleSpaceResponse, error)
+
+	// UpdateRoleSpaceWithBodyWithResponse request with any body
+	UpdateRoleSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRoleSpaceResponse, error)
+
+	UpdateRoleSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body UpdateRoleSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRoleSpaceResponse, error)
+
+	// RemoveRolePermissionsSpaceWithBodyWithResponse request with any body
+	RemoveRolePermissionsSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsSpaceResponse, error)
+
+	RemoveRolePermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body RemoveRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsSpaceResponse, error)
+
+	// GetRolePermissionsSpaceWithResponse request
+	GetRolePermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRolePermissionsSpaceResponse, error)
+
+	// AddRolePermissionsSpaceWithBodyWithResponse request with any body
+	AddRolePermissionsSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRolePermissionsSpaceResponse, error)
+
+	AddRolePermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body AddRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolePermissionsSpaceResponse, error)
 
 	// ListServiceAccountSpaceWithResponse request
 	ListServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error)
@@ -4129,6 +6122,191 @@ func (r UpdatePermissionResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdatePermissionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListRolesResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *RoleListResponseSchema
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListRolesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListRolesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateRoleResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *RoleCreatedResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateRoleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateRoleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteRoleResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteRoleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteRoleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetRoleResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *RoleCreatedResponseSchema
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetRoleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetRoleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateRoleResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateRoleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateRoleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RemoveRolePermissionsResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r RemoveRolePermissionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RemoveRolePermissionsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetRolePermissionsResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *PermissionsResponseSchema
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetRolePermissionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetRolePermissionsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AddRolePermissionsResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r AddRolePermissionsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AddRolePermissionsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4337,6 +6515,212 @@ func (r GetPermissionOrganisationResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetPermissionOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListRolesOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListRolesResponseSchema
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListRolesOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListRolesOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateRoleOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *CreateRoleResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateRoleOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateRoleOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteRoleOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteRoleOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteRoleOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetRoleOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetRoleResponseSchema
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetRoleOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetRoleOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateRoleOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateRoleOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateRoleOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RemoveRolePermissionsOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r RemoveRolePermissionsOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RemoveRolePermissionsOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetRolePermissionsOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetRolePermissionsResponseSchema
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetRolePermissionsOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetRolePermissionsOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AddRolePermissionsOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r AddRolePermissionsOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AddRolePermissionsOrganisationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -4706,6 +7090,212 @@ func (r GetPermissionSpaceResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetPermissionSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListRolesSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *ListRolesResponseSchema
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListRolesSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListRolesSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateRoleSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *CreateRoleResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateRoleSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateRoleSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteRoleSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteRoleSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteRoleSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetRoleSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetRoleResponseSchema
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetRoleSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetRoleSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateRoleSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateRoleSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateRoleSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RemoveRolePermissionsSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r RemoveRolePermissionsSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RemoveRolePermissionsSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetRolePermissionsSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetRolePermissionsResponseSchema
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetRolePermissionsSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetRolePermissionsSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AddRolePermissionsSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r AddRolePermissionsSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AddRolePermissionsSpaceResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -5088,6 +7678,110 @@ func (c *ClientWithResponses) UpdatePermissionWithResponse(ctx context.Context, 
 	return ParseUpdatePermissionResponse(rsp)
 }
 
+// ListRolesWithResponse request returning *ListRolesResponse
+func (c *ClientWithResponses) ListRolesWithResponse(ctx context.Context, params *ListRolesParams, reqEditors ...RequestEditorFn) (*ListRolesResponse, error) {
+	rsp, err := c.ListRoles(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListRolesResponse(rsp)
+}
+
+// CreateRoleWithBodyWithResponse request with arbitrary body returning *CreateRoleResponse
+func (c *ClientWithResponses) CreateRoleWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRoleResponse, error) {
+	rsp, err := c.CreateRoleWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRoleResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateRoleWithResponse(ctx context.Context, body CreateRoleJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRoleResponse, error) {
+	rsp, err := c.CreateRole(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRoleResponse(rsp)
+}
+
+// DeleteRoleWithResponse request returning *DeleteRoleResponse
+func (c *ClientWithResponses) DeleteRoleWithResponse(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*DeleteRoleResponse, error) {
+	rsp, err := c.DeleteRole(ctx, roleUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteRoleResponse(rsp)
+}
+
+// GetRoleWithResponse request returning *GetRoleResponse
+func (c *ClientWithResponses) GetRoleWithResponse(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRoleResponse, error) {
+	rsp, err := c.GetRole(ctx, roleUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetRoleResponse(rsp)
+}
+
+// UpdateRoleWithBodyWithResponse request with arbitrary body returning *UpdateRoleResponse
+func (c *ClientWithResponses) UpdateRoleWithBodyWithResponse(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRoleResponse, error) {
+	rsp, err := c.UpdateRoleWithBody(ctx, roleUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRoleResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateRoleWithResponse(ctx context.Context, roleUuid RoleUuid, body UpdateRoleJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRoleResponse, error) {
+	rsp, err := c.UpdateRole(ctx, roleUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRoleResponse(rsp)
+}
+
+// RemoveRolePermissionsWithBodyWithResponse request with arbitrary body returning *RemoveRolePermissionsResponse
+func (c *ClientWithResponses) RemoveRolePermissionsWithBodyWithResponse(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsResponse, error) {
+	rsp, err := c.RemoveRolePermissionsWithBody(ctx, roleUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveRolePermissionsResponse(rsp)
+}
+
+func (c *ClientWithResponses) RemoveRolePermissionsWithResponse(ctx context.Context, roleUuid RoleUuid, body RemoveRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsResponse, error) {
+	rsp, err := c.RemoveRolePermissions(ctx, roleUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveRolePermissionsResponse(rsp)
+}
+
+// GetRolePermissionsWithResponse request returning *GetRolePermissionsResponse
+func (c *ClientWithResponses) GetRolePermissionsWithResponse(ctx context.Context, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRolePermissionsResponse, error) {
+	rsp, err := c.GetRolePermissions(ctx, roleUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetRolePermissionsResponse(rsp)
+}
+
+// AddRolePermissionsWithBodyWithResponse request with arbitrary body returning *AddRolePermissionsResponse
+func (c *ClientWithResponses) AddRolePermissionsWithBodyWithResponse(ctx context.Context, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRolePermissionsResponse, error) {
+	rsp, err := c.AddRolePermissionsWithBody(ctx, roleUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRolePermissionsResponse(rsp)
+}
+
+func (c *ClientWithResponses) AddRolePermissionsWithResponse(ctx context.Context, roleUuid RoleUuid, body AddRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolePermissionsResponse, error) {
+	rsp, err := c.AddRolePermissions(ctx, roleUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRolePermissionsResponse(rsp)
+}
+
 // IntrospectWithBodyWithResponse request with arbitrary body returning *IntrospectResponse
 func (c *ClientWithResponses) IntrospectWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectResponse, error) {
 	rsp, err := c.IntrospectWithBody(ctx, contentType, body, reqEditors...)
@@ -5182,6 +7876,110 @@ func (c *ClientWithResponses) GetPermissionOrganisationWithResponse(ctx context.
 		return nil, err
 	}
 	return ParseGetPermissionOrganisationResponse(rsp)
+}
+
+// ListRolesOrganisationWithResponse request returning *ListRolesOrganisationResponse
+func (c *ClientWithResponses) ListRolesOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListRolesOrganisationParams, reqEditors ...RequestEditorFn) (*ListRolesOrganisationResponse, error) {
+	rsp, err := c.ListRolesOrganisation(ctx, organisationId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListRolesOrganisationResponse(rsp)
+}
+
+// CreateRoleOrganisationWithBodyWithResponse request with arbitrary body returning *CreateRoleOrganisationResponse
+func (c *ClientWithResponses) CreateRoleOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRoleOrganisationResponse, error) {
+	rsp, err := c.CreateRoleOrganisationWithBody(ctx, organisationId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRoleOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateRoleOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, body CreateRoleOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRoleOrganisationResponse, error) {
+	rsp, err := c.CreateRoleOrganisation(ctx, organisationId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRoleOrganisationResponse(rsp)
+}
+
+// DeleteRoleOrganisationWithResponse request returning *DeleteRoleOrganisationResponse
+func (c *ClientWithResponses) DeleteRoleOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*DeleteRoleOrganisationResponse, error) {
+	rsp, err := c.DeleteRoleOrganisation(ctx, organisationId, roleUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteRoleOrganisationResponse(rsp)
+}
+
+// GetRoleOrganisationWithResponse request returning *GetRoleOrganisationResponse
+func (c *ClientWithResponses) GetRoleOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRoleOrganisationResponse, error) {
+	rsp, err := c.GetRoleOrganisation(ctx, organisationId, roleUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetRoleOrganisationResponse(rsp)
+}
+
+// UpdateRoleOrganisationWithBodyWithResponse request with arbitrary body returning *UpdateRoleOrganisationResponse
+func (c *ClientWithResponses) UpdateRoleOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRoleOrganisationResponse, error) {
+	rsp, err := c.UpdateRoleOrganisationWithBody(ctx, organisationId, roleUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRoleOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateRoleOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body UpdateRoleOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRoleOrganisationResponse, error) {
+	rsp, err := c.UpdateRoleOrganisation(ctx, organisationId, roleUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRoleOrganisationResponse(rsp)
+}
+
+// RemoveRolePermissionsOrganisationWithBodyWithResponse request with arbitrary body returning *RemoveRolePermissionsOrganisationResponse
+func (c *ClientWithResponses) RemoveRolePermissionsOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsOrganisationResponse, error) {
+	rsp, err := c.RemoveRolePermissionsOrganisationWithBody(ctx, organisationId, roleUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveRolePermissionsOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) RemoveRolePermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body RemoveRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsOrganisationResponse, error) {
+	rsp, err := c.RemoveRolePermissionsOrganisation(ctx, organisationId, roleUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveRolePermissionsOrganisationResponse(rsp)
+}
+
+// GetRolePermissionsOrganisationWithResponse request returning *GetRolePermissionsOrganisationResponse
+func (c *ClientWithResponses) GetRolePermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRolePermissionsOrganisationResponse, error) {
+	rsp, err := c.GetRolePermissionsOrganisation(ctx, organisationId, roleUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetRolePermissionsOrganisationResponse(rsp)
+}
+
+// AddRolePermissionsOrganisationWithBodyWithResponse request with arbitrary body returning *AddRolePermissionsOrganisationResponse
+func (c *ClientWithResponses) AddRolePermissionsOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRolePermissionsOrganisationResponse, error) {
+	rsp, err := c.AddRolePermissionsOrganisationWithBody(ctx, organisationId, roleUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRolePermissionsOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) AddRolePermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body AddRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolePermissionsOrganisationResponse, error) {
+	rsp, err := c.AddRolePermissionsOrganisation(ctx, organisationId, roleUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRolePermissionsOrganisationResponse(rsp)
 }
 
 // ListServiceAccountOrganisationWithResponse request returning *ListServiceAccountOrganisationResponse
@@ -5348,6 +8146,110 @@ func (c *ClientWithResponses) GetPermissionSpaceWithResponse(ctx context.Context
 		return nil, err
 	}
 	return ParseGetPermissionSpaceResponse(rsp)
+}
+
+// ListRolesSpaceWithResponse request returning *ListRolesSpaceResponse
+func (c *ClientWithResponses) ListRolesSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListRolesSpaceParams, reqEditors ...RequestEditorFn) (*ListRolesSpaceResponse, error) {
+	rsp, err := c.ListRolesSpace(ctx, spaceId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListRolesSpaceResponse(rsp)
+}
+
+// CreateRoleSpaceWithBodyWithResponse request with arbitrary body returning *CreateRoleSpaceResponse
+func (c *ClientWithResponses) CreateRoleSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRoleSpaceResponse, error) {
+	rsp, err := c.CreateRoleSpaceWithBody(ctx, spaceId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRoleSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateRoleSpaceWithResponse(ctx context.Context, spaceId SpaceId, body CreateRoleSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRoleSpaceResponse, error) {
+	rsp, err := c.CreateRoleSpace(ctx, spaceId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateRoleSpaceResponse(rsp)
+}
+
+// DeleteRoleSpaceWithResponse request returning *DeleteRoleSpaceResponse
+func (c *ClientWithResponses) DeleteRoleSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*DeleteRoleSpaceResponse, error) {
+	rsp, err := c.DeleteRoleSpace(ctx, spaceId, roleUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteRoleSpaceResponse(rsp)
+}
+
+// GetRoleSpaceWithResponse request returning *GetRoleSpaceResponse
+func (c *ClientWithResponses) GetRoleSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRoleSpaceResponse, error) {
+	rsp, err := c.GetRoleSpace(ctx, spaceId, roleUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetRoleSpaceResponse(rsp)
+}
+
+// UpdateRoleSpaceWithBodyWithResponse request with arbitrary body returning *UpdateRoleSpaceResponse
+func (c *ClientWithResponses) UpdateRoleSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateRoleSpaceResponse, error) {
+	rsp, err := c.UpdateRoleSpaceWithBody(ctx, spaceId, roleUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRoleSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateRoleSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body UpdateRoleSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRoleSpaceResponse, error) {
+	rsp, err := c.UpdateRoleSpace(ctx, spaceId, roleUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateRoleSpaceResponse(rsp)
+}
+
+// RemoveRolePermissionsSpaceWithBodyWithResponse request with arbitrary body returning *RemoveRolePermissionsSpaceResponse
+func (c *ClientWithResponses) RemoveRolePermissionsSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsSpaceResponse, error) {
+	rsp, err := c.RemoveRolePermissionsSpaceWithBody(ctx, spaceId, roleUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveRolePermissionsSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) RemoveRolePermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body RemoveRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRolePermissionsSpaceResponse, error) {
+	rsp, err := c.RemoveRolePermissionsSpace(ctx, spaceId, roleUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRemoveRolePermissionsSpaceResponse(rsp)
+}
+
+// GetRolePermissionsSpaceWithResponse request returning *GetRolePermissionsSpaceResponse
+func (c *ClientWithResponses) GetRolePermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, reqEditors ...RequestEditorFn) (*GetRolePermissionsSpaceResponse, error) {
+	rsp, err := c.GetRolePermissionsSpace(ctx, spaceId, roleUuid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetRolePermissionsSpaceResponse(rsp)
+}
+
+// AddRolePermissionsSpaceWithBodyWithResponse request with arbitrary body returning *AddRolePermissionsSpaceResponse
+func (c *ClientWithResponses) AddRolePermissionsSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRolePermissionsSpaceResponse, error) {
+	rsp, err := c.AddRolePermissionsSpaceWithBody(ctx, spaceId, roleUuid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRolePermissionsSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) AddRolePermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body AddRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolePermissionsSpaceResponse, error) {
+	rsp, err := c.AddRolePermissionsSpace(ctx, spaceId, roleUuid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAddRolePermissionsSpaceResponse(rsp)
 }
 
 // ListServiceAccountSpaceWithResponse request returning *ListServiceAccountSpaceResponse
@@ -5673,6 +8575,277 @@ func ParseUpdatePermissionResponse(rsp *http.Response) (*UpdatePermissionRespons
 		}
 		response.ApplicationproblemJSON404 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListRolesResponse parses an HTTP response from a ListRolesWithResponse call
+func ParseListRolesResponse(rsp *http.Response) (*ListRolesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListRolesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RoleListResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateRoleResponse parses an HTTP response from a CreateRoleWithResponse call
+func ParseCreateRoleResponse(rsp *http.Response) (*CreateRoleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateRoleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RoleCreatedResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteRoleResponse parses an HTTP response from a DeleteRoleWithResponse call
+func ParseDeleteRoleResponse(rsp *http.Response) (*DeleteRoleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteRoleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetRoleResponse parses an HTTP response from a GetRoleWithResponse call
+func ParseGetRoleResponse(rsp *http.Response) (*GetRoleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetRoleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RoleCreatedResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateRoleResponse parses an HTTP response from a UpdateRoleWithResponse call
+func ParseUpdateRoleResponse(rsp *http.Response) (*UpdateRoleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateRoleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRemoveRolePermissionsResponse parses an HTTP response from a RemoveRolePermissionsWithResponse call
+func ParseRemoveRolePermissionsResponse(rsp *http.Response) (*RemoveRolePermissionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RemoveRolePermissionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetRolePermissionsResponse parses an HTTP response from a GetRolePermissionsWithResponse call
+func ParseGetRolePermissionsResponse(rsp *http.Response) (*GetRolePermissionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetRolePermissionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PermissionsResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAddRolePermissionsResponse parses an HTTP response from a AddRolePermissionsWithResponse call
+func ParseAddRolePermissionsResponse(rsp *http.Response) (*AddRolePermissionsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AddRolePermissionsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest Error
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -6077,6 +9250,424 @@ func ParseGetPermissionOrganisationResponse(rsp *http.Response) (*GetPermissionO
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListRolesOrganisationResponse parses an HTTP response from a ListRolesOrganisationWithResponse call
+func ParseListRolesOrganisationResponse(rsp *http.Response) (*ListRolesOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListRolesOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListRolesResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateRoleOrganisationResponse parses an HTTP response from a CreateRoleOrganisationWithResponse call
+func ParseCreateRoleOrganisationResponse(rsp *http.Response) (*CreateRoleOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateRoleOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CreateRoleResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteRoleOrganisationResponse parses an HTTP response from a DeleteRoleOrganisationWithResponse call
+func ParseDeleteRoleOrganisationResponse(rsp *http.Response) (*DeleteRoleOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteRoleOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetRoleOrganisationResponse parses an HTTP response from a GetRoleOrganisationWithResponse call
+func ParseGetRoleOrganisationResponse(rsp *http.Response) (*GetRoleOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetRoleOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetRoleResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateRoleOrganisationResponse parses an HTTP response from a UpdateRoleOrganisationWithResponse call
+func ParseUpdateRoleOrganisationResponse(rsp *http.Response) (*UpdateRoleOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateRoleOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRemoveRolePermissionsOrganisationResponse parses an HTTP response from a RemoveRolePermissionsOrganisationWithResponse call
+func ParseRemoveRolePermissionsOrganisationResponse(rsp *http.Response) (*RemoveRolePermissionsOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RemoveRolePermissionsOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetRolePermissionsOrganisationResponse parses an HTTP response from a GetRolePermissionsOrganisationWithResponse call
+func ParseGetRolePermissionsOrganisationResponse(rsp *http.Response) (*GetRolePermissionsOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetRolePermissionsOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetRolePermissionsResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAddRolePermissionsOrganisationResponse parses an HTTP response from a AddRolePermissionsOrganisationWithResponse call
+func ParseAddRolePermissionsOrganisationResponse(rsp *http.Response) (*AddRolePermissionsOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AddRolePermissionsOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest BadRequestError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -6868,6 +10459,424 @@ func ParseGetPermissionSpaceResponse(rsp *http.Response) (*GetPermissionSpaceRes
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListRolesSpaceResponse parses an HTTP response from a ListRolesSpaceWithResponse call
+func ParseListRolesSpaceResponse(rsp *http.Response) (*ListRolesSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListRolesSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListRolesResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateRoleSpaceResponse parses an HTTP response from a CreateRoleSpaceWithResponse call
+func ParseCreateRoleSpaceResponse(rsp *http.Response) (*CreateRoleSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateRoleSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CreateRoleResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteRoleSpaceResponse parses an HTTP response from a DeleteRoleSpaceWithResponse call
+func ParseDeleteRoleSpaceResponse(rsp *http.Response) (*DeleteRoleSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteRoleSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetRoleSpaceResponse parses an HTTP response from a GetRoleSpaceWithResponse call
+func ParseGetRoleSpaceResponse(rsp *http.Response) (*GetRoleSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetRoleSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetRoleResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateRoleSpaceResponse parses an HTTP response from a UpdateRoleSpaceWithResponse call
+func ParseUpdateRoleSpaceResponse(rsp *http.Response) (*UpdateRoleSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateRoleSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRemoveRolePermissionsSpaceResponse parses an HTTP response from a RemoveRolePermissionsSpaceWithResponse call
+func ParseRemoveRolePermissionsSpaceResponse(rsp *http.Response) (*RemoveRolePermissionsSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RemoveRolePermissionsSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetRolePermissionsSpaceResponse parses an HTTP response from a GetRolePermissionsSpaceWithResponse call
+func ParseGetRolePermissionsSpaceResponse(rsp *http.Response) (*GetRolePermissionsSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetRolePermissionsSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetRolePermissionsResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAddRolePermissionsSpaceResponse parses an HTTP response from a AddRolePermissionsSpaceWithResponse call
+func ParseAddRolePermissionsSpaceResponse(rsp *http.Response) (*AddRolePermissionsSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AddRolePermissionsSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest BadRequestError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {

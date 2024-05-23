@@ -20,6 +20,10 @@ resource "numspot_service_account" "test" {
   global_permissions = [
     "aaa-bbb-ccc",
   ]
+
+  roles = [
+    "aaa-xxx-zzz",
+  ]
 }
 ```
 
@@ -33,7 +37,8 @@ resource "numspot_service_account" "test" {
 
 ### Optional
 
-- `global_permissions` (List of String) List of global permission UUIDs attached to this service account.
+- `global_permissions` (Set of String) List of global permission UUIDs attached to this service account.
+- `roles` (Set of String) List of roles attached to this service account.
 
 ### Read-Only
 
