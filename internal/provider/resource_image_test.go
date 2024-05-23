@@ -95,6 +95,67 @@ resource "numspot_image" "test" {
 }`, imageId, name)
 }
 
+func TestAccImageResource_FromSnapshot(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	randint := rand.Intn(9999-1000) + 1000
+	imageName := fmt.Sprintf("terraform-generated-volume-%d", randint)
+	sourceImageId := "ami-026ce760"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: testImageConfig_Create_FromSnapshot(sourceImageId, imageName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
+					resource.TestCheckResourceAttr("numspot_image.test", "state", "available"),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_image.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"vm_id"},
+			},
+		},
+	})
+}
+
+func testImageConfig_Create_FromSnapshot(_, name string) string {
+	return fmt.Sprintf(`
+resource "numspot_volume" "test" {
+  type                   = "standard"
+  size                   = 11
+  availability_zone_name = "cloudgouv-eu-west-1a"
+}
+
+resource "numspot_snapshot" "test" {
+  volume_id   = numspot_volume.test.id
+  description = "a numspot snapshot description"
+}
+
+resource "numspot_image" "test" {
+  name  = %[1]q
+  root_device_name = "/dev/sda1"
+  block_device_mappings = [
+	{
+		device_name = "/dev/sda1"
+		bsu = {
+			snapshot_id = numspot_snapshot.test.id
+			volume_size = 120
+			volume_type = "io1"
+			iops = 150
+			delete_on_vm_deletion = true
+		}
+	}
+  ]
+}`, name)
+}
+
 func TestAccImageResource_Tags(t *testing.T) {
 	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
