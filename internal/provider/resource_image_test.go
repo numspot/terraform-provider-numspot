@@ -139,19 +139,19 @@ resource "numspot_snapshot" "test" {
 }
 
 resource "numspot_image" "test" {
-  name  = %[1]q
+  name             = %[1]q
   root_device_name = "/dev/sda1"
   block_device_mappings = [
-	{
-		device_name = "/dev/sda1"
-		bsu = {
-			snapshot_id = numspot_snapshot.test.id
-			volume_size = 120
-			volume_type = "io1"
-			iops = 150
-			delete_on_vm_deletion = true
-		}
-	}
+    {
+      device_name = "/dev/sda1"
+      bsu = {
+        snapshot_id           = numspot_snapshot.test.id
+        volume_size           = 120
+        volume_type           = "io1"
+        iops                  = 150
+        delete_on_vm_deletion = true
+      }
+    }
   ]
 }`, name)
 }

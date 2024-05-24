@@ -16,10 +16,10 @@ func TestAccSpaceResource(t *testing.T) {
 
 	// Required
 	organisationID := "67d97ad4-3005-48dc-a392-60a97ab5097c"
-	spaceName := "10.101.0.0/16"
-	spaceDescription := "10.101.1.0/24"
-	updatedSpaceName := "10.101.2.0/24"
-	updatedSpaceDescription := "10.101.2.0/24"
+	spaceName := "quiet space"
+	spaceDescription := "A quiet space"
+	updatedSpaceName := "best space"
+	updatedSpaceDescription := "A quieter space"
 
 	// Computed
 	spaceId := ""
