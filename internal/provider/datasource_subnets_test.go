@@ -38,6 +38,5 @@ resource "numspot_vpc" "main" {
 resource "numspot_subnet" "test" {
   vpc_id   = numspot_vpc.main.id
   ip_range = "10.101.1.0/24"
-}
-`
+}`
 }
