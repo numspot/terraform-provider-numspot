@@ -4,7 +4,9 @@ package provider
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
@@ -12,15 +14,15 @@ import (
 func TestAccDHCPOptionsDatasource_Basic(t *testing.T) {
 	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
-	domainName := "foo.bar"
+	domainName := fmt.Sprintf("foo.bar.%s", strconv.FormatInt(time.Now().UnixMilli(), 10))
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDHCPOptionsDatasourceConfig_Basic(domainName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.0.domain_name", domainName),
+					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "items.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "items.0.domain_name", domainName),
 				),
 			},
 		},
@@ -39,9 +41,9 @@ func TestAccDHCPOptionsDatasource_ByID(t *testing.T) {
 			{
 				Config: testAccDHCPOptionsDatasourceConfig_ByID(domainName1, domainName2),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.#", "2"),
-					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.0.domain_name", domainName1),
-					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.1.domain_name", domainName2),
+					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "items.#", "2"),
+					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "items.0.domain_name", domainName1),
+					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "items.1.domain_name", domainName2),
 				),
 			},
 		},
@@ -52,19 +54,18 @@ func TestAccDHCPOptionsDatasource_WithTags(t *testing.T) {
 	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 	domainName := "numspot.dev"
-	tagName := "Name"
+	tagName := fmt.Sprintf("Name-%s", strconv.FormatInt(time.Now().UnixMilli(), 10))
 	tagValue := "dhcp_numspot"
-
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDHCPOptionsDatasourceConfig_WithTags(domainName, tagName, tagValue),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.0.domain_name", domainName),
-					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.0.tags.0.key", tagName),
-					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "dhcp_options.0.tags.0.value", tagValue),
+					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "items.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "items.0.domain_name", domainName),
+					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "items.0.tags.0.key", tagName),
+					resource.TestCheckResourceAttr("data.numspot_dhcp_options.test", "items.0.tags.0.value", tagValue),
 				),
 			},
 		},

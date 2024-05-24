@@ -22,7 +22,13 @@ resource "numspot_client_gateway" "test" {
 data "numspot_client_gateways" "testdata" {
   ids        = [numspot_client_gateway.test.id]
   depends_on = [numspot_client_gateway.test]
+}
 
+# How to use the datasource in another field
+resource "null_resource" "print-datasource-id" {
+  provisioner "local-exec" {
+    command = "echo data.numspot_client_gateways.testdata.items.0.id"
+  }
 }
 ```
 
@@ -42,13 +48,13 @@ data "numspot_client_gateways" "testdata" {
 ### Read-Only
 
 - `bgp_asns` (List of Number) The Autonomous System Number (ASN) used by the Border Gateway Protocol (BGP) to find the path to your client gateway through the Internet.
-- `client_gateways` (Attributes List) (see [below for nested schema](#nestedatt--client_gateways))
 - `connection_types` (List of String) The type of communication tunnel used by the client gateway (only `ipsec.1` is supported).
+- `items` (Attributes List) (see [below for nested schema](#nestedatt--items))
 - `public_ips` (List of String) The public IPv4 address of the client gateway (must be a fixed address into a NATed network).
 - `states` (List of String) The state of the client gateway (`pending` \| `available` \| `deleting` \| `deleted`).
 
-<a id="nestedatt--client_gateways"></a>
-### Nested Schema for `client_gateways`
+<a id="nestedatt--items"></a>
+### Nested Schema for `items`
 
 Required:
 
@@ -56,7 +62,7 @@ Required:
 
 Optional:
 
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--client_gateways--tags))
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
 
 Read-Only:
 
@@ -65,8 +71,8 @@ Read-Only:
 - `public_ip` (String) The public IPv4 address of the client gateway (must be a fixed address into a NATed network).
 - `state` (String) The state of the client gateway (`pending` \| `available` \| `deleting` \| `deleted`).
 
-<a id="nestedatt--client_gateways--tags"></a>
-### Nested Schema for `client_gateways.tags`
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
 
 Required:
 

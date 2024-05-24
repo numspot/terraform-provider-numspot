@@ -16,7 +16,7 @@ func TestAccKeypairDatasource(t *testing.T) {
 			{
 				Config: fetchKeypairConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_keypairs.testdata", "keypairs.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_keypairs.testdata", "items.#", "1"),
 				),
 			},
 		},

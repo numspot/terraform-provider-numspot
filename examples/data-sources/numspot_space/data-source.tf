@@ -8,3 +8,10 @@ data "numspot_space" "testdata" {
   space_id   = numspot_space.test.id
   depends_on = [numspot_space.test]
 }
+
+# How to use the datasource in another field
+resource "null_resource" "print-datasource-id" {
+  provisioner "local-exec" {
+    command = "echo data.numspot_space.testdata.id"
+  }
+}

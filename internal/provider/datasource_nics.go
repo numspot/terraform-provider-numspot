@@ -14,7 +14,7 @@ import (
 )
 
 type NicsDataSourceModel struct {
-	Nics                           []datasource_nic.NicModel `tfsdk:"nics"`
+	Items                          []datasource_nic.NicModel `tfsdk:"items"`
 	Descriptions                   types.List                `tfsdk:"descriptions"`
 	IsSourceDestChecked            types.Bool                `tfsdk:"is_source_dest_checked"`
 	LinkNicDeleteOnVMDeletion      types.Bool                `tfsdk:"link_nic_delete_on_vm_deletion"`
@@ -99,40 +99,14 @@ func (d *nicsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		response.Diagnostics.AddError("HTTP call failed", "got empty Nic list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := NicsFromHttpToTfDatasource(ctx, &item)
-		if diags.HasError() {
-			response.Diagnostics.AddError("Error while converting Nic HTTP object to Terraform object", diags.Errors()[0].Detail())
-			return
-		}
-		state.Nics = append(state.Nics, *tf)
-	}
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, NicsFromHttpToTfDatasource)
 
-	state.Descriptions = plan.Descriptions
-	state.IsSourceDestChecked = plan.IsSourceDestChecked
-	state.LinkNicDeleteOnVMDeletion = plan.LinkNicDeleteOnVMDeletion
-	state.LinkNicDeviceNumbers = plan.LinkNicDeviceNumbers
-	state.LinkNicIds = plan.LinkNicIds
-	state.LinkNicStates = plan.LinkNicStates
-	state.LinkNicVMIds = plan.LinkNicVMIds
-	state.LinkPublicIpLinkPublicIpIds = plan.LinkPublicIpLinkPublicIpIds
-	state.LinkPublicIpPublicIpIds = plan.LinkPublicIpPublicIpIds
-	state.LinkPublicIpPublicIps = plan.LinkPublicIpPublicIps
-	state.MacAddresses = plan.MacAddresses
-	state.PrivateDnsNames = plan.PrivateDnsNames
-	state.PrivateIpIsPrimary = plan.PrivateIpIsPrimary
-	state.PrivateIpLinkPublicIpPublicIps = plan.PrivateIpLinkPublicIpPublicIps
-	state.PrivateIpPrivateIps = plan.PrivateIpPrivateIps
-	state.SecurityGroupIds = plan.SecurityGroupIds
-	state.SecurityGroupNames = plan.SecurityGroupNames
-	state.States = plan.States
-	state.SubnetIds = plan.SubnetIds
-	state.VpcIds = plan.VpcIds
-	state.IDs = plan.IDs
-	state.AvailabilityZoneNames = plan.AvailabilityZoneNames
-	state.Tags = plan.Tags
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

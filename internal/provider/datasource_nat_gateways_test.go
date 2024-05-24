@@ -18,7 +18,7 @@ func TestAccNatGatewaysDatasource(t *testing.T) {
 			{
 				Config: fetchNatGatewaysConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_nat_gateways.testdata", "nat_gateways.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_nat_gateways.testdata", "items.#", "1"),
 				),
 			},
 		},

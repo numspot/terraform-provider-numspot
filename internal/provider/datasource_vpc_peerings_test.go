@@ -18,7 +18,7 @@ func TestAccVpcPeeringsDatasource(t *testing.T) {
 			{
 				Config: fetchVpcPeeringConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_vpc_peerings.testdata", "vpc_peerings.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_vpc_peerings.testdata", "items.#", "1"),
 				),
 			},
 		},

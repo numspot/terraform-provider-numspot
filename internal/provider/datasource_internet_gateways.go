@@ -14,13 +14,13 @@ import (
 )
 
 type InternetGatewaysDataSourceModel struct {
-	InternetGateways []datasource_internet_gateway.InternetGatewayModel `tfsdk:"internet_gateways"`
-	IDs              types.List                                         `tfsdk:"ids"`
-	LinkStates       types.List                                         `tfsdk:"link_states"`
-	TagKeys          types.List                                         `tfsdk:"tag_keys"`
-	TagValues        types.List                                         `tfsdk:"tag_values"`
-	Tags             types.List                                         `tfsdk:"tags"`
-	LinkVpcIds       types.List                                         `tfsdk:"link_vpc_ids"`
+	Items      []datasource_internet_gateway.InternetGatewayModel `tfsdk:"items"`
+	IDs        types.List                                         `tfsdk:"ids"`
+	LinkStates types.List                                         `tfsdk:"link_states"`
+	TagKeys    types.List                                         `tfsdk:"tag_keys"`
+	TagValues  types.List                                         `tfsdk:"tag_values"`
+	Tags       types.List                                         `tfsdk:"tags"`
+	LinkVpcIds types.List                                         `tfsdk:"link_vpc_ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -82,20 +82,15 @@ func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasourc
 		response.Diagnostics.AddError("HTTP call failed", "got empty Internet Gateways list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := InternetGatewaysFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Internet Gateway HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.InternetGateways = append(state.InternetGateways, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, InternetGatewaysFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
 
-	state.IDs = plan.IDs
-	state.Tags = plan.Tags
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.LinkStates = plan.LinkStates
-	state.LinkVpcIds = plan.LinkVpcIds
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

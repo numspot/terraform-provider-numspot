@@ -112,20 +112,20 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *iaas.LoadBalancer) reso
 	}
 }
 
-func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBalancer) datasource_load_balancer.LoadBalancerModel {
+func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBalancer) (*datasource_load_balancer.LoadBalancerModel, diag.Diagnostics) {
 	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
-		return datasource_load_balancer.LoadBalancerModel{}
+		return nil, diags
 	}
 
 	listeners, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ListenersValue{}, listenersFromHTTP, *http.Listeners)
 	if diags.HasError() {
-		return datasource_load_balancer.LoadBalancerModel{}
+		return nil, diags
 	}
 
 	stickyCookiePolicies, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies)
 	if diags.HasError() {
-		return datasource_load_balancer.LoadBalancerModel{}
+		return nil, diags
 	}
 
 	backendIps, _ := utils.FromStringListPointerToTfStringList(ctx, http.BackendIps)
@@ -141,9 +141,8 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBala
 			"unhealthy_threshold": utils.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
 		})
 	if err != nil {
-		return datasource_load_balancer.LoadBalancerModel{}
+		return nil, diags
 	}
-	// httpListeners := *http.Listeners
 	securityGroups, _ := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
 	sourceSecurityGroup := datasource_load_balancer.SourceSecurityGroupValue{
 		SecurityGroupName: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
@@ -151,7 +150,7 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBala
 	subnets, _ := utils.FromStringListPointerToTfStringList(ctx, http.Subnets)
 	azNames, _ := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames)
 
-	return datasource_load_balancer.LoadBalancerModel{
+	return &datasource_load_balancer.LoadBalancerModel{
 		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciestypes,
 		BackendIps:                      backendIps,
 		BackendVmIds:                    backendVmIds,
@@ -169,7 +168,7 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBala
 		Subnets:                         subnets,
 		AvailabilityZoneNames:           azNames,
 		Type:                            types.StringPointerValue(http.Type),
-	}
+	}, nil
 }
 
 func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) iaas.CreateLoadBalancerJSONRequestBody {

@@ -14,7 +14,7 @@ import (
 )
 
 type ClientGatewaysDataSourceModel struct {
-	ClientGateways  []datasource_client_gateway.ClientGatewayModel `tfsdk:"client_gateways"`
+	Items           []datasource_client_gateway.ClientGatewayModel `tfsdk:"items"`
 	BgpAsns         types.List                                     `tfsdk:"bgp_asns"`
 	ConnectionTypes types.List                                     `tfsdk:"connection_types"`
 	IDs             types.List                                     `tfsdk:"ids"`
@@ -84,21 +84,15 @@ func (d *clientGatewaysDataSource) Read(ctx context.Context, request datasource.
 		response.Diagnostics.AddError("HTTP call failed", "got empty Client Gateways list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := ClientGatewaysFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Client Gateway HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.ClientGateways = append(state.ClientGateways, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, ClientGatewaysFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.IDs = plan.IDs
-	state.States = plan.States
-	state.Tags = plan.Tags
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.ConnectionTypes = plan.ConnectionTypes
-	state.BgpAsns = plan.BgpAsns
-	state.PublicIps = plan.PublicIps
+
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

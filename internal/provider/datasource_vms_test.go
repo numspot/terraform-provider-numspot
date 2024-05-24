@@ -16,7 +16,7 @@ func TestAccVmsDatasource(t *testing.T) {
 			{
 				Config: fetchVmConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_vms.testdata", "vms.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_vms.testdata", "items.#", "1"),
 				),
 				ExpectNonEmptyPlan: true,
 			},

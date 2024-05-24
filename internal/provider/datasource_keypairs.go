@@ -14,7 +14,7 @@ import (
 )
 
 type KeypairsDataSourceModel struct {
-	Keypairs     []datasource_key_pair.KeyPairModel `tfsdk:"keypairs"`
+	Items        []datasource_key_pair.KeyPairModel `tfsdk:"items"`
 	Fingerprints types.List                         `tfsdk:"fingerprints"`
 	Names        types.List                         `tfsdk:"names"`
 	Types        types.List                         `tfsdk:"types"`
@@ -77,14 +77,15 @@ func (d *keypairsDataSource) Read(ctx context.Context, request datasource.ReadRe
 		response.Diagnostics.AddError("HTTP call failed", "got empty Keypair list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf := KeypairsFromHttpToTfDatasource(ctx, &item)
-		state.Keypairs = append(state.Keypairs, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, KeypairsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
 
-	state.Fingerprints = plan.Fingerprints
-	state.Names = plan.Names
-	state.Types = plan.Types
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

@@ -14,7 +14,7 @@ import (
 )
 
 type VPCsDataSourceModel struct {
-	VPCs              []datasource_vpc.VpcModel `tfsdk:"vpcs"`
+	Items             []datasource_vpc.VpcModel `tfsdk:"items"`
 	IDs               types.List                `tfsdk:"ids"`
 	DHCPOptionsSetIds types.List                `tfsdk:"dhcp_options_set_ids"`
 	IPRanges          types.List                `tfsdk:"ip_ranges"`
@@ -82,21 +82,15 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		response.Diagnostics.AddError("HTTP call failed", "got empty VPCs list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := VPCsFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting VPC HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.VPCs = append(state.VPCs, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VPCsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.IDs = plan.IDs
-	state.States = plan.States
-	state.IPRanges = plan.IPRanges
-	state.IsDefault = plan.IsDefault
-	state.DHCPOptionsSetIds = plan.DHCPOptionsSetIds
-	state.Tags = plan.Tags
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
+
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

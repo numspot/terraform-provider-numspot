@@ -16,7 +16,7 @@ func TestAccRouteTablesDatasource(t *testing.T) {
 			{
 				Config: fetchRouteTableConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_route_tables.testdata", "route_tables.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_route_tables.testdata", "items.#", "1"),
 				),
 			},
 		},

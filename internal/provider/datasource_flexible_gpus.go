@@ -81,15 +81,15 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 		response.Diagnostics.AddError("HTTP call failed", "got empty FlexibleGpus list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := FlexibleGpusFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting FlexibleGpu HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.Items = append(state.Items, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, FlexibleGpusFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
 
 	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

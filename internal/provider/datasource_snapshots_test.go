@@ -16,7 +16,7 @@ func TestAccSnapshotsDatasource(t *testing.T) {
 			{
 				Config: fetchSnapshotConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_snapshots.testdata", "snapshots.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_snapshots.testdata", "items.#", "1"),
 				),
 			},
 		},

@@ -22,10 +22,10 @@ func TestAccVolumesDatasource(t *testing.T) {
 			{
 				Config: fetchVolumesConfigById(volumeType, volumeSize, volumeAZ),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "volumes.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "volumes.0.type", volumeType),
-					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "volumes.0.size", strconv.Itoa(volumeSize)),
-					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "volumes.0.availability_zone_name", volumeAZ),
+					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "items.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "items.0.type", volumeType),
+					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "items.0.size", strconv.Itoa(volumeSize)),
+					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "items.0.availability_zone_name", volumeAZ),
 				),
 			},
 		},

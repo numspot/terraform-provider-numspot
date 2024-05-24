@@ -29,14 +29,14 @@ description: |-
 
 ### Read-Only
 
-- `dhcp_options` (Attributes List) (see [below for nested schema](#nestedatt--dhcp_options))
+- `items` (Attributes List) (see [below for nested schema](#nestedatt--items))
 
-<a id="nestedatt--dhcp_options"></a>
-### Nested Schema for `dhcp_options`
+<a id="nestedatt--items"></a>
+### Nested Schema for `items`
 
 Optional:
 
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--dhcp_options--tags))
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
 
 Read-Only:
 
@@ -47,8 +47,8 @@ Read-Only:
 - `log_servers` (List of String) One or more IPs for the log servers.
 - `ntp_servers` (List of String) One or more IPs for the NTP servers.
 
-<a id="nestedatt--dhcp_options--tags"></a>
-### Nested Schema for `dhcp_options.tags`
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
 
 Required:
 

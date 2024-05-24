@@ -36,3 +36,10 @@ data "numspot_nat_gateways" "testdata" {
   subnet_ids = [numspot_subnet.test.id]
   depends_on = [numspot_nat_gateway.test]
 }
+
+# How to use the datasource in another field
+resource "null_resource" "print-datasource-id" {
+  provisioner "local-exec" {
+    command = "echo data.numspot_nat_gateways.testdata.items.0.id"
+  }
+}

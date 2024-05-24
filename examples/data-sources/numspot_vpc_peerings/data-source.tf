@@ -15,3 +15,10 @@ data "numspot_vpc_peerings" "testdata" {
   ids        = [numspot_vpc_peering.test.id]
   depends_on = [numspot_vpc_peering.test]
 }
+
+# How to use the datasource in another field
+resource "null_resource" "print-datasource-id" {
+  provisioner "local-exec" {
+    command = "echo data.numspot_vpc_peerings.testdata.items.0.id"
+  }
+}

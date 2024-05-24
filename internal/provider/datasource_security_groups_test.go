@@ -16,7 +16,7 @@ func TestAccSecurityGroupsDatasource(t *testing.T) {
 			{
 				Config: fetchSecurityGroupConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_security_groups.testdata", "security_groups.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_security_groups.testdata", "items.#", "1"),
 				),
 			},
 		},

@@ -14,7 +14,7 @@ import (
 )
 
 type VpnConnectionsDataSourceModel struct {
-	VpnConnections           []datasource_vpn_connection.VpnConnectionModel `tfsdk:"vpn_connections"`
+	Items                    []datasource_vpn_connection.VpnConnectionModel `tfsdk:"items"`
 	BgpAsns                  types.List                                     `tfsdk:"bgp_asns"`
 	ClientGatewayIds         types.List                                     `tfsdk:"client_gateway_ids"`
 	ConnectionTypes          types.List                                     `tfsdk:"connection_types"`
@@ -85,24 +85,15 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 		response.Diagnostics.AddError("HTTP call failed", "got empty Vpn Connection list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := VpnConnectionsFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Vpn Connection HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.VpnConnections = append(state.VpnConnections, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VpnConnectionsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.ClientGatewayIds = plan.ClientGatewayIds
-	state.ConnectionTypes = plan.ConnectionTypes
-	state.RouteDestinationIpRanges = plan.RouteDestinationIpRanges
-	state.StaticRouteOnly = plan.StaticRouteOnly
-	state.VirtualGatewayIds = plan.VirtualGatewayIds
-	state.States = plan.States
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.Tags = plan.Tags
-	state.Ids = plan.Ids
-	state.BgpAsns = plan.BgpAsns
+
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

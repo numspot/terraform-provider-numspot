@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
@@ -65,10 +66,10 @@ func KeypairsFromTfToAPIReadParams(ctx context.Context, tf KeypairsDataSourceMod
 	}
 }
 
-func KeypairsFromHttpToTfDatasource(ctx context.Context, http *iaas.Keypair) *datasource_key_pair.KeyPairModel {
+func KeypairsFromHttpToTfDatasource(ctx context.Context, http *iaas.Keypair) (*datasource_key_pair.KeyPairModel, diag.Diagnostics) {
 	return &datasource_key_pair.KeyPairModel{
 		Fingerprint: types.StringPointerValue(http.Fingerprint),
 		Name:        types.StringPointerValue(http.Name),
 		Type:        types.StringPointerValue(http.Type),
-	}
+	}, nil
 }

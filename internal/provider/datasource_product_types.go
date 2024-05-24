@@ -14,8 +14,8 @@ import (
 )
 
 type ProductTypesDataSourceModel struct {
-	ProductTypes []datasource_product_type.ProductTypeModel `tfsdk:"product_types"`
-	IDs          types.List                                 `tfsdk:"ids"`
+	Items []datasource_product_type.ProductTypeModel `tfsdk:"items"`
+	IDs   types.List                                 `tfsdk:"ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -75,14 +75,15 @@ func (d *productTypesDataSource) Read(ctx context.Context, request datasource.Re
 		response.Diagnostics.AddError("HTTP call failed", "got empty ProductTypes list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := ProductTypesFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting ProductType HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.ProductTypes = append(state.ProductTypes, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, ProductTypesFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.IDs = plan.IDs
+
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

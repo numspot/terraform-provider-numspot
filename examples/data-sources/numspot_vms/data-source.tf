@@ -9,3 +9,9 @@ data "numspot_vms" "testdata" {
   depends_on = [numspot_vm.test]
 }
 
+# How to use the datasource in another field
+resource "null_resource" "print-datasource-id" {
+  provisioner "local-exec" {
+    command = "echo data.numspot_vms.testdata.items.0.id"
+  }
+}

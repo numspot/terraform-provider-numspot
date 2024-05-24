@@ -14,7 +14,7 @@ import (
 )
 
 type SecurityGroupsDataSourceModel struct {
-	SecurityGroups                []datasource_security_group.SecurityGroupModel `tfsdk:"security_groups"`
+	Items                         []datasource_security_group.SecurityGroupModel `tfsdk:"items"`
 	Descriptions                  types.List                                     `tfsdk:"descriptions"`
 	InboundRulesAccountIds        types.List                                     `tfsdk:"inbound_rules_account_ids"`
 	InboundRulesFromPortRanges    types.List                                     `tfsdk:"inbound_rules_from_port_ranges"`
@@ -93,32 +93,15 @@ func (d *securityGroupsDataSource) Read(ctx context.Context, request datasource.
 		response.Diagnostics.AddError("HTTP call failed", "got empty Security Groups list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := SecurityGroupsFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Security Groups HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.SecurityGroups = append(state.SecurityGroups, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SecurityGroupsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
 
-	state.Descriptions = plan.Descriptions
-	state.InboundRulesAccountIds = plan.InboundRulesAccountIds
-	state.InboundRulesFromPortRanges = plan.InboundRulesFromPortRanges
-	state.InboundRulesRuleProtocols = plan.InboundRulesRuleProtocols
-	state.InboundRulesIpRanges = plan.InboundRulesIpRanges
-	state.InboundRulesSecurityGroupIds = plan.InboundRulesSecurityGroupIds
-	state.InboundRulesToPortRanges = plan.InboundRulesToPortRanges
-	state.Ids = plan.Ids
-	state.Names = plan.Names
-	state.OutboundRulesFromPortRanges = plan.OutboundRulesFromPortRanges
-	state.OutboundRulesRuleProtocols = plan.OutboundRulesRuleProtocols
-	state.OutboundRulesIpRanges = plan.OutboundRulesIpRanges
-	state.OutboundRulesAccountIds = plan.OutboundRulesAccountIds
-	state.OutboundRulesSecurityGroupIds = plan.OutboundRulesSecurityGroupIds
-	state.OutboundRulesToPortRanges = plan.OutboundRulesToPortRanges
-	state.VpcIds = plan.VpcIds
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.Tags = plan.Tags
+	state = plan
+	state.Items = objectItems
+
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

@@ -14,7 +14,7 @@ import (
 )
 
 type loadBalancersDataSourceModel struct {
-	LoadBalancers     []datasource_load_balancer.LoadBalancerModel `tfsdk:"load_balancers"`
+	Items             []datasource_load_balancer.LoadBalancerModel `tfsdk:"items"`
 	LoadBalancerNames types.List                                   `tfsdk:"load_balancer_names"`
 }
 
@@ -79,10 +79,15 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 		response.Diagnostics.AddError("HTTP call failed", "got empty load balancers list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf := LoadBalancerFromHttpToTfDatasource(ctx, &item)
-		state.LoadBalancers = append(state.LoadBalancers, tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, LoadBalancerFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.LoadBalancerNames = plan.LoadBalancerNames
+
+	state = plan
+	state.Items = objectItems
+
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

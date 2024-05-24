@@ -14,21 +14,20 @@ import (
 )
 
 type VpcPeeringsDataSourceModel struct {
-	VpcPeerings []datasource_vpc_peering.VpcPeeringModel `tfsdk:"vpc_peerings"`
-
-	ExpirationDates       types.List `tfsdk:"expiration_dates"`
-	StateMessages         types.List `tfsdk:"state_messages"`
-	StateNames            types.List `tfsdk:"state_names"`
-	AccepterVpcAccountIds types.List `tfsdk:"accepter_vpc_account_ids"`
-	AccepterVpcIpRanges   types.List `tfsdk:"accepter_vpc_ip_ranges"`
-	AccepterVpcVpcIds     types.List `tfsdk:"accepter_vpc_vpc_ids"`
-	IDs                   types.List `tfsdk:"ids"`
-	SourceVpcAccountIds   types.List `tfsdk:"source_vpc_account_ids"`
-	SourceVpcIpRanges     types.List `tfsdk:"source_vpc_ip_ranges"`
-	SourceVpcVpcIds       types.List `tfsdk:"source_vpc_vpc_ids"`
-	TagKeys               types.List `tfsdk:"tag_keys"`
-	TagValues             types.List `tfsdk:"tag_values"`
-	Tags                  types.List `tfsdk:"tags"`
+	Items                 []datasource_vpc_peering.VpcPeeringModel `tfsdk:"items"`
+	ExpirationDates       types.List                               `tfsdk:"expiration_dates"`
+	StateMessages         types.List                               `tfsdk:"state_messages"`
+	StateNames            types.List                               `tfsdk:"state_names"`
+	AccepterVpcAccountIds types.List                               `tfsdk:"accepter_vpc_account_ids"`
+	AccepterVpcIpRanges   types.List                               `tfsdk:"accepter_vpc_ip_ranges"`
+	AccepterVpcVpcIds     types.List                               `tfsdk:"accepter_vpc_vpc_ids"`
+	IDs                   types.List                               `tfsdk:"ids"`
+	SourceVpcAccountIds   types.List                               `tfsdk:"source_vpc_account_ids"`
+	SourceVpcIpRanges     types.List                               `tfsdk:"source_vpc_ip_ranges"`
+	SourceVpcVpcIds       types.List                               `tfsdk:"source_vpc_vpc_ids"`
+	TagKeys               types.List                               `tfsdk:"tag_keys"`
+	TagValues             types.List                               `tfsdk:"tag_values"`
+	Tags                  types.List                               `tfsdk:"tags"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -90,27 +89,15 @@ func (d *vpcPeeringsDataSource) Read(ctx context.Context, request datasource.Rea
 		response.Diagnostics.AddError("HTTP call failed", "got empty VPC Peering list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := VpcPeeringsFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting VPC Peering HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.VpcPeerings = append(state.VpcPeerings, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VpcPeeringsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
 
-	state.ExpirationDates = plan.ExpirationDates
-	state.StateMessages = plan.StateMessages
-	state.StateNames = plan.StateNames
-	state.AccepterVpcAccountIds = plan.AccepterVpcAccountIds
-	state.AccepterVpcIpRanges = plan.AccepterVpcIpRanges
-	state.AccepterVpcVpcIds = plan.AccepterVpcVpcIds
-	state.IDs = plan.IDs
-	state.SourceVpcAccountIds = plan.SourceVpcAccountIds
-	state.SourceVpcIpRanges = plan.SourceVpcIpRanges
-	state.SourceVpcVpcIds = plan.SourceVpcVpcIds
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.Tags = plan.Tags
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

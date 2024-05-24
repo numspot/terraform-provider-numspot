@@ -32,10 +32,10 @@ description: |-
 
 ### Read-Only
 
-- `volumes` (Attributes List) (see [below for nested schema](#nestedatt--volumes))
+- `items` (Attributes List) (see [below for nested schema](#nestedatt--items))
 
-<a id="nestedatt--volumes"></a>
-### Nested Schema for `volumes`
+<a id="nestedatt--items"></a>
+### Nested Schema for `items`
 
 Required:
 
@@ -48,14 +48,14 @@ Read-Only:
 - `iops` (Number) The number of I/O operations per second (IOPS):<br />
 - For `io1` volumes, the number of provisioned IOPS<br />
 - For `gp2` volumes, the baseline performance of the volume
-- `linked_volumes` (Attributes List) Information about your volume attachment. (see [below for nested schema](#nestedatt--volumes--linked_volumes))
+- `linked_volumes` (Attributes List) Information about your volume attachment. (see [below for nested schema](#nestedatt--items--linked_volumes))
 - `size` (Number) The size of the volume, in gibibytes (GiB).
 - `snapshot_id` (String) The snapshot from which the volume was created.
 - `state` (String) The state of the volume (`creating` \| `available` \| `in-use` \| `updating` \| `deleting` \| `error`).
 - `type` (String) The type of the volume (`standard` \| `gp2` \| `io1`).
 
-<a id="nestedatt--volumes--linked_volumes"></a>
-### Nested Schema for `volumes.linked_volumes`
+<a id="nestedatt--items--linked_volumes"></a>
+### Nested Schema for `items.linked_volumes`
 
 Read-Only:
 

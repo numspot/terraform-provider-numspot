@@ -14,7 +14,7 @@ import (
 )
 
 type VirtualGatewaysDataSourceModel struct {
-	VirtualGateways []datasource_virtual_gateway.VirtualGatewayModel `tfsdk:"virtual_gateways"`
+	Items           []datasource_virtual_gateway.VirtualGatewayModel `tfsdk:"items"`
 	ConnectionTypes types.List                                       `tfsdk:"connection_types"`
 	LinkStates      types.List                                       `tfsdk:"link_states"`
 	States          types.List                                       `tfsdk:"states"`
@@ -82,21 +82,15 @@ func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource
 		response.Diagnostics.AddError("HTTP call failed", "got empty Virtual Gateways list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := VirtualGatewaysFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Virtual Gateway HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.VirtualGateways = append(state.VirtualGateways, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VirtualGatewaysFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.IDs = plan.IDs
-	state.States = plan.States
-	state.Tags = plan.Tags
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.ConnectionTypes = plan.ConnectionTypes
-	state.LinkStates = plan.LinkStates
-	state.LinkVpcIds = plan.LinkVpcIds
+
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

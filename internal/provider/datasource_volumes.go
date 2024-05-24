@@ -14,7 +14,7 @@ import (
 )
 
 type VolumesDataSourceModel struct {
-	Volumes                      []datasource_volume.VolumeModel `tfsdk:"volumes"`
+	Items                        []datasource_volume.VolumeModel `tfsdk:"items"`
 	CreationDates                types.List                      `tfsdk:"creation_dates"`
 	LinkVolumeDeleteOnVmDeletion types.Bool                      `tfsdk:"link_volume_delete_on_vm_deletion"`
 	LinkVolumeDeviceNames        types.List                      `tfsdk:"link_volume_device_names"`
@@ -86,24 +86,15 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 		response.Diagnostics.AddError("HTTP call failed", "got empty volumes list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := VolumesFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Volume HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.Volumes = append(state.Volumes, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VolumesFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.AvailabilityZoneNames = plan.AvailabilityZoneNames
-	state.CreationDates = plan.CreationDates
-	state.Ids = plan.Ids
-	state.LinkVolumeDeleteOnVmDeletion = plan.LinkVolumeDeleteOnVmDeletion
-	state.LinkVolumeDeviceNames = plan.LinkVolumeDeviceNames
-	state.LinkVolumeLinkDates = plan.LinkVolumeLinkDates
-	state.LinkVolumeLinkStates = plan.LinkVolumeLinkStates
-	state.LinkVolumeVmIds = plan.LinkVolumeVmIds
-	state.SnapshotIds = plan.SnapshotIds
-	state.VolumeSizes = plan.VolumeSizes
-	state.VolumeStates = plan.VolumeStates
-	state.VolumeTypes = plan.VolumeTypes
+
+	state = plan
+	state.Items = objectItems
+
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

@@ -14,7 +14,7 @@ import (
 )
 
 type SnapshotsDataSourceModel struct {
-	Snapshots                                 []datasource_snapshot.SnapshotModel `tfsdk:"snapshots"`
+	Items                                     []datasource_snapshot.SnapshotModel `tfsdk:"items"`
 	Descriptions                              types.List                          `tfsdk:"descriptions"`
 	FromCreationDate                          types.String                        `tfsdk:"from_creation_date"`
 	PermissionsToCreateVolumeGlobalPermission types.Bool                          `tfsdk:"permissions_to_create_volume_global_permission"`
@@ -86,26 +86,15 @@ func (d *snapshotsDataSource) Read(ctx context.Context, request datasource.ReadR
 		response.Diagnostics.AddError("HTTP call failed", "got empty Snapshot list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := SnapshotsFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Snapshot HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.Snapshots = append(state.Snapshots, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SnapshotsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
 
-	state.Descriptions = plan.Descriptions
-	state.FromCreationDate = plan.FromCreationDate
-	state.PermissionsToCreateVolumeGlobalPermission = plan.PermissionsToCreateVolumeGlobalPermission
-	state.Progresses = plan.Progresses
-	state.States = plan.States
-	state.ToCreationDate = plan.ToCreationDate
-	state.VolumeIds = plan.VolumeIds
-	state.VolumeSizes = plan.VolumeSizes
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.Tags = plan.Tags
-	state.IDs = plan.IDs
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

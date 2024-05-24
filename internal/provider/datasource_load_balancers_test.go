@@ -18,8 +18,8 @@ func TestAccLoadBalancerDatasource(t *testing.T) {
 			{
 				Config: fetchLoadBalancersConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_load_balancers.test", "load_balancers.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_load_balancers.test", "load_balancers.0.name", "elb-test"),
+					resource.TestCheckResourceAttr("data.numspot_load_balancers.test", "items.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_load_balancers.test", "items.0.name", "elb-test"),
 				),
 			},
 		},

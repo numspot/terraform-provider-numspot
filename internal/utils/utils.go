@@ -276,3 +276,22 @@ func ParseUUID(id string, entityType EntityType) (uuid.UUID, diag.Diagnostics) {
 	}
 	return parsedUUID, diags
 }
+
+func FromHttpGenericListToTfList[httpType any, tfType any](
+	ctx context.Context,
+	http_items *[]httpType,
+	httpToTfParser func(context.Context, *httpType) (*tfType, diag.Diagnostics),
+) ([]tfType, diag.Diagnostics) {
+	itemList := make([]tfType, 0, len(*http_items))
+
+	for _, item := range *http_items {
+		tf, diags := httpToTfParser(ctx, &item)
+		if diags.HasError() {
+			return itemList, diags
+		}
+
+		itemList = append(itemList, *tf)
+	}
+
+	return itemList, nil
+}

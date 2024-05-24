@@ -14,7 +14,7 @@ import (
 )
 
 type RouteTablesDataSourceModel struct {
-	RouteTables                 []datasource_route_table.RouteTableModel `tfsdk:"route_tables"`
+	Items                       []datasource_route_table.RouteTableModel `tfsdk:"items"`
 	TagKeys                     types.List                               `tfsdk:"tag_keys"`
 	TagValues                   types.List                               `tfsdk:"tag_values"`
 	Tags                        types.List                               `tfsdk:"tags"`
@@ -91,32 +91,15 @@ func (d *routeTablesDataSource) Read(ctx context.Context, request datasource.Rea
 		response.Diagnostics.AddError("HTTP call failed", "got empty Route Table list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := RouteTablesFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Route Table HTTP object to Terraform object", diags.Errors()[0].Detail())
-			return
-		}
-		state.RouteTables = append(state.RouteTables, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, RouteTablesFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
 
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.Tags = plan.Tags
-	state.Ids = plan.Ids
-	state.RouteVpcPeeringIds = plan.RouteVpcPeeringIds
-	state.RouteNatGatewayIds = plan.RouteNatGatewayIds
-	state.RouteVmIds = plan.RouteVmIds
-	state.RouteCreationMethods = plan.RouteCreationMethods
-	state.RouteDestinationIpRanges = plan.RouteDestinationIpRanges
-	state.RouteDestinationServiceIds = plan.RouteDestinationServiceIds
-	state.RouteGatewayIds = plan.RouteGatewayIds
-	state.RouteStates = plan.RouteStates
-	state.VpcIds = plan.VpcIds
-	state.LinkRouteTableIds = plan.LinkRouteTableIds
-	state.LinkRouteTableMain = plan.LinkRouteTableMain
-	state.LinkRouteTableRouteTableIds = plan.LinkRouteTableRouteTableIds
-	state.LinkRouteTableSubnetIds = plan.LinkRouteTableSubnetIds
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

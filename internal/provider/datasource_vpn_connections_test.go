@@ -16,7 +16,7 @@ func TestAccVpnConnectionDatasource(t *testing.T) {
 			{
 				Config: fetchVpnConnectionConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_vpn_connections.testdata", "vpn_connections.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_vpn_connections.testdata", "items.#", "1"),
 				),
 			},
 		},

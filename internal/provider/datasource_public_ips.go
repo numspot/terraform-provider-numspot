@@ -14,7 +14,7 @@ import (
 )
 
 type PublicIpsDataSourceModel struct {
-	PublicIps       []datasource_public_ip.PublicIpModel `tfsdk:"public_ips"`
+	Items           []datasource_public_ip.PublicIpModel `tfsdk:"items"`
 	LinkPublicIpIds types.List                           `tfsdk:"link_public_ip_ids"`
 	NicIds          types.List                           `tfsdk:"nic_ids"`
 	TagKeys         types.List                           `tfsdk:"tag_keys"`
@@ -82,22 +82,15 @@ func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadR
 		response.Diagnostics.AddError("HTTP call failed", "got empty Public Ips list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := PublicIpsFromHttpToTfDatasource(ctx, &item)
-		if diags.HasError() {
-			response.Diagnostics.AddError("Error while converting Public Ip HTTP object to Terraform object", diags.Errors()[0].Detail())
-			return
-		}
-		state.PublicIps = append(state.PublicIps, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, PublicIpsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.IDs = plan.IDs
-	state.LinkPublicIpIds = plan.LinkPublicIpIds
-	state.Tags = plan.Tags
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.NicIds = plan.NicIds
-	state.PrivateIps = plan.PrivateIps
-	state.VmIds = plan.VmIds
+
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

@@ -28,10 +28,10 @@ description: |-
 
 ### Read-Only
 
-- `virtual_gateways` (Attributes List) (see [below for nested schema](#nestedatt--virtual_gateways))
+- `items` (Attributes List) (see [below for nested schema](#nestedatt--items))
 
-<a id="nestedatt--virtual_gateways"></a>
-### Nested Schema for `virtual_gateways`
+<a id="nestedatt--items"></a>
+### Nested Schema for `items`
 
 Required:
 
@@ -39,16 +39,16 @@ Required:
 
 Optional:
 
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--virtual_gateways--tags))
+- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
 
 Read-Only:
 
 - `connection_type` (String) The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).
-- `net_to_virtual_gateway_links` (Attributes List) The Net to which the virtual gateway is attached. (see [below for nested schema](#nestedatt--virtual_gateways--net_to_virtual_gateway_links))
+- `net_to_virtual_gateway_links` (Attributes List) The Net to which the virtual gateway is attached. (see [below for nested schema](#nestedatt--items--net_to_virtual_gateway_links))
 - `state` (String) The state of the virtual gateway (`pending` \| `available` \| `deleting` \| `deleted`).
 
-<a id="nestedatt--virtual_gateways--tags"></a>
-### Nested Schema for `virtual_gateways.tags`
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
 
 Required:
 
@@ -56,8 +56,8 @@ Required:
 - `value` (String) The value of the tag, between 0 and 255 characters.
 
 
-<a id="nestedatt--virtual_gateways--net_to_virtual_gateway_links"></a>
-### Nested Schema for `virtual_gateways.net_to_virtual_gateway_links`
+<a id="nestedatt--items--net_to_virtual_gateway_links"></a>
+### Nested Schema for `items.net_to_virtual_gateway_links`
 
 Read-Only:
 

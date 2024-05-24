@@ -10,3 +10,10 @@ data "numspot_internet_gateways" "testdata" {
   ids        = [numspot_internet_gateway.test.id]
   depends_on = [numspot_internet_gateway.test]
 }
+
+# How to use the datasource in another field
+resource "null_resource" "print-datasource-id" {
+  provisioner "local-exec" {
+    command = "echo data.numspot_internet_gateways.testdata.items.0.id"
+  }
+}

@@ -26,3 +26,10 @@ data "numspot_security_groups" "testdata" {
   ids        = [numspot_security_group.test.id]
   depends_on = [numspot_security_group.test]
 }
+
+# How to use the datasource in another field
+resource "null_resource" "print-datasource-id" {
+  provisioner "local-exec" {
+    command = "echo data.numspot_security_groups.testdata.items.0.id"
+  }
+}

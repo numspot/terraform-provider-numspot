@@ -14,7 +14,7 @@ import (
 )
 
 type SubnetsDataSourceModel struct {
-	Subnets               []datasource_subnet.SubnetModel `tfsdk:"subnets"`
+	Items                 []datasource_subnet.SubnetModel `tfsdk:"items"`
 	AvailableIpsCounts    types.List                      `tfsdk:"available_ips_counts"`
 	IpRanges              types.List                      `tfsdk:"ip_ranges"`
 	States                types.List                      `tfsdk:"states"`
@@ -80,19 +80,15 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 		response.Diagnostics.AddError("HTTP call failed", "got empty Subnets list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := SubnetsFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Subnet HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.Subnets = append(state.Subnets, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SubnetsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.IDs = plan.IDs
-	state.States = plan.States
-	state.VpcIds = plan.VpcIds
-	state.AvailabilityZoneNames = plan.AvailabilityZoneNames
-	state.AvailableIpsCounts = plan.AvailableIpsCounts
-	state.IpRanges = plan.IpRanges
+
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

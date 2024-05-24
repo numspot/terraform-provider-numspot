@@ -18,7 +18,7 @@ func TestAccProductTypesDatasource(t *testing.T) {
 			{
 				Config: fetchProductTypesConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_product_types.testdata", "product_types.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_product_types.testdata", "items.#", "1"),
 				),
 			},
 		},

@@ -129,7 +129,6 @@ type FlexibleGpuModel struct {
 	VmId                 types.String `tfsdk:"vm_id"`
 }
 
-
 var _ basetypes.ObjectTypable = ItemsType{}
 
 type ItemsType struct {

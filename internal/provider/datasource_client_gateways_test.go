@@ -16,7 +16,7 @@ func TestAccClientGatewaysDatasource(t *testing.T) {
 			{
 				Config: fetchClientGatewayConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_client_gateways.testdata", "client_gateways.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_client_gateways.testdata", "items.#", "1"),
 				),
 			},
 		},

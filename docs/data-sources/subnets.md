@@ -26,10 +26,10 @@ description: |-
 
 ### Read-Only
 
-- `subnets` (Attributes List) (see [below for nested schema](#nestedatt--subnets))
+- `items` (Attributes List) (see [below for nested schema](#nestedatt--items))
 
-<a id="nestedatt--subnets"></a>
-### Nested Schema for `subnets`
+<a id="nestedatt--items"></a>
+### Nested Schema for `items`
 
 Required:
 

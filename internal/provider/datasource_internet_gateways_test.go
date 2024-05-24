@@ -18,7 +18,7 @@ func TestAccInternetGatewaysDatasource(t *testing.T) {
 			{
 				Config: fetchInternetGatewaysConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_internet_gateways.testdata", "internet_gateways.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_internet_gateways.testdata", "items.#", "1"),
 				),
 			},
 		},

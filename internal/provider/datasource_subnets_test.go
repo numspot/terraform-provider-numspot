@@ -18,7 +18,7 @@ func TestAccSubnetsDatasource(t *testing.T) {
 			{
 				Config: fetchSubnetsConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_subnets.testdata", "subnets.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_subnets.testdata", "items.#", "1"),
 				),
 			},
 		},

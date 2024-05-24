@@ -14,14 +14,14 @@ import (
 )
 
 type NatGatewaysDataSourceModel struct {
-	NatGateways []datasource_nat_gateway.NatGatewayModel `tfsdk:"nat_gateways"`
-	IDs         types.List                               `tfsdk:"ids"`
-	States      types.List                               `tfsdk:"states"`
-	TagKeys     types.List                               `tfsdk:"tag_keys"`
-	TagValues   types.List                               `tfsdk:"tag_values"`
-	Tags        types.List                               `tfsdk:"tags"`
-	SubnetIds   types.List                               `tfsdk:"subnet_ids"`
-	VpcIds      types.List                               `tfsdk:"vpc_ids"`
+	Items     []datasource_nat_gateway.NatGatewayModel `tfsdk:"items"`
+	IDs       types.List                               `tfsdk:"ids"`
+	States    types.List                               `tfsdk:"states"`
+	TagKeys   types.List                               `tfsdk:"tag_keys"`
+	TagValues types.List                               `tfsdk:"tag_values"`
+	Tags      types.List                               `tfsdk:"tags"`
+	SubnetIds types.List                               `tfsdk:"subnet_ids"`
+	VpcIds    types.List                               `tfsdk:"vpc_ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -81,20 +81,15 @@ func (d *natGatewaysDataSource) Read(ctx context.Context, request datasource.Rea
 		response.Diagnostics.AddError("HTTP call failed", "got empty Nat Gateways list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := NatGatewaysFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting Nat Gateway HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.NatGateways = append(state.NatGateways, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, NatGatewaysFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.IDs = plan.IDs
-	state.States = plan.States
-	state.Tags = plan.Tags
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.SubnetIds = plan.SubnetIds
-	state.VpcIds = plan.VpcIds
+
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

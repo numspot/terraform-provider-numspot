@@ -58,10 +58,10 @@ data "numspot_public_ips" "public_ip_data_source" {
 
 ### Read-Only
 
-- `public_ips` (Attributes List) (see [below for nested schema](#nestedatt--public_ips))
+- `items` (Attributes List) (see [below for nested schema](#nestedatt--items))
 
-<a id="nestedatt--public_ips"></a>
-### Nested Schema for `public_ips`
+<a id="nestedatt--items"></a>
+### Nested Schema for `items`
 
 Required:
 
@@ -73,11 +73,11 @@ Read-Only:
 - `nic_id` (String) The ID of the NIC the public IP is associated with (if any).
 - `private_ip` (String) The private IP associated with the public IP.
 - `public_ip` (String) The public IP.
-- `tags` (Attributes List) One or more tags associated with the public IP. (see [below for nested schema](#nestedatt--public_ips--tags))
+- `tags` (Attributes List) One or more tags associated with the public IP. (see [below for nested schema](#nestedatt--items--tags))
 - `vm_id` (String) The ID of the VM the public IP is associated with (if any).
 
-<a id="nestedatt--public_ips--tags"></a>
-### Nested Schema for `public_ips.tags`
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
 
 Read-Only:
 

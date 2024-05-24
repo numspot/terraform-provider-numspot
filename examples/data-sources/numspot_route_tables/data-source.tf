@@ -26,3 +26,10 @@ data "numspot_route_tables" "testdata" {
   ids        = [numspot_route_table.test.id]
   depends_on = [numspot_route_table.test]
 }
+
+# How to use the datasource in another field
+resource "null_resource" "print-datasource-id" {
+  provisioner "local-exec" {
+    command = "echo data.numspot_route_tables.testdata.items.0.id"
+  }
+}

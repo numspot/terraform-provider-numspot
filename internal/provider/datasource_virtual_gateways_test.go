@@ -16,7 +16,7 @@ func TestAccVirtualGatewaysDatasource(t *testing.T) {
 			{
 				Config: fetchVirtualGatewayConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_virtual_gateways.testdata", "virtual_gateways.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_virtual_gateways.testdata", "items.#", "1"),
 				),
 			},
 		},

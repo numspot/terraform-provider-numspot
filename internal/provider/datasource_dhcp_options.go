@@ -14,7 +14,7 @@ import (
 )
 
 type DHCPOptionsDataSourceModel struct {
-	DHCPOptions       []datasource_dhcp_options.DhcpOptionsModel `tfsdk:"dhcp_options"`
+	Items             []datasource_dhcp_options.DhcpOptionsModel `tfsdk:"items"`
 	IDs               types.List                                 `tfsdk:"ids"`
 	Default           types.Bool                                 `tfsdk:"default"`
 	DomainNameServers types.List                                 `tfsdk:"domain_name_servers"`
@@ -83,21 +83,15 @@ func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.Rea
 		response.Diagnostics.AddError("HTTP call failed", "got empty DHCP options list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := DHCPOptionsFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting DHCPOptions HTTP object to Terraform object", diags.Errors()[0].Detail())
-		}
-		state.DHCPOptions = append(state.DHCPOptions, *tf)
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, DHCPOptionsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.IDs = plan.IDs
-	state.NTPServers = plan.NTPServers
-	state.DomainNames = plan.DomainNames
-	state.DomainNameServers = plan.DomainNameServers
-	state.LogServers = plan.LogServers
-	state.Default = plan.Default
-	state.Tags = plan.Tags
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
+
+	state = plan
+	state.Items = objectItems
+
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }

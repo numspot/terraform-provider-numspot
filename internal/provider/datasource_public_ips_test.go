@@ -18,7 +18,7 @@ func TestAccPublicIpsDatasource(t *testing.T) {
 			{
 				Config: fetchPublicIpsConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_public_ips.public_ip_data_source", "public_ips.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_public_ips.public_ip_data_source", "items.#", "1"),
 				),
 			},
 		},

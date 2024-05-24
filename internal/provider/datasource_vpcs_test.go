@@ -20,8 +20,8 @@ func TestAccVPCsDatasource_Basic(t *testing.T) {
 			{
 				Config: testAccVPCsDatasourceConfig_Basic(ipRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_vpcs.test", "vpcs.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_vpcs.test", "vpcs.0.ip_range", ipRange),
+					resource.TestCheckResourceAttr("data.numspot_vpcs.test", "items.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_vpcs.test", "items.0.ip_range", ipRange),
 				),
 			},
 		},

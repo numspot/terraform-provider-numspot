@@ -14,7 +14,7 @@ import (
 )
 
 type VmsDataSourceModel struct {
-	Vms                                   []datasource_vm.VmModel `tfsdk:"vms"`
+	Items                                 []datasource_vm.VmModel `tfsdk:"items"`
 	Architectures                         types.List              `tfsdk:"architectures"`
 	BlockDeviceMappingsDeleteOnVmDeletion types.Bool              `tfsdk:"block_device_mappings_delete_on_vm_deletion"`
 	BlockDeviceMappingsDeviceNames        types.List              `tfsdk:"block_device_mappings_device_names"`
@@ -126,66 +126,15 @@ func (d *vmsDataSource) Read(ctx context.Context, request datasource.ReadRequest
 		response.Diagnostics.AddError("HTTP call failed", "got empty VM list")
 	}
 
-	for _, item := range *res.JSON200.Items {
-		tf, diags := VmsFromHttpToTfDatasource(ctx, &item)
-		if diags != nil {
-			response.Diagnostics.AddError("Error while converting VM HTTP object to Terraform object", diags.Errors()[0].Detail())
-			return
-		}
-		state.Vms = append(state.Vms, utils.GetPtrValue(tf))
+	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VmsFromHttpToTfDatasource)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
 	}
-	state.Architectures = plan.Architectures
-	state.BlockDeviceMappingsDeleteOnVmDeletion = plan.BlockDeviceMappingsDeleteOnVmDeletion
-	state.BlockDeviceMappingsDeviceNames = plan.BlockDeviceMappingsDeviceNames
-	state.BlockDeviceMappingsLinkDates = plan.BlockDeviceMappingsLinkDates
-	state.BlockDeviceMappingsStates = plan.BlockDeviceMappingsStates
-	state.BlockDeviceMappingsVolumeIds = plan.BlockDeviceMappingsVolumeIds
-	state.ClientTokens = plan.ClientTokens
-	state.CreationDates = plan.CreationDates
-	state.ImageIds = plan.ImageIds
-	state.IsSourceDestChecked = plan.IsSourceDestChecked
-	state.KeypairNames = plan.KeypairNames
-	state.LaunchNumbers = plan.LaunchNumbers
-	state.NicAccountIds = plan.NicAccountIds
-	state.NicDescriptions = plan.NicDescriptions
-	state.NicIsSourceDestChecked = plan.NicIsSourceDestChecked
-	state.NicLinkNicDeleteOnVmDeletion = plan.NicLinkNicDeleteOnVmDeletion
-	state.NicLinkNicDeviceNumbers = plan.NicLinkNicDeviceNumbers
-	state.NicLinkNicLinkNicIds = plan.NicLinkNicLinkNicIds
-	state.NicLinkNicStates = plan.NicLinkNicStates
-	state.NicLinkPublicIpAccountIds = plan.NicLinkPublicIpAccountIds
-	state.NicLinkPublicIpsPublicIps = plan.NicLinkPublicIpsPublicIps
-	state.NicMacAddresses = plan.NicMacAddresses
-	state.NicNicIds = plan.NicNicIds
-	state.NicPrivateIpsLinkPublicIpAccountId = plan.NicPrivateIpsLinkPublicIpAccountId
-	state.NicPrivateIpsLinkPublicIps = plan.NicPrivateIpsLinkPublicIps
-	state.NicPrivateIpsIsPrimary = plan.NicPrivateIpsIsPrimary
-	state.NicPrivateIpsPrivateIps = plan.NicPrivateIpsPrivateIps
-	state.NicSecurityGroupIds = plan.NicSecurityGroupIds
-	state.NicSecurityGroupNames = plan.NicSecurityGroupNames
-	state.NicStates = plan.NicStates
-	state.NicSubnetIds = plan.NicSubnetIds
-	state.OsFamilies = plan.OsFamilies
-	state.PrivateIps = plan.PrivateIps
-	state.ProductCodes = plan.ProductCodes
-	state.PublicIps = plan.PublicIps
-	state.ReservationIds = plan.ReservationIds
-	state.RootDeviceNames = plan.RootDeviceNames
-	state.RootDeviceTypes = plan.RootDeviceTypes
-	state.SecurityGroupIds = plan.SecurityGroupIds
-	state.SecurityGroupNames = plan.SecurityGroupNames
-	state.StateReasonMessages = plan.StateReasonMessages
-	state.SubnetIds = plan.SubnetIds
-	state.TagKeys = plan.TagKeys
-	state.TagValues = plan.TagValues
-	state.Tags = plan.Tags
-	state.Tenancies = plan.Tenancies
-	state.VmStateNames = plan.VmStateNames
-	state.VmTypes = plan.VmTypes
-	state.VpcIds = plan.VpcIds
-	state.NicVpcIds = plan.NicVpcIds
-	state.AvailabilityZoneNames = plan.AvailabilityZoneNames
-	state.IDs = plan.IDs
+
+	state = plan
+	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
