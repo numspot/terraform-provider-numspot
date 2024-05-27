@@ -11,6 +11,7 @@ fmt: fmt-tf-conf
 
 fmt-tf-conf:
 	find . | egrep "test.go" | sort | while read f; do terrafmt fmt -fv $$f; done
+	terraform fmt -recursive examples/
 
 lint-fix:
 	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.55.2 golangci-lint run --fix -v

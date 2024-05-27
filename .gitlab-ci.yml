@@ -12,6 +12,22 @@ before_script:
   - echo "machine ${CI_SERVER_HOST} login gitlab-ci-token password
     ${CI_JOB_TOKEN}" > ~/.netrc
 
+fmt:
+  image: golang:1.21.0
+  stage: test
+  before_script:
+    - apt update && apt install -y git lsb-release gnupg software-properties-common
+    - wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+    - gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
+    - echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+    - apt update
+    - apt install terraform -y
+    - go install github.com/katbyte/terrafmt@latest
+  script:
+    - find . | egrep "test.go" | sort | while read f; do terrafmt fmt -fv $f; done
+    - terraform fmt -recursive examples/
+    - git diff --compact-summary --exit-code || (echo; echo "Unexpected difference in directories after code formatting. Run 'make fmt' command and commit."; exit 1)
+
 go_lint:
   image: golangci/golangci-lint:v1.57.1-alpine
   stage: test
