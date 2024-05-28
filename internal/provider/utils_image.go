@@ -29,13 +29,18 @@ func bsuFromTf(bsu resource_image.BsuValue) *iaas.BsuToCreate {
 }
 
 func blockDeviceMappingFromTf(bdm resource_image.BlockDeviceMappingsValue) iaas.BlockDeviceMappingImage {
-	bsuTf := resource_image.BsuValue{}
-	bsu := bsuFromTf(bsuTf)
+	attrtypes := bdm.Bsu.AttributeTypes(context.Background())
+	attrVals := bdm.Bsu.Attributes()
+	bsuTF, diags := resource_image.NewBsuValue(attrtypes, attrVals)
+	if diags.HasError() {
+		return iaas.BlockDeviceMappingImage{}
+	}
+	bsu := bsuFromTf(bsuTF)
 
 	return iaas.BlockDeviceMappingImage{
 		Bsu:               bsu,
 		DeviceName:        bdm.DeviceName.ValueStringPointer(),
-		VirtualDeviceName: bdm.VirtualDeviceName.ValueStringPointer(),
+		VirtualDeviceName: utils.FromTfStringToStringPtr(bdm.VirtualDeviceName),
 	}
 }
 

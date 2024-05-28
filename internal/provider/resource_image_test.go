@@ -112,7 +112,6 @@ func TestAccImageResource_FromSnapshot(t *testing.T) {
 					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
 					resource.TestCheckResourceAttr("numspot_image.test", "state", "available"),
 				),
-				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
