@@ -4,7 +4,7 @@ resource "numspot_vm" "example" {
 
 resource "numspot_vm" "example" {
   image_id           = "ami-12345678"
-  vm_type            = "ns-cus6-2c4r"
+  type               = "ns-cus6-2c4r"
   keypair_name       = "keypair-example"
   security_group_ids = ["sg-12345678"]
   user_data          = "..."

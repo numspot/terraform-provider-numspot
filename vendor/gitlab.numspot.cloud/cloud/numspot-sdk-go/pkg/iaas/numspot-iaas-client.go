@@ -207,7 +207,6 @@ type BsuToCreate struct {
 	VolumeSize *int `json:"volumeSize,omitempty"`
 
 	// VolumeType The type of the volume (`standard` \| `io1` \| `gp2`). If not specified in the request, a `standard` volume is created.<br />
-	//  For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
 	VolumeType *string `json:"volumeType,omitempty"`
 }
 
@@ -259,7 +258,7 @@ type CreateDhcpOptions struct {
 	// DomainName Specify a domain name (for example, `MyCompany.com`). You can specify only one domain name. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.
 	DomainName *string `json:"domainName,omitempty"`
 
-	// DomainNameServers The IPs of domain name servers. If no IPs are specified, the `OutscaleProvidedDNS` value is set by default. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.
+	// DomainNameServers The IPs of domain name servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.
 	DomainNameServers *[]string `json:"domainNameServers,omitempty"`
 
 	// LogServers The IPs of the log servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.
@@ -301,7 +300,7 @@ type CreateFlexibleGpu struct {
 	// Generation The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU).
 	Generation *string `json:"generation,omitempty"`
 
-	// ModelName The model of fGPU you want to allocate. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).
+	// ModelName The model of fGPU you want to allocate.
 	ModelName string `json:"modelName"`
 }
 
@@ -377,7 +376,7 @@ type CreateLoadBalancer struct {
 	// Name The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).
 	Name string `json:"name"`
 
-	// PublicIp (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by 3DS OUTSCALE is associated.
+	// PublicIp (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by NumSpot is associated.
 	PublicIp *string `json:"publicIp,omitempty"`
 
 	// SecurityGroups (Net only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Net is assigned to the load balancer.
@@ -540,7 +539,7 @@ type CreateSubnet struct {
 	AvailabilityZoneName *string `json:"availabilityZoneName,omitempty"`
 
 	// IpRange The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />
-	// The IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About Nets](https://docs.outscale.com/en/userguide/About-Nets.html).
+	// The IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs).
 	IpRange string `json:"ipRange"`
 
 	// VpcId The ID of the Net for which you want to create a Subnet.
@@ -615,8 +614,7 @@ type CreateVms struct {
 	// SubnetId The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.
 	SubnetId *string `json:"subnetId,omitempty"`
 
-	// Type The type of VM. You can specify a TINA type (in the `tinavW.cXrYpZ` or `tinavW.cXrY` format), or an AWS type (for example, `t2.small`, which is the default value).<br />
-	// If you specify an AWS type, it is converted in the background to its corresponding TINA type, but the AWS type is still returned. If the specified or converted TINA type includes a performance flag, this performance flag is applied regardless of the value you may have provided in the `Performance` parameter. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+	// Type The type of VM.
 	Type *string `json:"type,omitempty"`
 
 	// UserData Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
@@ -644,7 +642,6 @@ type CreateVolume struct {
 	SnapshotId *string `json:"snapshotId,omitempty"`
 
 	// Type The type of volume you want to create (`io1` \| `gp2` \ | `standard`). If not specified, a `standard` volume is created.<br />
-	//  For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
 	Type *string `json:"type,omitempty"`
 }
 
@@ -665,7 +662,7 @@ type CreateVpcAccessPoint struct {
 	// RouteTableIds One or more IDs of route tables to use for the connection.
 	RouteTableIds *[]string `json:"routeTableIds,omitempty"`
 
-	// ServiceName The name of the service (in the format `com.outscale.region.service`).
+	// ServiceName The name of the service.
 	ServiceName string `json:"serviceName"`
 
 	// VpcId The ID of the Net.
@@ -835,8 +832,8 @@ type DirectLinkInterface struct {
 	// Name The name of the DirectLink interface.
 	Name string `json:"name"`
 
-	// OutscalePrivateIp The IP on the OUTSCALE side of the DirectLink interface.
-	OutscalePrivateIp *string `json:"outscalePrivateIp,omitempty"`
+	// NumspotPrivateIp The IP on the NumSpot side of the DirectLink interface.
+	NumspotPrivateIp *string `json:"numspotPrivateIp,omitempty"`
 
 	// VirtualGatewayId The ID of the target virtual gateway.
 	VirtualGatewayId string `json:"virtualGatewayId"`
@@ -874,8 +871,8 @@ type DirectLinkInterfaces struct {
 	// Mtu The maximum transmission unit (MTU) of the DirectLink interface, in bytes (always `1500`).
 	Mtu *int `json:"mtu,omitempty"`
 
-	// OutscalePrivateIp The IP on the OUTSCALE side of the DirectLink interface.
-	OutscalePrivateIp *string `json:"outscalePrivateIp,omitempty"`
+	// NumspotPrivateIp The IP on the NumSpot side of the DirectLink interface.
+	NumspotPrivateIp *string `json:"numspotPrivateIp,omitempty"`
 
 	// State The state of the DirectLink interface (`pending` \| `available` \| `deleting` \| `deleted` \| `confirming` \| `rejected` \| `expired`).
 	State *string `json:"state,omitempty"`
@@ -917,7 +914,7 @@ type FlexibleGpu struct {
 	// Id The ID of the fGPU.
 	Id *string `json:"id,omitempty"`
 
-	// ModelName The model of fGPU. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).
+	// ModelName The model of fGPU.
 	ModelName *string `json:"modelName,omitempty"`
 
 	// State The state of the fGPU (`allocated` \| `attaching` \| `attached` \| `detaching`).
@@ -1208,7 +1205,7 @@ type Listener struct {
 	// PolicyNames The names of the policies. If there are no policies enabled, the list is empty.
 	PolicyNames *[]string `json:"policyNames,omitempty"`
 
-	// ServerCertificateId The OUTSCALE Resource Name (ORN) of the server certificate. For more information, see [Resource Identifiers > OUTSCALE Resource Names (ORNs)](https://docs.outscale.com/en/userguide/Resource-Identifiers.html#_outscale_resource_names_orns).
+	// ServerCertificateId The NumSpot Resource Name of the server certificate.
 	ServerCertificateId *string `json:"serverCertificateId,omitempty"`
 }
 
@@ -1920,7 +1917,7 @@ type Route struct {
 	// DestinationIpRange The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
 	DestinationIpRange *string `json:"destinationIpRange,omitempty"`
 
-	// DestinationServiceId The ID of the OUTSCALE service.
+	// DestinationServiceId The ID of the NumSpot service.
 	DestinationServiceId *string `json:"destinationServiceId,omitempty"`
 
 	// GatewayId The ID of the Internet service or virtual gateway attached to the Net.
@@ -2034,7 +2031,7 @@ type SecurityGroupRule struct {
 	// SecurityGroupsMembers Information about one or more source or destination security groups.
 	SecurityGroupsMembers *[]SecurityGroupsMember `json:"securityGroupsMembers,omitempty"`
 
-	// ServiceIds One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).
+	// ServiceIds One or more service IDs to allow traffic from a Net to access the corresponding NumSpot services.
 	ServiceIds *[]string `json:"serviceIds,omitempty"`
 
 	// ToPortRange The end of the port range for the TCP and UDP protocols, or an ICMP code number.
@@ -2249,7 +2246,7 @@ type UpdateLoadBalancer struct {
 	// PolicyNames The name of the policy you want to enable for the listener.
 	PolicyNames *[]string `json:"policyNames,omitempty"`
 
-	// PublicIp (internet-facing only) The public IP you want to associate with the load balancer. The former public IP of the load balancer is then disassociated. If you specify an empty string and the former public IP belonged to you, it is disassociated and replaced by a public IP owned by 3DS OUTSCALE.
+	// PublicIp (internet-facing only) The public IP you want to associate with the load balancer. The former public IP of the load balancer is then disassociated. If you specify an empty string and the former public IP belonged to you, it is disassociated and replaced by a public IP owned by NumSpot.
 	PublicIp *string `json:"publicIp,omitempty"`
 
 	// SecuredCookies If true, secure cookies are enabled for the load balancer.
@@ -2323,7 +2320,7 @@ type UpdateVm struct {
 	IsSourceDestChecked *bool `json:"isSourceDestChecked,omitempty"`
 
 	// KeypairName The name of a keypair you want to associate with the VM.<br />
-	// When you replace the keypair of a VM with another one, the metadata of the VM is modified to reflect the new public key, but the replacement is still not effective in the operating system of the VM. To complete the replacement and effectively apply the new keypair, you need to perform other actions inside the VM. For more information, see [Modifying the Keypair of a VM](https://docs.outscale.com/en/userguide/Modifying-the-Keypair-of-a-VM.html).
+	// When you replace the keypair of a VM with another one, the metadata of the VM is modified to reflect the new public key, but the replacement is still not effective in the operating system of the VM. To complete the replacement and effectively apply the new keypair, you need to perform other actions inside the VM.
 	KeypairName *string `json:"keypairName,omitempty"`
 
 	// NestedVirtualization (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
@@ -2335,7 +2332,7 @@ type UpdateVm struct {
 	// SecurityGroupIds One or more IDs of security groups for the VM.
 	SecurityGroupIds *[]string `json:"securityGroupIds,omitempty"`
 
-	// Type The type of VM. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+	// Type The type of VM.
 	Type *string `json:"type,omitempty"`
 
 	// UserData The Base64-encoded MIME user data, limited to 500 kibibytes (KiB).
@@ -2402,7 +2399,7 @@ type VgwTelemetry struct {
 	// LastStateChangeDate The date and time (UTC) of the latest state update.
 	LastStateChangeDate *time.Time `json:"lastStateChangeDate,omitempty"`
 
-	// OutsideIpAddress The IP on the OUTSCALE side of the tunnel.
+	// OutsideIpAddress The IP on the NumSpot side of the tunnel.
 	OutsideIpAddress *string `json:"outsideIpAddress,omitempty"`
 
 	// State The state of the IPSEC tunnel (`UP` \| `DOWN`).
@@ -2525,7 +2522,7 @@ type Vm struct {
 	// Tags One or more tags associated with the VM.
 	Tags *[]ResourceTag `json:"tags,omitempty"`
 
-	// Type The type of VM. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+	// Type The type of VM.
 	Type *string `json:"type,omitempty"`
 
 	// UserData The Base64-encoded MIME user data.
@@ -2707,7 +2704,7 @@ type VpnConnection struct {
 	// VgwTelemetries Information about the current state of one or more of the VPN tunnels.
 	VgwTelemetries *[]VgwTelemetry `json:"vgwTelemetries,omitempty"`
 
-	// VirtualGatewayId The ID of the virtual gateway used on the OUTSCALE end of the connection.
+	// VirtualGatewayId The ID of the virtual gateway used on the NumSpot end of the connection.
 	VirtualGatewayId *string `json:"virtualGatewayId,omitempty"`
 
 	// VpnOptions Information about the VPN options.
@@ -3399,7 +3396,7 @@ type ReadFlexibleGpusParams struct {
 	// Generations The processor generations that the fGPUs are compatible with.
 	Generations *[]string `form:"generations,omitempty" json:"generations,omitempty"`
 
-	// ModelNames One or more models of fGPUs. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).
+	// ModelNames One or more models of fGPUs.
 	ModelNames *[]string `form:"modelNames,omitempty" json:"modelNames,omitempty"`
 
 	// States The states of the fGPUs (`allocated` \| `attaching` \| `attached` \| `detaching`).
@@ -4139,7 +4136,7 @@ type ReadVmsParams struct {
 	// VmStateNames The state names of the VMs (`pending` \| `running` \| `stopping` \| `stopped` \| `shutting-down` \| `terminated` \| `quarantine`).
 	VmStateNames *[]string `form:"vmStateNames,omitempty" json:"vmStateNames,omitempty"`
 
-	// Types The VM types (for example, t2.micro). For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+	// Types The NumSpot VM types.
 	Types *[]string `form:"types,omitempty" json:"types,omitempty"`
 
 	// VpcIds The IDs of the Nets in which the VMs are running.

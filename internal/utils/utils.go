@@ -57,6 +57,10 @@ func FromTfBoolToBoolPtr(bl types.Bool) *bool {
 }
 
 func FromTfInt64ToIntPtr(tfInt types.Int64) *int {
+	if tfInt.IsUnknown() || tfInt.IsNull() {
+		return nil
+	}
+
 	if tfInt.ValueInt64Pointer() != nil {
 		val := int(tfInt.ValueInt64())
 		return &val
@@ -294,4 +298,14 @@ func FromHttpGenericListToTfList[httpType any, tfType any](
 	}
 
 	return itemList, nil
+}
+
+func EmptyTrueBoolPointer() *bool {
+	value := true
+	return &value
+}
+
+func EmptyStrPointer() *string {
+	value := ""
+	return &value
 }

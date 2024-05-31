@@ -12,7 +12,7 @@ info:
     title: Numspot IaaS API
     version: 0.0.22
 servers:
-    - url: https://iaas.{env}.{region}.numspot.internal
+    - url: https://cloud-compute-gateway.{env}.{region}.numspot.internal
       variables:
         env:
             default: zex-integ
@@ -74,7 +74,7 @@ paths:
                 - BearerAuth:
                     - metadata.tag.unset
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -87,7 +87,6 @@ paths:
             description: |-
                 Adds one or more tags to the specified load balancers.<br />
                  If a tag with the same key already exists for the load balancer, the tag value is replaced.<br /><br />
-                For more information, see [About Tags](https://docs.outscale.com/en/userguide/About-Tags.html).
             operationId: CreateLoadBalancerTags
             requestBody:
                 $ref: '#/components/requestBodies/CreateLoadBalancerTagsRequest'
@@ -134,7 +133,7 @@ paths:
                 - BearerAuth:
                     - metadata.tag.set
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -190,7 +189,7 @@ paths:
                 - BearerAuth:
                     - metadata.tag.unset
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Tag
             x-numspot-permissions:
@@ -225,8 +224,6 @@ paths:
                 * DHCP options (dopt-xxxxxxxx)<br />
                 * NMI export tasks (image-export-xxxxxxxx)<br />
                 * Snapshot export tasks (snap-export-xxxxxxxx)
-
-                For more information, see [About Tags](https://docs.outscale.com/en/userguide/About-Tags.html).
             operationId: CreateTags
             requestBody:
                 $ref: '#/components/requestBodies/CreateTagsRequest'
@@ -273,7 +270,7 @@ paths:
                 - BearerAuth:
                     - metadata.tag.set
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Tag
             x-numspot-permissions:
@@ -384,7 +381,7 @@ paths:
                 - BearerAuth:
                     - network.clientGateway
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - ClientGateway
             x-numspot-permissions:
@@ -401,7 +398,6 @@ paths:
                 Provides information about your client gateway.<br />
                 This action registers information to identify the client gateway that you deployed in your network.<br />
                 To open a tunnel to the client gateway, you must provide the communication protocol type, the fixed public IP of the gateway, and an Autonomous System Number (ASN).<br /><br />
-                For more information, see [About Client Gateways](https://docs.outscale.com/en/userguide/About-Client-Gateways.html).
             operationId: CreateClientGateway
             requestBody:
                 $ref: '#/components/requestBodies/CreateClientGatewayRequest'
@@ -448,7 +444,7 @@ paths:
                 - BearerAuth:
                     - network.clientGateway.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - ClientGateway
             x-numspot-permissions:
@@ -516,7 +512,7 @@ paths:
                 - BearerAuth:
                     - network.clientGateway.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - ClientGateway
             x-numspot-permissions:
@@ -579,7 +575,7 @@ paths:
                 - BearerAuth:
                     - network.clientGateway.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - ClientGateway
             x-numspot-permissions:
@@ -700,7 +696,7 @@ paths:
                 - BearerAuth:
                     - dhcp.dhcpOption
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DhcpOption
             x-numspot-permissions:
@@ -713,9 +709,7 @@ paths:
         parameters:
             - $ref: '#/components/parameters/SpaceId'
         post:
-            description: |-
-                Creates a set of DHCP options, that you can then associate with a Vpc using the [UpdateVpc](#updatenet) method.<br /><br />
-                For more information, see [About DHCP Options](https://docs.outscale.com/en/userguide/About-DHCP-Options.html).
+            description: Creates a set of DHCP options, that you can then associate with a Vpc using the [UpdateVpc](#updatenet) method.<br /><br />
             operationId: CreateDhcpOptions
             requestBody:
                 $ref: '#/components/requestBodies/CreateDhcpOptionsRequest'
@@ -762,7 +756,7 @@ paths:
                 - BearerAuth:
                     - dhcp.dhcpOption.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DhcpOption
             x-numspot-permissions:
@@ -833,7 +827,7 @@ paths:
                 - BearerAuth:
                     - dhcp.dhcpOption.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DhcpOption
             x-numspot-permissions:
@@ -896,7 +890,7 @@ paths:
                 - BearerAuth:
                     - dhcp.dhcpOption.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DhcpOption
             x-numspot-permissions:
@@ -970,7 +964,7 @@ paths:
                 - BearerAuth:
                     - network.directLinkInterface
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DirectLinkInterface
             x-numspot-permissions:
@@ -986,7 +980,6 @@ paths:
             description: |-
                 Creates a DirectLink interface.<br />
                 DirectLink interfaces enable you to reach one of your Vpcs through a virtual gateway.<br /><br />
-                For more information, see [About DirectLink](https://docs.outscale.com/en/userguide/About-DirectLink.html).
             operationId: CreateDirectLinkInterface
             requestBody:
                 $ref: '#/components/requestBodies/CreateDirectLinkInterfaceRequest'
@@ -1033,7 +1026,7 @@ paths:
                 - BearerAuth:
                     - network.directLinkInterface.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DirectLinkInterface
             x-numspot-permissions:
@@ -1099,7 +1092,7 @@ paths:
                 - BearerAuth:
                     - network.directLinkInterface.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DirectLinkInterface
             x-numspot-permissions:
@@ -1162,7 +1155,7 @@ paths:
                 - BearerAuth:
                     - network.directLinkInterface.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DirectLinkInterface
             x-numspot-permissions:
@@ -1229,7 +1222,7 @@ paths:
                 - BearerAuth:
                     - network.directLinkInterface.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DirectLinkInterface
             x-numspot-permissions:
@@ -1294,7 +1287,7 @@ paths:
                 - BearerAuth:
                     - network.directLink
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DirectLink
             x-numspot-permissions:
@@ -1307,9 +1300,7 @@ paths:
         parameters:
             - $ref: '#/components/parameters/SpaceId'
         post:
-            description: |-
-                Creates a DirectLink between a customer network and a specified DirectLink location.<br /><br />
-                For more information, see [About DirectLink](https://docs.outscale.com/en/userguide/About-DirectLink.html).
+            description: Creates a DirectLink between a customer network and a specified DirectLink location.<br /><br />
             operationId: CreateDirectLink
             requestBody:
                 $ref: '#/components/requestBodies/CreateDirectLinkRequest'
@@ -1356,7 +1347,7 @@ paths:
                 - BearerAuth:
                     - network.directLink.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DirectLink
             x-numspot-permissions:
@@ -1424,7 +1415,7 @@ paths:
                 - BearerAuth:
                     - network.directLink.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DirectLink
             x-numspot-permissions:
@@ -1487,7 +1478,7 @@ paths:
                 - BearerAuth:
                     - network.directLink.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - DirectLink
             x-numspot-permissions:
@@ -1546,7 +1537,7 @@ paths:
                 - BearerAuth:
                     - compute.flexibleGpu
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - FlexibleGpu
             x-numspot-permissions:
@@ -1575,7 +1566,7 @@ paths:
                     items:
                         type: string
                     type: array
-                - description: One or more models of fGPUs. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).
+                - description: One or more models of fGPUs.
                   in: query
                   name: modelNames
                   schema:
@@ -1653,7 +1644,7 @@ paths:
                 - BearerAuth:
                     - compute.flexibleGpu
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - FlexibleGpu
             x-numspot-permissions:
@@ -1669,7 +1660,6 @@ paths:
             description: |-
                 Allocates a flexible GPU (fGPU) to your account.<br />
                 You can then attach this fGPU to a virtual machine (VM).<br /><br />
-                For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).
             operationId: CreateFlexibleGpu
             requestBody:
                 $ref: '#/components/requestBodies/CreateFlexibleGpuRequest'
@@ -1716,7 +1706,7 @@ paths:
                 - BearerAuth:
                     - compute.flexibleGpu.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - FlexibleGpu
             x-numspot-permissions:
@@ -1784,7 +1774,7 @@ paths:
                 - BearerAuth:
                     - compute.flexibleGpu.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - FlexibleGpu
             x-numspot-permissions:
@@ -1847,7 +1837,7 @@ paths:
                 - BearerAuth:
                     - compute.flexibleGpu.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - FlexibleGpu
             x-numspot-permissions:
@@ -1914,7 +1904,7 @@ paths:
                 - BearerAuth:
                     - compute.flexibleGpu.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - FlexibleGpu
             x-numspot-permissions:
@@ -1985,7 +1975,7 @@ paths:
                     - compute.flexibleGpu.link
                     - compute.vm.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - FlexibleGpu
             x-numspot-permissions:
@@ -2055,7 +2045,7 @@ paths:
                     - compute.flexibleGpu.unlink
                     - compute.vm.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - FlexibleGpu
             x-numspot-permissions:
@@ -2271,7 +2261,7 @@ paths:
                 - BearerAuth:
                     - datamanagement.machineImage
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Image
             x-numspot-permissions:
@@ -2284,7 +2274,17 @@ paths:
         parameters:
             - $ref: '#/components/parameters/SpaceId'
         post:
-            description: "Creates an NumSpot machine image (NMI).<br />\nYou can use this method in different ways:\n* **Creating from a VM**: You create an NMI from one of your virtual machines (VMs).<br>\n* **Copying an NMI**: You copy an existing NMI. The source NMI can be one of your own NMIs, or an NMI owned by another account that has granted you permission via the [UpdateImage](#updateimage) method.<br>\n* **Registering from a snapshot**: You register an NMI from an existing snapshot. The source snapshot can be one of your own snapshots, or a snapshot owned by another account that has granted you permission via the [UpdateSnapshot](#updatesnapshot) method.<br>\n* **Registering from a bucket by using a manifest file**: You register an NMI from the manifest file of an NMI that was exported to an NumSpot Object Storage (NOS) bucket. First, the owner of the source NMI must export it to the bucket by using the [CreateImageExportTask](#createimageexporttask) method. Then, they must grant you permission to read the manifest file via a pre-signed URL or Access Control Lists. For more information, see [Managing Access to Your Buckets and Objects](https://docs.outscale.com/en/userguide/Managing-Access-to-Your-Buckets-and-Objects.html).<br />\n* **Registering from a bucket without using a manifest file**: This is similar to the previous case but you manually specify all the information that would be in a manifest file instead of using a manifest file.\n\n**[TIP]**<br />\nRegistering from a bucket enables you to copy an NMI across Regions.\n \nFor more information, see [About NMIs](https://docs.outscale.com/en/userguide/About-NMIs.html)."
+            description: |-
+                Creates an NumSpot machine image (NMI).<br />
+                You can use this method in different ways:
+                * **Creating from a VM**: You create an NMI from one of your virtual machines (VMs).<br>
+                * **Copying an NMI**: You copy an existing NMI. The source NMI can be one of your own NMIs, or an NMI owned by another account that has granted you permission via the [UpdateImage](#updateimage) method.<br>
+                * **Registering from a snapshot**: You register an NMI from an existing snapshot. The source snapshot can be one of your own snapshots, or a snapshot owned by another account that has granted you permission via the [UpdateSnapshot](#updatesnapshot) method.<br>
+                * **Registering from a bucket by using a manifest file**: You register an NMI from the manifest file of an NMI that was exported to an NumSpot Object Storage (NOS) bucket. First, the owner of the source NMI must export it to the bucket by using the [CreateImageExportTask](#createimageexporttask) method. Then, they must grant you permission to read the manifest file via a pre-signed URL or Access Control Lists.<br />
+                * **Registering from a bucket without using a manifest file**: This is similar to the previous case but you manually specify all the information that would be in a manifest file instead of using a manifest file.
+
+                **[TIP]**<br />
+                Registering from a bucket enables you to copy an NMI across Regions.
             operationId: CreateImage
             requestBody:
                 $ref: '#/components/requestBodies/CreateImageRequest'
@@ -2331,7 +2331,7 @@ paths:
                 - BearerAuth:
                     - datamanagement.machineImage.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Image
             x-numspot-permissions:
@@ -2397,7 +2397,7 @@ paths:
                 - BearerAuth:
                     - datamanagement.machineImage.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Image
             x-numspot-permissions:
@@ -2460,7 +2460,7 @@ paths:
                 - BearerAuth:
                     - datamanagement.machineImage.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Image
             x-numspot-permissions:
@@ -2530,7 +2530,7 @@ paths:
                 - BearerAuth:
                     - datamanagement.machineImage.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Image
             x-numspot-permissions:
@@ -2632,7 +2632,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.internetGateway
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - InternetGateway
             x-numspot-permissions:
@@ -2648,7 +2648,6 @@ paths:
             description: |-
                 Creates an Internet Gateway you can use with a Vpc.<br />
                 An Internet Gateway enables your virtual machines (VMs) launched in a Vpc to connect to the Internet. By default, a Vpc includes an Internet Gateway, and each Subnet is public. Every VM launched within a default Subnet has a private IP and a public IP.<br /><br />
-                For more information, see [About Internet Services](https://docs.outscale.com/en/userguide/About-Internet-Services.html).
             operationId: CreateInternetGateway
             responses:
                 "201":
@@ -2693,7 +2692,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.internetGateway.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - InternetGateway
             x-numspot-permissions:
@@ -2761,7 +2760,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.internetGateway.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - InternetGateway
             x-numspot-permissions:
@@ -2824,7 +2823,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.internetGateway.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - InternetGateway
             x-numspot-permissions:
@@ -2897,7 +2896,7 @@ paths:
                     - loadbalancing.internetGateway.link
                     - network.vpc.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - InternetGateway
             x-numspot-permissions:
@@ -2969,7 +2968,7 @@ paths:
                     - loadbalancing.internetGateway.unlink
                     - network.vpc.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - InternetGateway
             x-numspot-permissions:
@@ -3049,7 +3048,7 @@ paths:
                 - BearerAuth:
                     - security.keyPair
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Keypair
             x-numspot-permissions:
@@ -3068,8 +3067,6 @@ paths:
                 * **Creating a keypair**: In that case, NumSpot creates a 2048-bit RSA keypair, stores its public key in your account, and returns its private key in the response of the call so that you can save it in a file.<br />
                 When you save the returned private key, make sure you replace the `\n` escape sequences with real line breaks.
                  * **Importing a keypair created locally**: If you already have a keypair that you have created locally with a third-party tool, you can import its public key in your account. The following types of key can be imported: RSA (2048 bits or preferably 4096 bits), ECDSA (256 bits), and Ed25519. The following formats can be used: PEM, PKCS8, RFC4716, and OpenSSH.
-
-                For more information, see [About Keypairs](https://docs.outscale.com/en/userguide/About-Keypairs.html).
             operationId: CreateKeypair
             requestBody:
                 $ref: '#/components/requestBodies/CreateKeypairRequest'
@@ -3122,7 +3119,7 @@ paths:
                 - BearerAuth:
                     - security.keyPair.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Keypair
             x-numspot-permissions:
@@ -3190,7 +3187,7 @@ paths:
                 - BearerAuth:
                     - security.keyPair.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Keypair
             x-numspot-permissions:
@@ -3253,7 +3250,7 @@ paths:
                 - BearerAuth:
                     - security.keyPair.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Keypair
             x-numspot-permissions:
@@ -3320,7 +3317,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.listenerRule
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Listener
             x-numspot-permissions:
@@ -3336,7 +3333,6 @@ paths:
             description: |-
                 Creates a rule for traffic redirection for the specified listener. Each rule must have either the `HostNamePattern` or `PathPattern` parameter specified. Rules are treated in priority order, from the highest value to the lowest value.<br />
                 Once the rule is created, you need to register backend VMs with it. For more information, see the [RegisterVmsInLoadBalancer](#registervmsinloadbalancer) method.<br /><br />
-                For more information, see [About Load Balancers](https://docs.outscale.com/en/userguide/About-Load-Balancers.html).
             operationId: CreateListenerRule
             requestBody:
                 $ref: '#/components/requestBodies/CreateListenerRuleRequest'
@@ -3383,7 +3379,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.listenerRule.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Listener
             x-numspot-permissions:
@@ -3451,7 +3447,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.listenerRule.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Listener
             x-numspot-permissions:
@@ -3514,7 +3510,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.listenerRule.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Listener
             x-numspot-permissions:
@@ -3583,7 +3579,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.listenerRule.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Listener
             x-numspot-permissions:
@@ -3648,7 +3644,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.loadBalancer
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -3666,7 +3662,6 @@ paths:
                 The load balancer is created with a unique Domain Name Service (DNS) name. It receives the incoming traffic and routes it to its registered virtual machines (VMs).<br />
                 By default, this action creates an Internet-facing load balancer, resolving to public IPs. To create an internal load balancer in a Vpc, resolving to private IPs, use the `LoadBalancerType` parameter.<br />
                 You must specify either the `Subnets` or the `AvailabilityZoneNames` parameters.<br /><br />
-                For more information, see [About Load Balancers](https://docs.outscale.com/en/userguide/About-Load-Balancers.html).
             operationId: CreateLoadBalancer
             requestBody:
                 $ref: '#/components/requestBodies/CreateLoadBalancerRequest'
@@ -3713,7 +3708,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.loadBalancer.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -3779,7 +3774,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.loadBalancer.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -3842,7 +3837,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.loadBalancer.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -3916,7 +3911,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.loadBalancer.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -3987,7 +3982,7 @@ paths:
                     - loadbalancing.loadBalancer.link
                     - compute.vm.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -4057,7 +4052,7 @@ paths:
                     - loadbalancing.loadBalancer.unlink
                     - compute.vm.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -4124,7 +4119,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.listener.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Listener
             x-numspot-permissions:
@@ -4137,9 +4132,7 @@ paths:
         parameters:
             - $ref: '#/components/parameters/SpaceId'
         post:
-            description: |-
-                Creates one or more listeners for a specified load balancer.<br /><br />
-                For more information, see [About Load Balancers](https://docs.outscale.com/en/userguide/About-Load-Balancers.html).
+            description: Creates one or more listeners for a specified load balancer.<br /><br />
             operationId: CreateLoadBalancerListeners
             parameters:
                 - in: path
@@ -4193,7 +4186,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.listener.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Listener
             x-numspot-permissions:
@@ -4263,7 +4256,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.policy.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancerPolicy
             x-numspot-permissions:
@@ -4284,7 +4277,6 @@ paths:
                 You can also create a stickiness policy with sticky session lifetimes following the lifetime of an application-generated cookie.<br />
                 Unlike the other type of stickiness policy, the lifetime of the special Load Balancer Unit (LBU) cookie follows the lifetime of the application-generated cookie specified in the policy configuration. The load balancer inserts a new stickiness cookie only when the application response includes a new application cookie.<br />
                 The session stops being sticky if the application cookie is removed or expires, until a new application cookie is issued.<br /><br />
-                 For more information, see [About Load Balancers](https://docs.outscale.com/en/userguide/About-Load-Balancers.html).
             operationId: CreateLoadBalancerPolicy
             parameters:
                 - in: path
@@ -4338,7 +4330,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.policy.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancerPolicy
             x-numspot-permissions:
@@ -4406,7 +4398,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.loadBalancer.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -4467,7 +4459,7 @@ paths:
                 - BearerAuth:
                     - loadbalancing.tags
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - LoadBalancer
             x-numspot-permissions:
@@ -4481,9 +4473,7 @@ paths:
             - $ref: '#/components/parameters/SpaceId'
     /compute/spaces/{spaceId}/locations:
         get:
-            description: |-
-                Lists the locations, corresponding to datacenters, where you can set up a DirectLink.<br /><br />
-                For more information, see [About DirectLink](https://docs.outscale.com/en/userguide/About-DirectLink.html).
+            description: Lists the locations, corresponding to datacenters, where you can set up a DirectLink.<br /><br />
             operationId: ReadLocations
             responses:
                 "200":
@@ -4526,7 +4516,7 @@ paths:
                     description: The HTTP 500 response (Internal Server Error).
             security: []
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Location
         parameters:
@@ -4628,7 +4618,7 @@ paths:
                 - BearerAuth:
                     - network.natGateway
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - NatGateway
             x-numspot-permissions:
@@ -4641,7 +4631,7 @@ paths:
         parameters:
             - $ref: '#/components/parameters/SpaceId'
         post:
-            description: "Creates a network address translation (NAT) service in the specified public Subnet of a Vpc.<br />\nA NAT Gateway enables virtual machines (VMs) placed in the private Subnet of this Vpc to connect to the Internet, without being accessible from the Internet.<br />\nWhen creating a NAT Gateway, you specify the allocation ID of the public IP you want to use as public IP for the NAT Gateway. Once the NAT Gateway is created, you need to create a route in the route table of the private Subnet, with 0.0.0.0/0 as destination and the ID of the NAT Gateway as target. For more information, see [LinkPublicIP](#linkpublicip) and [CreateRoute](#createroute).<br />\nThis action also enables you to create multiple NAT Gateways in the same Vpc (one per public Subnet).<br /><br />\n \n**[IMPORTANT]**<br />\nYou cannot modify the public IP associated with a NAT Gateway after its creation. To do so, you need to delete the NAT Gateway and create a new one with another public IP.<br /><br />\nFor more information, see [About NAT Services](https://docs.outscale.com/en/userguide/About-NAT-Services.html)."
+            description: "Creates a network address translation (NAT) service in the specified public Subnet of a Vpc.<br />\nA NAT Gateway enables virtual machines (VMs) placed in the private Subnet of this Vpc to connect to the Internet, without being accessible from the Internet.<br />\nWhen creating a NAT Gateway, you specify the allocation ID of the public IP you want to use as public IP for the NAT Gateway. Once the NAT Gateway is created, you need to create a route in the route table of the private Subnet, with 0.0.0.0/0 as destination and the ID of the NAT Gateway as target. For more information, see [LinkPublicIP](#linkpublicip) and [CreateRoute](#createroute).<br />\nThis action also enables you to create multiple NAT Gateways in the same Vpc (one per public Subnet).<br /><br />\n \n**[IMPORTANT]**<br />\nYou cannot modify the public IP associated with a NAT Gateway after its creation. To do so, you need to delete the NAT Gateway and create a new one with another public IP.<br /><br />"
             operationId: CreateNatGateway
             requestBody:
                 $ref: '#/components/requestBodies/CreateNatGatewayRequest'
@@ -4690,7 +4680,7 @@ paths:
                     - network.subnet.get
                     - network.publicIp.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - NatGateway
             x-numspot-permissions:
@@ -4760,7 +4750,7 @@ paths:
                 - BearerAuth:
                     - network.natGateway.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - NatGateway
             x-numspot-permissions:
@@ -4823,7 +4813,7 @@ paths:
                 - BearerAuth:
                     - network.natGateway.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - NatGateway
             x-numspot-permissions:
@@ -5068,7 +5058,7 @@ paths:
                 - BearerAuth:
                     - network.nic
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Nic
             x-numspot-permissions:
@@ -5081,9 +5071,7 @@ paths:
         parameters:
             - $ref: '#/components/parameters/SpaceId'
         post:
-            description: |-
-                Creates a network interface card (NIC) in the specified Subnet.<br /><br />
-                For more information, see [About NICs](https://docs.outscale.com/en/userguide/About-NICs.html).
+            description: Creates a network interface card (NIC) in the specified Subnet.<br /><br />
             operationId: CreateNic
             requestBody:
                 $ref: '#/components/requestBodies/CreateNicRequest'
@@ -5130,7 +5118,7 @@ paths:
                 - BearerAuth:
                     - network.nic.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Nic
             x-numspot-permissions:
@@ -5198,7 +5186,7 @@ paths:
                 - BearerAuth:
                     - network.nic.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Nic
             x-numspot-permissions:
@@ -5261,7 +5249,7 @@ paths:
                 - BearerAuth:
                     - network.nic.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Nic
             x-numspot-permissions:
@@ -5328,7 +5316,7 @@ paths:
                 - BearerAuth:
                     - network.nic.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Nic
             x-numspot-permissions:
@@ -5396,7 +5384,7 @@ paths:
                 - BearerAuth:
                     - network.nic.link
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Nic
             x-numspot-permissions:
@@ -5464,7 +5452,7 @@ paths:
                 - BearerAuth:
                     - network.nic.unlink
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Nic
             x-numspot-permissions:
@@ -5480,7 +5468,7 @@ paths:
         put:
             description: |-
                 Attaches a network interface card (NIC) to a virtual machine (VM).<br />
-                The interface and the VM must be in the same AvailabilityZone. The VM can be either `running` or `stopped`. The NIC must be in the `available` state. For more information, see [Attaching a NIC to a VM](https://docs.outscale.com/en/userguide/Attaching-a-NIC-to-a-VM.html).
+                The interface and the VM must be in the same AvailabilityZone. The VM can be either `running` or `stopped`. The NIC must be in the `available` state.
             operationId: LinkNic
             parameters:
                 - in: path
@@ -5535,7 +5523,7 @@ paths:
                     - network.nic.link
                     - compute.vm.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Nic
             x-numspot-permissions:
@@ -5607,7 +5595,7 @@ paths:
                     - network.nic.unlink
                     - compute.vm.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Nic
             x-numspot-permissions:
@@ -5671,7 +5659,7 @@ paths:
                     description: The HTTP 500 response (Internal Server Error).
             security: []
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - ProductType
         parameters:
@@ -5728,14 +5716,14 @@ paths:
                     description: The HTTP 500 response (Internal Server Error).
             security: []
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - ProductType
         parameters:
             - $ref: '#/components/parameters/SpaceId'
     /compute/spaces/{spaceId}/publicIpRanges:
         get:
-            description: Gets the public IPv4 addresses in CIDR notation for the Region specified in the endpoint of the request. For more information, see [Regions, Endpoints, and AvailabilityZones Reference](https://docs.outscale.com/en/userguide/Regions-Endpoints-and-AvailabilityZones-Reference.html).
+            description: Gets the public IPv4 addresses in CIDR notation for the Region specified in the endpoint of the request.
             operationId: ReadPublicIpRanges
             responses:
                 "200":
@@ -5778,7 +5766,7 @@ paths:
                     description: The HTTP 500 response (Internal Server Error).
             security: []
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - PublicIp
         parameters:
@@ -5887,7 +5875,7 @@ paths:
                     description: The HTTP 500 response (Internal Server Error).
             security: []
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - PublicIp
         parameters:
@@ -5896,7 +5884,6 @@ paths:
             description: |-
                 Acquires a public IP for your account.<br />
                 A public IP is a static IP designed for dynamic Cloud computing. It can be associated with a virtual machine (VM) in the public Cloud or in a Vpc, a network interface card (NIC), a NAT Gateway.<br /><br />
-                For more information, see [About Public IPs](https://docs.outscale.com/en/userguide/About-Public-IPs.html).
             operationId: CreatePublicIp
             responses:
                 "201":
@@ -5939,7 +5926,7 @@ paths:
                     description: The HTTP 500 response (Internal Server Error).
             security: []
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - PublicIp
     /compute/spaces/{spaceId}/publicIps/{id}:
@@ -5998,7 +5985,7 @@ paths:
                 - BearerAuth:
                     - network.publicIp.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - PublicIp
             x-numspot-permissions:
@@ -6061,7 +6048,7 @@ paths:
                 - BearerAuth:
                     - network.publicIp.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - PublicIp
             x-numspot-permissions:
@@ -6137,7 +6124,7 @@ paths:
                 - BearerAuth:
                     - network.publicIp.link
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - PublicIp
             x-numspot-permissions:
@@ -6209,7 +6196,7 @@ paths:
                 - BearerAuth:
                     - network.publicIp.unlink
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - PublicIp
             x-numspot-permissions:
@@ -6386,7 +6373,7 @@ paths:
                 - BearerAuth:
                     - routing.routeTable
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - RouteTable
             x-numspot-permissions:
@@ -6402,7 +6389,6 @@ paths:
             description: |-
                 Creates a route table for a specified Vpc.<br />
                 You can then add routes and associate this route table with a Subnet.<br /><br />
-                For more information, see [About Route Tables](https://docs.outscale.com/en/userguide/About-Route-Tables.html).
             operationId: CreateRouteTable
             requestBody:
                 $ref: '#/components/requestBodies/CreateRouteTableRequest'
@@ -6449,7 +6435,7 @@ paths:
                 - BearerAuth:
                     - routing.routeTable.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - RouteTable
             x-numspot-permissions:
@@ -6517,7 +6503,7 @@ paths:
                 - BearerAuth:
                     - routing.routeTable.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - RouteTable
             x-numspot-permissions:
@@ -6580,7 +6566,7 @@ paths:
                 - BearerAuth:
                     - routing.routeTable.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - RouteTable
             x-numspot-permissions:
@@ -6650,7 +6636,7 @@ paths:
                 - BearerAuth:
                     - routing.routeTable.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - RouteTable
             x-numspot-permissions:
@@ -6716,7 +6702,7 @@ paths:
                 - BearerAuth:
                     - routing.routeTable.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Route
             x-numspot-permissions:
@@ -6741,7 +6727,6 @@ paths:
                 * Network interface card (NIC)<br /><br />
 
                 The routing algorithm is based on the most specific match.<br /><br />
-                For more information, see [About Route Tables](https://docs.outscale.com/en/userguide/About-Route-Tables.html).
             operationId: CreateRoute
             parameters:
                 - in: path
@@ -6795,7 +6780,7 @@ paths:
                 - BearerAuth:
                     - routing.routeTable.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Route
             x-numspot-permissions:
@@ -6862,7 +6847,7 @@ paths:
                 - BearerAuth:
                     - routing.routeTable.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Route
             x-numspot-permissions:
@@ -6933,7 +6918,7 @@ paths:
                     - routing.routeTable.link
                     - network.subnet.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - RouteTable
             x-numspot-permissions:
@@ -7005,7 +6990,7 @@ paths:
                     - routing.routeTable.unlink
                     - network.subnet.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - RouteTable
             x-numspot-permissions:
@@ -7213,7 +7198,7 @@ paths:
                 - BearerAuth:
                     - security.securityGroup
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - SecurityGroup
             x-numspot-permissions:
@@ -7233,7 +7218,6 @@ paths:
                 When creating a security group, you specify a name. Two security groups for use in the public Cloud or for use in a Vpc cannot have the same name.<br />
                 You can have up to 500 security groups in the public Cloud. You can create up to 500 security groups per Vpc.<br />
                 To add or remove rules, use the [CreateSecurityGroupRule](#createsecuritygrouprule) method.<br /><br />
-                For more information, see [About Security Groups](https://docs.outscale.com/en/userguide/About-Security-Groups.html).
             operationId: CreateSecurityGroup
             requestBody:
                 $ref: '#/components/requestBodies/CreateSecurityGroupRequest'
@@ -7280,7 +7264,7 @@ paths:
                 - BearerAuth:
                     - security.securityGroup.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - SecurityGroup
             x-numspot-permissions:
@@ -7349,7 +7333,7 @@ paths:
                 - BearerAuth:
                     - security.securityGroup.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - SecurityGroup
             x-numspot-permissions:
@@ -7412,7 +7396,7 @@ paths:
                 - BearerAuth:
                     - security.securityGroup.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - SecurityGroup
             x-numspot-permissions:
@@ -7484,7 +7468,7 @@ paths:
                 - BearerAuth:
                     - security.securityGroup.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - SecurityGroupRule
             x-numspot-permissions:
@@ -7512,8 +7496,6 @@ paths:
                 **[NOTE]**<br />
                 * The modifications are effective as quickly as possible, but a small delay may occur.<br />
                  * By default, traffic between two security groups is allowed through both public and private IPs. To restrict traffic to private IPs only, contact our Support team at support@numspot.com.
-
-                For more information, see [About Security Group Rules](https://docs.outscale.com/en/userguide/About-Security-Group-Rules.html).
             operationId: CreateSecurityGroupRule
             parameters:
                 - in: path
@@ -7567,7 +7549,7 @@ paths:
                 - BearerAuth:
                     - security.securityGroup.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - SecurityGroupRule
             x-numspot-permissions:
@@ -7705,7 +7687,7 @@ paths:
                 - BearerAuth:
                     - storageblock.snapshot
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Snapshot
             x-numspot-permissions:
@@ -7718,7 +7700,12 @@ paths:
         parameters:
             - $ref: '#/components/parameters/SpaceId'
         post:
-            description: "Creates a snapshot. Snapshots are point-in-time images of a volume that you can use to back up your data or to create replicas of this volume.<br />\nYou can use this method in three different ways:\n* **Creating from a volume**: You create a snapshot from one of your volumes.<br />\n* **Copying a snapshot**: You copy an existing snapshot. The source snapshot can be one of your own snapshots, or a snapshot owned by another account that has granted you permission via the [UpdateSnapshot](#updatesnapshot) method.<br />\n* **Importing from a bucket**: You import a snapshot located in an NumSpot Object Storage (NOS) bucket. First, the owner of the source snapshot must export it to the bucket by using the [CreateSnapshotExportTask](#createsnapshotexporttask) method. Then, they must grant you permission to read the snapshot via a pre-signed URL or Access Control Lists. For more information, see [Managing Access to Your Buckets and Objects](https://docs.outscale.com/en/userguide/Managing-Access-to-Your-Buckets-and-Objects.html).\n \nFor more information, see [About Snapshots](https://docs.outscale.com/en/userguide/About-Snapshots.html)."
+            description: |-
+                Creates a snapshot. Snapshots are point-in-time images of a volume that you can use to back up your data or to create replicas of this volume.<br />
+                You can use this method in three different ways:
+                * **Creating from a volume**: You create a snapshot from one of your volumes.<br />
+                * **Copying a snapshot**: You copy an existing snapshot. The source snapshot can be one of your own snapshots, or a snapshot owned by another account that has granted you permission via the [UpdateSnapshot](#updatesnapshot) method.<br />
+                * **Importing from a bucket**: You import a snapshot located in an NumSpot Object Storage (NOS) bucket. First, the owner of the source snapshot must export it to the bucket by using the [CreateSnapshotExportTask](#createsnapshotexporttask) method. Then, they must grant you permission to read the snapshot via a pre-signed URL or Access Control Lists.
             operationId: CreateSnapshot
             requestBody:
                 $ref: '#/components/requestBodies/CreateSnapshotRequest'
@@ -7765,7 +7752,7 @@ paths:
                 - BearerAuth:
                     - storageblock.snapshot.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Snapshot
             x-numspot-permissions:
@@ -7833,7 +7820,7 @@ paths:
                 - BearerAuth:
                     - storageblock.snapshot.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Snapshot
             x-numspot-permissions:
@@ -7896,7 +7883,7 @@ paths:
                 - BearerAuth:
                     - storageblock.snapshot.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Snapshot
             x-numspot-permissions:
@@ -8021,7 +8008,7 @@ paths:
                 - BearerAuth:
                     - network.subnet
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Subnet
             x-numspot-permissions:
@@ -8037,7 +8024,6 @@ paths:
             description: |-
                 Creates a Subnet in an existing Vpc.<br />
                 To create a Subnet in a Vpc, you have to provide the ID of the Vpc and the IP range for the Subnet (its network range). Once the Subnet is created, you cannot modify its IP range.<br /><br />
-                For more information, see [About Vpcs](https://docs.outscale.com/en/userguide/About-Vpcs.html).
             operationId: CreateSubnet
             requestBody:
                 $ref: '#/components/requestBodies/CreateSubnetRequest'
@@ -8090,7 +8076,7 @@ paths:
                 - BearerAuth:
                     - network.subnet.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Subnet
             x-numspot-permissions:
@@ -8156,7 +8142,7 @@ paths:
                 - BearerAuth:
                     - network.subnet.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Subnet
             x-numspot-permissions:
@@ -8219,7 +8205,7 @@ paths:
                 - BearerAuth:
                     - network.subnet.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Subnet
             x-numspot-permissions:
@@ -8286,7 +8272,7 @@ paths:
                 - BearerAuth:
                     - network.subnet.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Subnet
             x-numspot-permissions:
@@ -8372,7 +8358,7 @@ paths:
                 - BearerAuth:
                     - metadata.tag
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Tag
             x-numspot-permissions:
@@ -8488,7 +8474,7 @@ paths:
                 - BearerAuth:
                     - network.virtualGateway
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VirtualGateway
             x-numspot-permissions:
@@ -8504,7 +8490,6 @@ paths:
             description: |-
                 Creates a virtual gateway.<br />
                 A virtual gateway is the access point on the Vpc side of a VPN connection.<br /><br />
-                For more information, see [About Virtual Gateways](https://docs.outscale.com/en/userguide/About-Virtual-Gateways.html).
             operationId: CreateVirtualGateway
             requestBody:
                 $ref: '#/components/requestBodies/CreateVirtualGatewayRequest'
@@ -8551,7 +8536,7 @@ paths:
                 - BearerAuth:
                     - network.virtualGateway.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VirtualGateway
             x-numspot-permissions:
@@ -8619,7 +8604,7 @@ paths:
                 - BearerAuth:
                     - network.virtualGateway.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VirtualGateway
             x-numspot-permissions:
@@ -8682,7 +8667,7 @@ paths:
                 - BearerAuth:
                     - network.virtualGateway.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VirtualGateway
             x-numspot-permissions:
@@ -8757,7 +8742,7 @@ paths:
                     - network.virtualGateway.link
                     - network.vpc.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VirtualGateway
             x-numspot-permissions:
@@ -8829,7 +8814,7 @@ paths:
                     - network.virtualGateway.unlink
                     - network.vpc.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VirtualGateway
             x-numspot-permissions:
@@ -9255,7 +9240,7 @@ paths:
                     items:
                         type: string
                     type: array
-                - description: The VM types (for example, t2.micro). For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+                - description: The NumSpot VM types.
                   in: query
                   name: types
                   schema:
@@ -9340,7 +9325,7 @@ paths:
                 - BearerAuth:
                     - compute.vm
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -9360,7 +9345,6 @@ paths:
                 To check the state of your VMs, call the [ReadVms](#readvms) method.<br />
                 If not specified, the security group used by the service is the default one.<br />
                 The metadata server enables you to get the public key provided when the VM is launched. Official NMIs contain a script to get this public key and put it inside the VM to provide secure access without password.<br /><br />
-                For more information, see [About VMs](https://docs.outscale.com/en/userguide/About-VMs.html).
             operationId: CreateVms
             requestBody:
                 $ref: '#/components/requestBodies/CreateVmsRequest'
@@ -9407,7 +9391,7 @@ paths:
                 - BearerAuth:
                     - compute.vm.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -9480,7 +9464,7 @@ paths:
                 - BearerAuth:
                     - compute.vm.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -9543,7 +9527,7 @@ paths:
                 - BearerAuth:
                     - compute.vm.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -9616,7 +9600,7 @@ paths:
                 - BearerAuth:
                     - compute.vm.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -9686,7 +9670,7 @@ paths:
                 - BearerAuth:
                     - compute.vm.getAdminPassword
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -9756,7 +9740,7 @@ paths:
                 - BearerAuth:
                     - compute.vm.getConsoleOutput
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -9826,7 +9810,7 @@ paths:
                 - BearerAuth:
                     - compute.vm.reboot
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -9894,7 +9878,7 @@ paths:
                 - BearerAuth:
                     - compute.vm.start
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -9964,7 +9948,7 @@ paths:
                 - BearerAuth:
                     - compute.vm.stop
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -10073,7 +10057,7 @@ paths:
                 - BearerAuth:
                     - compute.vm
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vm
             x-numspot-permissions:
@@ -10238,7 +10222,7 @@ paths:
                 - BearerAuth:
                     - storageblock.volume
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Volume
             x-numspot-permissions:
@@ -10255,7 +10239,6 @@ paths:
                 Creates a Block Storage Unit (BSU) volume in a specified Region.<br />
                 BSU volumes can be attached to a virtual machine (VM) in the same AvailabilityZone. You can create an empty volume or restore a volume from an existing snapshot.<br />
                 You can create the following volume types: Enterprise (`io1`) for provisioned IOPS SSD volumes, Performance (`gp2`) for general purpose SSD volumes, or Magnetic (`standard`) volumes.<br /><br />
-                For more information, see [About Volumes](https://docs.outscale.com/en/userguide/About-Volumes.html).
             operationId: CreateVolume
             requestBody:
                 $ref: '#/components/requestBodies/CreateVolumeRequest'
@@ -10302,7 +10285,7 @@ paths:
                 - BearerAuth:
                     - storageblock.volume.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Volume
             x-numspot-permissions:
@@ -10370,7 +10353,7 @@ paths:
                 - BearerAuth:
                     - storageblock.volume.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Volume
             x-numspot-permissions:
@@ -10433,7 +10416,7 @@ paths:
                 - BearerAuth:
                     - storageblock.volume.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Volume
             x-numspot-permissions:
@@ -10505,7 +10488,7 @@ paths:
                 - BearerAuth:
                     - storageblock.volume.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Volume
             x-numspot-permissions:
@@ -10576,7 +10559,7 @@ paths:
                     - storageblock.volume.link
                     - compute.vm.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Volume
             x-numspot-permissions:
@@ -10647,7 +10630,7 @@ paths:
                 - BearerAuth:
                     - storageblock.volume.unlink
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Volume
             x-numspot-permissions:
@@ -10754,7 +10737,7 @@ paths:
                 - BearerAuth:
                     - network.vpcAccessPoint
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcAccessPoint
             x-numspot-permissions:
@@ -10771,7 +10754,6 @@ paths:
                 Creates a Vpc access point to access an NumSpot service from this Vpc without using the Internet and public IPs.<br />
                 You specify the service using its name. For more information about the available services, see [ReadVpcAccessPointServices](#readnetaccesspointservices).<br />
                 To control the routing of traffic between the Vpc and the specified service, you can specify one or more route tables. Virtual machines placed in Subnets associated with the specified route table thus use the Vpc access point to access the service. When you specify a route table, a route is automatically added to it with the destination set to the prefix list ID of the service, and the target set to the ID of the access point.<br /><br />
-                For more information, see [About Vpc Access Points](https://docs.outscale.com/en/userguide/About-Vpc-Access-Points.html).
             operationId: CreateVpcAccessPoint
             requestBody:
                 $ref: '#/components/requestBodies/CreateVpcAccessPointRequest'
@@ -10818,7 +10800,7 @@ paths:
                 - BearerAuth:
                     - network.vpcAccessPoint.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcAccessPoint
             x-numspot-permissions:
@@ -10886,7 +10868,7 @@ paths:
                 - BearerAuth:
                     - network.vpcAccessPoint.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcAccessPoint
             x-numspot-permissions:
@@ -10949,7 +10931,7 @@ paths:
                 - BearerAuth:
                     - network.vpcAccessPoint.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcAccessPoint
             x-numspot-permissions:
@@ -11018,7 +11000,7 @@ paths:
                 - BearerAuth:
                     - network.vpcAccessPoint.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcAccessPoint
             x-numspot-permissions:
@@ -11168,7 +11150,7 @@ paths:
                 - BearerAuth:
                     - network.vpcPeering
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcPeering
             x-numspot-permissions:
@@ -11189,8 +11171,6 @@ paths:
                 * Peered Vpcs must contain at least one virtual machine (VM) each before the creation of the Vpc peering.<br />
                 * The two Vpcs must not have overlapping IP ranges. Otherwise, the Vpc peering is in the `failed` state.<br />
                 * A peering connection between two Vpcs works both ways. Therefore, you do not need to create a B-to-A connection if an A-to-B connection is created and accepted.
-
-                For more information, see [About Vpc Peerings](https://docs.outscale.com/en/userguide/About-Vpc-Peerings.html).
             operationId: CreateVpcPeering
             requestBody:
                 $ref: '#/components/requestBodies/CreateVpcPeeringRequest'
@@ -11237,7 +11217,7 @@ paths:
                 - BearerAuth:
                     - network.vpcPeering.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcPeering
             x-numspot-permissions:
@@ -11313,7 +11293,7 @@ paths:
                 - BearerAuth:
                     - network.vpcPeering.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcPeering
             x-numspot-permissions:
@@ -11376,7 +11356,7 @@ paths:
                 - BearerAuth:
                     - network.vpcPeering.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcPeering
             x-numspot-permissions:
@@ -11455,7 +11435,7 @@ paths:
                 - BearerAuth:
                     - network.vpcPeering.accept
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcPeering
             x-numspot-permissions:
@@ -11529,7 +11509,7 @@ paths:
                 - BearerAuth:
                     - network.vpcPeering.reject
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpcPeering
             x-numspot-permissions:
@@ -11641,7 +11621,7 @@ paths:
                 - BearerAuth:
                     - network.vpc
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vpc
             x-numspot-permissions:
@@ -11657,7 +11637,6 @@ paths:
             description: |-
                 Creates a Vpc with a specified IP range.<br />
                 The IP range (network range) of your Vpc must be between a /28 netmask (16 IPs) and a /16 netmask (65536 IPs).<br /><br />
-                For more information, see [About Vpcs](https://docs.outscale.com/en/userguide/About-Vpcs.html).
             operationId: CreateVpc
             requestBody:
                 $ref: '#/components/requestBodies/CreateVpcRequest'
@@ -11710,7 +11689,7 @@ paths:
                 - BearerAuth:
                     - network.vpc.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vpc
             x-numspot-permissions:
@@ -11776,7 +11755,7 @@ paths:
                 - BearerAuth:
                     - network.vpc.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vpc
             x-numspot-permissions:
@@ -11839,7 +11818,7 @@ paths:
                 - BearerAuth:
                     - network.vpc.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vpc
             x-numspot-permissions:
@@ -11906,7 +11885,7 @@ paths:
                 - BearerAuth:
                     - network.vpc.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - Vpc
             x-numspot-permissions:
@@ -12039,7 +12018,7 @@ paths:
                 - BearerAuth:
                     - network.vpnConnection
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpnConnection
             x-numspot-permissions:
@@ -12058,7 +12037,6 @@ paths:
 
                 **[IMPORTANT]**<br />
                 This action can be done only if the virtual gateway is in the `available` state.<br /><br />
-                For more information, see [About VPN Connections](https://docs.outscale.com/en/userguide/About-VPN-Connections.html).
             operationId: CreateVpnConnection
             requestBody:
                 $ref: '#/components/requestBodies/CreateVpnConnectionRequest'
@@ -12105,7 +12083,7 @@ paths:
                 - BearerAuth:
                     - network.vpnConnection.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpnConnection
             x-numspot-permissions:
@@ -12173,7 +12151,7 @@ paths:
                 - BearerAuth:
                     - network.vpnConnection.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpnConnection
             x-numspot-permissions:
@@ -12236,7 +12214,7 @@ paths:
                 - BearerAuth:
                     - network.vpnConnection.get
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpnConnection
             x-numspot-permissions:
@@ -12303,7 +12281,7 @@ paths:
                 - BearerAuth:
                     - network.vpnConnection.update
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpnConnection
             x-numspot-permissions:
@@ -12370,7 +12348,7 @@ paths:
                     - network.vpnConnection.update
                     - network.vpnConnectionRoute.delete
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpnConnection
             x-numspot-permissions:
@@ -12387,7 +12365,6 @@ paths:
             description: |-
                 Creates a static route to a VPN connection.<br />
                 This enables you to select the network flows sent by the virtual gateway to the target VPN connection.<br /><br />
-                For more information, see [About Routing Configuration for VPN Connections](https://docs.outscale.com/en/userguide/About-Routing-Configuration-for-VPN-Connections.html).
             operationId: CreateVpnConnectionRoute
             parameters:
                 - in: path
@@ -12442,7 +12419,7 @@ paths:
                     - network.vpnConnection.update
                     - network.vpnConnectionRoute.create
             servers:
-                - url: http://wiretap:9090
+                - url: http://iaas-api-release-test-iaas-api-helm:80
             tags:
                 - VpnConnection
             x-numspot-permissions:
@@ -13816,9 +13793,7 @@ components:
                         If you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.
                     type: integer
                 volumeType:
-                    description: |-
-                        The type of the volume (`standard` \| `io1` \| `gp2`). If not specified in the request, a `standard` volume is created.<br />
-                         For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
+                    description: The type of the volume (`standard` \| `io1` \| `gp2`). If not specified in the request, a `standard` volume is created.<br />
                     type: string
             type: object
         BsuToUpdateVm:
@@ -13883,7 +13858,7 @@ components:
                     description: 'Specify a domain name (for example, `MyCompany.com`). You can specify only one domain name. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.'
                     type: string
                 domainNameServers:
-                    description: 'The IPs of domain name servers. If no IPs are specified, the `OutscaleProvidedDNS` value is set by default. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.'
+                    description: 'The IPs of domain name servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.'
                     items:
                         type: string
                     type: array
@@ -13941,7 +13916,7 @@ components:
                     description: The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU).
                     type: string
                 modelName:
-                    description: The model of fGPU you want to allocate. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).
+                    description: The model of fGPU you want to allocate.
                     type: string
             required:
                 - modelName
@@ -14038,7 +14013,7 @@ components:
                     description: The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).
                     type: string
                 publicIp:
-                    description: (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by 3DS OUTSCALE is associated.
+                    description: (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by NumSpot is associated.
                     type: string
                 securityGroups:
                     description: (Net only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Net is assigned to the load balancer.
@@ -14260,7 +14235,7 @@ components:
                 ipRange:
                     description: |-
                         The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />
-                        The IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About Nets](https://docs.outscale.com/en/userguide/About-Nets.html).
+                        The IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs).
                     type: string
                 vpcId:
                     description: The ID of the Net for which you want to create a Subnet.
@@ -14366,9 +14341,7 @@ components:
                     description: The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.
                     type: string
                 type:
-                    description: |-
-                        The type of VM. You can specify a TINA type (in the `tinavW.cXrYpZ` or `tinavW.cXrY` format), or an AWS type (for example, `t2.small`, which is the default value).<br />
-                        If you specify an AWS type, it is converted in the background to its corresponding TINA type, but the AWS type is still returned. If the specified or converted TINA type includes a performance flag, this performance flag is applied regardless of the value you may have provided in the `Performance` parameter. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+                    description: The type of VM.
                     type: string
                 userData:
                     description: Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
@@ -14396,9 +14369,7 @@ components:
                     description: The ID of the snapshot from which you want to create the volume.
                     type: string
                 type:
-                    description: |-
-                        The type of volume you want to create (`io1` \| `gp2` \ | `standard`). If not specified, a `standard` volume is created.<br />
-                         For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).
+                    description: The type of volume you want to create (`io1` \| `gp2` \ | `standard`). If not specified, a `standard` volume is created.<br />
                     type: string
             required:
                 - availabilityZoneName
@@ -14428,7 +14399,7 @@ components:
                         type: string
                     type: array
                 serviceName:
-                    description: The name of the service (in the format `com.outscale.region.service`).
+                    description: The name of the service.
                     type: string
                 vpcId:
                     description: The ID of the Net.
@@ -14662,8 +14633,8 @@ components:
                 name:
                     description: The name of the DirectLink interface.
                     type: string
-                outscalePrivateIp:
-                    description: The IP on the OUTSCALE side of the DirectLink interface.
+                numspotPrivateIp:
+                    description: The IP on the NumSpot side of the DirectLink interface.
                     type: string
                 virtualGatewayId:
                     description: The ID of the target virtual gateway.
@@ -14708,8 +14679,8 @@ components:
                 mtu:
                     description: The maximum transmission unit (MTU) of the DirectLink interface, in bytes (always `1500`).
                     type: integer
-                outscalePrivateIp:
-                    description: The IP on the OUTSCALE side of the DirectLink interface.
+                numspotPrivateIp:
+                    description: The IP on the NumSpot side of the DirectLink interface.
                     type: string
                 state:
                     description: The state of the DirectLink interface (`pending` \| `available` \| `deleting` \| `deleted` \| `confirming` \| `rejected` \| `expired`).
@@ -14797,7 +14768,7 @@ components:
                     description: The ID of the fGPU.
                     type: string
                 modelName:
-                    description: The model of fGPU. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).
+                    description: The model of fGPU.
                     type: string
                 state:
                     description: The state of the fGPU (`allocated` \| `attaching` \| `attached` \| `detaching`).
@@ -15152,7 +15123,7 @@ components:
                         type: string
                     type: array
                 serverCertificateId:
-                    description: The OUTSCALE Resource Name (ORN) of the server certificate. For more information, see [Resource Identifiers > OUTSCALE Resource Names (ORNs)](https://docs.outscale.com/en/userguide/Resource-Identifiers.html#_outscale_resource_names_orns).
+                    description: The NumSpot Resource Name of the server certificate.
                     type: string
             type: object
         ListenerForCreation:
@@ -16080,7 +16051,7 @@ components:
                     description: The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
                     type: string
                 destinationServiceId:
-                    description: The ID of the OUTSCALE service.
+                    description: The ID of the NumSpot service.
                     type: string
                 gatewayId:
                     description: The ID of the Internet service or virtual gateway attached to the Net.
@@ -16224,7 +16195,7 @@ components:
                         $ref: '#/components/schemas/SecurityGroupsMember'
                     type: array
                 serviceIds:
-                    description: One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).
+                    description: One or more service IDs to allow traffic from a Net to access the corresponding NumSpot services.
                     items:
                         type: string
                     type: array
@@ -16499,7 +16470,7 @@ components:
                         type: string
                     type: array
                 publicIp:
-                    description: (internet-facing only) The public IP you want to associate with the load balancer. The former public IP of the load balancer is then disassociated. If you specify an empty string and the former public IP belonged to you, it is disassociated and replaced by a public IP owned by 3DS OUTSCALE.
+                    description: (internet-facing only) The public IP you want to associate with the load balancer. The former public IP of the load balancer is then disassociated. If you specify an empty string and the former public IP belonged to you, it is disassociated and replaced by a public IP owned by NumSpot.
                     type: string
                 securedCookies:
                     description: If true, secure cookies are enabled for the load balancer.
@@ -16594,7 +16565,7 @@ components:
                 keypairName:
                     description: |-
                         The name of a keypair you want to associate with the VM.<br />
-                        When you replace the keypair of a VM with another one, the metadata of the VM is modified to reflect the new public key, but the replacement is still not effective in the operating system of the VM. To complete the replacement and effectively apply the new keypair, you need to perform other actions inside the VM. For more information, see [Modifying the Keypair of a VM](https://docs.outscale.com/en/userguide/Modifying-the-Keypair-of-a-VM.html).
+                        When you replace the keypair of a VM with another one, the metadata of the VM is modified to reflect the new public key, but the replacement is still not effective in the operating system of the VM. To complete the replacement and effectively apply the new keypair, you need to perform other actions inside the VM.
                     type: string
                 nestedVirtualization:
                     description: (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
@@ -16612,7 +16583,7 @@ components:
                         type: string
                     type: array
                 type:
-                    description: The type of VM. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+                    description: The type of VM.
                     type: string
                 userData:
                     description: The Base64-encoded MIME user data, limited to 500 kibibytes (KiB).
@@ -16698,7 +16669,7 @@ components:
                     format: date-time
                     type: string
                 outsideIpAddress:
-                    description: The IP on the OUTSCALE side of the tunnel.
+                    description: The IP on the NumSpot side of the tunnel.
                     type: string
                 state:
                     description: The state of the IPSEC tunnel (`UP` \| `DOWN`).
@@ -16839,7 +16810,7 @@ components:
                         $ref: '#/components/schemas/ResourceTag'
                     type: array
                 type:
-                    description: The type of VM. For more information, see [VM Types](https://docs.outscale.com/en/userguide/VM-Types.html).
+                    description: The type of VM.
                     type: string
                 userData:
                     description: The Base64-encoded MIME user data.
@@ -17060,7 +17031,7 @@ components:
                         $ref: '#/components/schemas/VgwTelemetry'
                     type: array
                 virtualGatewayId:
-                    description: The ID of the virtual gateway used on the OUTSCALE end of the connection.
+                    description: The ID of the virtual gateway used on the NumSpot end of the connection.
                     type: string
                 vpnOptions:
                     $ref: '#/components/schemas/VpnOptions'

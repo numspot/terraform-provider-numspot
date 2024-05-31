@@ -3,6 +3,7 @@
 package provider
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -51,15 +52,12 @@ func TestAccVmResource(t *testing.T) {
 
 func testVmConfig_Create(sourceImageId, vmType string) string {
 	return fmt.Sprintf(`
-resource "numspot_image" "test" {
-  name               = "terraform-generated-image-for-public-ip-test"
-  source_image_id    = %[1]q
-  source_region_name = "cloudgouv-eu-west-1"
-}
 resource "numspot_vm" "test" {
-  image_id = numspot_image.test.id
-  vm_type  = %[2]q
+  image_id = %[1]q
+  type     = %[2]q
 }
+
+
 `, sourceImageId, vmType)
 }
 
@@ -73,8 +71,8 @@ func TestAccVmResource_NetSubnet(t *testing.T) {
 			{
 				Config: testVmConfig_NetSubnet(sourceImageId, vmType),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vm.test", "vm_type", vmType),
-					resource.TestCheckResourceAttrSet("numspot_vm.test", "net_id"),
+					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmType),
+					resource.TestCheckResourceAttrSet("numspot_vm.test", "vpc_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "subnet_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "id"),
 				),
@@ -108,15 +106,9 @@ resource "numspot_subnet" "subnet" {
   ip_range = "10.101.1.0/24"
 }
 
-resource "numspot_image" "test" {
-  name               = "terraform-generated-image-for-public-ip-test"
-  source_image_id    = %[1]q
-  source_region_name = "cloudgouv-eu-west-1"
-}
-
 resource "numspot_vm" "test" {
-  image_id  = numspot_image.test.id
-  vm_type   = %[2]q
+  image_id  = %[1]q
+  type      = %[2]q
   subnet_id = numspot_subnet.subnet.id
 }
 `, sourceImageId, vmType)
@@ -132,11 +124,12 @@ func TestAccVmResource_NetSubnetSG(t *testing.T) {
 			{
 				Config: testVmConfig_NetSubnetSG(sourceImageId, vmType),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vm.test", "vm_type", vmType),
-					resource.TestCheckResourceAttrSet("numspot_vm.test", "net_id"),
+					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmType),
+					resource.TestCheckResourceAttrSet("numspot_vm.test", "vpc_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "subnet_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "id"),
 				),
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
@@ -168,15 +161,9 @@ resource "numspot_security_group" "sg" {
   ]
 }
 
-resource "numspot_image" "test" {
-  name               = "terraform-generated-image-for-vm-test"
-  source_image_id    = %[1]q
-  source_region_name = "cloudgouv-eu-west-1"
-}
-
 resource "numspot_vm" "test" {
-  image_id           = numspot_image.test.id
-  vm_type            = %[2]q
+  image_id           = %[1]q
+  type               = %[2]q
   subnet_id          = numspot_subnet.subnet.id
   security_group_ids = [numspot_security_group.sg.id]
   depends_on         = [numspot_security_group.sg]
@@ -194,8 +181,8 @@ func TestAccVmResource_NetSubnetSGRouteTable(t *testing.T) {
 			{
 				Config: testVmConfig_NetSubnetSGRouteTable(sourceImageId, vmType),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vm.test", "vm_type", vmType),
-					resource.TestCheckResourceAttrSet("numspot_vm.test", "net_id"),
+					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmType),
+					resource.TestCheckResourceAttrSet("numspot_vm.test", "vpc_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "subnet_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "id"),
 				),
@@ -232,11 +219,11 @@ resource "numspot_security_group" "sg" {
 }
 
 resource "numspot_internet_gateway" "igw" {
-  net_id = numspot_vpc.net.id
+  vpc_id = numspot_vpc.net.id
 }
 
 resource "numspot_route_table" "rt" {
-  net_id    = numspot_vpc.net.id
+  vpc_id    = numspot_vpc.net.id
   subnet_id = numspot_subnet.subnet.id
 
   routes = [
@@ -252,15 +239,9 @@ resource "numspot_public_ip" "public_ip" {
   depends_on = [numspot_route_table.rt]
 }
 
-resource "numspot_image" "test" {
-  name               = "terraform-generated-image-for-vm-test"
-  source_image_id    = %[1]q
-  source_region_name = "cloudgouv-eu-west-1"
-}
-
 resource "numspot_vm" "test" {
-  image_id           = numspot_image.test.id
-  vm_type            = %[2]q
+  image_id           = %[1]q
+  type               = %[2]q
   subnet_id          = numspot_subnet.subnet.id
   security_group_ids = [numspot_security_group.sg.id]
   depends_on         = [numspot_security_group.sg]
@@ -284,7 +265,8 @@ func TestAccVmResource_Tags(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.key", tagKey),
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", tagValue),
-					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1")),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1"),
+				),
 				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
@@ -312,7 +294,7 @@ func testVmConfig_Tags(imageId, vmType, tagKey, tagValue string) string {
 	return fmt.Sprintf(`
 resource "numspot_vm" "test" {
   image_id = %[1]q
-  vm_type  = %[2]q
+  type     = %[2]q
 
   tags = [
     {
@@ -322,4 +304,153 @@ resource "numspot_vm" "test" {
   ]
 }
 `, imageId, vmType, tagKey, tagValue)
+}
+
+func TestAccVmResource_Update_WithoutReplace(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	vmTypeUpdated := "ns-cus6-4c8r"
+	vmInitiatedShutdownBehavior := "stop"
+	vmInitiatedShutdownBehaviorUpdated := "terminate"
+
+	tagKey := "Name"
+	tagValue := "terraform-vm"
+	tagValueUpdated := tagValue + "-Updated"
+
+	performance := "medium"
+	performanceUpdated := "high"
+	var vm_id string
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: testVmConfig_UpdateNoReplace(sourceImageId, vmType, vmInitiatedShutdownBehavior, tagKey, tagValue, performance),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						vm_id = v
+						return nil
+					}),
+					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmType),
+					resource.TestCheckResourceAttr("numspot_vm.test", "performance", performance),
+					resource.TestCheckResourceAttr("numspot_vm.test", "vm_initiated_shutdown_behavior", vmInitiatedShutdownBehavior),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1"),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", tagValue),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_vm.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{},
+			},
+			// Update testing
+			{
+				Config: testVmConfig_UpdateNoReplace(sourceImageId, vmTypeUpdated, vmInitiatedShutdownBehaviorUpdated, tagKey, tagValueUpdated, performanceUpdated),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						if vm_id != v {
+							return errors.New("Id should be the same after Update without replace")
+						}
+						return nil
+					}),
+					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmTypeUpdated),
+					resource.TestCheckResourceAttr("numspot_vm.test", "vm_initiated_shutdown_behavior", vmInitiatedShutdownBehaviorUpdated),
+					resource.TestCheckResourceAttr("numspot_vm.test", "performance", performanceUpdated),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1"),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.key", tagKey),
+					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", tagValueUpdated),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+func testVmConfig_UpdateNoReplace(sourceImageId string, vmType string, vmInitiatedShutdownBehavior string, tagKey string, tagValue string, performance string) string {
+	return fmt.Sprintf(`
+resource "numspot_vm" "test" {
+  image_id                       = %[1]q
+  type                           = %[2]q
+  vm_initiated_shutdown_behavior = %[3]q
+  performance                    = %[6]q
+
+  tags = [
+    {
+      key   = %[4]q
+      value = %[5]q
+    }
+  ]
+}
+`, sourceImageId, vmType, vmInitiatedShutdownBehavior, tagKey, tagValue, performance)
+}
+
+func TestAccVmResource_Update_WithReplace(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	subregionName := "cloudgouv-eu-west-1a"
+	subregionNameUpdated := "cloudgouv-eu-west-1b"
+	var vm_id string
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: testVmConfig_UpdateWithReplace(sourceImageId, vmType, subregionName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						vm_id = v
+						return nil
+					}),
+					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmType),
+					resource.TestCheckResourceAttr("numspot_vm.test", "placement.availability_zone_name", subregionName),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_vm.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{},
+			},
+			// Update testing
+			{
+				Config: testVmConfig_UpdateWithReplace(sourceImageId, vmType, subregionNameUpdated),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						if vm_id == v {
+							return errors.New("Id should be different after Update with replace")
+						}
+						return nil
+					}),
+					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmType),
+					resource.TestCheckResourceAttr("numspot_vm.test", "placement.availability_zone_name", subregionNameUpdated),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+func testVmConfig_UpdateWithReplace(sourceImageId, vmType, subregionName string) string {
+	return fmt.Sprintf(`
+resource "numspot_vm" "test" {
+  image_id = %[1]q
+  type     = %[2]q
+  placement = {
+    tenancy                = "default"
+    availability_zone_name = %[3]q
+  }
+}
+`, sourceImageId, vmType, subregionName)
 }

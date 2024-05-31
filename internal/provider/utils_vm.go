@@ -20,13 +20,14 @@ func vmBsuFromApi(ctx context.Context, elt iaas.BsuCreated) (basetypes.ObjectVal
 		resource_vm.BsuValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(elt.DeleteOnVmDeletion),
-			"iops":                  types.Int64Null(), // FIXME Not set
 			"link_date":             types.StringValue(elt.LinkDate.String()),
-			"snapshot_id":           types.StringNull(), // FIXME Not set
-			"state":                 types.StringNull(), // FIXME Not set
+			"state":                 types.StringPointerValue(elt.State),
 			"volume_id":             types.StringPointerValue(elt.VolumeId),
-			"volume_size":           types.Int64Null(),  // FIXME Not set
-			"volume_type":           types.StringNull(), // FIXME Not set
+
+			"iops":        types.Int64Null(),
+			"snapshot_id": types.StringNull(),
+			"volume_size": types.Int64Null(),
+			"volume_type": types.StringNull(),
 		},
 	)
 	if diags != nil {
@@ -45,21 +46,170 @@ func vmBlockDeviceMappingFromApi(ctx context.Context, elt iaas.BlockDeviceMappin
 	return resource_vm.NewBlockDeviceMappingsValue(
 		resource_vm.BlockDeviceMappingsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"bsu":                 bsuTf,
-			"device_name":         types.StringPointerValue(elt.DeviceName),
+			"bsu":         bsuTf,
+			"device_name": types.StringPointerValue(elt.DeviceName),
+
 			"no_device":           types.StringNull(),
 			"virtual_device_name": types.StringNull(),
 		},
 	)
 }
 
+func linkNicsFromApi(ctx context.Context, linkNic iaas.LinkNicLight) (resource_vm.LinkNicValue, diag.Diagnostics) {
+	deviceNumber := int64(*linkNic.DeviceNumber)
+	return resource_vm.NewLinkNicValue(
+		resource_vm.LinkNicValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"delete_on_vm_deletion": types.BoolPointerValue(linkNic.DeleteOnVmDeletion),
+			"device_number":         types.Int64PointerValue(&deviceNumber),
+			"link_nic_id":           types.StringPointerValue(linkNic.LinkNicId),
+			"state":                 types.StringPointerValue(linkNic.State),
+		},
+	)
+}
+
+func linkPublicIpVmFromApi(ctx context.Context, linkPublicIp iaas.LinkPublicIpLightForVm) (resource_vm.LinkPublicIpValue, diag.Diagnostics) {
+	return resource_vm.NewLinkPublicIpValue(
+		resource_vm.LinkPublicIpValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"public_dns_name": types.StringPointerValue(linkPublicIp.PublicDnsName),
+			"public_ip":       types.StringPointerValue(linkPublicIp.PublicIp),
+		},
+	)
+}
+
+func privateIpsFromApi(ctx context.Context, privateIp iaas.PrivateIpLightForVm) (resource_vm.PrivateIpsValue, diag.Diagnostics) {
+	linkPublicIp, diags := linkPublicIpVmFromApi(ctx, utils.GetPtrValue(privateIp.LinkPublicIp))
+	if diags.HasError() {
+		return resource_vm.PrivateIpsValue{}, diags
+	}
+
+	linkPublicIpObjectValue, diagnostics := linkPublicIp.ToObjectValue(ctx)
+	if diagnostics.HasError() {
+		return resource_vm.PrivateIpsValue{}, diags
+	}
+
+	return resource_vm.NewPrivateIpsValue(
+		resource_vm.PrivateIpsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"is_primary":       types.BoolPointerValue(privateIp.IsPrimary),
+			"link_public_ip":   linkPublicIpObjectValue,
+			"private_dns_name": types.StringPointerValue(privateIp.PrivateDnsName),
+			"private_ip":       types.StringPointerValue(privateIp.PrivateIp),
+		},
+	)
+}
+
+func securityGroupsFromApi(ctx context.Context, privateIp iaas.SecurityGroupLight) (resource_vm.SecurityGroupsValue, diag.Diagnostics) {
+	return resource_vm.NewSecurityGroupsValue(
+		resource_vm.SecurityGroupsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"security_group_id":   types.StringPointerValue(privateIp.SecurityGroupId),
+			"security_group_name": types.StringPointerValue(privateIp.SecurityGroupName),
+		},
+	)
+}
+
+func nicsFromApi(ctx context.Context, nic iaas.NicLight) (resource_vm.NicsValue, diag.Diagnostics) {
+	var (
+		diagnosticsToReturn diag.Diagnostics
+		diags               diag.Diagnostics
+		linkNics            resource_vm.LinkNicValue
+		linkPublicIp        resource_vm.LinkPublicIpValue
+		privateIpsTf        basetypes.ListValue
+		securityGroupsTf    basetypes.ListValue
+	)
+
+	deviceNumber := int64(*nic.LinkNic.DeviceNumber)
+
+	if nic.LinkNic != nil {
+		linkNics, diags = linkNicsFromApi(ctx, *nic.LinkNic)
+		diagnosticsToReturn.Append(diags...)
+	}
+	linkNicsObjectValue, diagnostics := linkNics.ToObjectValue(ctx)
+	if diagnostics.HasError() {
+		return resource_vm.NicsValue{}, diagnosticsToReturn
+	}
+
+	if nic.LinkPublicIp != nil {
+		linkPublicIp, diags = linkPublicIpVmFromApi(ctx, *nic.LinkPublicIp)
+		diagnosticsToReturn.Append(diags...)
+	}
+	linkPublicIpObjectValue, diagnostics := linkPublicIp.ToObjectValue(ctx)
+	if diagnostics.HasError() {
+		return resource_vm.NicsValue{}, diagnosticsToReturn
+	}
+
+	var privateIps []iaas.PrivateIpLightForVm
+	if nic.PrivateIps != nil {
+		privateIps = *nic.PrivateIps
+	}
+	privateIpsTf, diags = utils.GenericListToTfListValue(
+		ctx,
+		resource_vm.PrivateIpsValue{},
+		privateIpsFromApi,
+		privateIps,
+	)
+	diagnosticsToReturn.Append(diags...)
+
+	var securityGroups []iaas.SecurityGroupLight
+	if nic.SecurityGroups != nil {
+		securityGroups = *nic.SecurityGroups
+	}
+	securityGroupsTf, diags = utils.GenericListToTfListValue(
+		ctx,
+		resource_vm.SecurityGroupsValue{},
+		securityGroupsFromApi,
+		securityGroups,
+	)
+	diagnosticsToReturn.Append(diags...)
+
+	if diagnosticsToReturn.HasError() {
+		return resource_vm.NicsValue{}, diagnosticsToReturn
+	}
+
+	return resource_vm.NewNicsValue(
+		resource_vm.NicsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"delete_on_vm_deletion":  types.BoolPointerValue(nic.LinkNic.DeleteOnVmDeletion),
+			"description":            types.StringPointerValue(nic.Description),
+			"device_number":          types.Int64PointerValue(&deviceNumber),
+			"is_source_dest_checked": types.BoolPointerValue(nic.IsSourceDestChecked),
+			"link_nic":               linkNicsObjectValue,
+			"link_public_ip":         linkPublicIpObjectValue,
+			"mac_address":            types.StringPointerValue(nic.MacAddress),
+			"vpc_id":                 types.StringPointerValue(nic.VpcId),
+			"nic_id":                 types.StringPointerValue(nic.NicId),
+			"private_dns_name":       types.StringPointerValue(nic.PrivateDnsName),
+			"private_ips":            privateIpsTf,
+			"security_groups":        securityGroupsTf,
+			"state":                  types.StringPointerValue(nic.State),
+			"subnet_id":              types.StringPointerValue(nic.SubnetId),
+
+			"security_group_ids":         types.ListNull(types.StringType),
+			"secondary_private_ip_count": types.Int64Null(),
+		},
+	)
+}
+
+func placementFromHTTP(ctx context.Context, elt *iaas.Placement) (resource_vm.PlacementValue, diag.Diagnostics) {
+	if elt == nil {
+		return resource_vm.PlacementValue{}, diag.Diagnostics{}
+	}
+	return resource_vm.NewPlacementValue(
+		resource_vm.PlacementValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"availability_zone_name": types.StringPointerValue(elt.AvailabilityZoneName),
+			"tenancy":                types.StringPointerValue(elt.Tenancy),
+		})
+}
+
 func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, diag.Diagnostics) {
 	var (
 		tagsTf types.List
 		diags  diag.Diagnostics
+		nics   = types.ListNull(resource_vm.NicsValue{}.Type(ctx))
 	)
-
-	vmsCount := utils.FromIntToTfInt64(1)
 
 	// Private Ips
 	var privateIps []string
@@ -135,11 +285,27 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		}
 	}
 
+	if http.Nics != nil {
+		nics, diags = utils.GenericListToTfListValue(ctx, resource_vm.NicsValue{}, nicsFromApi, *http.Nics)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	placement, diags := placementFromHTTP(ctx, http.Placement)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	var launchNumber basetypes.Int64Value
+	if http.LaunchNumber != nil {
+		launchNumber = utils.FromIntPtrToTfInt64(http.LaunchNumber)
+	}
+
 	r := resource_vm.VmModel{
 		//
 		Architecture:        types.StringPointerValue(http.Architecture),
 		BlockDeviceMappings: blockDeviceMappingTf,
-		BootOnCreation:      types.BoolValue(true), // FIXME Set value
 		BsuOptimized:        types.BoolPointerValue(http.BsuOptimized),
 		ClientToken:         types.StringPointerValue(http.ClientToken),
 		CreationDate:        types.StringValue(creationDate),
@@ -153,11 +319,11 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		KeypairName:               types.StringPointerValue(http.KeypairName),
 		//
 		NestedVirtualization: types.BoolPointerValue(http.NestedVirtualization),
-		NetId:                types.StringPointerValue(http.VpcId),
-		Nics:                 types.ListNull(resource_vm.NicsValue{}.Type(ctx)), // FIXME Set value
+		VpcId:                types.StringPointerValue(http.VpcId),
+		Nics:                 nics,
 		OsFamily:             types.StringPointerValue(http.OsFamily),
 		Performance:          types.StringPointerValue(http.Performance),
-		Placement:            resource_vm.PlacementValue{}, // FIXME Set value
+		Placement:            placement,
 		PrivateDnsName:       types.StringPointerValue(http.PrivateDnsName),
 		PrivateIp:            types.StringPointerValue(http.PrivateIp),
 		//
@@ -176,14 +342,9 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		Type:                        types.StringPointerValue(http.Type),
 		UserData:                    types.StringPointerValue(http.UserData),
 		VmInitiatedShutdownBehavior: types.StringPointerValue(http.InitiatedShutdownBehavior),
-		VmType:                      types.StringPointerValue(http.Type),
-		VmsCount:                    vmsCount,
 		Tags:                        tagsTf,
-	}
-
-	if http.LaunchNumber != nil {
-		launchNumber := utils.FromIntPtrToTfInt64(http.LaunchNumber)
-		r.LaunchNumber = launchNumber
+		LaunchNumber:                launchNumber,
+		BootOnCreation:              types.BoolPointerValue(utils.EmptyTrueBoolPointer()), // TODO : need to have BootOnCreation in SDK
 	}
 
 	var securityGroups []string
@@ -201,32 +362,75 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 	return &r, diags
 }
 
-func VmFromTfToCreateRequest(ctx context.Context, tf *resource_vm.VmModel) iaas.CreateVmsJSONRequestBody {
-	securityGroupIdsTf := make([]types.String, 0, len(tf.SecurityGroupIds.Elements()))
-	tf.SecurityGroupIds.ElementsAs(ctx, &securityGroupIdsTf, false)
-	securityGroupIds := []string{}
-	for _, sgid := range securityGroupIdsTf {
-		securityGroupIds = append(securityGroupIds, sgid.ValueString())
+func VmFromTfToCreateRequest(ctx context.Context, tf *resource_vm.VmModel, diags *diag.Diagnostics) iaas.CreateVmsJSONRequestBody {
+	nics := make([]iaas.NicForVmCreation, 0, len(tf.Nics.Elements()))
+	diags.Append(tf.Nics.ElementsAs(ctx, &nics, true)...)
+
+	blockDeviceMapping := make([]iaas.BlockDeviceMappingVmCreation, 0, len(tf.BlockDeviceMappings.Elements()))
+	diags.Append(tf.BlockDeviceMappings.ElementsAs(ctx, &blockDeviceMapping, true)...)
+
+	var placement *iaas.Placement
+	if !(tf.Placement.IsNull() || tf.Placement.IsUnknown()) {
+		placement = &iaas.Placement{
+			AvailabilityZoneName: utils.FromTfStringToStringPtr(tf.Placement.AvailabilityZoneName),
+			Tenancy:              utils.FromTfStringToStringPtr(tf.Placement.Tenancy),
+		}
+	}
+
+	var performance *iaas.CreateVmsPerformance
+	if !(tf.Performance.IsNull() || tf.Performance.IsUnknown()) {
+		performance = (*iaas.CreateVmsPerformance)(utils.FromTfStringToStringPtr(tf.Performance))
 	}
 
 	return iaas.CreateVmsJSONRequestBody{
-		BootOnCreation:              nil,
-		BsuOptimized:                nil,
-		ClientToken:                 nil,
-		DeletionProtection:          nil,
+		BootOnCreation:              utils.FromTfBoolToBoolPtr(tf.BootOnCreation),
+		BsuOptimized:                utils.FromTfBoolToBoolPtr(tf.BsuOptimized),
+		ClientToken:                 utils.FromTfStringToStringPtr(tf.ClientToken),
+		DeletionProtection:          utils.FromTfBoolToBoolPtr(tf.DeletionProtection),
 		ImageId:                     tf.ImageId.ValueString(),
-		KeypairName:                 tf.KeypairName.ValueStringPointer(),
-		NestedVirtualization:        nil,
-		Nics:                        nil,
-		Performance:                 nil,
-		Placement:                   nil,
-		PrivateIps:                  nil,
-		SecurityGroupIds:            &securityGroupIds,
-		SecurityGroups:              nil,
-		SubnetId:                    tf.SubnetId.ValueStringPointer(),
-		UserData:                    nil,
-		VmInitiatedShutdownBehavior: nil,
-		Type:                        tf.VmType.ValueStringPointer(),
+		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
+		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
+		Nics:                        &nics,
+		Performance:                 performance,
+		Placement:                   placement,
+		PrivateIps:                  utils.TfStringListToStringPtrList(ctx, tf.PrivateIps),
+		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
+		SecurityGroups:              utils.TfStringListToStringPtrList(ctx, tf.SecurityGroups),
+		SubnetId:                    utils.FromTfStringToStringPtr(tf.SubnetId),
+		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
+		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
+		Type:                        utils.FromTfStringToStringPtr(tf.Type),
+		BlockDeviceMappings:         &blockDeviceMapping,
+		MaxVmsCount:                 utils.FromTfInt64ToIntPtr(tf.MaxVmsCount),
+		MinVmsCount:                 utils.FromTfInt64ToIntPtr(tf.MinVmsCount),
+	}
+}
+
+func VmFromTfToUpdaterequest(ctx context.Context, tf *resource_vm.VmModel, diagnostics *diag.Diagnostics) iaas.UpdateVmJSONRequestBody {
+	blockDeviceMapping := utils.TfListToGenericList(func(a resource_vm.BlockDeviceMappingsValue) iaas.BlockDeviceMappingVmUpdate {
+		var bsu iaas.BsuToUpdateVm
+		a.Bsu.As(ctx, &bsu, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: false, UnhandledUnknownAsEmpty: false})
+
+		return iaas.BlockDeviceMappingVmUpdate{
+			Bsu:               &bsu,
+			DeviceName:        utils.FromTfStringToStringPtr(a.DeviceName),
+			NoDevice:          utils.FromTfStringToStringPtr(a.NoDevice),
+			VirtualDeviceName: utils.FromTfStringToStringPtr(a.VirtualDeviceName),
+		}
+	}, ctx, tf.BlockDeviceMappings)
+
+	return iaas.UpdateVmJSONRequestBody{
+		BsuOptimized:                utils.FromTfBoolToBoolPtr(tf.BsuOptimized),
+		DeletionProtection:          utils.FromTfBoolToBoolPtr(tf.DeletionProtection),
+		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
+		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
+		Performance:                 (*iaas.UpdateVmPerformance)(utils.FromTfStringToStringPtr(tf.Performance)),
+		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
+		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
+		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
+		Type:                        utils.FromTfStringToStringPtr(tf.Type),
+		BlockDeviceMappings:         &blockDeviceMapping,
+		IsSourceDestChecked:         utils.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
 	}
 }
 
@@ -356,7 +560,7 @@ func fromLinkNicToTFLinkNic(ctx context.Context, http *iaas.LinkNicLight) (datas
 	)
 }
 
-func fromLinkPublicIpToTFLinkPublicIp(ctx context.Context, http *iaas.LinkPublicIpLightForVm) (datasource_vm.LinkPublicIpValue, diag.Diagnostics) {
+func linkPublicIpForVmFromHTTPDatasource(ctx context.Context, http *iaas.LinkPublicIpLightForVm) (datasource_vm.LinkPublicIpValue, diag.Diagnostics) {
 	if http == nil {
 		return datasource_vm.LinkPublicIpValue{}, diag.Diagnostics{}
 	}
@@ -364,34 +568,9 @@ func fromLinkPublicIpToTFLinkPublicIp(ctx context.Context, http *iaas.LinkPublic
 	return datasource_vm.NewLinkPublicIpValue(
 		datasource_vm.LinkPublicIpValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"public_dns_name": types.StringPointerValue(http.PublicDnsName),
-			"public_ip":       types.StringPointerValue(http.PublicIp),
-		},
-	)
-}
-
-func linkPublicIpForVmFromHTTP(ctx context.Context, http iaas.LinkPublicIpLightForVm) (datasource_vm.LinkPublicIpValue, diag.Diagnostics) {
-	return datasource_vm.NewLinkPublicIpValue(
-		datasource_vm.LinkPublicIpValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"public_dns_name": types.StringPointerValue(http.PublicDnsName),
-			"public_ip":       types.StringPointerValue(http.PublicIp),
-		})
-}
-
-func privateIpsForVmFromHTTP(ctx context.Context, elt iaas.PrivateIpLightForVm) (resource_vm.PrivateIpsValue, diag.Diagnostics) {
-	linkPublicIp, diags := linkPublicIpForVmFromHTTP(ctx, utils.GetPtrValue(elt.LinkPublicIp))
-	if diags.HasError() {
-		return resource_vm.PrivateIpsValue{}, diags
-	}
-
-	return resource_vm.NewPrivateIpsValue(
-		resource_vm.PrivateIpsValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"is_primary":       types.BoolPointerValue(elt.IsPrimary),
-			"link_public_ip":   linkPublicIp,
-			"private_dns_name": types.StringPointerValue(elt.PrivateDnsName),
-			"private_ip":       types.StringPointerValue(elt.PrivateIp),
+			"public_dns_name":      types.StringPointerValue(http.PublicDnsName),
+			"public_ip":            types.StringPointerValue(http.PublicIp),
+			"public_ip_account_id": types.StringPointerValue(utils.EmptyStrPointer()),
 		})
 }
 
@@ -410,12 +589,12 @@ func fromNicsToNicsList(ctx context.Context, http iaas.NicLight) (datasource_vm.
 		return datasource_vm.NicsValue{}, diags
 	}
 
-	linkPublicIp, diags := fromLinkPublicIpToTFLinkPublicIp(ctx, http.LinkPublicIp)
+	linkPublicIp, diags := linkPublicIpForVmFromHTTPDatasource(ctx, http.LinkPublicIp)
 	if diags.HasError() {
 		return datasource_vm.NicsValue{}, diags
 	}
 
-	privateIps, diags := utils.GenericListToTfListValue(ctx, resource_vm.PrivateIpsValue{}, privateIpsForVmFromHTTP, utils.GetPtrValue(http.PrivateIps))
+	privateIps, diags := utils.GenericListToTfListValue(ctx, resource_vm.PrivateIpsValue{}, privateIpsFromApi, utils.GetPtrValue(http.PrivateIps))
 	if diags.HasError() {
 		return datasource_vm.NicsValue{}, diags
 	}

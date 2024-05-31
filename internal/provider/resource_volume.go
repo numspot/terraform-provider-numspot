@@ -169,7 +169,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		r.provider.ApiClient.ReadVolumesByIdWithResponse,
 	)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
+		response.Diagnostics.AddError("Failed to update volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
 		return
 	}
 
@@ -177,7 +177,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 
 	rr, ok := read.(*iaas.Volume)
 	if !ok {
-		response.Diagnostics.AddError("Failed to create volume", "object conversion error")
+		response.Diagnostics.AddError("Failed to update volume", "object conversion error")
 		return
 	}
 

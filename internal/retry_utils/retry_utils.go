@@ -133,47 +133,56 @@ func getFieldFromReflectStructPtr(structPtr reflect.Value, fieldName string) (re
 	return fieldValue, nil
 }
 
+func ReadResourceUtils[R TfRequestResp](
+	ctx context.Context,
+	createdId string,
+	spaceID iaas.SpaceId,
+	readFunction func(context.Context, iaas.SpaceId, string, ...iaas.RequestEditorFn) (*R, error),
+) (interface{}, string, error) {
+	readRes, err := readFunction(ctx, spaceID, createdId)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to read resource : %v", err.Error())
+	}
+
+	// Use reflection to access State attribute inside of interface object
+	json200ValuePtr, err := getFieldFromReflectStructPtr(reflect.ValueOf(readRes), "JSON200")
+	if err != nil {
+		return nil, "", err
+	}
+	stateValuePtr, err := getFieldFromReflectStructPtr(json200ValuePtr, "State")
+	if err != nil {
+		return nil, "", err
+	}
+
+	if stateValuePtr.Kind() != reflect.Ptr {
+		return nil, "", fmt.Errorf("expected a pointer but found %v", stateValuePtr)
+	}
+
+	stateValue := stateValuePtr.Elem()
+
+	if stateValue.Type().String() != "string" {
+		return nil, "", fmt.Errorf("field 'State' was expected to be a string but %v found", stateValue.Type())
+	}
+
+	data := json200ValuePtr.Interface()
+	stateValueStr := stateValue.String()
+
+	return data, stateValueStr, nil
+}
+
 func RetryReadUntilStateValid[R TfRequestResp](
 	ctx context.Context,
 	createdId string,
 	spaceID iaas.SpaceId,
 	pendingStates []string,
 	targetStates []string,
-	fun func(context.Context, iaas.SpaceId, string, ...iaas.RequestEditorFn) (*R, error),
+	readFunction func(context.Context, iaas.SpaceId, string, ...iaas.RequestEditorFn) (*R, error),
 ) (interface{}, error) {
 	createStateConf := &retry.StateChangeConf{
 		Pending: pendingStates,
 		Target:  targetStates,
 		Refresh: func() (interface{}, string, error) {
-			readRes, err := fun(ctx, spaceID, createdId)
-			if err != nil {
-				return nil, "", fmt.Errorf("failed to read resource : %v", err.Error())
-			}
-
-			// Use reflection to access State attribute inside of interface object
-			json200ValuePtr, err := getFieldFromReflectStructPtr(reflect.ValueOf(readRes), "JSON200")
-			if err != nil {
-				return nil, "", err
-			}
-			stateValuePtr, err := getFieldFromReflectStructPtr(json200ValuePtr, "State")
-			if err != nil {
-				return nil, "", err
-			}
-
-			if stateValuePtr.Kind() != reflect.Ptr {
-				return nil, "", fmt.Errorf("expected a pointer but found %v", stateValuePtr)
-			}
-
-			stateValue := stateValuePtr.Elem()
-
-			if stateValue.Type().String() != "string" {
-				return nil, "", fmt.Errorf("field 'State' was expected to be a string but %v found", stateValue.Type())
-			}
-
-			data := json200ValuePtr.Interface()
-			stateValueStr := stateValue.String()
-
-			return data, stateValueStr, nil
+			return ReadResourceUtils(ctx, createdId, spaceID, readFunction)
 		},
 		Timeout: TfRequestRetryTimeout,
 		Delay:   TfRequestRetryDelay,

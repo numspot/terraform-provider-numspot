@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vm"
@@ -67,10 +67,12 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.SpaceID,
-		VmFromTfToCreateRequest(ctx, &data),
+		VmFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
 		r.provider.ApiClient.CreateVmsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VM", err.Error())
+	}
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -90,7 +92,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		createdId,
 		r.provider.SpaceID,
 		[]string{"pending"},
-		[]string{"running"},
+		[]string{"running", "stopped"}, // In some cases, when there is insufficient capacity the VM is created with state = stopped
 		r.provider.ApiClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
@@ -101,14 +103,20 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	vmSchema, ok := read.(*iaas.Vm)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create VM", "object conversion error")
+		return
 	}
+
+	// In some cases, when there is insufficient capacity the VM is created with state = stopped
+	if utils.GetPtrValue(vmSchema.State) == "stopped" {
+		response.Diagnostics.AddError("Issue while creating VM", fmt.Sprintf("VM was created in 'stopped' state. Reason : %s", utils.GetPtrValue(vmSchema.StateReason)))
+		return
+	}
+
 	tf, diagnostics := VmFromHttpToTf(ctx, vmSchema)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
 	}
-
-	tf.Id = types.StringValue(createdId)
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
@@ -134,13 +142,61 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
+func (r *VmResource) stopVm(ctx context.Context, state *resource_vm.VmModel, response *resource.UpdateResponse) error {
+	id := state.Id.ValueString()
+
+	_, status, err := retry_utils.ReadResourceUtils(
+		ctx,
+		id,
+		r.provider.SpaceID,
+		r.provider.ApiClient.ReadVmsByIdWithResponse,
+	)
+	if err != nil {
+		return fmt.Errorf("error while reading VM : %v", err)
+	}
+
+	switch status {
+	case "running":
+		// Stop the VM
+		_ = utils.ExecuteRequest(func() (*iaas.StopVmResponse, error) {
+			forceStop := true
+			body := iaas.StopVm{
+				ForceStop: &forceStop,
+			}
+			return r.provider.ApiClient.StopVmWithResponse(ctx, r.provider.SpaceID, id, body)
+		}, http.StatusOK, &response.Diagnostics)
+	case "stopping", "shutting-down", "pending":
+		// Retry read until VM is either stopped or stoppable (running)
+		_, err := retry_utils.RetryReadUntilStateValid(
+			ctx,
+			id,
+			r.provider.SpaceID,
+			[]string{"stopping", "shutting-down", "pending"},
+			[]string{"running", "stopped"},
+			r.provider.ApiClient.ReadVmsByIdWithResponse,
+		)
+		if err != nil {
+			return fmt.Errorf("error while waiting for VM to be shut down : %v", err)
+		}
+	case "stopped":
+		// Nothing more to do
+		return nil
+	default:
+		return fmt.Errorf("can't update a VM with state %v", status)
+	}
+
+	return r.stopVm(ctx, state, response)
+}
+
 func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan resource_vm.VmModel
-	modifications := false
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
+	vmId := state.Id.ValueString()
+
+	// Update tags
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
 			ctx,
@@ -149,33 +205,87 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 			&response.Diagnostics,
 			r.provider.ApiClient,
 			r.provider.SpaceID,
-			state.Id.ValueString(),
+			vmId,
 		)
 		if response.Diagnostics.HasError() {
 			return
 		}
-		modifications = true
 	}
 
-	if !modifications {
+	body := VmFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
+	bodyFromState := VmFromTfToUpdaterequest(ctx, &state, &response.Diagnostics)
+
+	if isUpdateNeeded(body, bodyFromState) {
+		// Stop VM before doing update
+		err := r.stopVm(ctx, &state, response)
+		if err != nil {
+			response.Diagnostics.AddError("error while stopping VM", err.Error())
+			return
+		}
+
+		// Update VM
+		updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVmResponse, error) {
+			return r.provider.ApiClient.UpdateVmWithResponse(ctx, r.provider.SpaceID, vmId, body)
+		}, http.StatusOK, &response.Diagnostics)
+
+		if updatedRes == nil || response.Diagnostics.HasError() {
+			return
+		}
+
+		// Restart VM
+		_ = utils.ExecuteRequest(func() (*iaas.StartVmResponse, error) {
+			return r.provider.ApiClient.StartVmWithResponse(ctx, r.provider.SpaceID, vmId)
+		}, http.StatusOK, &response.Diagnostics)
+	}
+
+	// Retries read on VM until state is OK
+	read, err := retry_utils.RetryReadUntilStateValid(
+		ctx,
+		vmId,
+		r.provider.SpaceID,
+		[]string{"pending"},
+		[]string{"running"},
+		r.provider.ApiClient.ReadVmsByIdWithResponse,
+	)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to update VM", fmt.Sprintf("Error waiting for VM to be created: %s", err))
+		return
+	}
+	vmObject, ok := read.(*iaas.Vm)
+	if !ok {
+		response.Diagnostics.AddError("Failed to update VM", "object conversion error")
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadVmsByIdResponse, error) {
-		id := state.Id.ValueStringPointer()
-		return r.provider.ApiClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
+	tf, diags := VmFromHttpToTf(ctx, vmObject)
 
-	tf, diagnostics := VmFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
-		return
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+}
+
+func compareSimpleFieldPtr[R comparable](val1 *R, val2 *R) bool {
+	return utils.GetPtrValue(val1) == utils.GetPtrValue(val2)
+}
+
+func compareSlicePtr[R comparable](val1 *[]R, val2 *[]R) bool {
+	return slices.Equal(utils.GetPtrValue(val1), utils.GetPtrValue(val2))
+}
+
+func isUpdateNeeded(plan iaas.UpdateVmJSONRequestBody, state iaas.UpdateVmJSONRequestBody) bool {
+	return !(compareSimpleFieldPtr(plan.BsuOptimized, state.BsuOptimized) &&
+		compareSimpleFieldPtr(plan.DeletionProtection, state.DeletionProtection) &&
+		compareSimpleFieldPtr(plan.KeypairName, state.KeypairName) &&
+		compareSimpleFieldPtr(plan.NestedVirtualization, state.NestedVirtualization) &&
+		(utils.GetPtrValue(plan.Performance) == "" || compareSimpleFieldPtr(plan.Performance, state.Performance)) && // if performance is not provided by user,
+		(len(utils.GetPtrValue(plan.BlockDeviceMappings)) == 0 || compareSlicePtr(plan.SecurityGroupIds, state.SecurityGroupIds)) &&
+		compareSimpleFieldPtr(plan.UserData, state.UserData) &&
+		compareSimpleFieldPtr(plan.VmInitiatedShutdownBehavior, state.VmInitiatedShutdownBehavior) &&
+		compareSimpleFieldPtr(plan.Type, state.Type) &&
+		(len(utils.GetPtrValue(plan.BlockDeviceMappings)) == 0 || (compareSlicePtr(plan.BlockDeviceMappings, state.BlockDeviceMappings))) &&
+		compareSimpleFieldPtr(plan.IsSourceDestChecked, state.IsSourceDestChecked))
 }
 
 func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

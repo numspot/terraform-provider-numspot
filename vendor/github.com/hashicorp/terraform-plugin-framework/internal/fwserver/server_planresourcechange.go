@@ -20,6 +20,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 // PlanResourceChangeRequest is the framework server request for the
@@ -309,6 +310,32 @@ func MarkComputedNilsAsUnknown(ctx context.Context, config tftypes.Value, resour
 			return val, nil
 		}
 
+		attribute, err := resourceSchema.AttributeAtTerraformPath(ctx, path)
+
+		if err != nil {
+			if errors.Is(err, fwschema.ErrPathInsideAtomicAttribute) {
+				// ignore attributes/elements inside schema.Attributes, they have no schema of their own
+				logging.FrameworkTrace(ctx, "attribute is a non-schema attribute, not marking unknown")
+				return val, nil
+			}
+
+			if errors.Is(err, fwschema.ErrPathIsBlock) {
+				// ignore blocks, they do not have a computed field
+				logging.FrameworkTrace(ctx, "attribute is a block, not marking unknown")
+				return val, nil
+			}
+
+			if errors.Is(err, fwschema.ErrPathInsideDynamicAttribute) {
+				// ignore attributes/elements inside schema.DynamicAttribute, they have no schema of their own
+				logging.FrameworkTrace(ctx, "attribute is inside of a dynamic attribute, not marking unknown")
+				return val, nil
+			}
+
+			logging.FrameworkError(ctx, "couldn't find attribute in resource schema")
+
+			return tftypes.Value{}, fmt.Errorf("couldn't find attribute in resource schema: %w", err)
+		}
+
 		configValIface, _, err := tftypes.WalkAttributePath(config, path)
 
 		if err != nil && err != tftypes.ErrInvalidStep {
@@ -329,26 +356,6 @@ func MarkComputedNilsAsUnknown(ctx context.Context, config tftypes.Value, resour
 		if !configVal.IsNull() {
 			logging.FrameworkTrace(ctx, "Attribute/block not null in configuration, not marking unknown")
 			return val, nil
-		}
-
-		attribute, err := resourceSchema.AttributeAtTerraformPath(ctx, path)
-
-		if err != nil {
-			if errors.Is(err, fwschema.ErrPathInsideAtomicAttribute) {
-				// ignore attributes/elements inside schema.Attributes, they have no schema of their own
-				logging.FrameworkTrace(ctx, "attribute is a non-schema attribute, not marking unknown")
-				return val, nil
-			}
-
-			if errors.Is(err, fwschema.ErrPathIsBlock) {
-				// ignore blocks, they do not have a computed field
-				logging.FrameworkTrace(ctx, "attribute is a block, not marking unknown")
-				return val, nil
-			}
-
-			logging.FrameworkError(ctx, "couldn't find attribute in resource schema")
-
-			return tftypes.Value{}, fmt.Errorf("couldn't find attribute in resource schema: %w", err)
 		}
 
 		if !attribute.IsComputed() {
@@ -394,11 +401,25 @@ func MarkComputedNilsAsUnknown(ctx context.Context, config tftypes.Value, resour
 			if a.StringDefaultValue() != nil {
 				return val, nil
 			}
+		case fwschema.AttributeWithDynamicDefaultValue:
+			if a.DynamicDefaultValue() != nil {
+				return val, nil
+			}
+		}
+
+		// Value type from planned state to create unknown with
+		newValueType := val.Type()
+
+		// If the attribute is dynamic then we can't use the planned state value to create an unknown, as it may be a concrete type.
+		// This logic explicitly sets the unknown value type to dynamic so the type can be determined during apply.
+		_, isDynamic := attribute.GetType().(basetypes.DynamicTypable)
+		if isDynamic {
+			newValueType = tftypes.DynamicPseudoType
 		}
 
 		logging.FrameworkDebug(ctx, "marking computed attribute that is null in the config as unknown")
 
-		return tftypes.NewValue(val.Type(), tftypes.UnknownValue), nil
+		return tftypes.NewValue(newValueType, tftypes.UnknownValue), nil
 	}
 }
 
