@@ -133,11 +133,13 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 
 func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan resource_nic.NicModel
-	modifs := false
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
+	nicId := state.Id.ValueString()
+
+	// Update tags
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
 			ctx,
@@ -146,32 +148,38 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 			&response.Diagnostics,
 			r.provider.ApiClient,
 			r.provider.SpaceID,
-			state.Id.ValueString(),
+			nicId,
 		)
 		if response.Diagnostics.HasError() {
 			return
 		}
-
-		modifs = true
 	}
 
-	// Read if modifs
-	if modifs {
-		res := utils.ExecuteRequest(func() (*iaas.ReadNicsByIdResponse, error) {
-			return r.provider.ApiClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
-		}, http.StatusOK, &response.Diagnostics)
-		if res == nil {
-			return
-		}
+	// Update Nic
+	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateNicResponse, error) {
+		body := NicFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
+		return r.provider.ApiClient.UpdateNicWithResponse(ctx, r.provider.SpaceID, nicId, body)
+	}, http.StatusOK, &response.Diagnostics)
 
-		tf, diagnostics := NicFromHttpToTf(ctx, res.JSON200)
-		if diagnostics.HasError() {
-			response.Diagnostics.Append(diagnostics...)
-			return
-		}
-
-		response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	if updatedRes == nil || response.Diagnostics.HasError() {
+		return
 	}
+
+	// Read resource
+	res := utils.ExecuteRequest(func() (*iaas.ReadNicsByIdResponse, error) {
+		return r.provider.ApiClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	}, http.StatusOK, &response.Diagnostics)
+	if res == nil {
+		return
+	}
+
+	tf, diagnostics := NicFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

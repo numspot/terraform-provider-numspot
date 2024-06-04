@@ -307,3 +307,16 @@ func NicsFromHttpToTfDatasource(ctx context.Context, http *iaas.Nic) (*datasourc
 		Tags:                 tagsList,
 	}, nil
 }
+
+func NicFromTfToUpdaterequest(ctx context.Context, tf *resource_nic.NicModel, diagnostics *diag.Diagnostics) iaas.UpdateNicJSONRequestBody {
+	linkNic := iaas.LinkNicToUpdate{
+		DeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(tf.LinkNic.DeleteOnVmDeletion),
+		LinkNicId:          utils.FromTfStringToStringPtr(tf.LinkNic.Id),
+	}
+
+	return iaas.UpdateNicJSONRequestBody{
+		SecurityGroupIds: utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
+		Description:      utils.FromTfStringToStringPtr(tf.Description),
+		LinkNic:          &linkNic,
+	}
+}
