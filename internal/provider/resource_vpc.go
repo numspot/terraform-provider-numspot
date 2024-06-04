@@ -84,7 +84,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	}
 
 	// if dhcp_options_set_id is set, we need to update the Vpc as this attribute can be set on Update only and not on Create
-	if !data.DhcpOptionsSetId.IsNull() || !data.DhcpOptionsSetId.IsUnknown() {
+	if !data.DhcpOptionsSetId.IsNull() && !data.DhcpOptionsSetId.IsUnknown() {
 		updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVpcResponse, error) {
 			body := VpcFromTfToUpdaterequest(ctx, &data, &response.Diagnostics)
 			return r.provider.ApiClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, createdId, body)
