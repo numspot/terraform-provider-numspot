@@ -48,10 +48,10 @@ func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) iaas
 		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges),
 		IsDefault:         tf.IsDefault.ValueBoolPointer(),
 		States:            utils.TfStringListToStringPtrList(ctx, tf.States),
-		// TagKeys:           utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		// TagValues:         utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		// Tags:              utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids: utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		TagKeys:           utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
+		TagValues:         utils.TfStringListToStringPtrList(ctx, tf.TagValues),
+		Tags:              utils.TfStringListToStringPtrList(ctx, tf.Tags),
+		Ids:               utils.TfStringListToStringPtrList(ctx, tf.IDs),
 	}
 }
 
@@ -74,4 +74,10 @@ func VPCsFromHttpToTfDatasource(ctx context.Context, http *iaas.Vpc) (*datasourc
 		Tenancy:          types.StringPointerValue(http.Tenancy),
 		Tags:             tagsList,
 	}, nil
+}
+
+func VpcFromTfToUpdaterequest(ctx context.Context, tf *resource_vpc.VpcModel, diagnostics *diag.Diagnostics) iaas.UpdateVpcJSONRequestBody {
+	return iaas.UpdateVpcJSONRequestBody{
+		DhcpOptionsSetId: tf.DhcpOptionsSetId.ValueString(),
+	}
 }

@@ -3,6 +3,7 @@
 package provider
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -61,10 +62,11 @@ resource "numspot_vpc" "test" {
 }`, ipRange)
 }
 
-func TestAccNetResource_DhcpOptionsSet(t *testing.T) {
+func TestAccNetResourceUpdateWithReplace(t *testing.T) {
 	t.Parallel()
 
 	domainName := "foo.bar"
+	domainNameUpdated := "foo.bar.updated"
 	ipRange := "10.101.0.0/16"
 	ipRangeUpdated := "10.102.0.0/16"
 
@@ -75,7 +77,7 @@ func TestAccNetResource_DhcpOptionsSet(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testNetConfig_DhcpOptionsSet(domainName, ipRange),
+				Config: testNetConfigUpdateWithReplace(domainName, ipRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_vpc.test", "ip_range", ipRange),
 					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
@@ -98,7 +100,7 @@ func TestAccNetResource_DhcpOptionsSet(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testNetConfig_DhcpOptionsSet(domainName, ipRangeUpdated),
+				Config: testNetConfigUpdateWithReplace(domainNameUpdated, ipRangeUpdated),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_vpc.test", "ip_range", ipRangeUpdated),
 					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
@@ -115,7 +117,7 @@ func TestAccNetResource_DhcpOptionsSet(t *testing.T) {
 	})
 }
 
-func testNetConfig_DhcpOptionsSet(domainName, ipRange string) string {
+func testNetConfigUpdateWithReplace(domainName, ipRange string) string {
 	return fmt.Sprintf(`
 resource "numspot_dhcp_options" "test" {
   domain_name = %[1]q
@@ -187,4 +189,77 @@ resource "numspot_vpc" "test" {
     }
   ]
 }`, name)
+}
+
+func TestAccVpcResourceUpdateWithoutReplace(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	var vpc_id, dhcp_option_id string
+	dhcpOptionSuffix := ""
+	dhcpOptionSuffixUpdated := "_updated"
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: testVpcConfigUpdateWithoutReplace(dhcpOptionSuffix),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						vpc_id = v
+						return nil
+					}),
+					resource.TestCheckResourceAttrWith("numspot_vpc.test", "dhcp_options_set_id", func(v string) error {
+						require.NotEmpty(t, v)
+						dhcp_option_id = v
+						return nil
+					}),
+				),
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_vpc.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{},
+			},
+			{
+				Config: testVpcConfigUpdateWithoutReplace(dhcpOptionSuffixUpdated),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						if vpc_id != v {
+							return errors.New("Id should be the same after Update without replace")
+						}
+						return nil
+					}),
+					resource.TestCheckResourceAttrWith("numspot_vpc.test", "dhcp_options_set_id", func(v string) error {
+						require.NotEmpty(t, v)
+						if dhcp_option_id == v {
+							return errors.New("dhcp_options_set_id should be different after update")
+						}
+						return nil
+					}),
+				),
+			},
+		},
+	})
+}
+
+func testVpcConfigUpdateWithoutReplace(
+	dhcp_option_suffix string,
+) string {
+	return fmt.Sprintf(`
+resource "numspot_dhcp_options" "test" {
+  domain_name = "domain"
+}
+
+resource "numspot_dhcp_options" "test_updated" {
+  domain_name = "domain"
+}
+resource "numspot_vpc" "test" {
+  ip_range            = "10.101.0.0/16"
+  dhcp_options_set_id = numspot_dhcp_options.test%[1]s.id
+}`, dhcp_option_suffix)
 }

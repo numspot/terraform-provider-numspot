@@ -83,6 +83,17 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		}
 	}
 
+	// if dhcp_options_set_id is set, we need to update the Vpc as this attribute can be set on Update only and not on Create
+	if !data.DhcpOptionsSetId.IsNull() || !data.DhcpOptionsSetId.IsUnknown() {
+		updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVpcResponse, error) {
+			body := VpcFromTfToUpdaterequest(ctx, &data, &response.Diagnostics)
+			return r.provider.ApiClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, createdId, body)
+		}, http.StatusOK, &response.Diagnostics)
+
+		if updatedRes == nil || response.Diagnostics.HasError() {
+			return
+		}
+	}
 	readRes, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
@@ -143,6 +154,8 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
+	vpcId := state.Id.ValueString()
+
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
 			ctx,
@@ -151,13 +164,24 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 			&response.Diagnostics,
 			r.provider.ApiClient,
 			r.provider.SpaceID,
-			state.Id.ValueString(),
+			vpcId,
 		)
 		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
+	// Update Vpc
+	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVpcResponse, error) {
+		body := VpcFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
+		return r.provider.ApiClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, vpcId, body)
+	}, http.StatusOK, &response.Diagnostics)
+
+	if updatedRes == nil || response.Diagnostics.HasError() {
+		return
+	}
+
+	// Read resource
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
 		return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)

@@ -19,6 +19,7 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"dhcp_options_set_id": schema.StringAttribute{
 				Computed:            true,
+				Optional:            true,
 				Description:         "The ID of the DHCP options set (or `default` if you want to associate the default one).",
 				MarkdownDescription: "The ID of the DHCP options set (or `default` if you want to associate the default one).",
 			},
@@ -46,7 +47,7 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The tenancy options for the VMs:<br />\n- `default` if a VM created in a Net can be launched with any tenancy.<br />\n- `dedicated` if it can be launched with dedicated tenancy VMs running on single-tenant hardware.<br />\n- `dedicated group ID`: if it can be launched in a dedicated group on single-tenant hardware.",
 				MarkdownDescription: "The tenancy options for the VMs:<br />\n- `default` if a VM created in a Net can be launched with any tenancy.<br />\n- `dedicated` if it can be launched with dedicated tenancy VMs running on single-tenant hardware.<br />\n- `dedicated group ID`: if it can be launched in a dedicated group on single-tenant hardware.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
 			},
 			"tags": tags.TagsSchema(ctx),
