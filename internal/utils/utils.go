@@ -309,3 +309,36 @@ func EmptyStrPointer() *string {
 	value := ""
 	return &value
 }
+
+func Diff[A basetypes.ObjectValuable](current, desired []A) (toCreate, toDelete []A) {
+	toCreate = make([]A, 0)
+	toDelete = make([]A, 0)
+
+	for _, ea := range desired {
+		found := false
+		for _, eb := range current {
+			if ea.Equal(eb) {
+				found = true
+			}
+		}
+
+		if !found {
+			toCreate = append(toCreate, ea)
+		}
+	}
+
+	for _, ea := range current {
+		found := false
+		for _, eb := range desired {
+			if ea.Equal(eb) {
+				found = true
+			}
+		}
+
+		if !found {
+			toDelete = append(toDelete, ea)
+		}
+	}
+
+	return
+}

@@ -3,6 +3,7 @@
 package provider
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"testing"
@@ -11,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAccSecurityGroupResource_SingleInboundRule(t *testing.T) {
+func TestAccSecurityGroupResource_SingleInboundRule_WithReplace(t *testing.T) {
 	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
@@ -19,18 +20,24 @@ func TestAccSecurityGroupResource_SingleInboundRule(t *testing.T) {
 
 	randName := rand.Intn(9999-1000) + 1000
 	name := fmt.Sprintf("security-group-name-%d", randName)
-	descrition := fmt.Sprintf("security-group-description-%d", randName)
+	description := fmt.Sprintf("security-group-description-%d", randName)
+
+	nameUpdated := name + "_updated"
+	descriptionUpdated := description + "_updated"
+
+	var securityGroupId string
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testSecurityGroupConfig_SingleInboundRule(netIpRange, name, descrition),
+				Config: testSecurityGroupConfig_SingleInboundRule(netIpRange, name, description),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_security_group.test", "name", name),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "description", descrition),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "description", description),
 					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
+						securityGroupId = v
 						return nil
 					}),
 				),
@@ -44,8 +51,18 @@ func TestAccSecurityGroupResource_SingleInboundRule(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testSecurityGroupConfig_SingleInboundRule(netIpRange, name, descrition),
-				Check:  resource.ComposeAggregateTestCheckFunc(),
+				Config: testSecurityGroupConfig_SingleInboundRule(netIpRange, nameUpdated, descriptionUpdated),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						if v == securityGroupId {
+							return errors.New("Id should be different after Update with replace")
+						}
+						return nil
+					}),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "name", nameUpdated),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "description", descriptionUpdated),
+				),
 			},
 		},
 	})
@@ -58,7 +75,7 @@ resource "numspot_vpc" "net" {
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_vpc.net.id
+  vpc_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
   inbound_rules = [
@@ -69,7 +86,8 @@ resource "numspot_security_group" "test" {
       ip_protocol     = "tcp"
     }
   ]
-}`, netIpRange, name, description)
+}
+`, netIpRange, name, description)
 }
 
 func TestAccSecurityGroupResource_CoupleInboundRule(t *testing.T) {
@@ -119,7 +137,7 @@ resource "numspot_vpc" "net" {
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_vpc.net.id
+  vpc_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
   inbound_rules = [
@@ -186,7 +204,7 @@ resource "numspot_vpc" "net" {
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_vpc.net.id
+  vpc_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
   outbound_rules = [
@@ -247,7 +265,7 @@ resource "numspot_vpc" "net" {
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_vpc.net.id
+  vpc_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
   outbound_rules = [
@@ -267,7 +285,7 @@ resource "numspot_security_group" "test" {
 }`, netIpRange, name, description)
 }
 
-func TestAccSecurityGroupResource_MultipleRules(t *testing.T) {
+func TestAccSecurityGroupResource_MultipleRules_NoReplace(t *testing.T) {
 	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
@@ -275,20 +293,30 @@ func TestAccSecurityGroupResource_MultipleRules(t *testing.T) {
 
 	randName := rand.Intn(9999-1000) + 1000
 	name := fmt.Sprintf("security-group-name-%d", randName)
-	descrition := fmt.Sprintf("security-group-description-%d", randName)
+	description := fmt.Sprintf("security-group-description-%d", randName)
 
+	rule1PortRange := "443"
+	rule2PortRange := "80"
+
+	rule1PortRangeUpdated := "453"
+	rule2PortRangeUpdated := "90"
+
+	var securityGroupId string
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testSecurityGroupConfig_MultipleRules(netIpRange, name, descrition),
+				Config: testSecurityGroupConfig_MultipleRules_NoReplace(netIpRange, name, description, rule1PortRange, rule2PortRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_security_group.test", "name", name),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "description", descrition),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "description", description),
 					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
+						securityGroupId = v
 						return nil
 					}),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "inbound_rules.0.from_port_range", rule1PortRange),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "inbound_rules.1.from_port_range", rule2PortRange),
 				),
 			},
 			// ImportState testing
@@ -300,34 +328,44 @@ func TestAccSecurityGroupResource_MultipleRules(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testSecurityGroupConfig_MultipleRules(netIpRange, name, descrition),
-				Check:  resource.ComposeAggregateTestCheckFunc(),
+				Config: testSecurityGroupConfig_MultipleRules_NoReplace(netIpRange, name, description, rule1PortRangeUpdated, rule2PortRangeUpdated),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						if v != securityGroupId {
+							return errors.New("Id should be the same after Update without replace")
+						}
+						return nil
+					}),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "inbound_rules.0.from_port_range", rule1PortRangeUpdated),
+					resource.TestCheckResourceAttr("numspot_security_group.test", "inbound_rules.1.from_port_range", rule2PortRangeUpdated),
+				),
 			},
 		},
 	})
 }
 
-func testSecurityGroupConfig_MultipleRules(netIpRange, name, description string) string {
+func testSecurityGroupConfig_MultipleRules_NoReplace(netIpRange, name, description, rule1PortRange, rule2PortRange string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "net" {
   ip_range = %[1]q
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_vpc.net.id
+  vpc_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
 
   inbound_rules = [
     {
-      from_port_range = 80
-      to_port_range   = 80
+      from_port_range = %[4]s
+      to_port_range   = %[4]s
       ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     },
     {
-      from_port_range = 443
-      to_port_range   = 443
+      from_port_range = %[5]s
+      to_port_range   = %[5]s
       ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     },
@@ -335,19 +373,19 @@ resource "numspot_security_group" "test" {
 
   outbound_rules = [
     {
-      from_port_range = 80
-      to_port_range   = 80
+      from_port_range = %[4]s
+      to_port_range   = %[4]s
       ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     },
     {
-      from_port_range = 443
-      to_port_range   = 443
+      from_port_range = %[5]s
+      to_port_range   = %[5]s
       ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     }
   ]
-}`, netIpRange, name, description)
+}`, netIpRange, name, description, rule1PortRange, rule2PortRange)
 }
 
 func TestAccSecurityGroupResource_Tags(t *testing.T) {
@@ -408,7 +446,7 @@ resource "numspot_vpc" "net" {
 }
 
 resource "numspot_security_group" "test" {
-  net_id      = numspot_vpc.net.id
+  vpc_id      = numspot_vpc.net.id
   name        = %[2]q
   description = %[3]q
   tags = [

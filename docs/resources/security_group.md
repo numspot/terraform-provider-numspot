@@ -57,17 +57,18 @@ resource "numspot_security_group" "test" {
 
 ### Required
 
-- `description` (String) A description for the security group, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
+- `description` (String) A description for the security group.<br />
+This description can contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, accented letters, spaces, and `_.-:/()#,@[]+=&;{}!$*`.
 - `name` (String) The name of the security group.<br />
-This name must not start with `sg-`.</br>
-This name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.
+This name must not start with `sg-`.<br />
+This name must be unique and contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, spaces, and `_.-:/()#,@[]+=&;{}!$*`.
 
 ### Optional
 
 - `inbound_rules` (Attributes Set) The inbound rules associated with the security group. (see [below for nested schema](#nestedatt--inbound_rules))
-- `net_id` (String) The ID of the Net for the security group.
 - `outbound_rules` (Attributes Set) The outbound rules associated with the security group. (see [below for nested schema](#nestedatt--outbound_rules))
 - `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `vpc_id` (String) The ID of the Net for the security group.
 
 ### Read-Only
 
@@ -81,7 +82,7 @@ Optional:
 - `from_port_range` (Number) The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.
 - `ip_protocol` (String) The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
 - `ip_ranges` (List of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
-- `service_ids` (List of String) One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).
+- `service_ids` (List of String) One or more service IDs to allow traffic from a Net to access the corresponding NumSpot services.
 - `to_port_range` (Number) The end of the port range for the TCP and UDP protocols, or an ICMP code number.
 
 Read-Only:
@@ -94,6 +95,7 @@ Read-Only:
 Read-Only:
 
 - `security_group_id` (String) The ID of a source or destination security group that you want to link to the security group of the rule.
+- `security_group_name` (String) (Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.
 
 
 
@@ -106,7 +108,7 @@ Optional:
 - `ip_protocol` (String) The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
 - `ip_ranges` (List of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
 - `security_groups_members` (Attributes List) Information about one or more source or destination security groups. (see [below for nested schema](#nestedatt--outbound_rules--security_groups_members))
-- `service_ids` (List of String) One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).
+- `service_ids` (List of String) One or more service IDs to allow traffic from a Net to access the corresponding NumSpot services.
 - `to_port_range` (Number) The end of the port range for the TCP and UDP protocols, or an ICMP code number.
 
 <a id="nestedatt--outbound_rules--security_groups_members"></a>
@@ -115,6 +117,7 @@ Optional:
 Read-Only:
 
 - `security_group_id` (String) The ID of a source or destination security group that you want to link to the security group of the rule.
+- `security_group_name` (String) (Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.
 
 
 

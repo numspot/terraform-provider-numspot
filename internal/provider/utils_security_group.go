@@ -19,7 +19,7 @@ func SecurityGroupFromTfToHttp(tf *resource_security_group.SecurityGroupModel) *
 		Id:            tf.Id.ValueStringPointer(),
 		Description:   tf.Description.ValueStringPointer(),
 		Name:          tf.Name.ValueStringPointer(),
-		VpcId:         tf.NetId.ValueStringPointer(),
+		VpcId:         tf.VpcId.ValueStringPointer(),
 		InboundRules:  nil,
 		OutboundRules: nil,
 	}
@@ -87,7 +87,7 @@ func OutboundRuleFromHttpToTf(ctx context.Context, rules iaas.SecurityGroupRule)
 	)
 }
 
-func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_group.SecurityGroupModel, http *iaas.SecurityGroup) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
+func SecurityGroupFromHttpToTf(ctx context.Context, http *iaas.SecurityGroup) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
 	var (
 		tagsTf types.List
 		diags  diag.Diagnostics
@@ -134,7 +134,7 @@ func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_grou
 		Description:   types.StringPointerValue(http.Description),
 		Id:            types.StringPointerValue(http.Id),
 		Name:          types.StringPointerValue(http.Name),
-		NetId:         types.StringPointerValue(http.VpcId),
+		VpcId:         types.StringPointerValue(http.VpcId),
 		InboundRules:  ibdsTf,
 		OutboundRules: obdsTf,
 		Tags:          tagsTf,
@@ -146,7 +146,7 @@ func SecurityGroupFromHttpToTf(ctx context.Context, model resource_security_grou
 func SecurityGroupFromTfToCreateRequest(tf *resource_security_group.SecurityGroupModel) iaas.CreateSecurityGroupJSONRequestBody {
 	return iaas.CreateSecurityGroupJSONRequestBody{
 		Description: tf.Description.ValueString(),
-		VpcId:       tf.NetId.ValueStringPointer(),
+		VpcId:       tf.VpcId.ValueStringPointer(),
 		Name:        tf.Name.ValueString(),
 	}
 }

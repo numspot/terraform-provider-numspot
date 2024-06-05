@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -21,8 +23,11 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"description": schema.StringAttribute{
 				Required:            true,
-				Description:         "A description for the security group, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
-				MarkdownDescription: "A description for the security group, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
+				Description:         "A description for the security group.<br />\nThis description can contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, accented letters, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
+				MarkdownDescription: "A description for the security group.<br />\nThis description can contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, accented letters, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
@@ -59,6 +64,11 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 										Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
 										MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
 									},
+									"security_group_name": schema.StringAttribute{
+										Computed:            true,
+										Description:         "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
+										MarkdownDescription: "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
+									},
 								},
 								CustomType: SecurityGroupsMembersType{
 									ObjectType: types.ObjectType{
@@ -74,8 +84,8 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 							ElementType:         types.StringType,
 							Computed:            true,
 							Optional:            true,
-							Description:         "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
-							MarkdownDescription: "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
+							Description:         "One or more service IDs to allow traffic from a Net to access the corresponding NumSpot services.",
+							MarkdownDescription: "One or more service IDs to allow traffic from a Net to access the corresponding NumSpot services.",
 						},
 						"to_port_range": schema.Int64Attribute{
 							Computed:            true,
@@ -90,22 +100,18 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Optional: true,
-				Computed: true,
-
+				Optional:            true,
+				Computed:            true,
 				Description:         "The inbound rules associated with the security group.",
 				MarkdownDescription: "The inbound rules associated with the security group.",
 			},
 			"name": schema.StringAttribute{
 				Required:            true,
-				Description:         "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
-				MarkdownDescription: "The name of the security group.<br />\nThis name must not start with `sg-`.</br>\nThis name must be unique and contain between 1 and 255 ASCII characters. Accented letters are not allowed.",
-			},
-			"net_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The ID of the Net for the security group.",
-				MarkdownDescription: "The ID of the Net for the security group.",
+				Description:         "The name of the security group.<br />\nThis name must not start with `sg-`.<br />\nThis name must be unique and contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
+				MarkdownDescription: "The name of the security group.<br />\nThis name must not start with `sg-`.<br />\nThis name must be unique and contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"outbound_rules": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -137,6 +143,11 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 										Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
 										MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
 									},
+									"security_group_name": schema.StringAttribute{
+										Computed:            true,
+										Description:         "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
+										MarkdownDescription: "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
+									},
 								},
 								CustomType: SecurityGroupsMembersType{
 									ObjectType: types.ObjectType{
@@ -150,12 +161,11 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "Information about one or more source or destination security groups.",
 						},
 						"service_ids": schema.ListAttribute{
-							ElementType: types.StringType,
-							Optional:    true,
-							Computed:    true,
-
-							Description:         "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
-							MarkdownDescription: "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
+							ElementType:         types.StringType,
+							Optional:            true,
+							Computed:            true,
+							Description:         "One or more service IDs to allow traffic from a Net to access the corresponding NumSpot services.",
+							MarkdownDescription: "One or more service IDs to allow traffic from a Net to access the corresponding NumSpot services.",
 						},
 						"to_port_range": schema.Int64Attribute{
 							Optional:            true,
@@ -176,6 +186,12 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The outbound rules associated with the security group.",
 			},
 			"tags": tags.TagsSchema(ctx),
+			"vpc_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "The ID of the Net for the security group.",
+				MarkdownDescription: "The ID of the Net for the security group.",
+			},
 		},
 	}
 }
@@ -185,9 +201,9 @@ type SecurityGroupModel struct {
 	Id            types.String `tfsdk:"id"`
 	InboundRules  types.Set    `tfsdk:"inbound_rules"`
 	Name          types.String `tfsdk:"name"`
-	NetId         types.String `tfsdk:"net_id"`
 	OutboundRules types.Set    `tfsdk:"outbound_rules"`
 	Tags          types.List   `tfsdk:"tags"`
+	VpcId         types.String `tfsdk:"vpc_id"`
 }
 
 var _ basetypes.ObjectTypable = InboundRulesType{}
@@ -774,21 +790,31 @@ func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 		}), diags
 	}
 
-	objVal, diags := types.ObjectValue(
-		map[string]attr.Type{
-			"from_port_range": basetypes.Int64Type{},
-			"ip_protocol":     basetypes.StringType{},
-			"ip_ranges": basetypes.ListType{
-				ElemType: types.StringType,
-			},
-			"security_groups_members": basetypes.ListType{
-				ElemType: SecurityGroupsMembersValue{}.Type(ctx),
-			},
-			"service_ids": basetypes.ListType{
-				ElemType: types.StringType,
-			},
-			"to_port_range": basetypes.Int64Type{},
+	attributeTypes := map[string]attr.Type{
+		"from_port_range": basetypes.Int64Type{},
+		"ip_protocol":     basetypes.StringType{},
+		"ip_ranges": basetypes.ListType{
+			ElemType: types.StringType,
 		},
+		"security_groups_members": basetypes.ListType{
+			ElemType: SecurityGroupsMembersValue{}.Type(ctx),
+		},
+		"service_ids": basetypes.ListType{
+			ElemType: types.StringType,
+		},
+		"to_port_range": basetypes.Int64Type{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
 		map[string]attr.Value{
 			"from_port_range":         v.FromPortRange,
 			"ip_protocol":             v.IpProtocol,
@@ -911,13 +937,32 @@ func (t SecurityGroupsMembersType) ValueFromObject(ctx context.Context, in baset
 			fmt.Sprintf(`security_group_id expected to be basetypes.StringValue, was: %T`, securityGroupIdAttribute))
 	}
 
+	securityGroupNameAttribute, ok := attributes["security_group_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`security_group_name is missing from object`)
+
+		return nil, diags
+	}
+
+	securityGroupNameVal, ok := securityGroupNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`security_group_name expected to be basetypes.StringValue, was: %T`, securityGroupNameAttribute))
+	}
+
 	if diags.HasError() {
 		return nil, diags
 	}
 
 	return SecurityGroupsMembersValue{
-		SecurityGroupId: securityGroupIdVal,
-		state:           attr.ValueStateKnown,
+		SecurityGroupId:   securityGroupIdVal,
+		SecurityGroupName: securityGroupNameVal,
+		state:             attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1002,13 +1047,32 @@ func NewSecurityGroupsMembersValue(attributeTypes map[string]attr.Type, attribut
 			fmt.Sprintf(`security_group_id expected to be basetypes.StringValue, was: %T`, securityGroupIdAttribute))
 	}
 
+	securityGroupNameAttribute, ok := attributes["security_group_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`security_group_name is missing from object`)
+
+		return NewSecurityGroupsMembersValueUnknown(), diags
+	}
+
+	securityGroupNameVal, ok := securityGroupNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`security_group_name expected to be basetypes.StringValue, was: %T`, securityGroupNameAttribute))
+	}
+
 	if diags.HasError() {
 		return NewSecurityGroupsMembersValueUnknown(), diags
 	}
 
 	return SecurityGroupsMembersValue{
-		SecurityGroupId: securityGroupIdVal,
-		state:           attr.ValueStateKnown,
+		SecurityGroupId:   securityGroupIdVal,
+		SecurityGroupName: securityGroupNameVal,
+		state:             attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1080,8 +1144,9 @@ func (t SecurityGroupsMembersType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = SecurityGroupsMembersValue{}
 
 type SecurityGroupsMembersValue struct {
-	SecurityGroupId basetypes.StringValue `tfsdk:"security_group_id"`
-	state           attr.ValueState
+	SecurityGroupId   basetypes.StringValue `tfsdk:"security_group_id"`
+	SecurityGroupName basetypes.StringValue `tfsdk:"security_group_name"`
+	state             attr.ValueState
 }
 
 func (v SecurityGroupsMembersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
@@ -1091,6 +1156,7 @@ func (v SecurityGroupsMembersValue) ToTerraformValue(ctx context.Context) (tftyp
 	var err error
 
 	attrTypes["security_group_id"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["security_group_name"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
@@ -1105,6 +1171,14 @@ func (v SecurityGroupsMembersValue) ToTerraformValue(ctx context.Context) (tftyp
 		}
 
 		vals["security_group_id"] = val
+
+		val, err = v.SecurityGroupName.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["security_group_name"] = val
 
 		if err := tftypes.ValidateValue(objectType, vals); err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
@@ -1135,12 +1209,24 @@ func (v SecurityGroupsMembersValue) String() string {
 func (v SecurityGroupsMembersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	attributeTypes := map[string]attr.Type{
+		"security_group_id":   basetypes.StringType{},
+		"security_group_name": basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
 	objVal, diags := types.ObjectValue(
-		map[string]attr.Type{
-			"security_group_id": basetypes.StringType{},
-		},
+		attributeTypes,
 		map[string]attr.Value{
-			"security_group_id": v.SecurityGroupId,
+			"security_group_id":   v.SecurityGroupId,
+			"security_group_name": v.SecurityGroupName,
 		})
 
 	return objVal, diags
@@ -1165,6 +1251,10 @@ func (v SecurityGroupsMembersValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.SecurityGroupName.Equal(other.SecurityGroupName) {
+		return false
+	}
+
 	return true
 }
 
@@ -1178,7 +1268,8 @@ func (v SecurityGroupsMembersValue) Type(ctx context.Context) attr.Type {
 
 func (v SecurityGroupsMembersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"security_group_id": basetypes.StringType{},
+		"security_group_id":   basetypes.StringType{},
+		"security_group_name": basetypes.StringType{},
 	}
 }
 
@@ -1766,21 +1857,31 @@ func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		}), diags
 	}
 
-	objVal, diags := types.ObjectValue(
-		map[string]attr.Type{
-			"from_port_range": basetypes.Int64Type{},
-			"ip_protocol":     basetypes.StringType{},
-			"ip_ranges": basetypes.ListType{
-				ElemType: types.StringType,
-			},
-			"security_groups_members": basetypes.ListType{
-				ElemType: SecurityGroupsMembersValue{}.Type(ctx),
-			},
-			"service_ids": basetypes.ListType{
-				ElemType: types.StringType,
-			},
-			"to_port_range": basetypes.Int64Type{},
+	attributeTypes := map[string]attr.Type{
+		"from_port_range": basetypes.Int64Type{},
+		"ip_protocol":     basetypes.StringType{},
+		"ip_ranges": basetypes.ListType{
+			ElemType: types.StringType,
 		},
+		"security_groups_members": basetypes.ListType{
+			ElemType: SecurityGroupsMembersValue{}.Type(ctx),
+		},
+		"service_ids": basetypes.ListType{
+			ElemType: types.StringType,
+		},
+		"to_port_range": basetypes.Int64Type{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
 		map[string]attr.Value{
 			"from_port_range":         v.FromPortRange,
 			"ip_protocol":             v.IpProtocol,

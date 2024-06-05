@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_security_group"
@@ -60,6 +61,100 @@ func (r *SecurityGroupResource) Schema(ctx context.Context, request resource.Sch
 	response.Schema = resource_security_group.SecurityGroupResourceSchema(ctx)
 }
 
+func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, existingRules *[]iaas.SecurityGroupRule, flow string) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	if existingRules == nil {
+		return nil
+	}
+
+	rules := make([]iaas.SecurityGroupRule, 0, len(*existingRules))
+	for _, e := range *existingRules {
+		rules = append(rules, iaas.SecurityGroupRule{
+			FromPortRange:         e.FromPortRange,
+			IpProtocol:            e.IpProtocol,
+			IpRanges:              e.IpRanges,
+			SecurityGroupsMembers: e.SecurityGroupsMembers,
+			ServiceIds:            e.ServiceIds,
+			ToPortRange:           e.ToPortRange,
+		})
+	}
+
+	utils.ExecuteRequest(func() (*iaas.DeleteSecurityGroupRuleResponse, error) {
+		body := iaas.DeleteSecurityGroupRuleJSONRequestBody{
+			Flow:  flow,
+			Rules: &rules,
+		}
+		return r.provider.ApiClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
+	}, http.StatusNoContent, &diags)
+
+	return diags
+}
+
+// Note : this is not a method of SecurityGroupResource because method do not handle generic types
+func createRules[RulesType any](
+	r *SecurityGroupResource,
+	ctx context.Context,
+	id string,
+	rulesToCreate basetypes.SetValue,
+	fun func(ctx context.Context, sgId string, data []RulesType) iaas.CreateSecurityGroupRuleJSONRequestBody,
+) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	rules := make([]RulesType, 0, len(rulesToCreate.Elements()))
+	rulesToCreate.ElementsAs(ctx, &rules, false)
+
+	_ = utils.ExecuteRequest(func() (*iaas.CreateSecurityGroupRuleResponse, error) {
+		body := fun(ctx, id, rules)
+		return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
+	}, http.StatusCreated, &diags)
+
+	return diags
+}
+
+func (r *SecurityGroupResource) updateAllRules(ctx context.Context, data resource_security_group.SecurityGroupModel, id string) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Read security group to retrieve the existing rules
+	read := r.readSecurityGroup(ctx, id, diags)
+	if diags.HasError() {
+		return diags
+	}
+
+	// Delete existing inbound rules
+	if len(*read.JSON200.InboundRules) > 0 {
+		diags = r.deleteRules(ctx, id, read.JSON200.InboundRules, "Inbound")
+		if diags.HasError() {
+			return diags
+		}
+	}
+
+	// Create wanted inbound rules
+	if len(data.InboundRules.Elements()) > 0 {
+		diags = createRules(r, ctx, id, data.InboundRules, CreateInboundRulesRequest)
+		if diags.HasError() {
+			return diags
+		}
+	}
+
+	// Delete existing Outbound rules
+	if len(*read.JSON200.OutboundRules) > 0 {
+		diags = r.deleteRules(ctx, id, read.JSON200.OutboundRules, "Outbound")
+		if diags.HasError() {
+			return diags
+		}
+	}
+	// Create wanted Outbound rules
+	if len(data.OutboundRules.Elements()) > 0 {
+		diags = createRules(r, ctx, id, data.OutboundRules, CreateOutboundRulesRequest)
+		if diags.HasError() {
+			return diags
+		}
+	}
+
+	return nil
+}
+
 func (r *SecurityGroupResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
@@ -75,72 +170,33 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	createdId := *res.JSON201.Id
+	id := utils.GetPtrValue(res.JSON201.Id)
+	if id == "" {
+		return
+	}
+
+	// Create tags
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, id, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
-	// Inbound
-	if len(data.InboundRules.Elements()) > 0 {
-		inboundRules := make([]resource_security_group.InboundRulesValue, 0, len(data.InboundRules.Elements()))
-		data.InboundRules.ElementsAs(ctx, &inboundRules, false)
+	// Create rules and delete the default one
+	diags := r.updateAllRules(ctx, data, id)
 
-		createdIbdRules := utils.ExecuteRequest(func() (*iaas.CreateSecurityGroupRuleResponse, error) {
-			body := CreateInboundRulesRequest(ctx, createdId, inboundRules)
-			return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, createdId, body)
-		}, http.StatusCreated, &response.Diagnostics)
-		if createdIbdRules == nil {
-			return
-		}
-	}
-
-	// Outbound
-	if len(data.OutboundRules.Elements()) > 0 {
-		// Delete default SG rule: (0.0.0.0/0 -1)
-		hRules := *res.JSON201.OutboundRules
-		rules := make([]iaas.SecurityGroupRule, 0, len(hRules))
-		for _, e := range hRules {
-			rules = append(rules, iaas.SecurityGroupRule{
-				FromPortRange:         e.FromPortRange,
-				IpProtocol:            e.IpProtocol,
-				IpRanges:              e.IpRanges,
-				SecurityGroupsMembers: e.SecurityGroupsMembers,
-				ServiceIds:            e.ServiceIds,
-				ToPortRange:           e.ToPortRange,
-			})
-		}
-
-		utils.ExecuteRequest(func() (*iaas.DeleteSecurityGroupRuleResponse, error) {
-			body := iaas.DeleteSecurityGroupRuleJSONRequestBody{
-				Flow:  "Outbound",
-				Rules: &rules,
-			}
-			return r.provider.ApiClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, createdId, body)
-		}, http.StatusNoContent, &response.Diagnostics)
-
-		// Create SG rules:
-		outboundRules := make([]resource_security_group.OutboundRulesValue, 0, len(data.OutboundRules.Elements()))
-		data.OutboundRules.ElementsAs(ctx, &outboundRules, false)
-
-		createdObdRules := utils.ExecuteRequest(func() (*iaas.CreateSecurityGroupRuleResponse, error) {
-			body := CreateOutboundRulesRequest(ctx, createdId, outboundRules)
-			return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, createdId, body)
-		}, http.StatusCreated, &response.Diagnostics)
-		if createdObdRules == nil {
-			return
-		}
+	if diags.HasError() {
+		return
 	}
 
 	// Read before store
-	read := r.readSecurityGroup(ctx, createdId, response.Diagnostics)
+	read := r.readSecurityGroup(ctx, id, response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, data, read.JSON200)
+	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, read.JSON200)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -158,7 +214,7 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 		return
 	}
 
-	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, data, res.JSON200)
+	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, res.JSON200)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -191,6 +247,9 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 
+	securityGroupId := state.Id.ValueString()
+
+	// update tags
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
 			ctx,
@@ -199,12 +258,35 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 			&response.Diagnostics,
 			r.provider.ApiClient,
 			r.provider.SpaceID,
-			state.Id.ValueString(),
+			securityGroupId,
 		)
 		if response.Diagnostics.HasError() {
 			return
 		}
 	}
+
+	// update rules
+	diags := r.updateAllRules(ctx, plan, securityGroupId)
+	if diags.HasError() {
+		return
+	}
+
+	res := r.readSecurityGroup(ctx, securityGroupId, response.Diagnostics)
+	if response.Diagnostics.HasError() || res == nil {
+		return
+	}
+
+	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, res.JSON200)
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+		return
+	}
+
+	if diagnostics.HasError() {
+		response.Diagnostics.Append(diagnostics...)
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
