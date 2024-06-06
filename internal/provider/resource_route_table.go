@@ -2,9 +2,9 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -26,13 +26,6 @@ var (
 type RouteTableResource struct {
 	provider Provider
 }
-
-type PrivateState struct {
-	DefaultDestinationIp string  `json:"defaultDestinationIp"`
-	SubnetId             *string `json:"subnetId"`
-}
-
-var PrivateStateKey = "private-state"
 
 func NewRouteTableResource() resource.Resource {
 	return &RouteTableResource{}
@@ -71,9 +64,6 @@ func (r *RouteTableResource) Schema(ctx context.Context, request resource.Schema
 func (r *RouteTableResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
@@ -97,64 +87,37 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		}
 	}
 
-	jsonRoutes := *jsonRes.Routes
-	defaultRoute := jsonRoutes[0]
-	privateState := PrivateState{DefaultDestinationIp: *defaultRoute.DestinationIpRange}
-
 	routes := make([]resource_route_table.RoutesValue, 0, len(data.Routes.Elements()))
 	data.Routes.ElementsAs(ctx, &routes, false)
-	for i := range routes {
-		route := &routes[i]
-		createdRoute := utils.ExecuteRequest(func() (*iaas.CreateRouteResponse, error) {
-			return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, createdId, iaas.CreateRouteJSONRequestBody{
-				DestinationIpRange: route.DestinationIpRange.ValueString(),
-				GatewayId:          route.GatewayId.ValueStringPointer(),
-				NatGatewayId:       route.NatGatewayId.ValueStringPointer(),
-				VpcPeeringId:       route.VpcPeeringId.ValueStringPointer(),
-				NicId:              route.NicId.ValueStringPointer(),
-				VmId:               route.VmId.ValueStringPointer(),
-			})
-		}, http.StatusCreated, &response.Diagnostics)
-		if createdRoute == nil {
-			return
-		}
+	diags := r.createRoutes(ctx, createdId, routes)
+	response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
+		return
 	}
 
 	if !data.SubnetId.IsNull() {
-		linkRes := utils.ExecuteRequest(func() (*iaas.LinkRouteTableResponse, error) {
-			return r.provider.ApiClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, createdId, iaas.LinkRouteTableJSONRequestBody{SubnetId: data.SubnetId.ValueString()})
-		}, http.StatusOK, &response.Diagnostics)
-		if linkRes == nil {
+		diags = r.linkRouteTable(ctx, createdId, data.SubnetId.ValueString())
+		response.Diagnostics.Append(diags...)
+		if response.Diagnostics.HasError() {
 			return
 		}
-
-		privateState.SubnetId = data.SubnetId.ValueStringPointer()
 	}
 
-	readed := r.readRouteTable(ctx, createdId, response.Diagnostics)
-	if readed == nil {
+	read := r.readRouteTable(ctx, createdId, response.Diagnostics)
+	if read == nil {
 		return
 	}
 
-	tf, diagnostics := RouteTableFromHttpToTf(
+	tf, diags := RouteTableFromHttpToTf(
 		ctx,
-		readed.JSON200,
-		privateState.DefaultDestinationIp,
-		privateState.SubnetId,
+		read.JSON200,
 	)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
-		return
-	}
-
-	bytes, err := json.Marshal(privateState)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Route Table", "Failed to marshall private state")
+	response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
-	response.Diagnostics.Append(response.Private.SetKey(ctx, PrivateStateKey, bytes)...)
 }
 
 func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
@@ -166,55 +129,12 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 		return
 	}
 
-	bytes, diagnostics := request.Private.GetKey(ctx, PrivateStateKey)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
-		return
-	}
-	var privateState PrivateState
-	if bytes != nil {
-		err := json.Unmarshal(bytes, &privateState)
-		if err != nil {
-			response.Diagnostics.AddError("Failed to read Route Table", err.Error())
-			return
-		}
-	} else {
-		// Retrieve Default Destination IP Range
-		readNetRes, err := r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, *res.JSON200.VpcId)
-		if err != nil {
-			response.Diagnostics.AddError("Failed to read associated Net", err.Error())
-			return
-		}
-
-		if readNetRes.StatusCode() != http.StatusOK {
-			apiError := utils.HandleError(readNetRes.Body)
-			response.Diagnostics.AddError("Failed to read associated Net", apiError.Error())
-			return
-		}
-
-		privateState.DefaultDestinationIp = *readNetRes.JSON200.IpRange
-	}
-
-	// Retrieve Subnet ID if the Route Table is linked
-	var subnetId *string
-	if privateState.SubnetId != nil {
-		subnetId = privateState.SubnetId
-	} else {
-		jsonSubnet := res.JSON200
-		if jsonSubnet != nil && jsonSubnet.LinkRouteTables != nil && len(*jsonSubnet.LinkRouteTables) > 0 {
-			subnets := *jsonSubnet.LinkRouteTables
-			subnetId = subnets[0].SubnetId
-		}
-	}
-
-	tf, diagnostics := RouteTableFromHttpToTf(
+	tf, diags := RouteTableFromHttpToTf(
 		ctx,
 		res.JSON200,
-		privateState.DefaultDestinationIp,
-		subnetId,
 	)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -240,14 +160,20 @@ func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag
 func (r *RouteTableResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan resource_route_table.RouteTableModel
-		modifs      bool
+		modifs      = false
 	)
-	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
-	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
+	diags := request.State.Get(ctx, &state)
+	response.Diagnostics.Append(diags...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	modifs = false
+
+	diags = request.Plan.Get(ctx, &plan)
+	response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
@@ -266,6 +192,98 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 		modifs = true
 	}
 
+	if !state.SubnetId.Equal(plan.SubnetId) {
+		currentSubnetId := state.SubnetId.ValueStringPointer()
+		desiredSubnetId := plan.SubnetId.ValueStringPointer()
+
+		switch {
+		case currentSubnetId != nil && desiredSubnetId == nil:
+			// Nothing to do, the subnet is deleted first, and the route table assoc is deleted
+			diags = r.unlinkSubnet(ctx, state, *currentSubnetId)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+		case currentSubnetId == nil && desiredSubnetId != nil:
+			// Attach create subnet
+			diags = r.linkRouteTable(ctx, state.Id.ValueString(), *desiredSubnetId)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+		default:
+			// Detach current and attach desired
+			diags = r.unlinkSubnet(ctx, state, *currentSubnetId)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+
+			diags = r.linkRouteTable(ctx, state.Id.ValueString(), *desiredSubnetId)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+		}
+	}
+
+	stateRoutes := make([]resource_route_table.RoutesValue, 0, len(state.Routes.Elements()))
+	diags = state.Routes.ElementsAs(ctx, &stateRoutes, false)
+	response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	stateRoutesWithoutLocal := r.removeLocalRouteFromRoutes(stateRoutes)
+	if !state.Routes.Equal(plan.Routes) {
+		switch {
+		case len(stateRoutesWithoutLocal) == 0 && len(plan.Routes.Elements()) > 0:
+			planRoutes := make([]resource_route_table.RoutesValue, 0, len(plan.Routes.Elements()))
+			diags = plan.Routes.ElementsAs(ctx, &planRoutes, false)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+
+			diags = r.createRoutes(ctx, state.Id.ValueString(), planRoutes)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+
+			modifs = true
+		case len(stateRoutesWithoutLocal) > 0 && len(plan.Routes.Elements()) == 0:
+			diags = r.deleteRoutes(ctx, state.Id.ValueString(), stateRoutesWithoutLocal)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+
+			modifs = true
+		case len(stateRoutesWithoutLocal) > 0 && len(plan.Routes.Elements()) > 0:
+			planRoutes := make([]resource_route_table.RoutesValue, 0, len(plan.Routes.Elements()))
+			diags = plan.Routes.ElementsAs(ctx, &planRoutes, false)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+
+			toCreate, toDelete := utils.Diff(stateRoutesWithoutLocal, planRoutes)
+			diags = r.createRoutes(ctx, state.Id.ValueString(), toCreate)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+
+			diags = r.deleteRoutes(ctx, state.Id.ValueString(), toDelete)
+			response.Diagnostics.Append(diags...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+
+			modifs = true
+		}
+	}
+
 	if modifs {
 		// Read and update the state
 		res := r.readRouteTable(ctx, state.Id.ValueString(), response.Diagnostics)
@@ -273,54 +291,12 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 			return
 		}
 
-		bytes, diagnostics := request.Private.GetKey(ctx, PrivateStateKey)
-		if diagnostics.HasError() {
-			response.Diagnostics.Append(diagnostics...)
-			return
-		}
-		var privateState PrivateState
-		if bytes != nil {
-			err := json.Unmarshal(bytes, &privateState)
-			if err != nil {
-				response.Diagnostics.AddError("Failed to read Route Table", err.Error())
-				return
-			}
-		} else {
-			// Retrieve Default Destination IP Range
-			readNetRes, err := r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, *res.JSON200.VpcId)
-			if err != nil {
-				response.Diagnostics.AddError("Failed to read associated Net", err.Error())
-				return
-			}
-
-			if readNetRes.StatusCode() != http.StatusOK {
-				apiError := utils.HandleError(readNetRes.Body)
-				response.Diagnostics.AddError("Failed to read associated Net", apiError.Error())
-				return
-			}
-
-			privateState.DefaultDestinationIp = *readNetRes.JSON200.IpRange
-		}
-
-		var subnetId *string
-		if privateState.SubnetId != nil {
-			subnetId = privateState.SubnetId
-		} else {
-			jsonSubnet := res.JSON200
-			if jsonSubnet != nil && jsonSubnet.LinkRouteTables != nil && len(*jsonSubnet.LinkRouteTables) > 0 {
-				subnets := *jsonSubnet.LinkRouteTables
-				subnetId = subnets[0].SubnetId
-			}
-		}
-
-		tf, diagnostics := RouteTableFromHttpToTf(
+		tf, diags := RouteTableFromHttpToTf(
 			ctx,
 			res.JSON200,
-			privateState.DefaultDestinationIp,
-			subnetId,
 		)
-		if diagnostics.HasError() {
-			response.Diagnostics.Append(diagnostics...)
+		response.Diagnostics.Append(diags...)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
@@ -334,24 +310,26 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 
 	// Unlink route tables
 	links := make([]resource_route_table.LinkRouteTablesValue, 0, len(data.LinkRouteTables.Elements()))
-	diagnostics := data.LinkRouteTables.ElementsAs(ctx, &links, false)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	diags := data.LinkRouteTables.ElementsAs(ctx, &links, false)
+	response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
+	unlinkDiags := diag.Diagnostics{}
 	for _, link := range links {
-		unlinkRes := utils.ExecuteRequest(func() (*iaas.UnlinkRouteTableResponse, error) {
-			return r.provider.ApiClient.UnlinkRouteTableWithResponse(
-				ctx,
-				r.provider.SpaceID,
-				data.Id.ValueString(),
-				iaas.UnlinkRouteTableJSONRequestBody{
-					LinkRouteTableId: link.Id.ValueString(),
-				},
-			)
-		}, http.StatusNoContent, &response.Diagnostics)
-		if unlinkRes == nil {
+		diags = r.unlinkRouteTable(ctx, data.Id.ValueString(), link.Id.ValueString())
+		unlinkDiags.Append(diags...)
+	}
+
+	if unlinkDiags.HasError() {
+		readRes := r.readRouteTable(ctx, data.Id.ValueString(), response.Diagnostics)
+		if readRes == nil {
+			return
+		}
+
+		if len(*readRes.JSON200.LinkRouteTables) > 0 {
+			response.Diagnostics.Append(unlinkDiags...)
 			return
 		}
 	}
@@ -361,4 +339,119 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 		response.Diagnostics.AddError("Failed to delete Route Table", err.Error())
 		return
 	}
+}
+
+func (r *RouteTableResource) createRoutes(ctx context.Context, routeTableId string, routes []resource_route_table.RoutesValue) (diags diag.Diagnostics) {
+	for i := range routes {
+		route := &routes[i]
+		// prevent creating the one added in the plan modify function
+		if !route.IsUnknown() && !route.IsNull() && !strings.EqualFold(route.GatewayId.ValueString(), "local") {
+			createdRoute := utils.ExecuteRequest(func() (*iaas.CreateRouteResponse, error) {
+				return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToCreateRoutesRequest(*route))
+			}, http.StatusCreated, &diags)
+			if createdRoute == nil {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+func (r *RouteTableResource) deleteRoutes(ctx context.Context, routeTableId string, routes []resource_route_table.RoutesValue) (diags diag.Diagnostics) {
+	for i := range routes {
+		route := &routes[i]
+		deletedRoute := utils.ExecuteRequest(func() (*iaas.DeleteRouteResponse, error) {
+			return r.provider.ApiClient.DeleteRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToDeleteRoutesRequest(*route))
+		}, http.StatusNoContent, &diags)
+		if deletedRoute == nil {
+			return
+		}
+	}
+
+	return
+}
+
+func (r *RouteTableResource) unlinkSubnet(ctx context.Context, state resource_route_table.RouteTableModel, subnetId string) diag.Diagnostics {
+	// This function attempts to unlink a subnet from a route table.
+	// It first retrieves all linked route tables, then identifies the specific association by subnet ID.
+	// If found, it proceeds to unlink the route table using the association ID.
+	// Any errors encountered during the process are added to the diagnostics and returned.
+
+	var diags diag.Diagnostics
+	rtbAssocsTf := make([]resource_route_table.LinkRouteTablesValue, 0, len(state.LinkRouteTables.Elements()))
+	diags = state.LinkRouteTables.ElementsAs(ctx, &rtbAssocsTf, false)
+	if diags.HasError() {
+		return diags
+	}
+
+	var rtbAssocId *string
+	for _, rtbAssocTf := range rtbAssocsTf {
+		if strings.EqualFold(rtbAssocTf.SubnetId.ValueString(), subnetId) {
+			rtbAssocId = rtbAssocTf.Id.ValueStringPointer()
+			break
+		}
+	}
+
+	if rtbAssocId == nil {
+		diags.AddError("Failed to retrieve route table associated with subnet Id", "Failed to retrieve route table associated with subnet Id")
+		return diags
+	}
+
+	unlinkDiags := r.unlinkRouteTable(ctx, state.Id.ValueString(), *rtbAssocId)
+
+	// This check is necessary to ensure the operation is successful in scenarios where the subnet was created prior to this action.
+	// In such cases, the association link might be deleted before the route table resource has been updated, leading to potential inconsistencies.
+	if unlinkDiags.HasError() {
+		readRes := r.readRouteTable(ctx, state.Id.ValueString(), diags)
+		if readRes == nil {
+			return diags
+		}
+
+		found := false
+		for _, rtb := range *readRes.JSON200.LinkRouteTables {
+			if rtb.Id == rtbAssocId {
+				found = true
+				break
+			}
+		}
+
+		if found {
+			diags.Append(unlinkDiags...)
+			return diags
+		}
+	}
+
+	return diags
+}
+
+func (r *RouteTableResource) linkRouteTable(ctx context.Context, routeTableId, subnetId string) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	utils.ExecuteRequest(func() (*iaas.LinkRouteTableResponse, error) {
+		return r.provider.ApiClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, routeTableId, iaas.LinkRouteTableJSONRequestBody{SubnetId: subnetId})
+	}, http.StatusOK, &diags)
+
+	return diags
+}
+
+func (r *RouteTableResource) unlinkRouteTable(ctx context.Context, routeTableId, linkRouteTableId string) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	utils.ExecuteRequest(func() (*iaas.UnlinkRouteTableResponse, error) {
+		return r.provider.ApiClient.UnlinkRouteTableWithResponse(ctx, r.provider.SpaceID, routeTableId, iaas.UnlinkRouteTableJSONRequestBody{LinkRouteTableId: linkRouteTableId})
+	}, http.StatusNoContent, &diags)
+
+	return diags
+}
+
+func (r *RouteTableResource) removeLocalRouteFromRoutes(routes []resource_route_table.RoutesValue) []resource_route_table.RoutesValue {
+	arr := make([]resource_route_table.RoutesValue, 0)
+	for _, route := range routes {
+		if !strings.EqualFold(route.GatewayId.ValueString(), "local") {
+			arr = append(arr, route)
+		}
+	}
+
+	return arr
 }

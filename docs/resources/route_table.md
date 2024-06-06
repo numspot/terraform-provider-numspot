@@ -47,7 +47,8 @@ resource "numspot_route_table" "test" {
 
 ### Optional
 
-- `routes` (Attributes List) One or more routes in the route table. (see [below for nested schema](#nestedatt--routes))
+- `link_route_tables` (Attributes List) One or more associations between the route table and Subnets. (see [below for nested schema](#nestedatt--link_route_tables))
+- `routes` (Attributes Set) One or more routes in the route table. (see [below for nested schema](#nestedatt--routes))
 - `space_id` (String) space identifier
 - `subnet_id` (String) The ID of the SubNet for which you want to link the route table.
 - `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
@@ -55,8 +56,20 @@ resource "numspot_route_table" "test" {
 ### Read-Only
 
 - `id` (String) The ID of the route table.
-- `link_route_tables` (Attributes List) One or more associations between the route table and Subnets. (see [below for nested schema](#nestedatt--link_route_tables))
+- `local_route` (Attributes) (see [below for nested schema](#nestedatt--local_route))
 - `route_propagating_virtual_gateways` (Attributes List) Information about virtual gateways propagating routes. (see [below for nested schema](#nestedatt--route_propagating_virtual_gateways))
+
+<a id="nestedatt--link_route_tables"></a>
+### Nested Schema for `link_route_tables`
+
+Read-Only:
+
+- `id` (String) The ID of the association between the route table and the Subnet.
+- `main` (Boolean) If true, the route table is the main one.
+- `route_table_id` (String) The ID of the route table.
+- `subnet_id` (String) The ID of the Subnet.
+- `vpc_id` (String) The ID of the Net.
+
 
 <a id="nestedatt--routes"></a>
 ### Nested Schema for `routes`
@@ -90,16 +103,24 @@ Required:
 - `value` (String) The value of the tag, between 0 and 255 characters.
 
 
-<a id="nestedatt--link_route_tables"></a>
-### Nested Schema for `link_route_tables`
+<a id="nestedatt--local_route"></a>
+### Nested Schema for `local_route`
+
+Optional:
+
+- `gateway_id` (String) The ID of the Internet service or virtual gateway attached to the Net.
+- `nat_gateway_id` (String) The ID of a NAT service attached to the Net.
+- `nic_id` (String) The ID of the NIC.
+- `vm_id` (String) The ID of a VM specified in a route in the table.
+- `vpc_peering_id` (String) The ID of the Net peering.
 
 Read-Only:
 
-- `id` (String) The ID of the association between the route table and the Subnet.
-- `main` (Boolean) If true, the route table is the main one.
-- `route_table_id` (String) The ID of the route table.
-- `subnet_id` (String) The ID of the Subnet.
-- `vpc_id` (String) The ID of the Net.
+- `creation_method` (String) The method used to create the route.
+- `destination_ip_range` (String) The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
+- `destination_service_id` (String) The ID of the OUTSCALE service.
+- `state` (String) The state of a route in the route table (always `active`).
+- `vpc_access_point_id` (String) The ID of the Net access point.
 
 
 <a id="nestedatt--route_propagating_virtual_gateways"></a>

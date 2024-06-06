@@ -161,7 +161,7 @@ resource "numspot_internet_gateway" "igw" {
 }
 
 resource "numspot_route_table" "rt" {
-  net_id    = numspot_vpc.vpc.id
+  vpc_id    = numspot_vpc.vpc.id
   subnet_id = numspot_subnet.subnet.id
 
   routes = [

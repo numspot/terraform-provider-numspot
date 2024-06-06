@@ -14,27 +14,27 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable, defaultRouteDestination string, subnetId *string) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
+func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
 	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
+		tagsTf     types.List
+		diags      diag.Diagnostics
+		localRoute resource_route_table.RoutesValue
+		routes     []iaas.Route
 	)
 
-	// Routes
-	var routes []iaas.Route
-	if len(*http.Routes) > 0 {
-		// Remove "defaulted" route to prevent inconsistent state
-		routes = make([]iaas.Route, 0, len(*http.Routes)-1)
-		for _, e := range *http.Routes {
-			if *e.DestinationIpRange != defaultRouteDestination {
-				routes = append(routes, e)
+	for _, route := range *http.Routes {
+		if route.GatewayId != nil && *route.GatewayId == "local" {
+			localRoute, diags = routeTableRouteFromAPI(ctx, route)
+			if diags.HasError() {
+				return nil, diags
 			}
+		} else {
+			routes = append(routes, route)
 		}
-	} else {
-		routes = *http.Routes
 	}
 
-	tfRoutes, diags := utils.GenericListToTfListValue(ctx, resource_route_table.RoutesValue{}, routeTableRouteFromAPI, routes)
+	// Routes
+	tfRoutes, diags := utils.GenericSetToTfSetValue(ctx, resource_route_table.RoutesValue{}, routeTableRouteFromAPI, routes)
 	if diags.HasError() {
 		return nil, diags
 	}
@@ -43,6 +43,15 @@ func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable, defaultR
 	tfLinks, diags := utils.GenericListToTfListValue(ctx, resource_route_table.LinkRouteTablesValue{}, routeTableLinkFromAPI, *http.LinkRouteTables)
 	if diags.HasError() {
 		return nil, diags
+	}
+
+	// Retrieve Subnet Id:
+	var subnetId *string
+	for _, assoc := range *http.LinkRouteTables {
+		if assoc.SubnetId != nil {
+			subnetId = assoc.SubnetId
+			break
+		}
 	}
 
 	if http.Tags != nil {
@@ -60,6 +69,7 @@ func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable, defaultR
 		Routes:                          tfRoutes,
 		SubnetId:                        types.StringPointerValue(subnetId),
 		Tags:                            tagsTf,
+		LocalRoute:                      localRoute,
 	}
 
 	return &res, diags
@@ -99,6 +109,23 @@ func routeTableRouteFromAPI(ctx context.Context, route iaas.Route) (resource_rou
 func RouteTableFromTfToCreateRequest(tf *resource_route_table.RouteTableModel) iaas.CreateRouteTableJSONRequestBody {
 	return iaas.CreateRouteTableJSONRequestBody{
 		VpcId: tf.VpcId.ValueString(),
+	}
+}
+
+func RouteTableFromTfToCreateRoutesRequest(route resource_route_table.RoutesValue) iaas.CreateRouteJSONRequestBody {
+	return iaas.CreateRouteJSONRequestBody{
+		DestinationIpRange: route.DestinationIpRange.ValueString(),
+		GatewayId:          route.GatewayId.ValueStringPointer(),
+		NatGatewayId:       route.NatGatewayId.ValueStringPointer(),
+		VpcPeeringId:       route.VpcPeeringId.ValueStringPointer(),
+		NicId:              route.NicId.ValueStringPointer(),
+		VmId:               route.VmId.ValueStringPointer(),
+	}
+}
+
+func RouteTableFromTfToDeleteRoutesRequest(route resource_route_table.RoutesValue) iaas.DeleteRouteJSONRequestBody {
+	return iaas.DeleteRouteJSONRequestBody{
+		DestinationIpRange: route.DestinationIpRange.ValueString(),
 	}
 }
 

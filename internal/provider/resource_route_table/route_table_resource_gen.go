@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	//"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	//"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -59,6 +61,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
+				Optional:            true,
 				Computed:            true,
 				Description:         "One or more associations between the route table and Subnets.",
 				MarkdownDescription: "One or more associations between the route table and Subnets.",
@@ -82,7 +85,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about virtual gateways propagating routes.",
 				MarkdownDescription: "Information about virtual gateways propagating routes.",
 			},
-			"routes": schema.ListNestedAttribute{
+			"routes": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"creation_method": schema.StringAttribute{
@@ -152,6 +155,71 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "One or more routes in the route table.",
 				MarkdownDescription: "One or more routes in the route table.",
 			},
+			"local_route": schema.SingleNestedAttribute{
+				Attributes: map[string]schema.Attribute{
+					"creation_method": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The method used to create the route.",
+						MarkdownDescription: "The method used to create the route.",
+					},
+					"destination_ip_range": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
+						MarkdownDescription: "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
+					},
+					"destination_service_id": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The ID of the OUTSCALE service.",
+						MarkdownDescription: "The ID of the OUTSCALE service.",
+					},
+					"gateway_id": schema.StringAttribute{
+						Computed:            true,
+						Optional:            true,
+						Description:         "The ID of the Internet service or virtual gateway attached to the Net.",
+						MarkdownDescription: "The ID of the Internet service or virtual gateway attached to the Net.",
+					},
+					"nat_gateway_id": schema.StringAttribute{
+						Computed:            true,
+						Optional:            true,
+						Description:         "The ID of a NAT service attached to the Net.",
+						MarkdownDescription: "The ID of a NAT service attached to the Net.",
+					},
+					"nic_id": schema.StringAttribute{
+						Computed:            true,
+						Optional:            true,
+						Description:         "The ID of the NIC.",
+						MarkdownDescription: "The ID of the NIC.",
+					},
+					"state": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The state of a route in the route table (always `active`). ",
+						MarkdownDescription: "The state of a route in the route table (always `active`). ",
+					},
+					"vm_id": schema.StringAttribute{
+						Computed:            true,
+						Optional:            true,
+						Description:         "The ID of a VM specified in a route in the table.",
+						MarkdownDescription: "The ID of a VM specified in a route in the table.",
+					},
+					"vpc_access_point_id": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The ID of the Net access point.",
+						MarkdownDescription: "The ID of the Net access point.",
+					},
+					"vpc_peering_id": schema.StringAttribute{
+						Computed:            true,
+						Optional:            true,
+						Description:         "The ID of the Net peering.",
+						MarkdownDescription: "The ID of the Net peering.",
+					},
+				},
+				CustomType: RoutesType{
+					ObjectType: types.ObjectType{
+						AttrTypes: RoutesValue{}.AttributeTypes(ctx),
+					},
+				},
+				Computed: true,
+			},
 			"space_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -177,7 +245,8 @@ type RouteTableModel struct {
 	Id                              types.String `tfsdk:"id"`
 	LinkRouteTables                 types.List   `tfsdk:"link_route_tables"`
 	RoutePropagatingVirtualGateways types.List   `tfsdk:"route_propagating_virtual_gateways"`
-	Routes                          types.List   `tfsdk:"routes"`
+	Routes                          types.Set    `tfsdk:"routes"`
+	LocalRoute                      RoutesValue  `tfsdk:"local_route"`
 	SpaceId                         types.String `tfsdk:"space_id"`
 	VpcId                           types.String `tfsdk:"vpc_id"`
 	SubnetId                        types.String `tfsdk:"subnet_id"`

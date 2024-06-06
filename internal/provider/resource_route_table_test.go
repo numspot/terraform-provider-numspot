@@ -39,7 +39,47 @@ func TestAccRouteTableResource(t *testing.T) {
 			},
 			// Update testing
 			{
+				Config: testRouteTableConfig_Update(netIpRange, subnetIpRange),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						return nil
+					}),
+				),
+			},
+			// Update testing 2
+			{
 				Config: testRouteTableConfig(netIpRange, subnetIpRange),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						return nil
+					}),
+				),
+			},
+			// Update testing - Remove Subnet
+			{
+				Config: testRouteTableConfig_WithoutSubnet(netIpRange),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						return nil
+					}),
+				),
+			},
+			// Update testing - Re-add subnet
+			{
+				Config: testRouteTableConfig(netIpRange, subnetIpRange),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+						require.NotEmpty(t, v)
+						return nil
+					}),
+				),
+			},
+			// Update testing - Unlink subnet without deleting it
+			{
+				Config: testRouteTableConfig_WithoutLinkSubnet(netIpRange, subnetIpRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
@@ -52,6 +92,50 @@ func TestAccRouteTableResource(t *testing.T) {
 }
 
 func testRouteTableConfig(netIpRange, subnetIpRange string) string {
+	return fmt.Sprintf(`
+resource "numspot_vpc" "net" {
+  ip_range = %[1]q
+}
+
+resource "numspot_subnet" "subnet" {
+  vpc_id   = numspot_vpc.net.id
+  ip_range = %[2]q
+}
+
+resource "numspot_route_table" "test" {
+  vpc_id    = numspot_vpc.net.id
+  subnet_id = numspot_subnet.subnet.id
+}`, netIpRange, subnetIpRange)
+}
+
+func testRouteTableConfig_WithoutSubnet(netIpRange string) string {
+	return fmt.Sprintf(`
+resource "numspot_vpc" "net" {
+  ip_range = %[1]q
+}
+
+resource "numspot_route_table" "test" {
+  vpc_id = numspot_vpc.net.id
+}`, netIpRange)
+}
+
+func testRouteTableConfig_WithoutLinkSubnet(netIpRange, subnetIpRange string) string {
+	return fmt.Sprintf(`
+resource "numspot_vpc" "net" {
+  ip_range = %[1]q
+}
+
+resource "numspot_subnet" "subnet" {
+  vpc_id   = numspot_vpc.net.id
+  ip_range = %[2]q
+}
+
+resource "numspot_route_table" "test" {
+  vpc_id = numspot_vpc.net.id
+}`, netIpRange, subnetIpRange)
+}
+
+func testRouteTableConfig_Update(netIpRange, subnetIpRange string) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "net" {
   ip_range = %[1]q
@@ -134,14 +218,8 @@ resource "numspot_vpc" "net" {
   ip_range = %[1]q
 }
 
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.net.id
-  ip_range = %[2]q
-}
-
 resource "numspot_route_table" "test" {
-  vpc_id    = numspot_vpc.net.id
-  subnet_id = numspot_subnet.subnet.id
+  vpc_id = numspot_vpc.net.id
 
   tags = [
     {

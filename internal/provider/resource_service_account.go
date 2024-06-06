@@ -120,7 +120,7 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 	// Attach permissions
 	if len(plan.GlobalPermissions.Elements()) > 0 {
 		globalPermissions := utils.FromTfStringSetToStringList(ctx, plan.GlobalPermissions)
-		diags := r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddPermissions, res.JSON201.Id, globalPermissions)
+		diags := r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddPermissions, spaceId, res.JSON201.Id, globalPermissions)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
 			return
@@ -132,7 +132,7 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 	// Attach Roles
 	if len(plan.Roles.Elements()) > 0 {
 		roles := utils.FromTfStringSetToStringList(ctx, plan.Roles)
-		diags := r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddRoles, res.JSON201.Id, roles)
+		diags := r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddRoles, spaceId, res.JSON201.Id, roles)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
 			return
@@ -281,7 +281,7 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 		statePermissions := utils.FromTfStringSetToStringList(ctx, state.GlobalPermissions)
 		planPermissions := utils.FromTfStringSetToStringList(ctx, plan.GlobalPermissions)
 
-		diags := r.updateGlobalPermissions(ctx, state.ServiceAccountId.ValueString(), statePermissions, planPermissions)
+		diags := r.updateGlobalPermissions(ctx, spaceId, state.ServiceAccountId.ValueString(), statePermissions, planPermissions)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
 			return
@@ -294,7 +294,7 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 		stateRoles := utils.FromTfStringSetToStringList(ctx, state.Roles)
 		planRoles := utils.FromTfStringSetToStringList(ctx, plan.Roles)
 
-		diags := r.updateRoles(ctx, state.ServiceAccountId.ValueString(), stateRoles, planRoles)
+		diags := r.updateRoles(ctx, spaceId, state.ServiceAccountId.ValueString(), stateRoles, planRoles)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
 			return
@@ -405,6 +405,7 @@ func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.De
 func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 	ctx context.Context,
 	action modifyServiceAccountIAMPolicyAction,
+	spaceId uuid.UUID,
 	serviceAccountID string,
 	bulk []string,
 ) diag.Diagnostics {
@@ -444,7 +445,7 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 	utils.ExecuteRequest(func() (*iam.SetIAMPolicySpaceResponse, error) {
 		return r.provider.IAMAccessManagerClient.SetIAMPolicySpaceWithResponse(
 			ctx,
-			r.provider.SpaceID,
+			spaceId,
 			iam.ServiceAccounts,
 			serviceAccountUUID,
 			body,
@@ -456,14 +457,15 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 
 func (r *ServiceAccountResource) updateGlobalPermissions(
 	ctx context.Context,
+	spaceId uuid.UUID,
 	serviceAccountID string,
 	statePermissions, planPermissions []string,
 ) diag.Diagnostics {
 	if len(statePermissions) == 0 && len(planPermissions) > 0 {
-		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddPermissions, serviceAccountID, planPermissions)
+		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddPermissions, spaceId, serviceAccountID, planPermissions)
 	}
 	if len(planPermissions) == 0 && len(statePermissions) > 0 {
-		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemovePermissions, serviceAccountID, statePermissions)
+		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemovePermissions, spaceId, serviceAccountID, statePermissions)
 	}
 
 	permissionsToAdd := make([]string, 0)
@@ -483,14 +485,14 @@ func (r *ServiceAccountResource) updateGlobalPermissions(
 
 	var diags diag.Diagnostics
 	if len(permissionsToRemove) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemovePermissions, serviceAccountID, permissionsToRemove)
+		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemovePermissions, spaceId, serviceAccountID, permissionsToRemove)
 		if diags.HasError() {
 			return diags
 		}
 	}
 
 	if len(permissionsToAdd) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddPermissions, serviceAccountID, permissionsToAdd)
+		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddPermissions, spaceId, serviceAccountID, permissionsToAdd)
 		if diags.HasError() {
 			return diags
 		}
@@ -501,14 +503,15 @@ func (r *ServiceAccountResource) updateGlobalPermissions(
 
 func (r *ServiceAccountResource) updateRoles(
 	ctx context.Context,
+	spaceId uuid.UUID,
 	serviceAccountID string,
 	stateRoles, planRoles []string,
 ) diag.Diagnostics {
 	if len(stateRoles) == 0 && len(planRoles) > 0 {
-		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddRoles, serviceAccountID, planRoles)
+		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddRoles, spaceId, serviceAccountID, planRoles)
 	}
 	if len(planRoles) == 0 && len(stateRoles) > 0 {
-		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemoveRoles, serviceAccountID, stateRoles)
+		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemoveRoles, spaceId, serviceAccountID, stateRoles)
 	}
 
 	rolesToAdd := make([]string, 0)
@@ -528,14 +531,14 @@ func (r *ServiceAccountResource) updateRoles(
 
 	var diags diag.Diagnostics
 	if len(rolesToRemove) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemoveRoles, serviceAccountID, rolesToRemove)
+		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemoveRoles, spaceId, serviceAccountID, rolesToRemove)
 		if diags.HasError() {
 			return diags
 		}
 	}
 
 	if len(rolesToAdd) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddRoles, serviceAccountID, rolesToAdd)
+		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddRoles, spaceId, serviceAccountID, rolesToAdd)
 		if diags.HasError() {
 			return diags
 		}
@@ -559,6 +562,9 @@ func (r *ServiceAccountResource) getRolesAndGlobalPermissions(
 		return r.provider.IAMAccessManagerClient.GetIAMPolicySpaceWithResponse(
 			ctx, r.provider.SpaceID, iam.ServiceAccounts, serviceAccountUUID)
 	}, http.StatusOK, &diags)
+	if res == nil {
+		return nil, nil, diags
+	}
 
 	if res.JSON200 == nil {
 		diags.AddError("Failed to get IAM policy space response", res.Status())
