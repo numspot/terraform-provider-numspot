@@ -61,6 +61,9 @@ func (r *KeyPairResource) Schema(ctx context.Context, request resource.SchemaReq
 func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(

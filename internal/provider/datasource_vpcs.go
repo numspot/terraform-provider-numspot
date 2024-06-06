@@ -69,7 +69,10 @@ func (d *vpcsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest,
 // Read refreshes the Terraform state with the latest data.
 func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan VPCsDataSourceModel
-	request.Config.Get(ctx, &plan)
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	params := VPCsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsResponse, error) {

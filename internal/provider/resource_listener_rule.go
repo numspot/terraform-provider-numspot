@@ -61,6 +61,9 @@ func (r *ListenerRuleResource) Schema(ctx context.Context, request resource.Sche
 func (r *ListenerRuleResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(

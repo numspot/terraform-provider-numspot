@@ -62,6 +62,9 @@ func (r *ImageResource) Schema(ctx context.Context, request resource.SchemaReque
 func (r *ImageResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
@@ -140,6 +143,9 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(

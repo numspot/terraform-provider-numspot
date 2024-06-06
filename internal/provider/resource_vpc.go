@@ -62,6 +62,9 @@ func (r *VpcResource) Schema(ctx context.Context, request resource.SchemaRequest
 func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
@@ -153,6 +156,9 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	vpcId := state.Id.ValueString()
 

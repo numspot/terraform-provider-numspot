@@ -86,7 +86,10 @@ func (d *nicsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest,
 // Read refreshes the Terraform state with the latest data.
 func (d *nicsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan NicsDataSourceModel
-	request.Config.Get(ctx, &plan)
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	params := NicsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadNicsResponse, error) {

@@ -71,7 +71,10 @@ func (d *clientGatewaysDataSource) Schema(ctx context.Context, _ datasource.Sche
 // Read refreshes the Terraform state with the latest data.
 func (d *clientGatewaysDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan ClientGatewaysDataSourceModel
-	request.Config.Get(ctx, &plan)
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	params := ClientGatewaysFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadClientGatewaysResponse, error) {

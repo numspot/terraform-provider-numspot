@@ -61,6 +61,9 @@ func (r *LoadBalancerResource) Schema(ctx context.Context, request resource.Sche
 func (r *LoadBalancerResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
@@ -95,6 +98,9 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 func (r *LoadBalancerResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var plan resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	if !plan.BackendIps.IsUnknown() || !plan.BackendVmIds.IsUnknown() {
 		r.LinkBackendMachines(ctx, request, response)
@@ -106,6 +112,9 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var plan resource_load_balancer.LoadBalancerModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	payload := LoadBalancerFromTfToUpdateRequest(ctx, &plan)
 
@@ -124,6 +133,9 @@ func (r *LoadBalancerResource) LinkBackendMachines(ctx context.Context, request 
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	payload := iaas.LinkLoadBalancerBackendMachinesJSONRequestBody{}
 	if !plan.BackendIps.IsUnknown() {

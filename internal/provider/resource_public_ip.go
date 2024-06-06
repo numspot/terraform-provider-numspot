@@ -63,6 +63,9 @@ func (r *PublicIpResource) Schema(ctx context.Context, request resource.SchemaRe
 func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	createRes, err := retry_utils.RetryCreateUntilResourceAvailable(
@@ -141,9 +144,6 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return

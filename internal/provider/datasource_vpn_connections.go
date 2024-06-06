@@ -72,7 +72,10 @@ func (d *vpnConnectionsDataSource) Schema(ctx context.Context, _ datasource.Sche
 // Read refreshes the Terraform state with the latest data.
 func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan VpnConnectionsDataSourceModel
-	request.Config.Get(ctx, &plan)
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	params := VpnConnectionsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpnConnectionsResponse, error) {

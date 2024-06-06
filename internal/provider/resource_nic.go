@@ -62,6 +62,9 @@ func (r *NicResource) Schema(ctx context.Context, request resource.SchemaRequest
 func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
@@ -136,6 +139,9 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	nicId := state.Id.ValueString()
 

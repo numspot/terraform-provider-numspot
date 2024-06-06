@@ -62,7 +62,10 @@ func (d *loadBalancersDataSource) Schema(ctx context.Context, _ datasource.Schem
 // Read refreshes the Terraform state with the latest data.
 func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan loadBalancersDataSourceModel
-	request.Config.Get(ctx, &plan)
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	params := iaas.ReadLoadBalancersParams{}
 	if !plan.LoadBalancerNames.IsNull() {

@@ -85,6 +85,9 @@ func (r *ServiceAccountResource) Schema(ctx context.Context, request resource.Sc
 func (r *ServiceAccountResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_service_account.ServiceAccountModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	spaceId, diags := utils.ParseUUID(plan.SpaceId.ValueString(), utils.EntityTypeSpace)
 	if diags.HasError() {
@@ -235,6 +238,9 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 	var plan, state resource_service_account.ServiceAccountModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	spaceId, diags := utils.ParseUUID(plan.SpaceId.ValueString(), utils.EntityTypeSpace)
 	if diags.HasError() {

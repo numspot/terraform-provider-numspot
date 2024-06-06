@@ -62,6 +62,9 @@ func (r *VirtualGatewayResource) Schema(ctx context.Context, request resource.Sc
 func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
@@ -134,6 +137,9 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(

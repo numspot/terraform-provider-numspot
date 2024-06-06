@@ -71,6 +71,9 @@ func (r *RouteTableResource) Schema(ctx context.Context, request resource.Schema
 func (r *RouteTableResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
@@ -241,6 +244,9 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 	)
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 	modifs = false
 
 	if !state.Tags.Equal(plan.Tags) {

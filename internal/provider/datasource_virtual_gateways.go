@@ -69,7 +69,10 @@ func (d *virtualGatewaysDataSource) Schema(ctx context.Context, _ datasource.Sch
 // Read refreshes the Terraform state with the latest data.
 func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan VirtualGatewaysDataSourceModel
-	request.Config.Get(ctx, &plan)
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	params := VirtualGatewaysFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadVirtualGatewaysResponse, error) {

@@ -70,7 +70,10 @@ func (d *dhcpOptionsDataSource) Schema(ctx context.Context, _ datasource.SchemaR
 // Read refreshes the Terraform state with the latest data.
 func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan DHCPOptionsDataSourceModel
-	request.Config.Get(ctx, &plan)
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	params := DhcpOptionsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadDhcpOptionsResponse, error) {

@@ -69,7 +69,10 @@ func (d *internetGatewaysDataSource) Schema(ctx context.Context, _ datasource.Sc
 // Read refreshes the Terraform state with the latest data.
 func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan InternetGatewaysDataSourceModel
-	request.Config.Get(ctx, &plan)
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	params := InternetGatewaysFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysResponse, error) {

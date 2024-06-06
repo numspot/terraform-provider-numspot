@@ -64,7 +64,10 @@ func (d *serviceAccountsDataSource) Schema(ctx context.Context, _ datasource.Sch
 // Read refreshes the Terraform state with the latest data.
 func (d *serviceAccountsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan ServiceAccountsDataSourceModel
-	request.Config.Get(ctx, &plan)
+	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	spaceId, err := uuid.Parse(plan.SpaceID.ValueString())
 	if err != nil {

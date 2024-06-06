@@ -63,6 +63,9 @@ func (r *VolumeResource) Schema(ctx context.Context, request resource.SchemaRequ
 func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
@@ -134,6 +137,9 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	var state, plan resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(

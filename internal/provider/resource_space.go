@@ -61,6 +61,9 @@ func (r *SpaceResource) Schema(ctx context.Context, request resource.SchemaReque
 func (r *SpaceResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_space.SpaceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	organisationId, err := uuid.Parse(plan.OrganisationId.ValueString())

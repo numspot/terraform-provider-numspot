@@ -62,6 +62,9 @@ func (r *VpnConnectionResource) Schema(ctx context.Context, request resource.Sch
 func (r *VpnConnectionResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	// Retries create until request response is OK
 	res, err := retry_utils.RetryCreateUntilResourceAvailableWithBody(
@@ -137,6 +140,9 @@ func (r *VpnConnectionResource) Update(ctx context.Context, request resource.Upd
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
