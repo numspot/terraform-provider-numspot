@@ -130,7 +130,29 @@ func (r *FlexibleGpuResource) Read(ctx context.Context, request resource.ReadReq
 }
 
 func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("implement me")
+	var plan, state resource_flexible_gpu.FlexibleGpuModel
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	if plan.DeleteOnVmDeletion != state.DeleteOnVmDeletion {
+		body := FlexibleGpuFromTfToUpdateRequest(&plan)
+		res := utils.ExecuteRequest(func() (*iaas.UpdateFlexibleGpuResponse, error) {
+			return r.provider.ApiClient.UpdateFlexibleGpuWithResponse(
+				ctx,
+				r.provider.SpaceID,
+				state.Id.ValueString(),
+				body)
+		}, http.StatusOK, &response.Diagnostics)
+		if res == nil {
+			return
+		}
+
+		state = FlexibleGpuFromHttpToTf(res.JSON200)
+		response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	}
 }
 
 func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

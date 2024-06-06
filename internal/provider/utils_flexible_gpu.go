@@ -33,6 +33,12 @@ func FlexibleGpuFromTfToCreateRequest(tf *resource_flexible_gpu.FlexibleGpuModel
 	}
 }
 
+func FlexibleGpuFromTfToUpdateRequest(tf *resource_flexible_gpu.FlexibleGpuModel) iaas.UpdateFlexibleGpuJSONRequestBody {
+	return iaas.UpdateFlexibleGpuJSONRequestBody{
+		DeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(tf.DeleteOnVmDeletion),
+	}
+}
+
 func FlexibleGpusFromTfToAPIReadParams(ctx context.Context, tf FlexibleGpuModel) iaas.ReadFlexibleGpusParams {
 	return iaas.ReadFlexibleGpusParams{
 		States:                utils.TfStringListToStringPtrList(ctx, tf.States),
