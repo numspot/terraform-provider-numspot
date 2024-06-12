@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -50,14 +51,14 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Subregion in which the load balancer was created.",
 				MarkdownDescription: "The ID of the Subregion in which the load balancer was created.",
 			},
-			"backend_ips": schema.ListAttribute{
+			"backend_ips": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Computed:            true,
 				Optional:            true,
 				Description:         "One or more public IPs of back-end VMs.",
 				MarkdownDescription: "One or more public IPs of back-end VMs.",
 			},
-			"backend_vm_ids": schema.ListAttribute{
+			"backend_vm_ids": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Computed:            true,
 				Optional:            true,
@@ -267,6 +268,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Net for the load balancer.",
 				MarkdownDescription: "The ID of the Net for the load balancer.",
 			},
+			"tags": tags.TagsSchema(ctx),
 		},
 	}
 }
@@ -274,8 +276,8 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 type LoadBalancerModel struct {
 	ApplicationStickyCookiePolicies types.List               `tfsdk:"application_sticky_cookie_policies"`
 	AvailabilityZoneNames           types.List               `tfsdk:"availability_zone_names"`
-	BackendIps                      types.List               `tfsdk:"backend_ips"`
-	BackendVmIds                    types.List               `tfsdk:"backend_vm_ids"`
+	BackendIps                      types.Set                `tfsdk:"backend_ips"`
+	BackendVmIds                    types.Set                `tfsdk:"backend_vm_ids"`
 	DnsName                         types.String             `tfsdk:"dns_name"`
 	HealthCheck                     HealthCheckValue         `tfsdk:"health_check"`
 	Id                              types.String             `tfsdk:"id"`
@@ -290,6 +292,7 @@ type LoadBalancerModel struct {
 	Subnets                         types.List               `tfsdk:"subnets"`
 	Type                            types.String             `tfsdk:"type"`
 	VpcId                           types.String             `tfsdk:"vpc_id"`
+	Tags                            types.List               `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = ApplicationStickyCookiePoliciesType{}

@@ -9,6 +9,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
@@ -67,6 +68,22 @@ func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, ret
 	}
 }
 
+func RetryUnlinkUntilSuccess[A any, R TfRequestResp](
+	ctx context.Context,
+	spaceId iaas.SpaceId,
+	resourceId string,
+	unlinkBody A,
+	fun func(context.Context, iaas.SpaceId, string, A, ...iaas.RequestEditorFn) (R, error),
+) error {
+	return retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+		tflog.Debug(ctx, fmt.Sprintf("Retry unlink on resource: %s", resourceId))
+		res, err := fun(ctx, spaceId, resourceId, unlinkBody)
+		tflog.Debug(ctx, fmt.Sprintf("Retry unlink got response: %d", res.StatusCode()))
+
+		return checkRetryCondition(res, err, StatusCodeStopRetryOnCreate, StatusCodeRetryOnCreate)
+	})
+}
+
 func RetryDeleteUntilResourceAvailable[R TfRequestResp](
 	ctx context.Context,
 	spaceID iaas.SpaceId,
@@ -74,7 +91,9 @@ func RetryDeleteUntilResourceAvailable[R TfRequestResp](
 	fun func(context.Context, iaas.SpaceId, string, ...iaas.RequestEditorFn) (R, error),
 ) error {
 	return retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+		tflog.Debug(ctx, fmt.Sprintf("Retry delete on resource: %s", id))
 		res, err := fun(ctx, spaceID, id)
+		tflog.Debug(ctx, fmt.Sprintf("Retry delete got response: %d", res.StatusCode()))
 
 		return checkRetryCondition(res, err, StatusCodeStopRetryOnCreate, StatusCodeRetryOnCreate)
 	})

@@ -113,6 +113,13 @@ func FromStringListToTfStringList(ctx context.Context, arr []string) (types.List
 	return types.ListValueFrom(ctx, types.StringType, arr)
 }
 
+func FromStringListPointerToTfStringSet(ctx context.Context, arr *[]string) (types.Set, diag.Diagnostics) {
+	if arr == nil {
+		return types.SetValueFrom(ctx, types.StringType, []string{})
+	}
+	return types.SetValueFrom(ctx, types.StringType, *arr)
+}
+
 func FromStringListPointerToTfStringList(ctx context.Context, arr *[]string) (types.List, diag.Diagnostics) {
 	if arr == nil {
 		return types.ListValueFrom(ctx, types.StringType, []string{})
@@ -139,6 +146,22 @@ func TFInt64ListToIntListPointer(ctx context.Context, list types.List) *[]int {
 	}, ctx, list)
 
 	return &arr
+}
+
+func TfSetToGenericSet[A, B any](fun func(A) B, ctx context.Context, set types.Set) []B {
+	if len(set.Elements()) == 0 {
+		return nil
+	}
+
+	tfList := make([]A, 0, len(set.Elements()))
+	res := make([]B, 0, len(set.Elements()))
+
+	set.ElementsAs(ctx, &tfList, false)
+	for _, e := range tfList {
+		res = append(res, fun(e))
+	}
+
+	return res
 }
 
 func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list types.List) []B {
@@ -177,6 +200,13 @@ func TfStringListToStringList(ctx context.Context, list types.List) []string {
 	return TfListToGenericList(func(a types.String) string {
 		return a.ValueString()
 	}, ctx, list)
+}
+
+func TfStringSetToStringPtrSet(ctx context.Context, set types.Set) *[]string {
+	slice := TfSetToGenericSet(func(a types.String) string {
+		return a.ValueString()
+	}, ctx, set)
+	return &slice
 }
 
 func TfStringListToStringPtrList(ctx context.Context, list types.List) *[]string {
@@ -231,6 +261,17 @@ func GenericSetToTfSetValue[A ITFValue, B any](ctx context.Context, tfListInnerO
 	}
 
 	return types.SetValueFrom(ctx, to[0].Type(ctx), to)
+}
+
+func StringSetToTfSetValue(ctx context.Context, from []string) (types.Set, diag.Diagnostics) {
+	return GenericSetToTfSetValue(
+		ctx,
+		basetypes.StringValue{},
+		func(_ context.Context, from string) (types.String, diag.Diagnostics) {
+			return types.StringValue(from), nil
+		},
+		from,
+	)
 }
 
 func StringListToTfListValue(ctx context.Context, from []string) (types.List, diag.Diagnostics) {

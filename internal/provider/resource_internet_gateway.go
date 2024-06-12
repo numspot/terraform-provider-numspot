@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_internet_gateway"
@@ -201,17 +202,22 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 	var data resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
+	tflog.Debug(ctx, fmt.Sprintf("Deleting internet gateway: %s", data.Id.ValueString()))
+
 	if !data.VpcIp.IsNull() {
-		res := utils.ExecuteRequest(func() (*iaas.UnlinkInternetGatewayResponse, error) {
-			return r.provider.ApiClient.UnlinkInternetGatewayWithResponse(
-				ctx,
-				r.provider.SpaceID,
-				data.Id.ValueString(),
-				iaas.UnlinkInternetGatewayJSONRequestBody{
-					VpcId: data.VpcIp.ValueString(),
-				})
-		}, http.StatusNoContent, &response.Diagnostics)
-		if res == nil {
+		tflog.Debug(ctx, fmt.Sprintf("Detaching vpc: %s, from internet gateway: %s", data.VpcIp.ValueString(), data.Id.ValueString()))
+
+		err := retry_utils.RetryUnlinkUntilSuccess(
+			ctx,
+			r.provider.SpaceID,
+			data.Id.ValueString(),
+			iaas.UnlinkInternetGatewayJSONRequestBody{
+				VpcId: data.VpcIp.ValueString(),
+			},
+			r.provider.ApiClient.UnlinkInternetGatewayWithResponse,
+		)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to delete Internet Gateway", err.Error())
 			return
 		}
 	}
