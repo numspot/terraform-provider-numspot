@@ -86,10 +86,15 @@ func NicFromHttpToTf(ctx context.Context, http *iaas.Nic) (*resource_nic.NicMode
 		return nil, diags
 	}
 
+	if http.SecurityGroups == nil {
+		return nil, diags
+	}
 	// Retrieve security groups id
 	securityGroupIds := make([]string, 0, len(*http.SecurityGroups))
 	for _, e := range *http.SecurityGroups {
-		securityGroupIds = append(securityGroupIds, *e.SecurityGroupId)
+		if e.SecurityGroupId != nil {
+			securityGroupIds = append(securityGroupIds, *e.SecurityGroupId)
+		}
 	}
 
 	// Security Group Ids

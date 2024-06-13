@@ -72,7 +72,11 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *iaas.VpcPeering) (*resour
 		name := vpcPeeringStateHttp.Name
 
 		if name != nil && *name == "failed" {
-			diags.AddError("Failed to create vpc peering", *message)
+			var errorMessage string
+			if message != nil {
+				errorMessage = *message
+			}
+			diags.AddError("Failed to create vpc peering", errorMessage)
 			return nil, diags
 		}
 	}

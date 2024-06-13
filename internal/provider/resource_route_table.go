@@ -344,13 +344,15 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 func (r *RouteTableResource) createRoutes(ctx context.Context, routeTableId string, routes []resource_route_table.RoutesValue) (diags diag.Diagnostics) {
 	for i := range routes {
 		route := &routes[i]
-		// prevent creating the one added in the plan modify function
-		if !route.IsUnknown() && !route.IsNull() && !strings.EqualFold(route.GatewayId.ValueString(), "local") {
-			createdRoute := utils.ExecuteRequest(func() (*iaas.CreateRouteResponse, error) {
-				return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToCreateRoutesRequest(*route))
-			}, http.StatusCreated, &diags)
-			if createdRoute == nil {
-				return
+		if route != nil {
+			// prevent creating the one added in the plan modify function
+			if !route.IsUnknown() && !route.IsNull() && !strings.EqualFold(route.GatewayId.ValueString(), "local") {
+				createdRoute := utils.ExecuteRequest(func() (*iaas.CreateRouteResponse, error) {
+					return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToCreateRoutesRequest(*route))
+				}, http.StatusCreated, &diags)
+				if createdRoute == nil {
+					return
+				}
 			}
 		}
 	}
@@ -361,11 +363,13 @@ func (r *RouteTableResource) createRoutes(ctx context.Context, routeTableId stri
 func (r *RouteTableResource) deleteRoutes(ctx context.Context, routeTableId string, routes []resource_route_table.RoutesValue) (diags diag.Diagnostics) {
 	for i := range routes {
 		route := &routes[i]
-		deletedRoute := utils.ExecuteRequest(func() (*iaas.DeleteRouteResponse, error) {
-			return r.provider.ApiClient.DeleteRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToDeleteRoutesRequest(*route))
-		}, http.StatusNoContent, &diags)
-		if deletedRoute == nil {
-			return
+		if route != nil {
+			deletedRoute := utils.ExecuteRequest(func() (*iaas.DeleteRouteResponse, error) {
+				return r.provider.ApiClient.DeleteRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToDeleteRoutesRequest(*route))
+			}, http.StatusNoContent, &diags)
+			if deletedRoute == nil {
+				return
+			}
 		}
 	}
 

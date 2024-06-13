@@ -93,6 +93,9 @@ func SecurityGroupFromHttpToTf(ctx context.Context, http *iaas.SecurityGroup) (*
 		diags  diag.Diagnostics
 	)
 
+	if http.InboundRules == nil {
+		return nil, diags
+	}
 	ibd := make([]resource_security_group.InboundRulesValue, 0, len(*http.InboundRules))
 	for _, e := range *http.InboundRules {
 		value, diags := InboundRuleFromHttpToTf(ctx, e)
@@ -103,6 +106,9 @@ func SecurityGroupFromHttpToTf(ctx context.Context, http *iaas.SecurityGroup) (*
 		ibd = append(ibd, value)
 	}
 
+	if http.OutboundRules == nil {
+		return nil, diags
+	}
 	obd := make([]resource_security_group.OutboundRulesValue, 0, len(*http.OutboundRules))
 	for _, e := range *http.OutboundRules {
 		value, diags := OutboundRuleFromHttpToTf(ctx, e)

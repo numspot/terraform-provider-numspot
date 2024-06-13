@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"slices"
@@ -129,7 +130,10 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVmsByIdResponse, error) {
-		id := data.Id.ValueStringPointer()
+		id := utils.FromTfStringToStringPtr(data.Id)
+		if id == nil {
+			return nil, errors.New("Found invalid id")
+		}
 		return r.provider.ApiClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {

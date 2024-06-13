@@ -32,18 +32,21 @@ func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http iaas.Linked
 
 func VolumeFromHttpToTf(ctx context.Context, http *iaas.Volume) (*resource_volume.VolumeModel, diag.Diagnostics) {
 	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
+		volumes = types.ListNull(resource_volume.LinkedVolumesValue{}.Type(ctx))
+		tagsTf  types.List
+		diags   diag.Diagnostics
 	)
 
-	volumes, diags := utils.GenericListToTfListValue(
-		ctx,
-		resource_volume.LinkedVolumesValue{},
-		fromLinkedVolumeSchemaToTFVolumesList,
-		*http.LinkedVolumes,
-	)
-	if diags.HasError() {
-		return nil, diags
+	if http.LinkedVolumes != nil {
+		volumes, diags = utils.GenericListToTfListValue(
+			ctx,
+			resource_volume.LinkedVolumesValue{},
+			fromLinkedVolumeSchemaToTFVolumesList,
+			*http.LinkedVolumes,
+		)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 
 	if http.Tags != nil {

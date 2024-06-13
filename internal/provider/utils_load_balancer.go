@@ -60,16 +60,26 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *iaas.LoadBalancer) (*re
 		tagsTf types.List
 	)
 
+	if http.ApplicationStickyCookiePolicies == nil {
+		return nil, diags
+	}
+
 	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags
 	}
 
+	if http.Listeners == nil {
+		return nil, diags
+	}
 	listeners, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ListenersValue{}, listenersFromHTTP, *http.Listeners)
 	if diags.HasError() {
 		return nil, diags
 	}
 
+	if http.StickyCookiePolicies == nil {
+		return nil, diags
+	}
 	stickyCookiePolicies, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags
@@ -149,16 +159,26 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *iaas.LoadBalancer) (*re
 }
 
 func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBalancer) (*datasource_load_balancer.LoadBalancerModel, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	if http.ApplicationStickyCookiePolicies == nil {
+		return nil, diags
+	}
 	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags
 	}
 
+	if http.Listeners == nil {
+		return nil, diags
+	}
 	listeners, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ListenersValue{}, listenersFromHTTP, *http.Listeners)
 	if diags.HasError() {
 		return nil, diags
 	}
 
+	if http.StickyCookiePolicies == nil {
+		return nil, diags
+	}
 	stickyCookiePolicies, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags

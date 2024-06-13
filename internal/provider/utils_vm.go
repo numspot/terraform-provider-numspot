@@ -37,6 +37,11 @@ func vmBsuFromApi(ctx context.Context, elt iaas.BsuCreated) (basetypes.ObjectVal
 }
 
 func vmBlockDeviceMappingFromApi(ctx context.Context, elt iaas.BlockDeviceMappingCreated) (resource_vm.BlockDeviceMappingsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if elt.Bsu == nil {
+		return resource_vm.BlockDeviceMappingsValue{}, diags
+	}
 	// Bsu
 	bsuTf, diagnostics := vmBsuFromApi(ctx, *elt.Bsu)
 	if diagnostics.HasError() {
@@ -56,6 +61,11 @@ func vmBlockDeviceMappingFromApi(ctx context.Context, elt iaas.BlockDeviceMappin
 }
 
 func linkNicsFromApi(ctx context.Context, linkNic iaas.LinkNicLight) (resource_vm.LinkNicValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if linkNic.DeviceNumber == nil {
+		return resource_vm.LinkNicValue{}, diags
+	}
 	deviceNumber := int64(*linkNic.DeviceNumber)
 	return resource_vm.NewLinkNicValue(
 		resource_vm.LinkNicValue{}.AttributeTypes(ctx),
@@ -118,11 +128,15 @@ func nicsFromApi(ctx context.Context, nic iaas.NicLight) (resource_vm.NicsValue,
 		linkPublicIp        resource_vm.LinkPublicIpValue
 		privateIpsTf        basetypes.ListValue
 		securityGroupsTf    basetypes.ListValue
+		deviceNumber        int64
 	)
 
-	deviceNumber := int64(*nic.LinkNic.DeviceNumber)
-
 	if nic.LinkNic != nil {
+		if nic.LinkNic.DeviceNumber == nil {
+			return resource_vm.NicsValue{}, diags
+		}
+		deviceNumber = int64(*nic.LinkNic.DeviceNumber)
+
 		linkNics, diags = linkNicsFromApi(ctx, *nic.LinkNic)
 		diagnosticsToReturn.Append(diags...)
 	}
@@ -239,8 +253,10 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		securityGroupIds = make([]string, 0, len(*http.SecurityGroups))
 		securityGroupNames = make([]string, 0, len(*http.SecurityGroups))
 		for _, e := range *http.SecurityGroups {
-			securityGroupIds = append(securityGroupIds, *e.SecurityGroupId)
-			securityGroupNames = append(securityGroupNames, *e.SecurityGroupName)
+			if e.SecurityGroupId != nil && e.SecurityGroupName != nil {
+				securityGroupIds = append(securityGroupIds, *e.SecurityGroupId)
+				securityGroupNames = append(securityGroupNames, *e.SecurityGroupName)
+			}
 		}
 	}
 
@@ -348,7 +364,9 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 	if http.SecurityGroups != nil {
 		securityGroups = make([]string, 0, len(*http.SecurityGroups))
 		for _, e := range *http.SecurityGroups {
-			securityGroups = append(securityGroups, *e.SecurityGroupId)
+			if e.SecurityGroupId != nil {
+				securityGroups = append(securityGroups, *e.SecurityGroupId)
+			}
 		}
 	}
 	if http.SecurityGroups != nil {

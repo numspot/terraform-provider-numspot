@@ -22,6 +22,9 @@ func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable) (*resour
 		routes     []iaas.Route
 	)
 
+	if http.Routes == nil {
+		return nil, diags
+	}
 	for _, route := range *http.Routes {
 		if route.GatewayId != nil && *route.GatewayId == "local" {
 			localRoute, diags = routeTableRouteFromAPI(ctx, route)
