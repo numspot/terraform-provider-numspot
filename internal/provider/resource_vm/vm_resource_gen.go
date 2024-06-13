@@ -5,7 +5,6 @@ package resource_vm
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -14,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -126,19 +124,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "One or more block device mappings.",
 				MarkdownDescription: "One or more block device mappings.",
-			},
-			"boot_on_creation": schema.BoolAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "By default or if true, the VM is started on creation. If false, the VM is stopped on creation.",
-				MarkdownDescription: "By default or if true, the VM is started on creation. If false, the VM is stopped on creation.",
-				Default:             booldefault.StaticBool(true),
-			},
-			"bsu_optimized": schema.BoolAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.",
-				MarkdownDescription: "This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.",
 			},
 			"client_token": schema.StringAttribute{
 				Optional:            true,
@@ -441,20 +426,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Indicates the operating system (OS) of the VM.",
 				MarkdownDescription: "Indicates the operating system (OS) of the VM.",
 			},
-			"performance": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The performance of the VM (`medium` \\| `high` \\|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `type` parameter.",
-				MarkdownDescription: "The performance of the VM (`medium` \\| `high` \\|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `type` parameter.",
-				Validators: []validator.String{
-					stringvalidator.OneOf(
-						"medium",
-						"high",
-						"highest",
-					),
-				},
-				// Default: stringdefault.StaticString("high"),
-			},
 			"placement": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
 					"availability_zone_name": schema.StringAttribute{
@@ -558,9 +529,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The state of the VM (`pending` \\| `running` \\| `stopping` \\| `stopped` \\| `shutting-down` \\| `terminated` \\| `quarantine`).",
 				MarkdownDescription: "The state of the VM (`pending` \\| `running` \\| `stopping` \\| `stopped` \\| `shutting-down` \\| `terminated` \\| `quarantine`).",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
-				},
 			},
 			"state_reason": schema.StringAttribute{
 				Computed:            true,
@@ -605,8 +573,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 type VmModel struct {
 	Architecture                types.String   `tfsdk:"architecture"`
 	BlockDeviceMappings         types.List     `tfsdk:"block_device_mappings"`
-	BootOnCreation              types.Bool     `tfsdk:"boot_on_creation"`
-	BsuOptimized                types.Bool     `tfsdk:"bsu_optimized"`
 	ClientToken                 types.String   `tfsdk:"client_token"`
 	CreationDate                types.String   `tfsdk:"creation_date"`
 	DeletionProtection          types.Bool     `tfsdk:"deletion_protection"`
@@ -622,7 +588,6 @@ type VmModel struct {
 	NestedVirtualization        types.Bool     `tfsdk:"nested_virtualization"`
 	Nics                        types.List     `tfsdk:"nics"`
 	OsFamily                    types.String   `tfsdk:"os_family"`
-	Performance                 types.String   `tfsdk:"performance"`
 	Placement                   PlacementValue `tfsdk:"placement"`
 	PrivateDnsName              types.String   `tfsdk:"private_dns_name"`
 	PrivateIp                   types.String   `tfsdk:"private_ip"`

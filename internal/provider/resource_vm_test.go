@@ -1,4 +1,4 @@
-//go:build acc
+///go:build acc
 
 package provider
 
@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	vmType        = "ns-cus6-2c4r"
-	sourceImageId = "ami-026ce760"
+	vmType        = "ns-mus6-2c16r"
+	sourceImageId = "ami-0987a84b"
 )
 
 func TestAccVmResource(t *testing.T) {
@@ -31,7 +31,6 @@ func TestAccVmResource(t *testing.T) {
 						return nil
 					}),
 				),
-				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
@@ -42,9 +41,8 @@ func TestAccVmResource(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config:             testVmConfig_Create(sourceImageId, vmType),
-				Check:              resource.ComposeAggregateTestCheckFunc(),
-				ExpectNonEmptyPlan: true,
+				Config: testVmConfig_Create(sourceImageId, vmType),
+				Check:  resource.ComposeAggregateTestCheckFunc(),
 			},
 		},
 	})
@@ -147,7 +145,7 @@ resource "numspot_subnet" "subnet" {
 }
 
 resource "numspot_security_group" "sg" {
-  net_id      = numspot_vpc.net.id
+  vpc_id      = numspot_vpc.net.id
   name        = "terraform-vm-tests-sg-name"
   description = "terraform-vm-tests-sg-description"
 
@@ -204,7 +202,7 @@ resource "numspot_subnet" "subnet" {
 }
 
 resource "numspot_security_group" "sg" {
-  net_id      = numspot_vpc.net.id
+  vpc_id      = numspot_vpc.net.id
   name        = "terraform-vm-tests-sg-name"
   description = "terraform-vm-tests-sg-description"
 
@@ -267,7 +265,6 @@ func TestAccVmResource_Tags(t *testing.T) {
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", tagValue),
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1"),
 				),
-				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
@@ -284,7 +281,6 @@ func TestAccVmResource_Tags(t *testing.T) {
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", tagValueUpdated),
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1"),
 				),
-				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
@@ -318,15 +314,13 @@ func TestAccVmResource_Update_WithoutReplace(t *testing.T) {
 	tagValue := "terraform-vm"
 	tagValueUpdated := tagValue + "-Updated"
 
-	performance := "medium"
-	performanceUpdated := "high"
 	var vm_id string
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testVmConfig_UpdateNoReplace(sourceImageId, vmType, vmInitiatedShutdownBehavior, tagKey, tagValue, performance),
+				Config: testVmConfig_UpdateNoReplace(sourceImageId, vmType, vmInitiatedShutdownBehavior, tagKey, tagValue),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
@@ -334,13 +328,11 @@ func TestAccVmResource_Update_WithoutReplace(t *testing.T) {
 						return nil
 					}),
 					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmType),
-					resource.TestCheckResourceAttr("numspot_vm.test", "performance", performance),
 					resource.TestCheckResourceAttr("numspot_vm.test", "vm_initiated_shutdown_behavior", vmInitiatedShutdownBehavior),
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1"),
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.key", tagKey),
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", tagValue),
 				),
-				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
@@ -351,7 +343,7 @@ func TestAccVmResource_Update_WithoutReplace(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testVmConfig_UpdateNoReplace(sourceImageId, vmTypeUpdated, vmInitiatedShutdownBehaviorUpdated, tagKey, tagValueUpdated, performanceUpdated),
+				Config: testVmConfig_UpdateNoReplace(sourceImageId, vmTypeUpdated, vmInitiatedShutdownBehaviorUpdated, tagKey, tagValueUpdated),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
 						require.NotEmpty(t, v)
@@ -362,24 +354,27 @@ func TestAccVmResource_Update_WithoutReplace(t *testing.T) {
 					}),
 					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmTypeUpdated),
 					resource.TestCheckResourceAttr("numspot_vm.test", "vm_initiated_shutdown_behavior", vmInitiatedShutdownBehaviorUpdated),
-					resource.TestCheckResourceAttr("numspot_vm.test", "performance", performanceUpdated),
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1"),
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.key", tagKey),
 					resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", tagValueUpdated),
 				),
-				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
 }
 
-func testVmConfig_UpdateNoReplace(sourceImageId string, vmType string, vmInitiatedShutdownBehavior string, tagKey string, tagValue string, performance string) string {
+func testVmConfig_UpdateNoReplace(
+	sourceImageId,
+	vmType,
+	vmInitiatedShutdownBehavior,
+	tagKey,
+	tagValue string,
+) string {
 	return fmt.Sprintf(`
 resource "numspot_vm" "test" {
   image_id                       = %[1]q
   type                           = %[2]q
   vm_initiated_shutdown_behavior = %[3]q
-  performance                    = %[6]q
 
   tags = [
     {
@@ -388,7 +383,7 @@ resource "numspot_vm" "test" {
     }
   ]
 }
-`, sourceImageId, vmType, vmInitiatedShutdownBehavior, tagKey, tagValue, performance)
+`, sourceImageId, vmType, vmInitiatedShutdownBehavior, tagKey, tagValue)
 }
 
 func TestAccVmResource_Update_WithReplace(t *testing.T) {
@@ -413,7 +408,6 @@ func TestAccVmResource_Update_WithReplace(t *testing.T) {
 					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmType),
 					resource.TestCheckResourceAttr("numspot_vm.test", "placement.availability_zone_name", subregionName),
 				),
-				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
@@ -436,7 +430,6 @@ func TestAccVmResource_Update_WithReplace(t *testing.T) {
 					resource.TestCheckResourceAttr("numspot_vm.test", "type", vmType),
 					resource.TestCheckResourceAttr("numspot_vm.test", "placement.availability_zone_name", subregionNameUpdated),
 				),
-				ExpectNonEmptyPlan: true,
 			},
 		},
 	})

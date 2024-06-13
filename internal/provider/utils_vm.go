@@ -306,7 +306,6 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		//
 		Architecture:        types.StringPointerValue(http.Architecture),
 		BlockDeviceMappings: blockDeviceMappingTf,
-		BsuOptimized:        types.BoolPointerValue(http.BsuOptimized),
 		ClientToken:         types.StringPointerValue(http.ClientToken),
 		CreationDate:        types.StringValue(creationDate),
 		//
@@ -322,7 +321,6 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		VpcId:                types.StringPointerValue(http.VpcId),
 		Nics:                 nics,
 		OsFamily:             types.StringPointerValue(http.OsFamily),
-		Performance:          types.StringPointerValue(http.Performance),
 		Placement:            placement,
 		PrivateDnsName:       types.StringPointerValue(http.PrivateDnsName),
 		PrivateIp:            types.StringPointerValue(http.PrivateIp),
@@ -344,7 +342,6 @@ func VmFromHttpToTf(ctx context.Context, http *iaas.Vm) (*resource_vm.VmModel, d
 		VmInitiatedShutdownBehavior: types.StringPointerValue(http.InitiatedShutdownBehavior),
 		Tags:                        tagsTf,
 		LaunchNumber:                launchNumber,
-		BootOnCreation:              types.BoolPointerValue(utils.EmptyTrueBoolPointer()), // TODO : need to have BootOnCreation in SDK
 	}
 
 	var securityGroups []string
@@ -377,21 +374,15 @@ func VmFromTfToCreateRequest(ctx context.Context, tf *resource_vm.VmModel, diags
 		}
 	}
 
-	var performance *iaas.CreateVmsPerformance
-	if !(tf.Performance.IsNull() || tf.Performance.IsUnknown()) {
-		performance = (*iaas.CreateVmsPerformance)(utils.FromTfStringToStringPtr(tf.Performance))
-	}
-
+	bootOnCreation := true
 	return iaas.CreateVmsJSONRequestBody{
-		BootOnCreation:              utils.FromTfBoolToBoolPtr(tf.BootOnCreation),
-		BsuOptimized:                utils.FromTfBoolToBoolPtr(tf.BsuOptimized),
+		BootOnCreation:              &bootOnCreation,
 		ClientToken:                 utils.FromTfStringToStringPtr(tf.ClientToken),
 		DeletionProtection:          utils.FromTfBoolToBoolPtr(tf.DeletionProtection),
 		ImageId:                     tf.ImageId.ValueString(),
 		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
 		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
 		Nics:                        &nics,
-		Performance:                 performance,
 		Placement:                   placement,
 		PrivateIps:                  utils.TfStringListToStringPtrList(ctx, tf.PrivateIps),
 		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
@@ -420,11 +411,9 @@ func VmFromTfToUpdaterequest(ctx context.Context, tf *resource_vm.VmModel, diagn
 	}, ctx, tf.BlockDeviceMappings)
 
 	return iaas.UpdateVmJSONRequestBody{
-		BsuOptimized:                utils.FromTfBoolToBoolPtr(tf.BsuOptimized),
 		DeletionProtection:          utils.FromTfBoolToBoolPtr(tf.DeletionProtection),
 		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
 		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
-		Performance:                 (*iaas.UpdateVmPerformance)(utils.FromTfStringToStringPtr(tf.Performance)),
 		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
 		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
 		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),

@@ -48,8 +48,6 @@ resource "numspot_vm" "example" {
 ### Optional
 
 - `block_device_mappings` (Attributes List) One or more block device mappings. (see [below for nested schema](#nestedatt--block_device_mappings))
-- `boot_on_creation` (Boolean) By default or if true, the VM is started on creation. If false, the VM is stopped on creation.
-- `bsu_optimized` (Boolean) This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
 - `client_token` (String) A unique identifier which enables you to manage the idempotency.
 - `deletion_protection` (Boolean) If true, you cannot delete the VM unless you change this parameter back to false.
 - `keypair_name` (String) The name of the keypair.
@@ -57,7 +55,6 @@ resource "numspot_vm" "example" {
 - `min_vms_count` (Number) The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.
 - `nested_virtualization` (Boolean) (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
 - `nics` (Attributes List) One or more NICs. If you specify this parameter, you must not specify the `SubnetId` and `SubregionName` parameters. You also must define one NIC as the primary network interface of the VM with `0` as its device number. (see [below for nested schema](#nestedatt--nics))
-- `performance` (String) The performance of the VM (`medium` \| `high` \|  `highest`). By default, `high`. This parameter is ignored if you specify a performance flag directly in the `type` parameter.
 - `placement` (Attributes) Information about the placement of the VM. (see [below for nested schema](#nestedatt--placement))
 - `private_ips` (List of String) One or more private IPs of the VM.
 - `security_group_ids` (List of String) One or more IDs of security group for the VMs.
