@@ -1,0 +1,38 @@
+package lib
+
+// actionRelation represents the relation between the permission verb and the relation in keto.
+var actionRelation = map[PermissionAction]PermissionRelation{
+	"createPolicy":     "creatorsPolicy",
+	"getPolicy":        "gettersPolicy",
+	"deletePolicy":     "deletersPolicy",
+	"create":           "creators",
+	"get":              "getters",
+	"list":             "getters", // TODO : why ? there is no mention of a permission list in the rbac.
+	"update":           "updaters",
+	"delete":           "deleters",
+	"disable":          "disablers",
+	"enable":           "enablers",
+	"recover":          "recoverers",
+	"impersonate":      "impersonators",
+	"use":              "users",
+	"start":            "starters",
+	"stop":             "stoppers",
+	"setIAMPolicy":     "settersIAMPolicy",
+	"getIAMPolicy":     "gettersIAMPolicy",
+	"accept":           "acceptors",
+	"reject":           "rejectors",
+	"link":             "linkers",
+	"unlink":           "unlinkers",
+	"getCatalog":       "gettersCatalog",
+	"reboot":           "rebooters",
+	"upscale":          "upscalers",
+	"downscale":        "downscalers",
+	"getAdminPassword": "gettersAdminPassword",
+	"getConsoleOutput": "gettersConsoleOutput",
+	"getVmTypes":       "gettersVmTypes",
+	"set":              "setters",
+	"unset":            "unsetters",
+	"import":           "importers",
+	"createURL":        "creatorsURL",
+	"resetPassword":    "resetersPassword",
+}

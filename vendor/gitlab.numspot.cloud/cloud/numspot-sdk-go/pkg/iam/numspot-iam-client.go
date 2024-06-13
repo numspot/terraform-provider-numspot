@@ -16,10 +16,10 @@ import (
 
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
+	pkg "gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/access-manager/v2/pkg"
 )
 
 const (
-	BasicAuthScopes  = "BasicAuth.Scopes"
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
@@ -62,12 +62,6 @@ const (
 	SpaceStatusQUEUED  SpaceStatus = "QUEUED"
 	SpaceStatusREADY   SpaceStatus = "READY"
 	SpaceStatusRUNNING SpaceStatus = "RUNNING"
-)
-
-// Defines values for SubjectType.
-const (
-	ServiceAccounts SubjectType = "serviceAccounts"
-	Users           SubjectType = "users"
 )
 
 // BadRequestError defines model for BadRequestError.
@@ -129,15 +123,6 @@ type Error struct {
 // ErrorDocumentationUrl Documentation URL for the domain error
 type ErrorDocumentationUrl string
 
-// ErrorOauth2 defines model for ErrorOauth2.
-type ErrorOauth2 struct {
-	// Error The error type.
-	Error string `json:"error"`
-
-	// ErrorDescription A human-readable explanation specific to this occurrence of the problem.
-	ErrorDescription *string `json:"error_description,omitempty"`
-}
-
 // GranularPermission defines model for GranularPermission.
 type GranularPermission struct {
 	// Action Type of action (e.g., owners, editors, getters)
@@ -170,6 +155,11 @@ type IAMPolicy struct {
 	Roles *[]openapi_types.UUID `json:"roles,omitempty"`
 }
 
+// IdentitiesIdsList defines model for IdentitiesIdsList.
+type IdentitiesIdsList struct {
+	Items []openapi_types.UUID `json:"items"`
+}
+
 // ImmutableSpace defines model for ImmutableSpace.
 type ImmutableSpace struct {
 	CreatedOn DateTime `json:"createdOn"`
@@ -190,42 +180,6 @@ type ImmutableSpaceStatus string
 
 // Int Equivalent to int32
 type Int = int32
-
-// IntrospectResp defines model for IntrospectResp.
-type IntrospectResp struct {
-	// Active A boolean value indicating whether the token is active or not.
-	Active bool `json:"active"`
-
-	// Aud The intended audience of the token, specifying who the token is intended for.
-	Aud *[]string `json:"aud,omitempty"`
-
-	// ClientId The unique identifier of the client application that requested the token.
-	ClientId *string `json:"clientId,omitempty"`
-
-	// Exp The expiration time of the token in seconds since the Unix epoch.
-	Exp *int `json:"exp,omitempty"`
-
-	// Iat The issued-at time of the token in seconds since the Unix epoch.
-	Iat *int `json:"iat,omitempty"`
-
-	// Iss The issuer of the token, identify the authorization server that issued the token.
-	Iss *string `json:"iss,omitempty"`
-
-	// Nbf The not-before time of the token in seconds since the Unix epoch, indicating the earliest time the token can be used.
-	Nbf *int `json:"nbf,omitempty"`
-
-	// Scope The scope of the token, defining the permissions it grants.
-	Scope *string `json:"scope,omitempty"`
-
-	// Sub The subject of the token, typically the user or resource the token is issued for.
-	Sub *string `json:"sub,omitempty"`
-
-	// TokenType Indicate the type of the token, such as "Bearer".
-	TokenType *string `json:"tokenType,omitempty"`
-
-	// TokenUse Specify the intended use of the token, such as "access" or "refresh".
-	TokenUse *string `json:"tokenUse,omitempty"`
-}
 
 // MutableSpace defines model for MutableSpace.
 type MutableSpace struct {
@@ -486,46 +440,7 @@ type SpaceSimplePaginatedList struct {
 }
 
 // SubjectType defines model for SubjectType.
-type SubjectType string
-
-// TokenBody defines model for TokenBody.
-type TokenBody struct {
-	// Token The token to provide.
-	Token string `json:"token"`
-}
-
-// TokenReq defines model for TokenReq.
-type TokenReq struct {
-	// ClientId The client id.
-	ClientId *string `json:"client_id,omitempty"`
-
-	// ClientSecret The client secret.
-	ClientSecret *string `json:"client_secret,omitempty"`
-
-	// Code The code authorization.
-	Code *string `json:"code,omitempty"`
-
-	// GrantType The grant type.
-	GrantType string `json:"grant_type"`
-
-	// RedirectUri The URLs redirection
-	RedirectUri *string `json:"redirect_uri,omitempty"`
-
-	// RefreshToken The refresh Token
-	RefreshToken *string `json:"refresh_token,omitempty"`
-}
-
-// TokenResp defines model for TokenResp.
-type TokenResp struct {
-	// AccessToken The access token.
-	AccessToken string `json:"access_token"`
-
-	// ExpiresIn The lifetime in seconds of the access token.
-	ExpiresIn int `json:"expires_in"`
-
-	// TokenType The type of the token issued.
-	TokenType string `json:"token_type"`
-}
+type SubjectType = pkg.IdentityPathType
 
 // Url defines model for Url.
 type Url = string
@@ -639,9 +554,6 @@ type Violation struct {
 // Action defines model for Action.
 type Action = string
 
-// Authorization defines model for Authorization.
-type Authorization = string
-
 // ListPermissionsPage defines model for ListPermissionsPage.
 type ListPermissionsPage struct {
 	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
@@ -747,20 +659,17 @@ type Service = string
 // ServiceAccountId defines model for ServiceAccountId.
 type ServiceAccountId = openapi_types.UUID
 
-// ServiceAccountName defines model for ServiceAccountName.
-type ServiceAccountName = string
-
 // SpaceId defines model for SpaceId.
 type SpaceId = openapi_types.UUID
 
 // SubResource defines model for SubResource.
 type SubResource = string
 
+// SubjectId defines model for SubjectId.
+type SubjectId = openapi_types.UUID
+
 // SubjectTypeParam defines model for SubjectTypeParam.
 type SubjectTypeParam = SubjectType
-
-// SubjectUuid defines model for SubjectUuid.
-type SubjectUuid = openapi_types.UUID
 
 // UserEmail defines model for UserEmail.
 type UserEmail = openapi_types.Email
@@ -768,98 +677,92 @@ type UserEmail = openapi_types.Email
 // UserId defines model for UserId.
 type UserId = openapi_types.UUID
 
-// CreateRoleResponseSchema defines model for CreateRoleResponse.
-type CreateRoleResponseSchema = RegisteredRole
+// CreateRole200ResponseSchema defines model for CreateRole200Response.
+type CreateRole200ResponseSchema = RegisteredRole
 
-// CreateServiceAccountResponseSchema defines model for CreateServiceAccountResponse.
-type CreateServiceAccountResponseSchema = CreatedServiceAccount
+// CreateServiceAccount201ResponseSchema defines model for CreateServiceAccount201Response.
+type CreateServiceAccount201ResponseSchema = CreatedServiceAccount
 
-// CreateSpaceResponseSchema defines model for CreateSpaceResponse.
-type CreateSpaceResponseSchema = Space
+// CreateSpace200ResponseSchema defines model for CreateSpace200Response.
+type CreateSpace200ResponseSchema = Space
 
-// CreateUserResponseSchema defines model for CreateUserResponse.
-type CreateUserResponseSchema = UserCreated
+// CreateUser201ResponseSchema defines model for CreateUser201Response.
+type CreateUser201ResponseSchema = UserCreated
 
-// GetIAMGranularPolicyResponseSchema defines model for GetIAMGranularPolicyResponse.
-type GetIAMGranularPolicyResponseSchema = IAMGranularPolicyList
+// GetIAMGranularPolicy200ResponseSchema defines model for GetIAMGranularPolicy200Response.
+type GetIAMGranularPolicy200ResponseSchema = IAMGranularPolicyList
 
-// GetIAMPolicyResponseSchema defines model for GetIAMPolicyResponse.
-type GetIAMPolicyResponseSchema = IAMPolicy
+// GetIAMPolicy200ResponseSchema defines model for GetIAMPolicy200Response.
+type GetIAMPolicy200ResponseSchema = IAMPolicy
 
-// GetPermissionResponseSchema defines model for GetPermissionResponse.
-type GetPermissionResponseSchema = RegisteredPermission
+// GetPermission200ResponseSchema defines model for GetPermission200Response.
+type GetPermission200ResponseSchema = RegisteredPermission
 
-// GetRolePermissionsResponseSchema defines model for GetRolePermissionsResponse.
-type GetRolePermissionsResponseSchema = PermissionsPaginatedList
+// GetRole200ResponseSchema defines model for GetRole200Response.
+type GetRole200ResponseSchema = RegisteredRole
 
-// GetRoleResponseSchema defines model for GetRoleResponse.
-type GetRoleResponseSchema = RegisteredRole
+// GetRolePermissions200ResponseSchema defines model for GetRolePermissions200Response.
+type GetRolePermissions200ResponseSchema = PermissionsPaginatedList
 
-// GetServiceAccountResponseSchema defines model for GetServiceAccountResponse.
-type GetServiceAccountResponseSchema = ServiceAccountEdited
+// GetServiceAccount200ResponseSchema defines model for GetServiceAccount200Response.
+type GetServiceAccount200ResponseSchema = ServiceAccountEdited
 
-// GetSpaceByIdResponseSchema defines model for GetSpaceByIdResponse.
-type GetSpaceByIdResponseSchema = Space
+// GetSpaceById200ResponseSchema defines model for GetSpaceById200Response.
+type GetSpaceById200ResponseSchema = Space
 
-// GetUserResponseSchema defines model for GetUserResponse.
-type GetUserResponseSchema = UserModified
+// GetUser200ResponseSchema defines model for GetUser200Response.
+type GetUser200ResponseSchema = UserModified
 
-// IntrospectResponseSchema defines model for IntrospectResponse.
-type IntrospectResponseSchema = IntrospectResp
+// ListPermissions200ResponseSchema defines model for ListPermissions200Response.
+type ListPermissions200ResponseSchema = PermissionsPaginatedList
 
-// ListPermissionsResponseSchema defines model for ListPermissionsResponse.
-type ListPermissionsResponseSchema = PermissionsPaginatedList
+// ListRoles200ResponseSchema defines model for ListRoles200Response.
+type ListRoles200ResponseSchema = RolesPaginatedList
 
-// ListRolesResponseSchema defines model for ListRolesResponse.
-type ListRolesResponseSchema = RolesPaginatedList
+// ListServiceAccount200ResponseSchema defines model for ListServiceAccount200Response.
+type ListServiceAccount200ResponseSchema = ServiceAccountPaginatedList
 
-// ListServiceAccountResponseSchema defines model for ListServiceAccountResponse.
-type ListServiceAccountResponseSchema = ServiceAccountPaginatedList
+// ListSpaces200ResponseSchema defines model for ListSpaces200Response.
+type ListSpaces200ResponseSchema = SpacePaginatedList
 
-// ListSpacesIdentityResponseSchema defines model for ListSpacesIdentityResponse.
-type ListSpacesIdentityResponseSchema = SpaceSimplePaginatedList
+// ListSpacesIdentity200ResponseSchema defines model for ListSpacesIdentity200Response.
+type ListSpacesIdentity200ResponseSchema = SpaceSimplePaginatedList
 
-// ListSpacesResponseSchema defines model for ListSpacesResponse.
-type ListSpacesResponseSchema = SpacePaginatedList
+// ListSpacesServiceAccount200ResponseSchema defines model for ListSpacesServiceAccount200Response.
+type ListSpacesServiceAccount200ResponseSchema = SpaceSimplePaginatedList
 
-// ListSpacesServiceAccountResponseSchema defines model for ListSpacesServiceAccountResponse.
-type ListSpacesServiceAccountResponseSchema = SpaceSimplePaginatedList
+// ListSpacesUser200ResponseSchema defines model for ListSpacesUser200Response.
+type ListSpacesUser200ResponseSchema = SpaceSimplePaginatedList
 
-// ListSpacesUserResponseSchema defines model for ListSpacesUserResponse.
-type ListSpacesUserResponseSchema = SpaceSimplePaginatedList
+// ListUser200ResponseSchema defines model for ListUser200Response.
+type ListUser200ResponseSchema = UserPaginatedList
 
-// ListUserOrganisationsResponseSchema defines model for ListUserOrganisationsResponse.
-type ListUserOrganisationsResponseSchema = OrganisationSimplePaginatedList
+// ListUserOrganisations200ResponseSchema defines model for ListUserOrganisations200Response.
+type ListUserOrganisations200ResponseSchema = OrganisationSimplePaginatedList
 
-// ListUserResponseSchema defines model for ListUserResponse.
-type ListUserResponseSchema = UserPaginatedList
+// PatchUserState200ResponseSchema defines model for PatchUserState200Response.
+type PatchUserState200ResponseSchema = UserEdited
 
-// PatchUserStateResponseSchema defines model for PatchUserStateResponse.
-type PatchUserStateResponseSchema = UserEdited
+// PermissionCreated200ResponseSchema defines model for PermissionCreated200Response.
+type PermissionCreated200ResponseSchema = RegisteredPermission
 
-// PermissionCreatedResponseSchema defines model for PermissionCreatedResponse.
-type PermissionCreatedResponseSchema = RegisteredPermission
+// Permissions200ResponseSchema defines model for Permissions200Response.
+type Permissions200ResponseSchema = RegisteredPermissionList
 
-// PermissionsResponseSchema defines model for PermissionsResponse.
-type PermissionsResponseSchema = RegisteredPermissionList
+// RecoverUser200ResponseSchema defines model for RecoverUser200Response.
+type RecoverUser200ResponseSchema = RecoveryLink
 
-// RecoverUserResponseSchema defines model for RecoverUserResponse.
-type RecoverUserResponseSchema = RecoveryLink
+// RoleCreated200ResponseSchema defines model for RoleCreated200Response.
+type RoleCreated200ResponseSchema = RegisteredRole
 
-// RoleCreatedResponseSchema defines model for RoleCreatedResponse.
-type RoleCreatedResponseSchema = RegisteredRole
+// RoleList200ResponseSchema defines model for RoleList200Response.
+type RoleList200ResponseSchema = RegisteredRoleList
 
-// RoleListResponseSchema defines model for RoleListResponse.
-type RoleListResponseSchema = RegisteredRoleList
+// UpdateServiceAccount200ResponseSchema defines model for UpdateServiceAccount200Response.
+type UpdateServiceAccount200ResponseSchema = ServiceAccountEdited
 
-// TokenResponseSchema defines model for TokenResponse.
-type TokenResponseSchema = TokenResp
-
-// UpdateServiceAccountResponseSchema defines model for UpdateServiceAccountResponse.
-type UpdateServiceAccountResponseSchema = ServiceAccountEdited
-
-// UpdateUserResponseSchema defines model for UpdateUserResponse.
-type UpdateUserResponseSchema = UserModified
+// UpdateUser200ResponseSchema defines model for UpdateUser200Response.
+type UpdateUser200ResponseSchema = UserModified
 
 // AddGlobalRolePermissionsRequest defines model for AddGlobalRolePermissionsRequest.
 type AddGlobalRolePermissionsRequest struct {
@@ -881,6 +784,9 @@ type CreateSpaceRequest = CreateSpace
 
 // CreateUserRequest defines model for CreateUserRequest.
 type CreateUserRequest = User
+
+// ListIdentitiesByAccessRequest defines model for ListIdentitiesByAccessRequest.
+type ListIdentitiesByAccessRequest = IdentitiesIdsList
 
 // ListSpaceIdsRequest defines model for ListSpaceIdsRequest.
 type ListSpaceIdsRequest = SpaceIdsList
@@ -1065,9 +971,6 @@ type UpdateRoleOrganisationJSONBody struct {
 
 // ListServiceAccountOrganisationParams defines parameters for ListServiceAccountOrganisation.
 type ListServiceAccountOrganisationParams struct {
-	// Name Service account name
-	Name *ServiceAccountName `form:"name,omitempty" json:"name,omitempty"`
-
 	// Page Paginated request
 	Page *ListServiceAccounts `json:"page,omitempty"`
 }
@@ -1097,12 +1000,6 @@ type ListUserOrganisationParams struct {
 type ListSpacesOfUserParams struct {
 	// Page Paginated request
 	Page *ListSpacesOfUser `json:"page,omitempty"`
-}
-
-// RevokeParams defines parameters for Revoke.
-type RevokeParams struct {
-	// Authorization The client identifier.
-	Authorization *Authorization `json:"Authorization,omitempty"`
 }
 
 // SetIAMGranularPolicySpaceJSONBody defines parameters for SetIAMGranularPolicySpace.
@@ -1155,9 +1052,6 @@ type UpdateRoleSpaceJSONBody struct {
 
 // ListServiceAccountSpaceParams defines parameters for ListServiceAccountSpace.
 type ListServiceAccountSpaceParams struct {
-	// Name Service account name
-	Name *ServiceAccountName `form:"name,omitempty" json:"name,omitempty"`
-
 	// Page Paginated request
 	Page *ListServiceAccounts `json:"page,omitempty"`
 }
@@ -1171,17 +1065,14 @@ type ListUserSpaceParams struct {
 	Page *ListUser `json:"page,omitempty"`
 }
 
-// TokenParams defines parameters for Token.
-type TokenParams struct {
-	// Authorization The client identifier.
-	Authorization *Authorization `json:"Authorization,omitempty"`
-}
-
 // ListSpacesParams defines parameters for ListSpaces.
 type ListSpacesParams struct {
 	// Page list spaces paginated request
 	Page *ListSpacesPage `json:"page,omitempty"`
 }
+
+// CreateAdminServiceAccountSpaceJSONRequestBody defines body for CreateAdminServiceAccountSpace for application/json ContentType.
+type CreateAdminServiceAccountSpaceJSONRequestBody = ServiceAccount
 
 // CreatePermissionJSONRequestBody defines body for CreatePermission for application/json ContentType.
 type CreatePermissionJSONRequestBody = Permission
@@ -1201,9 +1092,6 @@ type RemoveRolePermissionsJSONRequestBody RemoveRolePermissionsJSONBody
 // AddRolePermissionsJSONRequestBody defines body for AddRolePermissions for application/json ContentType.
 type AddRolePermissionsJSONRequestBody AddRolePermissionsJSONBody
 
-// IntrospectFormdataRequestBody defines body for Introspect for application/x-www-form-urlencoded ContentType.
-type IntrospectFormdataRequestBody = TokenBody
-
 // SetIAMGranularPolicyOrganisationJSONRequestBody defines body for SetIAMGranularPolicyOrganisation for application/json ContentType.
 type SetIAMGranularPolicyOrganisationJSONRequestBody SetIAMGranularPolicyOrganisationJSONBody
 
@@ -1222,11 +1110,17 @@ type RemoveRolePermissionsOrganisationJSONRequestBody = RolePermission
 // AddRolePermissionsOrganisationJSONRequestBody defines body for AddRolePermissionsOrganisation for application/json ContentType.
 type AddRolePermissionsOrganisationJSONRequestBody = RolePermission
 
+// ListServiceAccountOrganisationJSONRequestBody defines body for ListServiceAccountOrganisation for application/json ContentType.
+type ListServiceAccountOrganisationJSONRequestBody = IdentitiesIdsList
+
 // CreateServiceAccountOrganisationJSONRequestBody defines body for CreateServiceAccountOrganisation for application/json ContentType.
 type CreateServiceAccountOrganisationJSONRequestBody = ServiceAccount
 
 // UpdateServiceAccountOrganisationJSONRequestBody defines body for UpdateServiceAccountOrganisation for application/json ContentType.
 type UpdateServiceAccountOrganisationJSONRequestBody = ServiceAccount
+
+// ListUserOrganisationJSONRequestBody defines body for ListUserOrganisation for application/json ContentType.
+type ListUserOrganisationJSONRequestBody = IdentitiesIdsList
 
 // CreateUserOrganisationJSONRequestBody defines body for CreateUserOrganisation for application/json ContentType.
 type CreateUserOrganisationJSONRequestBody = User
@@ -1236,9 +1130,6 @@ type PatchUserStateOrganisationJSONRequestBody = UserState
 
 // UpdateUserOrganisationJSONRequestBody defines body for UpdateUserOrganisation for application/json ContentType.
 type UpdateUserOrganisationJSONRequestBody = UserUpdate
-
-// RevokeFormdataRequestBody defines body for Revoke for application/x-www-form-urlencoded ContentType.
-type RevokeFormdataRequestBody = TokenBody
 
 // SetIAMGranularPolicySpaceJSONRequestBody defines body for SetIAMGranularPolicySpace for application/json ContentType.
 type SetIAMGranularPolicySpaceJSONRequestBody SetIAMGranularPolicySpaceJSONBody
@@ -1258,11 +1149,17 @@ type RemoveRolePermissionsSpaceJSONRequestBody = RolePermission
 // AddRolePermissionsSpaceJSONRequestBody defines body for AddRolePermissionsSpace for application/json ContentType.
 type AddRolePermissionsSpaceJSONRequestBody = RolePermission
 
+// ListServiceAccountSpaceJSONRequestBody defines body for ListServiceAccountSpace for application/json ContentType.
+type ListServiceAccountSpaceJSONRequestBody = IdentitiesIdsList
+
 // CreateServiceAccountSpaceJSONRequestBody defines body for CreateServiceAccountSpace for application/json ContentType.
 type CreateServiceAccountSpaceJSONRequestBody = ServiceAccount
 
 // UpdateServiceAccountSpaceJSONRequestBody defines body for UpdateServiceAccountSpace for application/json ContentType.
 type UpdateServiceAccountSpaceJSONRequestBody = ServiceAccount
+
+// ListUserSpaceJSONRequestBody defines body for ListUserSpace for application/json ContentType.
+type ListUserSpaceJSONRequestBody = IdentitiesIdsList
 
 // CreateUserSpaceJSONRequestBody defines body for CreateUserSpace for application/json ContentType.
 type CreateUserSpaceJSONRequestBody = User
@@ -1272,9 +1169,6 @@ type PatchUserStateSpaceJSONRequestBody = UserState
 
 // UpdateUserSpaceJSONRequestBody defines body for UpdateUserSpace for application/json ContentType.
 type UpdateUserSpaceJSONRequestBody = UserUpdate
-
-// TokenFormdataRequestBody defines body for Token for application/x-www-form-urlencoded ContentType.
-type TokenFormdataRequestBody = TokenReq
 
 // UpdateSpaceJSONRequestBody defines body for UpdateSpace for application/json ContentType.
 type UpdateSpaceJSONRequestBody = MutableSpace
@@ -1358,6 +1252,11 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// CreateAdminServiceAccountSpaceWithBody request with any body
+	CreateAdminServiceAccountSpaceWithBody(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateAdminServiceAccountSpace(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, body CreateAdminServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListPermissions request
 	ListPermissions(ctx context.Context, params *ListPermissionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1409,29 +1308,24 @@ type ClientInterface interface {
 
 	AddRolePermissions(ctx context.Context, roleUuid RoleUuid, body AddRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// IntrospectWithBody request with any body
-	IntrospectWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	IntrospectWithFormdataBody(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// ListOrganisationsIdentity request
 	ListOrganisationsIdentity(ctx context.Context, params *ListOrganisationsIdentityParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetIAMGranularPolicyOrganisation request
-	GetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SetIAMGranularPolicyOrganisationWithBody request with any body
-	SetIAMGranularPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SetIAMGranularPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	SetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetIAMPolicyOrganisation request
-	GetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SetIAMPolicyOrganisationWithBody request with any body
-	SetIAMPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SetIAMPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	SetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListPermissionsOrganisation request
 	ListPermissionsOrganisation(ctx context.Context, organisationId OrganisationId, params *ListPermissionsOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1471,8 +1365,10 @@ type ClientInterface interface {
 
 	AddRolePermissionsOrganisation(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body AddRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ListServiceAccountOrganisation request
-	ListServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ListServiceAccountOrganisationWithBody request with any body
+	ListServiceAccountOrganisationWithBody(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ListServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, body ListServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateServiceAccountOrganisationWithBody request with any body
 	CreateServiceAccountOrganisationWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1496,8 +1392,10 @@ type ClientInterface interface {
 	// ListSpacesIdentity request
 	ListSpacesIdentity(ctx context.Context, organisationId OrganisationId, params *ListSpacesIdentityParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ListUserOrganisation request
-	ListUserOrganisation(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ListUserOrganisationWithBody request with any body
+	ListUserOrganisationWithBody(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ListUserOrganisation(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, body ListUserOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateUserOrganisationWithBody request with any body
 	CreateUserOrganisationWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1526,26 +1424,21 @@ type ClientInterface interface {
 	// ListSpacesOfUser request
 	ListSpacesOfUser(ctx context.Context, organisationId OrganisationId, userId UserId, params *ListSpacesOfUserParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// RevokeWithBody request with any body
-	RevokeWithBody(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	RevokeWithFormdataBody(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// GetIAMGranularPolicySpace request
-	GetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SetIAMGranularPolicySpaceWithBody request with any body
-	SetIAMGranularPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SetIAMGranularPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	SetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetIAMPolicySpace request
-	GetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SetIAMPolicySpaceWithBody request with any body
-	SetIAMPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SetIAMPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	SetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListPermissionsSpace request
 	ListPermissionsSpace(ctx context.Context, spaceId SpaceId, params *ListPermissionsSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1585,8 +1478,10 @@ type ClientInterface interface {
 
 	AddRolePermissionsSpace(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body AddRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ListServiceAccountSpace request
-	ListServiceAccountSpace(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ListServiceAccountSpaceWithBody request with any body
+	ListServiceAccountSpaceWithBody(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ListServiceAccountSpace(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, body ListServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateServiceAccountSpaceWithBody request with any body
 	CreateServiceAccountSpaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1607,8 +1502,10 @@ type ClientInterface interface {
 
 	UpdateServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body UpdateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ListUserSpace request
-	ListUserSpace(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ListUserSpaceWithBody request with any body
+	ListUserSpaceWithBody(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ListUserSpace(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, body ListUserSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateUserSpaceWithBody request with any body
 	CreateUserSpaceWithBody(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1637,11 +1534,6 @@ type ClientInterface interface {
 	// RecoverUserSpace request
 	RecoverUserSpace(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TokenWithBody request with any body
-	TokenWithBody(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	TokenWithFormdataBody(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// DeleteSpace request
 	DeleteSpace(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1662,6 +1554,30 @@ type ClientInterface interface {
 	CreateSpaceWithBody(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateSpace(ctx context.Context, organisationId OrganisationId, body CreateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) CreateAdminServiceAccountSpaceWithBody(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAdminServiceAccountSpaceRequestWithBody(c.Server, organisationId, spaceId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateAdminServiceAccountSpace(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, body CreateAdminServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAdminServiceAccountSpaceRequest(c.Server, organisationId, spaceId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) ListPermissions(ctx context.Context, params *ListPermissionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -1892,30 +1808,6 @@ func (c *Client) AddRolePermissions(ctx context.Context, roleUuid RoleUuid, body
 	return c.Client.Do(req)
 }
 
-func (c *Client) IntrospectWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewIntrospectRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) IntrospectWithFormdataBody(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewIntrospectRequestWithFormdataBody(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) ListOrganisationsIdentity(ctx context.Context, params *ListOrganisationsIdentityParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListOrganisationsIdentityRequest(c.Server, params)
 	if err != nil {
@@ -1928,8 +1820,8 @@ func (c *Client) ListOrganisationsIdentity(ctx context.Context, params *ListOrga
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetIAMGranularPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectUuid, objectType)
+func (c *Client) GetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetIAMGranularPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectId, objectType)
 	if err != nil {
 		return nil, err
 	}
@@ -1940,8 +1832,8 @@ func (c *Client) GetIAMGranularPolicyOrganisation(ctx context.Context, organisat
 	return c.Client.Do(req)
 }
 
-func (c *Client) SetIAMGranularPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSetIAMGranularPolicyOrganisationRequestWithBody(c.Server, organisationId, subjectType, subjectUuid, objectType, contentType, body)
+func (c *Client) SetIAMGranularPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMGranularPolicyOrganisationRequestWithBody(c.Server, organisationId, subjectType, subjectId, objectType, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1952,8 +1844,8 @@ func (c *Client) SetIAMGranularPolicyOrganisationWithBody(ctx context.Context, o
 	return c.Client.Do(req)
 }
 
-func (c *Client) SetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSetIAMGranularPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectUuid, objectType, body)
+func (c *Client) SetIAMGranularPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMGranularPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectId, objectType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1964,8 +1856,8 @@ func (c *Client) SetIAMGranularPolicyOrganisation(ctx context.Context, organisat
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetIAMPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectUuid)
+func (c *Client) GetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetIAMPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -1976,8 +1868,8 @@ func (c *Client) GetIAMPolicyOrganisation(ctx context.Context, organisationId Or
 	return c.Client.Do(req)
 }
 
-func (c *Client) SetIAMPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSetIAMPolicyOrganisationRequestWithBody(c.Server, organisationId, subjectType, subjectUuid, contentType, body)
+func (c *Client) SetIAMPolicyOrganisationWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMPolicyOrganisationRequestWithBody(c.Server, organisationId, subjectType, subjectId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1988,8 +1880,8 @@ func (c *Client) SetIAMPolicyOrganisationWithBody(ctx context.Context, organisat
 	return c.Client.Do(req)
 }
 
-func (c *Client) SetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSetIAMPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectUuid, body)
+func (c *Client) SetIAMPolicyOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMPolicyOrganisationRequest(c.Server, organisationId, subjectType, subjectId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2168,8 +2060,20 @@ func (c *Client) AddRolePermissionsOrganisation(ctx context.Context, organisatio
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListServiceAccountOrganisationRequest(c.Server, organisationId, params)
+func (c *Client) ListServiceAccountOrganisationWithBody(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListServiceAccountOrganisationRequestWithBody(c.Server, organisationId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, body ListServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListServiceAccountOrganisationRequest(c.Server, organisationId, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2276,8 +2180,20 @@ func (c *Client) ListSpacesIdentity(ctx context.Context, organisationId Organisa
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListUserOrganisation(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListUserOrganisationRequest(c.Server, organisationId, params)
+func (c *Client) ListUserOrganisationWithBody(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListUserOrganisationRequestWithBody(c.Server, organisationId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListUserOrganisation(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, body ListUserOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListUserOrganisationRequest(c.Server, organisationId, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2408,8 +2324,8 @@ func (c *Client) ListSpacesOfUser(ctx context.Context, organisationId Organisati
 	return c.Client.Do(req)
 }
 
-func (c *Client) RevokeWithBody(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRevokeRequestWithBody(c.Server, params, contentType, body)
+func (c *Client) GetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetIAMGranularPolicySpaceRequest(c.Server, spaceId, subjectType, subjectId, objectType)
 	if err != nil {
 		return nil, err
 	}
@@ -2420,8 +2336,8 @@ func (c *Client) RevokeWithBody(ctx context.Context, params *RevokeParams, conte
 	return c.Client.Do(req)
 }
 
-func (c *Client) RevokeWithFormdataBody(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRevokeRequestWithFormdataBody(c.Server, params, body)
+func (c *Client) SetIAMGranularPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMGranularPolicySpaceRequestWithBody(c.Server, spaceId, subjectType, subjectId, objectType, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2432,8 +2348,8 @@ func (c *Client) RevokeWithFormdataBody(ctx context.Context, params *RevokeParam
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetIAMGranularPolicySpaceRequest(c.Server, spaceId, subjectType, subjectUuid, objectType)
+func (c *Client) SetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMGranularPolicySpaceRequest(c.Server, spaceId, subjectType, subjectId, objectType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2444,8 +2360,8 @@ func (c *Client) GetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId,
 	return c.Client.Do(req)
 }
 
-func (c *Client) SetIAMGranularPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSetIAMGranularPolicySpaceRequestWithBody(c.Server, spaceId, subjectType, subjectUuid, objectType, contentType, body)
+func (c *Client) GetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetIAMPolicySpaceRequest(c.Server, spaceId, subjectType, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -2456,8 +2372,8 @@ func (c *Client) SetIAMGranularPolicySpaceWithBody(ctx context.Context, spaceId 
 	return c.Client.Do(req)
 }
 
-func (c *Client) SetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSetIAMGranularPolicySpaceRequest(c.Server, spaceId, subjectType, subjectUuid, objectType, body)
+func (c *Client) SetIAMPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMPolicySpaceRequestWithBody(c.Server, spaceId, subjectType, subjectId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2468,32 +2384,8 @@ func (c *Client) SetIAMGranularPolicySpace(ctx context.Context, spaceId SpaceId,
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetIAMPolicySpaceRequest(c.Server, spaceId, subjectType, subjectUuid)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) SetIAMPolicySpaceWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSetIAMPolicySpaceRequestWithBody(c.Server, spaceId, subjectType, subjectUuid, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) SetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSetIAMPolicySpaceRequest(c.Server, spaceId, subjectType, subjectUuid, body)
+func (c *Client) SetIAMPolicySpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSetIAMPolicySpaceRequest(c.Server, spaceId, subjectType, subjectId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2672,8 +2564,20 @@ func (c *Client) AddRolePermissionsSpace(ctx context.Context, spaceId SpaceId, r
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListServiceAccountSpace(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListServiceAccountSpaceRequest(c.Server, spaceId, params)
+func (c *Client) ListServiceAccountSpaceWithBody(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListServiceAccountSpaceRequestWithBody(c.Server, spaceId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListServiceAccountSpace(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, body ListServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListServiceAccountSpaceRequest(c.Server, spaceId, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2768,8 +2672,20 @@ func (c *Client) UpdateServiceAccountSpace(ctx context.Context, spaceId SpaceId,
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListUserSpace(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListUserSpaceRequest(c.Server, spaceId, params)
+func (c *Client) ListUserSpaceWithBody(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListUserSpaceRequestWithBody(c.Server, spaceId, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListUserSpace(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, body ListUserSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListUserSpaceRequest(c.Server, spaceId, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -2900,30 +2816,6 @@ func (c *Client) RecoverUserSpace(ctx context.Context, spaceId SpaceId, userId U
 	return c.Client.Do(req)
 }
 
-func (c *Client) TokenWithBody(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTokenRequestWithBody(c.Server, params, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) TokenWithFormdataBody(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTokenRequestWithFormdataBody(c.Server, params, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) DeleteSpace(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteSpaceRequest(c.Server, spaceId)
 	if err != nil {
@@ -3018,6 +2910,60 @@ func (c *Client) CreateSpace(ctx context.Context, organisationId OrganisationId,
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+// NewCreateAdminServiceAccountSpaceRequest calls the generic CreateAdminServiceAccountSpace builder with application/json body
+func NewCreateAdminServiceAccountSpaceRequest(server string, organisationId OrganisationId, spaceId SpaceId, body CreateAdminServiceAccountSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateAdminServiceAccountSpaceRequestWithBody(server, organisationId, spaceId, "application/json", bodyReader)
+}
+
+// NewCreateAdminServiceAccountSpaceRequestWithBody generates requests for CreateAdminServiceAccountSpace with any type of body
+func NewCreateAdminServiceAccountSpaceRequestWithBody(server string, organisationId OrganisationId, spaceId SpaceId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/admin/organisations/%s/spaces/%s/serviceAccounts", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
 }
 
 // NewListPermissionsRequest generates requests for ListPermissions
@@ -3556,46 +3502,6 @@ func NewAddRolePermissionsRequestWithBody(server string, roleUuid RoleUuid, cont
 	return req, nil
 }
 
-// NewIntrospectRequestWithFormdataBody calls the generic Introspect builder with application/x-www-form-urlencoded body
-func NewIntrospectRequestWithFormdataBody(server string, body IntrospectFormdataRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	bodyStr, err := runtime.MarshalForm(body, nil)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewIntrospectRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
-}
-
-// NewIntrospectRequestWithBody generates requests for Introspect with any type of body
-func NewIntrospectRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/iam/introspect")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
 // NewListOrganisationsIdentityRequest generates requests for ListOrganisationsIdentity
 func NewListOrganisationsIdentityRequest(server string, params *ListOrganisationsIdentityParams) (*http.Request, error) {
 	var err error
@@ -3646,7 +3552,7 @@ func NewListOrganisationsIdentityRequest(server string, params *ListOrganisation
 }
 
 // NewGetIAMGranularPolicyOrganisationRequest generates requests for GetIAMGranularPolicyOrganisation
-func NewGetIAMGranularPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType) (*http.Request, error) {
+func NewGetIAMGranularPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -3665,7 +3571,7 @@ func NewGetIAMGranularPolicyOrganisationRequest(server string, organisationId Or
 
 	var pathParam2 string
 
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -3701,18 +3607,18 @@ func NewGetIAMGranularPolicyOrganisationRequest(server string, organisationId Or
 }
 
 // NewSetIAMGranularPolicyOrganisationRequest calls the generic SetIAMGranularPolicyOrganisation builder with application/json body
-func NewSetIAMGranularPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody) (*http.Request, error) {
+func NewSetIAMGranularPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewSetIAMGranularPolicyOrganisationRequestWithBody(server, organisationId, subjectType, subjectUuid, objectType, "application/json", bodyReader)
+	return NewSetIAMGranularPolicyOrganisationRequestWithBody(server, organisationId, subjectType, subjectId, objectType, "application/json", bodyReader)
 }
 
 // NewSetIAMGranularPolicyOrganisationRequestWithBody generates requests for SetIAMGranularPolicyOrganisation with any type of body
-func NewSetIAMGranularPolicyOrganisationRequestWithBody(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader) (*http.Request, error) {
+func NewSetIAMGranularPolicyOrganisationRequestWithBody(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -3731,7 +3637,7 @@ func NewSetIAMGranularPolicyOrganisationRequestWithBody(server string, organisat
 
 	var pathParam2 string
 
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -3769,7 +3675,7 @@ func NewSetIAMGranularPolicyOrganisationRequestWithBody(server string, organisat
 }
 
 // NewGetIAMPolicyOrganisationRequest generates requests for GetIAMPolicyOrganisation
-func NewGetIAMPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid) (*http.Request, error) {
+func NewGetIAMPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -3788,7 +3694,7 @@ func NewGetIAMPolicyOrganisationRequest(server string, organisationId Organisati
 
 	var pathParam2 string
 
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -3817,18 +3723,18 @@ func NewGetIAMPolicyOrganisationRequest(server string, organisationId Organisati
 }
 
 // NewSetIAMPolicyOrganisationRequest calls the generic SetIAMPolicyOrganisation builder with application/json body
-func NewSetIAMPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody) (*http.Request, error) {
+func NewSetIAMPolicyOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicyOrganisationJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewSetIAMPolicyOrganisationRequestWithBody(server, organisationId, subjectType, subjectUuid, "application/json", bodyReader)
+	return NewSetIAMPolicyOrganisationRequestWithBody(server, organisationId, subjectType, subjectId, "application/json", bodyReader)
 }
 
 // NewSetIAMPolicyOrganisationRequestWithBody generates requests for SetIAMPolicyOrganisation with any type of body
-func NewSetIAMPolicyOrganisationRequestWithBody(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader) (*http.Request, error) {
+func NewSetIAMPolicyOrganisationRequestWithBody(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -3847,7 +3753,7 @@ func NewSetIAMPolicyOrganisationRequestWithBody(server string, organisationId Or
 
 	var pathParam2 string
 
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -4442,8 +4348,19 @@ func NewAddRolePermissionsOrganisationRequestWithBody(server string, organisatio
 	return req, nil
 }
 
-// NewListServiceAccountOrganisationRequest generates requests for ListServiceAccountOrganisation
-func NewListServiceAccountOrganisationRequest(server string, organisationId OrganisationId, params *ListServiceAccountOrganisationParams) (*http.Request, error) {
+// NewListServiceAccountOrganisationRequest calls the generic ListServiceAccountOrganisation builder with application/json body
+func NewListServiceAccountOrganisationRequest(server string, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, body ListServiceAccountOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewListServiceAccountOrganisationRequestWithBody(server, organisationId, params, "application/json", bodyReader)
+}
+
+// NewListServiceAccountOrganisationRequestWithBody generates requests for ListServiceAccountOrganisation with any type of body
+func NewListServiceAccountOrganisationRequestWithBody(server string, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -4471,22 +4388,6 @@ func NewListServiceAccountOrganisationRequest(server string, organisationId Orga
 	if params != nil {
 		queryValues := queryURL.Query()
 
-		if params.Name != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "name", runtime.ParamLocationQuery, *params.Name); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
 		if params.Page != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
@@ -4506,10 +4407,12 @@ func NewListServiceAccountOrganisationRequest(server string, organisationId Orga
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("GET", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -4816,8 +4719,19 @@ func NewListSpacesIdentityRequest(server string, organisationId OrganisationId, 
 	return req, nil
 }
 
-// NewListUserOrganisationRequest generates requests for ListUserOrganisation
-func NewListUserOrganisationRequest(server string, organisationId OrganisationId, params *ListUserOrganisationParams) (*http.Request, error) {
+// NewListUserOrganisationRequest calls the generic ListUserOrganisation builder with application/json body
+func NewListUserOrganisationRequest(server string, organisationId OrganisationId, params *ListUserOrganisationParams, body ListUserOrganisationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewListUserOrganisationRequestWithBody(server, organisationId, params, "application/json", bodyReader)
+}
+
+// NewListUserOrganisationRequestWithBody generates requests for ListUserOrganisation with any type of body
+func NewListUserOrganisationRequestWithBody(server string, organisationId OrganisationId, params *ListUserOrganisationParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -4880,10 +4794,12 @@ func NewListUserOrganisationRequest(server string, organisationId OrganisationId
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("GET", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -5229,63 +5145,8 @@ func NewListSpacesOfUserRequest(server string, organisationId OrganisationId, us
 	return req, nil
 }
 
-// NewRevokeRequestWithFormdataBody calls the generic Revoke builder with application/x-www-form-urlencoded body
-func NewRevokeRequestWithFormdataBody(server string, params *RevokeParams, body RevokeFormdataRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	bodyStr, err := runtime.MarshalForm(body, nil)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewRevokeRequestWithBody(server, params, "application/x-www-form-urlencoded", bodyReader)
-}
-
-// NewRevokeRequestWithBody generates requests for Revoke with any type of body
-func NewRevokeRequestWithBody(server string, params *RevokeParams, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/iam/revoke")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	if params != nil {
-
-		if params.Authorization != nil {
-			var headerParam0 string
-
-			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, *params.Authorization)
-			if err != nil {
-				return nil, err
-			}
-
-			req.Header.Set("Authorization", headerParam0)
-		}
-
-	}
-
-	return req, nil
-}
-
 // NewGetIAMGranularPolicySpaceRequest generates requests for GetIAMGranularPolicySpace
-func NewGetIAMGranularPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType) (*http.Request, error) {
+func NewGetIAMGranularPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -5304,7 +5165,7 @@ func NewGetIAMGranularPolicySpaceRequest(server string, spaceId SpaceId, subject
 
 	var pathParam2 string
 
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -5340,18 +5201,18 @@ func NewGetIAMGranularPolicySpaceRequest(server string, spaceId SpaceId, subject
 }
 
 // NewSetIAMGranularPolicySpaceRequest calls the generic SetIAMGranularPolicySpace builder with application/json body
-func NewSetIAMGranularPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody) (*http.Request, error) {
+func NewSetIAMGranularPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewSetIAMGranularPolicySpaceRequestWithBody(server, spaceId, subjectType, subjectUuid, objectType, "application/json", bodyReader)
+	return NewSetIAMGranularPolicySpaceRequestWithBody(server, spaceId, subjectType, subjectId, objectType, "application/json", bodyReader)
 }
 
 // NewSetIAMGranularPolicySpaceRequestWithBody generates requests for SetIAMGranularPolicySpace with any type of body
-func NewSetIAMGranularPolicySpaceRequestWithBody(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader) (*http.Request, error) {
+func NewSetIAMGranularPolicySpaceRequestWithBody(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -5370,7 +5231,7 @@ func NewSetIAMGranularPolicySpaceRequestWithBody(server string, spaceId SpaceId,
 
 	var pathParam2 string
 
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -5408,7 +5269,7 @@ func NewSetIAMGranularPolicySpaceRequestWithBody(server string, spaceId SpaceId,
 }
 
 // NewGetIAMPolicySpaceRequest generates requests for GetIAMPolicySpace
-func NewGetIAMPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid) (*http.Request, error) {
+func NewGetIAMPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -5427,7 +5288,7 @@ func NewGetIAMPolicySpaceRequest(server string, spaceId SpaceId, subjectType Sub
 
 	var pathParam2 string
 
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -5456,18 +5317,18 @@ func NewGetIAMPolicySpaceRequest(server string, spaceId SpaceId, subjectType Sub
 }
 
 // NewSetIAMPolicySpaceRequest calls the generic SetIAMPolicySpace builder with application/json body
-func NewSetIAMPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody) (*http.Request, error) {
+func NewSetIAMPolicySpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicySpaceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewSetIAMPolicySpaceRequestWithBody(server, spaceId, subjectType, subjectUuid, "application/json", bodyReader)
+	return NewSetIAMPolicySpaceRequestWithBody(server, spaceId, subjectType, subjectId, "application/json", bodyReader)
 }
 
 // NewSetIAMPolicySpaceRequestWithBody generates requests for SetIAMPolicySpace with any type of body
-func NewSetIAMPolicySpaceRequestWithBody(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader) (*http.Request, error) {
+func NewSetIAMPolicySpaceRequestWithBody(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -5486,7 +5347,7 @@ func NewSetIAMPolicySpaceRequestWithBody(server string, spaceId SpaceId, subject
 
 	var pathParam2 string
 
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectUuid", runtime.ParamLocationPath, subjectUuid)
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
 	if err != nil {
 		return nil, err
 	}
@@ -6081,8 +5942,19 @@ func NewAddRolePermissionsSpaceRequestWithBody(server string, spaceId SpaceId, r
 	return req, nil
 }
 
-// NewListServiceAccountSpaceRequest generates requests for ListServiceAccountSpace
-func NewListServiceAccountSpaceRequest(server string, spaceId SpaceId, params *ListServiceAccountSpaceParams) (*http.Request, error) {
+// NewListServiceAccountSpaceRequest calls the generic ListServiceAccountSpace builder with application/json body
+func NewListServiceAccountSpaceRequest(server string, spaceId SpaceId, params *ListServiceAccountSpaceParams, body ListServiceAccountSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewListServiceAccountSpaceRequestWithBody(server, spaceId, params, "application/json", bodyReader)
+}
+
+// NewListServiceAccountSpaceRequestWithBody generates requests for ListServiceAccountSpace with any type of body
+func NewListServiceAccountSpaceRequestWithBody(server string, spaceId SpaceId, params *ListServiceAccountSpaceParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -6110,22 +5982,6 @@ func NewListServiceAccountSpaceRequest(server string, spaceId SpaceId, params *L
 	if params != nil {
 		queryValues := queryURL.Query()
 
-		if params.Name != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "name", runtime.ParamLocationQuery, *params.Name); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
 		if params.Page != nil {
 
 			if queryFrag, err := runtime.StyleParamWithLocation("deepObject", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
@@ -6145,10 +6001,12 @@ func NewListServiceAccountSpaceRequest(server string, spaceId SpaceId, params *L
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("GET", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -6377,8 +6235,19 @@ func NewUpdateServiceAccountSpaceRequestWithBody(server string, spaceId SpaceId,
 	return req, nil
 }
 
-// NewListUserSpaceRequest generates requests for ListUserSpace
-func NewListUserSpaceRequest(server string, spaceId SpaceId, params *ListUserSpaceParams) (*http.Request, error) {
+// NewListUserSpaceRequest calls the generic ListUserSpace builder with application/json body
+func NewListUserSpaceRequest(server string, spaceId SpaceId, params *ListUserSpaceParams, body ListUserSpaceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewListUserSpaceRequestWithBody(server, spaceId, params, "application/json", bodyReader)
+}
+
+// NewListUserSpaceRequestWithBody generates requests for ListUserSpace with any type of body
+func NewListUserSpaceRequestWithBody(server string, spaceId SpaceId, params *ListUserSpaceParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -6441,10 +6310,12 @@ func NewListUserSpaceRequest(server string, spaceId SpaceId, params *ListUserSpa
 		queryURL.RawQuery = queryValues.Encode()
 	}
 
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	req, err := http.NewRequest("GET", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -6768,61 +6639,6 @@ func NewRecoverUserSpaceRequest(server string, spaceId SpaceId, userId UserId) (
 	return req, nil
 }
 
-// NewTokenRequestWithFormdataBody calls the generic Token builder with application/x-www-form-urlencoded body
-func NewTokenRequestWithFormdataBody(server string, params *TokenParams, body TokenFormdataRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	bodyStr, err := runtime.MarshalForm(body, nil)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = strings.NewReader(bodyStr.Encode())
-	return NewTokenRequestWithBody(server, params, "application/x-www-form-urlencoded", bodyReader)
-}
-
-// NewTokenRequestWithBody generates requests for Token with any type of body
-func NewTokenRequestWithBody(server string, params *TokenParams, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/iam/token")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	if params != nil {
-
-		if params.Authorization != nil {
-			var headerParam0 string
-
-			headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, *params.Authorization)
-			if err != nil {
-				return nil, err
-			}
-
-			req.Header.Set("Authorization", headerParam0)
-		}
-
-	}
-
-	return req, nil
-}
-
 // NewDeleteSpaceRequest generates requests for DeleteSpace
 func NewDeleteSpaceRequest(server string, spaceId SpaceId) (*http.Request, error) {
 	var err error
@@ -7097,6 +6913,11 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// CreateAdminServiceAccountSpaceWithBodyWithResponse request with any body
+	CreateAdminServiceAccountSpaceWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAdminServiceAccountSpaceResponse, error)
+
+	CreateAdminServiceAccountSpaceWithResponse(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, body CreateAdminServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAdminServiceAccountSpaceResponse, error)
+
 	// ListPermissionsWithResponse request
 	ListPermissionsWithResponse(ctx context.Context, params *ListPermissionsParams, reqEditors ...RequestEditorFn) (*ListPermissionsResponse, error)
 
@@ -7148,29 +6969,24 @@ type ClientWithResponsesInterface interface {
 
 	AddRolePermissionsWithResponse(ctx context.Context, roleUuid RoleUuid, body AddRolePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolePermissionsResponse, error)
 
-	// IntrospectWithBodyWithResponse request with any body
-	IntrospectWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectResponse, error)
-
-	IntrospectWithFormdataBodyWithResponse(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*IntrospectResponse, error)
-
 	// ListOrganisationsIdentityWithResponse request
 	ListOrganisationsIdentityWithResponse(ctx context.Context, params *ListOrganisationsIdentityParams, reqEditors ...RequestEditorFn) (*ListOrganisationsIdentityResponse, error)
 
 	// GetIAMGranularPolicyOrganisationWithResponse request
-	GetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicyOrganisationResponse, error)
+	GetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicyOrganisationResponse, error)
 
 	// SetIAMGranularPolicyOrganisationWithBodyWithResponse request with any body
-	SetIAMGranularPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error)
+	SetIAMGranularPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error)
 
-	SetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error)
+	SetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error)
 
 	// GetIAMPolicyOrganisationWithResponse request
-	GetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*GetIAMPolicyOrganisationResponse, error)
+	GetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*GetIAMPolicyOrganisationResponse, error)
 
 	// SetIAMPolicyOrganisationWithBodyWithResponse request with any body
-	SetIAMPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error)
+	SetIAMPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error)
 
-	SetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error)
+	SetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error)
 
 	// ListPermissionsOrganisationWithResponse request
 	ListPermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListPermissionsOrganisationParams, reqEditors ...RequestEditorFn) (*ListPermissionsOrganisationResponse, error)
@@ -7210,8 +7026,10 @@ type ClientWithResponsesInterface interface {
 
 	AddRolePermissionsOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, roleUuid RoleUuid, body AddRolePermissionsOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolePermissionsOrganisationResponse, error)
 
-	// ListServiceAccountOrganisationWithResponse request
-	ListServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error)
+	// ListServiceAccountOrganisationWithBodyWithResponse request with any body
+	ListServiceAccountOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error)
+
+	ListServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, body ListServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error)
 
 	// CreateServiceAccountOrganisationWithBodyWithResponse request with any body
 	CreateServiceAccountOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountOrganisationResponse, error)
@@ -7235,8 +7053,10 @@ type ClientWithResponsesInterface interface {
 	// ListSpacesIdentityWithResponse request
 	ListSpacesIdentityWithResponse(ctx context.Context, organisationId OrganisationId, params *ListSpacesIdentityParams, reqEditors ...RequestEditorFn) (*ListSpacesIdentityResponse, error)
 
-	// ListUserOrganisationWithResponse request
-	ListUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, reqEditors ...RequestEditorFn) (*ListUserOrganisationResponse, error)
+	// ListUserOrganisationWithBodyWithResponse request with any body
+	ListUserOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListUserOrganisationResponse, error)
+
+	ListUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, body ListUserOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*ListUserOrganisationResponse, error)
 
 	// CreateUserOrganisationWithBodyWithResponse request with any body
 	CreateUserOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserOrganisationResponse, error)
@@ -7265,26 +7085,21 @@ type ClientWithResponsesInterface interface {
 	// ListSpacesOfUserWithResponse request
 	ListSpacesOfUserWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, params *ListSpacesOfUserParams, reqEditors ...RequestEditorFn) (*ListSpacesOfUserResponse, error)
 
-	// RevokeWithBodyWithResponse request with any body
-	RevokeWithBodyWithResponse(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RevokeResponse, error)
-
-	RevokeWithFormdataBodyWithResponse(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*RevokeResponse, error)
-
 	// GetIAMGranularPolicySpaceWithResponse request
-	GetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicySpaceResponse, error)
+	GetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicySpaceResponse, error)
 
 	// SetIAMGranularPolicySpaceWithBodyWithResponse request with any body
-	SetIAMGranularPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error)
+	SetIAMGranularPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error)
 
-	SetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error)
+	SetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error)
 
 	// GetIAMPolicySpaceWithResponse request
-	GetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*GetIAMPolicySpaceResponse, error)
+	GetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*GetIAMPolicySpaceResponse, error)
 
 	// SetIAMPolicySpaceWithBodyWithResponse request with any body
-	SetIAMPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error)
+	SetIAMPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error)
 
-	SetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error)
+	SetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error)
 
 	// ListPermissionsSpaceWithResponse request
 	ListPermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListPermissionsSpaceParams, reqEditors ...RequestEditorFn) (*ListPermissionsSpaceResponse, error)
@@ -7324,8 +7139,10 @@ type ClientWithResponsesInterface interface {
 
 	AddRolePermissionsSpaceWithResponse(ctx context.Context, spaceId SpaceId, roleUuid RoleUuid, body AddRolePermissionsSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolePermissionsSpaceResponse, error)
 
-	// ListServiceAccountSpaceWithResponse request
-	ListServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error)
+	// ListServiceAccountSpaceWithBodyWithResponse request with any body
+	ListServiceAccountSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error)
+
+	ListServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, body ListServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error)
 
 	// CreateServiceAccountSpaceWithBodyWithResponse request with any body
 	CreateServiceAccountSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateServiceAccountSpaceResponse, error)
@@ -7346,8 +7163,10 @@ type ClientWithResponsesInterface interface {
 
 	UpdateServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body UpdateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountSpaceResponse, error)
 
-	// ListUserSpaceWithResponse request
-	ListUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, reqEditors ...RequestEditorFn) (*ListUserSpaceResponse, error)
+	// ListUserSpaceWithBodyWithResponse request with any body
+	ListUserSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListUserSpaceResponse, error)
+
+	ListUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, body ListUserSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*ListUserSpaceResponse, error)
 
 	// CreateUserSpaceWithBodyWithResponse request with any body
 	CreateUserSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserSpaceResponse, error)
@@ -7376,11 +7195,6 @@ type ClientWithResponsesInterface interface {
 	// RecoverUserSpaceWithResponse request
 	RecoverUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*RecoverUserSpaceResponse, error)
 
-	// TokenWithBodyWithResponse request with any body
-	TokenWithBodyWithResponse(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TokenResponse, error)
-
-	TokenWithFormdataBodyWithResponse(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*TokenResponse, error)
-
 	// DeleteSpaceWithResponse request
 	DeleteSpaceWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*DeleteSpaceResponse, error)
 
@@ -7403,10 +7217,37 @@ type ClientWithResponsesInterface interface {
 	CreateSpaceWithResponse(ctx context.Context, organisationId OrganisationId, body CreateSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSpaceResponse, error)
 }
 
+type CreateAdminServiceAccountSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON201                   *CreateServiceAccount201ResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON409 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateAdminServiceAccountSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateAdminServiceAccountSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListPermissionsResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PermissionsResponseSchema
+	JSON200                   *Permissions200ResponseSchema
 	ApplicationproblemJSON500 *Error
 }
 
@@ -7429,7 +7270,7 @@ func (r ListPermissionsResponse) StatusCode() int {
 type CreatePermissionResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PermissionCreatedResponseSchema
+	JSON200                   *PermissionCreated200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON500 *Error
 }
@@ -7475,7 +7316,7 @@ func (r DeletePermissionResponse) StatusCode() int {
 type GetPermissionResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PermissionCreatedResponseSchema
+	JSON200                   *PermissionCreated200ResponseSchema
 	ApplicationproblemJSON404 *Error
 	ApplicationproblemJSON500 *Error
 }
@@ -7523,7 +7364,7 @@ func (r UpdatePermissionResponse) StatusCode() int {
 type ListRolesResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *RoleListResponseSchema
+	JSON200                   *RoleList200ResponseSchema
 	ApplicationproblemJSON500 *Error
 }
 
@@ -7546,7 +7387,7 @@ func (r ListRolesResponse) StatusCode() int {
 type CreateRoleResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *RoleCreatedResponseSchema
+	JSON200                   *RoleCreated200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON500 *Error
 }
@@ -7592,7 +7433,7 @@ func (r DeleteRoleResponse) StatusCode() int {
 type GetRoleResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *RoleCreatedResponseSchema
+	JSON200                   *RoleCreated200ResponseSchema
 	ApplicationproblemJSON404 *Error
 	ApplicationproblemJSON500 *Error
 }
@@ -7662,7 +7503,7 @@ func (r RemoveRolePermissionsResponse) StatusCode() int {
 type GetRolePermissionsResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PermissionsResponseSchema
+	JSON200                   *Permissions200ResponseSchema
 	ApplicationproblemJSON404 *Error
 	ApplicationproblemJSON500 *Error
 }
@@ -7705,33 +7546,10 @@ func (r AddRolePermissionsResponse) StatusCode() int {
 	return 0
 }
 
-type IntrospectResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *IntrospectResponseSchema
-	JSON500      *ErrorOauth2
-}
-
-// Status returns HTTPResponse.Status
-func (r IntrospectResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r IntrospectResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type ListOrganisationsIdentityResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListUserOrganisationsResponseSchema
+	JSON200                   *ListUserOrganisations200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -7758,7 +7576,7 @@ func (r ListOrganisationsIdentityResponse) StatusCode() int {
 type GetIAMGranularPolicyOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetIAMGranularPolicyResponseSchema
+	JSON200                   *GetIAMGranularPolicy200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -7811,7 +7629,7 @@ func (r SetIAMGranularPolicyOrganisationResponse) StatusCode() int {
 type GetIAMPolicyOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetIAMPolicyResponseSchema
+	JSON200                   *GetIAMPolicy200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -7864,7 +7682,7 @@ func (r SetIAMPolicyOrganisationResponse) StatusCode() int {
 type ListPermissionsOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListPermissionsResponseSchema
+	JSON200                   *ListPermissions200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON500 *Error
@@ -7889,7 +7707,7 @@ func (r ListPermissionsOrganisationResponse) StatusCode() int {
 type GetPermissionOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetPermissionResponseSchema
+	JSON200                   *GetPermission200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -7916,7 +7734,7 @@ func (r GetPermissionOrganisationResponse) StatusCode() int {
 type ListRolesOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListRolesResponseSchema
+	JSON200                   *ListRoles200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON404 *Error
@@ -7942,7 +7760,7 @@ func (r ListRolesOrganisationResponse) StatusCode() int {
 type CreateRoleOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *CreateRoleResponseSchema
+	JSON200                   *CreateRole200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -7993,7 +7811,7 @@ func (r DeleteRoleOrganisationResponse) StatusCode() int {
 type GetRoleOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetRoleResponseSchema
+	JSON200                   *GetRole200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON404 *Error
@@ -8070,7 +7888,7 @@ func (r RemoveRolePermissionsOrganisationResponse) StatusCode() int {
 type GetRolePermissionsOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetRolePermissionsResponseSchema
+	JSON200                   *GetRolePermissions200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON404 *Error
@@ -8122,7 +7940,7 @@ func (r AddRolePermissionsOrganisationResponse) StatusCode() int {
 type ListServiceAccountOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListServiceAccountResponseSchema
+	JSON200                   *ListServiceAccount200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8149,7 +7967,7 @@ func (r ListServiceAccountOrganisationResponse) StatusCode() int {
 type CreateServiceAccountOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *CreateServiceAccountResponseSchema
+	JSON201                   *CreateServiceAccount201ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8201,7 +8019,7 @@ func (r DeleteServiceAccountOrganisationResponse) StatusCode() int {
 type GetServiceAccountOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetServiceAccountResponseSchema
+	JSON200                   *GetServiceAccount200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8228,7 +8046,7 @@ func (r GetServiceAccountOrganisationResponse) StatusCode() int {
 type UpdateServiceAccountOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *UpdateServiceAccountResponseSchema
+	JSON200                   *UpdateServiceAccount200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8256,7 +8074,7 @@ func (r UpdateServiceAccountOrganisationResponse) StatusCode() int {
 type ListSpacesOfServiceAccountResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListSpacesServiceAccountResponseSchema
+	JSON200                   *ListSpacesServiceAccount200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8283,7 +8101,7 @@ func (r ListSpacesOfServiceAccountResponse) StatusCode() int {
 type ListSpacesIdentityResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListSpacesIdentityResponseSchema
+	JSON200                   *ListSpacesIdentity200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8310,7 +8128,7 @@ func (r ListSpacesIdentityResponse) StatusCode() int {
 type ListUserOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListUserResponseSchema
+	JSON200                   *ListUser200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8337,7 +8155,7 @@ func (r ListUserOrganisationResponse) StatusCode() int {
 type CreateUserOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *CreateUserResponseSchema
+	JSON201                   *CreateUser201ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8389,7 +8207,7 @@ func (r DeleteUserOrganisationResponse) StatusCode() int {
 type GetUserOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetUserResponseSchema
+	JSON200                   *GetUser200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8416,7 +8234,7 @@ func (r GetUserOrganisationResponse) StatusCode() int {
 type PatchUserStateOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PatchUserStateResponseSchema
+	JSON200                   *PatchUserState200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8444,7 +8262,7 @@ func (r PatchUserStateOrganisationResponse) StatusCode() int {
 type UpdateUserOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *UpdateUserResponseSchema
+	JSON200                   *UpdateUser200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8472,7 +8290,7 @@ func (r UpdateUserOrganisationResponse) StatusCode() int {
 type RecoverUserOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *RecoverUserResponseSchema
+	JSON200                   *RecoverUser200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON404 *Error
@@ -8498,7 +8316,7 @@ func (r RecoverUserOrganisationResponse) StatusCode() int {
 type ListSpacesOfUserResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListSpacesUserResponseSchema
+	JSON200                   *ListSpacesUser200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8522,33 +8340,10 @@ func (r ListSpacesOfUserResponse) StatusCode() int {
 	return 0
 }
 
-type RevokeResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON400      *ErrorOauth2
-	JSON401      *ErrorOauth2
-}
-
-// Status returns HTTPResponse.Status
-func (r RevokeResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r RevokeResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type GetIAMGranularPolicySpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetIAMGranularPolicyResponseSchema
+	JSON200                   *GetIAMGranularPolicy200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8601,7 +8396,7 @@ func (r SetIAMGranularPolicySpaceResponse) StatusCode() int {
 type GetIAMPolicySpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetIAMPolicyResponseSchema
+	JSON200                   *GetIAMPolicy200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8654,7 +8449,7 @@ func (r SetIAMPolicySpaceResponse) StatusCode() int {
 type ListPermissionsSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListPermissionsResponseSchema
+	JSON200                   *ListPermissions200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON500 *Error
@@ -8679,7 +8474,7 @@ func (r ListPermissionsSpaceResponse) StatusCode() int {
 type GetPermissionSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetPermissionResponseSchema
+	JSON200                   *GetPermission200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8706,7 +8501,7 @@ func (r GetPermissionSpaceResponse) StatusCode() int {
 type ListRolesSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListRolesResponseSchema
+	JSON200                   *ListRoles200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON404 *Error
@@ -8732,7 +8527,7 @@ func (r ListRolesSpaceResponse) StatusCode() int {
 type CreateRoleSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *CreateRoleResponseSchema
+	JSON200                   *CreateRole200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8783,7 +8578,7 @@ func (r DeleteRoleSpaceResponse) StatusCode() int {
 type GetRoleSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetRoleResponseSchema
+	JSON200                   *GetRole200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON404 *Error
@@ -8860,7 +8655,7 @@ func (r RemoveRolePermissionsSpaceResponse) StatusCode() int {
 type GetRolePermissionsSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetRolePermissionsResponseSchema
+	JSON200                   *GetRolePermissions200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON404 *Error
@@ -8912,7 +8707,7 @@ func (r AddRolePermissionsSpaceResponse) StatusCode() int {
 type ListServiceAccountSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListServiceAccountResponseSchema
+	JSON200                   *ListServiceAccount200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8939,7 +8734,7 @@ func (r ListServiceAccountSpaceResponse) StatusCode() int {
 type CreateServiceAccountSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *CreateServiceAccountResponseSchema
+	JSON201                   *CreateServiceAccount201ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -8991,7 +8786,7 @@ func (r DeleteServiceAccountSpaceResponse) StatusCode() int {
 type GetServiceAccountSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetServiceAccountResponseSchema
+	JSON200                   *GetServiceAccount200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -9044,7 +8839,7 @@ func (r AssignServiceAccountToSpaceResponse) StatusCode() int {
 type UpdateServiceAccountSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *UpdateServiceAccountResponseSchema
+	JSON200                   *UpdateServiceAccount200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -9072,7 +8867,7 @@ func (r UpdateServiceAccountSpaceResponse) StatusCode() int {
 type ListUserSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListUserResponseSchema
+	JSON200                   *ListUser200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -9099,7 +8894,7 @@ func (r ListUserSpaceResponse) StatusCode() int {
 type CreateUserSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON201                   *CreateUserResponseSchema
+	JSON201                   *CreateUser201ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -9151,7 +8946,7 @@ func (r DeleteUserSpaceResponse) StatusCode() int {
 type GetUserSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetUserResponseSchema
+	JSON200                   *GetUser200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -9178,7 +8973,7 @@ func (r GetUserSpaceResponse) StatusCode() int {
 type PatchUserStateSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *PatchUserStateResponseSchema
+	JSON200                   *PatchUserState200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -9232,7 +9027,7 @@ func (r AssignUserToSpaceResponse) StatusCode() int {
 type UpdateUserSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *UpdateUserResponseSchema
+	JSON200                   *UpdateUser200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -9260,7 +9055,7 @@ func (r UpdateUserSpaceResponse) StatusCode() int {
 type RecoverUserSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *RecoverUserResponseSchema
+	JSON200                   *RecoverUser200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON404 *Error
@@ -9277,31 +9072,6 @@ func (r RecoverUserSpaceResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r RecoverUserSpaceResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type TokenResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *TokenResponseSchema
-	JSON400      *ErrorOauth2
-	JSON401      *ErrorOauth2
-	JSON500      *ErrorOauth2
-}
-
-// Status returns HTTPResponse.Status
-func (r TokenResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r TokenResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -9336,7 +9106,7 @@ func (r DeleteSpaceResponse) StatusCode() int {
 type GetSpaceByIdResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *GetSpaceByIdResponseSchema
+	JSON200                   *GetSpaceById200ResponseSchema
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
 	ApplicationproblemJSON404 *Error
@@ -9388,7 +9158,7 @@ func (r UpdateSpaceResponse) StatusCode() int {
 type ListSpacesResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *ListSpacesResponseSchema
+	JSON200                   *ListSpaces200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -9415,7 +9185,7 @@ func (r ListSpacesResponse) StatusCode() int {
 type CreateSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
-	JSON200                   *CreateSpaceResponseSchema
+	JSON200                   *CreateSpace200ResponseSchema
 	ApplicationproblemJSON400 *BadRequestError
 	ApplicationproblemJSON401 *Error
 	ApplicationproblemJSON403 *Error
@@ -9436,6 +9206,23 @@ func (r CreateSpaceResponse) StatusCode() int {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
+}
+
+// CreateAdminServiceAccountSpaceWithBodyWithResponse request with arbitrary body returning *CreateAdminServiceAccountSpaceResponse
+func (c *ClientWithResponses) CreateAdminServiceAccountSpaceWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAdminServiceAccountSpaceResponse, error) {
+	rsp, err := c.CreateAdminServiceAccountSpaceWithBody(ctx, organisationId, spaceId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAdminServiceAccountSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateAdminServiceAccountSpaceWithResponse(ctx context.Context, organisationId OrganisationId, spaceId SpaceId, body CreateAdminServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAdminServiceAccountSpaceResponse, error) {
+	rsp, err := c.CreateAdminServiceAccountSpace(ctx, organisationId, spaceId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateAdminServiceAccountSpaceResponse(rsp)
 }
 
 // ListPermissionsWithResponse request returning *ListPermissionsResponse
@@ -9603,23 +9390,6 @@ func (c *ClientWithResponses) AddRolePermissionsWithResponse(ctx context.Context
 	return ParseAddRolePermissionsResponse(rsp)
 }
 
-// IntrospectWithBodyWithResponse request with arbitrary body returning *IntrospectResponse
-func (c *ClientWithResponses) IntrospectWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IntrospectResponse, error) {
-	rsp, err := c.IntrospectWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseIntrospectResponse(rsp)
-}
-
-func (c *ClientWithResponses) IntrospectWithFormdataBodyWithResponse(ctx context.Context, body IntrospectFormdataRequestBody, reqEditors ...RequestEditorFn) (*IntrospectResponse, error) {
-	rsp, err := c.IntrospectWithFormdataBody(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseIntrospectResponse(rsp)
-}
-
 // ListOrganisationsIdentityWithResponse request returning *ListOrganisationsIdentityResponse
 func (c *ClientWithResponses) ListOrganisationsIdentityWithResponse(ctx context.Context, params *ListOrganisationsIdentityParams, reqEditors ...RequestEditorFn) (*ListOrganisationsIdentityResponse, error) {
 	rsp, err := c.ListOrganisationsIdentity(ctx, params, reqEditors...)
@@ -9630,8 +9400,8 @@ func (c *ClientWithResponses) ListOrganisationsIdentityWithResponse(ctx context.
 }
 
 // GetIAMGranularPolicyOrganisationWithResponse request returning *GetIAMGranularPolicyOrganisationResponse
-func (c *ClientWithResponses) GetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicyOrganisationResponse, error) {
-	rsp, err := c.GetIAMGranularPolicyOrganisation(ctx, organisationId, subjectType, subjectUuid, objectType, reqEditors...)
+func (c *ClientWithResponses) GetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicyOrganisationResponse, error) {
+	rsp, err := c.GetIAMGranularPolicyOrganisation(ctx, organisationId, subjectType, subjectId, objectType, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -9639,16 +9409,16 @@ func (c *ClientWithResponses) GetIAMGranularPolicyOrganisationWithResponse(ctx c
 }
 
 // SetIAMGranularPolicyOrganisationWithBodyWithResponse request with arbitrary body returning *SetIAMGranularPolicyOrganisationResponse
-func (c *ClientWithResponses) SetIAMGranularPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error) {
-	rsp, err := c.SetIAMGranularPolicyOrganisationWithBody(ctx, organisationId, subjectType, subjectUuid, objectType, contentType, body, reqEditors...)
+func (c *ClientWithResponses) SetIAMGranularPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error) {
+	rsp, err := c.SetIAMGranularPolicyOrganisationWithBody(ctx, organisationId, subjectType, subjectId, objectType, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseSetIAMGranularPolicyOrganisationResponse(rsp)
 }
 
-func (c *ClientWithResponses) SetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error) {
-	rsp, err := c.SetIAMGranularPolicyOrganisation(ctx, organisationId, subjectType, subjectUuid, objectType, body, reqEditors...)
+func (c *ClientWithResponses) SetIAMGranularPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicyOrganisationResponse, error) {
+	rsp, err := c.SetIAMGranularPolicyOrganisation(ctx, organisationId, subjectType, subjectId, objectType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -9656,8 +9426,8 @@ func (c *ClientWithResponses) SetIAMGranularPolicyOrganisationWithResponse(ctx c
 }
 
 // GetIAMPolicyOrganisationWithResponse request returning *GetIAMPolicyOrganisationResponse
-func (c *ClientWithResponses) GetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*GetIAMPolicyOrganisationResponse, error) {
-	rsp, err := c.GetIAMPolicyOrganisation(ctx, organisationId, subjectType, subjectUuid, reqEditors...)
+func (c *ClientWithResponses) GetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*GetIAMPolicyOrganisationResponse, error) {
+	rsp, err := c.GetIAMPolicyOrganisation(ctx, organisationId, subjectType, subjectId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -9665,16 +9435,16 @@ func (c *ClientWithResponses) GetIAMPolicyOrganisationWithResponse(ctx context.C
 }
 
 // SetIAMPolicyOrganisationWithBodyWithResponse request with arbitrary body returning *SetIAMPolicyOrganisationResponse
-func (c *ClientWithResponses) SetIAMPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error) {
-	rsp, err := c.SetIAMPolicyOrganisationWithBody(ctx, organisationId, subjectType, subjectUuid, contentType, body, reqEditors...)
+func (c *ClientWithResponses) SetIAMPolicyOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error) {
+	rsp, err := c.SetIAMPolicyOrganisationWithBody(ctx, organisationId, subjectType, subjectId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseSetIAMPolicyOrganisationResponse(rsp)
 }
 
-func (c *ClientWithResponses) SetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error) {
-	rsp, err := c.SetIAMPolicyOrganisation(ctx, organisationId, subjectType, subjectUuid, body, reqEditors...)
+func (c *ClientWithResponses) SetIAMPolicyOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicyOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicyOrganisationResponse, error) {
+	rsp, err := c.SetIAMPolicyOrganisation(ctx, organisationId, subjectType, subjectId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -9803,9 +9573,17 @@ func (c *ClientWithResponses) AddRolePermissionsOrganisationWithResponse(ctx con
 	return ParseAddRolePermissionsOrganisationResponse(rsp)
 }
 
-// ListServiceAccountOrganisationWithResponse request returning *ListServiceAccountOrganisationResponse
-func (c *ClientWithResponses) ListServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error) {
-	rsp, err := c.ListServiceAccountOrganisation(ctx, organisationId, params, reqEditors...)
+// ListServiceAccountOrganisationWithBodyWithResponse request with arbitrary body returning *ListServiceAccountOrganisationResponse
+func (c *ClientWithResponses) ListServiceAccountOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error) {
+	rsp, err := c.ListServiceAccountOrganisationWithBody(ctx, organisationId, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListServiceAccountOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) ListServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListServiceAccountOrganisationParams, body ListServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*ListServiceAccountOrganisationResponse, error) {
+	rsp, err := c.ListServiceAccountOrganisation(ctx, organisationId, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -9882,9 +9660,17 @@ func (c *ClientWithResponses) ListSpacesIdentityWithResponse(ctx context.Context
 	return ParseListSpacesIdentityResponse(rsp)
 }
 
-// ListUserOrganisationWithResponse request returning *ListUserOrganisationResponse
-func (c *ClientWithResponses) ListUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, reqEditors ...RequestEditorFn) (*ListUserOrganisationResponse, error) {
-	rsp, err := c.ListUserOrganisation(ctx, organisationId, params, reqEditors...)
+// ListUserOrganisationWithBodyWithResponse request with arbitrary body returning *ListUserOrganisationResponse
+func (c *ClientWithResponses) ListUserOrganisationWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListUserOrganisationResponse, error) {
+	rsp, err := c.ListUserOrganisationWithBody(ctx, organisationId, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListUserOrganisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) ListUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, params *ListUserOrganisationParams, body ListUserOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*ListUserOrganisationResponse, error) {
+	rsp, err := c.ListUserOrganisation(ctx, organisationId, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -9978,26 +9764,9 @@ func (c *ClientWithResponses) ListSpacesOfUserWithResponse(ctx context.Context, 
 	return ParseListSpacesOfUserResponse(rsp)
 }
 
-// RevokeWithBodyWithResponse request with arbitrary body returning *RevokeResponse
-func (c *ClientWithResponses) RevokeWithBodyWithResponse(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RevokeResponse, error) {
-	rsp, err := c.RevokeWithBody(ctx, params, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseRevokeResponse(rsp)
-}
-
-func (c *ClientWithResponses) RevokeWithFormdataBodyWithResponse(ctx context.Context, params *RevokeParams, body RevokeFormdataRequestBody, reqEditors ...RequestEditorFn) (*RevokeResponse, error) {
-	rsp, err := c.RevokeWithFormdataBody(ctx, params, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseRevokeResponse(rsp)
-}
-
 // GetIAMGranularPolicySpaceWithResponse request returning *GetIAMGranularPolicySpaceResponse
-func (c *ClientWithResponses) GetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicySpaceResponse, error) {
-	rsp, err := c.GetIAMGranularPolicySpace(ctx, spaceId, subjectType, subjectUuid, objectType, reqEditors...)
+func (c *ClientWithResponses) GetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, reqEditors ...RequestEditorFn) (*GetIAMGranularPolicySpaceResponse, error) {
+	rsp, err := c.GetIAMGranularPolicySpace(ctx, spaceId, subjectType, subjectId, objectType, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -10005,16 +9774,16 @@ func (c *ClientWithResponses) GetIAMGranularPolicySpaceWithResponse(ctx context.
 }
 
 // SetIAMGranularPolicySpaceWithBodyWithResponse request with arbitrary body returning *SetIAMGranularPolicySpaceResponse
-func (c *ClientWithResponses) SetIAMGranularPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error) {
-	rsp, err := c.SetIAMGranularPolicySpaceWithBody(ctx, spaceId, subjectType, subjectUuid, objectType, contentType, body, reqEditors...)
+func (c *ClientWithResponses) SetIAMGranularPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error) {
+	rsp, err := c.SetIAMGranularPolicySpaceWithBody(ctx, spaceId, subjectType, subjectId, objectType, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseSetIAMGranularPolicySpaceResponse(rsp)
 }
 
-func (c *ClientWithResponses) SetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error) {
-	rsp, err := c.SetIAMGranularPolicySpace(ctx, spaceId, subjectType, subjectUuid, objectType, body, reqEditors...)
+func (c *ClientWithResponses) SetIAMGranularPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, objectType ObjectType, body SetIAMGranularPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMGranularPolicySpaceResponse, error) {
+	rsp, err := c.SetIAMGranularPolicySpace(ctx, spaceId, subjectType, subjectId, objectType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -10022,8 +9791,8 @@ func (c *ClientWithResponses) SetIAMGranularPolicySpaceWithResponse(ctx context.
 }
 
 // GetIAMPolicySpaceWithResponse request returning *GetIAMPolicySpaceResponse
-func (c *ClientWithResponses) GetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, reqEditors ...RequestEditorFn) (*GetIAMPolicySpaceResponse, error) {
-	rsp, err := c.GetIAMPolicySpace(ctx, spaceId, subjectType, subjectUuid, reqEditors...)
+func (c *ClientWithResponses) GetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, reqEditors ...RequestEditorFn) (*GetIAMPolicySpaceResponse, error) {
+	rsp, err := c.GetIAMPolicySpace(ctx, spaceId, subjectType, subjectId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -10031,16 +9800,16 @@ func (c *ClientWithResponses) GetIAMPolicySpaceWithResponse(ctx context.Context,
 }
 
 // SetIAMPolicySpaceWithBodyWithResponse request with arbitrary body returning *SetIAMPolicySpaceResponse
-func (c *ClientWithResponses) SetIAMPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error) {
-	rsp, err := c.SetIAMPolicySpaceWithBody(ctx, spaceId, subjectType, subjectUuid, contentType, body, reqEditors...)
+func (c *ClientWithResponses) SetIAMPolicySpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error) {
+	rsp, err := c.SetIAMPolicySpaceWithBody(ctx, spaceId, subjectType, subjectId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseSetIAMPolicySpaceResponse(rsp)
 }
 
-func (c *ClientWithResponses) SetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectUuid SubjectUuid, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error) {
-	rsp, err := c.SetIAMPolicySpace(ctx, spaceId, subjectType, subjectUuid, body, reqEditors...)
+func (c *ClientWithResponses) SetIAMPolicySpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body SetIAMPolicySpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*SetIAMPolicySpaceResponse, error) {
+	rsp, err := c.SetIAMPolicySpace(ctx, spaceId, subjectType, subjectId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -10169,9 +9938,17 @@ func (c *ClientWithResponses) AddRolePermissionsSpaceWithResponse(ctx context.Co
 	return ParseAddRolePermissionsSpaceResponse(rsp)
 }
 
-// ListServiceAccountSpaceWithResponse request returning *ListServiceAccountSpaceResponse
-func (c *ClientWithResponses) ListServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error) {
-	rsp, err := c.ListServiceAccountSpace(ctx, spaceId, params, reqEditors...)
+// ListServiceAccountSpaceWithBodyWithResponse request with arbitrary body returning *ListServiceAccountSpaceResponse
+func (c *ClientWithResponses) ListServiceAccountSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error) {
+	rsp, err := c.ListServiceAccountSpaceWithBody(ctx, spaceId, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListServiceAccountSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) ListServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListServiceAccountSpaceParams, body ListServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*ListServiceAccountSpaceResponse, error) {
+	rsp, err := c.ListServiceAccountSpace(ctx, spaceId, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -10239,9 +10016,17 @@ func (c *ClientWithResponses) UpdateServiceAccountSpaceWithResponse(ctx context.
 	return ParseUpdateServiceAccountSpaceResponse(rsp)
 }
 
-// ListUserSpaceWithResponse request returning *ListUserSpaceResponse
-func (c *ClientWithResponses) ListUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, reqEditors ...RequestEditorFn) (*ListUserSpaceResponse, error) {
-	rsp, err := c.ListUserSpace(ctx, spaceId, params, reqEditors...)
+// ListUserSpaceWithBodyWithResponse request with arbitrary body returning *ListUserSpaceResponse
+func (c *ClientWithResponses) ListUserSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListUserSpaceResponse, error) {
+	rsp, err := c.ListUserSpaceWithBody(ctx, spaceId, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListUserSpaceResponse(rsp)
+}
+
+func (c *ClientWithResponses) ListUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, body ListUserSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*ListUserSpaceResponse, error) {
+	rsp, err := c.ListUserSpace(ctx, spaceId, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -10335,23 +10120,6 @@ func (c *ClientWithResponses) RecoverUserSpaceWithResponse(ctx context.Context, 
 	return ParseRecoverUserSpaceResponse(rsp)
 }
 
-// TokenWithBodyWithResponse request with arbitrary body returning *TokenResponse
-func (c *ClientWithResponses) TokenWithBodyWithResponse(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TokenResponse, error) {
-	rsp, err := c.TokenWithBody(ctx, params, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseTokenResponse(rsp)
-}
-
-func (c *ClientWithResponses) TokenWithFormdataBodyWithResponse(ctx context.Context, params *TokenParams, body TokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*TokenResponse, error) {
-	rsp, err := c.TokenWithFormdataBody(ctx, params, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseTokenResponse(rsp)
-}
-
 // DeleteSpaceWithResponse request returning *DeleteSpaceResponse
 func (c *ClientWithResponses) DeleteSpaceWithResponse(ctx context.Context, spaceId SpaceId, reqEditors ...RequestEditorFn) (*DeleteSpaceResponse, error) {
 	rsp, err := c.DeleteSpace(ctx, spaceId, reqEditors...)
@@ -10421,6 +10189,67 @@ func (c *ClientWithResponses) CreateSpaceWithResponse(ctx context.Context, organ
 	return ParseCreateSpaceResponse(rsp)
 }
 
+// ParseCreateAdminServiceAccountSpaceResponse parses an HTTP response from a CreateAdminServiceAccountSpaceWithResponse call
+func ParseCreateAdminServiceAccountSpaceResponse(rsp *http.Response) (*CreateAdminServiceAccountSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateAdminServiceAccountSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest CreateServiceAccount201ResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListPermissionsResponse parses an HTTP response from a ListPermissionsWithResponse call
 func ParseListPermissionsResponse(rsp *http.Response) (*ListPermissionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -10436,7 +10265,7 @@ func ParseListPermissionsResponse(rsp *http.Response) (*ListPermissionsResponse,
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PermissionsResponseSchema
+		var dest Permissions200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -10469,7 +10298,7 @@ func ParseCreatePermissionResponse(rsp *http.Response) (*CreatePermissionRespons
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PermissionCreatedResponseSchema
+		var dest PermissionCreated200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -10535,7 +10364,7 @@ func ParseGetPermissionResponse(rsp *http.Response) (*GetPermissionResponse, err
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PermissionCreatedResponseSchema
+		var dest PermissionCreated200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -10615,7 +10444,7 @@ func ParseListRolesResponse(rsp *http.Response) (*ListRolesResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest RoleListResponseSchema
+		var dest RoleList200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -10648,7 +10477,7 @@ func ParseCreateRoleResponse(rsp *http.Response) (*CreateRoleResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest RoleCreatedResponseSchema
+		var dest RoleCreated200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -10714,7 +10543,7 @@ func ParseGetRoleResponse(rsp *http.Response) (*GetRoleResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest RoleCreatedResponseSchema
+		var dest RoleCreated200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -10820,7 +10649,7 @@ func ParseGetRolePermissionsResponse(rsp *http.Response) (*GetRolePermissionsRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PermissionsResponseSchema
+		var dest Permissions200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -10871,39 +10700,6 @@ func ParseAddRolePermissionsResponse(rsp *http.Response) (*AddRolePermissionsRes
 	return response, nil
 }
 
-// ParseIntrospectResponse parses an HTTP response from a IntrospectWithResponse call
-func ParseIntrospectResponse(rsp *http.Response) (*IntrospectResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &IntrospectResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest IntrospectResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorOauth2
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseListOrganisationsIdentityResponse parses an HTTP response from a ListOrganisationsIdentityWithResponse call
 func ParseListOrganisationsIdentityResponse(rsp *http.Response) (*ListOrganisationsIdentityResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -10919,7 +10715,7 @@ func ParseListOrganisationsIdentityResponse(rsp *http.Response) (*ListOrganisati
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListUserOrganisationsResponseSchema
+		var dest ListUserOrganisations200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -10980,7 +10776,7 @@ func ParseGetIAMGranularPolicyOrganisationResponse(rsp *http.Response) (*GetIAMG
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetIAMGranularPolicyResponseSchema
+		var dest GetIAMGranularPolicy200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11095,7 +10891,7 @@ func ParseGetIAMPolicyOrganisationResponse(rsp *http.Response) (*GetIAMPolicyOrg
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetIAMPolicyResponseSchema
+		var dest GetIAMPolicy200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11210,7 +11006,7 @@ func ParseListPermissionsOrganisationResponse(rsp *http.Response) (*ListPermissi
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListPermissionsResponseSchema
+		var dest ListPermissions200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11257,7 +11053,7 @@ func ParseGetPermissionOrganisationResponse(rsp *http.Response) (*GetPermissionO
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetPermissionResponseSchema
+		var dest GetPermission200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11318,7 +11114,7 @@ func ParseListRolesOrganisationResponse(rsp *http.Response) (*ListRolesOrganisat
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListRolesResponseSchema
+		var dest ListRoles200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11372,7 +11168,7 @@ func ParseCreateRoleOrganisationResponse(rsp *http.Response) (*CreateRoleOrganis
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CreateRoleResponseSchema
+		var dest CreateRole200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11473,7 +11269,7 @@ func ParseGetRoleOrganisationResponse(rsp *http.Response) (*GetRoleOrganisationR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetRoleResponseSchema
+		var dest GetRole200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11628,7 +11424,7 @@ func ParseGetRolePermissionsOrganisationResponse(rsp *http.Response) (*GetRolePe
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetRolePermissionsResponseSchema
+		var dest GetRolePermissions200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11736,7 +11532,7 @@ func ParseListServiceAccountOrganisationResponse(rsp *http.Response) (*ListServi
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListServiceAccountResponseSchema
+		var dest ListServiceAccount200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11797,7 +11593,7 @@ func ParseCreateServiceAccountOrganisationResponse(rsp *http.Response) (*CreateS
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateServiceAccountResponseSchema
+		var dest CreateServiceAccount201ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11905,7 +11701,7 @@ func ParseGetServiceAccountOrganisationResponse(rsp *http.Response) (*GetService
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetServiceAccountResponseSchema
+		var dest GetServiceAccount200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -11966,7 +11762,7 @@ func ParseUpdateServiceAccountOrganisationResponse(rsp *http.Response) (*UpdateS
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest UpdateServiceAccountResponseSchema
+		var dest UpdateServiceAccount200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12034,7 +11830,7 @@ func ParseListSpacesOfServiceAccountResponse(rsp *http.Response) (*ListSpacesOfS
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListSpacesServiceAccountResponseSchema
+		var dest ListSpacesServiceAccount200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12095,7 +11891,7 @@ func ParseListSpacesIdentityResponse(rsp *http.Response) (*ListSpacesIdentityRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListSpacesIdentityResponseSchema
+		var dest ListSpacesIdentity200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12156,7 +11952,7 @@ func ParseListUserOrganisationResponse(rsp *http.Response) (*ListUserOrganisatio
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListUserResponseSchema
+		var dest ListUser200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12217,7 +12013,7 @@ func ParseCreateUserOrganisationResponse(rsp *http.Response) (*CreateUserOrganis
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateUserResponseSchema
+		var dest CreateUser201ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12325,7 +12121,7 @@ func ParseGetUserOrganisationResponse(rsp *http.Response) (*GetUserOrganisationR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetUserResponseSchema
+		var dest GetUser200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12386,7 +12182,7 @@ func ParsePatchUserStateOrganisationResponse(rsp *http.Response) (*PatchUserStat
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PatchUserStateResponseSchema
+		var dest PatchUserState200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12454,7 +12250,7 @@ func ParseUpdateUserOrganisationResponse(rsp *http.Response) (*UpdateUserOrganis
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest UpdateUserResponseSchema
+		var dest UpdateUser200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12522,7 +12318,7 @@ func ParseRecoverUserOrganisationResponse(rsp *http.Response) (*RecoverUserOrgan
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest RecoverUserResponseSchema
+		var dest RecoverUser200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12576,7 +12372,7 @@ func ParseListSpacesOfUserResponse(rsp *http.Response) (*ListSpacesOfUserRespons
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListSpacesUserResponseSchema
+		var dest ListSpacesUser200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12622,39 +12418,6 @@ func ParseListSpacesOfUserResponse(rsp *http.Response) (*ListSpacesOfUserRespons
 	return response, nil
 }
 
-// ParseRevokeResponse parses an HTTP response from a RevokeWithResponse call
-func ParseRevokeResponse(rsp *http.Response) (*RevokeResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &RevokeResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorOauth2
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorOauth2
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	}
-
-	return response, nil
-}
-
 // ParseGetIAMGranularPolicySpaceResponse parses an HTTP response from a GetIAMGranularPolicySpaceWithResponse call
 func ParseGetIAMGranularPolicySpaceResponse(rsp *http.Response) (*GetIAMGranularPolicySpaceResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -12670,7 +12433,7 @@ func ParseGetIAMGranularPolicySpaceResponse(rsp *http.Response) (*GetIAMGranular
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetIAMGranularPolicyResponseSchema
+		var dest GetIAMGranularPolicy200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12785,7 +12548,7 @@ func ParseGetIAMPolicySpaceResponse(rsp *http.Response) (*GetIAMPolicySpaceRespo
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetIAMPolicyResponseSchema
+		var dest GetIAMPolicy200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12900,7 +12663,7 @@ func ParseListPermissionsSpaceResponse(rsp *http.Response) (*ListPermissionsSpac
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListPermissionsResponseSchema
+		var dest ListPermissions200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -12947,7 +12710,7 @@ func ParseGetPermissionSpaceResponse(rsp *http.Response) (*GetPermissionSpaceRes
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetPermissionResponseSchema
+		var dest GetPermission200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13008,7 +12771,7 @@ func ParseListRolesSpaceResponse(rsp *http.Response) (*ListRolesSpaceResponse, e
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListRolesResponseSchema
+		var dest ListRoles200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13062,7 +12825,7 @@ func ParseCreateRoleSpaceResponse(rsp *http.Response) (*CreateRoleSpaceResponse,
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CreateRoleResponseSchema
+		var dest CreateRole200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13163,7 +12926,7 @@ func ParseGetRoleSpaceResponse(rsp *http.Response) (*GetRoleSpaceResponse, error
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetRoleResponseSchema
+		var dest GetRole200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13318,7 +13081,7 @@ func ParseGetRolePermissionsSpaceResponse(rsp *http.Response) (*GetRolePermissio
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetRolePermissionsResponseSchema
+		var dest GetRolePermissions200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13426,7 +13189,7 @@ func ParseListServiceAccountSpaceResponse(rsp *http.Response) (*ListServiceAccou
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListServiceAccountResponseSchema
+		var dest ListServiceAccount200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13487,7 +13250,7 @@ func ParseCreateServiceAccountSpaceResponse(rsp *http.Response) (*CreateServiceA
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateServiceAccountResponseSchema
+		var dest CreateServiceAccount201ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13595,7 +13358,7 @@ func ParseGetServiceAccountSpaceResponse(rsp *http.Response) (*GetServiceAccount
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetServiceAccountResponseSchema
+		var dest GetServiceAccount200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13710,7 +13473,7 @@ func ParseUpdateServiceAccountSpaceResponse(rsp *http.Response) (*UpdateServiceA
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest UpdateServiceAccountResponseSchema
+		var dest UpdateServiceAccount200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13778,7 +13541,7 @@ func ParseListUserSpaceResponse(rsp *http.Response) (*ListUserSpaceResponse, err
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListUserResponseSchema
+		var dest ListUser200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13839,7 +13602,7 @@ func ParseCreateUserSpaceResponse(rsp *http.Response) (*CreateUserSpaceResponse,
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest CreateUserResponseSchema
+		var dest CreateUser201ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -13947,7 +13710,7 @@ func ParseGetUserSpaceResponse(rsp *http.Response) (*GetUserSpaceResponse, error
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetUserResponseSchema
+		var dest GetUser200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -14008,7 +13771,7 @@ func ParsePatchUserStateSpaceResponse(rsp *http.Response) (*PatchUserStateSpaceR
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PatchUserStateResponseSchema
+		var dest PatchUserState200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -14130,7 +13893,7 @@ func ParseUpdateUserSpaceResponse(rsp *http.Response) (*UpdateUserSpaceResponse,
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest UpdateUserResponseSchema
+		var dest UpdateUser200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -14198,7 +13961,7 @@ func ParseRecoverUserSpaceResponse(rsp *http.Response) (*RecoverUserSpaceRespons
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest RecoverUserResponseSchema
+		var dest RecoverUser200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -14231,53 +13994,6 @@ func ParseRecoverUserSpaceResponse(rsp *http.Response) (*RecoverUserSpaceRespons
 			return nil, err
 		}
 		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseTokenResponse parses an HTTP response from a TokenWithResponse call
-func ParseTokenResponse(rsp *http.Response) (*TokenResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &TokenResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest TokenResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest ErrorOauth2
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest ErrorOauth2
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest ErrorOauth2
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON500 = &dest
 
 	}
 
@@ -14346,7 +14062,7 @@ func ParseGetSpaceByIdResponse(rsp *http.Response) (*GetSpaceByIdResponse, error
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetSpaceByIdResponseSchema
+		var dest GetSpaceById200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -14454,7 +14170,7 @@ func ParseListSpacesResponse(rsp *http.Response) (*ListSpacesResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ListSpacesResponseSchema
+		var dest ListSpaces200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -14515,7 +14231,7 @@ func ParseCreateSpaceResponse(rsp *http.Response) (*CreateSpaceResponse, error) 
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest CreateSpaceResponseSchema
+		var dest CreateSpace200ResponseSchema
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

@@ -1,0 +1,11 @@
+with-expecter: True
+inpackage: False
+dir: mocks/{{ replaceAll .InterfaceDirRelative "internal" "internal_" }}
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+filename: "{{ .InterfaceName | snakecase }}.go"
+all: True
+packages:
+  gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/keto/lib:
+    config:
+      recursive: True

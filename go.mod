@@ -16,7 +16,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.33.0
 	github.com/hashicorp/terraform-plugin-testing v1.6.0
 	github.com/stretchr/testify v1.9.0
-	gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.36
+	gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.37
 )
 
 require (
@@ -71,6 +71,8 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/oapi-codegen/runtime v1.1.1 // indirect
 	github.com/oklog/run v1.0.0 // indirect
+	github.com/orsinium-labs/enum v1.4.0 // indirect
+	github.com/ory/keto/proto v0.13.0-alpha.0 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/posener/complete v1.2.3 // indirect
@@ -84,6 +86,8 @@ require (
 	github.com/yuin/goldmark v1.6.0 // indirect
 	github.com/yuin/goldmark-meta v1.1.0 // indirect
 	github.com/zclconf/go-cty v1.14.3 // indirect
+	gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/access-manager/v2 v2.19.1 // indirect
+	gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/keto/lib v1.17.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20240531132922-fd00a4e0eefc // indirect
 	golang.org/x/mod v0.17.0 // indirect
