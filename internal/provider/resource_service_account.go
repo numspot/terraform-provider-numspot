@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/access-manager/v2/pkg"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_service_account"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
