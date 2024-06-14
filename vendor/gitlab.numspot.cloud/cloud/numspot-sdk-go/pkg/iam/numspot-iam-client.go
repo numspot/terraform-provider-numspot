@@ -16,7 +16,6 @@ import (
 
 	"github.com/oapi-codegen/runtime"
 	openapi_types "github.com/oapi-codegen/runtime/types"
-	pkg "gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/access-manager/v2/pkg"
 )
 
 const (
@@ -63,6 +62,12 @@ const (
 	SpaceStatusQUEUED  SpaceStatus = "QUEUED"
 	SpaceStatusREADY   SpaceStatus = "READY"
 	SpaceStatusRUNNING SpaceStatus = "RUNNING"
+)
+
+// Defines values for SubjectType.
+const (
+	ServiceAccounts SubjectType = "serviceAccounts"
+	Users           SubjectType = "users"
 )
 
 // ACL defines model for ACL.
@@ -520,7 +525,7 @@ type SpaceSimplePaginatedList struct {
 }
 
 // SubjectType defines model for SubjectType.
-type SubjectType = pkg.IdentityPathType
+type SubjectType string
 
 // TokenBody defines model for TokenBody.
 type TokenBody struct {

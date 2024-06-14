@@ -9442,10 +9442,6 @@ components:
                 - serviceAccounts
             title: IamIdentityType
             type: string
-            x-go-type: pkg.IdentityType
-            x-go-type-import:
-                name: pkg
-                path: gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/access-manager/v2/pkg
         IdentitiesIdsList:
             $schema: https://json-schema.org/draft/2020-12/schema
             properties:
@@ -11289,10 +11285,6 @@ components:
                 - serviceAccounts
             title: SubjectType
             type: string
-            x-go-type: pkg.IdentityPathType
-            x-go-type-import:
-                name: pkg
-                path: gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/access-manager/v2/pkg
         SuccessfulNativeLogin:
             $schema: https://json-schema.org/draft/2020-12/schema
             description: The Response for Login Flows via API

@@ -442,12 +442,14 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 		body.Delete = &iam.IAMPolicy{Permissions: &uuidBulk}
 	}
 
+	tmp := pkg.IdentityPathTypeService
+	fmt.Println(tmp)
 	// Execute
 	utils.ExecuteRequest(func() (*iam.SetIAMPolicySpaceResponse, error) {
 		return r.provider.IAMAccessManagerClient.SetIAMPolicySpaceWithResponse(
 			ctx,
 			spaceId,
-			pkg.IdentityPathTypeService,
+			iam.ServiceAccounts,
 			serviceAccountUUID,
 			body,
 		)
@@ -561,7 +563,7 @@ func (r *ServiceAccountResource) getRolesAndGlobalPermissions(
 
 	res := utils.ExecuteRequest(func() (*iam.GetIAMPolicySpaceResponse, error) {
 		return r.provider.IAMAccessManagerClient.GetIAMPolicySpaceWithResponse(
-			ctx, r.provider.SpaceID, pkg.IdentityPathTypeService, serviceAccountUUID)
+			ctx, r.provider.SpaceID, iam.ServiceAccounts, serviceAccountUUID)
 	}, http.StatusOK, &diags)
 	if res == nil {
 		return nil, nil, diags

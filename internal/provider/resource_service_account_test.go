@@ -16,7 +16,7 @@ func TestAccServiceAccountResource_Basic(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
+	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	name := "My Service Account"
 	updatedName := "My New Service Account"
 
@@ -61,7 +61,7 @@ func TestAccServiceAccountResource_GlobalPermission(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
+	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	name := "My Service Account"
 	updatedName := "My New Service Account"
 
@@ -135,7 +135,7 @@ func TestAccServiceAccountResource_Roles(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
+	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	name := "My Service Account"
 	updatedName := "My New Service Account"
 
