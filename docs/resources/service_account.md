@@ -33,12 +33,12 @@ resource "numspot_service_account" "test" {
 ### Required
 
 - `name` (String) Service Account name
+- `space_id` (String) Space ID
 
 ### Optional
 
 - `global_permissions` (Set of String) List of global permission UUIDs attached to this service account.
 - `roles` (Set of String) List of roles attached to this service account.
-- `space_id` (String) Space ID
 
 ### Read-Only
 

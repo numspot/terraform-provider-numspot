@@ -28,7 +28,7 @@ func ServiceAccountResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Service account secret.",
 			},
 			"space_id": schema.StringAttribute{
-				Optional:            true,
+				Required:            true,
 				Description:         "Space ID",
 				MarkdownDescription: "Space ID",
 				PlanModifiers: []planmodifier.String{
