@@ -442,8 +442,6 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 		body.Delete = &iam.IAMPolicy{Permissions: &uuidBulk}
 	}
 
-	tmp := pkg.IdentityPathTypeService
-	fmt.Println(tmp)
 	// Execute
 	utils.ExecuteRequest(func() (*iam.SetIAMPolicySpaceResponse, error) {
 		return r.provider.IAMAccessManagerClient.SetIAMPolicySpaceWithResponse(
