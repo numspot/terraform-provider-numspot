@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -106,7 +107,10 @@ func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotPro
 		return nil, err
 	}
 
-	clientUuid, _ := utils.ParseUUID(data.ClientId.ValueString(), utils.EntityTypeServiceAccount)
+	clientUuid, diags := utils.ParseUUID(data.ClientId.ValueString(), utils.EntityTypeServiceAccount)
+	if diags.HasError() {
+		return nil, fmt.Errorf("Error while parsing %s as UUID", data.ClientId.ValueString())
+	}
 	body := iam.TokenReq{
 		GrantType:    "client_credentials",
 		ClientId:     &clientUuid,
