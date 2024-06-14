@@ -14,7 +14,7 @@ func ServiceAccountFromTFToCreateRequest(tf resource_service_account.ServiceAcco
 	}
 }
 
-func CreateServiceAccountResponseFromHTTPToTF(http iam.CreateServiceAccountResponseSchema) resource_service_account.ServiceAccountModel {
+func CreateServiceAccountResponseFromHTTPToTF(http iam.CreateServiceAccount201ResponseSchema) resource_service_account.ServiceAccountModel {
 	permissions := types.SetNull(types.StringType)
 	roles := types.SetNull(types.StringType)
 
@@ -49,7 +49,5 @@ func ServiceAccountEditedResponseFromHTTPToTFDataSource(http iam.ServiceAccountE
 }
 
 func ServiceAccountsFromTfToAPIReadParams(tf ServiceAccountsDataSourceModel) iam.ListServiceAccountSpaceParams {
-	return iam.ListServiceAccountSpaceParams{
-		Name: tf.ServiceAccountName.ValueStringPointer(),
-	}
+	return iam.ListServiceAccountSpaceParams{}
 }

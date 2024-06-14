@@ -18,6 +18,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var _ provider.Provider = (*numspotProvider)(nil)
@@ -104,9 +106,10 @@ func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotPro
 		return nil, err
 	}
 
+	clientUuid, _ := utils.ParseUUID(data.ClientId.ValueString(), utils.EntityTypeServiceAccount)
 	body := iam.TokenReq{
 		GrantType:    "client_credentials",
-		ClientId:     data.ClientId.ValueStringPointer(),
+		ClientId:     &clientUuid,
 		ClientSecret: data.ClientSecret.ValueStringPointer(),
 	}
 

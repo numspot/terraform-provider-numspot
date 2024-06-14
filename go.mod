@@ -16,7 +16,8 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.33.0
 	github.com/hashicorp/terraform-plugin-testing v1.6.0
 	github.com/stretchr/testify v1.9.0
-	gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.37
+	gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.38
+	gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/access-manager/v2 v2.19.1
 )
 
 require (
@@ -86,7 +87,6 @@ require (
 	github.com/yuin/goldmark v1.6.0 // indirect
 	github.com/yuin/goldmark-meta v1.1.0 // indirect
 	github.com/zclconf/go-cty v1.14.3 // indirect
-	gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/access-manager/v2 v2.19.1 // indirect
 	gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/keto/lib v1.17.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20240531132922-fd00a4e0eefc // indirect

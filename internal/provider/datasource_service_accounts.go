@@ -93,8 +93,9 @@ func (d *serviceAccountsDataSource) fetchPaginatedServiceAccounts(
 	svcAccountsHolder *[]datasource_service_account.ServiceAccountModel,
 	response *datasource.ReadResponse,
 ) {
+	body := iam.ListServiceAccountSpaceJSONRequestBody{}
 	res := utils.ExecuteRequest(func() (*iam.ListServiceAccountSpaceResponse, error) {
-		return d.provider.IAMIdentityManagerClient.ListServiceAccountSpaceWithResponse(ctx, spaceID, requestParams)
+		return d.provider.IAMIdentityManagerClient.ListServiceAccountSpaceWithResponse(ctx, spaceID, requestParams, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-iam/access-manager/v2/pkg"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_service_account"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -446,7 +447,7 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 		return r.provider.IAMAccessManagerClient.SetIAMPolicySpaceWithResponse(
 			ctx,
 			spaceId,
-			iam.ServiceAccounts,
+			pkg.IdentityPathTypeService,
 			serviceAccountUUID,
 			body,
 		)
@@ -560,7 +561,7 @@ func (r *ServiceAccountResource) getRolesAndGlobalPermissions(
 
 	res := utils.ExecuteRequest(func() (*iam.GetIAMPolicySpaceResponse, error) {
 		return r.provider.IAMAccessManagerClient.GetIAMPolicySpaceWithResponse(
-			ctx, r.provider.SpaceID, iam.ServiceAccounts, serviceAccountUUID)
+			ctx, r.provider.SpaceID, pkg.IdentityPathTypeService, serviceAccountUUID)
 	}, http.StatusOK, &diags)
 	if res == nil {
 		return nil, nil, diags
