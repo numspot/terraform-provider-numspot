@@ -17,4 +17,4 @@ lint-fix:
 	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.55.2 golangci-lint run --fix -v
 
 lint:
-	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.55.2 golangci-lint run -v
+	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.59-alpine golangci-lint run -v
