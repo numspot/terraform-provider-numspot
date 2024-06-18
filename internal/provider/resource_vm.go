@@ -149,52 +149,6 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *VmResource) stopVm(ctx context.Context, state *resource_vm.VmModel, response *resource.UpdateResponse) error {
-	id := state.Id.ValueString()
-
-	_, status, err := retry_utils.ReadResourceUtils(
-		ctx,
-		id,
-		r.provider.SpaceID,
-		r.provider.ApiClient.ReadVmsByIdWithResponse,
-	)
-	if err != nil {
-		return fmt.Errorf("error while reading VM : %v", err)
-	}
-
-	switch status {
-	case "running":
-		// Stop the VM
-		_ = utils.ExecuteRequest(func() (*iaas.StopVmResponse, error) {
-			forceStop := true
-			body := iaas.StopVm{
-				ForceStop: &forceStop,
-			}
-			return r.provider.ApiClient.StopVmWithResponse(ctx, r.provider.SpaceID, id, body)
-		}, http.StatusOK, &response.Diagnostics)
-	case "stopping", "shutting-down", "pending":
-		// Retry read until VM is either stopped or stoppable (running)
-		_, err := retry_utils.RetryReadUntilStateValid(
-			ctx,
-			id,
-			r.provider.SpaceID,
-			[]string{"stopping", "shutting-down", "pending"},
-			[]string{"running", "stopped"},
-			r.provider.ApiClient.ReadVmsByIdWithResponse,
-		)
-		if err != nil {
-			return fmt.Errorf("error while waiting for VM to be shut down : %v", err)
-		}
-	case "stopped":
-		// Nothing more to do
-		return nil
-	default:
-		return fmt.Errorf("can't update a VM with state %v", status)
-	}
-
-	return r.stopVm(ctx, state, response)
-}
-
 func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan resource_vm.VmModel
 
@@ -227,9 +181,9 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 
 	if isUpdateNeeded(body, bodyFromState) {
 		// Stop VM before doing update
-		err := r.stopVm(ctx, &state, response)
-		if err != nil {
-			response.Diagnostics.AddError("error while stopping VM", err.Error())
+		diags := StopVm(ctx, r.provider, vmId)
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
 			return
 		}
 
@@ -243,9 +197,11 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		}
 
 		// Restart VM
-		_ = utils.ExecuteRequest(func() (*iaas.StartVmResponse, error) {
-			return r.provider.ApiClient.StartVmWithResponse(ctx, r.provider.SpaceID, vmId)
-		}, http.StatusOK, &response.Diagnostics)
+		diags = StartVm(ctx, r.provider, vmId)
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
+			return
+		}
 	}
 
 	// Retries read on VM until state is OK

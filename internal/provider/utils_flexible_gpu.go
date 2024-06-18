@@ -62,3 +62,10 @@ func FlexibleGpusFromHttpToTfDatasource(ctx context.Context, http *iaas.Flexible
 		VmId:                 types.StringPointerValue(http.VmId),
 	}, nil
 }
+
+func LinkFlexibleGpuFromTfToCreateRequest(tf *resource_flexible_gpu.FlexibleGpuModel) iaas.LinkFlexibleGpuJSONRequestBody {
+	vmId := utils.FromTfStringToStringPtr(tf.VmId)
+	return iaas.LinkFlexibleGpuJSONRequestBody{
+		VmId: utils.GetPtrValue(vmId),
+	}
+}

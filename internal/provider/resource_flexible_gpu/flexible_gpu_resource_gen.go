@@ -54,6 +54,7 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"vm_id": schema.StringAttribute{
 				Computed:            true,
+				Optional:            true,
 				Description:         "The ID of the VM the fGPU is attached to, if any.",
 				MarkdownDescription: "The ID of the VM the fGPU is attached to, if any.",
 			},

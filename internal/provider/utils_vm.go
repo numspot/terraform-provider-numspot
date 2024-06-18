@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -12,8 +13,70 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vm"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vm"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
+
+func StopVm(ctx context.Context, provider Provider, id string) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	forceStop := true
+	body := iaas.StopVm{
+		ForceStop: &forceStop,
+	}
+
+	// Stop the VM
+	_ = utils.ExecuteRequest(func() (*iaas.StopVmResponse, error) {
+		return provider.ApiClient.StopVmWithResponse(ctx, provider.SpaceID, id, body)
+	}, http.StatusOK, &diags)
+
+	if diags.HasError() {
+		return diags
+	}
+
+	_, err := retry_utils.RetryReadUntilStateValid(
+		ctx,
+		id,
+		provider.SpaceID,
+		[]string{"stopping"},
+		[]string{"stopped"},
+		provider.ApiClient.ReadVmsByIdWithResponse,
+	)
+	if err != nil {
+		diags.AddError("error while waiting for VM to stop", err.Error())
+		return diags
+	}
+
+	return diags
+}
+
+func StartVm(ctx context.Context, provider Provider, id string) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Start the VM
+	_ = utils.ExecuteRequest(func() (*iaas.StartVmResponse, error) {
+		return provider.ApiClient.StartVmWithResponse(ctx, provider.SpaceID, id)
+	}, http.StatusOK, &diags)
+
+	if diags.HasError() {
+		return diags
+	}
+
+	_, err := retry_utils.RetryReadUntilStateValid(
+		ctx,
+		id,
+		provider.SpaceID,
+		[]string{"pending"},
+		[]string{"running"},
+		provider.ApiClient.ReadVmsByIdWithResponse,
+	)
+	if err != nil {
+		diags.AddError("error while waiting for VM to start", err.Error())
+		return diags
+	}
+
+	return diags
+}
 
 func vmBsuFromApi(ctx context.Context, elt iaas.BsuCreated) (basetypes.ObjectValue, diag.Diagnostics) {
 	obj, diags := resource_vm.NewBsuValue(

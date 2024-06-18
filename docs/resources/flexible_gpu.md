@@ -13,11 +13,17 @@ description: |-
 ## Example Usage
 
 ```terraform
+resource "numspot_vm" "vm" {
+  image_id = "ami-026ce760"
+  type     = "ns-mus6-2c16r"
+}
+
 resource "numspot_flexible_gpu" "test" {
   model_name             = "nvidia-a100-80"
   generation             = "v6"
-  availability_zone_name = "eu-west-2a"
+  availability_zone_name = "cloudgouv-eu-west-1a"
   delete_on_vm_deletion  = true
+  vm_id                  = numspot_vm.vm.id
 }
 ```
 
@@ -34,9 +40,9 @@ resource "numspot_flexible_gpu" "test" {
 - `delete_on_vm_deletion` (Boolean) If true, the fGPU is deleted when the VM is terminated.
 - `generation` (String) The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU).
 - `space_id` (String) space identifier
+- `vm_id` (String) The ID of the VM the fGPU is attached to, if any.
 
 ### Read-Only
 
 - `id` (String) The ID of the fGPU.
 - `state` (String) The state of the fGPU (`allocated` \| `attaching` \| `attached` \| `detaching`).
-- `vm_id` (String) The ID of the VM the fGPU is attached to, if any.

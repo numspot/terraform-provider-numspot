@@ -59,6 +59,55 @@ func (r *FlexibleGpuResource) Schema(ctx context.Context, request resource.Schem
 	response.Schema = resource_flexible_gpu.FlexibleGpuResourceSchema(ctx)
 }
 
+func (r *FlexibleGpuResource) linkVm(ctx context.Context, gpuId string, data resource_flexible_gpu.FlexibleGpuModel) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Link GPU to VM
+	body := LinkFlexibleGpuFromTfToCreateRequest(&data)
+	_ = utils.ExecuteRequest(func() (*iaas.LinkFlexibleGpuResponse, error) {
+		return r.provider.ApiClient.LinkFlexibleGpuWithResponse(ctx, r.provider.SpaceID, gpuId, body)
+	}, http.StatusNoContent, &diags)
+	if diags.HasError() {
+		return diags
+	}
+
+	// Restart VM needed when linking a GPU
+	diags = StopVm(ctx, r.provider, data.VmId.ValueString())
+	if diags.HasError() {
+		return diags
+	}
+	diags = StartVm(ctx, r.provider, data.VmId.ValueString())
+	if diags.HasError() {
+		return diags
+	}
+
+	return diags
+}
+
+func (r *FlexibleGpuResource) unlinkVm(ctx context.Context, gpuId string, data resource_flexible_gpu.FlexibleGpuModel) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Unlink GPU from any VM
+	_ = utils.ExecuteRequest(func() (*iaas.UnlinkFlexibleGpuResponse, error) {
+		return r.provider.ApiClient.UnlinkFlexibleGpuWithResponse(ctx, r.provider.SpaceID, gpuId)
+	}, http.StatusNoContent, &diags)
+	if diags.HasError() {
+		return diags
+	}
+
+	// Restart VM needed when unlinking a GPU
+	diags = StopVm(ctx, r.provider, data.VmId.ValueString())
+	if diags.HasError() {
+		return diags
+	}
+	diags = StartVm(ctx, r.provider, data.VmId.ValueString())
+	if diags.HasError() {
+		return diags
+	}
+
+	return diags
+}
+
 func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
@@ -78,6 +127,15 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	}
 
 	createdId := *res.JSON201.Id
+
+	// Link GPU to VM
+	if !(data.VmId.IsNull() || data.VmId.IsUnknown()) {
+		response.Diagnostics.Append(r.linkVm(ctx, createdId, data)...)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	read, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
@@ -97,6 +155,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 		return
 	}
 	tf := FlexibleGpuFromHttpToTf(flexGPU)
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -137,6 +196,30 @@ func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.Updat
 		return
 	}
 
+	if plan.VmId.ValueString() != state.VmId.ValueString() {
+		if state.VmId.IsNull() || state.VmId.IsUnknown() { // If GPU is not linked to any VM and we want to link it
+			response.Diagnostics.Append(r.linkVm(ctx, state.Id.ValueString(), plan)...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+
+		} else if plan.VmId.IsNull() || plan.VmId.IsUnknown() { // If GPU is linked to a VM and we want to unlink it
+			response.Diagnostics.Append(r.unlinkVm(ctx, state.Id.ValueString(), state)...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+		} else { // Gpu is linked to a VM and we want to link it to another
+			response.Diagnostics.Append(r.unlinkVm(ctx, state.Id.ValueString(), state)...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+			response.Diagnostics.Append(r.linkVm(ctx, state.Id.ValueString(), plan)...)
+			if response.Diagnostics.HasError() {
+				return
+			}
+		}
+	}
+
 	if plan.DeleteOnVmDeletion != state.DeleteOnVmDeletion {
 		body := FlexibleGpuFromTfToUpdateRequest(&plan)
 		res := utils.ExecuteRequest(func() (*iaas.UpdateFlexibleGpuResponse, error) {
@@ -150,14 +233,25 @@ func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.Updat
 			return
 		}
 
-		state = FlexibleGpuFromHttpToTf(res.JSON200)
-		response.Diagnostics.Append(response.State.Set(ctx, state)...)
 	}
+
+	gpu := r.read(ctx, state.Id.ValueString(), response.Diagnostics)
+	if gpu == nil {
+		return
+	}
+
+	tf := FlexibleGpuFromHttpToTf(gpu)
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+
+	if !(data.VmId.IsNull() || data.VmId.IsUnknown()) {
+		response.Diagnostics.Append(r.unlinkVm(ctx, data.Id.ValueString(), data)...)
+		// Even if there is an error on unlink, we will try to delete the GPU
+	}
 
 	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteFlexibleGpuWithResponse)
 	if err != nil {
