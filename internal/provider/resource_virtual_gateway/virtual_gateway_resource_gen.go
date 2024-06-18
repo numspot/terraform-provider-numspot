@@ -29,29 +29,11 @@ func VirtualGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the virtual gateway.",
 				MarkdownDescription: "The ID of the virtual gateway.",
 			},
-			"net_to_virtual_gateway_links": schema.ListNestedAttribute{
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"state": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
-							MarkdownDescription: "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
-						},
-						"vpc_id": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The ID of the Net to which the virtual gateway is attached.",
-							MarkdownDescription: "The ID of the Net to which the virtual gateway is attached.",
-						},
-					},
-					CustomType: NetToVirtualGatewayLinksType{
-						ObjectType: types.ObjectType{
-							AttrTypes: NetToVirtualGatewayLinksValue{}.AttributeTypes(ctx),
-						},
-					},
-				},
+			"vpc_id": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The Net to which the virtual gateway is attached.",
-				MarkdownDescription: "The Net to which the virtual gateway is attached.",
+				Optional:            true,
+				Description:         "The ID of the Net to which the virtual gateway is attached.",
+				MarkdownDescription: "The ID of the Net to which the virtual gateway is attached.",
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,
@@ -64,11 +46,11 @@ func VirtualGatewayResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type VirtualGatewayModel struct {
-	ConnectionType           types.String `tfsdk:"connection_type"`
-	Id                       types.String `tfsdk:"id"`
-	NetToVirtualGatewayLinks types.List   `tfsdk:"net_to_virtual_gateway_links"`
-	State                    types.String `tfsdk:"state"`
-	Tags                     types.List   `tfsdk:"tags"`
+	ConnectionType types.String `tfsdk:"connection_type"`
+	Id             types.String `tfsdk:"id"`
+	VpcId          types.String `tfsdk:"vpc_id"`
+	State          types.String `tfsdk:"state"`
+	Tags           types.List   `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = NetToVirtualGatewayLinksType{}

@@ -85,6 +85,23 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 		}
 	}
 
+	// Link virtual gateway to VPCs
+	if !data.VpcId.IsNull() {
+		_ = utils.ExecuteRequest(func() (*iaas.LinkVirtualGatewayToVpcResponse, error) {
+			return r.provider.ApiClient.LinkVirtualGatewayToVpcWithResponse(
+				ctx,
+				r.provider.SpaceID,
+				createdId,
+				iaas.LinkVirtualGatewayToVpcJSONRequestBody{
+					VpcId: data.VpcId.ValueString(),
+				},
+			)
+		}, http.StatusOK, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	// Retries read on resource until state is OK
 	read, err := retry_utils.RetryReadUntilStateValid(
 		ctx,
@@ -157,6 +174,46 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 		modifications = true
 	}
 
+	// Link/Unlink virtual gateway to VPCs
+	if state.VpcId.ValueString() != plan.VpcId.ValueString() {
+
+		// Unlink
+		if !(state.VpcId.IsNull() || state.VpcId.IsUnknown()) {
+			_ = utils.ExecuteRequest(func() (*iaas.UnlinkVirtualGatewayToVpcResponse, error) {
+				return r.provider.ApiClient.UnlinkVirtualGatewayToVpcWithResponse(
+					ctx,
+					r.provider.SpaceID,
+					state.Id.ValueString(),
+					iaas.UnlinkVirtualGatewayToVpcJSONRequestBody{
+						VpcId: state.VpcId.ValueString(),
+					},
+				)
+			}, http.StatusNoContent, &response.Diagnostics)
+			if response.Diagnostics.HasError() {
+				return
+			}
+		}
+
+		// Link
+		if !(plan.VpcId.IsNull() || plan.VpcId.IsUnknown()) {
+			_ = utils.ExecuteRequest(func() (*iaas.LinkVirtualGatewayToVpcResponse, error) {
+				return r.provider.ApiClient.LinkVirtualGatewayToVpcWithResponse(
+					ctx,
+					r.provider.SpaceID,
+					state.Id.ValueString(),
+					iaas.LinkVirtualGatewayToVpcJSONRequestBody{
+						VpcId: plan.VpcId.ValueString(),
+					},
+				)
+			}, http.StatusOK, &response.Diagnostics)
+			if response.Diagnostics.HasError() {
+				return
+			}
+		}
+
+		modifications = true
+	}
+
 	if !modifications {
 		return
 	}
@@ -178,6 +235,22 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data resource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+
+	// Unlink
+	if !(data.VpcId.IsNull() || data.VpcId.IsUnknown()) {
+		_ = utils.ExecuteRequest(func() (*iaas.UnlinkVirtualGatewayToVpcResponse, error) {
+			return r.provider.ApiClient.UnlinkVirtualGatewayToVpcWithResponse(
+				ctx,
+				r.provider.SpaceID,
+				data.Id.ValueString(),
+				iaas.UnlinkVirtualGatewayToVpcJSONRequestBody{
+					VpcId: data.VpcId.ValueString(),
+				},
+			)
+		}, http.StatusNoContent, &response.Diagnostics)
+
+		// Note : don't return in case of error, we want to try to delete the resource anyway
+	}
 
 	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVirtualGatewayWithResponse)
 	if err != nil {

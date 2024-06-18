@@ -44,8 +44,8 @@ Optional:
 Read-Only:
 
 - `connection_type` (String) The type of VPN connection supported by the virtual gateway (only `ipsec.1` is supported).
-- `net_to_virtual_gateway_links` (Attributes List) The Net to which the virtual gateway is attached. (see [below for nested schema](#nestedatt--items--net_to_virtual_gateway_links))
 - `state` (String) The state of the virtual gateway (`pending` \| `available` \| `deleting` \| `deleted`).
+- `vpc_id` (String) The ID of the Net to which the virtual gateway is attached.
 
 <a id="nestedatt--items--tags"></a>
 ### Nested Schema for `items.tags`
@@ -54,12 +54,3 @@ Required:
 
 - `key` (String) The key of the tag, with a minimum of 1 character.
 - `value` (String) The value of the tag, between 0 and 255 characters.
-
-
-<a id="nestedatt--items--net_to_virtual_gateway_links"></a>
-### Nested Schema for `items.net_to_virtual_gateway_links`
-
-Read-Only:
-
-- `state` (String) The state of the attachment (`attaching` \| `attached` \| `detaching` \| `detached`).
-- `vpc_id` (String) The ID of the Net to which the virtual gateway is attached.

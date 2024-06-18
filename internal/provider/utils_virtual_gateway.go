@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
@@ -14,33 +13,38 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func vpcToVGLinkFromApi(ctx context.Context, from iaas.VpcToVirtualGatewayLink) (resource_virtual_gateway.NetToVirtualGatewayLinksValue, diag.Diagnostics) {
-	return resource_virtual_gateway.NewNetToVirtualGatewayLinksValue(
-		resource_virtual_gateway.NetToVirtualGatewayLinksValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{},
-	)
+/*
+The Linking of Virtual Gateway with VPC is weird on Outscale side :
+A Virtual Gateway can be linked to a single VPC, but vpcToVirtualGatewayLinks is an array of VPCs
+This array contains all the VPC that has been linked to the Virtual Gateway (a given VPC can appear multiple time)
+VPCs that have been unlinked have the state "detached", and the linked VPC (if any), have state "attached"
+
+This function retrieve the first (single) vpcId that has state attached, if any
+*/
+func getVpcId(vpcToVirtualGatewayLinks *[]iaas.VpcToVirtualGatewayLink) *string {
+	var vpcId *string
+
+	if vpcToVirtualGatewayLinks != nil {
+		vpcToVirtualGatewayLinksValue := *vpcToVirtualGatewayLinks
+
+		for _, vpc := range vpcToVirtualGatewayLinksValue {
+			if vpc.State != nil && vpc.VpcId != nil && *vpc.State == "attached" {
+				vpcId = vpc.VpcId
+				break
+			}
+		}
+	}
+
+	return vpcId
 }
 
 func VirtualGatewayFromHttpToTf(ctx context.Context, http *iaas.VirtualGateway) (*resource_virtual_gateway.VirtualGatewayModel, diag.Diagnostics) {
 	var (
-		diags                      diag.Diagnostics
-		tagsTf                     types.List
-		netToVirtualGatewaysLinkTd types.List
+		diags  diag.Diagnostics
+		tagsTf types.List
 	)
 
-	if http.VpcToVirtualGatewayLinks != nil {
-		netToVirtualGatewaysLinkTd, diags = utils.GenericListToTfListValue(
-			ctx,
-			resource_virtual_gateway.NetToVirtualGatewayLinksValue{},
-			vpcToVGLinkFromApi,
-			*http.VpcToVirtualGatewayLinks,
-		)
-		if diags.HasError() {
-			return nil, diags
-		}
-	} else {
-		netToVirtualGatewaysLinkTd = types.ListNull(resource_virtual_gateway.NetToVirtualGatewayLinksValue{}.Type(ctx))
-	}
+	vpcId := getVpcId(http.VpcToVirtualGatewayLinks)
 
 	if http.Tags != nil {
 		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
@@ -50,11 +54,11 @@ func VirtualGatewayFromHttpToTf(ctx context.Context, http *iaas.VirtualGateway) 
 	}
 
 	return &resource_virtual_gateway.VirtualGatewayModel{
-		ConnectionType:           types.StringPointerValue(http.ConnectionType),
-		Id:                       types.StringPointerValue(http.Id),
-		NetToVirtualGatewayLinks: netToVirtualGatewaysLinkTd,
-		State:                    types.StringPointerValue(http.State),
-		Tags:                     tagsTf,
+		ConnectionType: types.StringPointerValue(http.ConnectionType),
+		Id:             types.StringPointerValue(http.Id),
+		VpcId:          types.StringPointerValue(vpcId),
+		State:          types.StringPointerValue(http.State),
+		Tags:           tagsTf,
 	}, diags
 }
 
@@ -79,21 +83,10 @@ func VirtualGatewaysFromTfToAPIReadParams(ctx context.Context, tf VirtualGateway
 
 func VirtualGatewaysFromHttpToTfDatasource(ctx context.Context, http *iaas.VirtualGateway) (*datasource_virtual_gateway.VirtualGatewayModel, diag.Diagnostics) {
 	var (
-		netToVirtualGatewayLinks = types.ListNull(datasource_virtual_gateway.NetToVirtualGatewayLinksValue{}.Type(ctx))
-		diags                    diag.Diagnostics
-		tagsList                 types.List
+		diags    diag.Diagnostics
+		tagsList types.List
 	)
-	if http.VpcToVirtualGatewayLinks != nil {
-		netToVirtualGatewayLinks, diags = utils.GenericListToTfListValue(
-			ctx,
-			datasource_virtual_gateway.NetToVirtualGatewayLinksValue{},
-			fromVpcToVirtualGatewayLinkSchemaToTFVpcToVirtualGatewayLinkList,
-			*http.VpcToVirtualGatewayLinks,
-		)
-		if diags.HasError() {
-			return nil, diags
-		}
-	}
+
 	if http.Tags != nil {
 		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
 		if diags.HasError() {
@@ -101,20 +94,13 @@ func VirtualGatewaysFromHttpToTfDatasource(ctx context.Context, http *iaas.Virtu
 		}
 	}
 
-	return &datasource_virtual_gateway.VirtualGatewayModel{
-		Id:                       types.StringPointerValue(http.Id),
-		State:                    types.StringPointerValue(http.State),
-		ConnectionType:           types.StringPointerValue(http.ConnectionType),
-		NetToVirtualGatewayLinks: netToVirtualGatewayLinks,
-		Tags:                     tagsList,
-	}, nil
-}
+	vpcId := getVpcId(http.VpcToVirtualGatewayLinks)
 
-func fromVpcToVirtualGatewayLinkSchemaToTFVpcToVirtualGatewayLinkList(ctx context.Context, http iaas.VpcToVirtualGatewayLink) (datasource_virtual_gateway.NetToVirtualGatewayLinksValue, diag.Diagnostics) {
-	return datasource_virtual_gateway.NewNetToVirtualGatewayLinksValue(
-		datasource_virtual_gateway.NetToVirtualGatewayLinksValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"state":  types.StringPointerValue(http.State),
-			"vpc_id": types.StringPointerValue(http.VpcId),
-		})
+	return &datasource_virtual_gateway.VirtualGatewayModel{
+		Id:             types.StringPointerValue(http.Id),
+		State:          types.StringPointerValue(http.State),
+		ConnectionType: types.StringPointerValue(http.ConnectionType),
+		VpcId:          types.StringPointerValue(vpcId),
+		Tags:           tagsList,
+	}, nil
 }

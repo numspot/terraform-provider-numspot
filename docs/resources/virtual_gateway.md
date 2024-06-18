@@ -22,11 +22,11 @@ description: |-
 ### Optional
 
 - `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `vpc_id` (String) The ID of the Net to which the virtual gateway is attached.
 
 ### Read-Only
 
 - `id` (String) The ID of the virtual gateway.
-- `net_to_virtual_gateway_links` (Attributes List) The Net to which the virtual gateway is attached. (see [below for nested schema](#nestedatt--net_to_virtual_gateway_links))
 - `state` (String) The state of the virtual gateway (`pending` \| `available` \| `deleting` \| `deleted`).
 
 <a id="nestedatt--tags"></a>
@@ -36,12 +36,3 @@ Required:
 
 - `key` (String) The key of the tag, with a minimum of 1 character.
 - `value` (String) The value of the tag, between 0 and 255 characters.
-
-
-<a id="nestedatt--net_to_virtual_gateway_links"></a>
-### Nested Schema for `net_to_virtual_gateway_links`
-
-Read-Only:
-
-- `state` (String) The state of the attachment (`attaching` \| `attached` \| `detaching` \| `detached`).
-- `vpc_id` (String) The ID of the Net to which the virtual gateway is attached.
