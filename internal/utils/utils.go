@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/google/uuid"
@@ -341,16 +342,6 @@ func FromHttpGenericListToTfList[httpType any, tfType any](
 	return itemList, nil
 }
 
-func EmptyTrueBoolPointer() *bool {
-	value := true
-	return &value
-}
-
-func EmptyStrPointer() *string {
-	value := ""
-	return &value
-}
-
 func Diff[A basetypes.ObjectValuable](current, desired []A) (toCreate, toDelete []A) {
 	toCreate = make([]A, 0)
 	toDelete = make([]A, 0)
@@ -358,7 +349,7 @@ func Diff[A basetypes.ObjectValuable](current, desired []A) (toCreate, toDelete 
 	for _, ea := range desired {
 		found := false
 		for _, eb := range current {
-			if ea.Equal(eb) {
+			if reflect.DeepEqual(ea, eb) {
 				found = true
 			}
 		}
@@ -371,7 +362,7 @@ func Diff[A basetypes.ObjectValuable](current, desired []A) (toCreate, toDelete 
 	for _, ea := range current {
 		found := false
 		for _, eb := range desired {
-			if ea.Equal(eb) {
+			if reflect.DeepEqual(ea, eb) {
 				found = true
 			}
 		}
@@ -382,4 +373,14 @@ func Diff[A basetypes.ObjectValuable](current, desired []A) (toCreate, toDelete 
 	}
 
 	return
+}
+
+func EmptyTrueBoolPointer() *bool {
+	value := true
+	return &value
+}
+
+func EmptyStrPointer() *string {
+	value := ""
+	return &value
 }

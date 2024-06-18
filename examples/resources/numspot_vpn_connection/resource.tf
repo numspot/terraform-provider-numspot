@@ -20,4 +20,18 @@ resource "numspot_vpn_connection" "test" {
       value = "Terraform VPN Connection"
     }
   ]
+  vpn_options = {
+    phase2options = {
+      pre_shared_key = "sample key !"
+    }
+    tunnel_inside_ip_range = "169.254.254.22/30"
+  }
+  routes = [
+    {
+      destination_ip_range = "192.0.2.0/24"
+    },
+    {
+      destination_ip_range = "192.168.255.0/24"
+    }
+  ]
 }
