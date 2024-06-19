@@ -76,9 +76,9 @@ func RetryUnlinkUntilSuccess[A any, R TfRequestResp](
 	fun func(context.Context, iaas.SpaceId, string, A, ...iaas.RequestEditorFn) (R, error),
 ) error {
 	return retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
-		tflog.Debug(ctx, fmt.Sprintf("Retry unlink on resource: %s", resourceId))
+		tflog.Debug(ctx, fmt.Sprintf("Retry delete on resource: %s", resourceId))
 		res, err := fun(ctx, spaceId, resourceId, unlinkBody)
-		tflog.Debug(ctx, fmt.Sprintf("Retry unlink got response: %d", res.StatusCode()))
+		tflog.Debug(ctx, fmt.Sprintf("Retry delete got response: %d", res.StatusCode()))
 
 		return checkRetryCondition(res, err, StatusCodeStopRetryOnCreate, StatusCodeRetryOnCreate)
 	})

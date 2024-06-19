@@ -60,26 +60,16 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *iaas.LoadBalancer) (*re
 		tagsTf types.List
 	)
 
-	if http.ApplicationStickyCookiePolicies == nil {
-		return nil, diags
-	}
-
 	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags
 	}
 
-	if http.Listeners == nil {
-		return nil, diags
-	}
-	listeners, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ListenersValue{}, listenersFromHTTP, *http.Listeners)
+	listeners, diags := utils.GenericSetToTfSetValue(ctx, resource_load_balancer.ListenersValue{}, listenersFromHTTP, *http.Listeners)
 	if diags.HasError() {
 		return nil, diags
 	}
 
-	if http.StickyCookiePolicies == nil {
-		return nil, diags
-	}
 	stickyCookiePolicies, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags
@@ -159,26 +149,16 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *iaas.LoadBalancer) (*re
 }
 
 func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBalancer) (*datasource_load_balancer.LoadBalancerModel, diag.Diagnostics) {
-	var diags diag.Diagnostics
-	if http.ApplicationStickyCookiePolicies == nil {
-		return nil, diags
-	}
 	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags
 	}
 
-	if http.Listeners == nil {
-		return nil, diags
-	}
 	listeners, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ListenersValue{}, listenersFromHTTP, *http.Listeners)
 	if diags.HasError() {
 		return nil, diags
 	}
 
-	if http.StickyCookiePolicies == nil {
-		return nil, diags
-	}
 	stickyCookiePolicies, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags
@@ -230,7 +210,7 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBala
 func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) iaas.CreateLoadBalancerJSONRequestBody {
 	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
 	subnets := utils.TfStringListToStringList(ctx, tf.Subnets)
-	listeners := utils.TfListToGenericList(func(a resource_load_balancer.ListenersValue) iaas.ListenerForCreation {
+	listeners := utils.TfSetToGenericList(func(a resource_load_balancer.ListenersValue) iaas.ListenerForCreation {
 		return iaas.ListenerForCreation{
 			BackendPort:          utils.FromTfInt64ToInt(a.BackendPort),
 			BackendProtocol:      a.BackendProtocol.ValueStringPointer(),
@@ -276,7 +256,7 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_ba
 		securedCookies = tf.SecuredCookies.ValueBoolPointer()
 	}
 	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
-	listeners := utils.TfListToGenericList(func(elt resource_load_balancer.ListenersValue) iaas.Listener {
+	listeners := utils.TfSetToGenericSet(func(elt resource_load_balancer.ListenersValue) iaas.Listener {
 		policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames)
 		return iaas.Listener{
 			BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
@@ -303,20 +283,6 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_ba
 	}
 }
 
-func LoadBalancerHealthCheckToAttachHealthCheckRequest(healthCheck resource_load_balancer.HealthCheckValue) iaas.UpdateLoadBalancerJSONRequestBody {
-	return iaas.UpdateLoadBalancerJSONRequestBody{
-		HealthCheck: &iaas.HealthCheck{
-			CheckInterval:      utils.FromTfInt64ToInt(healthCheck.CheckInterval),
-			HealthyThreshold:   utils.FromTfInt64ToInt(healthCheck.HealthyThreshold),
-			Path:               healthCheck.Path.ValueStringPointer(),
-			Port:               utils.FromTfInt64ToInt(healthCheck.Port),
-			Protocol:           healthCheck.Protocol.ValueString(),
-			Timeout:            utils.FromTfInt64ToInt(healthCheck.Timeout),
-			UnhealthyThreshold: utils.FromTfInt64ToInt(healthCheck.UnhealthyThreshold),
-		},
-	}
-}
-
 func CreateLoadBalancerTags(
 	ctx context.Context,
 	spaceId iaas.SpaceId,
@@ -338,6 +304,32 @@ func CreateLoadBalancerTags(
 
 	_ = utils.ExecuteRequest(func() (*iaas.CreateLoadBalancerTagsResponse, error) {
 		return iaasClient.CreateLoadBalancerTagsWithResponse(ctx, spaceId, iaas.CreateLoadBalancerTagsRequest{
+			Names: []string{loadBalancerName},
+			Tags:  apiTags,
+		})
+	}, http.StatusNoContent, diags)
+}
+
+func DeleteLoadBalancerTags(
+	ctx context.Context,
+	spaceId iaas.SpaceId,
+	iaasClient *iaas.ClientWithResponses,
+	loadBalancerName string,
+	tagList types.List,
+	diags *diag.Diagnostics,
+) {
+	tfTags := make([]tags.TagsValue, 0, len(tagList.Elements()))
+	tagList.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]iaas.ResourceLoadBalancerTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, iaas.ResourceLoadBalancerTag{
+			Key: tfTag.Key.ValueStringPointer(),
+		})
+	}
+
+	_ = utils.ExecuteRequest(func() (*iaas.DeleteLoadBalancerTagsResponse, error) {
+		return iaasClient.DeleteLoadBalancerTagsWithResponse(ctx, spaceId, iaas.DeleteLoadBalancerTagsJSONRequestBody{
 			Names: []string{loadBalancerName},
 			Tags:  apiTags,
 		})

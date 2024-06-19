@@ -103,7 +103,7 @@ resource "numspot_load_balancer" "testlb" {
 
 ### Required
 
-- `listeners` (Attributes List) One or more listeners to create. (see [below for nested schema](#nestedatt--listeners))
+- `listeners` (Attributes Set) One or more listeners to create. (see [below for nested schema](#nestedatt--listeners))
 - `name` (String) The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).
 
 ### Optional
