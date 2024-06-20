@@ -90,7 +90,7 @@ type ACL struct {
 
 // ACLList List of ACLs.
 type ACLList struct {
-	Items *[]ACL `json:"items,omitempty"`
+	Items []ACL `json:"items"`
 }
 
 // ACLPaginatedList defines model for ACLPaginatedList.
@@ -1123,6 +1123,13 @@ type ListServiceAccountOrganisationParams struct {
 	Page *ListServiceAccounts `json:"page,omitempty"`
 }
 
+// GetACLServiceAccountOrganisationParams defines parameters for GetACLServiceAccountOrganisation.
+type GetACLServiceAccountOrganisationParams struct {
+	Service     string  `form:"service" json:"service"`
+	Resource    string  `form:"resource" json:"resource"`
+	Subresource *string `form:"subresource,omitempty" json:"subresource,omitempty"`
+}
+
 // ListSpacesOfServiceAccountParams defines parameters for ListSpacesOfServiceAccount.
 type ListSpacesOfServiceAccountParams struct {
 	// Page Paginated request
@@ -1144,17 +1151,17 @@ type ListUserOrganisationParams struct {
 	Page *ListUser `json:"page,omitempty"`
 }
 
+// GetACLUserOrganisationParams defines parameters for GetACLUserOrganisation.
+type GetACLUserOrganisationParams struct {
+	Service     string  `form:"service" json:"service"`
+	Resource    string  `form:"resource" json:"resource"`
+	Subresource *string `form:"subresource,omitempty" json:"subresource,omitempty"`
+}
+
 // ListSpacesOfUserParams defines parameters for ListSpacesOfUser.
 type ListSpacesOfUserParams struct {
 	// Page Paginated request
 	Page *ListSpacesOfUser `json:"page,omitempty"`
-}
-
-// GetACLOrganisationParams defines parameters for GetACLOrganisation.
-type GetACLOrganisationParams struct {
-	Service     string  `form:"service" json:"service"`
-	Resource    string  `form:"resource" json:"resource"`
-	Subresource *string `form:"subresource,omitempty" json:"subresource,omitempty"`
 }
 
 // RevokeParams defines parameters for Revoke.
@@ -1217,6 +1224,13 @@ type ListServiceAccountSpaceParams struct {
 	Page *ListServiceAccounts `json:"page,omitempty"`
 }
 
+// GetACLServiceAccountSpaceParams defines parameters for GetACLServiceAccountSpace.
+type GetACLServiceAccountSpaceParams struct {
+	Service     string  `form:"service" json:"service"`
+	Resource    string  `form:"resource" json:"resource"`
+	Subresource *string `form:"subresource,omitempty" json:"subresource,omitempty"`
+}
+
 // ListUserSpaceParams defines parameters for ListUserSpace.
 type ListUserSpaceParams struct {
 	// Email User email
@@ -1226,8 +1240,8 @@ type ListUserSpaceParams struct {
 	Page *ListUser `json:"page,omitempty"`
 }
 
-// GetACLSpaceParams defines parameters for GetACLSpace.
-type GetACLSpaceParams struct {
+// GetACLUserSpaceParams defines parameters for GetACLUserSpace.
+type GetACLUserSpaceParams struct {
 	Service     string  `form:"service" json:"service"`
 	Resource    string  `form:"resource" json:"resource"`
 	Subresource *string `form:"subresource,omitempty" json:"subresource,omitempty"`
@@ -1296,6 +1310,12 @@ type CreateServiceAccountOrganisationJSONRequestBody = ServiceAccount
 // UpdateServiceAccountOrganisationJSONRequestBody defines body for UpdateServiceAccountOrganisation for application/json ContentType.
 type UpdateServiceAccountOrganisationJSONRequestBody = ServiceAccount
 
+// DeleteACLServiceAccountOrganisationBulkJSONRequestBody defines body for DeleteACLServiceAccountOrganisationBulk for application/json ContentType.
+type DeleteACLServiceAccountOrganisationBulkJSONRequestBody = ACLList
+
+// CreateACLServiceAccountOrganisationBulkJSONRequestBody defines body for CreateACLServiceAccountOrganisationBulk for application/json ContentType.
+type CreateACLServiceAccountOrganisationBulkJSONRequestBody = ACLList
+
 // ListUserOrganisationJSONRequestBody defines body for ListUserOrganisation for application/json ContentType.
 type ListUserOrganisationJSONRequestBody = IdentitiesIdsList
 
@@ -1308,11 +1328,11 @@ type PatchUserStateOrganisationJSONRequestBody = UserState
 // UpdateUserOrganisationJSONRequestBody defines body for UpdateUserOrganisation for application/json ContentType.
 type UpdateUserOrganisationJSONRequestBody = UserUpdate
 
-// DeleteACLOrganisationBulkJSONRequestBody defines body for DeleteACLOrganisationBulk for application/json ContentType.
-type DeleteACLOrganisationBulkJSONRequestBody = ACLList
+// DeleteACLUserOrganisationBulkJSONRequestBody defines body for DeleteACLUserOrganisationBulk for application/json ContentType.
+type DeleteACLUserOrganisationBulkJSONRequestBody = ACLList
 
-// CreateACLOrganisationBulkJSONRequestBody defines body for CreateACLOrganisationBulk for application/json ContentType.
-type CreateACLOrganisationBulkJSONRequestBody = ACLList
+// CreateACLUserOrganisationBulkJSONRequestBody defines body for CreateACLUserOrganisationBulk for application/json ContentType.
+type CreateACLUserOrganisationBulkJSONRequestBody = ACLList
 
 // RevokeFormdataRequestBody defines body for Revoke for application/x-www-form-urlencoded ContentType.
 type RevokeFormdataRequestBody = TokenBody
@@ -1344,6 +1364,12 @@ type CreateServiceAccountSpaceJSONRequestBody = ServiceAccount
 // UpdateServiceAccountSpaceJSONRequestBody defines body for UpdateServiceAccountSpace for application/json ContentType.
 type UpdateServiceAccountSpaceJSONRequestBody = ServiceAccount
 
+// DeleteACLServiceAccountSpaceBulkJSONRequestBody defines body for DeleteACLServiceAccountSpaceBulk for application/json ContentType.
+type DeleteACLServiceAccountSpaceBulkJSONRequestBody = ACLList
+
+// CreateACLServiceAccountSpaceBulkJSONRequestBody defines body for CreateACLServiceAccountSpaceBulk for application/json ContentType.
+type CreateACLServiceAccountSpaceBulkJSONRequestBody = ACLList
+
 // ListUserSpaceJSONRequestBody defines body for ListUserSpace for application/json ContentType.
 type ListUserSpaceJSONRequestBody = IdentitiesIdsList
 
@@ -1356,11 +1382,11 @@ type PatchUserStateSpaceJSONRequestBody = UserState
 // UpdateUserSpaceJSONRequestBody defines body for UpdateUserSpace for application/json ContentType.
 type UpdateUserSpaceJSONRequestBody = UserUpdate
 
-// DeleteACLSpaceBulkJSONRequestBody defines body for DeleteACLSpaceBulk for application/json ContentType.
-type DeleteACLSpaceBulkJSONRequestBody = ACLList
+// DeleteACLUserSpaceBulkJSONRequestBody defines body for DeleteACLUserSpaceBulk for application/json ContentType.
+type DeleteACLUserSpaceBulkJSONRequestBody = ACLList
 
-// CreateACLSpaceBulkJSONRequestBody defines body for CreateACLSpaceBulk for application/json ContentType.
-type CreateACLSpaceBulkJSONRequestBody = ACLList
+// CreateACLUserSpaceBulkJSONRequestBody defines body for CreateACLUserSpaceBulk for application/json ContentType.
+type CreateACLUserSpaceBulkJSONRequestBody = ACLList
 
 // TokenFormdataRequestBody defines body for Token for application/x-www-form-urlencoded ContentType.
 type TokenFormdataRequestBody = TokenReq
@@ -1586,6 +1612,19 @@ type ClientInterface interface {
 
 	UpdateServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body UpdateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetACLServiceAccountOrganisation request
+	GetACLServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteACLServiceAccountOrganisationBulkWithBody request with any body
+	DeleteACLServiceAccountOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteACLServiceAccountOrganisationBulk(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateACLServiceAccountOrganisationBulkWithBody request with any body
+	CreateACLServiceAccountOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateACLServiceAccountOrganisationBulk(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListSpacesOfServiceAccount request
 	ListSpacesOfServiceAccount(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1618,24 +1657,24 @@ type ClientInterface interface {
 
 	UpdateUserOrganisation(ctx context.Context, organisationId OrganisationId, userId UserId, body UpdateUserOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetACLUserOrganisation request
+	GetACLUserOrganisation(ctx context.Context, organisationId OrganisationId, userId UserId, params *GetACLUserOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteACLUserOrganisationBulkWithBody request with any body
+	DeleteACLUserOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteACLUserOrganisationBulk(ctx context.Context, organisationId OrganisationId, userId UserId, body DeleteACLUserOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateACLUserOrganisationBulkWithBody request with any body
+	CreateACLUserOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateACLUserOrganisationBulk(ctx context.Context, organisationId OrganisationId, userId UserId, body CreateACLUserOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RecoverUserOrganisation request
 	RecoverUserOrganisation(ctx context.Context, organisationId OrganisationId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListSpacesOfUser request
 	ListSpacesOfUser(ctx context.Context, organisationId OrganisationId, userId UserId, params *ListSpacesOfUserParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetACLOrganisation request
-	GetACLOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteACLOrganisationBulkWithBody request with any body
-	DeleteACLOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	DeleteACLOrganisationBulk(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// CreateACLOrganisationBulkWithBody request with any body
-	CreateACLOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	CreateACLOrganisationBulk(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RevokeWithBody request with any body
 	RevokeWithBody(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1720,6 +1759,19 @@ type ClientInterface interface {
 
 	UpdateServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body UpdateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetACLServiceAccountSpace request
+	GetACLServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteACLServiceAccountSpaceBulkWithBody request with any body
+	DeleteACLServiceAccountSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteACLServiceAccountSpaceBulk(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateACLServiceAccountSpaceBulkWithBody request with any body
+	CreateACLServiceAccountSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateACLServiceAccountSpaceBulk(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListUserSpaceWithBody request with any body
 	ListUserSpaceWithBody(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -1749,21 +1801,21 @@ type ClientInterface interface {
 
 	UpdateUserSpace(ctx context.Context, spaceId SpaceId, userId UserId, body UpdateUserSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetACLUserSpace request
+	GetACLUserSpace(ctx context.Context, spaceId SpaceId, userId UserId, params *GetACLUserSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteACLUserSpaceBulkWithBody request with any body
+	DeleteACLUserSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DeleteACLUserSpaceBulk(ctx context.Context, spaceId SpaceId, userId UserId, body DeleteACLUserSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateACLUserSpaceBulkWithBody request with any body
+	CreateACLUserSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateACLUserSpaceBulk(ctx context.Context, spaceId SpaceId, userId UserId, body CreateACLUserSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RecoverUserSpace request
 	RecoverUserSpace(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetACLSpace request
-	GetACLSpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteACLSpaceBulkWithBody request with any body
-	DeleteACLSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	DeleteACLSpaceBulk(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// CreateACLSpaceBulkWithBody request with any body
-	CreateACLSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	CreateACLSpaceBulk(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// TokenWithBody request with any body
 	TokenWithBody(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -2416,6 +2468,66 @@ func (c *Client) UpdateServiceAccountOrganisation(ctx context.Context, organisat
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetACLServiceAccountOrganisation(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetACLServiceAccountOrganisationRequest(c.Server, organisationId, serviceAccountId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteACLServiceAccountOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteACLServiceAccountOrganisationBulkRequestWithBody(c.Server, organisationId, serviceAccountId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteACLServiceAccountOrganisationBulk(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteACLServiceAccountOrganisationBulkRequest(c.Server, organisationId, serviceAccountId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateACLServiceAccountOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateACLServiceAccountOrganisationBulkRequestWithBody(c.Server, organisationId, serviceAccountId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateACLServiceAccountOrganisationBulk(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateACLServiceAccountOrganisationBulkRequest(c.Server, organisationId, serviceAccountId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) ListSpacesOfServiceAccount(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListSpacesOfServiceAccountRequest(c.Server, organisationId, serviceAccountId, params)
 	if err != nil {
@@ -2560,6 +2672,66 @@ func (c *Client) UpdateUserOrganisation(ctx context.Context, organisationId Orga
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetACLUserOrganisation(ctx context.Context, organisationId OrganisationId, userId UserId, params *GetACLUserOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetACLUserOrganisationRequest(c.Server, organisationId, userId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteACLUserOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteACLUserOrganisationBulkRequestWithBody(c.Server, organisationId, userId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteACLUserOrganisationBulk(ctx context.Context, organisationId OrganisationId, userId UserId, body DeleteACLUserOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteACLUserOrganisationBulkRequest(c.Server, organisationId, userId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateACLUserOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateACLUserOrganisationBulkRequestWithBody(c.Server, organisationId, userId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateACLUserOrganisationBulk(ctx context.Context, organisationId OrganisationId, userId UserId, body CreateACLUserOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateACLUserOrganisationBulkRequest(c.Server, organisationId, userId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) RecoverUserOrganisation(ctx context.Context, organisationId OrganisationId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRecoverUserOrganisationRequest(c.Server, organisationId, userId)
 	if err != nil {
@@ -2574,66 +2746,6 @@ func (c *Client) RecoverUserOrganisation(ctx context.Context, organisationId Org
 
 func (c *Client) ListSpacesOfUser(ctx context.Context, organisationId OrganisationId, userId UserId, params *ListSpacesOfUserParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListSpacesOfUserRequest(c.Server, organisationId, userId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetACLOrganisation(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLOrganisationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetACLOrganisationRequest(c.Server, organisationId, subjectType, subjectId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteACLOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteACLOrganisationBulkRequestWithBody(c.Server, organisationId, subjectType, subjectId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteACLOrganisationBulk(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteACLOrganisationBulkRequest(c.Server, organisationId, subjectType, subjectId, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateACLOrganisationBulkWithBody(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateACLOrganisationBulkRequestWithBody(c.Server, organisationId, subjectType, subjectId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateACLOrganisationBulk(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateACLOrganisationBulkRequest(c.Server, organisationId, subjectType, subjectId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -3016,6 +3128,66 @@ func (c *Client) UpdateServiceAccountSpace(ctx context.Context, spaceId SpaceId,
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetACLServiceAccountSpace(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetACLServiceAccountSpaceRequest(c.Server, spaceId, serviceAccountId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteACLServiceAccountSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteACLServiceAccountSpaceBulkRequestWithBody(c.Server, spaceId, serviceAccountId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteACLServiceAccountSpaceBulk(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteACLServiceAccountSpaceBulkRequest(c.Server, spaceId, serviceAccountId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateACLServiceAccountSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateACLServiceAccountSpaceBulkRequestWithBody(c.Server, spaceId, serviceAccountId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateACLServiceAccountSpaceBulk(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateACLServiceAccountSpaceBulkRequest(c.Server, spaceId, serviceAccountId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) ListUserSpaceWithBody(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListUserSpaceRequestWithBody(c.Server, spaceId, params, contentType, body)
 	if err != nil {
@@ -3148,68 +3320,68 @@ func (c *Client) UpdateUserSpace(ctx context.Context, spaceId SpaceId, userId Us
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetACLUserSpace(ctx context.Context, spaceId SpaceId, userId UserId, params *GetACLUserSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetACLUserSpaceRequest(c.Server, spaceId, userId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteACLUserSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteACLUserSpaceBulkRequestWithBody(c.Server, spaceId, userId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteACLUserSpaceBulk(ctx context.Context, spaceId SpaceId, userId UserId, body DeleteACLUserSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteACLUserSpaceBulkRequest(c.Server, spaceId, userId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateACLUserSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateACLUserSpaceBulkRequestWithBody(c.Server, spaceId, userId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateACLUserSpaceBulk(ctx context.Context, spaceId SpaceId, userId UserId, body CreateACLUserSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateACLUserSpaceBulkRequest(c.Server, spaceId, userId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) RecoverUserSpace(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRecoverUserSpaceRequest(c.Server, spaceId, userId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetACLSpace(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLSpaceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetACLSpaceRequest(c.Server, spaceId, subjectType, subjectId, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteACLSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteACLSpaceBulkRequestWithBody(c.Server, spaceId, subjectType, subjectId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteACLSpaceBulk(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteACLSpaceBulkRequest(c.Server, spaceId, subjectType, subjectId, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateACLSpaceBulkWithBody(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateACLSpaceBulkRequestWithBody(c.Server, spaceId, subjectType, subjectId, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateACLSpaceBulk(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateACLSpaceBulkRequest(c.Server, spaceId, subjectType, subjectId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -5068,6 +5240,201 @@ func NewUpdateServiceAccountOrganisationRequestWithBody(server string, organisat
 	return req, nil
 }
 
+// NewGetACLServiceAccountOrganisationRequest generates requests for GetACLServiceAccountOrganisation
+func NewGetACLServiceAccountOrganisationRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountOrganisationParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s/acl", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "service", runtime.ParamLocationQuery, params.Service); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resource", runtime.ParamLocationQuery, params.Resource); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if params.Subresource != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "subresource", runtime.ParamLocationQuery, *params.Subresource); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteACLServiceAccountOrganisationBulkRequest calls the generic DeleteACLServiceAccountOrganisationBulk builder with application/json body
+func NewDeleteACLServiceAccountOrganisationBulkRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountOrganisationBulkJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteACLServiceAccountOrganisationBulkRequestWithBody(server, organisationId, serviceAccountId, "application/json", bodyReader)
+}
+
+// NewDeleteACLServiceAccountOrganisationBulkRequestWithBody generates requests for DeleteACLServiceAccountOrganisationBulk with any type of body
+func NewDeleteACLServiceAccountOrganisationBulkRequestWithBody(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s/bulk/acl", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateACLServiceAccountOrganisationBulkRequest calls the generic CreateACLServiceAccountOrganisationBulk builder with application/json body
+func NewCreateACLServiceAccountOrganisationBulkRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountOrganisationBulkJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateACLServiceAccountOrganisationBulkRequestWithBody(server, organisationId, serviceAccountId, "application/json", bodyReader)
+}
+
+// NewCreateACLServiceAccountOrganisationBulkRequestWithBody generates requests for CreateACLServiceAccountOrganisationBulk with any type of body
+func NewCreateACLServiceAccountOrganisationBulkRequestWithBody(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/serviceAccounts/%s/bulk/acl", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewListSpacesOfServiceAccountRequest generates requests for ListSpacesOfServiceAccount
 func NewListSpacesOfServiceAccountRequest(server string, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams) (*http.Request, error) {
 	var err error
@@ -5509,6 +5876,201 @@ func NewUpdateUserOrganisationRequestWithBody(server string, organisationId Orga
 	return req, nil
 }
 
+// NewGetACLUserOrganisationRequest generates requests for GetACLUserOrganisation
+func NewGetACLUserOrganisationRequest(server string, organisationId OrganisationId, userId UserId, params *GetACLUserOrganisationParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/users/%s/acl", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "service", runtime.ParamLocationQuery, params.Service); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resource", runtime.ParamLocationQuery, params.Resource); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if params.Subresource != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "subresource", runtime.ParamLocationQuery, *params.Subresource); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteACLUserOrganisationBulkRequest calls the generic DeleteACLUserOrganisationBulk builder with application/json body
+func NewDeleteACLUserOrganisationBulkRequest(server string, organisationId OrganisationId, userId UserId, body DeleteACLUserOrganisationBulkJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteACLUserOrganisationBulkRequestWithBody(server, organisationId, userId, "application/json", bodyReader)
+}
+
+// NewDeleteACLUserOrganisationBulkRequestWithBody generates requests for DeleteACLUserOrganisationBulk with any type of body
+func NewDeleteACLUserOrganisationBulkRequestWithBody(server string, organisationId OrganisationId, userId UserId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/users/%s/bulk/acl", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateACLUserOrganisationBulkRequest calls the generic CreateACLUserOrganisationBulk builder with application/json body
+func NewCreateACLUserOrganisationBulkRequest(server string, organisationId OrganisationId, userId UserId, body CreateACLUserOrganisationBulkJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateACLUserOrganisationBulkRequestWithBody(server, organisationId, userId, "application/json", bodyReader)
+}
+
+// NewCreateACLUserOrganisationBulkRequestWithBody generates requests for CreateACLUserOrganisationBulk with any type of body
+func NewCreateACLUserOrganisationBulkRequestWithBody(server string, organisationId OrganisationId, userId UserId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/organisations/%s/users/%s/bulk/acl", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewRecoverUserOrganisationRequest generates requests for RecoverUserOrganisation
 func NewRecoverUserOrganisationRequest(server string, organisationId OrganisationId, userId UserId) (*http.Request, error) {
 	var err error
@@ -5609,222 +6171,6 @@ func NewListSpacesOfUserRequest(server string, organisationId OrganisationId, us
 	if err != nil {
 		return nil, err
 	}
-
-	return req, nil
-}
-
-// NewGetACLOrganisationRequest generates requests for GetACLOrganisation
-func NewGetACLOrganisationRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLOrganisationParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam2 string
-
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/iam/organisations/%s/%s/%s/acl", pathParam0, pathParam1, pathParam2)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "service", runtime.ParamLocationQuery, params.Service); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resource", runtime.ParamLocationQuery, params.Resource); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		if params.Subresource != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "subresource", runtime.ParamLocationQuery, *params.Subresource); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewDeleteACLOrganisationBulkRequest calls the generic DeleteACLOrganisationBulk builder with application/json body
-func NewDeleteACLOrganisationBulkRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLOrganisationBulkJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewDeleteACLOrganisationBulkRequestWithBody(server, organisationId, subjectType, subjectId, "application/json", bodyReader)
-}
-
-// NewDeleteACLOrganisationBulkRequestWithBody generates requests for DeleteACLOrganisationBulk with any type of body
-func NewDeleteACLOrganisationBulkRequestWithBody(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam2 string
-
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/iam/organisations/%s/%s/%s/bulk/acl", pathParam0, pathParam1, pathParam2)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewCreateACLOrganisationBulkRequest calls the generic CreateACLOrganisationBulk builder with application/json body
-func NewCreateACLOrganisationBulkRequest(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLOrganisationBulkJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewCreateACLOrganisationBulkRequestWithBody(server, organisationId, subjectType, subjectId, "application/json", bodyReader)
-}
-
-// NewCreateACLOrganisationBulkRequestWithBody generates requests for CreateACLOrganisationBulk with any type of body
-func NewCreateACLOrganisationBulkRequestWithBody(server string, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "organisationId", runtime.ParamLocationPath, organisationId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam2 string
-
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/iam/organisations/%s/%s/%s/bulk/acl", pathParam0, pathParam1, pathParam2)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -6974,6 +7320,201 @@ func NewUpdateServiceAccountSpaceRequestWithBody(server string, spaceId SpaceId,
 	return req, nil
 }
 
+// NewGetACLServiceAccountSpaceRequest generates requests for GetACLServiceAccountSpace
+func NewGetACLServiceAccountSpaceRequest(server string, spaceId SpaceId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountSpaceParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/serviceAccounts/%s/acl", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "service", runtime.ParamLocationQuery, params.Service); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "resource", runtime.ParamLocationQuery, params.Resource); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if params.Subresource != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "subresource", runtime.ParamLocationQuery, *params.Subresource); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteACLServiceAccountSpaceBulkRequest calls the generic DeleteACLServiceAccountSpaceBulk builder with application/json body
+func NewDeleteACLServiceAccountSpaceBulkRequest(server string, spaceId SpaceId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountSpaceBulkJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDeleteACLServiceAccountSpaceBulkRequestWithBody(server, spaceId, serviceAccountId, "application/json", bodyReader)
+}
+
+// NewDeleteACLServiceAccountSpaceBulkRequestWithBody generates requests for DeleteACLServiceAccountSpaceBulk with any type of body
+func NewDeleteACLServiceAccountSpaceBulkRequestWithBody(server string, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/serviceAccounts/%s/bulk/acl", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewCreateACLServiceAccountSpaceBulkRequest calls the generic CreateACLServiceAccountSpaceBulk builder with application/json body
+func NewCreateACLServiceAccountSpaceBulkRequest(server string, spaceId SpaceId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountSpaceBulkJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateACLServiceAccountSpaceBulkRequestWithBody(server, spaceId, serviceAccountId, "application/json", bodyReader)
+}
+
+// NewCreateACLServiceAccountSpaceBulkRequestWithBody generates requests for CreateACLServiceAccountSpaceBulk with any type of body
+func NewCreateACLServiceAccountSpaceBulkRequestWithBody(server string, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountId", runtime.ParamLocationPath, serviceAccountId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/serviceAccounts/%s/bulk/acl", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewListUserSpaceRequest calls the generic ListUserSpace builder with application/json body
 func NewListUserSpaceRequest(server string, spaceId SpaceId, params *ListUserSpaceParams, body ListUserSpaceJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -7337,8 +7878,8 @@ func NewUpdateUserSpaceRequestWithBody(server string, spaceId SpaceId, userId Us
 	return req, nil
 }
 
-// NewRecoverUserSpaceRequest generates requests for RecoverUserSpace
-func NewRecoverUserSpaceRequest(server string, spaceId SpaceId, userId UserId) (*http.Request, error) {
+// NewGetACLUserSpaceRequest generates requests for GetACLUserSpace
+func NewGetACLUserSpaceRequest(server string, spaceId SpaceId, userId UserId, params *GetACLUserSpaceParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -7360,55 +7901,7 @@ func NewRecoverUserSpaceRequest(server string, spaceId SpaceId, userId UserId) (
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/iam/spaces/%s/users/%s/recover", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetACLSpaceRequest generates requests for GetACLSpace
-func NewGetACLSpaceRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLSpaceParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam2 string
-
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/iam/spaces/%s/%s/%s/acl", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/iam/spaces/%s/users/%s/acl", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -7472,19 +7965,19 @@ func NewGetACLSpaceRequest(server string, spaceId SpaceId, subjectType SubjectTy
 	return req, nil
 }
 
-// NewDeleteACLSpaceBulkRequest calls the generic DeleteACLSpaceBulk builder with application/json body
-func NewDeleteACLSpaceBulkRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLSpaceBulkJSONRequestBody) (*http.Request, error) {
+// NewDeleteACLUserSpaceBulkRequest calls the generic DeleteACLUserSpaceBulk builder with application/json body
+func NewDeleteACLUserSpaceBulkRequest(server string, spaceId SpaceId, userId UserId, body DeleteACLUserSpaceBulkJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewDeleteACLSpaceBulkRequestWithBody(server, spaceId, subjectType, subjectId, "application/json", bodyReader)
+	return NewDeleteACLUserSpaceBulkRequestWithBody(server, spaceId, userId, "application/json", bodyReader)
 }
 
-// NewDeleteACLSpaceBulkRequestWithBody generates requests for DeleteACLSpaceBulk with any type of body
-func NewDeleteACLSpaceBulkRequestWithBody(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader) (*http.Request, error) {
+// NewDeleteACLUserSpaceBulkRequestWithBody generates requests for DeleteACLUserSpaceBulk with any type of body
+func NewDeleteACLUserSpaceBulkRequestWithBody(server string, spaceId SpaceId, userId UserId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -7496,14 +7989,7 @@ func NewDeleteACLSpaceBulkRequestWithBody(server string, spaceId SpaceId, subjec
 
 	var pathParam1 string
 
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam2 string
-
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -7513,7 +7999,7 @@ func NewDeleteACLSpaceBulkRequestWithBody(server string, spaceId SpaceId, subjec
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/iam/spaces/%s/%s/%s/bulk/acl", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/iam/spaces/%s/users/%s/bulk/acl", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -7533,19 +8019,19 @@ func NewDeleteACLSpaceBulkRequestWithBody(server string, spaceId SpaceId, subjec
 	return req, nil
 }
 
-// NewCreateACLSpaceBulkRequest calls the generic CreateACLSpaceBulk builder with application/json body
-func NewCreateACLSpaceBulkRequest(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLSpaceBulkJSONRequestBody) (*http.Request, error) {
+// NewCreateACLUserSpaceBulkRequest calls the generic CreateACLUserSpaceBulk builder with application/json body
+func NewCreateACLUserSpaceBulkRequest(server string, spaceId SpaceId, userId UserId, body CreateACLUserSpaceBulkJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateACLSpaceBulkRequestWithBody(server, spaceId, subjectType, subjectId, "application/json", bodyReader)
+	return NewCreateACLUserSpaceBulkRequestWithBody(server, spaceId, userId, "application/json", bodyReader)
 }
 
-// NewCreateACLSpaceBulkRequestWithBody generates requests for CreateACLSpaceBulk with any type of body
-func NewCreateACLSpaceBulkRequestWithBody(server string, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateACLUserSpaceBulkRequestWithBody generates requests for CreateACLUserSpaceBulk with any type of body
+func NewCreateACLUserSpaceBulkRequestWithBody(server string, spaceId SpaceId, userId UserId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -7557,14 +8043,7 @@ func NewCreateACLSpaceBulkRequestWithBody(server string, spaceId SpaceId, subjec
 
 	var pathParam1 string
 
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "subjectType", runtime.ParamLocationPath, subjectType)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam2 string
-
-	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "subjectId", runtime.ParamLocationPath, subjectId)
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -7574,7 +8053,7 @@ func NewCreateACLSpaceBulkRequestWithBody(server string, spaceId SpaceId, subjec
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/iam/spaces/%s/%s/%s/bulk/acl", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/iam/spaces/%s/users/%s/bulk/acl", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -7590,6 +8069,47 @@ func NewCreateACLSpaceBulkRequestWithBody(server string, spaceId SpaceId, subjec
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRecoverUserSpaceRequest generates requests for RecoverUserSpace
+func NewRecoverUserSpaceRequest(server string, spaceId SpaceId, userId UserId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "userId", runtime.ParamLocationPath, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/iam/spaces/%s/users/%s/recover", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -8062,6 +8582,19 @@ type ClientWithResponsesInterface interface {
 
 	UpdateServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body UpdateServiceAccountOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountOrganisationResponse, error)
 
+	// GetACLServiceAccountOrganisationWithResponse request
+	GetACLServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*GetACLServiceAccountOrganisationResponse, error)
+
+	// DeleteACLServiceAccountOrganisationBulkWithBodyWithResponse request with any body
+	DeleteACLServiceAccountOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountOrganisationBulkResponse, error)
+
+	DeleteACLServiceAccountOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountOrganisationBulkResponse, error)
+
+	// CreateACLServiceAccountOrganisationBulkWithBodyWithResponse request with any body
+	CreateACLServiceAccountOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLServiceAccountOrganisationBulkResponse, error)
+
+	CreateACLServiceAccountOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLServiceAccountOrganisationBulkResponse, error)
+
 	// ListSpacesOfServiceAccountWithResponse request
 	ListSpacesOfServiceAccountWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams, reqEditors ...RequestEditorFn) (*ListSpacesOfServiceAccountResponse, error)
 
@@ -8094,24 +8627,24 @@ type ClientWithResponsesInterface interface {
 
 	UpdateUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, body UpdateUserOrganisationJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserOrganisationResponse, error)
 
+	// GetACLUserOrganisationWithResponse request
+	GetACLUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, params *GetACLUserOrganisationParams, reqEditors ...RequestEditorFn) (*GetACLUserOrganisationResponse, error)
+
+	// DeleteACLUserOrganisationBulkWithBodyWithResponse request with any body
+	DeleteACLUserOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLUserOrganisationBulkResponse, error)
+
+	DeleteACLUserOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, body DeleteACLUserOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLUserOrganisationBulkResponse, error)
+
+	// CreateACLUserOrganisationBulkWithBodyWithResponse request with any body
+	CreateACLUserOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLUserOrganisationBulkResponse, error)
+
+	CreateACLUserOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, body CreateACLUserOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLUserOrganisationBulkResponse, error)
+
 	// RecoverUserOrganisationWithResponse request
 	RecoverUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, reqEditors ...RequestEditorFn) (*RecoverUserOrganisationResponse, error)
 
 	// ListSpacesOfUserWithResponse request
 	ListSpacesOfUserWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, params *ListSpacesOfUserParams, reqEditors ...RequestEditorFn) (*ListSpacesOfUserResponse, error)
-
-	// GetACLOrganisationWithResponse request
-	GetACLOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLOrganisationParams, reqEditors ...RequestEditorFn) (*GetACLOrganisationResponse, error)
-
-	// DeleteACLOrganisationBulkWithBodyWithResponse request with any body
-	DeleteACLOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLOrganisationBulkResponse, error)
-
-	DeleteACLOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLOrganisationBulkResponse, error)
-
-	// CreateACLOrganisationBulkWithBodyWithResponse request with any body
-	CreateACLOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLOrganisationBulkResponse, error)
-
-	CreateACLOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLOrganisationBulkResponse, error)
 
 	// RevokeWithBodyWithResponse request with any body
 	RevokeWithBodyWithResponse(ctx context.Context, params *RevokeParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RevokeResponse, error)
@@ -8196,6 +8729,19 @@ type ClientWithResponsesInterface interface {
 
 	UpdateServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body UpdateServiceAccountSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateServiceAccountSpaceResponse, error)
 
+	// GetACLServiceAccountSpaceWithResponse request
+	GetACLServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*GetACLServiceAccountSpaceResponse, error)
+
+	// DeleteACLServiceAccountSpaceBulkWithBodyWithResponse request with any body
+	DeleteACLServiceAccountSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountSpaceBulkResponse, error)
+
+	DeleteACLServiceAccountSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountSpaceBulkResponse, error)
+
+	// CreateACLServiceAccountSpaceBulkWithBodyWithResponse request with any body
+	CreateACLServiceAccountSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLServiceAccountSpaceBulkResponse, error)
+
+	CreateACLServiceAccountSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLServiceAccountSpaceBulkResponse, error)
+
 	// ListUserSpaceWithBodyWithResponse request with any body
 	ListUserSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListUserSpaceResponse, error)
 
@@ -8225,21 +8771,21 @@ type ClientWithResponsesInterface interface {
 
 	UpdateUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, body UpdateUserSpaceJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateUserSpaceResponse, error)
 
+	// GetACLUserSpaceWithResponse request
+	GetACLUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, params *GetACLUserSpaceParams, reqEditors ...RequestEditorFn) (*GetACLUserSpaceResponse, error)
+
+	// DeleteACLUserSpaceBulkWithBodyWithResponse request with any body
+	DeleteACLUserSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLUserSpaceBulkResponse, error)
+
+	DeleteACLUserSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, body DeleteACLUserSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLUserSpaceBulkResponse, error)
+
+	// CreateACLUserSpaceBulkWithBodyWithResponse request with any body
+	CreateACLUserSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLUserSpaceBulkResponse, error)
+
+	CreateACLUserSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, body CreateACLUserSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLUserSpaceBulkResponse, error)
+
 	// RecoverUserSpaceWithResponse request
 	RecoverUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*RecoverUserSpaceResponse, error)
-
-	// GetACLSpaceWithResponse request
-	GetACLSpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLSpaceParams, reqEditors ...RequestEditorFn) (*GetACLSpaceResponse, error)
-
-	// DeleteACLSpaceBulkWithBodyWithResponse request with any body
-	DeleteACLSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLSpaceBulkResponse, error)
-
-	DeleteACLSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLSpaceBulkResponse, error)
-
-	// CreateACLSpaceBulkWithBodyWithResponse request with any body
-	CreateACLSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLSpaceBulkResponse, error)
-
-	CreateACLSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLSpaceBulkResponse, error)
 
 	// TokenWithBodyWithResponse request with any body
 	TokenWithBodyWithResponse(ctx context.Context, params *TokenParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*TokenResponse, error)
@@ -9145,6 +9691,85 @@ func (r UpdateServiceAccountOrganisationResponse) StatusCode() int {
 	return 0
 }
 
+type GetACLServiceAccountOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetACL200ResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetACLServiceAccountOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetACLServiceAccountOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteACLServiceAccountOrganisationBulkResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteACLServiceAccountOrganisationBulkResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteACLServiceAccountOrganisationBulkResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateACLServiceAccountOrganisationBulkResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateACLServiceAccountOrganisationBulkResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateACLServiceAccountOrganisationBulkResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListSpacesOfServiceAccountResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -9361,6 +9986,85 @@ func (r UpdateUserOrganisationResponse) StatusCode() int {
 	return 0
 }
 
+type GetACLUserOrganisationResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetACL200ResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetACLUserOrganisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetACLUserOrganisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteACLUserOrganisationBulkResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteACLUserOrganisationBulkResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteACLUserOrganisationBulkResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateACLUserOrganisationBulkResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateACLUserOrganisationBulkResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateACLUserOrganisationBulkResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RecoverUserOrganisationResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -9408,85 +10112,6 @@ func (r ListSpacesOfUserResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ListSpacesOfUserResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetACLOrganisationResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	JSON200                   *GetACL200ResponseSchema
-	ApplicationproblemJSON400 *BadRequestError
-	ApplicationproblemJSON401 *Error
-	ApplicationproblemJSON403 *Error
-	ApplicationproblemJSON404 *Error
-	ApplicationproblemJSON500 *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r GetACLOrganisationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetACLOrganisationResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type DeleteACLOrganisationBulkResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	ApplicationproblemJSON400 *BadRequestError
-	ApplicationproblemJSON401 *Error
-	ApplicationproblemJSON403 *Error
-	ApplicationproblemJSON404 *Error
-	ApplicationproblemJSON500 *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r DeleteACLOrganisationBulkResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r DeleteACLOrganisationBulkResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type CreateACLOrganisationBulkResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	ApplicationproblemJSON400 *BadRequestError
-	ApplicationproblemJSON401 *Error
-	ApplicationproblemJSON403 *Error
-	ApplicationproblemJSON404 *Error
-	ApplicationproblemJSON500 *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r CreateACLOrganisationBulkResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r CreateACLOrganisationBulkResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -10040,6 +10665,85 @@ func (r UpdateServiceAccountSpaceResponse) StatusCode() int {
 	return 0
 }
 
+type GetACLServiceAccountSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetACL200ResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetACLServiceAccountSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetACLServiceAccountSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteACLServiceAccountSpaceBulkResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteACLServiceAccountSpaceBulkResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteACLServiceAccountSpaceBulkResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateACLServiceAccountSpaceBulkResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateACLServiceAccountSpaceBulkResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateACLServiceAccountSpaceBulkResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListUserSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -10228,6 +10932,85 @@ func (r UpdateUserSpaceResponse) StatusCode() int {
 	return 0
 }
 
+type GetACLUserSpaceResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *GetACL200ResponseSchema
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetACLUserSpaceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetACLUserSpaceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteACLUserSpaceBulkResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteACLUserSpaceBulkResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteACLUserSpaceBulkResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateACLUserSpaceBulkResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	ApplicationproblemJSON400 *BadRequestError
+	ApplicationproblemJSON401 *Error
+	ApplicationproblemJSON403 *Error
+	ApplicationproblemJSON404 *Error
+	ApplicationproblemJSON500 *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateACLUserSpaceBulkResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateACLUserSpaceBulkResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RecoverUserSpaceResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
@@ -10248,85 +11031,6 @@ func (r RecoverUserSpaceResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r RecoverUserSpaceResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetACLSpaceResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	JSON200                   *GetACL200ResponseSchema
-	ApplicationproblemJSON400 *BadRequestError
-	ApplicationproblemJSON401 *Error
-	ApplicationproblemJSON403 *Error
-	ApplicationproblemJSON404 *Error
-	ApplicationproblemJSON500 *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r GetACLSpaceResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetACLSpaceResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type DeleteACLSpaceBulkResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	ApplicationproblemJSON400 *BadRequestError
-	ApplicationproblemJSON401 *Error
-	ApplicationproblemJSON403 *Error
-	ApplicationproblemJSON404 *Error
-	ApplicationproblemJSON500 *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r DeleteACLSpaceBulkResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r DeleteACLSpaceBulkResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type CreateACLSpaceBulkResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	ApplicationproblemJSON400 *BadRequestError
-	ApplicationproblemJSON401 *Error
-	ApplicationproblemJSON403 *Error
-	ApplicationproblemJSON404 *Error
-	ApplicationproblemJSON500 *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r CreateACLSpaceBulkResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r CreateACLSpaceBulkResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -10939,6 +11643,49 @@ func (c *ClientWithResponses) UpdateServiceAccountOrganisationWithResponse(ctx c
 	return ParseUpdateServiceAccountOrganisationResponse(rsp)
 }
 
+// GetACLServiceAccountOrganisationWithResponse request returning *GetACLServiceAccountOrganisationResponse
+func (c *ClientWithResponses) GetACLServiceAccountOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountOrganisationParams, reqEditors ...RequestEditorFn) (*GetACLServiceAccountOrganisationResponse, error) {
+	rsp, err := c.GetACLServiceAccountOrganisation(ctx, organisationId, serviceAccountId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetACLServiceAccountOrganisationResponse(rsp)
+}
+
+// DeleteACLServiceAccountOrganisationBulkWithBodyWithResponse request with arbitrary body returning *DeleteACLServiceAccountOrganisationBulkResponse
+func (c *ClientWithResponses) DeleteACLServiceAccountOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountOrganisationBulkResponse, error) {
+	rsp, err := c.DeleteACLServiceAccountOrganisationBulkWithBody(ctx, organisationId, serviceAccountId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteACLServiceAccountOrganisationBulkResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteACLServiceAccountOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountOrganisationBulkResponse, error) {
+	rsp, err := c.DeleteACLServiceAccountOrganisationBulk(ctx, organisationId, serviceAccountId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteACLServiceAccountOrganisationBulkResponse(rsp)
+}
+
+// CreateACLServiceAccountOrganisationBulkWithBodyWithResponse request with arbitrary body returning *CreateACLServiceAccountOrganisationBulkResponse
+func (c *ClientWithResponses) CreateACLServiceAccountOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLServiceAccountOrganisationBulkResponse, error) {
+	rsp, err := c.CreateACLServiceAccountOrganisationBulkWithBody(ctx, organisationId, serviceAccountId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateACLServiceAccountOrganisationBulkResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateACLServiceAccountOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLServiceAccountOrganisationBulkResponse, error) {
+	rsp, err := c.CreateACLServiceAccountOrganisationBulk(ctx, organisationId, serviceAccountId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateACLServiceAccountOrganisationBulkResponse(rsp)
+}
+
 // ListSpacesOfServiceAccountWithResponse request returning *ListSpacesOfServiceAccountResponse
 func (c *ClientWithResponses) ListSpacesOfServiceAccountWithResponse(ctx context.Context, organisationId OrganisationId, serviceAccountId ServiceAccountId, params *ListSpacesOfServiceAccountParams, reqEditors ...RequestEditorFn) (*ListSpacesOfServiceAccountResponse, error) {
 	rsp, err := c.ListSpacesOfServiceAccount(ctx, organisationId, serviceAccountId, params, reqEditors...)
@@ -11043,6 +11790,49 @@ func (c *ClientWithResponses) UpdateUserOrganisationWithResponse(ctx context.Con
 	return ParseUpdateUserOrganisationResponse(rsp)
 }
 
+// GetACLUserOrganisationWithResponse request returning *GetACLUserOrganisationResponse
+func (c *ClientWithResponses) GetACLUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, params *GetACLUserOrganisationParams, reqEditors ...RequestEditorFn) (*GetACLUserOrganisationResponse, error) {
+	rsp, err := c.GetACLUserOrganisation(ctx, organisationId, userId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetACLUserOrganisationResponse(rsp)
+}
+
+// DeleteACLUserOrganisationBulkWithBodyWithResponse request with arbitrary body returning *DeleteACLUserOrganisationBulkResponse
+func (c *ClientWithResponses) DeleteACLUserOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLUserOrganisationBulkResponse, error) {
+	rsp, err := c.DeleteACLUserOrganisationBulkWithBody(ctx, organisationId, userId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteACLUserOrganisationBulkResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteACLUserOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, body DeleteACLUserOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLUserOrganisationBulkResponse, error) {
+	rsp, err := c.DeleteACLUserOrganisationBulk(ctx, organisationId, userId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteACLUserOrganisationBulkResponse(rsp)
+}
+
+// CreateACLUserOrganisationBulkWithBodyWithResponse request with arbitrary body returning *CreateACLUserOrganisationBulkResponse
+func (c *ClientWithResponses) CreateACLUserOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLUserOrganisationBulkResponse, error) {
+	rsp, err := c.CreateACLUserOrganisationBulkWithBody(ctx, organisationId, userId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateACLUserOrganisationBulkResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateACLUserOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, body CreateACLUserOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLUserOrganisationBulkResponse, error) {
+	rsp, err := c.CreateACLUserOrganisationBulk(ctx, organisationId, userId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateACLUserOrganisationBulkResponse(rsp)
+}
+
 // RecoverUserOrganisationWithResponse request returning *RecoverUserOrganisationResponse
 func (c *ClientWithResponses) RecoverUserOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, userId UserId, reqEditors ...RequestEditorFn) (*RecoverUserOrganisationResponse, error) {
 	rsp, err := c.RecoverUserOrganisation(ctx, organisationId, userId, reqEditors...)
@@ -11059,49 +11849,6 @@ func (c *ClientWithResponses) ListSpacesOfUserWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParseListSpacesOfUserResponse(rsp)
-}
-
-// GetACLOrganisationWithResponse request returning *GetACLOrganisationResponse
-func (c *ClientWithResponses) GetACLOrganisationWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLOrganisationParams, reqEditors ...RequestEditorFn) (*GetACLOrganisationResponse, error) {
-	rsp, err := c.GetACLOrganisation(ctx, organisationId, subjectType, subjectId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetACLOrganisationResponse(rsp)
-}
-
-// DeleteACLOrganisationBulkWithBodyWithResponse request with arbitrary body returning *DeleteACLOrganisationBulkResponse
-func (c *ClientWithResponses) DeleteACLOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLOrganisationBulkResponse, error) {
-	rsp, err := c.DeleteACLOrganisationBulkWithBody(ctx, organisationId, subjectType, subjectId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteACLOrganisationBulkResponse(rsp)
-}
-
-func (c *ClientWithResponses) DeleteACLOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLOrganisationBulkResponse, error) {
-	rsp, err := c.DeleteACLOrganisationBulk(ctx, organisationId, subjectType, subjectId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteACLOrganisationBulkResponse(rsp)
-}
-
-// CreateACLOrganisationBulkWithBodyWithResponse request with arbitrary body returning *CreateACLOrganisationBulkResponse
-func (c *ClientWithResponses) CreateACLOrganisationBulkWithBodyWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLOrganisationBulkResponse, error) {
-	rsp, err := c.CreateACLOrganisationBulkWithBody(ctx, organisationId, subjectType, subjectId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateACLOrganisationBulkResponse(rsp)
-}
-
-func (c *ClientWithResponses) CreateACLOrganisationBulkWithResponse(ctx context.Context, organisationId OrganisationId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLOrganisationBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLOrganisationBulkResponse, error) {
-	rsp, err := c.CreateACLOrganisationBulk(ctx, organisationId, subjectType, subjectId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateACLOrganisationBulkResponse(rsp)
 }
 
 // RevokeWithBodyWithResponse request with arbitrary body returning *RevokeResponse
@@ -11373,6 +12120,49 @@ func (c *ClientWithResponses) UpdateServiceAccountSpaceWithResponse(ctx context.
 	return ParseUpdateServiceAccountSpaceResponse(rsp)
 }
 
+// GetACLServiceAccountSpaceWithResponse request returning *GetACLServiceAccountSpaceResponse
+func (c *ClientWithResponses) GetACLServiceAccountSpaceWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, params *GetACLServiceAccountSpaceParams, reqEditors ...RequestEditorFn) (*GetACLServiceAccountSpaceResponse, error) {
+	rsp, err := c.GetACLServiceAccountSpace(ctx, spaceId, serviceAccountId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetACLServiceAccountSpaceResponse(rsp)
+}
+
+// DeleteACLServiceAccountSpaceBulkWithBodyWithResponse request with arbitrary body returning *DeleteACLServiceAccountSpaceBulkResponse
+func (c *ClientWithResponses) DeleteACLServiceAccountSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountSpaceBulkResponse, error) {
+	rsp, err := c.DeleteACLServiceAccountSpaceBulkWithBody(ctx, spaceId, serviceAccountId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteACLServiceAccountSpaceBulkResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteACLServiceAccountSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body DeleteACLServiceAccountSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLServiceAccountSpaceBulkResponse, error) {
+	rsp, err := c.DeleteACLServiceAccountSpaceBulk(ctx, spaceId, serviceAccountId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteACLServiceAccountSpaceBulkResponse(rsp)
+}
+
+// CreateACLServiceAccountSpaceBulkWithBodyWithResponse request with arbitrary body returning *CreateACLServiceAccountSpaceBulkResponse
+func (c *ClientWithResponses) CreateACLServiceAccountSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLServiceAccountSpaceBulkResponse, error) {
+	rsp, err := c.CreateACLServiceAccountSpaceBulkWithBody(ctx, spaceId, serviceAccountId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateACLServiceAccountSpaceBulkResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateACLServiceAccountSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, serviceAccountId ServiceAccountId, body CreateACLServiceAccountSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLServiceAccountSpaceBulkResponse, error) {
+	rsp, err := c.CreateACLServiceAccountSpaceBulk(ctx, spaceId, serviceAccountId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateACLServiceAccountSpaceBulkResponse(rsp)
+}
+
 // ListUserSpaceWithBodyWithResponse request with arbitrary body returning *ListUserSpaceResponse
 func (c *ClientWithResponses) ListUserSpaceWithBodyWithResponse(ctx context.Context, spaceId SpaceId, params *ListUserSpaceParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ListUserSpaceResponse, error) {
 	rsp, err := c.ListUserSpaceWithBody(ctx, spaceId, params, contentType, body, reqEditors...)
@@ -11468,6 +12258,49 @@ func (c *ClientWithResponses) UpdateUserSpaceWithResponse(ctx context.Context, s
 	return ParseUpdateUserSpaceResponse(rsp)
 }
 
+// GetACLUserSpaceWithResponse request returning *GetACLUserSpaceResponse
+func (c *ClientWithResponses) GetACLUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, params *GetACLUserSpaceParams, reqEditors ...RequestEditorFn) (*GetACLUserSpaceResponse, error) {
+	rsp, err := c.GetACLUserSpace(ctx, spaceId, userId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetACLUserSpaceResponse(rsp)
+}
+
+// DeleteACLUserSpaceBulkWithBodyWithResponse request with arbitrary body returning *DeleteACLUserSpaceBulkResponse
+func (c *ClientWithResponses) DeleteACLUserSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLUserSpaceBulkResponse, error) {
+	rsp, err := c.DeleteACLUserSpaceBulkWithBody(ctx, spaceId, userId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteACLUserSpaceBulkResponse(rsp)
+}
+
+func (c *ClientWithResponses) DeleteACLUserSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, body DeleteACLUserSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLUserSpaceBulkResponse, error) {
+	rsp, err := c.DeleteACLUserSpaceBulk(ctx, spaceId, userId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteACLUserSpaceBulkResponse(rsp)
+}
+
+// CreateACLUserSpaceBulkWithBodyWithResponse request with arbitrary body returning *CreateACLUserSpaceBulkResponse
+func (c *ClientWithResponses) CreateACLUserSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLUserSpaceBulkResponse, error) {
+	rsp, err := c.CreateACLUserSpaceBulkWithBody(ctx, spaceId, userId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateACLUserSpaceBulkResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateACLUserSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, body CreateACLUserSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLUserSpaceBulkResponse, error) {
+	rsp, err := c.CreateACLUserSpaceBulk(ctx, spaceId, userId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateACLUserSpaceBulkResponse(rsp)
+}
+
 // RecoverUserSpaceWithResponse request returning *RecoverUserSpaceResponse
 func (c *ClientWithResponses) RecoverUserSpaceWithResponse(ctx context.Context, spaceId SpaceId, userId UserId, reqEditors ...RequestEditorFn) (*RecoverUserSpaceResponse, error) {
 	rsp, err := c.RecoverUserSpace(ctx, spaceId, userId, reqEditors...)
@@ -11475,49 +12308,6 @@ func (c *ClientWithResponses) RecoverUserSpaceWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParseRecoverUserSpaceResponse(rsp)
-}
-
-// GetACLSpaceWithResponse request returning *GetACLSpaceResponse
-func (c *ClientWithResponses) GetACLSpaceWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, params *GetACLSpaceParams, reqEditors ...RequestEditorFn) (*GetACLSpaceResponse, error) {
-	rsp, err := c.GetACLSpace(ctx, spaceId, subjectType, subjectId, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetACLSpaceResponse(rsp)
-}
-
-// DeleteACLSpaceBulkWithBodyWithResponse request with arbitrary body returning *DeleteACLSpaceBulkResponse
-func (c *ClientWithResponses) DeleteACLSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteACLSpaceBulkResponse, error) {
-	rsp, err := c.DeleteACLSpaceBulkWithBody(ctx, spaceId, subjectType, subjectId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteACLSpaceBulkResponse(rsp)
-}
-
-func (c *ClientWithResponses) DeleteACLSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body DeleteACLSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*DeleteACLSpaceBulkResponse, error) {
-	rsp, err := c.DeleteACLSpaceBulk(ctx, spaceId, subjectType, subjectId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteACLSpaceBulkResponse(rsp)
-}
-
-// CreateACLSpaceBulkWithBodyWithResponse request with arbitrary body returning *CreateACLSpaceBulkResponse
-func (c *ClientWithResponses) CreateACLSpaceBulkWithBodyWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateACLSpaceBulkResponse, error) {
-	rsp, err := c.CreateACLSpaceBulkWithBody(ctx, spaceId, subjectType, subjectId, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateACLSpaceBulkResponse(rsp)
-}
-
-func (c *ClientWithResponses) CreateACLSpaceBulkWithResponse(ctx context.Context, spaceId SpaceId, subjectType SubjectTypeParam, subjectId SubjectId, body CreateACLSpaceBulkJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateACLSpaceBulkResponse, error) {
-	rsp, err := c.CreateACLSpaceBulk(ctx, spaceId, subjectType, subjectId, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateACLSpaceBulkResponse(rsp)
 }
 
 // TokenWithBodyWithResponse request with arbitrary body returning *TokenResponse
@@ -13265,6 +14055,175 @@ func ParseUpdateServiceAccountOrganisationResponse(rsp *http.Response) (*UpdateS
 	return response, nil
 }
 
+// ParseGetACLServiceAccountOrganisationResponse parses an HTTP response from a GetACLServiceAccountOrganisationWithResponse call
+func ParseGetACLServiceAccountOrganisationResponse(rsp *http.Response) (*GetACLServiceAccountOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetACLServiceAccountOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetACL200ResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteACLServiceAccountOrganisationBulkResponse parses an HTTP response from a DeleteACLServiceAccountOrganisationBulkWithResponse call
+func ParseDeleteACLServiceAccountOrganisationBulkResponse(rsp *http.Response) (*DeleteACLServiceAccountOrganisationBulkResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteACLServiceAccountOrganisationBulkResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateACLServiceAccountOrganisationBulkResponse parses an HTTP response from a CreateACLServiceAccountOrganisationBulkWithResponse call
+func ParseCreateACLServiceAccountOrganisationBulkResponse(rsp *http.Response) (*CreateACLServiceAccountOrganisationBulkResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateACLServiceAccountOrganisationBulkResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListSpacesOfServiceAccountResponse parses an HTTP response from a ListSpacesOfServiceAccountWithResponse call
 func ParseListSpacesOfServiceAccountResponse(rsp *http.Response) (*ListSpacesOfServiceAccountResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -13753,6 +14712,175 @@ func ParseUpdateUserOrganisationResponse(rsp *http.Response) (*UpdateUserOrganis
 	return response, nil
 }
 
+// ParseGetACLUserOrganisationResponse parses an HTTP response from a GetACLUserOrganisationWithResponse call
+func ParseGetACLUserOrganisationResponse(rsp *http.Response) (*GetACLUserOrganisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetACLUserOrganisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetACL200ResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteACLUserOrganisationBulkResponse parses an HTTP response from a DeleteACLUserOrganisationBulkWithResponse call
+func ParseDeleteACLUserOrganisationBulkResponse(rsp *http.Response) (*DeleteACLUserOrganisationBulkResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteACLUserOrganisationBulkResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateACLUserOrganisationBulkResponse parses an HTTP response from a CreateACLUserOrganisationBulkWithResponse call
+func ParseCreateACLUserOrganisationBulkResponse(rsp *http.Response) (*CreateACLUserOrganisationBulkResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateACLUserOrganisationBulkResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseRecoverUserOrganisationResponse parses an HTTP response from a RecoverUserOrganisationWithResponse call
 func ParseRecoverUserOrganisationResponse(rsp *http.Response) (*RecoverUserOrganisationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -13828,175 +14956,6 @@ func ParseListSpacesOfUserResponse(rsp *http.Response) (*ListSpacesOfUserRespons
 		}
 		response.JSON200 = &dest
 
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequestError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetACLOrganisationResponse parses an HTTP response from a GetACLOrganisationWithResponse call
-func ParseGetACLOrganisationResponse(rsp *http.Response) (*GetACLOrganisationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetACLOrganisationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetACL200ResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequestError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseDeleteACLOrganisationBulkResponse parses an HTTP response from a DeleteACLOrganisationBulkWithResponse call
-func ParseDeleteACLOrganisationBulkResponse(rsp *http.Response) (*DeleteACLOrganisationBulkResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &DeleteACLOrganisationBulkResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest BadRequestError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseCreateACLOrganisationBulkResponse parses an HTTP response from a CreateACLOrganisationBulkWithResponse call
-func ParseCreateACLOrganisationBulkResponse(rsp *http.Response) (*CreateACLOrganisationBulkResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &CreateACLOrganisationBulkResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest BadRequestError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -15178,6 +16137,175 @@ func ParseUpdateServiceAccountSpaceResponse(rsp *http.Response) (*UpdateServiceA
 	return response, nil
 }
 
+// ParseGetACLServiceAccountSpaceResponse parses an HTTP response from a GetACLServiceAccountSpaceWithResponse call
+func ParseGetACLServiceAccountSpaceResponse(rsp *http.Response) (*GetACLServiceAccountSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetACLServiceAccountSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetACL200ResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteACLServiceAccountSpaceBulkResponse parses an HTTP response from a DeleteACLServiceAccountSpaceBulkWithResponse call
+func ParseDeleteACLServiceAccountSpaceBulkResponse(rsp *http.Response) (*DeleteACLServiceAccountSpaceBulkResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteACLServiceAccountSpaceBulkResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateACLServiceAccountSpaceBulkResponse parses an HTTP response from a CreateACLServiceAccountSpaceBulkWithResponse call
+func ParseCreateACLServiceAccountSpaceBulkResponse(rsp *http.Response) (*CreateACLServiceAccountSpaceBulkResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateACLServiceAccountSpaceBulkResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest BadRequestError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListUserSpaceResponse parses an HTTP response from a ListUserSpaceWithResponse call
 func ParseListUserSpaceResponse(rsp *http.Response) (*ListUserSpaceResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -15598,69 +16726,15 @@ func ParseUpdateUserSpaceResponse(rsp *http.Response) (*UpdateUserSpaceResponse,
 	return response, nil
 }
 
-// ParseRecoverUserSpaceResponse parses an HTTP response from a RecoverUserSpaceWithResponse call
-func ParseRecoverUserSpaceResponse(rsp *http.Response) (*RecoverUserSpaceResponse, error) {
+// ParseGetACLUserSpaceResponse parses an HTTP response from a GetACLUserSpaceWithResponse call
+func ParseGetACLUserSpaceResponse(rsp *http.Response) (*GetACLUserSpaceResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &RecoverUserSpaceResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest RecoverUser200ResponseSchema
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON401 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetACLSpaceResponse parses an HTTP response from a GetACLSpaceWithResponse call
-func ParseGetACLSpaceResponse(rsp *http.Response) (*GetACLSpaceResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetACLSpaceResponse{
+	response := &GetACLUserSpaceResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -15713,15 +16787,15 @@ func ParseGetACLSpaceResponse(rsp *http.Response) (*GetACLSpaceResponse, error) 
 	return response, nil
 }
 
-// ParseDeleteACLSpaceBulkResponse parses an HTTP response from a DeleteACLSpaceBulkWithResponse call
-func ParseDeleteACLSpaceBulkResponse(rsp *http.Response) (*DeleteACLSpaceBulkResponse, error) {
+// ParseDeleteACLUserSpaceBulkResponse parses an HTTP response from a DeleteACLUserSpaceBulkWithResponse call
+func ParseDeleteACLUserSpaceBulkResponse(rsp *http.Response) (*DeleteACLUserSpaceBulkResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DeleteACLSpaceBulkResponse{
+	response := &DeleteACLUserSpaceBulkResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -15767,15 +16841,15 @@ func ParseDeleteACLSpaceBulkResponse(rsp *http.Response) (*DeleteACLSpaceBulkRes
 	return response, nil
 }
 
-// ParseCreateACLSpaceBulkResponse parses an HTTP response from a CreateACLSpaceBulkWithResponse call
-func ParseCreateACLSpaceBulkResponse(rsp *http.Response) (*CreateACLSpaceBulkResponse, error) {
+// ParseCreateACLUserSpaceBulkResponse parses an HTTP response from a CreateACLUserSpaceBulkWithResponse call
+func ParseCreateACLUserSpaceBulkResponse(rsp *http.Response) (*CreateACLUserSpaceBulkResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateACLSpaceBulkResponse{
+	response := &CreateACLUserSpaceBulkResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -15787,6 +16861,60 @@ func ParseCreateACLSpaceBulkResponse(rsp *http.Response) (*CreateACLSpaceBulkRes
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRecoverUserSpaceResponse parses an HTTP response from a RecoverUserSpaceWithResponse call
+func ParseRecoverUserSpaceResponse(rsp *http.Response) (*RecoverUserSpaceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RecoverUserSpaceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RecoverUser200ResponseSchema
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
 		var dest Error

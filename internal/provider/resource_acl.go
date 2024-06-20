@@ -145,7 +145,7 @@ func (r *AclsResource) updateAcls(
 	}
 
 	body := iam.ACLList{
-		Items: &acls,
+		Items: acls,
 	}
 
 	if diags.HasError() {
@@ -154,21 +154,19 @@ func (r *AclsResource) updateAcls(
 
 	// Execute
 	if action == AddAction {
-		utils.ExecuteRequest(func() (*iam.CreateACLSpaceBulkResponse, error) {
-			return r.provider.IAMAccessManagerClient.CreateACLSpaceBulkWithResponse(
+		utils.ExecuteRequest(func() (*iam.CreateACLServiceAccountSpaceBulkResponse, error) {
+			return r.provider.IAMAccessManagerClient.CreateACLServiceAccountSpaceBulkWithResponse(
 				ctx,
 				spaceUUID,
-				iam.ServiceAccounts,
 				serviceAccountUUID,
 				body,
 			)
 		}, http.StatusCreated, &diags)
 	} else if action == DeleteAction {
-		utils.ExecuteRequest(func() (*iam.DeleteACLSpaceBulkResponse, error) {
-			return r.provider.IAMAccessManagerClient.DeleteACLSpaceBulkWithResponse(
+		utils.ExecuteRequest(func() (*iam.DeleteACLServiceAccountSpaceBulkResponse, error) {
+			return r.provider.IAMAccessManagerClient.DeleteACLServiceAccountSpaceBulkWithResponse(
 				ctx,
 				spaceUUID,
-				iam.ServiceAccounts,
 				serviceAccountUUID,
 				body,
 			)
@@ -197,14 +195,15 @@ func (r *AclsResource) readAcls(
 		return nil, diags
 	}
 
-	body := iam.GetACLSpaceParams{
+	body := iam.GetACLServiceAccountSpaceParams{
 		Service:     tf.Service.ValueString(),
 		Resource:    tf.Resource.ValueString(),
 		Subresource: tf.Subresource.ValueStringPointer(),
 	}
-	res := utils.ExecuteRequest(func() (*iam.GetACLSpaceResponse, error) {
-		return r.provider.IAMAccessManagerClient.GetACLSpaceWithResponse(
-			ctx, r.provider.SpaceID, iam.ServiceAccounts, serviceAccountUUID, &body)
+
+	res := utils.ExecuteRequest(func() (*iam.GetACLServiceAccountSpaceResponse, error) {
+		return r.provider.IAMAccessManagerClient.GetACLServiceAccountSpaceWithResponse(
+			ctx, r.provider.SpaceID, serviceAccountUUID, &body)
 	}, http.StatusOK, &diags)
 	if res == nil {
 		return nil, diags

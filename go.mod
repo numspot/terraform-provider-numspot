@@ -16,7 +16,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.33.0
 	github.com/hashicorp/terraform-plugin-testing v1.6.0
 	github.com/stretchr/testify v1.9.0
-	gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.39
+	gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.42
 )
 
 require (

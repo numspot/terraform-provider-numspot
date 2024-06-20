@@ -3260,173 +3260,6 @@ paths:
             x-numspot-permissions:
                 operation-action: READ
                 path-with-tenant: false
-    /iam/organisations/{organisationId}/{subjectType}/{subjectId}/acl:
-        get:
-            description: Retrieve the ACLs assigned to a specific subject for a specific object type.
-            operationId: GetACLOrganisation
-            parameters:
-                - $ref: '#/components/parameters/OrganisationId'
-                - $ref: '#/components/parameters/SubjectTypeParam'
-                - $ref: '#/components/parameters/SubjectId'
-                - in: query
-                  name: service
-                  required: true
-                  schema:
-                    type: string
-                - in: query
-                  name: resource
-                  required: true
-                  schema:
-                    type: string
-                - in: query
-                  name: subresource
-                  required: false
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    $ref: '#/components/responses/GetACL200Response'
-                "400":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/BadRequestError'
-                    description: Invalid role
-                "401":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthenticated
-                "403":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthorized
-                "404":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: No IAM policy found for the given subject.
-                "500":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Internal error
-            security:
-                - BearerAuth: []
-            servers:
-                - url: http://access-manager:8000
-                - url: /
-            tags:
-                - ACL
-            x-numspot-permissions:
-                operation-action: READ
-                tenant-path-name: organisationId
-    /iam/organisations/{organisationId}/{subjectType}/{subjectId}/bulk/acl:
-        delete:
-            description: delete an ACLs between a subject and a resource.
-            operationId: DeleteACLOrganisationBulk
-            requestBody:
-                $ref: '#/components/requestBodies/DeleteACLRequest'
-            responses:
-                "204":
-                    description: acl deleted.
-                "400":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/BadRequestError'
-                    description: Invalid role
-                "401":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthenticated
-                "403":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthorized
-                "404":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: No IAM policy found for the given subject.
-                "500":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Internal error
-            security:
-                - BearerAuth: []
-            servers:
-                - url: http://access-manager:8000
-                - url: /
-            tags:
-                - ACL
-            x-numspot-permissions:
-                operation-action: DELETE
-                tenant-path-name: organisationId
-        parameters:
-            - $ref: '#/components/parameters/OrganisationId'
-            - $ref: '#/components/parameters/SubjectTypeParam'
-            - $ref: '#/components/parameters/SubjectId'
-        post:
-            description: Create an ACLs between a subject and a resource.
-            operationId: CreateACLOrganisationBulk
-            requestBody:
-                $ref: '#/components/requestBodies/SetACLRequest'
-            responses:
-                "201":
-                    description: acl created.
-                "400":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/BadRequestError'
-                    description: Invalid role
-                "401":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthenticated
-                "403":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthorized
-                "404":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: No IAM policy found for the given subject.
-                "500":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Internal error
-            security:
-                - BearerAuth: []
-            servers:
-                - url: http://access-manager:8000
-                - url: /
-            tags:
-                - ACL
-            x-numspot-permissions:
-                operation-action: CREATE
-                tenant-path-name: organisationId
     /iam/organisations/{organisationId}/iamgranularPolicy/{subjectType}/{subjectId}/{objectType}:
         get:
             deprecated: true
@@ -4403,6 +4236,171 @@ paths:
                         location: serviceAccountId
                         locationType: PATH
                 tenant-path-name: organisationId
+    /iam/organisations/{organisationId}/serviceAccounts/{serviceAccountId}/acl:
+        get:
+            description: Retrieve the ACLs assigned to a specific subject for a specific object type.
+            operationId: GetACLServiceAccountOrganisation
+            parameters:
+                - $ref: '#/components/parameters/OrganisationId'
+                - $ref: '#/components/parameters/ServiceAccountId'
+                - in: query
+                  name: service
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: resource
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: subresource
+                  required: false
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/GetACL200Response'
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: READ
+                tenant-path-name: organisationId
+    /iam/organisations/{organisationId}/serviceAccounts/{serviceAccountId}/bulk/acl:
+        delete:
+            description: delete an ACLs between a subject and a resource.
+            operationId: DeleteACLServiceAccountOrganisationBulk
+            requestBody:
+                $ref: '#/components/requestBodies/DeleteACLRequest'
+            responses:
+                "204":
+                    description: acl deleted.
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: DELETE
+                tenant-path-name: organisationId
+        parameters:
+            - $ref: '#/components/parameters/OrganisationId'
+            - $ref: '#/components/parameters/ServiceAccountId'
+        post:
+            description: Create an ACLs between a subject and a resource.
+            operationId: CreateACLServiceAccountOrganisationBulk
+            requestBody:
+                $ref: '#/components/requestBodies/SetACLRequest'
+            responses:
+                "201":
+                    description: acl created.
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: CREATE
+                tenant-path-name: organisationId
     /iam/organisations/{organisationId}/serviceAccounts/{serviceAccountId}/spaces:
         get:
             description: Get a list of spaces assigned to a service account within an organisation.
@@ -4840,6 +4838,171 @@ paths:
                         location: userId
                         locationType: PATH
                 tenant-path-name: organisationId
+    /iam/organisations/{organisationId}/users/{userId}/acl:
+        get:
+            description: Retrieve the ACLs assigned to a specific user for a specific object type.
+            operationId: GetACLUserOrganisation
+            parameters:
+                - $ref: '#/components/parameters/OrganisationId'
+                - $ref: '#/components/parameters/UserId'
+                - in: query
+                  name: service
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: resource
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: subresource
+                  required: false
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/GetACL200Response'
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: READ
+                tenant-path-name: organisationId
+    /iam/organisations/{organisationId}/users/{userId}/bulk/acl:
+        delete:
+            description: delete an ACLs between a subject and a resource.
+            operationId: DeleteACLUserOrganisationBulk
+            requestBody:
+                $ref: '#/components/requestBodies/DeleteACLRequest'
+            responses:
+                "204":
+                    description: acl deleted.
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: DELETE
+                tenant-path-name: organisationId
+        parameters:
+            - $ref: '#/components/parameters/OrganisationId'
+            - $ref: '#/components/parameters/UserId'
+        post:
+            description: Create an ACLs between a subject and a resource.
+            operationId: CreateACLUserOrganisationBulk
+            requestBody:
+                $ref: '#/components/requestBodies/SetACLRequest'
+            responses:
+                "201":
+                    description: acl created.
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: CREATE
+                tenant-path-name: organisationId
     /iam/organisations/{organisationId}/users/{userId}/recover:
         post:
             description: Generate a recovery link to let the user set his password / totp
@@ -5126,170 +5289,6 @@ paths:
                 path-with-tenant: false
                 scopes-details:
                     identity.san.setIAMPolicy: null
-    /iam/spaces/{spaceId}/{subjectType}/{subjectId}/acl:
-        get:
-            description: Retrieve the ACLs assigned to a specific subject for a specific object type.
-            operationId: GetACLSpace
-            parameters:
-                - $ref: '#/components/parameters/SpaceId'
-                - $ref: '#/components/parameters/SubjectTypeParam'
-                - $ref: '#/components/parameters/SubjectId'
-                - in: query
-                  name: service
-                  required: true
-                  schema:
-                    type: string
-                - in: query
-                  name: resource
-                  required: true
-                  schema:
-                    type: string
-                - in: query
-                  name: subresource
-                  required: false
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    $ref: '#/components/responses/GetACL200Response'
-                "400":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/BadRequestError'
-                    description: Invalid role
-                "401":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthenticated
-                "403":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthorized
-                "404":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: No IAM policy found for the given subject.
-                "500":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Internal error
-            security:
-                - BearerAuth: []
-            servers:
-                - url: http://access-manager:8000
-                - url: /
-            tags:
-                - ACL
-            x-numspot-permissions:
-                operation-action: READ
-    /iam/spaces/{spaceId}/{subjectType}/{subjectId}/bulk/acl:
-        delete:
-            description: delete an ACLs between a subject and a resource.
-            operationId: DeleteACLSpaceBulk
-            requestBody:
-                $ref: '#/components/requestBodies/DeleteACLRequest'
-            responses:
-                "204":
-                    description: acl deleted.
-                "400":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/BadRequestError'
-                    description: Invalid role
-                "401":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthenticated
-                "403":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthorized
-                "404":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: No IAM policy found for the given subject.
-                "500":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Internal error
-            security:
-                - BearerAuth: []
-            servers:
-                - url: http://access-manager:8000
-                - url: /
-            tags:
-                - ACL
-            x-numspot-permissions:
-                operation-action: DELETE
-        parameters:
-            - $ref: '#/components/parameters/SpaceId'
-            - $ref: '#/components/parameters/SubjectTypeParam'
-            - $ref: '#/components/parameters/SubjectId'
-        post:
-            description: Create an ACLs between a subject and a resource.
-            operationId: CreateACLSpaceBulk
-            requestBody:
-                $ref: '#/components/requestBodies/SetACLRequest'
-            responses:
-                "201":
-                    description: acl created.
-                "400":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/BadRequestError'
-                    description: Invalid role
-                "401":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthenticated
-                "403":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Unauthorized
-                "404":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: No IAM policy found for the given subject.
-                "500":
-                    content:
-                        application/problem+json:
-                            schema:
-                                $ref: '#/components/schemas/Error'
-                    description: Internal error
-            security:
-                - BearerAuth: []
-            servers:
-                - url: http://access-manager:8000
-                - url: /
-            tags:
-                - ACL
-            x-numspot-permissions:
-                operation-action: CREATE
     /iam/spaces/{spaceId}/iamgranularPolicy/{subjectType}/{subjectId}/{objectType}:
         get:
             deprecated: true
@@ -6297,6 +6296,168 @@ paths:
                         cardinality: SINGLE
                         location: serviceAccountId
                         locationType: PATH
+    /iam/spaces/{spaceId}/serviceAccounts/{serviceAccountId}/acl:
+        get:
+            description: Retrieve the ACLs assigned to a specific subject for a specific object type.
+            operationId: GetACLServiceAccountSpace
+            parameters:
+                - $ref: '#/components/parameters/SpaceId'
+                - $ref: '#/components/parameters/ServiceAccountId'
+                - in: query
+                  name: service
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: resource
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: subresource
+                  required: false
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/GetACL200Response'
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: READ
+    /iam/spaces/{spaceId}/serviceAccounts/{serviceAccountId}/bulk/acl:
+        delete:
+            description: delete an ACLs between a subject and a resource.
+            operationId: DeleteACLServiceAccountSpaceBulk
+            requestBody:
+                $ref: '#/components/requestBodies/DeleteACLRequest'
+            responses:
+                "204":
+                    description: acl deleted.
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: DELETE
+        parameters:
+            - $ref: '#/components/parameters/SpaceId'
+            - $ref: '#/components/parameters/ServiceAccountId'
+        post:
+            description: Create an ACLs between a subject and a resource.
+            operationId: CreateACLServiceAccountSpaceBulk
+            requestBody:
+                $ref: '#/components/requestBodies/SetACLRequest'
+            responses:
+                "201":
+                    description: acl created.
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: CREATE
     /iam/spaces/{spaceId}/users:
         get:
             description: List users or get an existing user by email.
@@ -6677,6 +6838,168 @@ paths:
                         cardinality: SINGLE
                         location: userId
                         locationType: PATH
+    /iam/spaces/{spaceId}/users/{userId}/acl:
+        get:
+            description: Retrieve the ACLs assigned to a specific subject for a specific object type.
+            operationId: GetACLUserSpace
+            parameters:
+                - $ref: '#/components/parameters/SpaceId'
+                - $ref: '#/components/parameters/UserId'
+                - in: query
+                  name: service
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: resource
+                  required: true
+                  schema:
+                    type: string
+                - in: query
+                  name: subresource
+                  required: false
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    $ref: '#/components/responses/GetACL200Response'
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: READ
+    /iam/spaces/{spaceId}/users/{userId}/bulk/acl:
+        delete:
+            description: delete an ACLs between a subject and a resource.
+            operationId: DeleteACLUserSpaceBulk
+            requestBody:
+                $ref: '#/components/requestBodies/DeleteACLRequest'
+            responses:
+                "204":
+                    description: acl deleted.
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: DELETE
+        parameters:
+            - $ref: '#/components/parameters/SpaceId'
+            - $ref: '#/components/parameters/UserId'
+        post:
+            description: Create an ACLs between a subject and a resource.
+            operationId: CreateACLUserSpaceBulk
+            requestBody:
+                $ref: '#/components/requestBodies/SetACLRequest'
+            responses:
+                "201":
+                    description: acl created.
+                "400":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestError'
+                    description: Invalid role
+                "401":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthenticated
+                "403":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Unauthorized
+                "404":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: No IAM policy found for the given subject.
+                "500":
+                    content:
+                        application/problem+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                    description: Internal error
+            security:
+                - BearerAuth: []
+            servers:
+                - url: http://access-manager:8000
+                - url: /
+            tags:
+                - ACL
+            x-numspot-permissions:
+                operation-action: CREATE
     /iam/spaces/{spaceId}/users/{userId}/recover:
         post:
             description: Generate a recovery link to let the user set his password / totp
@@ -7916,6 +8239,7 @@ components:
                     schema:
                         $ref: '#/components/schemas/ServiceAccount'
             description: Create a new service account
+            required: true
         CreateSpaceRequest:
             content:
                 application/json:
@@ -8781,6 +9105,8 @@ components:
                     maxItems: 100
                     minItems: 1
                     type: array
+            required:
+                - items
             title: ACLList
             type: object
         ACLPaginatedList:
@@ -12243,193 +12569,60 @@ components:
                 - $ref: '#/components/schemas/UpdateSettingsFlowWithPasswordMethod'
                 - $ref: '#/components/schemas/UpdateSettingsFlowWithTotpMethod'
             title: Update Settings Flow Body
-        UpdateSettingsFlowWithLookupMethod:
-            $schema: https://json-schema.org/draft/2020-12/schema
-            description: Update Settings Flow with Lookup Method
-            properties:
-                csrf_token:
-                    description: CSRFToken is the anti-CSRF token
-                    type: string
-                lookup_secret_confirm:
-                    description: If set to true will save the regenerated lookup secrets
-                    type: boolean
-                lookup_secret_disable:
-                    description: Disables this method if true.
-                    type: boolean
-                lookup_secret_regenerate:
-                    description: If set to true will regenerate the lookup secrets
-                    type: boolean
-                lookup_secret_reveal:
-                    description: If set to true will reveal the lookup secrets
-                    type: boolean
-                method:
-                    description: Should be set to "lookup" when trying to add, update, or remove a lookup pairing.
-                    type: string
-            required:
-                - method
-            title: Update Settings Flow Lookup
             type: object
-        UpdateSettingsFlowWithOidcMethod:
+        UpdateSettingsFlowMethod:
             $schema: https://json-schema.org/draft/2020-12/schema
-            description: Update Settings Flow with OpenID Connect Method
             properties:
-                flow:
-                    description: |-
-                        Flow ID is the flow's ID.
-
-                        in: query
-                    type: string
-                link:
-                    description: |-
-                        Link this provider
-
-                        Either this or `unlink` must be set.
-
-                        type: string
-                        in: body
-                    type: string
-                method:
-                    description: |-
-                        Method
-
-                        Should be set to profile when trying to update a profile.
-                    type: string
-                traits:
-                    description: |-
-                        The identity's traits
-
-                        in: body
-                    type: object
-                unlink:
-                    description: |-
-                        Unlink this provider
-
-                        Either this or `link` must be set.
-
-                        type: string
-                        in: body
-                    type: string
-                upstream_parameters:
-                    description: |-
-                        UpstreamParameters are the parameters that are passed to the upstream identity provider.
-
-                        These parameters are optional and depend on what the upstream identity provider supports.
-                        Supported parameters are:
-                        `login_hint` (string): The `login_hint` parameter suppresses the account chooser and either pre-fills the email box on the sign-in form, or selects the proper session.
-                        `hd` (string): The `hd` parameter limits the login/registration process to a Google Organization, e.g. `mycollege.edu`.
-                        `prompt` (string): The `prompt` specifies whether the Authorization Server prompts the End-User for reauthentication and consent, e.g. `select_account`.
-                    type: object
-            required:
-                - method
-            title: Update Settings Flow Oidc
-            type: object
-        UpdateSettingsFlowWithPasswordMethod:
-            $schema: https://json-schema.org/draft/2020-12/schema
-            description: Update Settings Flow with Password Method
-            properties:
-                csrf_token:
-                    description: CSRFToken is the anti-CSRF token
-                    type: string
                 method:
                     description: |-
                         Method
 
                         Should be set to password when trying to update a password.
                     type: string
-                password:
-                    description: Password is the updated password
-                    type: string
             required:
-                - password
                 - method
-            title: Update Settings Flow Password
+            title: Update Settings Flow method
             type: object
-        UpdateSettingsFlowWithProfileMethod:
+        UpdateSettingsFlowWithPasswordMethod:
             $schema: https://json-schema.org/draft/2020-12/schema
-            description: Update Settings Flow with Profile Method
-            properties:
-                csrf_token:
-                    description: |-
-                        The Anti-CSRF Token
-
-                        This token is only required when performing browser flows.
-                    type: string
-                method:
-                    description: |-
-                        Method
-
-                        Should be set to profile when trying to update a profile.
-                    type: string
-                traits:
-                    description: |-
-                        Traits
-
-                        The identity's traits.
-                    type: object
-            required:
-                - traits
-                - method
-            title: Update Settings Flow Profile
-            type: object
+            allOf:
+                - $ref: '#/components/schemas/UpdateSettingsFlowMethod'
+                - properties:
+                    csrf_token:
+                        description: CSRFToken is the anti-CSRF token
+                        type: string
+                    method:
+                        const: password
+                    password:
+                        description: Password is the updated password
+                        type: string
+                  required:
+                    - password
+                  type: object
+            description: Update Settings Flow with Password Method
+            title: Update Settings Flow Password
         UpdateSettingsFlowWithTotpMethod:
             $schema: https://json-schema.org/draft/2020-12/schema
+            allOf:
+                - $ref: '#/components/schemas/UpdateSettingsFlowMethod'
+                - properties:
+                    csrf_token:
+                        description: CSRFToken is the anti-CSRF token
+                        type: string
+                    method:
+                        const: totp
+                    totp_code:
+                        description: ValidationTOTP must contain a valid TOTP based on the
+                        type: string
+                    totp_unlink:
+                        description: |-
+                            UnlinkTOTP if true will remove the TOTP pairing,
+                            effectively removing the credential. This can be used
+                            to set up a new TOTP device.
+                        type: boolean
+                  type: object
             description: Update Settings Flow with TOTP Method
-            properties:
-                csrf_token:
-                    description: CSRFToken is the anti-CSRF token
-                    type: string
-                method:
-                    description: Should be set to "totp" when trying to add, update, or remove a totp pairing.
-                    type: string
-                totp_code:
-                    description: ValidationTOTP must contain a valid TOTP based on the
-                    type: string
-                totp_unlink:
-                    description: |-
-                        UnlinkTOTP if true will remove the TOTP pairing,
-                        effectively removing the credential. This can be used
-                        to set up a new TOTP device.
-                    type: boolean
-            required:
-                - method
             title: Update Settings Flow Totp
-            type: object
-        UpdateSettingsFlowWithWebAuthnMethod:
-            $schema: https://json-schema.org/draft/2020-12/schema
-            description: Update Settings Flow with WebAuthn Method
-            properties:
-                csrf_token:
-                    description: CSRFToken is the anti-CSRF token
-                    type: string
-                method:
-                    description: |-
-                        Method
-
-                        Should be set to "webauthn" when trying to add, update, or remove a webAuthn pairing.
-                    type: string
-                webauthn_register:
-                    description: |-
-                        Register a WebAuthn Security Key
-
-                        It is expected that the JSON returned by the WebAuthn registration process
-                        is included here.
-                    type: string
-                webauthn_register_displayname:
-                    description: |-
-                        Name of the WebAuthn Security Key to be Added
-
-                        A human-readable name for the security key which will be added.
-                    type: string
-                webauthn_remove:
-                    description: |-
-                        Remove a WebAuthn Security Key
-
-                        This must contain the ID of the WebAuthN connection.
-                    type: string
-            required:
-                - method
-            title: Update Settings Flow WebAuth
-            type: object
         UpdateVerificationFlowBody:
             $schema: https://json-schema.org/draft/2020-12/schema
             description: Update Verification Flow Request Body
