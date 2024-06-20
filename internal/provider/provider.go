@@ -107,7 +107,7 @@ func (p *numspotProvider) authenticateUser(ctx context.Context, data *NumspotPro
 		return nil, err
 	}
 
-	clientUuid, diags := utils.ParseUUID(data.ClientId.ValueString(), utils.EntityTypeServiceAccount)
+	clientUuid, diags := utils.ParseUUID(data.ClientId.ValueString())
 	if diags.HasError() {
 		return nil, fmt.Errorf("Error while parsing %s as UUID", data.ClientId.ValueString())
 	}
@@ -548,5 +548,6 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewVpcPeeringResource,
 		NewSpaceResource,
 		NewServiceAccountResource,
+		NewAclsResource,
 	}
 }

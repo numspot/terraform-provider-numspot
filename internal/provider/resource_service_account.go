@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"slices"
 	"strings"
 
 	"github.com/google/uuid"
@@ -24,13 +23,21 @@ var (
 	_ resource.ResourceWithImportState = &ServiceAccountResource{}
 )
 
-type modifyServiceAccountIAMPolicyAction string
+type (
+	EntityType string
+	Action     string
+)
 
-var (
-	modifyServiceAccountIAMPolicyActionAddRoles          modifyServiceAccountIAMPolicyAction = "add_roles"
-	modifyServiceAccountIAMPolicyActionRemoveRoles       modifyServiceAccountIAMPolicyAction = "remove_roles"
-	modifyServiceAccountIAMPolicyActionAddPermissions    modifyServiceAccountIAMPolicyAction = "add_permissions"
-	modifyServiceAccountIAMPolicyActionRemovePermissions modifyServiceAccountIAMPolicyAction = "remove_permissions"
+const (
+	EntityTypePermission     EntityType = "permission"
+	EntityTypeRole           EntityType = "role"
+	EntityTypeSpace          EntityType = "space"
+	EntityTypeServiceAccount EntityType = "service account"
+)
+
+const (
+	AddAction    Action = "add"
+	DeleteAction Action = "delete"
 )
 
 type ServiceAccountResource struct {
@@ -89,7 +96,7 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	spaceId, diags := utils.ParseUUID(plan.SpaceId.ValueString(), utils.EntityTypeSpace)
+	spaceId, diags := utils.ParseUUID(plan.SpaceId.ValueString())
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -111,7 +118,7 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	tf := CreateServiceAccountResponseFromHTTPToTF(*res.JSON201)
+	tf := CreateServiceAccountResponseFromHTTPToTF(ctx, *res.JSON201)
 	tf.SpaceId = plan.SpaceId
 
 	// This var is used to know if we need to fetch roles & permissions after creation
@@ -120,7 +127,7 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 	// Attach permissions
 	if len(plan.GlobalPermissions.Elements()) > 0 {
 		globalPermissions := utils.FromTfStringSetToStringList(ctx, plan.GlobalPermissions)
-		diags := r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddPermissions, spaceId, res.JSON201.Id, globalPermissions)
+		diags := r.modifyServiceAccountIAMPolicy(ctx, AddAction, EntityTypePermission, spaceId, res.JSON201.Id, globalPermissions)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
 			return
@@ -132,7 +139,7 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 	// Attach Roles
 	if len(plan.Roles.Elements()) > 0 {
 		roles := utils.FromTfStringSetToStringList(ctx, plan.Roles)
-		diags := r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddRoles, spaceId, res.JSON201.Id, roles)
+		diags := r.modifyServiceAccountIAMPolicy(ctx, AddAction, EntityTypeRole, spaceId, res.JSON201.Id, roles)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
 			return
@@ -180,13 +187,13 @@ func (r *ServiceAccountResource) Read(ctx context.Context, request resource.Read
 	var state resource_service_account.ServiceAccountModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
-	spaceId, diags := utils.ParseUUID(state.SpaceId.ValueString(), utils.EntityTypeSpace)
+	spaceId, diags := utils.ParseUUID(state.SpaceId.ValueString())
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
 	}
 
-	serviceAccountID, diags := utils.ParseUUID(state.ServiceAccountId.ValueString(), utils.EntityTypeServiceAccount)
+	serviceAccountID, diags := utils.ParseUUID(state.ServiceAccountId.ValueString())
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -228,7 +235,7 @@ func (r *ServiceAccountResource) Read(ctx context.Context, request resource.Read
 		state.GlobalPermissions = permissionsTf
 	}
 
-	tf := ServiceAccountEditedResponseFromHTTPToTF(*res.JSON200)
+	tf := ServiceAccountEditedResponseFromHTTPToTF(ctx, *res.JSON200)
 	state.ServiceAccountId = tf.ServiceAccountId
 	state.Name = tf.Name
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
@@ -242,13 +249,13 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 		return
 	}
 
-	spaceId, diags := utils.ParseUUID(plan.SpaceId.ValueString(), utils.EntityTypeSpace)
+	spaceId, diags := utils.ParseUUID(plan.SpaceId.ValueString())
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
 	}
 
-	serviceAccountID, diags := utils.ParseUUID(state.ServiceAccountId.ValueString(), utils.EntityTypeServiceAccount)
+	serviceAccountID, diags := utils.ParseUUID(state.ServiceAccountId.ValueString())
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -281,7 +288,7 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 		statePermissions := utils.FromTfStringSetToStringList(ctx, state.GlobalPermissions)
 		planPermissions := utils.FromTfStringSetToStringList(ctx, plan.GlobalPermissions)
 
-		diags := r.updateGlobalPermissions(ctx, spaceId, state.ServiceAccountId.ValueString(), statePermissions, planPermissions)
+		diags := r.updateRolesOrPermission(ctx, spaceId, state.ServiceAccountId.ValueString(), EntityTypePermission, statePermissions, planPermissions)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
 			return
@@ -294,7 +301,7 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 		stateRoles := utils.FromTfStringSetToStringList(ctx, state.Roles)
 		planRoles := utils.FromTfStringSetToStringList(ctx, plan.Roles)
 
-		diags := r.updateRoles(ctx, spaceId, state.ServiceAccountId.ValueString(), stateRoles, planRoles)
+		diags := r.updateRolesOrPermission(ctx, spaceId, state.ServiceAccountId.ValueString(), EntityTypeRole, stateRoles, planRoles)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
 			return
@@ -355,7 +362,7 @@ func (r *ServiceAccountResource) updateServiceAccount(
 		return nil, fmt.Errorf("failed to update service account: %v", "empty response")
 	}
 
-	tf := ServiceAccountEditedResponseFromHTTPToTF(*res.JSON200)
+	tf := ServiceAccountEditedResponseFromHTTPToTF(ctx, *res.JSON200)
 	return &tf, nil
 }
 
@@ -378,13 +385,13 @@ func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.De
 	var state resource_service_account.ServiceAccountModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
-	spaceId, diags := utils.ParseUUID(state.SpaceId.ValueString(), utils.EntityTypeSpace)
+	spaceId, diags := utils.ParseUUID(state.SpaceId.ValueString())
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
 	}
 
-	serviceAccountID, diags := utils.ParseUUID(state.ServiceAccountId.ValueString(), utils.EntityTypeServiceAccount)
+	serviceAccountID, diags := utils.ParseUUID(state.ServiceAccountId.ValueString())
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -400,45 +407,60 @@ func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.De
 	response.State.RemoveResource(ctx)
 }
 
-// Global Permissions & Roles
-
-func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
-	ctx context.Context,
-	action modifyServiceAccountIAMPolicyAction,
-	spaceId uuid.UUID,
-	serviceAccountID string,
-	bulk []string,
-) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	// Parse Service Account ID
-	serviceAccountUUID, diags := utils.ParseUUID(serviceAccountID, utils.EntityTypeServiceAccount)
-	if diags.HasError() {
-		return diags
-	}
-
-	// Parse Bulk IDs
-	uuidBulk := make([]uuid.UUID, 0, len(bulk))
-	for _, b := range bulk {
-		currentUuid, diags := utils.ParseUUID(b, utils.EntityTypePermission)
+func parseStringListAsUUIDs(strList []string) ([]uuid.UUID, diag.Diagnostics) {
+	uuidBulk := make([]uuid.UUID, 0, len(strList))
+	for _, str := range strList {
+		currentUuid, diags := utils.ParseUUID(str)
 		if diags.HasError() {
-			return diags
+			return nil, diags
 		}
 
 		uuidBulk = append(uuidBulk, currentUuid)
 	}
 
-	// Create Body
-	body := iam.SetIAMPolicySpaceJSONRequestBody{}
+	return uuidBulk, nil
+}
 
-	if action == modifyServiceAccountIAMPolicyActionAddRoles {
-		body.Add = &iam.IAMPolicy{Roles: &uuidBulk}
-	} else if action == modifyServiceAccountIAMPolicyActionRemoveRoles {
-		body.Delete = &iam.IAMPolicy{Roles: &uuidBulk}
-	} else if action == modifyServiceAccountIAMPolicyActionAddPermissions {
-		body.Add = &iam.IAMPolicy{Permissions: &uuidBulk}
-	} else if action == modifyServiceAccountIAMPolicyActionRemovePermissions {
-		body.Delete = &iam.IAMPolicy{Permissions: &uuidBulk}
+// Global Permissions & Roles
+func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
+	ctx context.Context,
+	action Action,
+	entityType EntityType,
+	spaceId uuid.UUID,
+	serviceAccountID string,
+	uuids []string,
+) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Parse Service Account ID
+	serviceAccountUUID, diags := utils.ParseUUID(serviceAccountID)
+	if diags.HasError() {
+		return diags
+	}
+
+	// Parse UUIDs
+	uuidList, diags := parseStringListAsUUIDs(uuids)
+	if diags.HasError() {
+		return diags
+	}
+
+	// Create Body
+	var policies *iam.IAMPolicy
+	if entityType == EntityTypeRole {
+		policies = &iam.IAMPolicy{Roles: &uuidList}
+	} else if entityType == EntityTypePermission {
+		policies = &iam.IAMPolicy{Permissions: &uuidList}
+	}
+
+	var body iam.SetIAMPolicySpaceJSONRequestBody
+	if action == AddAction {
+		body = iam.SetIAMPolicySpaceJSONRequestBody{
+			Add: policies,
+		}
+	} else if action == DeleteAction {
+		body = iam.SetIAMPolicySpaceJSONRequestBody{
+			Delete: policies,
+		}
 	}
 
 	// Execute
@@ -455,90 +477,26 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 	return diags
 }
 
-func (r *ServiceAccountResource) updateGlobalPermissions(
+func (r *ServiceAccountResource) updateRolesOrPermission(
 	ctx context.Context,
 	spaceId uuid.UUID,
 	serviceAccountID string,
-	statePermissions, planPermissions []string,
+	entityType EntityType,
+	stateValues, planValues []string,
 ) diag.Diagnostics {
-	if len(statePermissions) == 0 && len(planPermissions) > 0 {
-		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddPermissions, spaceId, serviceAccountID, planPermissions)
-	}
-	if len(planPermissions) == 0 && len(statePermissions) > 0 {
-		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemovePermissions, spaceId, serviceAccountID, statePermissions)
-	}
-
-	permissionsToAdd := make([]string, 0)
-	permissionsToRemove := make([]string, 0)
-
-	for _, planPermission := range planPermissions {
-		if !slices.Contains(statePermissions, planPermission) {
-			permissionsToAdd = append(permissionsToAdd, planPermission)
-		}
-	}
-
-	for _, statePermission := range statePermissions {
-		if !slices.Contains(planPermissions, statePermission) {
-			permissionsToRemove = append(permissionsToRemove, statePermission)
-		}
-	}
-
 	var diags diag.Diagnostics
-	if len(permissionsToRemove) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemovePermissions, spaceId, serviceAccountID, permissionsToRemove)
+
+	toAdd, toRemove := utils.DiffComparable(stateValues, planValues)
+
+	if len(toRemove) > 0 {
+		diags = r.modifyServiceAccountIAMPolicy(ctx, DeleteAction, entityType, spaceId, serviceAccountID, toRemove)
 		if diags.HasError() {
 			return diags
 		}
 	}
 
-	if len(permissionsToAdd) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddPermissions, spaceId, serviceAccountID, permissionsToAdd)
-		if diags.HasError() {
-			return diags
-		}
-	}
-
-	return diags
-}
-
-func (r *ServiceAccountResource) updateRoles(
-	ctx context.Context,
-	spaceId uuid.UUID,
-	serviceAccountID string,
-	stateRoles, planRoles []string,
-) diag.Diagnostics {
-	if len(stateRoles) == 0 && len(planRoles) > 0 {
-		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddRoles, spaceId, serviceAccountID, planRoles)
-	}
-	if len(planRoles) == 0 && len(stateRoles) > 0 {
-		return r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemoveRoles, spaceId, serviceAccountID, stateRoles)
-	}
-
-	rolesToAdd := make([]string, 0)
-	rolesToRemove := make([]string, 0)
-
-	for _, planRole := range planRoles {
-		if !slices.Contains(stateRoles, planRole) {
-			rolesToAdd = append(rolesToAdd, planRole)
-		}
-	}
-
-	for _, stateRole := range stateRoles {
-		if !slices.Contains(planRoles, stateRole) {
-			rolesToRemove = append(rolesToRemove, stateRole)
-		}
-	}
-
-	var diags diag.Diagnostics
-	if len(rolesToRemove) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionRemoveRoles, spaceId, serviceAccountID, rolesToRemove)
-		if diags.HasError() {
-			return diags
-		}
-	}
-
-	if len(rolesToAdd) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, modifyServiceAccountIAMPolicyActionAddRoles, spaceId, serviceAccountID, rolesToAdd)
+	if len(toAdd) > 0 {
+		diags = r.modifyServiceAccountIAMPolicy(ctx, AddAction, entityType, spaceId, serviceAccountID, toAdd)
 		if diags.HasError() {
 			return diags
 		}
@@ -553,7 +511,7 @@ func (r *ServiceAccountResource) getRolesAndGlobalPermissions(
 ) (*[]uuid.UUID, *[]uuid.UUID, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	serviceAccountUUID, diags := utils.ParseUUID(serviceAccountID, utils.EntityTypeServiceAccount)
+	serviceAccountUUID, diags := utils.ParseUUID(serviceAccountID)
 	if diags.HasError() {
 		return nil, nil, diags
 	}

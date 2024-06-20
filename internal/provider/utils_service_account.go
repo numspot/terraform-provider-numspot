@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
 
@@ -14,7 +16,7 @@ func ServiceAccountFromTFToCreateRequest(tf resource_service_account.ServiceAcco
 	}
 }
 
-func CreateServiceAccountResponseFromHTTPToTF(http iam.CreateServiceAccount201ResponseSchema) resource_service_account.ServiceAccountModel {
+func CreateServiceAccountResponseFromHTTPToTF(ctx context.Context, http iam.CreateServiceAccount201ResponseSchema) resource_service_account.ServiceAccountModel {
 	permissions := types.SetNull(types.StringType)
 	roles := types.SetNull(types.StringType)
 
@@ -28,7 +30,7 @@ func CreateServiceAccountResponseFromHTTPToTF(http iam.CreateServiceAccount201Re
 	}
 }
 
-func ServiceAccountEditedResponseFromHTTPToTF(http iam.ServiceAccountEdited) resource_service_account.ServiceAccountModel {
+func ServiceAccountEditedResponseFromHTTPToTF(ctx context.Context, http iam.ServiceAccountEdited) resource_service_account.ServiceAccountModel {
 	permissions := types.SetNull(types.StringType)
 	roles := types.SetNull(types.StringType)
 

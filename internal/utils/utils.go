@@ -2,8 +2,8 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	"reflect"
+	"slices"
 	"time"
 
 	"github.com/google/uuid"
@@ -11,15 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-)
-
-type EntityType string
-
-var (
-	EntityTypePermission     EntityType = "permission"
-	EntityTypeRole           EntityType = "role"
-	EntityTypeSpace          EntityType = "space"
-	EntityTypeServiceAccount EntityType = "service account"
 )
 
 type (
@@ -229,9 +220,7 @@ func TfStringListToTimeList(ctx context.Context, list types.List, format string)
 }
 
 func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, tfListInnerObjType A, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.ListValue, diag.Diagnostics) {
-	if len(from) == 0 {
-		return types.ListNull(tfListInnerObjType.Type(ctx)), diag.Diagnostics{}
-	}
+	var emptyA A
 
 	to := make([]A, 0, len(from))
 	for i := range from {
@@ -243,13 +232,11 @@ func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, tfListInne
 		to = append(to, res)
 	}
 
-	return types.ListValueFrom(ctx, to[0].Type(ctx), to)
+	return types.ListValueFrom(ctx, emptyA.Type(ctx), to)
 }
 
 func GenericSetToTfSetValue[A ITFValue, B any](ctx context.Context, tfListInnerObjType A, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.SetValue, diag.Diagnostics) {
-	if len(from) == 0 {
-		return types.SetNull(tfListInnerObjType.Type(ctx)), diag.Diagnostics{}
-	}
+	var emptyA A
 
 	to := make([]A, 0, len(from))
 	for i := range from {
@@ -261,7 +248,7 @@ func GenericSetToTfSetValue[A ITFValue, B any](ctx context.Context, tfListInnerO
 		to = append(to, res)
 	}
 
-	return types.SetValueFrom(ctx, to[0].Type(ctx), to)
+	return types.SetValueFrom(ctx, emptyA.Type(ctx), to)
 }
 
 func StringSetToTfSetValue(ctx context.Context, from []string) (types.Set, diag.Diagnostics) {
@@ -314,11 +301,11 @@ func FromTfStringSetToStringList(ctx context.Context, set types.Set) []string {
 	}, ctx, set)
 }
 
-func ParseUUID(id string, entityType EntityType) (uuid.UUID, diag.Diagnostics) {
+func ParseUUID(id string) (uuid.UUID, diag.Diagnostics) {
 	var diags diag.Diagnostics
 	parsedUUID, err := uuid.Parse(id)
 	if err != nil {
-		diags.AddError(fmt.Sprintf("Failed to parse %s id", entityType), err.Error())
+		diags.AddError("Failed to parse id", err.Error())
 	}
 	return parsedUUID, diags
 }
@@ -343,36 +330,45 @@ func FromHttpGenericListToTfList[httpType any, tfType any](
 }
 
 func Diff[A basetypes.ObjectValuable](current, desired []A) (toCreate, toDelete []A) {
-	toCreate = make([]A, 0)
-	toDelete = make([]A, 0)
-
-	for _, ea := range desired {
-		found := false
-		for _, eb := range current {
-			if reflect.DeepEqual(ea, eb) {
-				found = true
-			}
-		}
-
-		if !found {
-			toCreate = append(toCreate, ea)
-		}
-	}
-
-	for _, ea := range current {
-		found := false
-		for _, eb := range desired {
-			if reflect.DeepEqual(ea, eb) {
-				found = true
-			}
-		}
-
-		if !found {
-			toDelete = append(toDelete, ea)
-		}
-	}
-
+	toCreate = diff(desired, current)
+	toDelete = diff(current, desired)
 	return
+}
+
+// Return the subset of slice1 elements that are not in slice2
+func diff[A basetypes.ObjectValuable](slice1, slice2 []A) []A {
+	diff := make([]A, 0)
+
+	for _, ea := range slice1 {
+		found := false
+		for _, eb := range slice2 {
+			if reflect.DeepEqual(ea, eb) {
+				found = true
+			}
+		}
+
+		if !found {
+			diff = append(diff, ea)
+		}
+	}
+	return diff
+}
+
+func DiffComparable[A comparable](current, desired []A) (toCreate, toDelete []A) {
+	toCreate = diffComparable(desired, current)
+	toDelete = diffComparable(current, desired)
+	return
+}
+
+// Return the subset of slice1 elements that are not in slice2
+func diffComparable[A comparable](slice1, slice2 []A) []A {
+	diff := make([]A, 0)
+	for _, ea := range slice1 {
+		if !slices.Contains(slice2, ea) {
+			diff = append(diff, ea)
+		}
+	}
+	return diff
 }
 
 func EmptyTrueBoolPointer() *bool {

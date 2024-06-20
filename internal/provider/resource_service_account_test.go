@@ -1,4 +1,4 @@
-//go:build acc
+///go:build acc
 
 package provider
 
@@ -11,12 +11,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
+const spaceID = "bba8c1df-609f-4775-9638-952d488502e6"
+
 func TestAccServiceAccountResource_Basic(t *testing.T) {
 	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	name := "My Service Account"
 	updatedName := "My New Service Account"
 
@@ -24,7 +25,7 @@ func TestAccServiceAccountResource_Basic(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testServiceAccountConfig(spaceID, name),
+				Config: testServiceAccountConfig(name),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_service_account.test", "name", name),
 					resource.TestCheckResourceAttr("numspot_service_account.test", "space_id", spaceID),
@@ -39,7 +40,7 @@ func TestAccServiceAccountResource_Basic(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testServiceAccountConfig(spaceID, updatedName),
+				Config: testServiceAccountConfig(updatedName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_service_account.test", "name", updatedName),
 				),
@@ -48,7 +49,7 @@ func TestAccServiceAccountResource_Basic(t *testing.T) {
 	})
 }
 
-func testServiceAccountConfig(spaceID, name string) string {
+func testServiceAccountConfig(name string) string {
 	return fmt.Sprintf(`
 resource "numspot_service_account" "test" {
   space_id = %[1]q
@@ -61,13 +62,12 @@ func TestAccServiceAccountResource_GlobalPermission(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	name := "My Service Account"
 	updatedName := "My New Service Account"
 
 	permissions := []string{
-		"94034915-045e-4196-a7e7-714aa207db68",
-		"766b2dca-4238-4d39-a5ea-86b99318f2b5",
+		"0288e52e-3853-49d0-b1d1-2daef11be8ab",
+		"33fe3c63-4a3b-4e46-a28d-c24d7d2d64de",
 	}
 
 	updatedPermissions1 := permissions[:len(permissions)-1]
@@ -77,7 +77,7 @@ func TestAccServiceAccountResource_GlobalPermission(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testServiceAccountConfig_GlobalPermission(spaceID, name, permissions),
+				Config: testServiceAccountConfig_GlobalPermission(name, permissions),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_service_account.test", "name", name),
 					resource.TestCheckResourceAttr("numspot_service_account.test", "space_id", spaceID),
@@ -93,7 +93,7 @@ func TestAccServiceAccountResource_GlobalPermission(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testServiceAccountConfig_GlobalPermission(spaceID, updatedName, updatedPermissions1),
+				Config: testServiceAccountConfig_GlobalPermission(updatedName, updatedPermissions1),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_service_account.test", "name", updatedName),
 					resource.TestCheckResourceAttr("numspot_service_account.test", "global_permissions.#", strconv.Itoa(len(updatedPermissions1))),
@@ -102,7 +102,7 @@ func TestAccServiceAccountResource_GlobalPermission(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testServiceAccountConfig_GlobalPermission(spaceID, updatedName, updatedPermissions2),
+				Config: testServiceAccountConfig_GlobalPermission(updatedName, updatedPermissions2),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_service_account.test", "name", updatedName),
 					resource.TestCheckResourceAttr("numspot_service_account.test", "global_permissions.#", strconv.Itoa(len(updatedPermissions2))),
@@ -112,13 +112,13 @@ func TestAccServiceAccountResource_GlobalPermission(t *testing.T) {
 	})
 }
 
-func testServiceAccountConfig_GlobalPermission(spaceID, name string, permissions []string) string {
+func testServiceAccountConfig_GlobalPermission(name string, permissions []string) string {
 	var permissionsList string
 
 	if len(permissions) > 0 {
 		permissionsList = fmt.Sprintf(`["%s"]`, strings.Join(permissions, `", "`))
 	} else {
-		permissionsList = fmt.Sprintf(`[]`)
+		permissionsList = `[]`
 	}
 
 	return fmt.Sprintf(`
@@ -135,27 +135,26 @@ func TestAccServiceAccountResource_Roles(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	name := "My Service Account"
 	updatedName := "My New Service Account"
 
 	roles := []string{
-		"8d9706cc-c77a-499c-bb67-3597644f6d27",
-		"fd4c0997-157a-42ba-89ac-241e54c05124",
+		"6f275ef2-6651-4150-86e7-9e6a51fa1f56",
+		"92061163-c643-481f-96e2-37788864fd78",
 	}
 
 	updatedRoles := roles[:len(roles)-1]
 	updatedRoles2 := []string{}
 	updatedRoles3 := []string{
-		"3a3afcfb-555c-4495-943a-70973940cc17",
-		"44541946-1310-49c0-b43a-e1c64aa3925c",
+		"31b75fdd-319d-4517-b543-80e18b88a410",
+		"708696a9-cb19-4d57-861e-ba5212d6b933",
 	}
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: testServiceAccountConfig_Roles(spaceID, name, roles),
+				Config: testServiceAccountConfig_Roles(name, roles),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_service_account.test", "name", name),
 					resource.TestCheckResourceAttr("numspot_service_account.test", "space_id", spaceID),
@@ -173,7 +172,7 @@ func TestAccServiceAccountResource_Roles(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testServiceAccountConfig_Roles(spaceID, updatedName, updatedRoles),
+				Config: testServiceAccountConfig_Roles(updatedName, updatedRoles),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_service_account.test", "name", updatedName),
 					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.#", strconv.Itoa(len(updatedRoles))),
@@ -182,7 +181,7 @@ func TestAccServiceAccountResource_Roles(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testServiceAccountConfig_Roles(spaceID, updatedName, updatedRoles2),
+				Config: testServiceAccountConfig_Roles(updatedName, updatedRoles2),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_service_account.test", "name", updatedName),
 					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.#", strconv.Itoa(len(updatedRoles2))),
@@ -190,7 +189,7 @@ func TestAccServiceAccountResource_Roles(t *testing.T) {
 			},
 			// Update testing
 			{
-				Config: testServiceAccountConfig_Roles(spaceID, updatedName, updatedRoles3),
+				Config: testServiceAccountConfig_Roles(updatedName, updatedRoles3),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_service_account.test", "name", updatedName),
 					resource.TestCheckResourceAttr("numspot_service_account.test", "roles.#", strconv.Itoa(len(updatedRoles3))),
@@ -202,13 +201,13 @@ func TestAccServiceAccountResource_Roles(t *testing.T) {
 	})
 }
 
-func testServiceAccountConfig_Roles(spaceID, name string, roles []string) string {
+func testServiceAccountConfig_Roles(name string, roles []string) string {
 	var rolesList string
 
 	if len(roles) > 0 {
 		rolesList = fmt.Sprintf(`["%s"]`, strings.Join(roles, `", "`))
 	} else {
-		rolesList = fmt.Sprintf(`[]`)
+		rolesList = `[]`
 	}
 
 	return fmt.Sprintf(`

@@ -117,3 +117,63 @@ func TestDiff_Delete(t *testing.T) {
 	assert.Equal(t, wantCreate, toCreate)
 	assert.Equal(t, wantDelete, toDelete)
 }
+
+func TestDiffComparable_Create(t *testing.T) {
+	t.Parallel()
+
+	givenCurrent := []basetypes.ObjectValuable{}
+	givenDesired := []basetypes.ObjectValuable{StringObjValuable{value: "toto"}}
+
+	wantCreate := givenDesired
+	wantDelete := givenCurrent
+
+	toCreate, toDelete := DiffComparable(givenCurrent, givenDesired)
+
+	assert.Equal(t, wantCreate, toCreate)
+	assert.Equal(t, wantDelete, toDelete)
+}
+
+func TestDiffComparable_Update(t *testing.T) {
+	t.Parallel()
+
+	givenCurrent := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}}
+	givenDesired := []basetypes.ObjectValuable{StringObjValuable{value: "toto"}}
+
+	wantCreate := givenDesired
+	wantDelete := givenCurrent
+
+	toCreate, toDelete := DiffComparable(givenCurrent, givenDesired)
+
+	assert.Equal(t, wantCreate, toCreate)
+	assert.Equal(t, wantDelete, toDelete)
+}
+
+func TestDiffComparable_Update2(t *testing.T) {
+	t.Parallel()
+
+	givenCurrent := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}}
+	givenDesired := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}, StringObjValuable{value: "toto"}}
+
+	wantCreate := []basetypes.ObjectValuable{StringObjValuable{value: "toto"}}
+	wantDelete := []basetypes.ObjectValuable{}
+
+	toCreate, toDelete := DiffComparable(givenCurrent, givenDesired)
+
+	assert.Equal(t, wantCreate, toCreate)
+	assert.Equal(t, wantDelete, toDelete)
+}
+
+func TestDiffComparable_Delete(t *testing.T) {
+	t.Parallel()
+
+	givenCurrent := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}}
+	givenDesired := []basetypes.ObjectValuable{}
+
+	wantCreate := []basetypes.ObjectValuable{}
+	wantDelete := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}}
+
+	toCreate, toDelete := DiffComparable(givenCurrent, givenDesired)
+
+	assert.Equal(t, wantCreate, toCreate)
+	assert.Equal(t, wantDelete, toDelete)
+}
