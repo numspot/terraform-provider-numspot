@@ -9,129 +9,118 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestAccACLs(t *testing.T) {
+type (
+	stepData struct {
+		service    string
+		resource   string
+		actions    []string
+		resourceID string
+	}
+)
+
+func TestAccACLsResource(t *testing.T) {
+	testData := []stepData{
+		{
+			service:    "network",
+			resource:   "vpc",
+			actions:    []string{"getIAMPolicy"},
+			resourceID: "numspot_vpc.vpc.id",
+		},
+		{
+			service:    "network",
+			resource:   "vpc",
+			actions:    []string{"getIAMPolicy"},
+			resourceID: "numspot_vpc.vpc2.id",
+		},
+		{
+			service:  "network",
+			resource: "vpc",
+		},
+		{
+			service:    "storageblock",
+			resource:   "volume",
+			actions:    []string{"update", "unlink", "getIAMPolicy"},
+			resourceID: "numspot_volume.volume2.id",
+		},
+		{
+			service:    "storageblock",
+			resource:   "volume",
+			actions:    []string{"update", "unlink", "create"},
+			resourceID: "numspot_volume.volume.id",
+		},
+	}
 	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	// Required
-	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
-
-	service := "network"
-	aclResource := "vpc"
-
-	serviceVolume := "storageblock"
-	resourceVolume := "volume"
-
-	acls := `[
-		{
-		resource_id   = numspot_vpc.vpc.id
-		permission_id = "c537ba9e-19b6-4937-b7d4-7bf362d53bc6"
-		}
-  	]`
-
-	acls2 := `[
-		{
-		  resource_id   = numspot_vpc.vpc2.id
-		  permission_id = "c537ba9e-19b6-4937-b7d4-7bf362d53bc6"
-		}
-	]`
-
-	acls3 := `[
-		{
-		  resource_id   = numspot_volume.volume2.id
-		  permission_id = "e572d5da-c6f8-4fdb-af5b-cab6ebaa628e"
-		},
-		{
-		  resource_id   = numspot_volume.volume2.id
-		  permission_id = "983b3c03-6b00-4862-9b16-7032df5a89ab"
-		},
-		{
-		  resource_id   = numspot_volume.volume2.id
-		  permission_id = "c3f5a8e2-248f-45dc-938b-be00aef9dc12"
-		}
-	]`
-
-	acls4 := `[
-		{
-		  resource_id   = numspot_volume.volume.id
-		  permission_id = "e572d5da-c6f8-4fdb-af5b-cab6ebaa628e"
-		},
-		{
-		  resource_id   = numspot_volume.volume.id
-		  permission_id = "983b3c03-6b00-4862-9b16-7032df5a89ab"
-		},
-		{
-		  resource_id   = numspot_volume.volume.id
-		  permission_id = "da7dd53a-f026-4534-a21d-51df7247f8dc"
-		},
-	]`
+	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{ // 1 - Create ACLS
-				Config: testACLsConfig(spaceID, service, aclResource, acls),
+				Config: testACLsConfig(spaceID, testData[0]),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
 					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", service),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", aclResource),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[0].service),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[0].resource),
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "1"),
 					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "acls.0.resource_id", "numspot_vpc.vpc", "id"),
 				),
 			},
 			{ // 2 - Update an ACLS
-				Config: testACLsConfig(spaceID, service, aclResource, acls2),
+				Config: testACLsConfig(spaceID, testData[1]),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
 					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", service),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", aclResource),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[1].service),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[1].resource),
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "1"),
 					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "acls.0.resource_id", "numspot_vpc.vpc2", "id"),
 				),
 			},
 			{ // 3 - Empty ACLS and delete dependencies (we need acls to be in "requiresReplace" mode to work)
-				Config: testACLsConfig_NoSubResource(spaceID, service, aclResource),
+				Config: testACLsConfig_NoSubResource(spaceID, testData[2]),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
 					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", service),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", aclResource),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[2].service),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[2].resource),
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "0"),
 				),
 			},
 			{ // 4 - Update acls's service/resource
-				Config: testACLsConfigVolume(spaceID, serviceVolume, resourceVolume, acls3),
+				Config: testACLsConfigVolume(spaceID, testData[3]),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
 					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", serviceVolume),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", resourceVolume),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[3].service),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[3].resource),
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "3"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_acls.acls_network", "acls.*", map[string]string{"permission_id": "e572d5da-c6f8-4fdb-af5b-cab6ebaa628e"}), // Note : we can't easily test value of permission_id and resource_id together (we need a mix of TestCheckTypeSetElemAttrPair and TestCheckTypeSetElemNestedAttrs function)
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_acls.acls_network", "acls.*", map[string]string{"permission_id": "983b3c03-6b00-4862-9b16-7032df5a89ab"}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_acls.acls_network", "acls.*", map[string]string{"permission_id": "c3f5a8e2-248f-45dc-938b-be00aef9dc12"}),
+					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_1", "items.0.id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_2", "items.0.id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_3", "items.0.id"),
 				),
 			},
 			{ // 5 - Update multiple acls
-				Config: testACLsConfigVolume(spaceID, serviceVolume, resourceVolume, acls4),
+				Config: testACLsConfigVolume(spaceID, testData[4]),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
 					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", serviceVolume),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", resourceVolume),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[4].service),
+					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[4].resource),
 					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "3"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_acls.acls_network", "acls.*", map[string]string{"permission_id": "e572d5da-c6f8-4fdb-af5b-cab6ebaa628e"}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_acls.acls_network", "acls.*", map[string]string{"permission_id": "983b3c03-6b00-4862-9b16-7032df5a89ab"}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_acls.acls_network", "acls.*", map[string]string{"permission_id": "da7dd53a-f026-4534-a21d-51df7247f8dc"}),
+					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_1", "items.0.id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_2", "items.0.id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_3", "items.0.id"),
 				),
 			},
 		},
 	})
 }
 
-func testACLsConfig(spaceID, service, resource, acls string) string {
+func testACLsConfig(spaceID string, testData stepData) string {
 	return fmt.Sprintf(`
 resource "numspot_service_account" "test" {
   space_id = %[1]q
@@ -146,17 +135,29 @@ resource "numspot_vpc" "vpc2" {
   ip_range = "10.101.0.0/24"
 }
 
+data "numspot_permissions" "perm_getIAMPolicy_vpc" {
+  space_id = %[1]q
+  action   = %[4]q
+  service  = %[2]q
+  resource = %[3]q
+}
+
 resource "numspot_acls" "acls_network" {
   space_id           = %[1]q
   service_account_id = numspot_service_account.test.service_account_id
-  service            = %[3]q
-  resource           = %[4]q
-  acls               = %[2]s
+  service            = %[2]q
+  resource           = %[3]q
+  acls = [
+    {
+      resource_id   = %[5]s
+      permission_id = data.numspot_permissions.perm_getIAMPolicy_vpc.items.0.id
+    }
+  ]
 
-}`, spaceID, acls, service, resource)
+}`, spaceID, testData.service, testData.resource, testData.actions[0], testData.resourceID)
 }
 
-func testACLsConfig_NoSubResource(spaceID, service, resource string) string {
+func testACLsConfig_NoSubResource(spaceID string, testData stepData) string {
 	return fmt.Sprintf(`
 resource "numspot_service_account" "test" {
   space_id = %[1]q
@@ -171,10 +172,10 @@ resource "numspot_acls" "acls_network" {
   resource           = %[3]q
   acls               = []
 
-}`, spaceID, service, resource)
+}`, spaceID, testData.service, testData.resource)
 }
 
-func testACLsConfigVolume(spaceID, service, resource, acls string) string {
+func testACLsConfigVolume(spaceID string, testData stepData) string {
 	return fmt.Sprintf(`
 resource "numspot_service_account" "test" {
   space_id = %[1]q
@@ -193,12 +194,52 @@ resource "numspot_volume" "volume2" {
   availability_zone_name = "cloudgouv-eu-west-1a"
 }
 
+data "numspot_permissions" "perm_1" {
+  space_id = %[1]q
+  action   = %[4]q
+  service  = %[2]q
+  resource = %[3]q
+}
+
+data "numspot_permissions" "perm_2" {
+  space_id = %[1]q
+  action   = %[5]q
+  service  = %[2]q
+  resource = %[3]q
+}
+
+data "numspot_permissions" "perm_3" {
+  space_id = %[1]q
+  action   = %[6]q
+  service  = %[2]q
+  resource = %[3]q
+}
+
 resource "numspot_acls" "acls_network" {
   space_id           = %[1]q
   service_account_id = numspot_service_account.test.service_account_id
-  service            = %[3]q
-  resource           = %[4]q
-  acls               = %[2]s
+  service            = %[2]q
+  resource           = %[3]q
+  acls = [
+    {
+      resource_id   = %[7]s
+      permission_id = data.numspot_permissions.perm_1.items.0.id
+    },
+    {
+      resource_id   = %[7]s
+      permission_id = data.numspot_permissions.perm_2.items.0.id
+    },
+    {
+      resource_id   = %[7]s
+      permission_id = data.numspot_permissions.perm_3.items.0.id
+    }
+  ]
 
-}`, spaceID, acls, service, resource)
+}`, spaceID,
+		testData.service,
+		testData.resource,
+		testData.actions[0],
+		testData.actions[1],
+		testData.actions[2],
+		testData.resourceID)
 }
