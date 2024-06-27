@@ -517,6 +517,8 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewProductTypesDataSource,
 		NewFlexibleGpusDataSource,
 		NewServiceAccountsDataSource,
+		NewPermissionsDataSource,
+		NewRolesDatasource,
 	}
 }
 
