@@ -2,13 +2,13 @@ package provider
 
 import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_permissions"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func RegisteredPermissionFromHTTPToTFDataSource(http iam.RegisteredPermission) datasource_permissions.PermissionModel {
+func RegisteredPermissionFromHTTPToTFDataSource(http numspot.RegisteredPermission) datasource_permissions.PermissionModel {
 	return datasource_permissions.PermissionModel{
 		ID:          types.StringValue(http.Uuid.String()),
 		Name:        types.StringValue(http.Name),
@@ -22,8 +22,8 @@ func RegisteredPermissionFromHTTPToTFDataSource(http iam.RegisteredPermission) d
 	}
 }
 
-func PermissionsFromTfToAPIReadParams(tf PermissionsDataSourceModel) iam.ListPermissionsSpaceParams {
-	return iam.ListPermissionsSpaceParams{
+func PermissionsFromTfToAPIReadParams(tf PermissionsDataSourceModel) numspot.ListPermissionsSpaceParams {
+	return numspot.ListPermissionsSpaceParams{
 		Service:     utils.FromTfStringToStringPtr(tf.Service),
 		Resource:    utils.FromTfStringToStringPtr(tf.Resource),
 		Subresource: utils.FromTfStringToStringPtr(tf.Subresource),

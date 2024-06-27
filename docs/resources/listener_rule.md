@@ -3,12 +3,12 @@
 page_title: "numspot_listener_rule Resource - terraform-provider-numspot"
 subcategory: ""
 description: |-
-  
+  This resource is not implemented yet. Please consider not using it.
 ---
 
 # numspot_listener_rule (Resource)
 
-
+This resource is not implemented yet. Please consider not using it.
 
 
 
