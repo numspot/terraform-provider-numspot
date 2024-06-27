@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_service_account"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -89,13 +89,13 @@ func (d *serviceAccountsDataSource) Read(ctx context.Context, request datasource
 func (d *serviceAccountsDataSource) fetchPaginatedServiceAccounts(
 	ctx context.Context,
 	spaceID uuid.UUID,
-	requestParams *iam.ListServiceAccountSpaceParams,
+	requestParams *numspot.ListServiceAccountSpaceParams,
 	svcAccountsHolder *[]datasource_service_account.ServiceAccountModel,
 	response *datasource.ReadResponse,
 ) {
-	body := iam.ListServiceAccountSpaceJSONRequestBody{}
-	res := utils.ExecuteRequest(func() (*iam.ListServiceAccountSpaceResponse, error) {
-		return d.provider.IAMIdentityManagerClient.ListServiceAccountSpaceWithResponse(ctx, spaceID, requestParams, body)
+	body := numspot.ListServiceAccountSpaceJSONRequestBody{}
+	res := utils.ExecuteRequest(func() (*numspot.ListServiceAccountSpaceResponse, error) {
+		return d.provider.NumSpotClient.ListServiceAccountSpaceWithResponse(ctx, spaceID, requestParams, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -110,7 +110,7 @@ func (d *serviceAccountsDataSource) fetchPaginatedServiceAccounts(
 	}
 
 	if res.JSON200.NextPageToken != nil {
-		requestParams.Page = new(iam.ListServiceAccounts)
+		requestParams.Page = new(numspot.ListServiceAccounts)
 		requestParams.Page.NextToken = res.JSON200.NextPageToken
 		d.fetchPaginatedServiceAccounts(ctx, spaceID, requestParams, svcAccountsHolder, response)
 	}

@@ -71,7 +71,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		ctx,
 		r.provider.SpaceID,
 		NetFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateVpcWithResponse)
+		r.provider.IaasClient.CreateVpcWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPC", err.Error())
 		return
@@ -80,7 +80,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	// Handle tags
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -90,7 +90,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	if !data.DhcpOptionsSetId.IsNull() && !data.DhcpOptionsSetId.IsUnknown() {
 		updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVpcResponse, error) {
 			body := VpcFromTfToUpdaterequest(ctx, &data, &response.Diagnostics)
-			return r.provider.ApiClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, createdId, body)
+			return r.provider.IaasClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, createdId, body)
 		}, http.StatusOK, &response.Diagnostics)
 
 		if updatedRes == nil || response.Diagnostics.HasError() {
@@ -103,7 +103,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadVpcsByIdWithResponse,
+		r.provider.IaasClient.ReadVpcsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -129,7 +129,7 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
-		return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -168,7 +168,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			vpcId,
 		)
@@ -180,7 +180,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 	// Update Vpc
 	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVpcResponse, error) {
 		body := VpcFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
-		return r.provider.ApiClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, vpcId, body)
+		return r.provider.IaasClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, vpcId, body)
 	}, http.StatusOK, &response.Diagnostics)
 
 	if updatedRes == nil || response.Diagnostics.HasError() {
@@ -189,7 +189,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 
 	// Read resource
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
-		return r.provider.ApiClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -210,7 +210,7 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVpcWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVpcWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPC", err.Error())
 		return

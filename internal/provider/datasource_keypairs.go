@@ -71,7 +71,7 @@ func (d *keypairsDataSource) Read(ctx context.Context, request datasource.ReadRe
 
 	params := KeypairsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadKeypairsResponse, error) {
-		return d.provider.ApiClient.ReadKeypairsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadKeypairsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -71,7 +71,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		ctx,
 		r.provider.SpaceID,
 		NicFromTfToCreateRequest(ctx, &data),
-		r.provider.ApiClient.CreateNicWithResponse)
+		r.provider.IaasClient.CreateNicWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create NIC", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -92,7 +92,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		r.provider.SpaceID,
 		[]string{"attaching"},
 		[]string{"available", "in-use"},
-		r.provider.ApiClient.ReadNicsByIdWithResponse,
+		r.provider.IaasClient.ReadNicsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Nic", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -119,7 +119,7 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadNicsByIdResponse, error) {
-		return r.provider.ApiClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -152,7 +152,7 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			nicId,
 		)
@@ -164,7 +164,7 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 	// Update Nic
 	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateNicResponse, error) {
 		body := NicFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
-		return r.provider.ApiClient.UpdateNicWithResponse(ctx, r.provider.SpaceID, nicId, body)
+		return r.provider.IaasClient.UpdateNicWithResponse(ctx, r.provider.SpaceID, nicId, body)
 	}, http.StatusOK, &response.Diagnostics)
 
 	if updatedRes == nil || response.Diagnostics.HasError() {
@@ -173,7 +173,7 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 
 	// Read resource
 	res := utils.ExecuteRequest(func() (*iaas.ReadNicsByIdResponse, error) {
-		return r.provider.ApiClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -192,7 +192,7 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteNicWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteNicWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Nic", err.Error())
 		return

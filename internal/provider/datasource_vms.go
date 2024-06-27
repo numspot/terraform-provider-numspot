@@ -120,7 +120,7 @@ func (d *vmsDataSource) Read(ctx context.Context, request datasource.ReadRequest
 
 	params := VmsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadVmsResponse, error) {
-		return d.provider.ApiClient.ReadVmsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadVmsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

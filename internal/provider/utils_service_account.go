@@ -4,19 +4,19 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_service_account"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_service_account"
 )
 
-func ServiceAccountFromTFToCreateRequest(tf resource_service_account.ServiceAccountModel) iam.CreateServiceAccountSpaceJSONRequestBody {
-	return iam.CreateServiceAccountSpaceJSONRequestBody{
+func ServiceAccountFromTFToCreateRequest(tf resource_service_account.ServiceAccountModel) numspot.CreateServiceAccountSpaceJSONRequestBody {
+	return numspot.CreateServiceAccountSpaceJSONRequestBody{
 		Name: tf.Name.ValueString(),
 	}
 }
 
-func CreateServiceAccountResponseFromHTTPToTF(ctx context.Context, http iam.CreateServiceAccount201ResponseSchema) resource_service_account.ServiceAccountModel {
+func CreateServiceAccountResponseFromHTTPToTF(ctx context.Context, http numspot.CreateServiceAccount201ResponseSchema) resource_service_account.ServiceAccountModel {
 	permissions := types.SetNull(types.StringType)
 	roles := types.SetNull(types.StringType)
 
@@ -30,7 +30,7 @@ func CreateServiceAccountResponseFromHTTPToTF(ctx context.Context, http iam.Crea
 	}
 }
 
-func ServiceAccountEditedResponseFromHTTPToTF(ctx context.Context, http iam.ServiceAccountEdited) resource_service_account.ServiceAccountModel {
+func ServiceAccountEditedResponseFromHTTPToTF(ctx context.Context, http numspot.ServiceAccountEdited) resource_service_account.ServiceAccountModel {
 	permissions := types.SetNull(types.StringType)
 	roles := types.SetNull(types.StringType)
 
@@ -43,13 +43,13 @@ func ServiceAccountEditedResponseFromHTTPToTF(ctx context.Context, http iam.Serv
 	}
 }
 
-func ServiceAccountEditedResponseFromHTTPToTFDataSource(http iam.ServiceAccountEdited) datasource_service_account.ServiceAccountModel {
+func ServiceAccountEditedResponseFromHTTPToTFDataSource(http numspot.ServiceAccountEdited) datasource_service_account.ServiceAccountModel {
 	return datasource_service_account.ServiceAccountModel{
 		ID:   types.StringValue(http.Id),
 		Name: types.StringValue(http.Name),
 	}
 }
 
-func ServiceAccountsFromTfToAPIReadParams(tf ServiceAccountsDataSourceModel) iam.ListServiceAccountSpaceParams {
-	return iam.ListServiceAccountSpaceParams{}
+func ServiceAccountsFromTfToAPIReadParams(tf ServiceAccountsDataSourceModel) numspot.ListServiceAccountSpaceParams {
+	return numspot.ListServiceAccountSpaceParams{}
 }

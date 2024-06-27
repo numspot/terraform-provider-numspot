@@ -70,7 +70,7 @@ func (r *DirectLinkResource) Create(ctx context.Context, request resource.Create
 		ctx,
 		r.provider.SpaceID,
 		DirectLinkFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateDirectLinkWithResponse)
+		r.provider.IaasClient.CreateDirectLinkWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Direct Link", err.Error())
 		return
@@ -84,7 +84,7 @@ func (r *DirectLinkResource) Create(ctx context.Context, request resource.Create
 		r.provider.SpaceID,
 		[]string{"pending", "requested"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadDirectLinksByIdWithResponse,
+		r.provider.IaasClient.ReadDirectLinksByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Direct Link", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -100,7 +100,7 @@ func (r *DirectLinkResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadDirectLinksByIdResponse, error) {
-		return r.provider.ApiClient.ReadDirectLinksByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
+		return r.provider.IaasClient.ReadDirectLinksByIdWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -118,7 +118,7 @@ func (r *DirectLinkResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_direct_link.DirectLinkModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteDirectLinkWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteDirectLinkWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Direct Link", err.Error())
 		return

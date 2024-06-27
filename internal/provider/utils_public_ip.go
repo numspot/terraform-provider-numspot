@@ -75,7 +75,7 @@ func invokeLinkPublicIP(ctx context.Context, provider Provider, data *resource_p
 			PrivateIp: data.PrivateIp.ValueStringPointer(),
 		}
 	}
-	res, err := provider.ApiClient.LinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
+	res, err := provider.IaasClient.LinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func invokeUnlinkPublicIP(ctx context.Context, provider Provider, data *resource
 	payload := iaas.UnlinkPublicIpJSONRequestBody{
 		LinkPublicIpId: data.LinkPublicIP.ValueStringPointer(),
 	}
-	res, err := provider.ApiClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
+	res, err := provider.IaasClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func refreshState(ctx context.Context, provider Provider, id string) (*resource_
 	// Refresh state
 	var diags diag.Diagnostics
 
-	res, err := provider.ApiClient.ReadPublicIpsByIdWithResponse(ctx, provider.SpaceID, id)
+	res, err := provider.IaasClient.ReadPublicIpsByIdWithResponse(ctx, provider.SpaceID, id)
 	if err != nil {
 		diags.AddError("Failed to read public ip", err.Error())
 		return nil, diags

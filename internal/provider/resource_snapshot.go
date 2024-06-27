@@ -72,7 +72,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		ctx,
 		r.provider.SpaceID,
 		SnapshotFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateSnapshotWithResponse)
+		r.provider.IaasClient.CreateSnapshotWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Snapshot", err.Error())
 		return
@@ -80,7 +80,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -93,7 +93,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		r.provider.SpaceID,
 		[]string{"pending/queued", "in-queue", "pending"},
 		[]string{"completed"},
-		r.provider.ApiClient.ReadSnapshotsByIdWithResponse,
+		r.provider.IaasClient.ReadSnapshotsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Snapshot", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -132,7 +132,7 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadSnapshotsByIdResponse, error) {
-		return r.provider.ApiClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -175,7 +175,7 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -191,7 +191,7 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadSnapshotsByIdResponse, error) {
-		return r.provider.ApiClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -222,7 +222,7 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	var data resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteSnapshotWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteSnapshotWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Snapshot", err.Error())
 		return

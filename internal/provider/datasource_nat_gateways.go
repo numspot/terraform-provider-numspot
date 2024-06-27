@@ -75,7 +75,7 @@ func (d *natGatewaysDataSource) Read(ctx context.Context, request datasource.Rea
 
 	params := NatGatewaysFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadNatGatewayResponse, error) {
-		return d.provider.ApiClient.ReadNatGatewayWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadNatGatewayWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -71,7 +71,7 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 		ctx,
 		r.provider.SpaceID,
 		NetAccessPointFromTfToCreateRequest(ctx, &data),
-		r.provider.ApiClient.CreateVpcAccessPointWithResponse)
+		r.provider.IaasClient.CreateVpcAccessPointWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPC Access Point", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -92,7 +92,7 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadVpcAccessPointsByIdWithResponse,
+		r.provider.IaasClient.ReadVpcAccessPointsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPC Access Point", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -122,7 +122,7 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcAccessPointsByIdResponse, error) {
-		return r.provider.ApiClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -152,7 +152,7 @@ func (r *NetAccessPointResource) Update(ctx context.Context, request resource.Up
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -167,7 +167,7 @@ func (r *NetAccessPointResource) Update(ctx context.Context, request resource.Up
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcAccessPointsByIdResponse, error) {
-		return r.provider.ApiClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -187,6 +187,6 @@ func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.De
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	_ = utils.ExecuteRequest(func() (*iaas.DeleteVpcAccessPointResponse, error) {
-		return r.provider.ApiClient.DeleteVpcAccessPointWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.DeleteVpcAccessPointWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }

@@ -70,7 +70,7 @@ func (r *ListenerRuleResource) Create(ctx context.Context, request resource.Crea
 		ctx,
 		r.provider.SpaceID,
 		ListenerRuleFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateListenerRuleWithResponse)
+		r.provider.IaasClient.CreateListenerRuleWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Listener Rule", err.Error())
 		return
@@ -85,7 +85,7 @@ func (r *ListenerRuleResource) Read(ctx context.Context, request resource.ReadRe
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadListenerRulesByIdResponse, error) {
-		return r.provider.ApiClient.ReadListenerRulesByIdWithResponse(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()))
+		return r.provider.IaasClient.ReadListenerRulesByIdWithResponse(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()))
 	}, http.StatusOK, &response.Diagnostics)
 
 	tf := ListenerRuleFromHttpToTf(res.JSON200)
@@ -100,7 +100,7 @@ func (r *ListenerRuleResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()), r.provider.ApiClient.DeleteListenerRuleWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()), r.provider.IaasClient.DeleteListenerRuleWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Listener Rule", err.Error())
 		return

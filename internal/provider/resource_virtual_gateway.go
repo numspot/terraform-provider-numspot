@@ -71,7 +71,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 		ctx,
 		r.provider.SpaceID,
 		VirtualGatewayFromTfToCreateRequest(data),
-		r.provider.ApiClient.CreateVirtualGatewayWithResponse)
+		r.provider.IaasClient.CreateVirtualGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Virtual Gateway", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -88,7 +88,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 	// Link virtual gateway to VPCs
 	if !data.VpcId.IsNull() {
 		_ = utils.ExecuteRequest(func() (*iaas.LinkVirtualGatewayToVpcResponse, error) {
-			return r.provider.ApiClient.LinkVirtualGatewayToVpcWithResponse(
+			return r.provider.IaasClient.LinkVirtualGatewayToVpcWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				createdId,
@@ -109,7 +109,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadVirtualGatewaysByIdWithResponse,
+		r.provider.IaasClient.ReadVirtualGatewaysByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Virtual Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -135,7 +135,7 @@ func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.Read
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVirtualGatewaysByIdResponse, error) {
-		return r.provider.ApiClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -164,7 +164,7 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -180,7 +180,7 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 		// Unlink
 		if !(state.VpcId.IsNull() || state.VpcId.IsUnknown()) {
 			_ = utils.ExecuteRequest(func() (*iaas.UnlinkVirtualGatewayToVpcResponse, error) {
-				return r.provider.ApiClient.UnlinkVirtualGatewayToVpcWithResponse(
+				return r.provider.IaasClient.UnlinkVirtualGatewayToVpcWithResponse(
 					ctx,
 					r.provider.SpaceID,
 					state.Id.ValueString(),
@@ -197,7 +197,7 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 		// Link
 		if !(plan.VpcId.IsNull() || plan.VpcId.IsUnknown()) {
 			_ = utils.ExecuteRequest(func() (*iaas.LinkVirtualGatewayToVpcResponse, error) {
-				return r.provider.ApiClient.LinkVirtualGatewayToVpcWithResponse(
+				return r.provider.IaasClient.LinkVirtualGatewayToVpcWithResponse(
 					ctx,
 					r.provider.SpaceID,
 					state.Id.ValueString(),
@@ -219,7 +219,7 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVirtualGatewaysByIdResponse, error) {
-		return r.provider.ApiClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -239,7 +239,7 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 	// Unlink
 	if !(data.VpcId.IsNull() || data.VpcId.IsUnknown()) {
 		_ = utils.ExecuteRequest(func() (*iaas.UnlinkVirtualGatewayToVpcResponse, error) {
-			return r.provider.ApiClient.UnlinkVirtualGatewayToVpcWithResponse(
+			return r.provider.IaasClient.UnlinkVirtualGatewayToVpcWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				data.Id.ValueString(),
@@ -252,7 +252,7 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 		// Note : don't return in case of error, we want to try to delete the resource anyway
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVirtualGatewayWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVirtualGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Virtual Gateway", err.Error())
 		return

@@ -70,7 +70,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 		ctx,
 		r.provider.SpaceID,
 		KeyPairFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateKeypairWithResponse)
+		r.provider.IaasClient.CreateKeypairWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create KeyPair", err.Error())
 		return
@@ -92,7 +92,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadKeypairsByIdResponse, error) {
-		return r.provider.ApiClient.ReadKeypairsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
+		return r.provider.IaasClient.ReadKeypairsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -121,7 +121,7 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteKeypairWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteKeypairWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete KeyPair", err.Error())
 		return

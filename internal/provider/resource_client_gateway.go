@@ -71,7 +71,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 		ctx,
 		r.provider.SpaceID,
 		ClientGatewayFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateClientGatewayWithResponse)
+		r.provider.IaasClient.CreateClientGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Client Gateway", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -92,7 +92,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadClientGatewaysByIdWithResponse,
+		r.provider.IaasClient.ReadClientGatewaysByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Client Gateways", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -119,7 +119,7 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadClientGatewaysByIdResponse, error) {
-		return r.provider.ApiClient.ReadClientGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadClientGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -150,7 +150,7 @@ func (r *ClientGatewayResource) Update(ctx context.Context, request resource.Upd
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -165,7 +165,7 @@ func (r *ClientGatewayResource) Update(ctx context.Context, request resource.Upd
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadClientGatewaysByIdResponse, error) {
-		return r.provider.ApiClient.ReadClientGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadClientGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -184,7 +184,7 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	var data resource_client_gateway.ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteClientGatewayWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteClientGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Client Gateway", err.Error())
 		return

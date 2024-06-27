@@ -71,7 +71,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		ctx,
 		r.provider.SpaceID,
 		VolumeFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateVolumeWithResponse)
+		r.provider.IaasClient.CreateVolumeWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Volume", err.Error())
 		return
@@ -80,7 +80,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	// Retries read on resource until state is OK
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -93,7 +93,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		r.provider.SpaceID,
 		[]string{"creating"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadVolumesByIdWithResponse,
+		r.provider.IaasClient.ReadVolumesByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", *res.JSON201.Id, err))
@@ -119,7 +119,7 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVolumesByIdResponse, error) {
-		return r.provider.ApiClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -147,7 +147,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -158,7 +158,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 
 	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVolumeResponse, error) {
 		body := ValueFromTfToUpdaterequest(&plan)
-		return r.provider.ApiClient.UpdateVolumeWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString(), body)
+		return r.provider.IaasClient.UpdateVolumeWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString(), body)
 	}, http.StatusOK, &response.Diagnostics)
 	if updatedRes == nil {
 		return
@@ -172,7 +172,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		r.provider.SpaceID,
 		[]string{"creating", "updating"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadVolumesByIdWithResponse,
+		r.provider.IaasClient.ReadVolumesByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to update volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
@@ -201,7 +201,7 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVolumeWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVolumeWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Volume", err.Error())
 		return

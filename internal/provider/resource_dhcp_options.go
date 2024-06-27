@@ -71,7 +71,7 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 		ctx,
 		r.provider.SpaceID,
 		DhcpOptionsFromTfToCreateRequest(ctx, data),
-		r.provider.ApiClient.CreateDhcpOptionsWithResponse)
+		r.provider.IaasClient.CreateDhcpOptionsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create DHCP Options", err.Error())
 		return
@@ -79,14 +79,14 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
 	tf, diagnostics := DhcpOptionsFromHttpToTf(ctx, res.JSON201)
-	tf.Tags = tags.ReadTags(ctx, r.provider.ApiClient, r.provider.SpaceID, response.Diagnostics, createdId)
+	tf.Tags = tags.ReadTags(ctx, r.provider.IaasClient, r.provider.SpaceID, response.Diagnostics, createdId)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -100,7 +100,7 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadDhcpOptionsByIdResponse, error) {
-		return r.provider.ApiClient.ReadDhcpOptionsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadDhcpOptionsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -129,7 +129,7 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -139,7 +139,7 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadDhcpOptionsByIdResponse, error) {
-		return r.provider.ApiClient.ReadDhcpOptionsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadDhcpOptionsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -160,7 +160,7 @@ func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.Delet
 	var data resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteDhcpOptionsWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteDhcpOptionsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete DHCP Options", err.Error())
 		return

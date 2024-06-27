@@ -76,7 +76,7 @@ func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadR
 
 	params := PublicIpsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadPublicIpsResponse, error) {
-		return d.provider.ApiClient.ReadPublicIpsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadPublicIpsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

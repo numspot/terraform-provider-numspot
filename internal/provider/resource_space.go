@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_space"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -71,8 +71,8 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 		response.Diagnostics.AddError("Invalid organisation_id", "organisation_id should be in UUID format")
 		return
 	}
-	res := utils.ExecuteRequest(func() (*iam.CreateSpaceResponse, error) {
-		return r.provider.IAMSpaceManagerClient.CreateSpaceWithResponse(
+	res := utils.ExecuteRequest(func() (*numspot.CreateSpaceResponse, error) {
+		return r.provider.NumSpotClient.CreateSpaceWithResponse(
 			ctx,
 			organisationId,
 			SpaceFromTfToCreateRequest(&plan),
@@ -81,13 +81,13 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 	if res == nil {
 		return
 	}
-	readRes, err := RetryReadSpaceUntilReady(ctx, r.provider.IAMSpaceManagerClient, res.JSON200.Id)
+	readRes, err := RetryReadSpaceUntilReady(ctx, r.provider.NumSpotClient, res.JSON200.Id)
 	if err != nil {
 		response.Diagnostics.AddError("failed to read space", err.Error())
 		return
 	}
 
-	space, ok := readRes.(*iam.Space)
+	space, ok := readRes.(*numspot.Space)
 	if !ok {
 		response.Diagnostics.AddError("failed to read space", "")
 		return
@@ -106,8 +106,8 @@ func (r *SpaceResource) Read(ctx context.Context, request resource.ReadRequest, 
 		response.Diagnostics.AddError("Invalid space_id", "space_id should be in UUID format")
 		return
 	}
-	res := utils.ExecuteRequest(func() (*iam.GetSpaceByIdResponse, error) {
-		return r.provider.IAMSpaceManagerClient.GetSpaceByIdWithResponse(ctx, spaceId)
+	res := utils.ExecuteRequest(func() (*numspot.GetSpaceByIdResponse, error) {
+		return r.provider.NumSpotClient.GetSpaceByIdWithResponse(ctx, spaceId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -130,8 +130,8 @@ func (r *SpaceResource) Delete(ctx context.Context, request resource.DeleteReque
 		response.Diagnostics.AddError("Invalid space_id", "space_id should be in UUID format")
 		return
 	}
-	res := utils.ExecuteRequest(func() (*iam.DeleteSpaceResponse, error) {
-		return r.provider.IAMSpaceManagerClient.DeleteSpaceWithResponse(ctx, spaceId)
+	res := utils.ExecuteRequest(func() (*numspot.DeleteSpaceResponse, error) {
+		return r.provider.NumSpotClient.DeleteSpaceWithResponse(ctx, spaceId)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

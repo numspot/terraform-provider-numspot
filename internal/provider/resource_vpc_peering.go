@@ -65,7 +65,7 @@ func (r *VpcPeeringResource) Create(ctx context.Context, request resource.Create
 		ctx,
 		r.provider.SpaceID,
 		VpcPeeringFromTfToCreateRequest(data),
-		r.provider.ApiClient.CreateVpcPeeringWithResponse)
+		r.provider.IaasClient.CreateVpcPeeringWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPC Peering", err.Error())
 		return
@@ -77,14 +77,14 @@ func (r *VpcPeeringResource) Create(ctx context.Context, request resource.Create
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
 	readRes := utils.ExecuteRequest(func() (*iaas.ReadVpcPeeringsByIdResponse, error) {
-		return r.provider.ApiClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
+		return r.provider.IaasClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -112,7 +112,7 @@ func (r *VpcPeeringResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcPeeringsByIdResponse, error) {
-		return r.provider.ApiClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -151,7 +151,7 @@ func (r *VpcPeeringResource) Update(ctx context.Context, request resource.Update
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -166,7 +166,7 @@ func (r *VpcPeeringResource) Update(ctx context.Context, request resource.Update
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcPeeringsByIdResponse, error) {
-		return r.provider.ApiClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -193,7 +193,7 @@ func (r *VpcPeeringResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_vpc_peering.VpcPeeringModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVpcPeeringWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVpcPeeringWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPC Peering", err.Error())
 		return

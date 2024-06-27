@@ -87,7 +87,7 @@ func (d *securityGroupsDataSource) Read(ctx context.Context, request datasource.
 
 	params := SecurityGroupsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadSecurityGroupsResponse, error) {
-		return d.provider.ApiClient.ReadSecurityGroupsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadSecurityGroupsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

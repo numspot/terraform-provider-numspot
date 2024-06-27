@@ -71,7 +71,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	createRes, err := retry_utils.RetryCreateUntilResourceAvailable(
 		ctx,
 		r.provider.SpaceID,
-		r.provider.ApiClient.CreatePublicIpWithResponse)
+		r.provider.IaasClient.CreatePublicIpWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Public IP", err.Error())
 		return
@@ -85,7 +85,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 
 	createdId := *createRes.JSON201.Id
 	if len(plan.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -121,7 +121,7 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	readRes := utils.ExecuteRequest(func() (*iaas.ReadPublicIpsByIdResponse, error) {
-		return r.provider.ApiClient.ReadPublicIpsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadPublicIpsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
 		return
@@ -155,7 +155,7 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -214,7 +214,7 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 		_ = invokeUnlinkPublicIP(ctx, r.provider, &state) // We still want to try delete resource even if the unlink didn't work (ressource has been unlinked before for example)
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, state.Id.ValueString(), r.provider.ApiClient.DeletePublicIpWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, state.Id.ValueString(), r.provider.IaasClient.DeletePublicIpWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Public IP", err.Error())
 		return

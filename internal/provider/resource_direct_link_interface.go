@@ -70,7 +70,7 @@ func (r *DirectLinkInterfaceResource) Create(ctx context.Context, request resour
 		ctx,
 		r.provider.SpaceID,
 		DirectLinkInterfaceFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateDirectLinkInterfaceWithResponse)
+		r.provider.IaasClient.CreateDirectLinkInterfaceWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Direct Link Interface", err.Error())
 		return
@@ -84,7 +84,7 @@ func (r *DirectLinkInterfaceResource) Create(ctx context.Context, request resour
 		r.provider.SpaceID,
 		[]string{"pending", "confirming"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadDirectLinkInterfacesByIdWithResponse,
+		r.provider.IaasClient.ReadDirectLinkInterfacesByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Direct Link Interface", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -100,7 +100,7 @@ func (r *DirectLinkInterfaceResource) Read(ctx context.Context, request resource
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadDirectLinkInterfacesByIdResponse, error) {
-		return r.provider.ApiClient.ReadDirectLinkInterfacesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadDirectLinkInterfacesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -119,13 +119,13 @@ func (r *DirectLinkInterfaceResource) Delete(ctx context.Context, request resour
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteDirectLinkInterfaceWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteDirectLinkInterfaceWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Direct Link Interface", err.Error())
 		return
 	}
 
 	utils.ExecuteRequest(func() (*iaas.DeleteDirectLinkInterfaceResponse, error) {
-		return r.provider.ApiClient.DeleteDirectLinkInterfaceWithResponse(ctx, r.provider.SpaceID, data.Id.String())
+		return r.provider.IaasClient.DeleteDirectLinkInterfaceWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }

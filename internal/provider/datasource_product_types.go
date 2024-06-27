@@ -69,7 +69,7 @@ func (d *productTypesDataSource) Read(ctx context.Context, request datasource.Re
 
 	params := ProductTypesFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadProductTypesResponse, error) {
-		return d.provider.ApiClient.ReadProductTypesWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadProductTypesWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
