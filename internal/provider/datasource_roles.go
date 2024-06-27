@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_roles"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -88,13 +88,13 @@ func (d *rolesDataSource) Read(ctx context.Context, request datasource.ReadReque
 func (d *rolesDataSource) fetchPaginatedRoles(
 	ctx context.Context,
 	spaceID uuid.UUID,
-	requestParams *iam.ListRolesSpaceParams,
+	requestParams *numspot.ListRolesSpaceParams,
 	permissionsHolder *[]datasource_roles.RolesModel,
 	response *datasource.ReadResponse,
 ) {
 	var pageSize int32 = 50
-	res := utils.ExecuteRequest(func() (*iam.ListRolesSpaceResponse, error) {
-		return d.provider.IAMAccessManagerClient.ListRolesSpaceWithResponse(ctx, spaceID, requestParams)
+	res := utils.ExecuteRequest(func() (*numspot.ListRolesSpaceResponse, error) {
+		return d.provider.NumSpotClient.ListRolesSpaceWithResponse(ctx, spaceID, requestParams)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -109,7 +109,7 @@ func (d *rolesDataSource) fetchPaginatedRoles(
 	}
 
 	if res.JSON200.NextPageToken != nil {
-		requestParams.Page = new(iam.ListRolesPage)
+		requestParams.Page = new(numspot.ListRolesPage)
 		requestParams.Page.NextToken = res.JSON200.NextPageToken
 		requestParams.Page.Size = &pageSize
 		d.fetchPaginatedRoles(ctx, spaceID, requestParams, permissionsHolder, response)

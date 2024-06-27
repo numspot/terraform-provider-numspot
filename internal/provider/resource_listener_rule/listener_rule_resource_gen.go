@@ -122,6 +122,7 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The IDs of the backend VMs.",
 			},
 		},
+		MarkdownDescription: "This resource is not implemented yet. Please consider not using it.",
 	}
 }
 

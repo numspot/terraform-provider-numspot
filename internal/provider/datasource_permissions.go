@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_permissions"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -91,12 +91,12 @@ func (d *permissionsDataSource) Read(ctx context.Context, request datasource.Rea
 func (d *permissionsDataSource) fetchPaginatedPermissions(
 	ctx context.Context,
 	spaceID uuid.UUID,
-	requestParams *iam.ListPermissionsSpaceParams,
+	requestParams *numspot.ListPermissionsSpaceParams,
 	permissionsHolder *[]datasource_permissions.PermissionModel,
 	response *datasource.ReadResponse,
 ) {
-	res := utils.ExecuteRequest(func() (*iam.ListPermissionsSpaceResponse, error) {
-		return d.provider.IAMAccessManagerClient.ListPermissionsSpaceWithResponse(ctx, spaceID, requestParams)
+	res := utils.ExecuteRequest(func() (*numspot.ListPermissionsSpaceResponse, error) {
+		return d.provider.NumSpotClient.ListPermissionsSpaceWithResponse(ctx, spaceID, requestParams)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -113,7 +113,7 @@ func (d *permissionsDataSource) fetchPaginatedPermissions(
 	pagesize := new(int32)
 	*pagesize = 15
 	if res.JSON200.NextPageToken != nil {
-		requestParams.Page = new(iam.ListPermissionsPage)
+		requestParams.Page = new(numspot.ListPermissionsPage)
 		requestParams.Page.NextToken = res.JSON200.NextPageToken
 		requestParams.Page.Size = pagesize
 		d.fetchPaginatedPermissions(ctx, spaceID, requestParams, permissionsHolder, response)
