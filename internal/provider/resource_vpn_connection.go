@@ -73,7 +73,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 		ctx,
 		r.provider.SpaceID,
 		VpnConnectionFromTfToCreateRequest(&plan),
-		r.provider.ApiClient.CreateVpnConnectionWithResponse)
+		r.provider.IaasClient.CreateVpnConnectionWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPN Connection", err.Error())
 		return
@@ -81,7 +81,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 
 	createdId := *res.JSON201.Id
 	if len(plan.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -147,7 +147,7 @@ func (r *VpnConnectionResource) Update(ctx context.Context, request resource.Upd
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -216,7 +216,7 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 		return
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVpnConnectionWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVpnConnectionWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPN Connection", err.Error())
 		return
@@ -234,7 +234,7 @@ func (r *VpnConnectionResource) addRoutes(ctx context.Context, vpnID string, tfR
 
 	for _, route := range routes {
 		_ = utils.ExecuteRequest(func() (*iaas.CreateVpnConnectionRouteResponse, error) {
-			return r.provider.ApiClient.CreateVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
+			return r.provider.IaasClient.CreateVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
 		}, http.StatusOK, &diags)
 	}
 
@@ -252,7 +252,7 @@ func (r *VpnConnectionResource) deleteRoutes(ctx context.Context, vpnID string, 
 
 	for _, route := range routes {
 		_ = utils.ExecuteRequest(func() (*iaas.DeleteVpnConnectionRouteResponse, error) {
-			return r.provider.ApiClient.DeleteVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
+			return r.provider.IaasClient.DeleteVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
 		}, http.StatusNoContent, &diags)
 	}
 
@@ -279,7 +279,7 @@ func (r *VpnConnectionResource) readVPNConnection(
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadVpnConnectionsByIdWithResponse,
+		r.provider.IaasClient.ReadVpnConnectionsByIdWithResponse,
 	)
 	if err != nil {
 		diags.AddError("Failed to read VpnConnection", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", id, err))
@@ -308,7 +308,7 @@ func (r *VpnConnectionResource) updateVPNOptions(
 ) (*resource_vpn_connection.VpnConnectionModel, diag.Diagnostics) {
 	diags := diag.Diagnostics{}
 	res := utils.ExecuteRequest(func() (*iaas.UpdateVpnConnectionResponse, error) {
-		return r.provider.ApiClient.UpdateVpnConnectionWithResponse(
+		return r.provider.IaasClient.UpdateVpnConnectionWithResponse(
 			ctx,
 			r.provider.SpaceID,
 			id,

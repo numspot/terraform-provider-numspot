@@ -79,7 +79,7 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 
 	params := VpnConnectionsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpnConnectionsResponse, error) {
-		return d.provider.ApiClient.ReadVpnConnectionsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadVpnConnectionsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

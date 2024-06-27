@@ -85,7 +85,7 @@ func (d *routeTablesDataSource) Read(ctx context.Context, request datasource.Rea
 
 	params := RouteTablesFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadRouteTablesResponse, error) {
-		return d.provider.ApiClient.ReadRouteTablesWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadRouteTablesWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

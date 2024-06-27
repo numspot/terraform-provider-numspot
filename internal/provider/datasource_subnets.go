@@ -74,7 +74,7 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 
 	params := SubnetsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadSubnetsResponse, error) {
-		return d.provider.ApiClient.ReadSubnetsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadSubnetsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

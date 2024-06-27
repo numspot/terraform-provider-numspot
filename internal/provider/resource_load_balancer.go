@@ -71,7 +71,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 		ctx,
 		r.provider.SpaceID,
 		LoadBalancerFromTfToCreateRequest(ctx, &data),
-		r.provider.ApiClient.CreateLoadBalancerWithResponse)
+		r.provider.IaasClient.CreateLoadBalancerWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Load Balancer", err.Error())
 		return
@@ -98,7 +98,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	// Tags
 	// In load balancer case, tags are not handled in the same way as other resources
 	if len(data.Tags.Elements()) > 0 {
-		CreateLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.ApiClient, data.Name.ValueString(), data.Tags, &response.Diagnostics)
+		CreateLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.IaasClient, data.Name.ValueString(), data.Tags, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -115,7 +115,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 
 func (r *LoadBalancerResource) readLoadBalancer(ctx context.Context, id string, diagnostic diag.Diagnostics) *resource_load_balancer.LoadBalancerModel {
 	res := utils.ExecuteRequest(func() (*iaas.ReadLoadBalancersByIdResponse, error) {
-		return r.provider.ApiClient.ReadLoadBalancersByIdWithResponse(ctx, r.provider.SpaceID, id)
+		return r.provider.IaasClient.ReadLoadBalancersByIdWithResponse(ctx, r.provider.SpaceID, id)
 	}, http.StatusOK, &diagnostic)
 	if res == nil {
 		return nil
@@ -183,7 +183,7 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 			return
 		}
 
-		DeleteLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.ApiClient, state.Name.ValueString(), toDeleteTf, &response.Diagnostics)
+		DeleteLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.IaasClient, state.Name.ValueString(), toDeleteTf, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -194,7 +194,7 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 			return
 		}
 
-		CreateLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.ApiClient, state.Name.ValueString(), toCreateTf, &response.Diagnostics)
+		CreateLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.IaasClient, state.Name.ValueString(), toCreateTf, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -270,7 +270,7 @@ func (r *LoadBalancerResource) createListeners(ctx context.Context, loadBalancer
 	}
 
 	utils.ExecuteRequest(func() (*iaas.CreateLoadBalancerListenersResponse, error) {
-		return r.provider.ApiClient.CreateLoadBalancerListenersWithResponse(
+		return r.provider.IaasClient.CreateLoadBalancerListenersWithResponse(
 			ctx,
 			r.provider.SpaceID,
 			loadBalancerId,
@@ -292,7 +292,7 @@ func (r *LoadBalancerResource) deleteListeners(ctx context.Context, loadBalancer
 	}
 
 	utils.ExecuteRequest(func() (*iaas.DeleteLoadBalancerListenersResponse, error) {
-		return r.provider.ApiClient.DeleteLoadBalancerListenersWithResponse(
+		return r.provider.IaasClient.DeleteLoadBalancerListenersWithResponse(
 			ctx,
 			r.provider.SpaceID,
 			loadBalancerId,
@@ -331,7 +331,7 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 	// HealthCheck:
 	if !plan.HealthCheck.IsUnknown() && !state.HealthCheck.Equal(plan.HealthCheck) {
 		res := utils.ExecuteRequest(func() (*iaas.UpdateLoadBalancerResponse, error) {
-			return r.provider.ApiClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), iaas.UpdateLoadBalancerJSONRequestBody{
+			return r.provider.IaasClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), iaas.UpdateLoadBalancerJSONRequestBody{
 				HealthCheck: &iaas.HealthCheck{
 					CheckInterval:      utils.FromTfInt64ToInt(plan.HealthCheck.CheckInterval),
 					HealthyThreshold:   utils.FromTfInt64ToInt(plan.HealthCheck.HealthyThreshold),
@@ -352,7 +352,7 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 	if !plan.SecurityGroups.IsUnknown() && !state.SecurityGroups.Equal(plan.SecurityGroups) {
 		res := utils.ExecuteRequest(func() (*iaas.UpdateLoadBalancerResponse, error) {
 			securityGroups := utils.FromTfStringListToStringList(ctx, plan.SecurityGroups)
-			return r.provider.ApiClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), iaas.UpdateLoadBalancerJSONRequestBody{
+			return r.provider.IaasClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), iaas.UpdateLoadBalancerJSONRequestBody{
 				SecurityGroups: &securityGroups,
 			})
 		}, http.StatusOK, &response.Diagnostics)
@@ -374,7 +374,7 @@ func (r *LoadBalancerResource) linkBackendMachines(ctx context.Context, plan res
 	}
 
 	utils.ExecuteRequest(func() (*iaas.LinkLoadBalancerBackendMachinesResponse, error) {
-		return r.provider.ApiClient.LinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), payload)
+		return r.provider.IaasClient.LinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), payload)
 	}, http.StatusNoContent, &diags)
 	return diags
 }
@@ -395,7 +395,7 @@ func (r *LoadBalancerResource) AttachHealthCheck(ctx context.Context, lbName str
 	}
 
 	updatedLoadBalancer := utils.ExecuteRequest(func() (*iaas.UpdateLoadBalancerResponse, error) {
-		return r.provider.ApiClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, lbName, payload)
+		return r.provider.IaasClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, lbName, payload)
 	}, http.StatusOK, &diags)
 
 	return updatedLoadBalancer, diags
@@ -410,7 +410,7 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 	// Detach security groups
 	emptyList := []string{}
 	res := utils.ExecuteRequest(func() (*iaas.UpdateLoadBalancerResponse, error) {
-		return r.provider.ApiClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, data.Name.ValueString(), iaas.UpdateLoadBalancerJSONRequestBody{
+		return r.provider.IaasClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, data.Name.ValueString(), iaas.UpdateLoadBalancerJSONRequestBody{
 			SecurityGroups: &emptyList,
 		})
 	}, http.StatusOK, &response.Diagnostics)
@@ -418,7 +418,7 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 		return
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteLoadBalancerWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteLoadBalancerWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Load Balancer", err.Error())
 		return

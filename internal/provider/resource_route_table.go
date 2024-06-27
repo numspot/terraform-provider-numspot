@@ -70,7 +70,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		ctx,
 		r.provider.SpaceID,
 		RouteTableFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateRouteTableWithResponse)
+		r.provider.IaasClient.CreateRouteTableWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Route Table", err.Error())
 		return
@@ -81,7 +81,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 
 	// Tags
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -142,7 +142,7 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 }
 
 func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag diag.Diagnostics) *iaas.ReadRouteTablesByIdResponse {
-	res, err := r.provider.ApiClient.ReadRouteTablesByIdWithResponse(ctx, r.provider.SpaceID, id)
+	res, err := r.provider.IaasClient.ReadRouteTablesByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diag.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -181,7 +181,7 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -334,7 +334,7 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 		}
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteRouteTableWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteRouteTableWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Route Table", err.Error())
 		return
@@ -348,7 +348,7 @@ func (r *RouteTableResource) createRoutes(ctx context.Context, routeTableId stri
 			// prevent creating the one added in the plan modify function
 			if !route.IsUnknown() && !route.IsNull() && !strings.EqualFold(route.GatewayId.ValueString(), "local") {
 				createdRoute := utils.ExecuteRequest(func() (*iaas.CreateRouteResponse, error) {
-					return r.provider.ApiClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToCreateRoutesRequest(*route))
+					return r.provider.IaasClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToCreateRoutesRequest(*route))
 				}, http.StatusCreated, &diags)
 				if createdRoute == nil {
 					return
@@ -365,7 +365,7 @@ func (r *RouteTableResource) deleteRoutes(ctx context.Context, routeTableId stri
 		route := &routes[i]
 		if route != nil {
 			deletedRoute := utils.ExecuteRequest(func() (*iaas.DeleteRouteResponse, error) {
-				return r.provider.ApiClient.DeleteRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToDeleteRoutesRequest(*route))
+				return r.provider.IaasClient.DeleteRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToDeleteRoutesRequest(*route))
 			}, http.StatusNoContent, &diags)
 			if deletedRoute == nil {
 				return
@@ -433,7 +433,7 @@ func (r *RouteTableResource) linkRouteTable(ctx context.Context, routeTableId, s
 	var diags diag.Diagnostics
 
 	utils.ExecuteRequest(func() (*iaas.LinkRouteTableResponse, error) {
-		return r.provider.ApiClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, routeTableId, iaas.LinkRouteTableJSONRequestBody{SubnetId: subnetId})
+		return r.provider.IaasClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, routeTableId, iaas.LinkRouteTableJSONRequestBody{SubnetId: subnetId})
 	}, http.StatusOK, &diags)
 
 	return diags
@@ -443,7 +443,7 @@ func (r *RouteTableResource) unlinkRouteTable(ctx context.Context, routeTableId,
 	var diags diag.Diagnostics
 
 	utils.ExecuteRequest(func() (*iaas.UnlinkRouteTableResponse, error) {
-		return r.provider.ApiClient.UnlinkRouteTableWithResponse(ctx, r.provider.SpaceID, routeTableId, iaas.UnlinkRouteTableJSONRequestBody{LinkRouteTableId: linkRouteTableId})
+		return r.provider.IaasClient.UnlinkRouteTableWithResponse(ctx, r.provider.SpaceID, routeTableId, iaas.UnlinkRouteTableJSONRequestBody{LinkRouteTableId: linkRouteTableId})
 	}, http.StatusNoContent, &diags)
 
 	return diags

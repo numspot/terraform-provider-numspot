@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	resource_acls "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_acl"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -129,7 +129,7 @@ func (r *AclsResource) updateAcls(
 	action Action,
 	spaceId string,
 	serviceAccountID string,
-	acls []iam.ACL,
+	acls []numspot.ACL,
 ) diag.Diagnostics {
 	var diags diag.Diagnostics
 
@@ -144,7 +144,7 @@ func (r *AclsResource) updateAcls(
 		return diags
 	}
 
-	body := iam.ACLList{
+	body := numspot.ACLList{
 		Items: acls,
 	}
 
@@ -154,8 +154,8 @@ func (r *AclsResource) updateAcls(
 
 	// Execute
 	if action == AddAction {
-		utils.ExecuteRequest(func() (*iam.CreateACLServiceAccountSpaceBulkResponse, error) {
-			return r.provider.IAMAccessManagerClient.CreateACLServiceAccountSpaceBulkWithResponse(
+		utils.ExecuteRequest(func() (*numspot.CreateACLServiceAccountSpaceBulkResponse, error) {
+			return r.provider.NumSpotClient.CreateACLServiceAccountSpaceBulkWithResponse(
 				ctx,
 				spaceUUID,
 				serviceAccountUUID,
@@ -163,8 +163,8 @@ func (r *AclsResource) updateAcls(
 			)
 		}, http.StatusCreated, &diags)
 	} else if action == DeleteAction {
-		utils.ExecuteRequest(func() (*iam.DeleteACLServiceAccountSpaceBulkResponse, error) {
-			return r.provider.IAMAccessManagerClient.DeleteACLServiceAccountSpaceBulkWithResponse(
+		utils.ExecuteRequest(func() (*numspot.DeleteACLServiceAccountSpaceBulkResponse, error) {
+			return r.provider.NumSpotClient.DeleteACLServiceAccountSpaceBulkWithResponse(
 				ctx,
 				spaceUUID,
 				serviceAccountUUID,
@@ -195,14 +195,14 @@ func (r *AclsResource) readAcls(
 		return nil, diags
 	}
 
-	body := iam.GetACLServiceAccountSpaceParams{
+	body := numspot.GetACLServiceAccountSpaceParams{
 		Service:     tf.Service.ValueString(),
 		Resource:    tf.Resource.ValueString(),
 		Subresource: tf.Subresource.ValueStringPointer(),
 	}
 
-	res := utils.ExecuteRequest(func() (*iam.GetACLServiceAccountSpaceResponse, error) {
-		return r.provider.IAMAccessManagerClient.GetACLServiceAccountSpaceWithResponse(
+	res := utils.ExecuteRequest(func() (*numspot.GetACLServiceAccountSpaceResponse, error) {
+		return r.provider.NumSpotClient.GetACLServiceAccountSpaceWithResponse(
 			ctx, r.provider.SpaceID, serviceAccountUUID, &body)
 	}, http.StatusOK, &diags)
 	if res == nil {

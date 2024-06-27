@@ -71,7 +71,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		ctx,
 		r.provider.SpaceID,
 		SubnetFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateSubnetWithResponse)
+		r.provider.IaasClient.CreateSubnetWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Subnet", err.Error())
 		return
@@ -84,7 +84,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadSubnetsByIdWithResponse,
+		r.provider.IaasClient.ReadSubnetsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", *res.JSON201.Id, err))
@@ -93,7 +93,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 
 	if data.MapPublicIpOnLaunch.ValueBool() {
 		updateRes := utils.ExecuteRequest(func() (*iaas.UpdateSubnetResponse, error) {
-			return r.provider.ApiClient.UpdateSubnetWithResponse(ctx, r.provider.SpaceID, createdId, iaas.UpdateSubnetJSONRequestBody{
+			return r.provider.IaasClient.UpdateSubnetWithResponse(ctx, r.provider.SpaceID, createdId, iaas.UpdateSubnetJSONRequestBody{
 				MapPublicIpOnLaunch: true,
 			})
 		}, http.StatusOK, &response.Diagnostics)
@@ -103,14 +103,14 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	}
 
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
 	readRes := utils.ExecuteRequest(func() (*iaas.ReadSubnetsByIdResponse, error) {
-		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
+		return r.provider.IaasClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
 		return
@@ -128,7 +128,7 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadSubnetsByIdResponse, error) {
-		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -156,7 +156,7 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -166,7 +166,7 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadSubnetsByIdResponse, error) {
-		return r.provider.ApiClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadSubnetsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -187,7 +187,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteSubnetWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteSubnetWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete subnet", err.Error())
 		return

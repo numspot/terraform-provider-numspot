@@ -71,7 +71,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	res, err := retry_utils.RetryCreateUntilResourceAvailable(
 		ctx,
 		r.provider.SpaceID,
-		r.provider.ApiClient.CreateInternetGatewayWithResponse)
+		r.provider.IaasClient.CreateInternetGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Internet Gateway", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -89,7 +89,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	vpcId := data.VpcIp
 	if !vpcId.IsNull() {
 		linRes := utils.ExecuteRequest(func() (*iaas.LinkInternetGatewayResponse, error) {
-			return r.provider.ApiClient.LinkInternetGatewayWithResponse(
+			return r.provider.IaasClient.LinkInternetGatewayWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				createdId,
@@ -109,7 +109,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 		r.provider.SpaceID,
 		[]string{},
 		[]string{"available"},
-		r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse,
+		r.provider.IaasClient.ReadInternetGatewaysByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Internet Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -137,7 +137,7 @@ func (r *InternetGatewayResource) Read(ctx context.Context, request resource.Rea
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysByIdResponse, error) {
-		return r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -168,7 +168,7 @@ func (r *InternetGatewayResource) Update(ctx context.Context, request resource.U
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -183,7 +183,7 @@ func (r *InternetGatewayResource) Update(ctx context.Context, request resource.U
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysByIdResponse, error) {
-		return r.provider.ApiClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -214,7 +214,7 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 			iaas.UnlinkInternetGatewayJSONRequestBody{
 				VpcId: data.VpcIp.ValueString(),
 			},
-			r.provider.ApiClient.UnlinkInternetGatewayWithResponse,
+			r.provider.IaasClient.UnlinkInternetGatewayWithResponse,
 		)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to delete Internet Gateway", err.Error())
@@ -226,7 +226,7 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 		ctx,
 		r.provider.SpaceID,
 		data.Id.ValueString(),
-		r.provider.ApiClient.DeleteInternetGatewayWithResponse)
+		r.provider.IaasClient.DeleteInternetGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Internet Gateway", err.Error())
 		return

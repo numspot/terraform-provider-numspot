@@ -93,7 +93,7 @@ func (d *nicsDataSource) Read(ctx context.Context, request datasource.ReadReques
 
 	params := NicsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadNicsResponse, error) {
-		return d.provider.ApiClient.ReadNicsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadNicsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

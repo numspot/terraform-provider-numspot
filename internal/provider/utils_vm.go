@@ -27,7 +27,7 @@ func StopVm(ctx context.Context, provider Provider, id string) diag.Diagnostics 
 
 	// Stop the VM
 	_ = utils.ExecuteRequest(func() (*iaas.StopVmResponse, error) {
-		return provider.ApiClient.StopVmWithResponse(ctx, provider.SpaceID, id, body)
+		return provider.IaasClient.StopVmWithResponse(ctx, provider.SpaceID, id, body)
 	}, http.StatusOK, &diags)
 
 	if diags.HasError() {
@@ -40,7 +40,7 @@ func StopVm(ctx context.Context, provider Provider, id string) diag.Diagnostics 
 		provider.SpaceID,
 		[]string{"stopping"},
 		[]string{"stopped"},
-		provider.ApiClient.ReadVmsByIdWithResponse,
+		provider.IaasClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		diags.AddError("error while waiting for VM to stop", err.Error())
@@ -55,7 +55,7 @@ func StartVm(ctx context.Context, provider Provider, id string) diag.Diagnostics
 
 	// Start the VM
 	_ = utils.ExecuteRequest(func() (*iaas.StartVmResponse, error) {
-		return provider.ApiClient.StartVmWithResponse(ctx, provider.SpaceID, id)
+		return provider.IaasClient.StartVmWithResponse(ctx, provider.SpaceID, id)
 	}, http.StatusOK, &diags)
 
 	if diags.HasError() {
@@ -68,7 +68,7 @@ func StartVm(ctx context.Context, provider Provider, id string) diag.Diagnostics
 		provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running"},
-		provider.ApiClient.ReadVmsByIdWithResponse,
+		provider.IaasClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		diags.AddError("error while waiting for VM to start", err.Error())

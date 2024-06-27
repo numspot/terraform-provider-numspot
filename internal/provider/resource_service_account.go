@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_service_account"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -102,8 +102,8 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iam.CreateServiceAccountSpaceResponse, error) {
-		return r.provider.IAMIdentityManagerClient.CreateServiceAccountSpaceWithResponse(
+	res := utils.ExecuteRequest(func() (*numspot.CreateServiceAccountSpaceResponse, error) {
+		return r.provider.NumSpotClient.CreateServiceAccountSpaceWithResponse(
 			ctx,
 			spaceId,
 			ServiceAccountFromTFToCreateRequest(plan),
@@ -199,8 +199,8 @@ func (r *ServiceAccountResource) Read(ctx context.Context, request resource.Read
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iam.GetServiceAccountSpaceResponse, error) {
-		return r.provider.IAMIdentityManagerClient.GetServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
+	res := utils.ExecuteRequest(func() (*numspot.GetServiceAccountSpaceResponse, error) {
+		return r.provider.NumSpotClient.GetServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -349,10 +349,10 @@ func (r *ServiceAccountResource) updateServiceAccount(
 	serviceAccountName string,
 	response *resource.UpdateResponse,
 ) (*resource_service_account.ServiceAccountModel, error) {
-	payload := iam.ServiceAccount{Name: serviceAccountName}
+	payload := numspot.ServiceAccount{Name: serviceAccountName}
 
-	res := utils.ExecuteRequest(func() (*iam.UpdateServiceAccountSpaceResponse, error) {
-		return r.provider.IAMIdentityManagerClient.UpdateServiceAccountSpaceWithResponse(ctx, spaceID, servicAccountID, payload)
+	res := utils.ExecuteRequest(func() (*numspot.UpdateServiceAccountSpaceResponse, error) {
+		return r.provider.NumSpotClient.UpdateServiceAccountSpaceWithResponse(ctx, spaceID, servicAccountID, payload)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return nil, fmt.Errorf("failed to update service account: %v", "empty response")
@@ -371,8 +371,8 @@ func (r *ServiceAccountResource) assignServiceAccountToSpace(
 	spaceID, servicAccountID uuid.UUID,
 	response *resource.UpdateResponse,
 ) error {
-	res := utils.ExecuteRequest(func() (*iam.AssignServiceAccountToSpaceResponse, error) {
-		return r.provider.IAMIdentityManagerClient.AssignServiceAccountToSpaceWithResponse(ctx, spaceID, servicAccountID)
+	res := utils.ExecuteRequest(func() (*numspot.AssignServiceAccountToSpaceResponse, error) {
+		return r.provider.NumSpotClient.AssignServiceAccountToSpaceWithResponse(ctx, spaceID, servicAccountID)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return fmt.Errorf("failed to assign service account to space: %v", "empty response")
@@ -397,8 +397,8 @@ func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.De
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iam.DeleteServiceAccountSpaceResponse, error) {
-		return r.provider.IAMIdentityManagerClient.DeleteServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
+	res := utils.ExecuteRequest(func() (*numspot.DeleteServiceAccountSpaceResponse, error) {
+		return r.provider.NumSpotClient.DeleteServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
@@ -445,30 +445,30 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 	}
 
 	// Create Body
-	var policies *iam.IAMPolicy
+	var policies *numspot.IAMPolicy
 	if entityType == EntityTypeRole {
-		policies = &iam.IAMPolicy{Roles: &uuidList}
+		policies = &numspot.IAMPolicy{Roles: &uuidList}
 	} else if entityType == EntityTypePermission {
-		policies = &iam.IAMPolicy{Permissions: &uuidList}
+		policies = &numspot.IAMPolicy{Permissions: &uuidList}
 	}
 
-	var body iam.SetIAMPolicySpaceJSONRequestBody
+	var body numspot.SetIAMPolicySpaceJSONRequestBody
 	if action == AddAction {
-		body = iam.SetIAMPolicySpaceJSONRequestBody{
+		body = numspot.SetIAMPolicySpaceJSONRequestBody{
 			Add: policies,
 		}
 	} else if action == DeleteAction {
-		body = iam.SetIAMPolicySpaceJSONRequestBody{
+		body = numspot.SetIAMPolicySpaceJSONRequestBody{
 			Delete: policies,
 		}
 	}
 
 	// Execute
-	utils.ExecuteRequest(func() (*iam.SetIAMPolicySpaceResponse, error) {
-		return r.provider.IAMAccessManagerClient.SetIAMPolicySpaceWithResponse(
+	utils.ExecuteRequest(func() (*numspot.SetIAMPolicySpaceResponse, error) {
+		return r.provider.NumSpotClient.SetIAMPolicySpaceWithResponse(
 			ctx,
 			spaceId,
-			iam.ServiceAccounts,
+			numspot.ServiceAccounts,
 			serviceAccountUUID,
 			body,
 		)
@@ -516,9 +516,9 @@ func (r *ServiceAccountResource) getRolesAndGlobalPermissions(
 		return nil, nil, diags
 	}
 
-	res := utils.ExecuteRequest(func() (*iam.GetIAMPolicySpaceResponse, error) {
-		return r.provider.IAMAccessManagerClient.GetIAMPolicySpaceWithResponse(
-			ctx, r.provider.SpaceID, iam.ServiceAccounts, serviceAccountUUID)
+	res := utils.ExecuteRequest(func() (*numspot.GetIAMPolicySpaceResponse, error) {
+		return r.provider.NumSpotClient.GetIAMPolicySpaceWithResponse(
+			ctx, r.provider.SpaceID, numspot.ServiceAccounts, serviceAccountUUID)
 	}, http.StatusOK, &diags)
 	if res == nil {
 		return nil, nil, diags

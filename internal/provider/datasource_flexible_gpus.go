@@ -75,7 +75,7 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 
 	params := FlexibleGpusFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadFlexibleGpusResponse, error) {
-		return d.provider.ApiClient.ReadFlexibleGpusWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadFlexibleGpusWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

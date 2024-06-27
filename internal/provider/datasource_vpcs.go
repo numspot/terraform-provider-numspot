@@ -76,7 +76,7 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 
 	params := VPCsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsResponse, error) {
-		return d.provider.ApiClient.ReadVpcsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadVpcsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

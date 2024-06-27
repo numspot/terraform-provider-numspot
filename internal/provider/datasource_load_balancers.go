@@ -73,7 +73,7 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 		params.LoadBalancerNames = &lbNames
 	}
 	res := utils.ExecuteRequest(func() (*iaas.ReadLoadBalancersResponse, error) {
-		return d.provider.ApiClient.ReadLoadBalancersWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadLoadBalancersWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -72,7 +72,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		ctx,
 		r.provider.SpaceID,
 		VmFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
-		r.provider.ApiClient.CreateVmsWithResponse)
+		r.provider.IaasClient.CreateVmsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VM", err.Error())
 	}
@@ -85,7 +85,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 
 	// Create tags
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -97,7 +97,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running", "stopped"}, // In some cases, when there is insufficient capacity the VM is created with state = stopped
-		r.provider.ApiClient.ReadVmsByIdWithResponse,
+		r.provider.IaasClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", createdId, err))
@@ -134,7 +134,7 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 		if id == nil {
 			return nil, errors.New("Found invalid id")
 		}
-		return r.provider.ApiClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
+		return r.provider.IaasClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -167,7 +167,7 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			vmId,
 		)
@@ -189,7 +189,7 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 
 		// Update VM
 		updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVmResponse, error) {
-			return r.provider.ApiClient.UpdateVmWithResponse(ctx, r.provider.SpaceID, vmId, body)
+			return r.provider.IaasClient.UpdateVmWithResponse(ctx, r.provider.SpaceID, vmId, body)
 		}, http.StatusOK, &response.Diagnostics)
 
 		if updatedRes == nil || response.Diagnostics.HasError() {
@@ -211,7 +211,7 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running"},
-		r.provider.ApiClient.ReadVmsByIdWithResponse,
+		r.provider.IaasClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to update VM", fmt.Sprintf("Error waiting for VM to be created: %s", err))
@@ -258,7 +258,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteVmsWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVmsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VM", err.Error())
 		return

@@ -71,7 +71,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		ctx,
 		r.provider.SpaceID,
 		*ImageFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
-		r.provider.ApiClient.CreateImageWithResponse)
+		r.provider.IaasClient.CreateImageWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Image", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -92,7 +92,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadImagesByIdWithResponse,
+		r.provider.IaasClient.ReadImagesByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Image", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -125,7 +125,7 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadImagesByIdResponse, error) {
-		return r.provider.ApiClient.ReadImagesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadImagesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
 	tf, diagnostics := ImageFromHttpToTf(ctx, res.JSON200)
@@ -153,7 +153,7 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -168,7 +168,7 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadImagesByIdResponse, error) {
-		return r.provider.ApiClient.ReadImagesByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadImagesByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
 	tf, diagnostics := ImageFromHttpToTf(ctx, res.JSON200)
@@ -184,7 +184,7 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	var data resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteImageWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteImageWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Image", err.Error())
 		return

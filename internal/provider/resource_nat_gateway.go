@@ -71,7 +71,7 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 		ctx,
 		r.provider.SpaceID,
 		NatGatewayFromTfToCreateRequest(data),
-		r.provider.ApiClient.CreateNatGatewayWithResponse)
+		r.provider.IaasClient.CreateNatGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Nat Gateway", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -92,7 +92,7 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.ApiClient.ReadNatGatewayByIdWithResponse,
+		r.provider.IaasClient.ReadNatGatewayByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Nat Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -118,7 +118,7 @@ func (r *NatGatewayResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadNatGatewayByIdResponse, error) {
-		return r.provider.ApiClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+		return r.provider.IaasClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -147,7 +147,7 @@ func (r *NatGatewayResource) Update(ctx context.Context, request resource.Update
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -161,7 +161,7 @@ func (r *NatGatewayResource) Update(ctx context.Context, request resource.Update
 	}
 
 	res := utils.ExecuteRequest(func() (*iaas.ReadNatGatewayByIdResponse, error) {
-		return r.provider.ApiClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+		return r.provider.IaasClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -179,7 +179,7 @@ func (r *NatGatewayResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_nat_gateway.NatGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteNatGatewayWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteNatGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete NAT Gateway", err.Error())
 		return

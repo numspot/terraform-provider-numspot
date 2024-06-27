@@ -77,7 +77,7 @@ func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.Rea
 
 	params := DhcpOptionsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadDhcpOptionsResponse, error) {
-		return d.provider.ApiClient.ReadDhcpOptionsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadDhcpOptionsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

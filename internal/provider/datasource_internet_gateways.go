@@ -76,7 +76,7 @@ func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasourc
 
 	params := InternetGatewaysFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysResponse, error) {
-		return d.provider.ApiClient.ReadInternetGatewaysWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadInternetGatewaysWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

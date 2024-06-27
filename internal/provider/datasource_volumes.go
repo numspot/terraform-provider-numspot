@@ -80,7 +80,7 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 
 	params := VolumeFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadVolumesResponse, error) {
-		return d.provider.ApiClient.ReadVolumesWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadVolumesWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

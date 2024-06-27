@@ -85,7 +85,7 @@ func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, exis
 			Flow:  flow,
 			Rules: &rules,
 		}
-		return r.provider.ApiClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
+		return r.provider.IaasClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
 	}, http.StatusNoContent, &diags)
 
 	return diags
@@ -106,7 +106,7 @@ func createRules[RulesType any](
 
 	_ = utils.ExecuteRequest(func() (*iaas.CreateSecurityGroupRuleResponse, error) {
 		body := fun(ctx, id, rules)
-		return r.provider.ApiClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
+		return r.provider.IaasClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
 	}, http.StatusCreated, &diags)
 
 	return diags
@@ -167,7 +167,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		ctx,
 		r.provider.SpaceID,
 		SecurityGroupFromTfToCreateRequest(&data),
-		r.provider.ApiClient.CreateSecurityGroupWithResponse)
+		r.provider.IaasClient.CreateSecurityGroupWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Security Group", err.Error())
 		return
@@ -180,7 +180,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 	// Create tags
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.ApiClient, r.provider.SpaceID, &response.Diagnostics, id, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, id, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -230,7 +230,7 @@ func (r *SecurityGroupResource) readSecurityGroup(
 	id string,
 	diagnostics diag.Diagnostics,
 ) *iaas.ReadSecurityGroupsByIdResponse {
-	res, err := r.provider.ApiClient.ReadSecurityGroupsByIdWithResponse(ctx, r.provider.SpaceID, id)
+	res, err := r.provider.IaasClient.ReadSecurityGroupsByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -262,7 +262,7 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.ApiClient,
+			r.provider.IaasClient,
 			r.provider.SpaceID,
 			securityGroupId,
 		)
@@ -299,7 +299,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.ApiClient.DeleteSecurityGroupWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteSecurityGroupWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Security Group", err.Error())
 		return

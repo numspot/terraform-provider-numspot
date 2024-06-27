@@ -2,7 +2,7 @@ workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE != "merge_request_event"
 include:
-  - project: 'cloud/ci-templates'
+  - project: 'platform-software-factory/ci-templates'
     ref: 'jobs/go_unit-tests@0.2.2'
     file: 'jobs/go_unit-tests/go_unit-tests.yml'
 

@@ -80,7 +80,7 @@ func (d *snapshotsDataSource) Read(ctx context.Context, request datasource.ReadR
 
 	params := SnapshotsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadSnapshotsResponse, error) {
-		return d.provider.ApiClient.ReadSnapshotsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadSnapshotsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

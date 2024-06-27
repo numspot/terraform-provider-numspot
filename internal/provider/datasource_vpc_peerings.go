@@ -83,7 +83,7 @@ func (d *vpcPeeringsDataSource) Read(ctx context.Context, request datasource.Rea
 
 	params := VpcPeeringsFromTfToAPIReadParams(ctx, plan)
 	res := utils.ExecuteRequest(func() (*iaas.ReadVpcPeeringsResponse, error) {
-		return d.provider.ApiClient.ReadVpcPeeringsWithResponse(ctx, d.provider.SpaceID, &params)
+		return d.provider.IaasClient.ReadVpcPeeringsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

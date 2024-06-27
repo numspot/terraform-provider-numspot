@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iam"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_space"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -68,8 +68,8 @@ func (d *spaceDataSource) Read(ctx context.Context, request datasource.ReadReque
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iam.GetSpaceByIdResponse, error) {
-		return d.provider.IAMSpaceManagerClient.GetSpaceByIdWithResponse(ctx, spaceId)
+	res := utils.ExecuteRequest(func() (*numspot.GetSpaceByIdResponse, error) {
+		return d.provider.NumSpotClient.GetSpaceByIdWithResponse(ctx, spaceId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
