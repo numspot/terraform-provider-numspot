@@ -17,6 +17,7 @@ func TestAccNicsDatasource(t *testing.T) {
 				Config: fetchNicConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_nics.testdata", "items.#", "1"),
+					resource.TestCheckResourceAttrPair("data.numspot_nics.testdata", "items.0.id", "numspot_nic.test", "id"),
 				),
 			},
 		},

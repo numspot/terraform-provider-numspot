@@ -1,0 +1,47 @@
+//go:build acc
+
+package provider
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+)
+
+func TestAcc{{Datasource}}Datasource(t *testing.T) {
+	t.Parallel()
+	pr := TestAccProtoV6ProviderFactories
+
+	{{resource fields}} // Define wanted resource fields 
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: fetch{{Datasource}}Config({{resource fields}}),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					// If datasource returns a single element
+					resource.TestCheckResourceAttrPair("data.numspot_{{datasource}}.testdata", "id", "numspot_{{resource}}.test", "id"),
+					resource.TestCheckResourceAttr("data.numspot_{{datasource}}.testdata", "{{resource field X}}", {{resource field X}}), // Check attribute value for all resource fields
+				
+					// If datasource returns multiple elements 
+					resource.TestCheckResourceAttr("data.numspot_{{datasource}}.testdata", "items.#", "1"),
+					resource.TestCheckResourceAttrPair("data.numspot_{{datasource}}.testdata", "items.0.id", "numspot_{{resource}}.test", "id"),
+					resource.TestCheckTypeSetElemNestedAttrs("data.numspot_{{datasource}}.testdata", "items.*", map[string]string{{{match all resource fields}}}), 
+				),
+			},
+		},
+	})
+}
+
+func datasource{{Datasource}}Config({{resource fields}}) string {
+	return fmt.Sprintf(`
+resource "numspot_{{resource}}" "test" {
+	{{set resource fields with params}}
+}
+
+data "numspot_{{datasource}}" "testdata" {
+    {{search fields matching resource above}}
+}`, {{resource fields}})
+}
