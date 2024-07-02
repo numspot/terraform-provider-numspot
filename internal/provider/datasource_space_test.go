@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
 )
 
 func TestAccSpaceDatasource(t *testing.T) {
@@ -23,10 +22,7 @@ func TestAccSpaceDatasource(t *testing.T) {
 			{
 				Config: fetchSpaceConfig(organisationId, name, description),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("data.numspot_space.testdata", "id", func(id string) error {
-						require.NotEmpty(t, id)
-						return nil
-					}),
+					resource.TestCheckResourceAttrPair("data.numspot_space.testdata", "id", "numspot_space.test", "id"),
 					resource.TestCheckResourceAttr("data.numspot_space.testdata", "organisation_id", organisationId),
 					resource.TestCheckResourceAttr("data.numspot_space.testdata", "name", name),
 					resource.TestCheckResourceAttr("data.numspot_space.testdata", "description", description),
@@ -45,8 +41,7 @@ resource "numspot_space" "test" {
 }
 
 data "numspot_space" "testdata" {
-  space_id   = numspot_space.test.id
-  depends_on = [numspot_space.test]
+  space_id = numspot_space.test.id
 }
 	`, organisationId, name, description)
 }
