@@ -123,6 +123,7 @@ func ClusterResourceSchema(ctx context.Context) schema.Schema {
 				Required: true,
 			},
 		},
+		DeprecationMessage: "Managing Openshift clusters with Terraform still not supported",
 	}
 }
 

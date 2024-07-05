@@ -254,6 +254,7 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Load balancer names to filter with.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 
 }

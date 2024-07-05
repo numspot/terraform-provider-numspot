@@ -799,6 +799,7 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "ID for ReadVms",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

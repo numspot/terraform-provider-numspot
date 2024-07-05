@@ -58,6 +58,7 @@ func KeyPairDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The type of the keypair (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

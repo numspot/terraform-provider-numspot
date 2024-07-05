@@ -55,6 +55,7 @@ func ProductTypeDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The IDs of the product types.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

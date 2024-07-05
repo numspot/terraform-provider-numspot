@@ -133,6 +133,7 @@ func SnapshotDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "ID for ReadSnapshots",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

@@ -48,6 +48,7 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

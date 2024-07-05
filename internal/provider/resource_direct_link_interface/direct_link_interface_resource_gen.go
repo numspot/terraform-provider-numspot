@@ -141,6 +141,7 @@ func DirectLinkInterfaceResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The VLAN number associated with the DirectLink interface.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

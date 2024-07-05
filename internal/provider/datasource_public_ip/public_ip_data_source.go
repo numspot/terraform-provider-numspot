@@ -126,6 +126,7 @@ func PublicIpDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The IDs of the VMs.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

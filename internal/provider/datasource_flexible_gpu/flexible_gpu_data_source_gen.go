@@ -116,6 +116,7 @@ func FlexibleGpuDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "One or more IDs of VMs.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

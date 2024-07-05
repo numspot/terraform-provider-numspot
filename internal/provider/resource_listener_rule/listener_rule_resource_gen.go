@@ -123,6 +123,7 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 			},
 		},
 		MarkdownDescription: "This resource is not implemented yet. Please consider not using it.",
+		DeprecationMessage:  "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

@@ -299,6 +299,7 @@ func LoadBalancerPolicyResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Net for the load balancer.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

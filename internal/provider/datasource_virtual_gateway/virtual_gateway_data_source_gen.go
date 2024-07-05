@@ -97,6 +97,7 @@ func VirtualGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The key/value combination of the tags associated with the virtual gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 
