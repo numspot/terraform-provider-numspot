@@ -267,6 +267,7 @@ func RouteTableDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Subnet.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

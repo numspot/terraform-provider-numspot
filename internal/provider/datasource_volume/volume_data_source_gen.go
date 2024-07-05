@@ -176,6 +176,7 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The IDs of the volumes.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

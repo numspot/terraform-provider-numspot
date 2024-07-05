@@ -567,6 +567,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Net in which the VM is running.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

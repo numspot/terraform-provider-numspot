@@ -114,6 +114,7 @@ func NatGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The IDs of the Nets in which the NAT services are.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

@@ -49,6 +49,7 @@ func DirectLinkResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The state of the DirectLink.<br />\n* `requested`: The DirectLink is requested but the request has not been validated yet.<br />\n* `pending`: The DirectLink request has been validated. It remains in the `pending` state until you establish the physical link.<br />\n* `available`: The physical link is established and the connection is ready to use.<br />\n * `deleting`: The deletion process is in progress.<br />\n* `deleted`: The DirectLink is deleted.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

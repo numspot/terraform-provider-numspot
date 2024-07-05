@@ -315,6 +315,7 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The Border Gateway Protocol (BGP) Autonomous System Numbers (ASNs) of the connections.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

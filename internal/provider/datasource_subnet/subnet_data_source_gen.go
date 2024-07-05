@@ -97,6 +97,7 @@ func SubnetDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The names of the Subregions in which the Subnets are located.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

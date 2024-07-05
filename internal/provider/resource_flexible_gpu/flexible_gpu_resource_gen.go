@@ -59,6 +59,7 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the VM the fGPU is attached to, if any.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

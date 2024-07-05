@@ -78,6 +78,7 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"tags": tags.TagsSchema(ctx),
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 

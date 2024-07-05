@@ -224,6 +224,7 @@ func VpcPeeringDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The key/value combination of the tags associated with the Net peerings, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.",
 			},
 		},
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
 }
 
