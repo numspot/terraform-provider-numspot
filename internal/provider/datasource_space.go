@@ -68,8 +68,14 @@ func (d *spaceDataSource) Read(ctx context.Context, request datasource.ReadReque
 		return
 	}
 
+	organisationId, err := uuid.Parse(plan.OrganisationId.ValueString())
+	if err != nil {
+		response.Diagnostics.AddError("Invalid organisation id", fmt.Sprintf("organisation id should be in UUID format but was '%s'", plan.OrganisationId))
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.GetSpaceByIdResponse, error) {
-		return d.provider.NumSpotClient.GetSpaceByIdWithResponse(ctx, spaceId)
+		return d.provider.NumspotClient.GetSpaceByIdWithResponse(ctx, organisationId, spaceId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

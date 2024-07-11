@@ -5,14 +5,14 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_flexible_gpu"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_flexible_gpu"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func FlexibleGpuFromHttpToTf(http *iaas.FlexibleGpu) resource_flexible_gpu.FlexibleGpuModel {
+func FlexibleGpuFromHttpToTf(http *numspot.FlexibleGpu) resource_flexible_gpu.FlexibleGpuModel {
 	return resource_flexible_gpu.FlexibleGpuModel{
 		DeleteOnVmDeletion:   types.BoolPointerValue(http.DeleteOnVmDeletion),
 		Generation:           types.StringPointerValue(http.Generation),
@@ -24,8 +24,8 @@ func FlexibleGpuFromHttpToTf(http *iaas.FlexibleGpu) resource_flexible_gpu.Flexi
 	}
 }
 
-func FlexibleGpuFromTfToCreateRequest(tf *resource_flexible_gpu.FlexibleGpuModel) iaas.CreateFlexibleGpuJSONRequestBody {
-	return iaas.CreateFlexibleGpuJSONRequestBody{
+func FlexibleGpuFromTfToCreateRequest(tf *resource_flexible_gpu.FlexibleGpuModel) numspot.CreateFlexibleGpuJSONRequestBody {
+	return numspot.CreateFlexibleGpuJSONRequestBody{
 		DeleteOnVmDeletion:   tf.DeleteOnVmDeletion.ValueBoolPointer(),
 		Generation:           tf.Generation.ValueStringPointer(),
 		ModelName:            tf.ModelName.ValueString(),
@@ -33,14 +33,14 @@ func FlexibleGpuFromTfToCreateRequest(tf *resource_flexible_gpu.FlexibleGpuModel
 	}
 }
 
-func FlexibleGpuFromTfToUpdateRequest(tf *resource_flexible_gpu.FlexibleGpuModel) iaas.UpdateFlexibleGpuJSONRequestBody {
-	return iaas.UpdateFlexibleGpuJSONRequestBody{
+func FlexibleGpuFromTfToUpdateRequest(tf *resource_flexible_gpu.FlexibleGpuModel) numspot.UpdateFlexibleGpuJSONRequestBody {
+	return numspot.UpdateFlexibleGpuJSONRequestBody{
 		DeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(tf.DeleteOnVmDeletion),
 	}
 }
 
-func FlexibleGpusFromTfToAPIReadParams(ctx context.Context, tf FlexibleGpuModel) iaas.ReadFlexibleGpusParams {
-	return iaas.ReadFlexibleGpusParams{
+func FlexibleGpusFromTfToAPIReadParams(ctx context.Context, tf FlexibleGpuModel) numspot.ReadFlexibleGpusParams {
+	return numspot.ReadFlexibleGpusParams{
 		States:                utils.TfStringListToStringPtrList(ctx, tf.States),
 		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.Ids),
 		AvailabilityZoneNames: utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames),
@@ -51,7 +51,7 @@ func FlexibleGpusFromTfToAPIReadParams(ctx context.Context, tf FlexibleGpuModel)
 	}
 }
 
-func FlexibleGpusFromHttpToTfDatasource(ctx context.Context, http *iaas.FlexibleGpu) (*datasource_flexible_gpu.FlexibleGpuModel, diag.Diagnostics) {
+func FlexibleGpusFromHttpToTfDatasource(ctx context.Context, http *numspot.FlexibleGpu) (*datasource_flexible_gpu.FlexibleGpuModel, diag.Diagnostics) {
 	return &datasource_flexible_gpu.FlexibleGpuModel{
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		Id:                   types.StringPointerValue(http.Id),
@@ -63,9 +63,9 @@ func FlexibleGpusFromHttpToTfDatasource(ctx context.Context, http *iaas.Flexible
 	}, nil
 }
 
-func LinkFlexibleGpuFromTfToCreateRequest(tf *resource_flexible_gpu.FlexibleGpuModel) iaas.LinkFlexibleGpuJSONRequestBody {
+func LinkFlexibleGpuFromTfToCreateRequest(tf *resource_flexible_gpu.FlexibleGpuModel) numspot.LinkFlexibleGpuJSONRequestBody {
 	vmId := utils.FromTfStringToStringPtr(tf.VmId)
-	return iaas.LinkFlexibleGpuJSONRequestBody{
+	return numspot.LinkFlexibleGpuJSONRequestBody{
 		VmId: utils.GetPtrValue(vmId),
 	}
 }

@@ -103,7 +103,7 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.CreateServiceAccountSpaceResponse, error) {
-		return r.provider.NumSpotClient.CreateServiceAccountSpaceWithResponse(
+		return r.provider.NumspotClient.CreateServiceAccountSpaceWithResponse(
 			ctx,
 			spaceId,
 			ServiceAccountFromTFToCreateRequest(plan),
@@ -200,7 +200,7 @@ func (r *ServiceAccountResource) Read(ctx context.Context, request resource.Read
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.GetServiceAccountSpaceResponse, error) {
-		return r.provider.NumSpotClient.GetServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
+		return r.provider.NumspotClient.GetServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -352,7 +352,7 @@ func (r *ServiceAccountResource) updateServiceAccount(
 	payload := numspot.ServiceAccount{Name: serviceAccountName}
 
 	res := utils.ExecuteRequest(func() (*numspot.UpdateServiceAccountSpaceResponse, error) {
-		return r.provider.NumSpotClient.UpdateServiceAccountSpaceWithResponse(ctx, spaceID, servicAccountID, payload)
+		return r.provider.NumspotClient.UpdateServiceAccountSpaceWithResponse(ctx, spaceID, servicAccountID, payload)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return nil, fmt.Errorf("failed to update service account: %v", "empty response")
@@ -372,7 +372,7 @@ func (r *ServiceAccountResource) assignServiceAccountToSpace(
 	response *resource.UpdateResponse,
 ) error {
 	res := utils.ExecuteRequest(func() (*numspot.AssignServiceAccountToSpaceResponse, error) {
-		return r.provider.NumSpotClient.AssignServiceAccountToSpaceWithResponse(ctx, spaceID, servicAccountID)
+		return r.provider.NumspotClient.AssignServiceAccountToSpaceWithResponse(ctx, spaceID, servicAccountID)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return fmt.Errorf("failed to assign service account to space: %v", "empty response")
@@ -398,7 +398,7 @@ func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.De
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.DeleteServiceAccountSpaceResponse, error) {
-		return r.provider.NumSpotClient.DeleteServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
+		return r.provider.NumspotClient.DeleteServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
@@ -465,7 +465,7 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 
 	// Execute
 	utils.ExecuteRequest(func() (*numspot.SetIAMPolicySpaceResponse, error) {
-		return r.provider.NumSpotClient.SetIAMPolicySpaceWithResponse(
+		return r.provider.NumspotClient.SetIAMPolicySpaceWithResponse(
 			ctx,
 			spaceId,
 			numspot.ServiceAccounts,
@@ -517,7 +517,7 @@ func (r *ServiceAccountResource) getRolesAndGlobalPermissions(
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.GetIAMPolicySpaceResponse, error) {
-		return r.provider.NumSpotClient.GetIAMPolicySpaceWithResponse(
+		return r.provider.NumspotClient.GetIAMPolicySpaceWithResponse(
 			ctx, r.provider.SpaceID, numspot.ServiceAccounts, serviceAccountUUID)
 	}, http.StatusOK, &diags)
 	if res == nil {

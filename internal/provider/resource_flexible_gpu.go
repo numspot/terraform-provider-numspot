@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_flexible_gpu"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
@@ -64,8 +64,8 @@ func (r *FlexibleGpuResource) linkVm(ctx context.Context, gpuId string, data res
 
 	// Link GPU to VM
 	body := LinkFlexibleGpuFromTfToCreateRequest(&data)
-	_ = utils.ExecuteRequest(func() (*iaas.LinkFlexibleGpuResponse, error) {
-		return r.provider.IaasClient.LinkFlexibleGpuWithResponse(ctx, r.provider.SpaceID, gpuId, body)
+	_ = utils.ExecuteRequest(func() (*numspot.LinkFlexibleGpuResponse, error) {
+		return r.provider.NumspotClient.LinkFlexibleGpuWithResponse(ctx, r.provider.SpaceID, gpuId, body)
 	}, http.StatusNoContent, &diags)
 	if diags.HasError() {
 		return diags
@@ -88,8 +88,8 @@ func (r *FlexibleGpuResource) unlinkVm(ctx context.Context, gpuId string, data r
 	var diags diag.Diagnostics
 
 	// Unlink GPU from any VM
-	_ = utils.ExecuteRequest(func() (*iaas.UnlinkFlexibleGpuResponse, error) {
-		return r.provider.IaasClient.UnlinkFlexibleGpuWithResponse(ctx, r.provider.SpaceID, gpuId)
+	_ = utils.ExecuteRequest(func() (*numspot.UnlinkFlexibleGpuResponse, error) {
+		return r.provider.NumspotClient.UnlinkFlexibleGpuWithResponse(ctx, r.provider.SpaceID, gpuId)
 	}, http.StatusNoContent, &diags)
 	if diags.HasError() {
 		return diags
@@ -120,7 +120,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 		ctx,
 		r.provider.SpaceID,
 		FlexibleGpuFromTfToCreateRequest(&data),
-		r.provider.IaasClient.CreateFlexibleGpuWithResponse)
+		r.provider.NumspotClient.CreateFlexibleGpuWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Flexible GPU", err.Error())
 		return
@@ -142,14 +142,14 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 		r.provider.SpaceID,
 		[]string{"attaching", "detaching"},
 		[]string{"allocated", "attached"},
-		r.provider.IaasClient.ReadFlexibleGpusByIdWithResponse,
+		r.provider.NumspotClient.ReadFlexibleGpusByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Flexible GPU", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", data.Id.ValueString(), err))
 		return
 	}
 
-	flexGPU, ok := read.(*iaas.FlexibleGpu)
+	flexGPU, ok := read.(*numspot.FlexibleGpu)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create Flexible GPU", "object conversion error")
 		return
@@ -159,8 +159,8 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *iaas.FlexibleGpu {
-	res, err := r.provider.IaasClient.ReadFlexibleGpusByIdWithResponse(ctx, r.provider.SpaceID, id)
+func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *numspot.FlexibleGpu {
+	res, err := r.provider.NumspotClient.ReadFlexibleGpusByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -222,8 +222,8 @@ func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.Updat
 
 	if plan.DeleteOnVmDeletion != state.DeleteOnVmDeletion {
 		body := FlexibleGpuFromTfToUpdateRequest(&plan)
-		res := utils.ExecuteRequest(func() (*iaas.UpdateFlexibleGpuResponse, error) {
-			return r.provider.IaasClient.UpdateFlexibleGpuWithResponse(
+		res := utils.ExecuteRequest(func() (*numspot.UpdateFlexibleGpuResponse, error) {
+			return r.provider.NumspotClient.UpdateFlexibleGpuWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				state.Id.ValueString(),
@@ -253,7 +253,7 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 		// Even if there is an error on unlink, we will try to delete the GPU
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteFlexibleGpuWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteFlexibleGpuWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Flexible GPU", err.Error())
 		return

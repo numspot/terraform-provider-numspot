@@ -20,8 +20,8 @@ resource "numspot_space" "test" {
 }
 
 data "numspot_space" "testdata" {
-  space_id   = numspot_space.test.id
-  depends_on = [numspot_space.test]
+  space_id        = numspot_space.test.id
+  organisation_id = numspot_space.test.organisation_id
 }
 
 # How to use the datasource in another field
@@ -37,6 +37,7 @@ resource "null_resource" "print-datasource-id" {
 
 ### Required
 
+- `organisation_id` (String) Organisation_id
 - `space_id` (String) Space ID
 
 ### Read-Only
@@ -45,6 +46,5 @@ resource "null_resource" "print-datasource-id" {
 - `description` (String) Space description
 - `id` (String) Internal ID
 - `name` (String) Space name
-- `organisation_id` (String) Organisation_id
 - `status` (String) status of the space, the space can only be used when the status is ready.
 - `updated_on` (String) Space last update

@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vpn_connection"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpn_connection"
@@ -17,11 +17,11 @@ import (
 
 const VPNConnectionRouteStateDeleted = "deleted"
 
-func VpnConnectionFromTfToHttp(tf *resource_vpn_connection.VpnConnectionModel) *iaas.VpnConnection {
-	return &iaas.VpnConnection{}
+func VpnConnectionFromTfToHttp(tf *resource_vpn_connection.VpnConnectionModel) *numspot.VpnConnection {
+	return &numspot.VpnConnection{}
 }
 
-func routeFromHTTP(ctx context.Context, elt iaas.RouteLight) (resource_vpn_connection.RoutesValue, diag.Diagnostics) {
+func routeFromHTTP(ctx context.Context, elt numspot.RouteLight) (resource_vpn_connection.RoutesValue, diag.Diagnostics) {
 	return resource_vpn_connection.NewRoutesValue(
 		resource_vpn_connection.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -31,7 +31,7 @@ func routeFromHTTP(ctx context.Context, elt iaas.RouteLight) (resource_vpn_conne
 		})
 }
 
-func phase1OptionsFromHTTP(ctx context.Context, elt *iaas.Phase1Options) (resource_vpn_connection.Phase1optionsValue, diag.Diagnostics) {
+func phase1OptionsFromHTTP(ctx context.Context, elt *numspot.Phase1Options) (resource_vpn_connection.Phase1optionsValue, diag.Diagnostics) {
 	phase1IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase1optionsValue{}, diags
@@ -64,7 +64,7 @@ func phase1OptionsFromHTTP(ctx context.Context, elt *iaas.Phase1Options) (resour
 		})
 }
 
-func phase2OptionsFromHTTP(ctx context.Context, elt *iaas.Phase2Options) (resource_vpn_connection.Phase2optionsValue, diag.Diagnostics) {
+func phase2OptionsFromHTTP(ctx context.Context, elt *numspot.Phase2Options) (resource_vpn_connection.Phase2optionsValue, diag.Diagnostics) {
 	phase2IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase2optionsValue{}, diags
@@ -89,7 +89,7 @@ func phase2OptionsFromHTTP(ctx context.Context, elt *iaas.Phase2Options) (resour
 		})
 }
 
-func vpnOptionsFromHTTP(ctx context.Context, elt *iaas.VpnOptions) (resource_vpn_connection.VpnOptionsValue, diag.Diagnostics) {
+func vpnOptionsFromHTTP(ctx context.Context, elt *numspot.VpnOptions) (resource_vpn_connection.VpnOptionsValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 	if elt == nil {
 		return resource_vpn_connection.VpnOptionsValue{}, diag.Diagnostics{}
@@ -138,7 +138,7 @@ func vpnOptionsFromHTTP(ctx context.Context, elt *iaas.VpnOptions) (resource_vpn
 	return vpnOptions, diags
 }
 
-func VGWTelemetryFromHTTPToTF(ctx context.Context, http iaas.VgwTelemetry) (resource_vpn_connection.VgwTelemetriesValue, diag.Diagnostics) {
+func VGWTelemetryFromHTTPToTF(ctx context.Context, http numspot.VgwTelemetry) (resource_vpn_connection.VgwTelemetriesValue, diag.Diagnostics) {
 	var lastStateChangeDate string
 	if http.LastStateChangeDate != nil {
 		lastStateChangeDate = http.LastStateChangeDate.String()
@@ -156,7 +156,7 @@ func VGWTelemetryFromHTTPToTF(ctx context.Context, http iaas.VgwTelemetry) (reso
 		})
 }
 
-func VpnConnectionFromHttpToTf(ctx context.Context, http *iaas.VpnConnection) (*resource_vpn_connection.VpnConnectionModel, diag.Diagnostics) {
+func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection) (*resource_vpn_connection.VpnConnectionModel, diag.Diagnostics) {
 	var (
 		diags  diag.Diagnostics
 		tagsTf types.List
@@ -188,7 +188,7 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *iaas.VpnConnection) (*
 
 	if http.Routes != nil {
 		// Skip vpn routes with state deleted
-		httpRoutes := slices.DeleteFunc(*http.Routes, func(r iaas.RouteLight) bool {
+		httpRoutes := slices.DeleteFunc(*http.Routes, func(r numspot.RouteLight) bool {
 			return *r.State == VPNConnectionRouteStateDeleted
 		})
 		routes, diags := utils.GenericSetToTfSetValue(ctx, resource_vpn_connection.RoutesValue{}, routeFromHTTP, httpRoutes)
@@ -209,8 +209,8 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *iaas.VpnConnection) (*
 	return &vpnConnectionModel, nil
 }
 
-func VpnConnectionFromTfToCreateRequest(tf *resource_vpn_connection.VpnConnectionModel) iaas.CreateVpnConnectionJSONRequestBody {
-	return iaas.CreateVpnConnectionJSONRequestBody{
+func VpnConnectionFromTfToCreateRequest(tf *resource_vpn_connection.VpnConnectionModel) numspot.CreateVpnConnectionJSONRequestBody {
+	return numspot.CreateVpnConnectionJSONRequestBody{
 		ClientGatewayId:  tf.ClientGatewayId.ValueString(),
 		ConnectionType:   tf.ConnectionType.ValueString(),
 		StaticRoutesOnly: tf.StaticRoutesOnly.ValueBoolPointer(),
@@ -218,24 +218,24 @@ func VpnConnectionFromTfToCreateRequest(tf *resource_vpn_connection.VpnConnectio
 	}
 }
 
-func VpnConnectionFromTfToUpdateRequest(ctx context.Context, tf *resource_vpn_connection.VpnConnectionModel) iaas.UpdateVpnConnectionJSONRequestBody {
-	var vpnOptions *iaas.VpnOptionsToUpdate
+func VpnConnectionFromTfToUpdateRequest(ctx context.Context, tf *resource_vpn_connection.VpnConnectionModel) numspot.UpdateVpnConnectionJSONRequestBody {
+	var vpnOptions *numspot.VpnOptionsToUpdate
 
 	phase2Options := phase2OptionsToUpdateFromTFToHTTP(ctx, tf.VpnOptions)
 	if phase2Options != nil || tf.VpnOptions.TunnelInsideIpRange.ValueStringPointer() != nil {
-		vpnOptions = &iaas.VpnOptionsToUpdate{}
+		vpnOptions = &numspot.VpnOptionsToUpdate{}
 	}
 	if vpnOptions != nil {
 		vpnOptions.Phase2Options = phase2Options
 		vpnOptions.TunnelInsideIpRange = tf.VpnOptions.TunnelInsideIpRange.ValueStringPointer()
 	}
 
-	return iaas.UpdateVpnConnectionJSONRequestBody{
+	return numspot.UpdateVpnConnectionJSONRequestBody{
 		VpnOptions: vpnOptions,
 	}
 }
 
-func phase2OptionsToUpdateFromTFToHTTP(ctx context.Context, vpnOptions resource_vpn_connection.VpnOptionsValue) *iaas.Phase2OptionsToUpdate {
+func phase2OptionsToUpdateFromTFToHTTP(ctx context.Context, vpnOptions resource_vpn_connection.VpnOptionsValue) *numspot.Phase2OptionsToUpdate {
 	vpnOptionsValue, diags := resource_vpn_connection.NewPhase2optionsValue(vpnOptions.Phase2options.AttributeTypes(ctx), vpnOptions.Phase2options.Attributes())
 	if diags.HasError() {
 		return nil
@@ -243,11 +243,11 @@ func phase2OptionsToUpdateFromTFToHTTP(ctx context.Context, vpnOptions resource_
 	if vpnOptionsValue.PreSharedKey.ValueStringPointer() == nil {
 		return nil
 	}
-	return &iaas.Phase2OptionsToUpdate{PreSharedKey: vpnOptionsValue.PreSharedKey.ValueStringPointer()}
+	return &numspot.Phase2OptionsToUpdate{PreSharedKey: vpnOptionsValue.PreSharedKey.ValueStringPointer()}
 }
 
-func VpnConnectionsFromTfToAPIReadParams(ctx context.Context, tf VpnConnectionsDataSourceModel) iaas.ReadVpnConnectionsParams {
-	return iaas.ReadVpnConnectionsParams{
+func VpnConnectionsFromTfToAPIReadParams(ctx context.Context, tf VpnConnectionsDataSourceModel) numspot.ReadVpnConnectionsParams {
+	return numspot.ReadVpnConnectionsParams{
 		States:                   utils.TfStringListToStringPtrList(ctx, tf.States),
 		TagKeys:                  utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
 		TagValues:                utils.TfStringListToStringPtrList(ctx, tf.TagValues),
@@ -262,7 +262,7 @@ func VpnConnectionsFromTfToAPIReadParams(ctx context.Context, tf VpnConnectionsD
 	}
 }
 
-func VpnConnectionsFromHttpToTfDatasource(ctx context.Context, http *iaas.VpnConnection) (*datasource_vpn_connection.VpnConnectionModel, diag.Diagnostics) {
+func VpnConnectionsFromHttpToTfDatasource(ctx context.Context, http *numspot.VpnConnection) (*datasource_vpn_connection.VpnConnectionModel, diag.Diagnostics) {
 	var (
 		routes              = types.ListNull(datasource_vpn_connection.RoutesValue{}.Type(ctx))
 		vgwTelemetriesValue = types.ListNull(datasource_vpn_connection.VgwTelemetriesValue{}.Type(ctx))
@@ -319,7 +319,7 @@ func VpnConnectionsFromHttpToTfDatasource(ctx context.Context, http *iaas.VpnCon
 	}, nil
 }
 
-func routeFromHTTPDatasource(ctx context.Context, elt iaas.RouteLight) (datasource_vpn_connection.RoutesValue, diag.Diagnostics) {
+func routeFromHTTPDatasource(ctx context.Context, elt numspot.RouteLight) (datasource_vpn_connection.RoutesValue, diag.Diagnostics) {
 	return datasource_vpn_connection.NewRoutesValue(
 		datasource_vpn_connection.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -329,7 +329,7 @@ func routeFromHTTPDatasource(ctx context.Context, elt iaas.RouteLight) (datasour
 		})
 }
 
-func phase1OptionsFromHTTPDatasource(ctx context.Context, elt *iaas.Phase1Options) (datasource_vpn_connection.Phase1optionsValue, diag.Diagnostics) {
+func phase1OptionsFromHTTPDatasource(ctx context.Context, elt *numspot.Phase1Options) (datasource_vpn_connection.Phase1optionsValue, diag.Diagnostics) {
 	phase1IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms)
 	if diags.HasError() {
 		return datasource_vpn_connection.Phase1optionsValue{}, diags
@@ -362,7 +362,7 @@ func phase1OptionsFromHTTPDatasource(ctx context.Context, elt *iaas.Phase1Option
 		})
 }
 
-func phase2OptionsFromHTTPDatasource(ctx context.Context, elt *iaas.Phase2Options) (datasource_vpn_connection.Phase2optionsValue, diag.Diagnostics) {
+func phase2OptionsFromHTTPDatasource(ctx context.Context, elt *numspot.Phase2Options) (datasource_vpn_connection.Phase2optionsValue, diag.Diagnostics) {
 	phase2IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms)
 	if diags.HasError() {
 		return datasource_vpn_connection.Phase2optionsValue{}, diags
@@ -387,7 +387,7 @@ func phase2OptionsFromHTTPDatasource(ctx context.Context, elt *iaas.Phase2Option
 		})
 }
 
-func vpnOptionsFromHTTPDatasource(ctx context.Context, elt *iaas.VpnOptions) (datasource_vpn_connection.VpnOptionsValue, diag.Diagnostics) {
+func vpnOptionsFromHTTPDatasource(ctx context.Context, elt *numspot.VpnOptions) (datasource_vpn_connection.VpnOptionsValue, diag.Diagnostics) {
 	if elt == nil {
 		return datasource_vpn_connection.VpnOptionsValue{}, diag.Diagnostics{}
 	}
@@ -418,7 +418,7 @@ func vpnOptionsFromHTTPDatasource(ctx context.Context, elt *iaas.VpnOptions) (da
 	return vpnOptions, diags
 }
 
-func VGWTelemetryFromHTTPDatasource(ctx context.Context, http iaas.VgwTelemetry) (datasource_vpn_connection.VgwTelemetriesValue, diag.Diagnostics) {
+func VGWTelemetryFromHTTPDatasource(ctx context.Context, http numspot.VgwTelemetry) (datasource_vpn_connection.VgwTelemetriesValue, diag.Diagnostics) {
 	var lastStateChangeDate string
 	if http.LastStateChangeDate != nil {
 		lastStateChangeDate = http.LastStateChangeDate.String()

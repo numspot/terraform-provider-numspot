@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_listener_rule"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
@@ -70,7 +70,7 @@ func (r *ListenerRuleResource) Create(ctx context.Context, request resource.Crea
 		ctx,
 		r.provider.SpaceID,
 		ListenerRuleFromTfToCreateRequest(&data),
-		r.provider.IaasClient.CreateListenerRuleWithResponse)
+		r.provider.NumspotClient.CreateListenerRuleWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Listener Rule", err.Error())
 		return
@@ -84,8 +84,8 @@ func (r *ListenerRuleResource) Read(ctx context.Context, request resource.ReadRe
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadListenerRulesByIdResponse, error) {
-		return r.provider.IaasClient.ReadListenerRulesByIdWithResponse(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()))
+	res := utils.ExecuteRequest(func() (*numspot.ReadListenerRulesByIdResponse, error) {
+		return r.provider.NumspotClient.ReadListenerRulesByIdWithResponse(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()))
 	}, http.StatusOK, &response.Diagnostics)
 
 	tf := ListenerRuleFromHttpToTf(res.JSON200)
@@ -100,7 +100,7 @@ func (r *ListenerRuleResource) Delete(ctx context.Context, request resource.Dele
 	var data resource_listener_rule.ListenerRuleModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()), r.provider.IaasClient.DeleteListenerRuleWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, fmt.Sprint(data.Id.ValueInt64()), r.provider.NumspotClient.DeleteListenerRuleWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Listener Rule", err.Error())
 		return

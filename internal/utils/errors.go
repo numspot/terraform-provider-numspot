@@ -12,11 +12,11 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 )
 
 func HandleError(httpResponseBody []byte) error {
-	var apiError iaas.Error
+	var apiError numspot.Error
 
 	err := json.Unmarshal(httpResponseBody, &apiError)
 	if err != nil {

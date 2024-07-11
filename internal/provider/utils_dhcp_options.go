@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_dhcp_options"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_dhcp_options"
@@ -13,7 +13,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func DhcpOptionsFromHttpToTf(ctx context.Context, http *iaas.DhcpOptionsSet) (*resource_dhcp_options.DhcpOptionsModel, diag.Diagnostics) {
+func DhcpOptionsFromHttpToTf(ctx context.Context, http *numspot.DhcpOptionsSet) (*resource_dhcp_options.DhcpOptionsModel, diag.Diagnostics) {
 	var diagnostics diag.Diagnostics
 	var domainNameServersTf, logServersTf, ntpServersTf, tagsTf types.List
 
@@ -56,7 +56,7 @@ func DhcpOptionsFromHttpToTf(ctx context.Context, http *iaas.DhcpOptionsSet) (*r
 	}, nil
 }
 
-func DhcpOptionsFromTfToCreateRequest(ctx context.Context, tf resource_dhcp_options.DhcpOptionsModel) iaas.CreateDhcpOptionsJSONRequestBody {
+func DhcpOptionsFromTfToCreateRequest(ctx context.Context, tf resource_dhcp_options.DhcpOptionsModel) numspot.CreateDhcpOptionsJSONRequestBody {
 	var domainNameServers, logServers, ntpServers []string
 
 	domainNameServers = make([]string, 0, len(tf.DomainNameServers.Elements()))
@@ -68,7 +68,7 @@ func DhcpOptionsFromTfToCreateRequest(ctx context.Context, tf resource_dhcp_opti
 	ntpServers = make([]string, 0, len(tf.NtpServers.Elements()))
 	tf.NtpServers.ElementsAs(ctx, &ntpServers, false)
 
-	return iaas.CreateDhcpOptionsJSONRequestBody{
+	return numspot.CreateDhcpOptionsJSONRequestBody{
 		DomainName:        tf.DomainName.ValueStringPointer(),
 		DomainNameServers: &domainNameServers,
 		LogServers:        &logServers,
@@ -76,7 +76,7 @@ func DhcpOptionsFromTfToCreateRequest(ctx context.Context, tf resource_dhcp_opti
 	}
 }
 
-func DhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSourceModel) iaas.ReadDhcpOptionsParams {
+func DhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSourceModel) numspot.ReadDhcpOptionsParams {
 	ids := utils.TfStringListToStringPtrList(ctx, tf.IDs)
 	domainNames := utils.TfStringListToStringPtrList(ctx, tf.DomainNames)
 	dnsServers := utils.TfStringListToStringPtrList(ctx, tf.DomainNameServers)
@@ -86,7 +86,7 @@ func DhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSou
 	tagValues := utils.TfStringListToStringPtrList(ctx, tf.TagValues)
 	tags := utils.TfStringListToStringPtrList(ctx, tf.Tags)
 
-	return iaas.ReadDhcpOptionsParams{
+	return numspot.ReadDhcpOptionsParams{
 		Default:           tf.Default.ValueBoolPointer(),
 		DomainNameServers: dnsServers,
 		DomainNames:       domainNames,
@@ -99,7 +99,7 @@ func DhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSou
 	}
 }
 
-func DHCPOptionsFromHttpToTfDatasource(ctx context.Context, http *iaas.DhcpOptionsSet) (*datasource_dhcp_options.DhcpOptionsModel, diag.Diagnostics) {
+func DHCPOptionsFromHttpToTfDatasource(ctx context.Context, http *numspot.DhcpOptionsSet) (*datasource_dhcp_options.DhcpOptionsModel, diag.Diagnostics) {
 	var tagsList types.List
 	dnsServers, diags := utils.FromStringListPointerToTfStringList(ctx, http.DomainNameServers)
 	if diags.HasError() {

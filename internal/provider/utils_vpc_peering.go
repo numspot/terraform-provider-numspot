@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vpc_peering"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc_peering"
@@ -15,7 +15,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func accepterVpcFromApi(ctx context.Context, http *iaas.AccepterVpc) (resource_vpc_peering.AccepterVpcValue, diag.Diagnostics) {
+func accepterVpcFromApi(ctx context.Context, http *numspot.AccepterVpc) (resource_vpc_peering.AccepterVpcValue, diag.Diagnostics) {
 	if http == nil {
 		return resource_vpc_peering.NewAccepterVpcValueNull(), nil
 	}
@@ -29,7 +29,7 @@ func accepterVpcFromApi(ctx context.Context, http *iaas.AccepterVpc) (resource_v
 	)
 }
 
-func sourceVpcFromApi(ctx context.Context, http *iaas.SourceVpc) (resource_vpc_peering.SourceVpcValue, diag.Diagnostics) {
+func sourceVpcFromApi(ctx context.Context, http *numspot.SourceVpc) (resource_vpc_peering.SourceVpcValue, diag.Diagnostics) {
 	if http == nil {
 		return resource_vpc_peering.NewSourceVpcValueNull(), nil
 	}
@@ -43,7 +43,7 @@ func sourceVpcFromApi(ctx context.Context, http *iaas.SourceVpc) (resource_vpc_p
 	)
 }
 
-func vpcPeeringStateFromApi(ctx context.Context, http *iaas.VpcPeeringState) (resource_vpc_peering.StateValue, diag.Diagnostics) {
+func vpcPeeringStateFromApi(ctx context.Context, http *numspot.VpcPeeringState) (resource_vpc_peering.StateValue, diag.Diagnostics) {
 	if http == nil {
 		return resource_vpc_peering.NewStateValueNull(), nil
 	}
@@ -57,7 +57,7 @@ func vpcPeeringStateFromApi(ctx context.Context, http *iaas.VpcPeeringState) (re
 	)
 }
 
-func VpcPeeringFromHttpToTf(ctx context.Context, http *iaas.VpcPeering) (*resource_vpc_peering.VpcPeeringModel, diag.Diagnostics) {
+func VpcPeeringFromHttpToTf(ctx context.Context, http *numspot.VpcPeering) (*resource_vpc_peering.VpcPeeringModel, diag.Diagnostics) {
 	// In the event that the creation of VPC peering fails, the error message might be found in
 	// the "state" field. If the state's name is "failed", then the error message will be contained
 	// in the state's message. We must address this particular scenario.
@@ -130,34 +130,32 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *iaas.VpcPeering) (*resour
 	}, diags
 }
 
-func VpcPeeringFromTfToCreateRequest(tf resource_vpc_peering.VpcPeeringModel) iaas.CreateVpcPeeringJSONRequestBody {
-	return iaas.CreateVpcPeeringJSONRequestBody{
+func VpcPeeringFromTfToCreateRequest(tf resource_vpc_peering.VpcPeeringModel) numspot.CreateVpcPeeringJSONRequestBody {
+	return numspot.CreateVpcPeeringJSONRequestBody{
 		AccepterVpcId: tf.AccepterVpcId.ValueString(),
 		SourceVpcId:   tf.SourceVpcId.ValueString(),
 	}
 }
 
-func VpcPeeringsFromTfToAPIReadParams(ctx context.Context, tf VpcPeeringsDataSourceModel) iaas.ReadVpcPeeringsParams {
+func VpcPeeringsFromTfToAPIReadParams(ctx context.Context, tf VpcPeeringsDataSourceModel) numspot.ReadVpcPeeringsParams {
 	expirationDates := utils.TfStringListToTimeList(ctx, tf.ExpirationDates, "2020-06-30T00:00:00.000Z")
 
-	return iaas.ReadVpcPeeringsParams{
-		ExpirationDates:       &expirationDates,
-		StateMessages:         utils.TfStringListToStringPtrList(ctx, tf.StateMessages),
-		StateNames:            utils.TfStringListToStringPtrList(ctx, tf.StateNames),
-		AccepterVpcAccountIds: utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcAccountIds),
-		AccepterVpcIpRanges:   utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcIpRanges),
-		AccepterVpcVpcIds:     utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcVpcIds),
-		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.IDs),
-		SourceVpcAccountIds:   utils.TfStringListToStringPtrList(ctx, tf.SourceVpcAccountIds),
-		SourceVpcIpRanges:     utils.TfStringListToStringPtrList(ctx, tf.SourceVpcIpRanges),
-		SourceVpcVpcIds:       utils.TfStringListToStringPtrList(ctx, tf.SourceVpcVpcIds),
-		TagKeys:               utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:             utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:                  utils.TfStringListToStringPtrList(ctx, tf.Tags),
+	return numspot.ReadVpcPeeringsParams{
+		ExpirationDates:     &expirationDates,
+		StateMessages:       utils.TfStringListToStringPtrList(ctx, tf.StateMessages),
+		StateNames:          utils.TfStringListToStringPtrList(ctx, tf.StateNames),
+		AccepterVpcIpRanges: utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcIpRanges),
+		AccepterVpcVpcIds:   utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcVpcIds),
+		Ids:                 utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		SourceVpcIpRanges:   utils.TfStringListToStringPtrList(ctx, tf.SourceVpcIpRanges),
+		SourceVpcVpcIds:     utils.TfStringListToStringPtrList(ctx, tf.SourceVpcVpcIds),
+		TagKeys:             utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
+		TagValues:           utils.TfStringListToStringPtrList(ctx, tf.TagValues),
+		Tags:                utils.TfStringListToStringPtrList(ctx, tf.Tags),
 	}
 }
 
-func VpcPeeringsFromHttpToTfDatasource(ctx context.Context, http *iaas.VpcPeering) (*datasource_vpc_peering.VpcPeeringModel, diag.Diagnostics) {
+func VpcPeeringsFromHttpToTfDatasource(ctx context.Context, http *numspot.VpcPeering) (*datasource_vpc_peering.VpcPeeringModel, diag.Diagnostics) {
 	var (
 		diags            diag.Diagnostics
 		tagsList         types.List

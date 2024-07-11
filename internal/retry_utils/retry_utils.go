@@ -11,7 +11,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -70,10 +70,10 @@ func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, ret
 
 func RetryUnlinkUntilSuccess[A any, R TfRequestResp](
 	ctx context.Context,
-	spaceId iaas.SpaceId,
+	spaceId numspot.SpaceId,
 	resourceId string,
 	unlinkBody A,
-	fun func(context.Context, iaas.SpaceId, string, A, ...iaas.RequestEditorFn) (R, error),
+	fun func(context.Context, numspot.SpaceId, string, A, ...numspot.RequestEditorFn) (R, error),
 ) error {
 	return retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		tflog.Debug(ctx, fmt.Sprintf("Retry delete on resource: %s", resourceId))
@@ -86,9 +86,9 @@ func RetryUnlinkUntilSuccess[A any, R TfRequestResp](
 
 func RetryDeleteUntilResourceAvailable[R TfRequestResp](
 	ctx context.Context,
-	spaceID iaas.SpaceId,
+	spaceID numspot.SpaceId,
 	id string,
-	fun func(context.Context, iaas.SpaceId, string, ...iaas.RequestEditorFn) (R, error),
+	fun func(context.Context, numspot.SpaceId, string, ...numspot.RequestEditorFn) (R, error),
 ) error {
 	return retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		tflog.Debug(ctx, fmt.Sprintf("Retry delete on resource: %s", id))
@@ -101,8 +101,8 @@ func RetryDeleteUntilResourceAvailable[R TfRequestResp](
 
 func RetryCreateUntilResourceAvailable[R TfRequestResp](
 	ctx context.Context,
-	spaceID iaas.SpaceId,
-	fun func(context.Context, iaas.SpaceId, ...iaas.RequestEditorFn) (R, error),
+	spaceID numspot.SpaceId,
+	fun func(context.Context, numspot.SpaceId, ...numspot.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
 	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
@@ -117,9 +117,9 @@ func RetryCreateUntilResourceAvailable[R TfRequestResp](
 
 func RetryCreateUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
 	ctx context.Context,
-	spaceID iaas.SpaceId,
+	spaceID numspot.SpaceId,
 	body BodyType,
-	fun func(context.Context, iaas.SpaceId, BodyType, ...iaas.RequestEditorFn) (R, error),
+	fun func(context.Context, numspot.SpaceId, BodyType, ...numspot.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
 	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
@@ -155,8 +155,8 @@ func getFieldFromReflectStructPtr(structPtr reflect.Value, fieldName string) (re
 func ReadResourceUtils[R TfRequestResp](
 	ctx context.Context,
 	createdId string,
-	spaceID iaas.SpaceId,
-	readFunction func(context.Context, iaas.SpaceId, string, ...iaas.RequestEditorFn) (*R, error),
+	spaceID numspot.SpaceId,
+	readFunction func(context.Context, numspot.SpaceId, string, ...numspot.RequestEditorFn) (*R, error),
 ) (interface{}, string, error) {
 	readRes, err := readFunction(ctx, spaceID, createdId)
 	if err != nil {
@@ -192,10 +192,10 @@ func ReadResourceUtils[R TfRequestResp](
 func RetryReadUntilStateValid[R TfRequestResp](
 	ctx context.Context,
 	createdId string,
-	spaceID iaas.SpaceId,
+	spaceID numspot.SpaceId,
 	pendingStates []string,
 	targetStates []string,
-	readFunction func(context.Context, iaas.SpaceId, string, ...iaas.RequestEditorFn) (*R, error),
+	readFunction func(context.Context, numspot.SpaceId, string, ...numspot.RequestEditorFn) (*R, error),
 ) (interface{}, error) {
 	createStateConf := &retry.StateChangeConf{
 		Pending: pendingStates,

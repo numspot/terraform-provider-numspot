@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
@@ -15,7 +15,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt iaas.ApplicationStickyCookiePolicy) (resource_load_balancer.ApplicationStickyCookiePoliciesValue, diag.Diagnostics) {
+func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt numspot.ApplicationStickyCookiePolicy) (resource_load_balancer.ApplicationStickyCookiePoliciesValue, diag.Diagnostics) {
 	return resource_load_balancer.NewApplicationStickyCookiePoliciesValue(
 		resource_load_balancer.ApplicationStickyCookiePoliciesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -24,7 +24,7 @@ func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt iaas.Appli
 		})
 }
 
-func listenersFromHTTP(ctx context.Context, elt iaas.Listener) (resource_load_balancer.ListenersValue, diag.Diagnostics) {
+func listenersFromHTTP(ctx context.Context, elt numspot.Listener) (resource_load_balancer.ListenersValue, diag.Diagnostics) {
 	tfPolicyNames, diags := utils.FromStringListPointerToTfStringList(ctx, elt.PolicyNames)
 	if diags.HasError() {
 		return resource_load_balancer.ListenersValue{}, diags
@@ -41,7 +41,7 @@ func listenersFromHTTP(ctx context.Context, elt iaas.Listener) (resource_load_ba
 		})
 }
 
-func stickyCookiePoliciesFromHTTP(ctx context.Context, elt iaas.LoadBalancerStickyCookiePolicy) (resource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
+func stickyCookiePoliciesFromHTTP(ctx context.Context, elt numspot.LoadBalancerStickyCookiePolicy) (resource_load_balancer.StickyCookiePoliciesValue, diag.Diagnostics) {
 	return resource_load_balancer.NewStickyCookiePoliciesValue(
 		resource_load_balancer.StickyCookiePoliciesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -50,11 +50,11 @@ func stickyCookiePoliciesFromHTTP(ctx context.Context, elt iaas.LoadBalancerStic
 		})
 }
 
-func LoadBalancerFromTfToHttp(tf *resource_load_balancer.LoadBalancerModel) *iaas.LoadBalancer {
-	return &iaas.LoadBalancer{}
+func LoadBalancerFromTfToHttp(tf *resource_load_balancer.LoadBalancerModel) *numspot.LoadBalancer {
+	return &numspot.LoadBalancer{}
 }
 
-func LoadBalancerFromHttpToTf(ctx context.Context, http *iaas.LoadBalancer) (*resource_load_balancer.LoadBalancerModel, diag.Diagnostics) {
+func LoadBalancerFromHttpToTf(ctx context.Context, http *numspot.LoadBalancer) (*resource_load_balancer.LoadBalancerModel, diag.Diagnostics) {
 	var (
 		diags  diag.Diagnostics
 		tagsTf types.List
@@ -148,7 +148,7 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *iaas.LoadBalancer) (*re
 	}, diags
 }
 
-func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBalancer) (*datasource_load_balancer.LoadBalancerModel, diag.Diagnostics) {
+func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadBalancer) (*datasource_load_balancer.LoadBalancerModel, diag.Diagnostics) {
 	applicationStickyCookiePoliciestypes, diags := utils.GenericListToTfListValue(ctx, resource_load_balancer.ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags
@@ -207,11 +207,11 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *iaas.LoadBala
 	}, nil
 }
 
-func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) iaas.CreateLoadBalancerJSONRequestBody {
+func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) numspot.CreateLoadBalancerJSONRequestBody {
 	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
 	subnets := utils.TfStringListToStringList(ctx, tf.Subnets)
-	listeners := utils.TfSetToGenericList(func(a resource_load_balancer.ListenersValue) iaas.ListenerForCreation {
-		return iaas.ListenerForCreation{
+	listeners := utils.TfSetToGenericList(func(a resource_load_balancer.ListenersValue) numspot.ListenerForCreation {
+		return numspot.ListenerForCreation{
 			BackendPort:          utils.FromTfInt64ToInt(a.BackendPort),
 			BackendProtocol:      a.BackendProtocol.ValueStringPointer(),
 			LoadBalancerPort:     utils.FromTfInt64ToInt(a.LoadBalancerPort),
@@ -219,27 +219,27 @@ func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *resource_load_ba
 		}
 	}, ctx, tf.Listeners)
 
-	return iaas.CreateLoadBalancerJSONRequestBody{
+	return numspot.CreateLoadBalancerJSONRequestBody{
 		Listeners:      listeners,
 		Name:           tf.Name.ValueString(),
 		PublicIp:       tf.PublicIp.ValueStringPointer(),
 		SecurityGroups: &securityGroups,
-		Subnets:        &subnets,
+		Subnets:        subnets,
 		Type:           tf.Type.ValueStringPointer(),
 	}
 }
 
-func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) iaas.UpdateLoadBalancerJSONRequestBody {
+func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_balancer.LoadBalancerModel) numspot.UpdateLoadBalancerJSONRequestBody {
 	var (
-		loadBalancerPort *int              = nil
-		policyNames      *[]string         = nil
-		hc               *iaas.HealthCheck = nil
-		publicIp         *string           = nil
-		securedCookies   *bool             = nil
+		loadBalancerPort *int                 = nil
+		policyNames      *[]string            = nil
+		hc               *numspot.HealthCheck = nil
+		publicIp         *string              = nil
+		securedCookies   *bool                = nil
 	)
 
 	if !tf.HealthCheck.IsUnknown() {
-		hc = &iaas.HealthCheck{
+		hc = &numspot.HealthCheck{
 			CheckInterval:      utils.FromTfInt64ToInt(tf.HealthCheck.CheckInterval),
 			HealthyThreshold:   utils.FromTfInt64ToInt(tf.HealthCheck.HealthyThreshold),
 			Path:               tf.HealthCheck.Path.ValueStringPointer(),
@@ -256,9 +256,9 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_ba
 		securedCookies = tf.SecuredCookies.ValueBoolPointer()
 	}
 	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups)
-	listeners := utils.TfSetToGenericSet(func(elt resource_load_balancer.ListenersValue) iaas.Listener {
+	listeners := utils.TfSetToGenericSet(func(elt resource_load_balancer.ListenersValue) numspot.Listener {
 		policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames)
-		return iaas.Listener{
+		return numspot.Listener{
 			BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
 			BackendProtocol:      elt.BackendProtocol.ValueStringPointer(),
 			LoadBalancerPort:     utils.FromTfInt64ToIntPtr(elt.LoadBalancerPort),
@@ -273,7 +273,7 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_ba
 		policyNames = listeners[0].PolicyNames
 	}
 
-	return iaas.UpdateLoadBalancerJSONRequestBody{
+	return numspot.UpdateLoadBalancerJSONRequestBody{
 		HealthCheck:      hc,
 		LoadBalancerPort: loadBalancerPort,
 		PolicyNames:      policyNames,
@@ -285,8 +285,8 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *resource_load_ba
 
 func CreateLoadBalancerTags(
 	ctx context.Context,
-	spaceId iaas.SpaceId,
-	iaasClient *iaas.ClientWithResponses,
+	spaceId numspot.SpaceId,
+	iaasClient *numspot.ClientWithResponses,
 	loadBalancerName string,
 	tagList types.List,
 	diags *diag.Diagnostics,
@@ -294,16 +294,16 @@ func CreateLoadBalancerTags(
 	tfTags := make([]tags.TagsValue, 0, len(tagList.Elements()))
 	tagList.ElementsAs(ctx, &tfTags, false)
 
-	apiTags := make([]iaas.ResourceTag, 0, len(tfTags))
+	apiTags := make([]numspot.ResourceTag, 0, len(tfTags))
 	for _, tfTag := range tfTags {
-		apiTags = append(apiTags, iaas.ResourceTag{
+		apiTags = append(apiTags, numspot.ResourceTag{
 			Key:   tfTag.Key.ValueString(),
 			Value: tfTag.Value.ValueString(),
 		})
 	}
 
-	_ = utils.ExecuteRequest(func() (*iaas.CreateLoadBalancerTagsResponse, error) {
-		return iaasClient.CreateLoadBalancerTagsWithResponse(ctx, spaceId, iaas.CreateLoadBalancerTagsRequest{
+	_ = utils.ExecuteRequest(func() (*numspot.CreateLoadBalancerTagsResponse, error) {
+		return iaasClient.CreateLoadBalancerTagsWithResponse(ctx, spaceId, numspot.CreateLoadBalancerTagsRequest{
 			Names: []string{loadBalancerName},
 			Tags:  apiTags,
 		})
@@ -312,8 +312,8 @@ func CreateLoadBalancerTags(
 
 func DeleteLoadBalancerTags(
 	ctx context.Context,
-	spaceId iaas.SpaceId,
-	iaasClient *iaas.ClientWithResponses,
+	spaceId numspot.SpaceId,
+	iaasClient *numspot.ClientWithResponses,
 	loadBalancerName string,
 	tagList types.List,
 	diags *diag.Diagnostics,
@@ -321,15 +321,15 @@ func DeleteLoadBalancerTags(
 	tfTags := make([]tags.TagsValue, 0, len(tagList.Elements()))
 	tagList.ElementsAs(ctx, &tfTags, false)
 
-	apiTags := make([]iaas.ResourceLoadBalancerTag, 0, len(tfTags))
+	apiTags := make([]numspot.ResourceLoadBalancerTag, 0, len(tfTags))
 	for _, tfTag := range tfTags {
-		apiTags = append(apiTags, iaas.ResourceLoadBalancerTag{
+		apiTags = append(apiTags, numspot.ResourceLoadBalancerTag{
 			Key: tfTag.Key.ValueStringPointer(),
 		})
 	}
 
-	_ = utils.ExecuteRequest(func() (*iaas.DeleteLoadBalancerTagsResponse, error) {
-		return iaasClient.DeleteLoadBalancerTagsWithResponse(ctx, spaceId, iaas.DeleteLoadBalancerTagsJSONRequestBody{
+	_ = utils.ExecuteRequest(func() (*numspot.DeleteLoadBalancerTagsResponse, error) {
+		return iaasClient.DeleteLoadBalancerTagsWithResponse(ctx, spaceId, numspot.DeleteLoadBalancerTagsJSONRequestBody{
 			Names: []string{loadBalancerName},
 			Tags:  apiTags,
 		})

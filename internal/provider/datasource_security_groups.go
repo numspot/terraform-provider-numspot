@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_security_group"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -86,8 +86,8 @@ func (d *securityGroupsDataSource) Read(ctx context.Context, request datasource.
 	}
 
 	params := SecurityGroupsFromTfToAPIReadParams(ctx, plan)
-	res := utils.ExecuteRequest(func() (*iaas.ReadSecurityGroupsResponse, error) {
-		return d.provider.IaasClient.ReadSecurityGroupsWithResponse(ctx, d.provider.SpaceID, &params)
+	res := utils.ExecuteRequest(func() (*numspot.ReadSecurityGroupsResponse, error) {
+		return d.provider.NumspotClient.ReadSecurityGroupsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

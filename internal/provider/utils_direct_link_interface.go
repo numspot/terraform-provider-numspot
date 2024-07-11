@@ -1,15 +1,17 @@
 package provider
 
+/*
+ DIRECT LINKS are not handled for now
+
 import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_direct_link_interface"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func DirectLinkInterfaceFromTfToHttp(tf *resource_direct_link_interface.DirectLinkInterfaceModel) *iaas.DirectLinkInterfaces {
-	return &iaas.DirectLinkInterfaces{
+func DirectLinkInterfaceFromTfToHttp(tf *resource_direct_link_interface.DirectLinkInterfaceModel) *numspot.DirectLinkInterfaces {
+	return &numspot.DirectLinkInterfaces{
 		BgpAsn:                  utils.FromTfInt64ToIntPtr(tf.BgpAsn),
 		BgpKey:                  tf.BgpKey.ValueStringPointer(),
 		ClientPrivateIp:         tf.ClientPrivateIp.ValueStringPointer(),
@@ -26,7 +28,7 @@ func DirectLinkInterfaceFromTfToHttp(tf *resource_direct_link_interface.DirectLi
 	}
 }
 
-func DirectLinkInterfaceFromHttpToTf(http *iaas.DirectLinkInterfaces) resource_direct_link_interface.DirectLinkInterfaceModel {
+func DirectLinkInterfaceFromHttpToTf(http *numspot.DirectLinkInterfaces) resource_direct_link_interface.DirectLinkInterfaceModel {
 	return resource_direct_link_interface.DirectLinkInterfaceModel{
 		BgpAsn:                  utils.FromIntPtrToTfInt64(http.BgpAsn),
 		BgpKey:                  types.StringPointerValue(http.BgpKey),
@@ -45,9 +47,10 @@ func DirectLinkInterfaceFromHttpToTf(http *iaas.DirectLinkInterfaces) resource_d
 	}
 }
 
-func DirectLinkInterfaceFromTfToCreateRequest(tf *resource_direct_link_interface.DirectLinkInterfaceModel) iaas.CreateDirectLinkInterfaceJSONRequestBody {
-	return iaas.CreateDirectLinkInterfaceJSONRequestBody{
+func DirectLinkInterfaceFromTfToCreateRequest(tf *resource_direct_link_interface.DirectLinkInterfaceModel) numspot.CreateDirectLinkInterfaceJSONRequestBody {
+	return numspot.CreateDirectLinkInterfaceJSONRequestBody{
 		DirectLinkId:        tf.DirectLinkId.ValueString(),
-		DirectLinkInterface: iaas.DirectLinkInterface{},
+		DirectLinkInterface: numspot.DirectLinkInterface{},
 	}
 }
+*/

@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_volume"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -79,8 +79,8 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 	}
 
 	params := VolumeFromTfToAPIReadParams(ctx, plan)
-	res := utils.ExecuteRequest(func() (*iaas.ReadVolumesResponse, error) {
-		return d.provider.IaasClient.ReadVolumesWithResponse(ctx, d.provider.SpaceID, &params)
+	res := utils.ExecuteRequest(func() (*numspot.ReadVolumesResponse, error) {
+		return d.provider.NumspotClient.ReadVolumesWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

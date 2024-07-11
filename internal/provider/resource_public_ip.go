@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -71,7 +71,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	createRes, err := retry_utils.RetryCreateUntilResourceAvailable(
 		ctx,
 		r.provider.SpaceID,
-		r.provider.IaasClient.CreatePublicIpWithResponse)
+		r.provider.NumspotClient.CreatePublicIpWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Public IP", err.Error())
 		return
@@ -85,7 +85,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 
 	createdId := *createRes.JSON201.Id
 	if len(plan.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -120,8 +120,8 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 	var data resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	readRes := utils.ExecuteRequest(func() (*iaas.ReadPublicIpsByIdResponse, error) {
-		return r.provider.IaasClient.ReadPublicIpsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	readRes := utils.ExecuteRequest(func() (*numspot.ReadPublicIpsByIdResponse, error) {
+		return r.provider.NumspotClient.ReadPublicIpsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
 		return
@@ -155,7 +155,7 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -214,7 +214,7 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 		_ = invokeUnlinkPublicIP(ctx, r.provider, &state) // We still want to try delete resource even if the unlink didn't work (ressource has been unlinked before for example)
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, state.Id.ValueString(), r.provider.IaasClient.DeletePublicIpWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, state.Id.ValueString(), r.provider.NumspotClient.DeletePublicIpWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Public IP", err.Error())
 		return

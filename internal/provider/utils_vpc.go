@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vpc"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
@@ -13,7 +13,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func NetFromHttpToTf(ctx context.Context, http *iaas.Vpc) (*resource_vpc.VpcModel, diag.Diagnostics) {
+func NetFromHttpToTf(ctx context.Context, http *numspot.Vpc) (*resource_vpc.VpcModel, diag.Diagnostics) {
 	var (
 		tagsTf types.List
 		diags  diag.Diagnostics
@@ -35,15 +35,15 @@ func NetFromHttpToTf(ctx context.Context, http *iaas.Vpc) (*resource_vpc.VpcMode
 	}, nil
 }
 
-func NetFromTfToCreateRequest(tf *resource_vpc.VpcModel) iaas.CreateVpcJSONRequestBody {
-	return iaas.CreateVpcJSONRequestBody{
+func NetFromTfToCreateRequest(tf *resource_vpc.VpcModel) numspot.CreateVpcJSONRequestBody {
+	return numspot.CreateVpcJSONRequestBody{
 		IpRange: tf.IpRange.ValueString(),
 		Tenancy: tf.Tenancy.ValueStringPointer(),
 	}
 }
 
-func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) iaas.ReadVpcsParams {
-	return iaas.ReadVpcsParams{
+func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) numspot.ReadVpcsParams {
+	return numspot.ReadVpcsParams{
 		DhcpOptionsSetIds: utils.TfStringListToStringPtrList(ctx, tf.DHCPOptionsSetIds),
 		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges),
 		IsDefault:         tf.IsDefault.ValueBoolPointer(),
@@ -55,7 +55,7 @@ func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) iaas
 	}
 }
 
-func VPCsFromHttpToTfDatasource(ctx context.Context, http *iaas.Vpc) (*datasource_vpc.VpcModel, diag.Diagnostics) {
+func VPCsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpc) (*datasource_vpc.VpcModel, diag.Diagnostics) {
 	var (
 		tagsList types.List
 		diags    diag.Diagnostics
@@ -76,8 +76,8 @@ func VPCsFromHttpToTfDatasource(ctx context.Context, http *iaas.Vpc) (*datasourc
 	}, nil
 }
 
-func VpcFromTfToUpdaterequest(ctx context.Context, tf *resource_vpc.VpcModel, diagnostics *diag.Diagnostics) iaas.UpdateVpcJSONRequestBody {
-	return iaas.UpdateVpcJSONRequestBody{
+func VpcFromTfToUpdaterequest(ctx context.Context, tf *resource_vpc.VpcModel, diagnostics *diag.Diagnostics) numspot.UpdateVpcJSONRequestBody {
+	return numspot.UpdateVpcJSONRequestBody{
 		DhcpOptionsSetId: tf.DhcpOptionsSetId.ValueString(),
 	}
 }

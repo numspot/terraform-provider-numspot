@@ -1,5 +1,9 @@
 package provider
 
+/*
+
+ DIRECT LINKS are not handled for now
+
 import (
 	"context"
 	"fmt"
@@ -7,7 +11,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_direct_link_interface"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
@@ -99,7 +102,7 @@ func (r *DirectLinkInterfaceResource) Read(ctx context.Context, request resource
 	var data resource_direct_link_interface.DirectLinkInterfaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadDirectLinkInterfacesByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadDirectLinkInterfacesByIdResponse, error) {
 		return r.provider.IaasClient.ReadDirectLinkInterfacesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -125,7 +128,8 @@ func (r *DirectLinkInterfaceResource) Delete(ctx context.Context, request resour
 		return
 	}
 
-	utils.ExecuteRequest(func() (*iaas.DeleteDirectLinkInterfaceResponse, error) {
+	utils.ExecuteRequest(func() (*numspot.DeleteDirectLinkInterfaceResponse, error) {
 		return r.provider.IaasClient.DeleteDirectLinkInterfaceWithResponse(ctx, r.provider.SpaceID, data.Id.String())
 	}, http.StatusOK, &response.Diagnostics)
 }
+*/

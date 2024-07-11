@@ -236,14 +236,8 @@ github.com/yuin/goldmark-meta v1.1.0 h1:pWw+JLHGZe8Rk0EGsMVssiNb/AaPMHfSRszZeUei
 github.com/yuin/goldmark-meta v1.1.0/go.mod h1:U4spWENafuA7Zyg+Lj5RqK/MF+ovMYtBvXi1lBb2VP0=
 github.com/zclconf/go-cty v1.14.3 h1:1JXy1XroaGrzZuG6X9dt7HL6s9AwbY+l4UNL8o5B6ho=
 github.com/zclconf/go-cty v1.14.3/go.mod h1:VvMs5i0vgZdhYawQNq5kePSpLAoz8u1xvZgrPIxfnZE=
-gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.42 h1:yq5nSYBJ9W2mHiEH8g5Cm1pGtnTCZPymNdYrc9ioI8w=
-gitlab.numspot.cloud/cloud/numspot-sdk-go v0.0.42/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
-gitlab.numspot.cloud/cloud/numspot-sdk-go v0.1.0 h1:7kJGRw8LcXwPws2ns6K1/6q9cFkJ4M+mHwPEl+RgweA=
-gitlab.numspot.cloud/cloud/numspot-sdk-go v0.1.0/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
-gitlab.numspot.cloud/cloud/numspot-sdk-go v0.1.1 h1:O78WnYAnosZo14uX6yFBcaKjnXJX6OxHQ4Zz0GXW3LU=
-gitlab.numspot.cloud/cloud/numspot-sdk-go v0.1.1/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
-gitlab.numspot.cloud/cloud/numspot-sdk-go v0.1.2 h1:eVG+Cem6yJ8Ilo8DO6HIsl+MSMsYciZfNiHdC0Y77l0=
-gitlab.numspot.cloud/cloud/numspot-sdk-go v0.1.2/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
+gitlab.numspot.cloud/cloud/numspot-sdk-go v0.1.4 h1:uRY1Do87udsYmRoGD5CQL3K8uDweAhzcv0nJ55S1toY=
+gitlab.numspot.cloud/cloud/numspot-sdk-go v0.1.4/go.mod h1:aJ2LEBm3T9MLw6zkkLwfQeuQmzlZGBEVU2zS40duMuU=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
 golang.org/x/crypto v0.3.0/go.mod h1:hebNnKkNXi2UzZN1eVRvBB7co0a+JxK6XbPiWVs/3J4=

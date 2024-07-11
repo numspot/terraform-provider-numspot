@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_dhcp_options"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -76,8 +76,8 @@ func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.Rea
 	}
 
 	params := DhcpOptionsFromTfToAPIReadParams(ctx, plan)
-	res := utils.ExecuteRequest(func() (*iaas.ReadDhcpOptionsResponse, error) {
-		return d.provider.IaasClient.ReadDhcpOptionsWithResponse(ctx, d.provider.SpaceID, &params)
+	res := utils.ExecuteRequest(func() (*numspot.ReadDhcpOptionsResponse, error) {
+		return d.provider.NumspotClient.ReadDhcpOptionsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

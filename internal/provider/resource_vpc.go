@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpc"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -71,7 +71,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		ctx,
 		r.provider.SpaceID,
 		NetFromTfToCreateRequest(&data),
-		r.provider.IaasClient.CreateVpcWithResponse)
+		r.provider.NumspotClient.CreateVpcWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPC", err.Error())
 		return
@@ -80,7 +80,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	// Handle tags
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -88,9 +88,9 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 
 	// if dhcp_options_set_id is set, we need to update the Vpc as this attribute can be set on Update only and not on Create
 	if !data.DhcpOptionsSetId.IsNull() && !data.DhcpOptionsSetId.IsUnknown() {
-		updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVpcResponse, error) {
+		updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
 			body := VpcFromTfToUpdaterequest(ctx, &data, &response.Diagnostics)
-			return r.provider.IaasClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, createdId, body)
+			return r.provider.NumspotClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, createdId, body)
 		}, http.StatusOK, &response.Diagnostics)
 
 		if updatedRes == nil || response.Diagnostics.HasError() {
@@ -103,14 +103,14 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.IaasClient.ReadVpcsByIdWithResponse,
+		r.provider.NumspotClient.ReadVpcsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
-	vpc, ok := readRes.(*iaas.Vpc)
+	vpc, ok := readRes.(*numspot.Vpc)
 	if !ok {
 		response.Diagnostics.AddError("Failed to read VPC", "object conversion error")
 		return
@@ -128,8 +128,8 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
-		return r.provider.IaasClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadVpcsByIdResponse, error) {
+		return r.provider.NumspotClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -168,7 +168,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			vpcId,
 		)
@@ -178,9 +178,9 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 	}
 
 	// Update Vpc
-	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVpcResponse, error) {
+	updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
 		body := VpcFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
-		return r.provider.IaasClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, vpcId, body)
+		return r.provider.NumspotClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, vpcId, body)
 	}, http.StatusOK, &response.Diagnostics)
 
 	if updatedRes == nil || response.Diagnostics.HasError() {
@@ -188,8 +188,8 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 	}
 
 	// Read resource
-	res := utils.ExecuteRequest(func() (*iaas.ReadVpcsByIdResponse, error) {
-		return r.provider.IaasClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadVpcsByIdResponse, error) {
+		return r.provider.NumspotClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -210,7 +210,7 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_vpc.VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVpcWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteVpcWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPC", err.Error())
 		return

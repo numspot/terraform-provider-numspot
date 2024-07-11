@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_route_table"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_route_table"
@@ -14,12 +14,12 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
+func RouteTableFromHttpToTf(ctx context.Context, http *numspot.RouteTable) (*resource_route_table.RouteTableModel, diag.Diagnostics) {
 	var (
 		tagsTf     types.List
 		diags      diag.Diagnostics
 		localRoute resource_route_table.RoutesValue
-		routes     []iaas.Route
+		routes     []numspot.Route
 	)
 
 	if http.Routes == nil {
@@ -78,7 +78,7 @@ func RouteTableFromHttpToTf(ctx context.Context, http *iaas.RouteTable) (*resour
 	return &res, diags
 }
 
-func routeTableLinkFromAPI(ctx context.Context, link iaas.LinkRouteTable) (resource_route_table.LinkRouteTablesValue, diag.Diagnostics) {
+func routeTableLinkFromAPI(ctx context.Context, link numspot.LinkRouteTable) (resource_route_table.LinkRouteTablesValue, diag.Diagnostics) {
 	return resource_route_table.NewLinkRouteTablesValue(
 		resource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -91,7 +91,7 @@ func routeTableLinkFromAPI(ctx context.Context, link iaas.LinkRouteTable) (resou
 	)
 }
 
-func routeTableRouteFromAPI(ctx context.Context, route iaas.Route) (resource_route_table.RoutesValue, diag.Diagnostics) {
+func routeTableRouteFromAPI(ctx context.Context, route numspot.Route) (resource_route_table.RoutesValue, diag.Diagnostics) {
 	return resource_route_table.NewRoutesValue(
 		resource_route_table.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -100,7 +100,6 @@ func routeTableRouteFromAPI(ctx context.Context, route iaas.Route) (resource_rou
 			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
 			"gateway_id":             types.StringPointerValue(route.GatewayId),
 			"nat_gateway_id":         types.StringPointerValue(route.NatGatewayId),
-			"vpc_access_point_id":    types.StringPointerValue(route.VpcAccessPointId),
 			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
 			"nic_id":                 types.StringPointerValue(route.NicId),
 			"state":                  types.StringPointerValue(route.State),
@@ -109,14 +108,14 @@ func routeTableRouteFromAPI(ctx context.Context, route iaas.Route) (resource_rou
 	)
 }
 
-func RouteTableFromTfToCreateRequest(tf *resource_route_table.RouteTableModel) iaas.CreateRouteTableJSONRequestBody {
-	return iaas.CreateRouteTableJSONRequestBody{
+func RouteTableFromTfToCreateRequest(tf *resource_route_table.RouteTableModel) numspot.CreateRouteTableJSONRequestBody {
+	return numspot.CreateRouteTableJSONRequestBody{
 		VpcId: tf.VpcId.ValueString(),
 	}
 }
 
-func RouteTableFromTfToCreateRoutesRequest(route resource_route_table.RoutesValue) iaas.CreateRouteJSONRequestBody {
-	return iaas.CreateRouteJSONRequestBody{
+func RouteTableFromTfToCreateRoutesRequest(route resource_route_table.RoutesValue) numspot.CreateRouteJSONRequestBody {
+	return numspot.CreateRouteJSONRequestBody{
 		DestinationIpRange: route.DestinationIpRange.ValueString(),
 		GatewayId:          route.GatewayId.ValueStringPointer(),
 		NatGatewayId:       route.NatGatewayId.ValueStringPointer(),
@@ -126,14 +125,14 @@ func RouteTableFromTfToCreateRoutesRequest(route resource_route_table.RoutesValu
 	}
 }
 
-func RouteTableFromTfToDeleteRoutesRequest(route resource_route_table.RoutesValue) iaas.DeleteRouteJSONRequestBody {
-	return iaas.DeleteRouteJSONRequestBody{
+func RouteTableFromTfToDeleteRoutesRequest(route resource_route_table.RoutesValue) numspot.DeleteRouteJSONRequestBody {
+	return numspot.DeleteRouteJSONRequestBody{
 		DestinationIpRange: route.DestinationIpRange.ValueString(),
 	}
 }
 
-func RouteTablesFromTfToAPIReadParams(ctx context.Context, tf RouteTablesDataSourceModel) iaas.ReadRouteTablesParams {
-	return iaas.ReadRouteTablesParams{
+func RouteTablesFromTfToAPIReadParams(ctx context.Context, tf RouteTablesDataSourceModel) numspot.ReadRouteTablesParams {
+	return numspot.ReadRouteTablesParams{
 		TagKeys:                         utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
 		TagValues:                       utils.TfStringListToStringPtrList(ctx, tf.TagValues),
 		Tags:                            utils.TfStringListToStringPtrList(ctx, tf.Tags),
@@ -154,7 +153,7 @@ func RouteTablesFromTfToAPIReadParams(ctx context.Context, tf RouteTablesDataSou
 	}
 }
 
-func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *iaas.RouteTable) (*datasource_route_table.RouteTableModel, diag.Diagnostics) {
+func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *numspot.RouteTable) (*datasource_route_table.RouteTableModel, diag.Diagnostics) {
 	var (
 		diags                               diag.Diagnostics
 		tagsList                            = types.ListNull(tags.TagsValue{}.Type(ctx))
@@ -204,7 +203,7 @@ func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *iaas.RouteTabl
 	}, nil
 }
 
-func routeTableLinkFromAPIDatasource(ctx context.Context, link iaas.LinkRouteTable) (datasource_route_table.LinkRouteTablesValue, diag.Diagnostics) {
+func routeTableLinkFromAPIDatasource(ctx context.Context, link numspot.LinkRouteTable) (datasource_route_table.LinkRouteTablesValue, diag.Diagnostics) {
 	return datasource_route_table.NewLinkRouteTablesValue(
 		datasource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -217,7 +216,7 @@ func routeTableLinkFromAPIDatasource(ctx context.Context, link iaas.LinkRouteTab
 	)
 }
 
-func routeTableRouteFromAPIDatasource(ctx context.Context, route iaas.Route) (datasource_route_table.RoutesValue, diag.Diagnostics) {
+func routeTableRouteFromAPIDatasource(ctx context.Context, route numspot.Route) (datasource_route_table.RoutesValue, diag.Diagnostics) {
 	return datasource_route_table.NewRoutesValue(
 		datasource_route_table.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -226,17 +225,15 @@ func routeTableRouteFromAPIDatasource(ctx context.Context, route iaas.Route) (da
 			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
 			"gateway_id":             types.StringPointerValue(route.GatewayId),
 			"nat_gateway_id":         types.StringPointerValue(route.NatGatewayId),
-			"vpc_access_point_id":    types.StringPointerValue(route.VpcAccessPointId),
 			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
 			"nic_id":                 types.StringPointerValue(route.NicId),
 			"state":                  types.StringPointerValue(route.State),
 			"vm_id":                  types.StringPointerValue(route.VmId),
-			"vm_account_id":          types.StringPointerValue(route.VmAccountId),
 		},
 	)
 }
 
-func routeTableRoutePropagatingVirtualGatewaysFromAPIDatasource(ctx context.Context, route iaas.RoutePropagatingVirtualGateway) (datasource_route_table.RoutePropagatingVirtualGatewaysValue, diag.Diagnostics) {
+func routeTableRoutePropagatingVirtualGatewaysFromAPIDatasource(ctx context.Context, route numspot.RoutePropagatingVirtualGateway) (datasource_route_table.RoutePropagatingVirtualGatewaysValue, diag.Diagnostics) {
 	return datasource_route_table.NewRoutePropagatingVirtualGatewaysValue(
 		datasource_route_table.RoutePropagatingVirtualGatewaysValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{

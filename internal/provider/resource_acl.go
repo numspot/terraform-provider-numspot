@@ -155,7 +155,7 @@ func (r *AclsResource) updateAcls(
 	// Execute
 	if action == AddAction {
 		utils.ExecuteRequest(func() (*numspot.CreateACLServiceAccountSpaceBulkResponse, error) {
-			return r.provider.NumSpotClient.CreateACLServiceAccountSpaceBulkWithResponse(
+			return r.provider.NumspotClient.CreateACLServiceAccountSpaceBulkWithResponse(
 				ctx,
 				spaceUUID,
 				serviceAccountUUID,
@@ -164,7 +164,7 @@ func (r *AclsResource) updateAcls(
 		}, http.StatusCreated, &diags)
 	} else if action == DeleteAction {
 		utils.ExecuteRequest(func() (*numspot.DeleteACLServiceAccountSpaceBulkResponse, error) {
-			return r.provider.NumSpotClient.DeleteACLServiceAccountSpaceBulkWithResponse(
+			return r.provider.NumspotClient.DeleteACLServiceAccountSpaceBulkWithResponse(
 				ctx,
 				spaceUUID,
 				serviceAccountUUID,
@@ -202,7 +202,7 @@ func (r *AclsResource) readAcls(
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.GetACLServiceAccountSpaceResponse, error) {
-		return r.provider.NumSpotClient.GetACLServiceAccountSpaceWithResponse(
+		return r.provider.NumspotClient.GetACLServiceAccountSpaceWithResponse(
 			ctx, r.provider.SpaceID, serviceAccountUUID, &body)
 	}, http.StatusOK, &diags)
 	if res == nil {

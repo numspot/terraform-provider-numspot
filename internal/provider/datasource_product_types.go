@@ -1,5 +1,10 @@
 package provider
 
+/*
+
+Product Types are not handled for now
+
+
 import (
 	"context"
 	"fmt"
@@ -7,7 +12,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_product_type"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -68,7 +72,7 @@ func (d *productTypesDataSource) Read(ctx context.Context, request datasource.Re
 	}
 
 	params := ProductTypesFromTfToAPIReadParams(ctx, plan)
-	res := utils.ExecuteRequest(func() (*iaas.ReadProductTypesResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadProductTypesResponse, error) {
 		return d.provider.IaasClient.ReadProductTypesWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -90,3 +94,4 @@ func (d *productTypesDataSource) Read(ctx context.Context, request datasource.Re
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
+*/

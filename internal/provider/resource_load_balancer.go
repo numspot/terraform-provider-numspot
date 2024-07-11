@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_load_balancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -71,7 +71,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 		ctx,
 		r.provider.SpaceID,
 		LoadBalancerFromTfToCreateRequest(ctx, &data),
-		r.provider.IaasClient.CreateLoadBalancerWithResponse)
+		r.provider.NumspotClient.CreateLoadBalancerWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Load Balancer", err.Error())
 		return
@@ -98,7 +98,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	// Tags
 	// In load balancer case, tags are not handled in the same way as other resources
 	if len(data.Tags.Elements()) > 0 {
-		CreateLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.IaasClient, data.Name.ValueString(), data.Tags, &response.Diagnostics)
+		CreateLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.NumspotClient, data.Name.ValueString(), data.Tags, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -114,8 +114,8 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 }
 
 func (r *LoadBalancerResource) readLoadBalancer(ctx context.Context, id string, diagnostic diag.Diagnostics) *resource_load_balancer.LoadBalancerModel {
-	res := utils.ExecuteRequest(func() (*iaas.ReadLoadBalancersByIdResponse, error) {
-		return r.provider.IaasClient.ReadLoadBalancersByIdWithResponse(ctx, r.provider.SpaceID, id)
+	res := utils.ExecuteRequest(func() (*numspot.ReadLoadBalancersByIdResponse, error) {
+		return r.provider.NumspotClient.ReadLoadBalancersByIdWithResponse(ctx, r.provider.SpaceID, id)
 	}, http.StatusOK, &diagnostic)
 	if res == nil {
 		return nil
@@ -183,7 +183,7 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 			return
 		}
 
-		DeleteLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.IaasClient, state.Name.ValueString(), toDeleteTf, &response.Diagnostics)
+		DeleteLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.NumspotClient, state.Name.ValueString(), toDeleteTf, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -194,7 +194,7 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 			return
 		}
 
-		CreateLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.IaasClient, state.Name.ValueString(), toCreateTf, &response.Diagnostics)
+		CreateLoadBalancerTags(ctx, r.provider.SpaceID, r.provider.NumspotClient, state.Name.ValueString(), toCreateTf, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -259,9 +259,9 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 func (r *LoadBalancerResource) createListeners(ctx context.Context, loadBalancerId string, listeners []resource_load_balancer.ListenersValue) diag.Diagnostics {
 	diags := diag.Diagnostics{}
 
-	listenersForCreation := make([]iaas.ListenerForCreation, 0, len(listeners))
+	listenersForCreation := make([]numspot.ListenerForCreation, 0, len(listeners))
 	for _, e := range listeners {
-		listenersForCreation = append(listenersForCreation, iaas.ListenerForCreation{
+		listenersForCreation = append(listenersForCreation, numspot.ListenerForCreation{
 			BackendPort:          utils.FromTfInt64ToInt(e.BackendPort),
 			BackendProtocol:      utils.FromTfStringToStringPtr(e.BackendProtocol),
 			LoadBalancerPort:     utils.FromTfInt64ToInt(e.LoadBalancerPort),
@@ -269,12 +269,12 @@ func (r *LoadBalancerResource) createListeners(ctx context.Context, loadBalancer
 		})
 	}
 
-	utils.ExecuteRequest(func() (*iaas.CreateLoadBalancerListenersResponse, error) {
-		return r.provider.IaasClient.CreateLoadBalancerListenersWithResponse(
+	utils.ExecuteRequest(func() (*numspot.CreateLoadBalancerListenersResponse, error) {
+		return r.provider.NumspotClient.CreateLoadBalancerListenersWithResponse(
 			ctx,
 			r.provider.SpaceID,
 			loadBalancerId,
-			iaas.CreateLoadBalancerListenersJSONRequestBody{
+			numspot.CreateLoadBalancerListenersJSONRequestBody{
 				Listeners: listenersForCreation,
 			},
 		)
@@ -291,12 +291,12 @@ func (r *LoadBalancerResource) deleteListeners(ctx context.Context, loadBalancer
 		listenersLoadBalancerPortToDelete = append(listenersLoadBalancerPortToDelete, utils.FromTfInt64ToInt(e.LoadBalancerPort))
 	}
 
-	utils.ExecuteRequest(func() (*iaas.DeleteLoadBalancerListenersResponse, error) {
-		return r.provider.IaasClient.DeleteLoadBalancerListenersWithResponse(
+	utils.ExecuteRequest(func() (*numspot.DeleteLoadBalancerListenersResponse, error) {
+		return r.provider.NumspotClient.DeleteLoadBalancerListenersWithResponse(
 			ctx,
 			r.provider.SpaceID,
 			loadBalancerId,
-			iaas.DeleteLoadBalancerListenersJSONRequestBody{
+			numspot.DeleteLoadBalancerListenersJSONRequestBody{
 				LoadBalancerPorts: listenersLoadBalancerPortToDelete,
 			},
 		)
@@ -330,9 +330,9 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 
 	// HealthCheck:
 	if !plan.HealthCheck.IsUnknown() && !state.HealthCheck.Equal(plan.HealthCheck) {
-		res := utils.ExecuteRequest(func() (*iaas.UpdateLoadBalancerResponse, error) {
-			return r.provider.IaasClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), iaas.UpdateLoadBalancerJSONRequestBody{
-				HealthCheck: &iaas.HealthCheck{
+		res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
+			return r.provider.NumspotClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
+				HealthCheck: &numspot.HealthCheck{
 					CheckInterval:      utils.FromTfInt64ToInt(plan.HealthCheck.CheckInterval),
 					HealthyThreshold:   utils.FromTfInt64ToInt(plan.HealthCheck.HealthyThreshold),
 					Path:               plan.HealthCheck.Path.ValueStringPointer(),
@@ -350,9 +350,9 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 
 	// Security Groups
 	if !plan.SecurityGroups.IsUnknown() && !state.SecurityGroups.Equal(plan.SecurityGroups) {
-		res := utils.ExecuteRequest(func() (*iaas.UpdateLoadBalancerResponse, error) {
+		res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
 			securityGroups := utils.FromTfStringListToStringList(ctx, plan.SecurityGroups)
-			return r.provider.IaasClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), iaas.UpdateLoadBalancerJSONRequestBody{
+			return r.provider.NumspotClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
 				SecurityGroups: &securityGroups,
 			})
 		}, http.StatusOK, &response.Diagnostics)
@@ -365,7 +365,7 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 func (r *LoadBalancerResource) linkBackendMachines(ctx context.Context, plan resource_load_balancer.LoadBalancerModel) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	payload := iaas.LinkLoadBalancerBackendMachinesJSONRequestBody{}
+	payload := numspot.LinkLoadBalancerBackendMachinesJSONRequestBody{}
 	if !plan.BackendIps.IsUnknown() {
 		payload.BackendIps = utils.TfStringSetToStringPtrSet(ctx, plan.BackendIps)
 	}
@@ -373,17 +373,17 @@ func (r *LoadBalancerResource) linkBackendMachines(ctx context.Context, plan res
 		payload.BackendVmIds = utils.TfStringSetToStringPtrSet(ctx, plan.BackendVmIds)
 	}
 
-	utils.ExecuteRequest(func() (*iaas.LinkLoadBalancerBackendMachinesResponse, error) {
-		return r.provider.IaasClient.LinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), payload)
+	utils.ExecuteRequest(func() (*numspot.LinkLoadBalancerBackendMachinesResponse, error) {
+		return r.provider.NumspotClient.LinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), payload)
 	}, http.StatusNoContent, &diags)
 	return diags
 }
 
-func (r *LoadBalancerResource) AttachHealthCheck(ctx context.Context, lbName string, healthCheck resource_load_balancer.HealthCheckValue) (*iaas.UpdateLoadBalancerResponse, diag.Diagnostics) {
+func (r *LoadBalancerResource) AttachHealthCheck(ctx context.Context, lbName string, healthCheck resource_load_balancer.HealthCheckValue) (*numspot.UpdateLoadBalancerResponse, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	payload := iaas.UpdateLoadBalancerJSONRequestBody{
-		HealthCheck: &iaas.HealthCheck{
+	payload := numspot.UpdateLoadBalancerJSONRequestBody{
+		HealthCheck: &numspot.HealthCheck{
 			CheckInterval:      utils.FromTfInt64ToInt(healthCheck.CheckInterval),
 			HealthyThreshold:   utils.FromTfInt64ToInt(healthCheck.HealthyThreshold),
 			Path:               healthCheck.Path.ValueStringPointer(),
@@ -394,8 +394,8 @@ func (r *LoadBalancerResource) AttachHealthCheck(ctx context.Context, lbName str
 		},
 	}
 
-	updatedLoadBalancer := utils.ExecuteRequest(func() (*iaas.UpdateLoadBalancerResponse, error) {
-		return r.provider.IaasClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, lbName, payload)
+	updatedLoadBalancer := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
+		return r.provider.NumspotClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, lbName, payload)
 	}, http.StatusOK, &diags)
 
 	return updatedLoadBalancer, diags
@@ -409,8 +409,8 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 
 	// Detach security groups
 	emptyList := []string{}
-	res := utils.ExecuteRequest(func() (*iaas.UpdateLoadBalancerResponse, error) {
-		return r.provider.IaasClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, data.Name.ValueString(), iaas.UpdateLoadBalancerJSONRequestBody{
+	res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
+		return r.provider.NumspotClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, data.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
 			SecurityGroups: &emptyList,
 		})
 	}, http.StatusOK, &response.Diagnostics)
@@ -418,7 +418,7 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 		return
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteLoadBalancerWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteLoadBalancerWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Load Balancer", err.Error())
 		return

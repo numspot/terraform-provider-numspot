@@ -96,7 +96,7 @@ func (d *permissionsDataSource) fetchPaginatedPermissions(
 	response *datasource.ReadResponse,
 ) {
 	res := utils.ExecuteRequest(func() (*numspot.ListPermissionsSpaceResponse, error) {
-		return d.provider.NumSpotClient.ListPermissionsSpaceWithResponse(ctx, spaceID, requestParams)
+		return d.provider.NumspotClient.ListPermissionsSpaceWithResponse(ctx, spaceID, requestParams)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

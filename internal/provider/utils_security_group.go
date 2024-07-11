@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_security_group"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_security_group"
@@ -14,8 +14,8 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func SecurityGroupFromTfToHttp(tf *resource_security_group.SecurityGroupModel) *iaas.SecurityGroup {
-	return &iaas.SecurityGroup{
+func SecurityGroupFromTfToHttp(tf *resource_security_group.SecurityGroupModel) *numspot.SecurityGroup {
+	return &numspot.SecurityGroup{
 		Id:            tf.Id.ValueStringPointer(),
 		Description:   tf.Description.ValueStringPointer(),
 		Name:          tf.Name.ValueStringPointer(),
@@ -25,7 +25,7 @@ func SecurityGroupFromTfToHttp(tf *resource_security_group.SecurityGroupModel) *
 	}
 }
 
-func InboundRuleFromHttpToTf(ctx context.Context, rules iaas.SecurityGroupRule) (resource_security_group.InboundRulesValue, diag.Diagnostics) {
+func InboundRuleFromHttpToTf(ctx context.Context, rules numspot.SecurityGroupRule) (resource_security_group.InboundRulesValue, diag.Diagnostics) {
 	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
 	if diags.HasError() {
 		return resource_security_group.InboundRulesValue{}, diags
@@ -56,7 +56,7 @@ func InboundRuleFromHttpToTf(ctx context.Context, rules iaas.SecurityGroupRule) 
 	)
 }
 
-func OutboundRuleFromHttpToTf(ctx context.Context, rules iaas.SecurityGroupRule) (resource_security_group.OutboundRulesValue, diag.Diagnostics) {
+func OutboundRuleFromHttpToTf(ctx context.Context, rules numspot.SecurityGroupRule) (resource_security_group.OutboundRulesValue, diag.Diagnostics) {
 	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
 	if diags.HasError() {
 		return resource_security_group.OutboundRulesValue{}, diags
@@ -87,7 +87,7 @@ func OutboundRuleFromHttpToTf(ctx context.Context, rules iaas.SecurityGroupRule)
 	)
 }
 
-func SecurityGroupFromHttpToTf(ctx context.Context, http *iaas.SecurityGroup) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
+func SecurityGroupFromHttpToTf(ctx context.Context, http *numspot.SecurityGroup) (*resource_security_group.SecurityGroupModel, diag.Diagnostics) {
 	var (
 		tagsTf types.List
 		diags  diag.Diagnostics
@@ -149,16 +149,16 @@ func SecurityGroupFromHttpToTf(ctx context.Context, http *iaas.SecurityGroup) (*
 	return &res, diags
 }
 
-func SecurityGroupFromTfToCreateRequest(tf *resource_security_group.SecurityGroupModel) iaas.CreateSecurityGroupJSONRequestBody {
-	return iaas.CreateSecurityGroupJSONRequestBody{
+func SecurityGroupFromTfToCreateRequest(tf *resource_security_group.SecurityGroupModel) numspot.CreateSecurityGroupJSONRequestBody {
+	return numspot.CreateSecurityGroupJSONRequestBody{
 		Description: tf.Description.ValueString(),
-		VpcId:       tf.VpcId.ValueStringPointer(),
+		VpcId:       tf.VpcId.ValueString(),
 		Name:        tf.Name.ValueString(),
 	}
 }
 
-func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource_security_group.InboundRulesValue) iaas.CreateSecurityGroupRuleJSONRequestBody {
-	rules := make([]iaas.SecurityGroupRule, 0, len(data))
+func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource_security_group.InboundRulesValue) numspot.CreateSecurityGroupRuleJSONRequestBody {
+	rules := make([]numspot.SecurityGroupRule, 0, len(data))
 	for i := range data {
 		e := &data[i]
 		fpr := int(e.FromPortRange.ValueInt64())
@@ -171,7 +171,7 @@ func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource
 			ipRanges = append(ipRanges, ip.ValueString())
 		}
 
-		rules = append(rules, iaas.SecurityGroupRule{
+		rules = append(rules, numspot.SecurityGroupRule{
 			FromPortRange: &fpr,
 			IpProtocol:    e.IpProtocol.ValueStringPointer(),
 			IpRanges:      &ipRanges,
@@ -179,7 +179,7 @@ func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource
 		})
 	}
 	tt := 22
-	inboundRulesCreationBody := iaas.CreateSecurityGroupRuleJSONRequestBody{
+	inboundRulesCreationBody := numspot.CreateSecurityGroupRuleJSONRequestBody{
 		Flow:          "Inbound",
 		Rules:         &rules,
 		FromPortRange: &tt,
@@ -189,8 +189,8 @@ func CreateInboundRulesRequest(ctx context.Context, sgId string, data []resource
 	return inboundRulesCreationBody
 }
 
-func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []resource_security_group.OutboundRulesValue) iaas.CreateSecurityGroupRuleJSONRequestBody {
-	rules := make([]iaas.SecurityGroupRule, 0, len(data))
+func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []resource_security_group.OutboundRulesValue) numspot.CreateSecurityGroupRuleJSONRequestBody {
+	rules := make([]numspot.SecurityGroupRule, 0, len(data))
 	for i := range data {
 		e := &data[i]
 
@@ -204,7 +204,7 @@ func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []resourc
 			ipRanges = append(ipRanges, ip.ValueString())
 		}
 
-		rules = append(rules, iaas.SecurityGroupRule{
+		rules = append(rules, numspot.SecurityGroupRule{
 			FromPortRange: &fpr,
 			IpProtocol:    e.IpProtocol.ValueStringPointer(),
 			IpRanges:      &ipRanges,
@@ -212,7 +212,7 @@ func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []resourc
 		})
 	}
 
-	outboundRulesCreationBody := iaas.CreateSecurityGroupRuleJSONRequestBody{
+	outboundRulesCreationBody := numspot.CreateSecurityGroupRuleJSONRequestBody{
 		Flow:  "Outbound",
 		Rules: &rules,
 	}
@@ -220,10 +220,9 @@ func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []resourc
 	return outboundRulesCreationBody
 }
 
-func SecurityGroupsFromTfToAPIReadParams(ctx context.Context, tf SecurityGroupsDataSourceModel) iaas.ReadSecurityGroupsParams {
-	return iaas.ReadSecurityGroupsParams{
+func SecurityGroupsFromTfToAPIReadParams(ctx context.Context, tf SecurityGroupsDataSourceModel) numspot.ReadSecurityGroupsParams {
+	return numspot.ReadSecurityGroupsParams{
 		Descriptions:                 utils.TfStringListToStringPtrList(ctx, tf.Descriptions),
-		InboundRuleAccountIds:        utils.TfStringListToStringPtrList(ctx, tf.InboundRulesAccountIds),
 		InboundRuleFromPortRanges:    utils.TFInt64ListToIntListPointer(ctx, tf.InboundRulesFromPortRanges),
 		InboundRuleProtocols:         utils.TfStringListToStringPtrList(ctx, tf.InboundRulesRuleProtocols),
 		InboundRuleIpRanges:          utils.TfStringListToStringPtrList(ctx, tf.InboundRulesIpRanges),
@@ -234,7 +233,6 @@ func SecurityGroupsFromTfToAPIReadParams(ctx context.Context, tf SecurityGroupsD
 		OutboundRuleFromPortRanges:   utils.TFInt64ListToIntListPointer(ctx, tf.OutboundRulesFromPortRanges),
 		OutboundRuleProtocols:        utils.TfStringListToStringPtrList(ctx, tf.OutboundRulesRuleProtocols),
 		OutboundRuleIpRanges:         utils.TfStringListToStringPtrList(ctx, tf.OutboundRulesIpRanges),
-		OutboundRuleAccountIds:       utils.TfStringListToStringPtrList(ctx, tf.OutboundRulesAccountIds),
 		OutboundRuleSecurityGroupIds: utils.TfStringListToStringPtrList(ctx, tf.OutboundRulesSecurityGroupIds),
 		OutboundRuleToPortRanges:     utils.TFInt64ListToIntListPointer(ctx, tf.OutboundRulesToPortRanges),
 		VpcIds:                       utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
@@ -244,7 +242,7 @@ func SecurityGroupsFromTfToAPIReadParams(ctx context.Context, tf SecurityGroupsD
 	}
 }
 
-func SecurityGroupsFromHttpToTfDatasource(ctx context.Context, http *iaas.SecurityGroup) (*datasource_security_group.SecurityGroupModel, diag.Diagnostics) {
+func SecurityGroupsFromHttpToTfDatasource(ctx context.Context, http *numspot.SecurityGroup) (*datasource_security_group.SecurityGroupModel, diag.Diagnostics) {
 	var (
 		inboundRules  = types.SetNull(datasource_security_group.InboundRulesValue{}.Type(ctx))
 		outboundRules = types.SetNull(datasource_security_group.OutboundRulesValue{}.Type(ctx))
@@ -294,7 +292,7 @@ func SecurityGroupsFromHttpToTfDatasource(ctx context.Context, http *iaas.Securi
 	}, nil
 }
 
-func inboundRuleFromHttpToTfDatasource(ctx context.Context, rules iaas.SecurityGroupRule) (datasource_security_group.InboundRulesValue, diag.Diagnostics) {
+func inboundRuleFromHttpToTfDatasource(ctx context.Context, rules numspot.SecurityGroupRule) (datasource_security_group.InboundRulesValue, diag.Diagnostics) {
 	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
 	if diags.HasError() {
 		return datasource_security_group.InboundRulesValue{}, diags
@@ -325,7 +323,7 @@ func inboundRuleFromHttpToTfDatasource(ctx context.Context, rules iaas.SecurityG
 	)
 }
 
-func outboundRuleFromHttpToTfDatasource(ctx context.Context, rules iaas.SecurityGroupRule) (datasource_security_group.OutboundRulesValue, diag.Diagnostics) {
+func outboundRuleFromHttpToTfDatasource(ctx context.Context, rules numspot.SecurityGroupRule) (datasource_security_group.OutboundRulesValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)

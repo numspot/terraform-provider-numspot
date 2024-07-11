@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_vpc_peering"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -82,8 +82,8 @@ func (d *vpcPeeringsDataSource) Read(ctx context.Context, request datasource.Rea
 	}
 
 	params := VpcPeeringsFromTfToAPIReadParams(ctx, plan)
-	res := utils.ExecuteRequest(func() (*iaas.ReadVpcPeeringsResponse, error) {
-		return d.provider.IaasClient.ReadVpcPeeringsWithResponse(ctx, d.provider.SpaceID, &params)
+	res := utils.ExecuteRequest(func() (*numspot.ReadVpcPeeringsResponse, error) {
+		return d.provider.NumspotClient.ReadVpcPeeringsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -33,7 +33,7 @@ func SpaceDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Space name",
 			},
 			"organisation_id": schema.StringAttribute{
-				Computed:            true,
+				Required:            true,
 				Description:         "Organisation_id",
 				MarkdownDescription: "Organisation_id",
 			},

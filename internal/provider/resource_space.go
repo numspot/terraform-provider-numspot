@@ -72,7 +72,7 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 	res := utils.ExecuteRequest(func() (*numspot.CreateSpaceResponse, error) {
-		return r.provider.NumSpotClient.CreateSpaceWithResponse(
+		return r.provider.NumspotClient.CreateSpaceWithResponse(
 			ctx,
 			organisationId,
 			SpaceFromTfToCreateRequest(&plan),
@@ -81,7 +81,7 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 	if res == nil {
 		return
 	}
-	readRes, err := RetryReadSpaceUntilReady(ctx, r.provider.NumSpotClient, res.JSON200.Id)
+	readRes, err := RetryReadSpaceUntilReady(ctx, r.provider.NumspotClient, organisationId, res.JSON200.Id)
 	if err != nil {
 		response.Diagnostics.AddError("failed to read space", err.Error())
 		return
@@ -106,8 +106,15 @@ func (r *SpaceResource) Read(ctx context.Context, request resource.ReadRequest, 
 		response.Diagnostics.AddError("Invalid space_id", "space_id should be in UUID format")
 		return
 	}
+
+	organisationId, err := uuid.Parse(data.OrganisationId.ValueString())
+	if err != nil {
+		response.Diagnostics.AddError("Invalid organisation_id", "organisation_id should be in UUID format")
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.GetSpaceByIdResponse, error) {
-		return r.provider.NumSpotClient.GetSpaceByIdWithResponse(ctx, spaceId)
+		return r.provider.NumspotClient.GetSpaceByIdWithResponse(ctx, organisationId, spaceId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -130,8 +137,15 @@ func (r *SpaceResource) Delete(ctx context.Context, request resource.DeleteReque
 		response.Diagnostics.AddError("Invalid space_id", "space_id should be in UUID format")
 		return
 	}
+
+	organisationId, err := uuid.Parse(data.OrganisationId.ValueString())
+	if err != nil {
+		response.Diagnostics.AddError("Invalid organisation_id", "organisation_id should be in UUID format")
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.DeleteSpaceResponse, error) {
-		return r.provider.NumSpotClient.DeleteSpaceWithResponse(ctx, spaceId)
+		return r.provider.NumspotClient.DeleteSpaceWithResponse(ctx, organisationId, spaceId)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

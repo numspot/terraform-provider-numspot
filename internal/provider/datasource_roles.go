@@ -94,7 +94,7 @@ func (d *rolesDataSource) fetchPaginatedRoles(
 ) {
 	var pageSize int32 = 50
 	res := utils.ExecuteRequest(func() (*numspot.ListRolesSpaceResponse, error) {
-		return d.provider.NumSpotClient.ListRolesSpaceWithResponse(ctx, spaceID, requestParams)
+		return d.provider.NumspotClient.ListRolesSpaceWithResponse(ctx, spaceID, requestParams)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
