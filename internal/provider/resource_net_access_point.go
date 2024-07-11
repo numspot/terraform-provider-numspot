@@ -1,5 +1,10 @@
 package provider
 
+/*
+
+Net Access Points are not handled for now
+
+
 import (
 	"context"
 	"fmt"
@@ -7,7 +12,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_net_access_point"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -79,7 +83,7 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -99,7 +103,7 @@ func (r *NetAccessPointResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	rr, ok := read.(*iaas.VpcAccessPoint)
+	rr, ok := read.(*numspot.VpcAccessPoint)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create vpc access point", "object conversion error")
 		return
@@ -121,7 +125,7 @@ func (r *NetAccessPointResource) Read(ctx context.Context, request resource.Read
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadVpcAccessPointsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadVpcAccessPointsByIdResponse, error) {
 		return r.provider.IaasClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -152,7 +156,7 @@ func (r *NetAccessPointResource) Update(ctx context.Context, request resource.Up
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -166,7 +170,7 @@ func (r *NetAccessPointResource) Update(ctx context.Context, request resource.Up
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadVpcAccessPointsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadVpcAccessPointsByIdResponse, error) {
 		return r.provider.IaasClient.ReadVpcAccessPointsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -186,7 +190,8 @@ func (r *NetAccessPointResource) Delete(ctx context.Context, request resource.De
 	var data resource_net_access_point.NetAccessPointModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	_ = utils.ExecuteRequest(func() (*iaas.DeleteVpcAccessPointResponse, error) {
+	_ = utils.ExecuteRequest(func() (*numspot.DeleteVpcAccessPointResponse, error) {
 		return r.provider.IaasClient.DeleteVpcAccessPointWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusNoContent, &response.Diagnostics)
 }
+*/

@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_virtual_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_virtual_gateway"
@@ -21,7 +21,7 @@ VPCs that have been unlinked have the state "detached", and the linked VPC (if a
 
 This function retrieve the first (single) vpcId that has state attached, if any
 */
-func getVpcId(vpcToVirtualGatewayLinks *[]iaas.VpcToVirtualGatewayLink) *string {
+func getVpcId(vpcToVirtualGatewayLinks *[]numspot.VpcToVirtualGatewayLink) *string {
 	var vpcId *string
 
 	if vpcToVirtualGatewayLinks != nil {
@@ -38,7 +38,7 @@ func getVpcId(vpcToVirtualGatewayLinks *[]iaas.VpcToVirtualGatewayLink) *string 
 	return vpcId
 }
 
-func VirtualGatewayFromHttpToTf(ctx context.Context, http *iaas.VirtualGateway) (*resource_virtual_gateway.VirtualGatewayModel, diag.Diagnostics) {
+func VirtualGatewayFromHttpToTf(ctx context.Context, http *numspot.VirtualGateway) (*resource_virtual_gateway.VirtualGatewayModel, diag.Diagnostics) {
 	var (
 		diags  diag.Diagnostics
 		tagsTf types.List
@@ -62,14 +62,14 @@ func VirtualGatewayFromHttpToTf(ctx context.Context, http *iaas.VirtualGateway) 
 	}, diags
 }
 
-func VirtualGatewayFromTfToCreateRequest(tf resource_virtual_gateway.VirtualGatewayModel) iaas.CreateVirtualGatewayJSONRequestBody {
-	return iaas.CreateVirtualGatewayJSONRequestBody{
+func VirtualGatewayFromTfToCreateRequest(tf resource_virtual_gateway.VirtualGatewayModel) numspot.CreateVirtualGatewayJSONRequestBody {
+	return numspot.CreateVirtualGatewayJSONRequestBody{
 		ConnectionType: tf.ConnectionType.ValueString(),
 	}
 }
 
-func VirtualGatewaysFromTfToAPIReadParams(ctx context.Context, tf VirtualGatewaysDataSourceModel) iaas.ReadVirtualGatewaysParams {
-	return iaas.ReadVirtualGatewaysParams{
+func VirtualGatewaysFromTfToAPIReadParams(ctx context.Context, tf VirtualGatewaysDataSourceModel) numspot.ReadVirtualGatewaysParams {
+	return numspot.ReadVirtualGatewaysParams{
 		States:          utils.TfStringListToStringPtrList(ctx, tf.States),
 		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
 		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues),
@@ -81,7 +81,7 @@ func VirtualGatewaysFromTfToAPIReadParams(ctx context.Context, tf VirtualGateway
 	}
 }
 
-func VirtualGatewaysFromHttpToTfDatasource(ctx context.Context, http *iaas.VirtualGateway) (*datasource_virtual_gateway.VirtualGatewayModel, diag.Diagnostics) {
+func VirtualGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.VirtualGateway) (*datasource_virtual_gateway.VirtualGatewayModel, diag.Diagnostics) {
 	var (
 		diags    diag.Diagnostics
 		tagsList types.List

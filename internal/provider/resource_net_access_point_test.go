@@ -2,6 +2,11 @@
 
 package provider
 
+/*
+
+Net Access Points are not handled for now
+
+
 import (
 	"fmt"
 	"testing"
@@ -114,3 +119,4 @@ resource "numspot_net_access_point" "test" {
 }
 `, tagKey, tagValue)
 }
+*/

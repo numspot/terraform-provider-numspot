@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_client_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_client_gateway"
@@ -13,8 +13,8 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *iaas.ClientGateway {
-	return &iaas.ClientGateway{
+func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *numspot.ClientGateway {
+	return &numspot.ClientGateway{
 		BgpAsn:         utils.FromTfInt64ToIntPtr(tf.BgpAsn),
 		ConnectionType: tf.ConnectionType.ValueStringPointer(),
 		Id:             tf.Id.ValueStringPointer(),
@@ -23,7 +23,7 @@ func ClientGatewayFromTfToHttp(tf *resource_client_gateway.ClientGatewayModel) *
 	}
 }
 
-func ClientGatewayFromHttpToTf(ctx context.Context, http *iaas.ClientGateway) (*resource_client_gateway.ClientGatewayModel, diag.Diagnostics) {
+func ClientGatewayFromHttpToTf(ctx context.Context, http *numspot.ClientGateway) (*resource_client_gateway.ClientGatewayModel, diag.Diagnostics) {
 	var (
 		tagsTf types.List
 		diags  diag.Diagnostics
@@ -46,16 +46,16 @@ func ClientGatewayFromHttpToTf(ctx context.Context, http *iaas.ClientGateway) (*
 	}, diags
 }
 
-func ClientGatewayFromTfToCreateRequest(tf *resource_client_gateway.ClientGatewayModel) iaas.CreateClientGatewayJSONRequestBody {
-	return iaas.CreateClientGatewayJSONRequestBody{
+func ClientGatewayFromTfToCreateRequest(tf *resource_client_gateway.ClientGatewayModel) numspot.CreateClientGatewayJSONRequestBody {
+	return numspot.CreateClientGatewayJSONRequestBody{
 		BgpAsn:         utils.FromTfInt64ToInt(tf.BgpAsn),
 		ConnectionType: tf.ConnectionType.ValueString(),
 		PublicIp:       tf.PublicIp.ValueString(),
 	}
 }
 
-func ClientGatewaysFromTfToAPIReadParams(ctx context.Context, tf ClientGatewaysDataSourceModel) iaas.ReadClientGatewaysParams {
-	return iaas.ReadClientGatewaysParams{
+func ClientGatewaysFromTfToAPIReadParams(ctx context.Context, tf ClientGatewaysDataSourceModel) numspot.ReadClientGatewaysParams {
+	return numspot.ReadClientGatewaysParams{
 		States:          utils.TfStringListToStringPtrList(ctx, tf.States),
 		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
 		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues),
@@ -67,7 +67,7 @@ func ClientGatewaysFromTfToAPIReadParams(ctx context.Context, tf ClientGatewaysD
 	}
 }
 
-func ClientGatewaysFromHttpToTfDatasource(ctx context.Context, http *iaas.ClientGateway) (*datasource_client_gateway.ClientGatewayModel, diag.Diagnostics) {
+func ClientGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.ClientGateway) (*datasource_client_gateway.ClientGatewayModel, diag.Diagnostics) {
 	var (
 		diags    diag.Diagnostics
 		tagsList types.List

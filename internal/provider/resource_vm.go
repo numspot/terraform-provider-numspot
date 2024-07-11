@@ -9,7 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vm"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -72,7 +72,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		ctx,
 		r.provider.SpaceID,
 		VmFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
-		r.provider.IaasClient.CreateVmsWithResponse)
+		r.provider.NumspotClient.CreateVmsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VM", err.Error())
 	}
@@ -85,7 +85,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 
 	// Create tags
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -97,14 +97,14 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running", "stopped"}, // In some cases, when there is insufficient capacity the VM is created with state = stopped
-		r.provider.IaasClient.ReadVmsByIdWithResponse,
+		r.provider.NumspotClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
-	vmSchema, ok := read.(*iaas.Vm)
+	vmSchema, ok := read.(*numspot.Vm)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create VM", "object conversion error")
 		return
@@ -129,12 +129,12 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadVmsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadVmsByIdResponse, error) {
 		id := utils.FromTfStringToStringPtr(data.Id)
 		if id == nil {
 			return nil, errors.New("Found invalid id")
 		}
-		return r.provider.IaasClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
+		return r.provider.NumspotClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -167,7 +167,7 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			vmId,
 		)
@@ -188,8 +188,8 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		}
 
 		// Update VM
-		updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVmResponse, error) {
-			return r.provider.IaasClient.UpdateVmWithResponse(ctx, r.provider.SpaceID, vmId, body)
+		updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVmResponse, error) {
+			return r.provider.NumspotClient.UpdateVmWithResponse(ctx, r.provider.SpaceID, vmId, body)
 		}, http.StatusOK, &response.Diagnostics)
 
 		if updatedRes == nil || response.Diagnostics.HasError() {
@@ -211,13 +211,13 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running"},
-		r.provider.IaasClient.ReadVmsByIdWithResponse,
+		r.provider.NumspotClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to update VM", fmt.Sprintf("Error waiting for VM to be created: %s", err))
 		return
 	}
-	vmObject, ok := read.(*iaas.Vm)
+	vmObject, ok := read.(*numspot.Vm)
 	if !ok {
 		response.Diagnostics.AddError("Failed to update VM", "object conversion error")
 		return
@@ -240,7 +240,7 @@ func compareSlicePtr[R comparable](val1 *[]R, val2 *[]R) bool {
 	return slices.Equal(utils.GetPtrValue(val1), utils.GetPtrValue(val2))
 }
 
-func isUpdateNeeded(plan iaas.UpdateVmJSONRequestBody, state iaas.UpdateVmJSONRequestBody) bool {
+func isUpdateNeeded(plan numspot.UpdateVmJSONRequestBody, state numspot.UpdateVmJSONRequestBody) bool {
 	return !(compareSimpleFieldPtr(plan.BsuOptimized, state.BsuOptimized) &&
 		compareSimpleFieldPtr(plan.DeletionProtection, state.DeletionProtection) &&
 		compareSimpleFieldPtr(plan.KeypairName, state.KeypairName) &&
@@ -258,7 +258,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	var data resource_vm.VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVmsWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteVmsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VM", err.Error())
 		return

@@ -6,7 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_snapshot"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_snapshot"
@@ -14,7 +14,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func SnapshotFromHttpToTf(ctx context.Context, http *iaas.Snapshot) (*resource_snapshot.SnapshotModel, diag.Diagnostics) {
+func SnapshotFromHttpToTf(ctx context.Context, http *numspot.Snapshot) (*resource_snapshot.SnapshotModel, diag.Diagnostics) {
 	var (
 		tagsTf          types.List
 		diags           diag.Diagnostics
@@ -45,8 +45,8 @@ func SnapshotFromHttpToTf(ctx context.Context, http *iaas.Snapshot) (*resource_s
 	}, nil
 }
 
-func SnapshotFromTfToCreateRequest(tf *resource_snapshot.SnapshotModel) iaas.CreateSnapshotJSONRequestBody {
-	return iaas.CreateSnapshotJSONRequestBody{
+func SnapshotFromTfToCreateRequest(tf *resource_snapshot.SnapshotModel) numspot.CreateSnapshotJSONRequestBody {
+	return numspot.CreateSnapshotJSONRequestBody{
 		Description:      tf.Description.ValueStringPointer(),
 		SourceRegionName: tf.SourceRegionName.ValueStringPointer(),
 		SourceSnapshotId: tf.SourceSnapshotId.ValueStringPointer(),
@@ -54,8 +54,8 @@ func SnapshotFromTfToCreateRequest(tf *resource_snapshot.SnapshotModel) iaas.Cre
 	}
 }
 
-func SnapshotsFromTfToAPIReadParams(ctx context.Context, tf SnapshotsDataSourceModel) iaas.ReadSnapshotsParams {
-	return iaas.ReadSnapshotsParams{
+func SnapshotsFromTfToAPIReadParams(ctx context.Context, tf SnapshotsDataSourceModel) numspot.ReadSnapshotsParams {
+	return numspot.ReadSnapshotsParams{
 		Descriptions:     utils.TfStringListToStringPtrList(ctx, tf.Descriptions),
 		FromCreationDate: utils.FromTfStringToStringPtr(tf.FromCreationDate),
 		IsPublic:         utils.FromTfBoolToBoolPtr(tf.PermissionsToCreateVolumeGlobalPermission),
@@ -71,7 +71,7 @@ func SnapshotsFromTfToAPIReadParams(ctx context.Context, tf SnapshotsDataSourceM
 	}
 }
 
-func SnapshotsFromHttpToTfDatasource(ctx context.Context, http *iaas.Snapshot) (*datasource_snapshot.SnapshotModel, diag.Diagnostics) {
+func SnapshotsFromHttpToTfDatasource(ctx context.Context, http *numspot.Snapshot) (*datasource_snapshot.SnapshotModel, diag.Diagnostics) {
 	var (
 		diags          diag.Diagnostics
 		tagsList       types.List

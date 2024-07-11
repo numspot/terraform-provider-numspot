@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_internet_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -71,7 +71,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	res, err := retry_utils.RetryCreateUntilResourceAvailable(
 		ctx,
 		r.provider.SpaceID,
-		r.provider.IaasClient.CreateInternetGatewayWithResponse)
+		r.provider.NumspotClient.CreateInternetGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Internet Gateway", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -88,12 +88,12 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	// Call Link Internet Service to VPC
 	vpcId := data.VpcIp
 	if !vpcId.IsNull() {
-		linRes := utils.ExecuteRequest(func() (*iaas.LinkInternetGatewayResponse, error) {
-			return r.provider.IaasClient.LinkInternetGatewayWithResponse(
+		linRes := utils.ExecuteRequest(func() (*numspot.LinkInternetGatewayResponse, error) {
+			return r.provider.NumspotClient.LinkInternetGatewayWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				createdId,
-				iaas.LinkInternetGatewayJSONRequestBody{
+				numspot.LinkInternetGatewayJSONRequestBody{
 					VpcId: data.VpcIp.ValueString(),
 				},
 			)
@@ -109,14 +109,14 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 		r.provider.SpaceID,
 		[]string{},
 		[]string{"available"},
-		r.provider.IaasClient.ReadInternetGatewaysByIdWithResponse,
+		r.provider.NumspotClient.ReadInternetGatewaysByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Internet Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
-	rr, ok := read.(*iaas.InternetGateway)
+	rr, ok := read.(*numspot.InternetGateway)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create internet gateway", "object conversion error")
 		return
@@ -136,8 +136,8 @@ func (r *InternetGatewayResource) Read(ctx context.Context, request resource.Rea
 	var data resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysByIdResponse, error) {
-		return r.provider.IaasClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadInternetGatewaysByIdResponse, error) {
+		return r.provider.NumspotClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -168,7 +168,7 @@ func (r *InternetGatewayResource) Update(ctx context.Context, request resource.U
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -182,8 +182,8 @@ func (r *InternetGatewayResource) Update(ctx context.Context, request resource.U
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadInternetGatewaysByIdResponse, error) {
-		return r.provider.IaasClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadInternetGatewaysByIdResponse, error) {
+		return r.provider.NumspotClient.ReadInternetGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -211,10 +211,10 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 			ctx,
 			r.provider.SpaceID,
 			data.Id.ValueString(),
-			iaas.UnlinkInternetGatewayJSONRequestBody{
+			numspot.UnlinkInternetGatewayJSONRequestBody{
 				VpcId: data.VpcIp.ValueString(),
 			},
-			r.provider.IaasClient.UnlinkInternetGatewayWithResponse,
+			r.provider.NumspotClient.UnlinkInternetGatewayWithResponse,
 		)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to delete Internet Gateway", err.Error())
@@ -226,7 +226,7 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 		ctx,
 		r.provider.SpaceID,
 		data.Id.ValueString(),
-		r.provider.IaasClient.DeleteInternetGatewayWithResponse)
+		r.provider.NumspotClient.DeleteInternetGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Internet Gateway", err.Error())
 		return

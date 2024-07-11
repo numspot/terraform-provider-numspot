@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_snapshot"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -72,7 +72,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		ctx,
 		r.provider.SpaceID,
 		SnapshotFromTfToCreateRequest(&data),
-		r.provider.IaasClient.CreateSnapshotWithResponse)
+		r.provider.NumspotClient.CreateSnapshotWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Snapshot", err.Error())
 		return
@@ -80,7 +80,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -93,14 +93,14 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		r.provider.SpaceID,
 		[]string{"pending/queued", "in-queue", "pending"},
 		[]string{"completed"},
-		r.provider.IaasClient.ReadSnapshotsByIdWithResponse,
+		r.provider.NumspotClient.ReadSnapshotsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Snapshot", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
-	rr, ok := readRes.(*iaas.Snapshot)
+	rr, ok := readRes.(*numspot.Snapshot)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create Snapshot", "object conversion error")
 		return
@@ -131,8 +131,8 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	var data resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadSnapshotsByIdResponse, error) {
-		return r.provider.IaasClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
+		return r.provider.NumspotClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -175,7 +175,7 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -190,8 +190,8 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadSnapshotsByIdResponse, error) {
-		return r.provider.IaasClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
+		return r.provider.NumspotClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -222,7 +222,7 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	var data resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteSnapshotWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteSnapshotWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Snapshot", err.Error())
 		return

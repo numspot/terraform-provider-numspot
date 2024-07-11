@@ -11,13 +11,11 @@ import (
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -43,7 +41,6 @@ type numspotProvider struct {
 
 type NumspotProviderModel struct {
 	NumSpotHost  types.String `tfsdk:"numspot_host"`
-	IAASHost     types.String `tfsdk:"iaas_host"`
 	ClientId     types.String `tfsdk:"client_id"`
 	ClientSecret types.String `tfsdk:"client_secret"`
 	SpaceId      types.String `tfsdk:"space_id"`
@@ -54,10 +51,6 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 		Attributes: map[string]schema.Attribute{
 			"numspot_host": schema.StringAttribute{
 				MarkdownDescription: "Numspot API Host",
-				Optional:            true,
-			},
-			"iaas_host": schema.StringAttribute{
-				MarkdownDescription: "Numspot API IAAS Host",
 				Optional:            true,
 			},
 			"client_id": schema.StringAttribute{
@@ -76,7 +69,7 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 	}
 }
 
-func (p *numspotProvider) authenticateUser(ctx context.Context, numSpotClient *numspot.ClientWithResponses, data *NumspotProviderModel) (*string, error) {
+func (p *numspotProvider) authenticateUser(ctx context.Context, NumspotClient *numspot.ClientWithResponses, data *NumspotProviderModel) (*string, error) {
 	clientUuid, diags := utils.ParseUUID(data.ClientId.ValueString())
 	if diags.HasError() {
 		return nil, fmt.Errorf("Error while parsing %s as UUID", data.ClientId.ValueString())
@@ -88,7 +81,7 @@ func (p *numspotProvider) authenticateUser(ctx context.Context, numSpotClient *n
 	}
 
 	basicAuth := buildBasicAuth(data.ClientId.ValueString(), data.ClientSecret.ValueString())
-	response, err := numSpotClient.TokenWithFormdataBodyWithResponse(ctx, &numspot.TokenParams{
+	response, err := NumspotClient.TokenWithFormdataBodyWithResponse(ctx, &numspot.TokenParams{
 		Authorization: &basicAuth,
 	}, body)
 	if err != nil {
@@ -103,32 +96,9 @@ func buildBasicAuth(username, password string) string {
 	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 }
 
-func (p *numspotProvider) apiClientWithAuth(accessToken string, diag *diag.Diagnostics, data *NumspotProviderModel) *iaas.ClientWithResponses {
-	bearerProvider, err := securityprovider.NewSecurityProviderBearerToken(accessToken)
-	if err != nil {
-		diag.AddError("Failed to create bearer provider token", err.Error())
-		return nil
-	}
-
-	numspotClient, err := iaas.NewClientWithResponses(data.IAASHost.ValueString(), iaas.WithRequestEditorFn(bearerProvider.Intercept),
-		iaas.WithHTTPClient(&http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			},
-		}),
-	)
-	if err != nil {
-		diag.AddError("Failed to create NumSpot api provider", err.Error())
-		return nil
-	}
-
-	return numspotClient
-}
-
 type Provider struct {
-	SpaceID       iaas.SpaceId
-	NumSpotClient *numspot.ClientWithResponses
-	IaasClient    *iaas.ClientWithResponses
+	SpaceID       numspot.SpaceId
+	NumspotClient *numspot.ClientWithResponses
 }
 
 func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -142,15 +112,6 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	// If practitioner provided a configuration value for any of the
 	// attributes, it must be a known value.
-	if config.IAASHost.IsUnknown() {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("iaas_host"),
-			"Unknown Numspot API IAAS host",
-			"The provider cannot create the Numspot API provider as there is an unknown configuration value for the Numspot IAAS host. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the NUMSPOT_IAAS_HOST environment variable.",
-		)
-	}
-
 	if config.ClientId.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("client_id"),
@@ -176,17 +137,12 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	// Default values to environment variables, but override
 	// with Terraform configuration value if set.
 	numSpotHost := os.Getenv("NUMSPOT_HOST")
-	iaasHost := os.Getenv("NUMSPOT_IAAS_HOST")
 	clientID := os.Getenv("NUMSPOT_CLIENT_ID")
 	clientSecret := os.Getenv("NUMSPOT_CLIENT_SECRET")
 	spaceId := os.Getenv("NUMSPOT_SPACE_ID")
 
 	if !config.NumSpotHost.IsNull() {
 		numSpotHost = config.NumSpotHost.ValueString()
-	}
-
-	if !config.IAASHost.IsNull() {
-		iaasHost = config.IAASHost.ValueString()
 	}
 
 	if !config.ClientId.IsNull() {
@@ -203,16 +159,6 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	// If any of the expected configurations are missing, return
 	// errors with provider-specific guidance.
-	if iaasHost == "" {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("iaas_host"),
-			"Missing Numspot API Host",
-			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot IAAS host. "+
-				"Set the host value in the configuration or use the NUMSPOT_IAAS_HOST environment variable. "+
-				"If either is already set, ensure the value is not empty.",
-		)
-	}
-
 	if numSpotHost == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("numspot_host"),
@@ -258,14 +204,12 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	}
 
 	config.NumSpotHost = types.StringValue(numSpotHost)
-	config.IAASHost = types.StringValue(iaasHost)
 	config.ClientId = types.StringValue(clientID)
 	config.ClientSecret = types.StringValue(clientSecret)
 
 	// Create a new Numspot provider using the configuration values
 	var (
-		iaasClient    *iaas.ClientWithResponses
-		numSpotClient *numspot.ClientWithResponses
+		numspotClient *numspot.ClientWithResponses
 	)
 
 	httpClient := func(c *numspot.Client) error {
@@ -282,13 +226,13 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return nil
 	})
 
-	numSpotClient, err := numspot.NewClientWithResponses(config.NumSpotHost.ValueString(), httpClient, requestEditor)
+	numspotClient, err := numspot.NewClientWithResponses(config.NumSpotHost.ValueString(), httpClient, requestEditor)
 	if err != nil {
 		resp.Diagnostics.AddError("Auth error", "failed to get access token")
 		return
 	}
 
-	accessToken, err := p.authenticateUser(ctx, numSpotClient, &config)
+	accessToken, err := p.authenticateUser(ctx, numspotClient, &config)
 	if err != nil {
 		resp.Diagnostics.AddError("Auth error", "failed to get access token")
 		return
@@ -310,14 +254,9 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	numSpotClient, err = numspot.NewClientWithResponses(config.NumSpotHost.ValueString(), httpClient, requestEditor, numspot.WithRequestEditorFn(bearerProvider.Intercept))
+	numspotClient, err = numspot.NewClientWithResponses(config.NumSpotHost.ValueString(), httpClient, requestEditor, numspot.WithRequestEditorFn(bearerProvider.Intercept))
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to create bearer provider token", err.Error())
-		return
-	}
-
-	iaasClient = p.apiClientWithAuth(*accessToken, &resp.Diagnostics, &config)
-	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -335,8 +274,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	providerData := Provider{
 		SpaceID:       spaceUuid,
-		NumSpotClient: numSpotClient,
-		IaasClient:    iaasClient,
+		NumspotClient: numspotClient,
 	}
 
 	resp.DataSourceData = providerData
@@ -369,7 +307,6 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewVpnConnectionsDataSource,
 		NewSpaceDataSource,
 		NewVmsDataSource,
-		NewProductTypesDataSource,
 		NewFlexibleGpusDataSource,
 		NewServiceAccountsDataSource,
 		NewPermissionsDataSource,
@@ -380,8 +317,6 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewClientGatewayResource,
-		NewDirectLinkResource,
-		NewDirectLinkInterfaceResource,
 		NewFlexibleGpuResource,
 		NewImageResource,
 		NewInternetGatewayResource,
@@ -389,7 +324,6 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewLoadBalancerResource,
 		NewNatGatewayResource,
 		NewNetResource,
-		NewNetAccessPointResource,
 		NewNicResource,
 		NewPublicIpResource,
 		NewRouteTableResource,

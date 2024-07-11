@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_public_ip"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -75,8 +75,8 @@ func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadR
 	}
 
 	params := PublicIpsFromTfToAPIReadParams(ctx, plan)
-	res := utils.ExecuteRequest(func() (*iaas.ReadPublicIpsResponse, error) {
-		return d.provider.IaasClient.ReadPublicIpsWithResponse(ctx, d.provider.SpaceID, &params)
+	res := utils.ExecuteRequest(func() (*numspot.ReadPublicIpsResponse, error) {
+		return d.provider.NumspotClient.ReadPublicIpsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

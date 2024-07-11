@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_volume"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -71,7 +71,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		ctx,
 		r.provider.SpaceID,
 		VolumeFromTfToCreateRequest(&data),
-		r.provider.IaasClient.CreateVolumeWithResponse)
+		r.provider.NumspotClient.CreateVolumeWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Volume", err.Error())
 		return
@@ -80,7 +80,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	// Retries read on resource until state is OK
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -93,14 +93,14 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		r.provider.SpaceID,
 		[]string{"creating"},
 		[]string{"available"},
-		r.provider.IaasClient.ReadVolumesByIdWithResponse,
+		r.provider.NumspotClient.ReadVolumesByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", *res.JSON201.Id, err))
 		return
 	}
 
-	rr, ok := read.(*iaas.Volume)
+	rr, ok := read.(*numspot.Volume)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create volume", "object conversion error")
 		return
@@ -118,8 +118,8 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadVolumesByIdResponse, error) {
-		return r.provider.IaasClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadVolumesByIdResponse, error) {
+		return r.provider.NumspotClient.ReadVolumesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -147,7 +147,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -156,9 +156,9 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		}
 	}
 
-	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateVolumeResponse, error) {
+	updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVolumeResponse, error) {
 		body := ValueFromTfToUpdaterequest(&plan)
-		return r.provider.IaasClient.UpdateVolumeWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString(), body)
+		return r.provider.NumspotClient.UpdateVolumeWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString(), body)
 	}, http.StatusOK, &response.Diagnostics)
 	if updatedRes == nil {
 		return
@@ -172,7 +172,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		r.provider.SpaceID,
 		[]string{"creating", "updating"},
 		[]string{"available"},
-		r.provider.IaasClient.ReadVolumesByIdWithResponse,
+		r.provider.NumspotClient.ReadVolumesByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to update volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
@@ -181,7 +181,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 
 	time.Sleep(3 * time.Second) // TODO remove when outscale fixes the State field => https://numsproduct.atlassian.net/browse/CLSEXP-612
 
-	rr, ok := read.(*iaas.Volume)
+	rr, ok := read.(*numspot.Volume)
 	if !ok {
 		response.Diagnostics.AddError("Failed to update volume", "object conversion error")
 		return
@@ -201,7 +201,7 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data resource_volume.VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVolumeWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteVolumeWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Volume", err.Error())
 		return

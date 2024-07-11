@@ -2,6 +2,10 @@
 
 package provider
 
+/*
+
+ DIRECT LINKS are not handled for now
+
 import (
 	"testing"
 
@@ -54,3 +58,4 @@ func testDirectLinkInterfaceConfig_Update() string {
 	return `resource "numspot_direct_link_interface" "test" {
 }`
 }
+*/

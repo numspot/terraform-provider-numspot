@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -441,8 +441,8 @@ func Diff(current, desired []TagsValue) (toCreate, toDelete, toUpdate []TagsValu
 
 func CreateTagsFromTf(
 	ctx context.Context,
-	apiClient *iaas.ClientWithResponses,
-	spaceId iaas.SpaceId,
+	apiClient *numspot.ClientWithResponses,
+	spaceId numspot.SpaceId,
 	diagnostics *diag.Diagnostics,
 	resourceId string,
 	tags types.List,
@@ -450,9 +450,9 @@ func CreateTagsFromTf(
 	tfTags := make([]TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 
-	apiTags := make([]iaas.ResourceTag, 0, len(tfTags))
+	apiTags := make([]numspot.ResourceTag, 0, len(tfTags))
 	for _, tfTag := range tfTags {
-		apiTags = append(apiTags, iaas.ResourceTag{
+		apiTags = append(apiTags, numspot.ResourceTag{
 			Key:   tfTag.Key.ValueString(),
 			Value: tfTag.Value.ValueString(),
 		})
@@ -463,13 +463,13 @@ func CreateTagsFromTf(
 
 func CreateTags(
 	ctx context.Context,
-	apiClient *iaas.ClientWithResponses,
-	spaceId iaas.SpaceId,
+	apiClient *numspot.ClientWithResponses,
+	spaceId numspot.SpaceId,
 	diagnostics *diag.Diagnostics,
 	resourceId string,
-	tags []iaas.ResourceTag,
+	tags []numspot.ResourceTag,
 ) {
-	res, err := apiClient.CreateTagsWithResponse(ctx, spaceId, iaas.CreateTagsJSONRequestBody{
+	res, err := apiClient.CreateTagsWithResponse(ctx, spaceId, numspot.CreateTagsJSONRequestBody{
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})
@@ -485,7 +485,7 @@ func CreateTags(
 	}
 }
 
-func tagFromAPI(ctx context.Context, tag iaas.Tag) (TagsValue, diag.Diagnostics) {
+func tagFromAPI(ctx context.Context, tag numspot.Tag) (TagsValue, diag.Diagnostics) {
 	return NewTagsValue(
 		TagsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -495,7 +495,7 @@ func tagFromAPI(ctx context.Context, tag iaas.Tag) (TagsValue, diag.Diagnostics)
 	)
 }
 
-func ResourceTagFromAPI(ctx context.Context, tag iaas.ResourceTag) (TagsValue, diag.Diagnostics) {
+func ResourceTagFromAPI(ctx context.Context, tag numspot.ResourceTag) (TagsValue, diag.Diagnostics) {
 	return NewTagsValue(
 		TagsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -507,13 +507,13 @@ func ResourceTagFromAPI(ctx context.Context, tag iaas.ResourceTag) (TagsValue, d
 
 func ReadTags(
 	ctx context.Context,
-	apiClient *iaas.ClientWithResponses,
-	spaceId iaas.SpaceId,
+	apiClient *numspot.ClientWithResponses,
+	spaceId numspot.SpaceId,
 	diagnostics diag.Diagnostics,
 	resourceId string,
 ) types.List {
 	resourceIds := []string{resourceId}
-	res, err := apiClient.ReadTagsWithResponse(ctx, spaceId, &iaas.ReadTagsParams{
+	res, err := apiClient.ReadTagsWithResponse(ctx, spaceId, &numspot.ReadTagsParams{
 		ResourceIds: &resourceIds,
 	})
 	if err != nil {
@@ -548,13 +548,13 @@ func ReadTags(
 
 func DeleteTags(
 	ctx context.Context,
-	apiClient *iaas.ClientWithResponses,
-	spaceId iaas.SpaceId,
+	apiClient *numspot.ClientWithResponses,
+	spaceId numspot.SpaceId,
 	diagnostics *diag.Diagnostics,
 	resourceId string,
-	tags []iaas.ResourceTag,
+	tags []numspot.ResourceTag,
 ) {
-	res, err := apiClient.DeleteTagsWithResponse(ctx, spaceId, iaas.DeleteTagsJSONRequestBody{
+	res, err := apiClient.DeleteTagsWithResponse(ctx, spaceId, numspot.DeleteTagsJSONRequestBody{
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})
@@ -574,8 +574,8 @@ func UpdateTags(
 	ctx context.Context,
 	stateTagsTf, planTagsTf types.List,
 	diagnostics *diag.Diagnostics,
-	apiClient *iaas.ClientWithResponses,
-	spaceId iaas.SpaceId,
+	apiClient *numspot.ClientWithResponses,
+	spaceId numspot.SpaceId,
 	resourceId string,
 ) {
 	var (
@@ -602,17 +602,17 @@ func UpdateTags(
 
 	toCreate, toDelete, toUpdate := Diff(stateTags, planTags)
 
-	toDeleteApiTags := make([]iaas.ResourceTag, 0, len(toUpdate)+len(toDelete))
-	toCreateApiTags := make([]iaas.ResourceTag, 0, len(toUpdate)+len(toCreate))
+	toDeleteApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toDelete))
+	toCreateApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toCreate))
 	for _, e := range toCreate {
-		toCreateApiTags = append(toCreateApiTags, iaas.ResourceTag{
+		toCreateApiTags = append(toCreateApiTags, numspot.ResourceTag{
 			Key:   e.Key.ValueString(),
 			Value: e.Value.ValueString(),
 		})
 	}
 
 	for _, e := range toDelete {
-		toDeleteApiTags = append(toDeleteApiTags, iaas.ResourceTag{
+		toDeleteApiTags = append(toDeleteApiTags, numspot.ResourceTag{
 			Key:   e.Key.ValueString(),
 			Value: e.Value.ValueString(),
 		})
@@ -620,13 +620,13 @@ func UpdateTags(
 
 	for _, e := range toUpdate {
 		// Delete
-		toDeleteApiTags = append(toDeleteApiTags, iaas.ResourceTag{
+		toDeleteApiTags = append(toDeleteApiTags, numspot.ResourceTag{
 			Key:   e.Key.ValueString(),
 			Value: e.Value.ValueString(),
 		})
 
 		// Create
-		toCreateApiTags = append(toCreateApiTags, iaas.ResourceTag{
+		toCreateApiTags = append(toCreateApiTags, numspot.ResourceTag{
 			Key:   e.Key.ValueString(),
 			Value: e.Value.ValueString(),
 		})

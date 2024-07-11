@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_nat_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -71,7 +71,7 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 		ctx,
 		r.provider.SpaceID,
 		NatGatewayFromTfToCreateRequest(data),
-		r.provider.IaasClient.CreateNatGatewayWithResponse)
+		r.provider.NumspotClient.CreateNatGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Nat Gateway", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -92,14 +92,14 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.IaasClient.ReadNatGatewayByIdWithResponse,
+		r.provider.NumspotClient.ReadNatGatewayByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Nat Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
-	rr, ok := read.(*iaas.NatGateway)
+	rr, ok := read.(*numspot.NatGateway)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create nat gateway", "object conversion error")
 		return
@@ -117,8 +117,8 @@ func (r *NatGatewayResource) Read(ctx context.Context, request resource.ReadRequ
 	var data resource_nat_gateway.NatGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadNatGatewayByIdResponse, error) {
-		return r.provider.IaasClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadNatGatewayByIdResponse, error) {
+		return r.provider.NumspotClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -147,7 +147,7 @@ func (r *NatGatewayResource) Update(ctx context.Context, request resource.Update
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -160,8 +160,8 @@ func (r *NatGatewayResource) Update(ctx context.Context, request resource.Update
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadNatGatewayByIdResponse, error) {
-		return r.provider.IaasClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadNatGatewayByIdResponse, error) {
+		return r.provider.NumspotClient.ReadNatGatewayByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -179,7 +179,7 @@ func (r *NatGatewayResource) Delete(ctx context.Context, request resource.Delete
 	var data resource_nat_gateway.NatGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteNatGatewayWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteNatGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete NAT Gateway", err.Error())
 		return

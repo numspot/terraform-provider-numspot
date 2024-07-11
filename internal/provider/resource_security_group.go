@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_security_group"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -61,16 +61,16 @@ func (r *SecurityGroupResource) Schema(ctx context.Context, request resource.Sch
 	response.Schema = resource_security_group.SecurityGroupResourceSchema(ctx)
 }
 
-func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, existingRules *[]iaas.SecurityGroupRule, flow string) diag.Diagnostics {
+func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, existingRules *[]numspot.SecurityGroupRule, flow string) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	if existingRules == nil {
 		return nil
 	}
 
-	rules := make([]iaas.SecurityGroupRule, 0, len(*existingRules))
+	rules := make([]numspot.SecurityGroupRule, 0, len(*existingRules))
 	for _, e := range *existingRules {
-		rules = append(rules, iaas.SecurityGroupRule{
+		rules = append(rules, numspot.SecurityGroupRule{
 			FromPortRange:         e.FromPortRange,
 			IpProtocol:            e.IpProtocol,
 			IpRanges:              e.IpRanges,
@@ -80,12 +80,12 @@ func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, exis
 		})
 	}
 
-	utils.ExecuteRequest(func() (*iaas.DeleteSecurityGroupRuleResponse, error) {
-		body := iaas.DeleteSecurityGroupRuleJSONRequestBody{
+	utils.ExecuteRequest(func() (*numspot.DeleteSecurityGroupRuleResponse, error) {
+		body := numspot.DeleteSecurityGroupRuleJSONRequestBody{
 			Flow:  flow,
 			Rules: &rules,
 		}
-		return r.provider.IaasClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
+		return r.provider.NumspotClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
 	}, http.StatusNoContent, &diags)
 
 	return diags
@@ -97,16 +97,16 @@ func createRules[RulesType any](
 	ctx context.Context,
 	id string,
 	rulesToCreate basetypes.SetValue,
-	fun func(ctx context.Context, sgId string, data []RulesType) iaas.CreateSecurityGroupRuleJSONRequestBody,
+	fun func(ctx context.Context, sgId string, data []RulesType) numspot.CreateSecurityGroupRuleJSONRequestBody,
 ) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	rules := make([]RulesType, 0, len(rulesToCreate.Elements()))
 	rulesToCreate.ElementsAs(ctx, &rules, false)
 
-	_ = utils.ExecuteRequest(func() (*iaas.CreateSecurityGroupRuleResponse, error) {
+	_ = utils.ExecuteRequest(func() (*numspot.CreateSecurityGroupRuleResponse, error) {
 		body := fun(ctx, id, rules)
-		return r.provider.IaasClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
+		return r.provider.NumspotClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
 	}, http.StatusCreated, &diags)
 
 	return diags
@@ -167,7 +167,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		ctx,
 		r.provider.SpaceID,
 		SecurityGroupFromTfToCreateRequest(&data),
-		r.provider.IaasClient.CreateSecurityGroupWithResponse)
+		r.provider.NumspotClient.CreateSecurityGroupWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Security Group", err.Error())
 		return
@@ -180,7 +180,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 	// Create tags
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, id, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, id, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -229,8 +229,8 @@ func (r *SecurityGroupResource) readSecurityGroup(
 	ctx context.Context,
 	id string,
 	diagnostics diag.Diagnostics,
-) *iaas.ReadSecurityGroupsByIdResponse {
-	res, err := r.provider.IaasClient.ReadSecurityGroupsByIdWithResponse(ctx, r.provider.SpaceID, id)
+) *numspot.ReadSecurityGroupsByIdResponse {
+	res, err := r.provider.NumspotClient.ReadSecurityGroupsByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -262,7 +262,7 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			securityGroupId,
 		)
@@ -299,7 +299,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	var data resource_security_group.SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteSecurityGroupWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteSecurityGroupWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Security Group", err.Error())
 		return

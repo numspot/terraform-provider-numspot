@@ -41,7 +41,7 @@ resource "numspot_space" "test" {
 }
 
 data "numspot_space" "testdata" {
-  space_id = numspot_space.test.id
-}
-	`, organisationId, name, description)
+  space_id        = numspot_space.test.id
+  organisation_id = numspot_space.test.organisation_id
+}`, organisationId, name, description)
 }

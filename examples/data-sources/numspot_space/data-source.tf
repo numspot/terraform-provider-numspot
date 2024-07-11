@@ -5,8 +5,8 @@ resource "numspot_space" "test" {
 }
 
 data "numspot_space" "testdata" {
-  space_id   = numspot_space.test.id
-  depends_on = [numspot_space.test]
+  space_id        = numspot_space.test.id
+  organisation_id = numspot_space.test.organisation_id
 }
 
 # How to use the datasource in another field

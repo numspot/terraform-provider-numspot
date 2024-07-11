@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_key_pair"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/retry_utils"
@@ -70,7 +70,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 		ctx,
 		r.provider.SpaceID,
 		KeyPairFromTfToCreateRequest(&data),
-		r.provider.IaasClient.CreateKeypairWithResponse)
+		r.provider.NumspotClient.CreateKeypairWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create KeyPair", err.Error())
 		return
@@ -91,8 +91,8 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadKeypairsByIdResponse, error) {
-		return r.provider.IaasClient.ReadKeypairsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
+	res := utils.ExecuteRequest(func() (*numspot.ReadKeypairsByIdResponse, error) {
+		return r.provider.NumspotClient.ReadKeypairsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -121,7 +121,7 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	var data resource_key_pair.KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteKeypairWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteKeypairWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete KeyPair", err.Error())
 		return

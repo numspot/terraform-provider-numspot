@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_nic"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -71,7 +71,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		ctx,
 		r.provider.SpaceID,
 		NicFromTfToCreateRequest(ctx, &data),
-		r.provider.IaasClient.CreateNicWithResponse)
+		r.provider.NumspotClient.CreateNicWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create NIC", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -92,14 +92,14 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		r.provider.SpaceID,
 		[]string{"attaching"},
 		[]string{"available", "in-use"},
-		r.provider.IaasClient.ReadNicsByIdWithResponse,
+		r.provider.NumspotClient.ReadNicsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Nic", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
-	read, ok := readRes.(*iaas.Nic)
+	read, ok := readRes.(*numspot.Nic)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create nic", "object conversion error")
 		return
@@ -118,8 +118,8 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadNicsByIdResponse, error) {
-		return r.provider.IaasClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadNicsByIdResponse, error) {
+		return r.provider.NumspotClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -152,7 +152,7 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			nicId,
 		)
@@ -162,9 +162,9 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 	}
 
 	// Update Nic
-	updatedRes := utils.ExecuteRequest(func() (*iaas.UpdateNicResponse, error) {
+	updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateNicResponse, error) {
 		body := NicFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
-		return r.provider.IaasClient.UpdateNicWithResponse(ctx, r.provider.SpaceID, nicId, body)
+		return r.provider.NumspotClient.UpdateNicWithResponse(ctx, r.provider.SpaceID, nicId, body)
 	}, http.StatusOK, &response.Diagnostics)
 
 	if updatedRes == nil || response.Diagnostics.HasError() {
@@ -172,8 +172,8 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 	}
 
 	// Read resource
-	res := utils.ExecuteRequest(func() (*iaas.ReadNicsByIdResponse, error) {
-		return r.provider.IaasClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadNicsByIdResponse, error) {
+		return r.provider.NumspotClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -192,7 +192,7 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteNicWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteNicWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Nic", err.Error())
 		return

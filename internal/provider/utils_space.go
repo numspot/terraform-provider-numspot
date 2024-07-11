@@ -38,14 +38,14 @@ func SpaceFromHttpToTf(http *numspot.Space) resource_space.SpaceModel {
 	}
 }
 
-func RetryReadSpaceUntilReady(ctx context.Context, client *numspot.ClientWithResponses, spaceID numspot.SpaceId) (interface{}, error) {
+func RetryReadSpaceUntilReady(ctx context.Context, client *numspot.ClientWithResponses, organisationID numspot.OrganisationId, spaceID numspot.SpaceId) (interface{}, error) {
 	pendingStates := []string{"", "QUEUED", "RUNNING"}
 	targetStates := []string{"READY"}
 	createStateConf := &retry.StateChangeConf{
 		Pending: pendingStates,
 		Target:  targetStates,
 		Refresh: func() (interface{}, string, error) {
-			res, err := client.GetSpaceByIdWithResponse(ctx, spaceID)
+			res, err := client.GetSpaceByIdWithResponse(ctx, organisationID, spaceID)
 			if err != nil {
 				return nil, "", fmt.Errorf("failed to read space : %v", err.Error())
 			}

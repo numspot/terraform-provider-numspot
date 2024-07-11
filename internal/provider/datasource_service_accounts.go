@@ -95,7 +95,7 @@ func (d *serviceAccountsDataSource) fetchPaginatedServiceAccounts(
 ) {
 	body := numspot.ListServiceAccountSpaceJSONRequestBody{}
 	res := utils.ExecuteRequest(func() (*numspot.ListServiceAccountSpaceResponse, error) {
-		return d.provider.NumSpotClient.ListServiceAccountSpaceWithResponse(ctx, spaceID, requestParams, body)
+		return d.provider.NumspotClient.ListServiceAccountSpaceWithResponse(ctx, spaceID, requestParams, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_virtual_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -71,7 +71,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 		ctx,
 		r.provider.SpaceID,
 		VirtualGatewayFromTfToCreateRequest(data),
-		r.provider.IaasClient.CreateVirtualGatewayWithResponse)
+		r.provider.NumspotClient.CreateVirtualGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Virtual Gateway", err.Error())
 		return
@@ -79,7 +79,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -87,12 +87,12 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 
 	// Link virtual gateway to VPCs
 	if !data.VpcId.IsNull() {
-		_ = utils.ExecuteRequest(func() (*iaas.LinkVirtualGatewayToVpcResponse, error) {
-			return r.provider.IaasClient.LinkVirtualGatewayToVpcWithResponse(
+		_ = utils.ExecuteRequest(func() (*numspot.LinkVirtualGatewayToVpcResponse, error) {
+			return r.provider.NumspotClient.LinkVirtualGatewayToVpcWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				createdId,
-				iaas.LinkVirtualGatewayToVpcJSONRequestBody{
+				numspot.LinkVirtualGatewayToVpcJSONRequestBody{
 					VpcId: data.VpcId.ValueString(),
 				},
 			)
@@ -109,14 +109,14 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.IaasClient.ReadVirtualGatewaysByIdWithResponse,
+		r.provider.NumspotClient.ReadVirtualGatewaysByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Virtual Gateway", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
 		return
 	}
 
-	rr, ok := read.(*iaas.VirtualGateway)
+	rr, ok := read.(*numspot.VirtualGateway)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create virtual gateway", "object conversion error")
 		return
@@ -134,8 +134,8 @@ func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.Read
 	var data resource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadVirtualGatewaysByIdResponse, error) {
-		return r.provider.IaasClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadVirtualGatewaysByIdResponse, error) {
+		return r.provider.NumspotClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -164,7 +164,7 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -179,12 +179,12 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 
 		// Unlink
 		if !(state.VpcId.IsNull() || state.VpcId.IsUnknown()) {
-			_ = utils.ExecuteRequest(func() (*iaas.UnlinkVirtualGatewayToVpcResponse, error) {
-				return r.provider.IaasClient.UnlinkVirtualGatewayToVpcWithResponse(
+			_ = utils.ExecuteRequest(func() (*numspot.UnlinkVirtualGatewayToVpcResponse, error) {
+				return r.provider.NumspotClient.UnlinkVirtualGatewayToVpcWithResponse(
 					ctx,
 					r.provider.SpaceID,
 					state.Id.ValueString(),
-					iaas.UnlinkVirtualGatewayToVpcJSONRequestBody{
+					numspot.UnlinkVirtualGatewayToVpcJSONRequestBody{
 						VpcId: state.VpcId.ValueString(),
 					},
 				)
@@ -196,12 +196,12 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 
 		// Link
 		if !(plan.VpcId.IsNull() || plan.VpcId.IsUnknown()) {
-			_ = utils.ExecuteRequest(func() (*iaas.LinkVirtualGatewayToVpcResponse, error) {
-				return r.provider.IaasClient.LinkVirtualGatewayToVpcWithResponse(
+			_ = utils.ExecuteRequest(func() (*numspot.LinkVirtualGatewayToVpcResponse, error) {
+				return r.provider.NumspotClient.LinkVirtualGatewayToVpcWithResponse(
 					ctx,
 					r.provider.SpaceID,
 					state.Id.ValueString(),
-					iaas.LinkVirtualGatewayToVpcJSONRequestBody{
+					numspot.LinkVirtualGatewayToVpcJSONRequestBody{
 						VpcId: plan.VpcId.ValueString(),
 					},
 				)
@@ -218,8 +218,8 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*iaas.ReadVirtualGatewaysByIdResponse, error) {
-		return r.provider.IaasClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
+	res := utils.ExecuteRequest(func() (*numspot.ReadVirtualGatewaysByIdResponse, error) {
+		return r.provider.NumspotClient.ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -238,12 +238,12 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 
 	// Unlink
 	if !(data.VpcId.IsNull() || data.VpcId.IsUnknown()) {
-		_ = utils.ExecuteRequest(func() (*iaas.UnlinkVirtualGatewayToVpcResponse, error) {
-			return r.provider.IaasClient.UnlinkVirtualGatewayToVpcWithResponse(
+		_ = utils.ExecuteRequest(func() (*numspot.UnlinkVirtualGatewayToVpcResponse, error) {
+			return r.provider.NumspotClient.UnlinkVirtualGatewayToVpcWithResponse(
 				ctx,
 				r.provider.SpaceID,
 				data.Id.ValueString(),
-				iaas.UnlinkVirtualGatewayToVpcJSONRequestBody{
+				numspot.UnlinkVirtualGatewayToVpcJSONRequestBody{
 					VpcId: data.VpcId.ValueString(),
 				},
 			)
@@ -252,7 +252,7 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 		// Note : don't return in case of error, we want to try to delete the resource anyway
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVirtualGatewayWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteVirtualGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Virtual Gateway", err.Error())
 		return

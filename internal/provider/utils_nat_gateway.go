@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_nat_gateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_nat_gateway"
@@ -14,7 +14,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func publicIpFromApi(ctx context.Context, elt iaas.PublicIpLight) (resource_nat_gateway.PublicIpsValue, diag.Diagnostics) {
+func publicIpFromApi(ctx context.Context, elt numspot.PublicIpLight) (resource_nat_gateway.PublicIpsValue, diag.Diagnostics) {
 	return resource_nat_gateway.NewPublicIpsValue(
 		resource_nat_gateway.PublicIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -24,13 +24,13 @@ func publicIpFromApi(ctx context.Context, elt iaas.PublicIpLight) (resource_nat_
 	)
 }
 
-func NatGatewayFromHttpToTf(ctx context.Context, http *iaas.NatGateway) (*resource_nat_gateway.NatGatewayModel, diag.Diagnostics) {
+func NatGatewayFromHttpToTf(ctx context.Context, http *numspot.NatGateway) (*resource_nat_gateway.NatGatewayModel, diag.Diagnostics) {
 	var (
 		tagsTf types.List
 		diags  diag.Diagnostics
 	)
 
-	var publicIp []iaas.PublicIpLight
+	var publicIp []numspot.PublicIpLight
 	if http.PublicIps != nil {
 		publicIp = *http.PublicIps
 	}
@@ -71,15 +71,15 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *iaas.NatGateway) (*resour
 	}, diags
 }
 
-func NatGatewayFromTfToCreateRequest(tf resource_nat_gateway.NatGatewayModel) iaas.CreateNatGatewayJSONRequestBody {
-	return iaas.CreateNatGatewayJSONRequestBody{
+func NatGatewayFromTfToCreateRequest(tf resource_nat_gateway.NatGatewayModel) numspot.CreateNatGatewayJSONRequestBody {
+	return numspot.CreateNatGatewayJSONRequestBody{
 		PublicIpId: tf.PublicIpId.ValueString(),
 		SubnetId:   tf.SubnetId.ValueString(),
 	}
 }
 
-func NatGatewaysFromTfToAPIReadParams(ctx context.Context, tf NatGatewaysDataSourceModel) iaas.ReadNatGatewayParams {
-	return iaas.ReadNatGatewayParams{
+func NatGatewaysFromTfToAPIReadParams(ctx context.Context, tf NatGatewaysDataSourceModel) numspot.ReadNatGatewayParams {
+	return numspot.ReadNatGatewayParams{
 		SubnetIds: utils.TfStringListToStringPtrList(ctx, tf.SubnetIds),
 		VpcIds:    utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
 		States:    utils.TfStringListToStringPtrList(ctx, tf.States),
@@ -90,7 +90,7 @@ func NatGatewaysFromTfToAPIReadParams(ctx context.Context, tf NatGatewaysDataSou
 	}
 }
 
-func fromPublicIpSchemaToTFPublicIpsList(ctx context.Context, http iaas.PublicIpLight) (resource_nat_gateway.PublicIpsValue, diag.Diagnostics) {
+func fromPublicIpSchemaToTFPublicIpsList(ctx context.Context, http numspot.PublicIpLight) (resource_nat_gateway.PublicIpsValue, diag.Diagnostics) {
 	return resource_nat_gateway.NewPublicIpsValue(
 		resource_nat_gateway.PublicIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
@@ -99,7 +99,7 @@ func fromPublicIpSchemaToTFPublicIpsList(ctx context.Context, http iaas.PublicIp
 		})
 }
 
-func NatGatewaysFromHttpToTfDatasource(ctx context.Context, http *iaas.NatGateway) (*datasource_nat_gateway.NatGatewayModel, diag.Diagnostics) {
+func NatGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.NatGateway) (*datasource_nat_gateway.NatGatewayModel, diag.Diagnostics) {
 	var (
 		publicIps = types.ListNull(resource_nat_gateway.PublicIpsValue{}.Type(ctx))
 		diags     diag.Diagnostics

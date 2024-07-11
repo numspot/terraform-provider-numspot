@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/datasource_public_ip"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_public_ip"
@@ -41,7 +41,7 @@ func ComputePublicIPChangeSet(plan, state *resource_public_ip.PublicIpModel) Pub
 	return c
 }
 
-func PublicIpFromHttpToTf(ctx context.Context, elt *iaas.PublicIp) (*resource_public_ip.PublicIpModel, diag.Diagnostics) {
+func PublicIpFromHttpToTf(ctx context.Context, elt *numspot.PublicIp) (*resource_public_ip.PublicIpModel, diag.Diagnostics) {
 	var (
 		diags    diag.Diagnostics
 		tagsList types.List
@@ -66,16 +66,16 @@ func PublicIpFromHttpToTf(ctx context.Context, elt *iaas.PublicIp) (*resource_pu
 }
 
 func invokeLinkPublicIP(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) (*string, error) {
-	var payload iaas.LinkPublicIpJSONRequestBody
+	var payload numspot.LinkPublicIpJSONRequestBody
 	if !data.VmId.IsNull() {
-		payload = iaas.LinkPublicIpJSONRequestBody{VmId: data.VmId.ValueStringPointer()}
+		payload = numspot.LinkPublicIpJSONRequestBody{VmId: data.VmId.ValueStringPointer()}
 	} else {
-		payload = iaas.LinkPublicIpJSONRequestBody{
+		payload = numspot.LinkPublicIpJSONRequestBody{
 			NicId:     data.NicId.ValueStringPointer(),
 			PrivateIp: data.PrivateIp.ValueStringPointer(),
 		}
 	}
-	res, err := provider.IaasClient.LinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
+	res, err := provider.NumspotClient.LinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -87,10 +87,10 @@ func invokeLinkPublicIP(ctx context.Context, provider Provider, data *resource_p
 }
 
 func invokeUnlinkPublicIP(ctx context.Context, provider Provider, data *resource_public_ip.PublicIpModel) error {
-	payload := iaas.UnlinkPublicIpJSONRequestBody{
+	payload := numspot.UnlinkPublicIpJSONRequestBody{
 		LinkPublicIpId: data.LinkPublicIP.ValueStringPointer(),
 	}
-	res, err := provider.IaasClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
+	res, err := provider.NumspotClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func refreshState(ctx context.Context, provider Provider, id string) (*resource_
 	// Refresh state
 	var diags diag.Diagnostics
 
-	res, err := provider.IaasClient.ReadPublicIpsByIdWithResponse(ctx, provider.SpaceID, id)
+	res, err := provider.NumspotClient.ReadPublicIpsByIdWithResponse(ctx, provider.SpaceID, id)
 	if err != nil {
 		diags.AddError("Failed to read public ip", err.Error())
 		return nil, diags
@@ -125,8 +125,8 @@ func refreshState(ctx context.Context, provider Provider, id string) (*resource_
 	return tf, diags
 }
 
-func PublicIpsFromTfToAPIReadParams(ctx context.Context, tf PublicIpsDataSourceModel) iaas.ReadPublicIpsParams {
-	return iaas.ReadPublicIpsParams{
+func PublicIpsFromTfToAPIReadParams(ctx context.Context, tf PublicIpsDataSourceModel) numspot.ReadPublicIpsParams {
+	return numspot.ReadPublicIpsParams{
 		LinkPublicIpIds: utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpIds),
 		NicIds:          utils.TfStringListToStringPtrList(ctx, tf.NicIds),
 		PrivateIps:      utils.TfStringListToStringPtrList(ctx, tf.PrivateIps),
@@ -138,7 +138,7 @@ func PublicIpsFromTfToAPIReadParams(ctx context.Context, tf PublicIpsDataSourceM
 	}
 }
 
-func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *iaas.PublicIp) (*datasource_public_ip.PublicIpModel, diag.Diagnostics) {
+func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *numspot.PublicIp) (*datasource_public_ip.PublicIpModel, diag.Diagnostics) {
 	var (
 		tagsList types.List
 		diag     diag.Diagnostics

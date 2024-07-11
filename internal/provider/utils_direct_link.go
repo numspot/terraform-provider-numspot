@@ -1,13 +1,15 @@
 package provider
 
+/*
+ DIRECT LINKS are not handled for now
+
 import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_direct_link"
 )
 
-func DirectLinkFromHttpToTf(http *iaas.DirectLink) resource_direct_link.DirectLinkModel {
+func DirectLinkFromHttpToTf(http *numspot.DirectLink) resource_direct_link.DirectLinkModel {
 	return resource_direct_link.DirectLinkModel{
 		Bandwidth:  types.StringPointerValue(http.Bandwidth),
 		Name:       types.StringPointerValue(http.Name),
@@ -18,10 +20,11 @@ func DirectLinkFromHttpToTf(http *iaas.DirectLink) resource_direct_link.DirectLi
 	}
 }
 
-func DirectLinkFromTfToCreateRequest(tf *resource_direct_link.DirectLinkModel) iaas.CreateDirectLinkJSONRequestBody {
-	return iaas.CreateDirectLinkJSONRequestBody{
+func DirectLinkFromTfToCreateRequest(tf *resource_direct_link.DirectLinkModel) numspot.CreateDirectLinkJSONRequestBody {
+	return numspot.CreateDirectLinkJSONRequestBody{
 		Bandwidth: tf.Bandwidth.ValueString(),
 		Name:      tf.Name.ValueString(),
 		Location:  tf.Location.ValueString(),
 	}
 }
+*/

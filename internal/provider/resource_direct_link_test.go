@@ -2,6 +2,10 @@
 
 package provider
 
+/*
+
+ DIRECT LINKS are not handled for now
+
 import (
 	"testing"
 
@@ -55,3 +59,4 @@ resource "numspot_direct_link" "test" {
 }
 `
 }
+*/

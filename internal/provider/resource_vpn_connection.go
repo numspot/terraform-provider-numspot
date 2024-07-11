@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/iaas"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/resource_vpn_connection"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/tags"
@@ -73,7 +73,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 		ctx,
 		r.provider.SpaceID,
 		VpnConnectionFromTfToCreateRequest(&plan),
-		r.provider.IaasClient.CreateVpnConnectionWithResponse)
+		r.provider.NumspotClient.CreateVpnConnectionWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPN Connection", err.Error())
 		return
@@ -81,7 +81,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 
 	createdId := *res.JSON201.Id
 	if len(plan.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.IaasClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
+		tags.CreateTagsFromTf(ctx, r.provider.NumspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -147,7 +147,7 @@ func (r *VpnConnectionResource) Update(ctx context.Context, request resource.Upd
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.IaasClient,
+			r.provider.NumspotClient,
 			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
@@ -216,7 +216,7 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 		return
 	}
 
-	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.IaasClient.DeleteVpnConnectionWithResponse)
+	err := retry_utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), r.provider.NumspotClient.DeleteVpnConnectionWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPN Connection", err.Error())
 		return
@@ -225,16 +225,16 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 
 func (r *VpnConnectionResource) addRoutes(ctx context.Context, vpnID string, tfRoutes []resource_vpn_connection.RoutesValue) diag.Diagnostics {
 	diags := diag.Diagnostics{}
-	routes := make([]iaas.CreateVpnConnectionRoute, len(tfRoutes))
+	routes := make([]numspot.CreateVpnConnectionRoute, len(tfRoutes))
 	for i := range tfRoutes {
-		routes[i] = iaas.CreateVpnConnectionRoute{
+		routes[i] = numspot.CreateVpnConnectionRoute{
 			DestinationIpRange: tfRoutes[i].DestinationIpRange.ValueString(),
 		}
 	}
 
 	for _, route := range routes {
-		_ = utils.ExecuteRequest(func() (*iaas.CreateVpnConnectionRouteResponse, error) {
-			return r.provider.IaasClient.CreateVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
+		_ = utils.ExecuteRequest(func() (*numspot.CreateVpnConnectionRouteResponse, error) {
+			return r.provider.NumspotClient.CreateVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
 		}, http.StatusOK, &diags)
 	}
 
@@ -243,16 +243,16 @@ func (r *VpnConnectionResource) addRoutes(ctx context.Context, vpnID string, tfR
 
 func (r *VpnConnectionResource) deleteRoutes(ctx context.Context, vpnID string, tfRoutes []resource_vpn_connection.RoutesValue) diag.Diagnostics {
 	diags := diag.Diagnostics{}
-	routes := make([]iaas.DeleteVpnConnectionRoute, len(tfRoutes))
+	routes := make([]numspot.DeleteVpnConnectionRoute, len(tfRoutes))
 	for i := range tfRoutes {
-		routes[i] = iaas.DeleteVpnConnectionRoute{
+		routes[i] = numspot.DeleteVpnConnectionRoute{
 			DestinationIpRange: tfRoutes[i].DestinationIpRange.ValueString(),
 		}
 	}
 
 	for _, route := range routes {
-		_ = utils.ExecuteRequest(func() (*iaas.DeleteVpnConnectionRouteResponse, error) {
-			return r.provider.IaasClient.DeleteVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
+		_ = utils.ExecuteRequest(func() (*numspot.DeleteVpnConnectionRouteResponse, error) {
+			return r.provider.NumspotClient.DeleteVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
 		}, http.StatusNoContent, &diags)
 	}
 
@@ -279,14 +279,14 @@ func (r *VpnConnectionResource) readVPNConnection(
 		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.IaasClient.ReadVpnConnectionsByIdWithResponse,
+		r.provider.NumspotClient.ReadVpnConnectionsByIdWithResponse,
 	)
 	if err != nil {
 		diags.AddError("Failed to read VpnConnection", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", id, err))
 		return nil, diags
 	}
 
-	rr, ok := read.(*iaas.VpnConnection)
+	rr, ok := read.(*numspot.VpnConnection)
 	if !ok {
 		diags.AddError("Failed to read vpn connection", "object conversion error")
 		return nil, diags
@@ -307,8 +307,8 @@ func (r *VpnConnectionResource) updateVPNOptions(
 	plan resource_vpn_connection.VpnConnectionModel,
 ) (*resource_vpn_connection.VpnConnectionModel, diag.Diagnostics) {
 	diags := diag.Diagnostics{}
-	res := utils.ExecuteRequest(func() (*iaas.UpdateVpnConnectionResponse, error) {
-		return r.provider.IaasClient.UpdateVpnConnectionWithResponse(
+	res := utils.ExecuteRequest(func() (*numspot.UpdateVpnConnectionResponse, error) {
+		return r.provider.NumspotClient.UpdateVpnConnectionWithResponse(
 			ctx,
 			r.provider.SpaceID,
 			id,
