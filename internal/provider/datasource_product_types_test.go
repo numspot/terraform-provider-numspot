@@ -1,10 +1,10 @@
 //go:build acc
+package provider
 
 /*
 
  PRODUCT TYPES are not handled for now
 
-package provider
 
 import (
 	"testing"
