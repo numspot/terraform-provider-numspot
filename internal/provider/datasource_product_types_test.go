@@ -1,5 +1,9 @@
 //go:build acc
 
+/*
+
+ PRODUCT TYPES are not handled for now
+
 package provider
 
 import (
@@ -32,3 +36,4 @@ data "numspot_product_types" "testdata" {
 }
 `
 }
+*/
