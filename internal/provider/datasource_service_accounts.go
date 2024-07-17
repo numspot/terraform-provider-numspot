@@ -15,7 +15,7 @@ import (
 )
 
 type ServiceAccountsDataSourceModel struct {
-	ServiceAccounts    []datasource_service_account.ServiceAccountModel `tfsdk:"service_accounts"`
+	Items              []datasource_service_account.ServiceAccountModel `tfsdk:"items"`
 	SpaceID            types.String                                     `tfsdk:"space_id"`
 	ServiceAccountName types.String                                     `tfsdk:"service_account_name"`
 }
@@ -79,7 +79,7 @@ func (d *serviceAccountsDataSource) Read(ctx context.Context, request datasource
 	params := ServiceAccountsFromTfToAPIReadParams(plan)
 	d.fetchPaginatedServiceAccounts(ctx, spaceId, &params, &serviceAccounts, response)
 
-	state.ServiceAccounts = serviceAccounts
+	state.Items = serviceAccounts
 	state.SpaceID = plan.SpaceID
 	state.ServiceAccountName = plan.ServiceAccountName
 

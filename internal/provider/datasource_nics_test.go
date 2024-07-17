@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccNicsDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -17,7 +18,10 @@ func TestAccNicsDatasource(t *testing.T) {
 				Config: fetchNicConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_nics.testdata", "items.#", "1"),
-					resource.TestCheckResourceAttrPair("data.numspot_nics.testdata", "items.0.id", "numspot_nic.test", "id"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_nics.testdata", "items.*", map[string]string{
+						"id":        utils_acctest.PAIR_PREFIX + "numspot_nic.test.id",
+						"subnet_id": utils_acctest.PAIR_PREFIX + "numspot_subnet.subnet.id",
+					}),
 				),
 			},
 		},
@@ -41,8 +45,7 @@ resource "numspot_nic" "test" {
 }
 
 data "numspot_nics" "testdata" {
-  ids        = [numspot_nic.test.id]
-  depends_on = [numspot_nic.test]
+  ids = [numspot_nic.test.id]
 }
 `
 }

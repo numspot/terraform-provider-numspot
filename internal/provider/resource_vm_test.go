@@ -34,8 +34,10 @@ func getFieldMatchChecksVm(data StepDataVm) []resource.TestCheckFunc {
 		resource.TestCheckResourceAttr("numspot_vm.test", "type", data.vmType),
 		resource.TestCheckResourceAttr("numspot_vm.test", "vm_initiated_shutdown_behavior", data.vmInitiatedShutdownBehavior),
 		resource.TestCheckResourceAttr("numspot_vm.test", "tags.#", "1"),
-		resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.key", data.tagKey),
-		resource.TestCheckResourceAttr("numspot_vm.test", "tags.0.value", data.tagValue),
+		resource.TestCheckTypeSetElemNestedAttrs("numspot_vm.test", "tags.*", map[string]string{
+			"key":   data.tagKey,
+			"value": data.tagValue,
+		}),
 		resource.TestCheckResourceAttr("numspot_vm.test", "placement.availability_zone_name", data.subregionName),
 	}
 }
@@ -49,7 +51,6 @@ func getDependencyChecksVm(dependenciesPrefix string) []resource.TestCheckFunc {
 }
 
 func TestAccVmResource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	var resourceId string
@@ -162,6 +163,7 @@ func TestAccVmResource(t *testing.T) {
 				)...),
 				ExpectNonEmptyPlan: true,
 			},
+			// <== If resource has required dependencies ==>
 			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
 				Config:             testVmConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
 				ExpectNonEmptyPlan: true,
@@ -181,6 +183,8 @@ func TestAccVmResource(t *testing.T) {
 				)...),
 				ExpectNonEmptyPlan: true,
 			},
+
+			// <== If resource has optional dependencies ==>
 
 			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource
@@ -252,7 +256,6 @@ resource "numspot_vm" "test" {
 }
 
 func TestAccVmResource_NetSubnetSGRouteTable(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{

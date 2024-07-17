@@ -20,7 +20,7 @@ func HandleError(httpResponseBody []byte) error {
 
 	err := json.Unmarshal(httpResponseBody, &apiError)
 	if err != nil {
-		return err
+		return errors.New("API Error : " + string(httpResponseBody))
 	}
 
 	errorString := apiError.Title

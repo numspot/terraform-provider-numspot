@@ -10,7 +10,6 @@ import (
 )
 
 func TestAccSpaceDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	organisationId := "67d97ad4-3005-48dc-a392-60a97ab5097c"

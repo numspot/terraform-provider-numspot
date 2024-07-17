@@ -32,24 +32,30 @@ func getDependencyChecks{{Resource}}(dependenciesPrefix string) []resource.TestC
 	return []resource.TestCheckFunc{
 		resource.TestCheckResourceAttrPair("numspot_{{resource}}.test", "{{subresource id}}", "numspot_{{subresource}}.test"+dependenciesPrefix, "id"), // If field is an id
 		resource.TestCheckTypeSetElemAttrPair("numspot_{{resource}}.test", "{{subresource id}}.*", "numspot_{{subresource}}.test"+dependenciesPrefix, "id"), // If field is a slice of ids
-		// If field is an object containing an id => Not handled with default terraform functions
+		utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_{{resource}}.test", "{{subresource id}}.*", map[string]string{ // If field is a list of objects (containing id and/or other fields)
+			"id":          fmt.Sprintf(utils_acctest.PAIR_PREFIX+"numspot_{{subresource}}.test%[1]s.id",dependenciesPrefix),
+			{{match other resource fields}}
+		}),
+		
 		{{You can test multiple dependencies if needed}}
 	}
 }
 
 func TestAcc{{Resource}}Resource(t *testing.T) {
-	t.Parallel()
+	
 	pr := TestAccProtoV6ProviderFactories
 
 	var resourceId string
 
 	////////////// Define input data that will be used in the test sequence //////////////
-	// resource fields that can be updated in-place	{{not updatable resource fields}} 
-	{{not updatable resource fields with updated value}} 
-
-	// resource fields that cannot be updated in-place (requires replace)
+	// resource fields that can be updated in-place	
 	{{updatable resource fields}} 
 	{{updatable resource fields with updated value}} 
+
+	// resource fields that cannot be updated in-place (requires replace)
+	{{not updatable resource fields}} 
+	{{not updatable resource fields with updated value}} 
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	////////////// Define plan values and generate associated attribute checks  //////////////
@@ -138,13 +144,13 @@ func TestAcc{{Resource}}Resource(t *testing.T) {
 
 			// <== If resource has required dependencies ==> 
 			{	// Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testVmConfig(utils_acctest.BASE_SUFFIX, basePlanValues)
+				Config: test{{Resource}}Config(utils_acctest.BASE_SUFFIX, basePlanValues),
 			},
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
 			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this 
 			{
-				Config: testVmConfig(utils_acctest.NEW_SUFFIX, updatePlanValues),
+				Config: test{{Resource}}Config(utils_acctest.NEW_SUFFIX, updatePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					updateChecks,
 					getDependencyChecks{{Resource}}(utils_acctest.NEW_SUFFIX),
@@ -153,7 +159,7 @@ func TestAcc{{Resource}}Resource(t *testing.T) {
 			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
 			{
-				Config: testVmConfig(utils_acctest.NEW_SUFFIX, replacePlanValues),
+				Config: test{{Resource}}Config(utils_acctest.NEW_SUFFIX, replacePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					replaceChecks,
 					getDependencyChecks{{Resource}}(utils_acctest.NEW_SUFFIX),
@@ -162,7 +168,7 @@ func TestAcc{{Resource}}Resource(t *testing.T) {
 
 			// <== If resource has optional dependencies ==> 
 			{	// Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testVmConfig(utils_acctest.BASE_SUFFIX, basePlanValues)
+				Config: test{{Resource}}Config(utils_acctest.BASE_SUFFIX, basePlanValues),
 			},
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
@@ -172,13 +178,13 @@ func TestAcc{{Resource}}Resource(t *testing.T) {
 				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
 			},
 			{	// Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: test{{Resource}}Config(subresourceSuffix, {{resource fields}})
+				Config: test{{Resource}}Config(utils_acctest.BASE_SUFFIX, basePlanValues),
 			},
 			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
 			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this 
 			{
-				Config: testVmConfig_DeletedDependencies(replacePlanValues),
+				Config: test{{Resource}}Config_DeletedDependencies(replacePlanValues),
 				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
 			},
 		},
@@ -188,21 +194,20 @@ func TestAcc{{Resource}}Resource(t *testing.T) {
 func test{{Resource}}Config(subresourceSuffix string, data StepData{{Resource}}) string {
 	return fmt.Sprintf(`
 
-// <== If resource has required dependencies ==> 
+// <== If resource has dependencies ==> 
 resource "numspot_{{dependency_resource}}" "test%[1]s" {
 	{{set resource fields with params}}
 }
 
 resource "numspot_{{resource}}" "test" {
 	{{set resource fields with params}}
-}`, subresourceSuffix, {{resource fields}}
-
-)}
+}`, subresourceSuffix, {{resource fields}})
+}
 
 // <== If resource has optional dependencies ==> 
 func test{{Resource}}Config_DeletedDependencies(data StepData{{Resource}}) string {
 	return fmt.Sprintf(`
 resource "numspot_{{resource}}" "test" {
 	{{set resource fields with params}}
-}`, {{resource fields}}
-)}
+}`, {{resource fields}})
+}

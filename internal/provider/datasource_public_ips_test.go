@@ -6,10 +6,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccPublicIpsDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -18,7 +19,11 @@ func TestAccPublicIpsDatasource(t *testing.T) {
 			{
 				Config: fetchPublicIpsConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_public_ips.public_ip_data_source", "items.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_public_ips.testdata", "items.#", "1"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_public_ips.testdata", "items.*", map[string]string{
+						"id":        utils_acctest.PAIR_PREFIX + "numspot_public_ip.test.id",
+						"public_ip": utils_acctest.PAIR_PREFIX + "numspot_public_ip.test.public_ip",
+					}),
 				),
 			},
 		},
@@ -45,14 +50,13 @@ resource "numspot_nic" "nic" {
   subnet_id = numspot_subnet.subnet.id
 }
 
-resource "numspot_public_ip" "public_ip" {
+resource "numspot_public_ip" "test" {
   nic_id     = numspot_nic.nic.id
   depends_on = [numspot_nic.nic, numspot_internet_gateway.internet_gateway]
 }
 
-data "numspot_public_ips" "public_ip_data_source" {
-  ids        = [numspot_public_ip.public_ip.id]
-  depends_on = [numspot_public_ip.public_ip]
+data "numspot_public_ips" "testdata" {
+  ids = [numspot_public_ip.test.id]
 }
 `
 }

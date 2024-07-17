@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccSnapshotsDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -17,6 +18,10 @@ func TestAccSnapshotsDatasource(t *testing.T) {
 				Config: fetchSnapshotConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_snapshots.testdata", "items.#", "1"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_snapshots.testdata", "items.*", map[string]string{
+						"id":        utils_acctest.PAIR_PREFIX + "numspot_snapshot.test.id",
+						"volume_id": utils_acctest.PAIR_PREFIX + "numspot_volume.test.id",
+					}),
 				),
 			},
 		},

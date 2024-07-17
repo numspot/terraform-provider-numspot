@@ -6,10 +6,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccNatGatewaysDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -19,6 +20,10 @@ func TestAccNatGatewaysDatasource(t *testing.T) {
 				Config: fetchNatGatewaysConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_nat_gateways.testdata", "items.#", "1"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_nat_gateways.testdata", "items.*", map[string]string{
+						"id":        utils_acctest.PAIR_PREFIX + "numspot_nat_gateway.test.id",
+						"subnet_id": utils_acctest.PAIR_PREFIX + "numspot_subnet.test.id",
+					}),
 				),
 			},
 		},

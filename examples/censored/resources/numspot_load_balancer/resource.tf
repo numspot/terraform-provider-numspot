@@ -39,7 +39,7 @@ resource "numspot_route_table" "rt" {
 }
 
 resource "numspot_vm" "test" {
-  image_id = "ami-026ce760"
+  image_id = "ami-0b7df82c"
   vm_type  = "tinav6.c1r1p3"
 
   subnet_id          = numspot_subnet.subnet.id

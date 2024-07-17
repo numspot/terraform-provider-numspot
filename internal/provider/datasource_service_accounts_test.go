@@ -7,11 +7,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccServiceAccountDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	spaceID := "67d97ad4-3005-48dc-a392-60a97ab5097c"
@@ -22,12 +22,11 @@ func TestAccServiceAccountDatasource(t *testing.T) {
 			{
 				Config: fetchServiceAccountsConfig(spaceID, name),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_service_accounts.testdata", "service_accounts.#", "1"),
-					resource.TestCheckResourceAttrWith("data.numspot_service_accounts.testdata", "service_accounts.0.id", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
+					resource.TestCheckResourceAttr("data.numspot_service_accounts.testdata", "items.#", "1"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_service_accounts.testdata", "items.*", map[string]string{
+						"id":   utils_acctest.PAIR_PREFIX + "numspot_service_account.test.id",
+						"name": name,
 					}),
-					resource.TestCheckResourceAttr("data.numspot_service_accounts.testdata", "service_accounts.0.name", name),
 				),
 			},
 		},

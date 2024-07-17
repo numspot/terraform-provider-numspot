@@ -10,7 +10,7 @@ import (
 )
 
 func TestAcc{{Datasource}}Datasource(t *testing.T) {
-	t.Parallel()
+	
 	pr := TestAccProtoV6ProviderFactories
 
 	{{resource fields}} // Define wanted resource fields 
@@ -27,8 +27,10 @@ func TestAcc{{Datasource}}Datasource(t *testing.T) {
 				
 					// If datasource returns multiple elements 
 					resource.TestCheckResourceAttr("data.numspot_{{datasource}}.testdata", "items.#", "1"),
-					resource.TestCheckResourceAttrPair("data.numspot_{{datasource}}.testdata", "items.0.id", "numspot_{{resource}}.test", "id"),
-					resource.TestCheckTypeSetElemNestedAttrs("data.numspot_{{datasource}}.testdata", "items.*", map[string]string{{{match all resource fields}}}), 
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_{{datasource}}.testdata", "items.*", map[string]string{
+						"id":          utils_acctest.PAIR_PREFIX+"numspot_{{resource}}.test.id",
+						{{match all resource fields}}
+					}),
 				),
 			},
 		},

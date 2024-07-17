@@ -1,253 +1,253 @@
-//go:build acc
+///go:build acc
 
 package provider
 
 import (
 	"fmt"
-	"math/rand"
+	"slices"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
-func TestAccLoadBalancerResource(t *testing.T) {
-	// t.Parallel()
-	randName := rand.Intn(9999-1000) + 1000
-	lbName := fmt.Sprintf("elb-%d", randName)
+// This struct will store the input data that will be used in your tests (all fields as string)
+type StepDataLoadBalancer struct {
+	name,
+	tagKey,
+	tagValue string
+	ports []string
+}
 
-	listenerPort := 80
-	updatedListenerPort := 443
-	updated2ListenerPort := 8080
+// Generate checks to validate that resource 'numspot_load_balancer.test' has input data values
+func getFieldMatchChecksLoadBalancer(data StepDataLoadBalancer) []resource.TestCheckFunc {
+	checks := []resource.TestCheckFunc{
+		resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", data.name),
+		resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.#", "1"),
+		resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "tags.*", map[string]string{
+			"key":   data.tagKey,
+			"value": data.tagValue,
+		}),
+		resource.TestCheckResourceAttr("numspot_load_balancer.test", "listeners.#", strconv.Itoa(len(data.ports))),
+	}
 
+	for _, port := range data.ports {
+		checks = append(checks, resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
+			"backend_port":       port,
+			"load_balancer_port": port,
+		}))
+	}
+
+	return checks
+}
+
+// Generate checks to validate that resource 'numspot_load_balancer.test' is properly linked to given subresources
+// If resource has no dependencies, return empty array
+func getDependencyChecksLoadBalancer(dependenciesPrefix string) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test"+dependenciesPrefix, "id"),
+		resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test"+dependenciesPrefix, "id"),
+		resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "backend_vm_ids.*", "numspot_vm.test"+dependenciesPrefix, "id"),
+	}
+}
+
+func TestAccLoadBalancerResource_Internal(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
+
+	var resourceId string
+
+	////////////// Define input data that will be used in the test sequence //////////////
+	// resource fields that can be updated in-place
+	tagKey := "Name"
+	tagValue := "ThisIsATerraformTest"
+	tagValueUpdated := "ThisIsATerraformTestUpdated"
+
+	ports := []string{"80"}
+	portsUpdated := []string{"443", "8080"}
+
+	// resource fields that cannot be updated in-place (requires replace)
+	name := "elb-terraform-test"
+	nameUpdated := "elb-terraform-test-updated"
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	////////////// Define plan values and generate associated attribute checks  //////////////
+	// The base plan (used in first create and to reset resource state before some tests)
+	basePlanValues := StepDataLoadBalancer{
+		tagKey:   tagKey,
+		tagValue: tagValue,
+		name:     name,
+		ports:    ports,
+	}
+	createChecks := append(
+		getFieldMatchChecksLoadBalancer(basePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_load_balancer.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			resourceId = v
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
+	updatePlanValues := StepDataLoadBalancer{
+		tagKey:   tagKey,
+		tagValue: tagValueUpdated,
+		name:     name,
+		ports:    portsUpdated,
+	}
+	updateChecks := append(
+		getFieldMatchChecksLoadBalancer(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_load_balancer.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.Equal(t, v, resourceId)
+			return nil
+		}),
+	)
+	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
+	replacePlanValues := StepDataLoadBalancer{
+		tagKey:   tagKey,
+		tagValue: tagValue,
+		name:     nameUpdated,
+		ports:    ports,
+	}
+	replaceChecks := append(
+		getFieldMatchChecksLoadBalancer(replacePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_load_balancer.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
+	/////////////////////////////////////////////////////////////////////////////////////
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{
-				Config: loadBalancerResource_Config(lbName, listenerPort),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.#", "1"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.backend_port", fmt.Sprint(listenerPort)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.load_balancer_port", fmt.Sprint(listenerPort)),
-				),
+			{ // Create testing
+				Config: testLoadBalancerConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					createChecks,
+					getDependencyChecksLoadBalancer(utils_acctest.BASE_SUFFIX),
+				)...),
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_load_balancer.testlb",
+				ResourceName:            "numspot_load_balancer.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"availability_zone_names"},
+				ImportStateVerifyIgnore: []string{"id"},
 			},
-			// Update listener port
+			// Update testing Without Replace (if needed)
 			{
-				Config: loadBalancerResource_Config(lbName, updatedListenerPort),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.#", "1"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.backend_port", fmt.Sprint(updatedListenerPort)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.load_balancer_port", fmt.Sprint(updatedListenerPort)),
-				),
+				Config: testLoadBalancerConfig(utils_acctest.BASE_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksLoadBalancer(utils_acctest.BASE_SUFFIX),
+				)...),
 			},
-			// Add second listener
 			{
-				Config: loadBalancerResource_ConfigWithTwoListeners(lbName, updatedListenerPort, updated2ListenerPort),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.#", "2"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.backend_port", fmt.Sprint(updatedListenerPort)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.load_balancer_port", fmt.Sprint(updatedListenerPort)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.1.backend_port", fmt.Sprint(updated2ListenerPort)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.1.load_balancer_port", fmt.Sprint(updated2ListenerPort)),
-				),
+				Config: testLoadBalancerConfig_Public(utils_acctest.BASE_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksLoadBalancer(utils_acctest.BASE_SUFFIX),
+				)...),
 			},
-			// Add Health Check
+			// Update testing With Replace (if needed)
 			{
-				Config: loadBalancerResource_ConfigWithHealthCheck(lbName, listenerPort),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.#", "1"),
-				),
+				Config: testLoadBalancerConfig(utils_acctest.BASE_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksLoadBalancer(utils_acctest.BASE_SUFFIX),
+				)...),
 			},
-			// First step state
-			{
-				Config: loadBalancerResource_Config(lbName, listenerPort),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.#", "1"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.backend_port", fmt.Sprint(listenerPort)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.load_balancer_port", fmt.Sprint(listenerPort)),
-				),
+
+			// <== If resource has required dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testLoadBalancerConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
 			},
-			// Security groups
+			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			{
-				Config: loadBalancerResource_ConfigWithSecurityGroups(lbName, listenerPort),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.#", "1"),
-					resource.TestCheckResourceAttrPair("numspot_load_balancer.testlb", "security_groups.0", "numspot_security_group.sg", "id"),
-				),
+				Config: testLoadBalancerConfig(utils_acctest.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksLoadBalancer(utils_acctest.NEW_SUFFIX),
+				)...),
 			},
-			// Detach security groups
 			{
-				Config: loadBalancerResource_ConfigWithSecurityGroupsDetached(lbName, listenerPort),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.#", "1"),
-				),
+				Config: testLoadBalancerConfig_Public(utils_acctest.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksLoadBalancer(utils_acctest.NEW_SUFFIX),
+				)...),
 			},
-			// First step state
+			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
 			{
-				Config: loadBalancerResource_Config(lbName, listenerPort),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.#", "1"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.backend_port", fmt.Sprint(listenerPort)),
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "listeners.0.load_balancer_port", fmt.Sprint(listenerPort)),
-				),
+				Config: testLoadBalancerConfig(utils_acctest.NEW_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksLoadBalancer(utils_acctest.NEW_SUFFIX),
+				)...),
+			},
+
+			// <== If resource has optional dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testLoadBalancerConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testLoadBalancerConfig_DeletedDependencies(updatePlanValues),
+				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
+			},
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testLoadBalancerConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testLoadBalancerConfig_DeletedDependencies(replacePlanValues),
+				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
 			},
 		},
 	})
 }
 
-func loadBalancerResource_Config(name string, listenerPort int) string {
+func testLoadBalancerConfig(subresourceSuffix string, data StepDataLoadBalancer) string {
+	listeners := "["
+
+	for _, port := range data.ports {
+		listeners += fmt.Sprintf(`
+    {
+      backend_port           = %[1]s
+      load_balancer_port     = %[1]s
+      load_balancer_protocol = "TCP"
+    }`, port)
+		listeners += ","
+	}
+	listeners += "]"
+
 	return fmt.Sprintf(`
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
-resource "numspot_subnet" "subnet" {
+resource "numspot_subnet" "test%[1]s" {
   vpc_id   = numspot_vpc.vpc.id
   ip_range = "10.101.1.0/24"
 }
 
-resource "numspot_load_balancer" "testlb" {
-  name = %[1]q
-  listeners = [
-    {
-      backend_port           = %[2]d
-      load_balancer_port     = %[2]d
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  subnets = [numspot_subnet.subnet.id]
-
-  type = "internal"
-}`, name, listenerPort)
-}
-
-func loadBalancerResource_ConfigWithTwoListeners(name string, listenerPortA, listenerPortB int) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_load_balancer" "testlb" {
-  name = %[1]q
-
-  listeners = [
-    {
-      backend_port           = %[2]d
-      load_balancer_port     = %[2]d
-      load_balancer_protocol = "TCP"
-    },
-    {
-      backend_port           = %[3]d
-      load_balancer_port     = %[3]d
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  subnets = [numspot_subnet.subnet.id]
-
-  type = "internal"
-}`, name, listenerPortA, listenerPortB)
-}
-
-func loadBalancerResource_ConfigWithHealthCheck(name string, listenerPort int) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_load_balancer" "testlb" {
-  name = %[1]q
-  listeners = [
-    {
-      backend_port           = %[2]d
-      load_balancer_port     = %[2]d
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  health_check = {
-    healthy_threshold   = 10
-    check_interval      = 30
-    path                = "/index.html"
-    port                = 8080
-    protocol            = "HTTPS"
-    timeout             = 5
-    unhealthy_threshold = 5
-  }
-
-  subnets = [numspot_subnet.subnet.id]
-
-  type = "internal"
-}`, name, listenerPort)
-}
-
-func loadBalancerResource_ConfigWithSecurityGroups(name string, listenerPort int) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_load_balancer" "testlb" {
-  name = %[1]q
-  listeners = [
-    {
-      backend_port           = %[2]d
-      load_balancer_port     = %[2]d
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  health_check = {
-    healthy_threshold   = 10
-    check_interval      = 30
-    path                = "/index.html"
-    port                = 8080
-    protocol            = "HTTPS"
-    timeout             = 5
-    unhealthy_threshold = 5
-  }
-
-  subnets = [numspot_subnet.subnet.id]
-
-  security_groups = [numspot_security_group.sg.id]
-
-  depends_on = [numspot_security_group.sg]
-
-  type = "internal"
-}
-
-resource "numspot_security_group" "sg" {
+resource "numspot_security_group" "test%[1]s" {
   vpc_id      = numspot_vpc.vpc.id
   name        = "group name"
   description = "this is a security group"
@@ -263,29 +263,24 @@ resource "numspot_security_group" "sg" {
   lifecycle {
     create_before_destroy = true
   }
-}`, name, listenerPort)
 }
 
-func loadBalancerResource_ConfigWithSecurityGroupsDetached(name string, listenerPort int) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
+resource "numspot_vm" "test%[1]s" {
+  image_id = "ami-8ef5b47e"
+  type     = "ns-cus6-2c4r"
+
+  subnet_id = numspot_subnet.test%[1]s.id
 }
 
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
+resource "numspot_load_balancer" "test" {
+  name      = %[2]q
+  listeners = %[5]s
 
-resource "numspot_load_balancer" "testlb" {
-  name = %[1]q
-  listeners = [
-    {
-      backend_port           = %[2]d
-      load_balancer_port     = %[2]d
-      load_balancer_protocol = "TCP"
-    }
-  ]
+  subnets         = [numspot_subnet.test%[1]s.id]
+  security_groups = [numspot_security_group.test%[1]s.id]
+  backend_vm_ids  = [numspot_vm.test%[1]s.id]
+
+  type = "internal"
 
   health_check = {
     healthy_threshold   = 10
@@ -297,160 +292,67 @@ resource "numspot_load_balancer" "testlb" {
     unhealthy_threshold = 5
   }
 
-  subnets = [numspot_subnet.subnet.id]
 
-  depends_on = [numspot_security_group.sg]
-
-  type = "internal"
-}
-
-resource "numspot_security_group" "sg" {
-  vpc_id      = numspot_vpc.vpc.id
-  name        = "group name"
-  description = "this is a security group"
-  outbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    }
-  ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}`, name, listenerPort)
-}
-
-func TestAccLoadBalancerResource_WithVm(t *testing.T) {
-	t.Parallel()
-	randName := rand.Intn(9999-1000) + 1000
-	lbName := fmt.Sprintf("elb-%d", randName)
-
-	imageId := "ami-8ef5b47e"
-	// vmType := "tinav6.c1r1p3"
-
-	pr := TestAccProtoV6ProviderFactories
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: loadBalancerResource_WithVm_Config(lbName, imageId, vmType),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-				),
-				ExpectNonEmptyPlan: true,
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_load_balancer.testlb",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"availability_zone_names"},
-			},
-		},
-	})
-}
-
-func loadBalancerResource_WithVm_Config(name, imageId, vmType string) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_vm" "example" {
-  image_id = %[1]q
-  type     = %[2]q
-
-  subnet_id = numspot_subnet.subnet.id
-}
-
-resource "numspot_load_balancer" "testlb" {
-  name = %[3]q
-  listeners = [
-    {
-      backend_port           = 80
-      load_balancer_port     = 80
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  subnets        = [numspot_subnet.subnet.id]
-  backend_vm_ids = [numspot_vm.example.id]
-
-  type = "internal"
-}`, imageId, vmType, name)
-}
-
-func TestAccLoadBalancerResource_PublicWithVm(t *testing.T) {
-	t.Parallel()
-	randName := rand.Intn(9999-1000) + 1000
-	lbName := fmt.Sprintf("elb-%d", randName)
-
-	imageId := "ami-8ef5b47e"
-	// vmType := "tinav6.c1r1p3"
-
-	pr := TestAccProtoV6ProviderFactories
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: loadBalancerResource_PublicWithVm_Config(lbName, imageId, vmType),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.testlb", "name", lbName),
-				),
-				ExpectNonEmptyPlan: true,
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_load_balancer.testlb",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"availability_zone_names", "public_ip"},
-			},
-		},
-	})
-}
-
-func loadBalancerResource_PublicWithVm_Config(name, imageId, vmType string) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
 
   tags = [
     {
-      key   = "env"
-      value = "Terraform-Tests"
+      key   = %[3]q
+      value = %[4]q
     }
   ]
+}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners)
+}
+
+func testLoadBalancerConfig_Public(subresourceSuffix string, data StepDataLoadBalancer) string {
+	listeners := "["
+
+	for _, port := range data.ports {
+		listeners += fmt.Sprintf(`
+    {
+      backend_port           = %[1]s
+      load_balancer_port     = %[1]s
+      load_balancer_protocol = "TCP"
+    }`, port)
+		listeners += ","
+	}
+	listeners += "]"
+
+	return fmt.Sprintf(`
+resource "numspot_vpc" "vpc" {
+  ip_range = "10.101.0.0/16"
 }
 
 resource "numspot_internet_gateway" "ig" {
   vpc_id = numspot_vpc.vpc.id
 }
 
-resource "numspot_subnet" "subnet" {
+resource "numspot_subnet" "test%[1]s" {
   vpc_id                  = numspot_vpc.vpc.id
   ip_range                = "10.101.1.0/24"
   map_public_ip_on_launch = true
+}
 
-  tags = [
+resource "numspot_security_group" "test%[1]s" {
+  vpc_id      = numspot_vpc.vpc.id
+  name        = "group name"
+  description = "this is a security group"
+  outbound_rules = [
     {
-      key   = "env"
-      value = "Terraform-Tests"
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
     }
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "numspot_route_table" "test" {
   vpc_id    = numspot_vpc.vpc.id
-  subnet_id = numspot_subnet.subnet.id
+  subnet_id = numspot_subnet.test%[1]s.id
 
   routes = [
     {
@@ -461,82 +363,44 @@ resource "numspot_route_table" "test" {
 }
 
 resource "numspot_vm" "example" {
-  image_id = %[1]q
-  type     = %[2]q
+  image_id = "ami-8ef5b47e"
+  type     = "ns-cus6-2c4r"
 
-  subnet_id = numspot_subnet.subnet.id
+  subnet_id = numspot_subnet.test%[1]s.id
 }
 
-resource "numspot_load_balancer" "testlb" {
-  name = %[3]q
-  listeners = [
-    {
-      backend_port           = 80
-      load_balancer_port     = 80
-      load_balancer_protocol = "TCP"
-    }
-  ]
+resource "numspot_load_balancer" "test" {
+  name      = %[2]q
+  listeners = %[5]s
 
-  subnets        = [numspot_subnet.subnet.id]
-  backend_vm_ids = [numspot_vm.example.id]
+  subnets         = [numspot_subnet.test%[1]s.id]
+  security_groups = [numspot_security_group.test%[1]s.id]
+  backend_vm_ids  = [numspot_vm.example.id]
 
   type = "internet-facing"
-}`, imageId, vmType, name)
+
+  health_check = {
+    healthy_threshold   = 10
+    check_interval      = 30
+    path                = "/index.html"
+    port                = 8080
+    protocol            = "HTTPS"
+    timeout             = 5
+    unhealthy_threshold = 5
+  }
+
+  tags = [
+    {
+      key   = %[3]q
+      value = %[4]q
+    }
+  ]
+}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners)
 }
 
-func TestAccLoadBalancerResource_Tags(t *testing.T) {
-	t.Parallel()
-	randName := rand.Intn(9999-1000) + 1000
-	lbName := fmt.Sprintf("elb-%d", randName)
-
-	tagKey := "Name"
-	tagValue := "ThisIsATerraformTest"
-	tagValueUpdate := "ThisIsATerraformTestUpdated"
-
-	pr := TestAccProtoV6ProviderFactories
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: loadBalancerResource_Config_Tags(lbName, tagKey, tagValue),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.0.value", tagValue),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.#", "1"),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_load_balancer.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"availability_zone_names"},
-			},
-			{
-				Config: loadBalancerResource_Config_Tags(lbName, tagKey, tagValueUpdate),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", lbName),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.0.value", tagValueUpdate),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.#", "1"),
-				),
-			},
-		},
-	})
-}
-
-func loadBalancerResource_Config_Tags(name, tagKey, tagValue string) string {
+// <== If resource has optional dependencies ==>
+func testLoadBalancerConfig_DeletedDependencies(data StepDataLoadBalancer) string {
 	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
 resource "numspot_load_balancer" "test" {
   name = "%s"
   listeners = [
@@ -547,8 +411,6 @@ resource "numspot_load_balancer" "test" {
     }
   ]
 
-  subnets = [numspot_subnet.subnet.id]
-
   type = "internal"
 
   tags = [
@@ -557,5 +419,5 @@ resource "numspot_load_balancer" "test" {
       value = %[3]q
     }
   ]
-}`, name, tagKey, tagValue)
+}`, data.name, data.tagKey, data.tagValue)
 }

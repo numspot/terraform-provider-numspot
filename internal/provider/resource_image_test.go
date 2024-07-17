@@ -1,35 +1,121 @@
-//go:build acc
+///go:build acc
 
 package provider
 
 import (
 	"fmt"
 	"math/rand"
+	"slices"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
-func TestAccImageResource_FromImage(t *testing.T) {
-	t.Parallel()
+// This struct will store the input data that will be used in your tests (all fields as string)
+type StepDataImage struct {
+	name,
+	sourceImageId,
+	tagKey,
+	tagValue string
+}
+
+// Generate checks to validate that resource 'numspot_image.test' has input data values
+func getFieldMatchChecksImage(data StepDataImage) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttr("numspot_image.test", "name", data.name),
+		resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", data.sourceImageId),
+		resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+		resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+			"key":   data.tagKey,
+			"value": data.tagValue,
+		}),
+	}
+}
+
+// Generate checks to validate that resource 'numspot_image.test' is properly linked to given subresources
+// If resource has no dependencies, return empty array
+func getDependencyChecksImage_FromVm(dependenciesPrefix string) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttrPair("numspot_image.test", "vm_id", "numspot_vm.test"+dependenciesPrefix, "id"),
+	}
+}
+
+func getDependencyChecksImage_FromSnapshot(dependenciesPrefix string) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test", "block_device_mappings.*", map[string]string{
+			"bsu.snapshot_id": fmt.Sprintf(utils_acctest.PAIR_PREFIX+"numspot_snapshot.test%[1]s.id", dependenciesPrefix),
+		}),
+	}
+}
+
+func TestAccImageResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
+	var resourceId string
+
+	////////////// Define input data that will be used in the test sequence //////////////
+	// resource fields that can be updated in-place
+
+	// resource fields that cannot be updated in-place (requires replace)
+
 	randint := rand.Intn(9999-1000) + 1000
-	imageName := fmt.Sprintf("terraform-generated-volume-%d", randint)
-	sourceImageId := "ami-026ce760"
-	region := "cloudgouv-eu-west-1"
+	name := fmt.Sprintf("terraform-image-test-%d", randint)
+	nameUpdated := fmt.Sprintf("terraform-image-test-Updated-%d", randint)
+	sourceImageId := "ami-0b7df82c"
+	sourceImageIdUpdated := "ami-0987a84b"
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	tagKey := "name"
+	tagValue := "Terraform-Test-Image"
+	tagValueUpdated := tagValue + "-Updated"
+
+	////////////// Define plan values and generate associated attribute checks  //////////////
+	// The base plan (used in first create and to reset resource state before some tests)
+	basePlanValues := StepDataImage{
+		name:          name,
+		sourceImageId: sourceImageId,
+		tagKey:        tagKey,
+		tagValue:      tagValue,
+	}
+	createChecks := append(
+		getFieldMatchChecksImage(basePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			resourceId = v
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
+	replacePlanValues := StepDataImage{
+		name:          nameUpdated,
+		sourceImageId: sourceImageIdUpdated,
+		tagKey:        tagKey,
+		tagValue:      tagValueUpdated,
+	}
+	replaceChecks := append(
+		getFieldMatchChecksImage(replacePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{
-				Config: testImageConfig_Create_FromImage(imageName, sourceImageId, region),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
-					resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", sourceImageId),
-					resource.TestCheckResourceAttr("numspot_image.test", "source_region_name", region),
-					resource.TestCheckResourceAttr("numspot_image.test", "state", "available"),
-				),
+			{ // Create testing
+				Config: testImageConfig_FromImage(basePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					createChecks,
+				)...),
 				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
@@ -39,92 +125,123 @@ func TestAccImageResource_FromImage(t *testing.T) {
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"source_image_id", "source_region_name"},
 			},
+			// Update testing With Replace (create image from Image)
+			{
+				Config: testImageConfig_FromImage(replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+				)...),
+				ExpectNonEmptyPlan: true,
+			},
+			// Update testing With Replace (create image from Vm)
+			{
+				Config: testImageConfig_FromVm(utils_acctest.BASE_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksImage_FromVm(utils_acctest.BASE_SUFFIX),
+				)...),
+				ExpectNonEmptyPlan: true,
+			},
+			// Update testing With Replace (create image from Snapshot)
+			{
+				Config: testImageConfig_FromSnapshot(utils_acctest.BASE_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksImage_FromSnapshot(utils_acctest.BASE_SUFFIX),
+				)...),
+				ExpectNonEmptyPlan: true,
+			},
+
+			// <== If resource has required dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testImageConfig_FromVm(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			{
+				Config: testImageConfig_FromVm(utils_acctest.NEW_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksImage_FromVm(utils_acctest.NEW_SUFFIX),
+				)...),
+				ExpectNonEmptyPlan: true,
+			},
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testImageConfig_FromSnapshot(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			{
+				Config: testImageConfig_FromSnapshot(utils_acctest.NEW_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksImage_FromSnapshot(utils_acctest.NEW_SUFFIX),
+				)...),
+				ExpectNonEmptyPlan: true,
+			},
+
+			// <== If resource has optional dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testImageConfig_FromVm(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config:             testImageConfig_FromImage(replacePlanValues),
+				Check:              resource.ComposeAggregateTestCheckFunc(replaceChecks...),
+				ExpectNonEmptyPlan: true,
+			},
+
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testImageConfig_FromSnapshot(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config:             testImageConfig_FromImage(replacePlanValues),
+				Check:              resource.ComposeAggregateTestCheckFunc(replaceChecks...),
+				ExpectNonEmptyPlan: true,
+			},
 		},
 	})
 }
 
-func testImageConfig_Create_FromImage(name, sourceImageId, region string) string {
+func testImageConfig_FromImage(data StepDataImage) string {
 	return fmt.Sprintf(`
 resource "numspot_image" "test" {
   name               = %[1]q
   source_image_id    = %[2]q
-  source_region_name = %[3]q
-}`, name, sourceImageId, region)
+  source_region_name = "cloudgouv-eu-west-1"
+  tags = [
+    {
+      key   = %[3]q
+      value = %[4]q
+    }
+  ]
+}`, data.name, data.sourceImageId, data.tagKey, data.tagValue)
 }
 
-func TestAccImageResource_FromVm(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-
-	randint := rand.Intn(9999-1000) + 1000
-	imageName := fmt.Sprintf("terraform-generated-volume-%d", randint)
-	sourceImageId := "ami-026ce760"
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testImageConfig_Create_FromVm(sourceImageId, imageName),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
-					resource.TestCheckResourceAttr("numspot_image.test", "state", "available"),
-				),
-				ExpectNonEmptyPlan: true,
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_image.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"vm_id"},
-			},
-		},
-	})
-}
-
-func testImageConfig_Create_FromVm(imageId, name string) string {
+func testImageConfig_FromVm(subresourceSuffix string, data StepDataImage) string {
 	return fmt.Sprintf(`
-resource "numspot_vm" "vm" {
-  image_id = %[1]q
-  vm_type  = "ns-cus6-2c4r"
+resource "numspot_vm" "test%[1]s" {
+  image_id = %[3]q
+  type     = "ns-cus6-2c4r"
 }
-
 resource "numspot_image" "test" {
   name  = %[2]q
-  vm_id = numspot_vm.vm.id
-}`, imageId, name)
+  vm_id = numspot_vm.test%[1]s.id
+  tags = [
+    {
+      key   = %[4]q
+      value = %[5]q
+    }
+  ]
+}`, subresourceSuffix, data.name, data.sourceImageId, data.tagKey, data.tagValue)
 }
 
-func TestAccImageResource_FromSnapshot(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-
-	randint := rand.Intn(9999-1000) + 1000
-	imageName := fmt.Sprintf("terraform-generated-volume-%d", randint)
-	sourceImageId := "ami-026ce760"
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testImageConfig_Create_FromSnapshot(sourceImageId, imageName),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
-					resource.TestCheckResourceAttr("numspot_image.test", "state", "available"),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_image.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"vm_id"},
-			},
-		},
-	})
-}
-
-func testImageConfig_Create_FromSnapshot(_, name string) string {
+func testImageConfig_FromSnapshot(subresourceSuffix string, data StepDataImage) string {
 	return fmt.Sprintf(`
 resource "numspot_volume" "test" {
   type                   = "standard"
@@ -132,19 +249,19 @@ resource "numspot_volume" "test" {
   availability_zone_name = "cloudgouv-eu-west-1a"
 }
 
-resource "numspot_snapshot" "test" {
+resource "numspot_snapshot" "test%[1]s" {
   volume_id   = numspot_volume.test.id
   description = "a numspot snapshot description"
 }
 
 resource "numspot_image" "test" {
-  name             = %[1]q
+  name             = %[2]q
   root_device_name = "/dev/sda1"
   block_device_mappings = [
     {
       device_name = "/dev/sda1"
       bsu = {
-        snapshot_id           = numspot_snapshot.test.id
+        snapshot_id           = numspot_snapshot.test%[1]s.id
         volume_size           = 120
         volume_type           = "io1"
         iops                  = 150
@@ -152,76 +269,11 @@ resource "numspot_image" "test" {
       }
     }
   ]
-}`, name)
-}
-
-func TestAccImageResource_Tags(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-
-	randint := rand.Intn(9999-1000) + 1000
-	imageName := fmt.Sprintf("terraform-generated-volume-%d", randint)
-	sourceImageId := "ami-026ce760"
-	region := "cloudgouv-eu-west-1"
-
-	tagKey := "name"
-	tagValue := "Terraform-Test-Image"
-	tagValueUpdated := tagValue + "-Updated"
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			// Create testing
-			{
-				Config: testImageConfig_Create_Tags(imageName, sourceImageId, region, tagKey, tagValue),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
-					resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", sourceImageId),
-					resource.TestCheckResourceAttr("numspot_image.test", "source_region_name", region),
-					resource.TestCheckResourceAttr("numspot_image.test", "state", "available"),
-					resource.TestCheckResourceAttr("numspot_image.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_image.test", "tags.0.value", tagValue),
-					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
-				),
-				ExpectNonEmptyPlan: true,
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_image.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"source_image_id", "source_region_name"},
-			},
-			// Update testing
-			{
-				Config: testImageConfig_Create_Tags(imageName, sourceImageId, region, tagKey, tagValueUpdated),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_image.test", "name", imageName),
-					resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", sourceImageId),
-					resource.TestCheckResourceAttr("numspot_image.test", "source_region_name", region),
-					resource.TestCheckResourceAttr("numspot_image.test", "state", "available"),
-					resource.TestCheckResourceAttr("numspot_image.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_image.test", "tags.0.value", tagValueUpdated),
-					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
-				),
-				ExpectNonEmptyPlan: true,
-			},
-		},
-	})
-}
-
-func testImageConfig_Create_Tags(name, sourceImageId, region, tagKey, tagValue string) string {
-	return fmt.Sprintf(`
-resource "numspot_image" "test" {
-  name               = %[1]q
-  source_image_id    = %[2]q
-  source_region_name = %[3]q
-
   tags = [
     {
-      key   = %[4]q
-      value = %[5]q
+      key   = %[3]q
+      value = %[4]q
     }
   ]
-}`, name, sourceImageId, region, tagKey, tagValue)
+}`, subresourceSuffix, data.name, data.tagKey, data.tagValue)
 }

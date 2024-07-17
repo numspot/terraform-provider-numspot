@@ -1,198 +1,210 @@
-//go:build acc
+///go:build acc
 
 package provider
 
 import (
-	"errors"
 	"fmt"
+	"slices"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
+// This struct will store the input data that will be used in your tests (all fields as string)
+type StepDataNic struct {
+	tagKey,
+	tagValue,
+	description string
+}
+
+// Generate checks to validate that resource 'numspot_nic.test' has input data values
+func getFieldMatchChecksNic(data StepDataNic) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttr("numspot_nic.test", "description", data.description),
+		resource.TestCheckResourceAttr("numspot_nic.test", "tags.#", "1"),
+		resource.TestCheckTypeSetElemNestedAttrs("numspot_nic.test", "tags.*", map[string]string{
+			"key":   data.tagKey,
+			"value": data.tagValue,
+		}),
+	}
+}
+
+// Generate checks to validate that resource 'numspot_nic.test' is properly linked to given subresources
+// If resource has no dependencies, return empty array
+func getDependencyChecksNic(dependenciesPrefix string) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttrPair("numspot_nic.test", "subnet_id", "numspot_subnet.test"+dependenciesPrefix, "id"),
+		resource.TestCheckTypeSetElemAttrPair("numspot_nic.test", "security_group_ids.*", "numspot_numspot_security_group.test"+dependenciesPrefix, "id"),
+	}
+}
+
 func TestAccNicResource(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testNicConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_nic.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
-			},
-		},
-	})
-}
-
-func testNicConfig() string {
-	return `
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_nic" "test" {
-  subnet_id = numspot_subnet.subnet.id
-}`
-}
-
-func TestAccNicResource_Tags(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
+	var resourceId string
+
+	////////////// Define input data that will be used in the test sequence //////////////
+	// resource fields that can be updated in-place
 	tagKey := "name"
 	tagValue := "Terraform-Test-Volume"
-	tagValueUpdate := "Terraform-Test-Volume-Update"
+	tagValueUpdated := "Terraform-Test-Volume-Update"
 
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testNicConfig_Tags(tagKey, tagValue),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_nic.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_nic.test", "tags.0.value", tagValue),
-					resource.TestCheckResourceAttr("numspot_nic.test", "tags.#", "1"),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_nic.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
-			},
-			//// Update testing
-			{
-				Config: testNicConfig_Tags(tagKey, tagValueUpdate),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_nic.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_nic.test", "tags.0.value", tagValueUpdate),
-					resource.TestCheckResourceAttr("numspot_nic.test", "tags.#", "1"),
-				),
-			},
-		},
-	})
-}
-
-func testNicConfig_Tags(key, value string) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_nic" "test" {
-  subnet_id = numspot_subnet.subnet.id
-  tags = [
-    {
-      key   = %[1]q
-      value = %[2]q
-    }
-  ]
-}`, key, value)
-}
-
-func TestAccNicResourceUpdateWithoutReplace(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-
-	var nic_id, security_group_id string
 	description := "The nic"
 	descriptionUpdated := "The better nic"
+	// resource fields that cannot be updated in-place (requires replace)
+	// None
 
-	securityGroupSuffix := ""
-	securityGroupSuffixUpdated := "_updated"
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	////////////// Define plan values and generate associated attribute checks  //////////////
+	// The base plan (used in first create and to reset resource state before some tests)
+	basePlanValues := StepDataNic{
+		tagKey:      tagKey,
+		tagValue:    tagValue,
+		description: description,
+	}
+	createChecks := append(
+		getFieldMatchChecksNic(basePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_nic.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			resourceId = v
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
+	updatePlanValues := StepDataNic{
+		tagKey:      tagKey,
+		tagValue:    tagValueUpdated,
+		description: descriptionUpdated,
+	}
+	updateChecks := append(
+		getFieldMatchChecksNic(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_nic.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.Equal(t, v, resourceId)
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
+	replacePlanValues := StepDataNic{ // Replace is triggered by a dependency change (subnet)
+		tagKey:      tagKey,
+		tagValue:    tagValue,
+		description: description,
+	}
+	replaceChecks := append(
+		getFieldMatchChecksNic(replacePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_nic.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{
-				Config: testNicConfigUpdateWithoutReplace(description, securityGroupSuffix),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						nic_id = v
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_nic.test", "description", description),
-					resource.TestCheckResourceAttr("numspot_nic.test", "security_group_ids.#", "1"),
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "security_group_ids.0", func(v string) error {
-						require.NotEmpty(t, v)
-						security_group_id = v
-						return nil
-					}),
-				),
+			{ // Create testing
+				Config: testNicConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					createChecks,
+					getDependencyChecksNic(utils_acctest.BASE_SUFFIX),
+				)...),
 			},
 			// ImportState testing
 			{
 				ResourceName:            "numspot_nic.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
+				ImportStateVerifyIgnore: []string{"id"},
 			},
+			// Update testing Without Replace (if needed)
 			{
-				Config: testNicConfigUpdateWithoutReplace(descriptionUpdated, securityGroupSuffixUpdated),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						if nic_id != v {
-							return errors.New("Id should be the same after Update without replace")
-						}
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_nic.test", "description", descriptionUpdated),
-					resource.TestCheckResourceAttr("numspot_nic.test", "security_group_ids.#", "1"),
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "security_group_ids.0", func(v string) error {
-						require.NotEmpty(t, v)
-						if security_group_id == v {
-							return errors.New("security_group id should be different after update")
-						}
-						return nil
-					}),
-				),
+				Config: testNicConfig(utils_acctest.BASE_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksNic(utils_acctest.BASE_SUFFIX),
+				)...),
+			},
+			// Update testing With Replace (if needed)
+			{
+				Config: testNicConfig(utils_acctest.BASE_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksNic(utils_acctest.BASE_SUFFIX),
+				)...),
+			},
+
+			// <== If resource has required dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testNicConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testNicConfig(utils_acctest.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksNic(utils_acctest.NEW_SUFFIX),
+				)...),
+			},
+			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			{
+				Config: testNicConfig(utils_acctest.NEW_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksNic(utils_acctest.NEW_SUFFIX),
+				)...),
+			},
+
+			// <== If resource has optional dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testNicConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testNicConfig_DeletedDependencies(updatePlanValues),
+				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
+			},
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testNicConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testNicConfig_DeletedDependencies(replacePlanValues),
+				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
 			},
 		},
 	})
 }
 
-func testNicConfigUpdateWithoutReplace(
-	description string,
-	security_group_suffix string,
-) string {
+func testNicConfig(subresourceSuffix string, data StepDataNic) string {
 	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
+resource "numspot_vpc" "test" {
   ip_range = "10.101.0.0/16"
 }
 
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
+resource "numspot_subnet" "test%[1]s" {
+  vpc_id   = numspot_vpc.test.id
   ip_range = "10.101.1.0/24"
 }
 
-resource "numspot_security_group" "security_group" {
-  net_id      = numspot_vpc.vpc.id
+resource "numspot_security_group" "test%[1]s" {
+  vpc_id      = numspot_vpc.test.id
   name        = "security_group"
   description = "numspot_security_group description"
 
@@ -206,104 +218,39 @@ resource "numspot_security_group" "security_group" {
   ]
 }
 
-resource "numspot_security_group" "security_group_updated" {
-  net_id      = numspot_vpc.vpc.id
-  name        = "security_group_updated"
-  description = "numspot_security_group description"
-
-  inbound_rules = [
+resource "numspot_nic" "test" {
+  subnet_id          = numspot_subnet.test%[1]s.id
+  description        = %[2]q
+  security_group_ids = [numspot_security_group.test%[1]s.id]
+  tags = [
     {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
+      key   = %[3]q
+      value = %[4]q
     }
   ]
+}`, subresourceSuffix, data.description, data.tagKey, data.tagValue)
 }
 
-resource "numspot_nic" "test" {
-  subnet_id          = numspot_subnet.subnet.id
-  description        = %[1]q
-  security_group_ids = [numspot_security_group.security_group%[2]s.id]
-  depends_on         = [numspot_security_group.security_group%[2]s]
-}`, description, security_group_suffix)
-}
-
-func TestAccNicResourceUpdateWithReplace(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-
-	var nic_id, subnet_id string
-	subnetSuffix := ""
-	subnetSuffixUpdated := "_updated"
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testNicConfigUpdateWithReplace(subnetSuffix),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						nic_id = v
-						return nil
-					}),
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "subnet_id", func(v string) error {
-						require.NotEmpty(t, v)
-						subnet_id = v
-						return nil
-					}),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_nic.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
-			},
-			{
-				Config: testNicConfigUpdateWithReplace(subnetSuffixUpdated),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						if nic_id == v {
-							return errors.New("Id should be different after Update with replace")
-						}
-						return nil
-					}),
-					resource.TestCheckResourceAttrWith("numspot_nic.test", "subnet_id", func(v string) error {
-						require.NotEmpty(t, v)
-						if subnet_id == v {
-							return errors.New("Subnet Id should be different after Update")
-						}
-						return nil
-					}),
-				),
-			},
-		},
-	})
-}
-
-func testNicConfigUpdateWithReplace(
-	subnet_suffix string,
-) string {
+// <== If resource has optional dependencies ==>
+func testNicConfig_DeletedDependencies(data StepDataNic) string {
 	return fmt.Sprintf(`
-resource "numspot_vpc" "vpc" {
+resource "numspot_vpc" "test" {
   ip_range = "10.101.0.0/16"
 }
 
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_subnet" "subnet_updated" {
+resource "numspot_subnet" "test" {
   vpc_id   = numspot_vpc.vpc.id
   ip_range = "10.101.1.0/24"
 }
 
 resource "numspot_nic" "test" {
-  subnet_id = numspot_subnet.subnet%[1]s.id
-}`, subnet_suffix)
+  subnet_id   = numspot_subnet.test.id
+  description = %[1]q
+  tags = [
+    {
+      key   = %[2]q
+      value = %[3]q
+    }
+  ]
+}`, data.description, data.tagKey, data.tagValue)
 }

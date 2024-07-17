@@ -24,6 +24,9 @@ linters:
     - unused
     - vet
 
+linters-settings:
+  paralleltest:
+    ignore-missing: true
 run:
   # Prevent false positive timeouts in CI
   timeout: 5m

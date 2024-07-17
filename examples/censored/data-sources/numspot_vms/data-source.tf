@@ -1,6 +1,6 @@
 
 resource "numspot_vm" "test" {
-  image_id = "ami-026ce760"
+  image_id = "ami-0b7df82c"
   vm_type  = "ns-cus6-2c4r"
 }
 

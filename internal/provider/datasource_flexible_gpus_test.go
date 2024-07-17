@@ -7,10 +7,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccFlexibleGpusDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	model_name := "nvidia-a100-80"
@@ -21,7 +22,10 @@ func TestAccFlexibleGpusDatasource(t *testing.T) {
 				Config: fetchFlexibleGpusConfig(model_name),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_flexible_gpus.testdata", "items.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_flexible_gpus.testdata", "items.0.model_name", model_name),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_flexible_gpus.testdata", "items.*", map[string]string{
+						"id":         utils_acctest.PAIR_PREFIX + "numspot_flexible_gpu.test.id",
+						"model_name": model_name,
+					}),
 				),
 			},
 		},

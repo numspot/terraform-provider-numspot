@@ -1,218 +1,244 @@
-///go:build acc
+//go:build acc
 
 package provider
 
 import (
 	"fmt"
+	"slices"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
-type (
-	stepData struct {
-		service    string
-		resource   string
-		actions    []string
-		resourceID string
+// This struct will store the input data that will be used in your tests (all fields as string)
+type StepDataACLs struct {
+	spaceId,
+	service,
+	resource string
+	actions []string
+}
+
+// Generate checks to validate that resource 'numspot_acls.test' has input data values
+func getFieldMatchChecksACLs(data StepDataACLs) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttr("numspot_acls.test", "space_id", data.spaceId),
+		resource.TestCheckResourceAttr("numspot_acls.test", "service", data.service),
+		resource.TestCheckResourceAttr("numspot_acls.test", "resource", data.resource),
 	}
-)
+}
+
+// Generate checks to validate that resource 'numspot_acls.test' is properly linked to given subresources
+// If resource has no dependencies, return empty array
+func getDependencyChecksACLs(dependenciesPrefix string, data StepDataACLs) []resource.TestCheckFunc {
+	checks := []resource.TestCheckFunc{
+		resource.TestCheckResourceAttrPair("numspot_acls.test", "service_account_id", "numspot_service_account.test"+dependenciesPrefix, "service_account_id"),
+		resource.TestCheckResourceAttr("numspot_acls.test", "acls.#", strconv.Itoa(len(data.actions))),
+	}
+
+	for _, action := range data.actions {
+		checks = append(checks, resource.TestCheckTypeSetElemNestedAttrs("numspot_acls.test", "acls.*", map[string]string{
+			"permission_id": fmt.Sprintf(utils_acctest.PAIR_PREFIX+"data.numspot_permissions.%s.items.0.id", generatePermissionName(action, data.service, data.resource)),
+			"resource_id":   fmt.Sprintf(utils_acctest.PAIR_PREFIX+"numspot_%s.test%s.id", data.resource, dependenciesPrefix),
+		}))
+	}
+
+	return checks
+}
 
 func TestAccACLsResource(t *testing.T) {
-	testData := []stepData{
-		{
-			service:    "network",
-			resource:   "vpc",
-			actions:    []string{"getIAMPolicy"},
-			resourceID: "numspot_vpc.vpc.id",
-		},
-		{
-			service:    "network",
-			resource:   "vpc",
-			actions:    []string{"getIAMPolicy"},
-			resourceID: "numspot_vpc.vpc2.id",
-		},
-		{
-			service:  "network",
-			resource: "vpc",
-		},
-		{
-			service:    "storageblock",
-			resource:   "volume",
-			actions:    []string{"update", "unlink", "getIAMPolicy"},
-			resourceID: "numspot_volume.volume2.id",
-		},
-		{
-			service:    "storageblock",
-			resource:   "volume",
-			actions:    []string{"update", "unlink", "create"},
-			resourceID: "numspot_volume.volume.id",
-		},
-	}
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
-	// Required
-	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
+	var resourceId string
+
+	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
+
+	////////////// Define input data that will be used in the test sequence //////////////
+	// resource fields that can be updated in-place
+	// None
+
+	// resource fields that cannot be updated in-place (requires replace)
+	service := "network"
+	serviceUpdated := "storageblock"
+
+	resourceName := "vpc"
+	resourceNameUpdated := "volume"
+
+	actions := []string{"getIAMPolicy"}
+	actionsUpdated1 := []string{"update", "unlink", "getIAMPolicy"}
+	actionsUpdated2 := []string{"update", "unlink", "create"}
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	////////////// Define plan values and generate associated attribute checks  //////////////
+	// The base plan (used in first create and to reset resource state before some tests)
+	basePlanValues := StepDataACLs{
+		spaceId:  spaceID,
+		service:  service,
+		resource: resourceName,
+		actions:  actions,
+	}
+	createChecks := append(
+		getFieldMatchChecksACLs(basePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_acls.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			// resourceId = v
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
+	replacePlanValues1 := StepDataACLs{
+		spaceId:  spaceID,
+		service:  serviceUpdated,
+		resource: resourceNameUpdated,
+		actions:  actionsUpdated1,
+	}
+	replaceChecks1 := append(
+		getFieldMatchChecksACLs(replacePlanValues1),
+
+		resource.TestCheckResourceAttrWith("numspot_acls.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
+
+	replacePlanValues2 := StepDataACLs{
+		spaceId:  spaceID,
+		service:  serviceUpdated,
+		resource: resourceNameUpdated,
+		actions:  actionsUpdated2,
+	}
+	replaceChecks2 := append(
+		getFieldMatchChecksACLs(replacePlanValues2),
+
+		resource.TestCheckResourceAttrWith("numspot_acls.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{ // 1 - Create ACLS
-				Config: testACLsConfig(spaceID, testData[0]),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
-					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[0].service),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[0].resource),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "1"),
-					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "acls.0.resource_id", "numspot_vpc.vpc", "id"),
-				),
+			{ // Create testing
+				Config: testACLsConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					createChecks,
+					getDependencyChecksACLs(utils_acctest.BASE_SUFFIX, basePlanValues),
+				)...),
 			},
-			{ // 2 - Update an ACLS
-				Config: testACLsConfig(spaceID, testData[1]),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
-					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[1].service),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[1].resource),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "1"),
-					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "acls.0.resource_id", "numspot_vpc.vpc2", "id"),
-				),
+			// ImportState testing
+			{
+				ResourceName:            "numspot_acls.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"id"},
 			},
-			{ // 3 - Empty ACLS and delete dependencies (we need acls to be in "requiresReplace" mode to work)
-				Config: testACLsConfig_NoSubResource(spaceID, testData[2]),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
-					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[2].service),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[2].resource),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "0"),
-				),
+			// Update testing With Replace (if needed)
+			{
+				Config: testACLsConfig(utils_acctest.BASE_SUFFIX, replacePlanValues1),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks1,
+					getDependencyChecksACLs(utils_acctest.BASE_SUFFIX, replacePlanValues1),
+				)...),
 			},
-			{ // 4 - Update acls's service/resource
-				Config: testACLsConfigVolume(spaceID, testData[3]),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
-					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[3].service),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[3].resource),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "3"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_1", "items.0.id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_2", "items.0.id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_3", "items.0.id"),
-				),
+			// Update testing With Replace (if needed)
+			{
+				Config: testACLsConfig(utils_acctest.BASE_SUFFIX, replacePlanValues2),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks2,
+					getDependencyChecksACLs(utils_acctest.BASE_SUFFIX, replacePlanValues2),
+				)...),
 			},
-			{ // 5 - Update multiple acls
-				Config: testACLsConfigVolume(spaceID, testData[4]),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "space_id", spaceID),
-					resource.TestCheckResourceAttrPair("numspot_acls.acls_network", "service_account_id", "numspot_service_account.test", "service_account_id"),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "service", testData[4].service),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "resource", testData[4].resource),
-					resource.TestCheckResourceAttr("numspot_acls.acls_network", "acls.#", "3"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_1", "items.0.id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_2", "items.0.id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_acls.acls_network", "acls.*.permission_id", "data.numspot_permissions.perm_3", "items.0.id"),
-				),
+
+			// <== If resource has required dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testACLsConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			{
+				Config: testACLsConfig(utils_acctest.NEW_SUFFIX, replacePlanValues1),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks1,
+					getDependencyChecksACLs(utils_acctest.NEW_SUFFIX, replacePlanValues1),
+				)...),
+			},
+
+			// <== If resource has optional dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testACLsConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testACLsConfig_DeletedDependencies(replacePlanValues1),
+				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks1...),
 			},
 		},
 	})
 }
 
-func testACLsConfig(spaceID string, testData stepData) string {
+func testACLsConfig(subresourceSuffix string, data StepDataACLs) string {
+	var aclList, permissionDatasources string
+	for _, action := range data.actions {
+		permissionName := generatePermissionName(action, data.service, data.resource)
+
+		permissionDatasources += getPermissionHCLBLock(data.spaceId, action, data.service, data.resource, permissionName)
+
+		aclList += getACLBlock(fmt.Sprintf("numspot_%[1]s.test%[2]s.id", data.resource, subresourceSuffix), permissionName)
+		aclList += ","
+	}
+
+	aclList = strings.TrimSuffix(aclList, ",")
+
 	return fmt.Sprintf(`
-resource "numspot_service_account" "test" {
-  space_id = %[1]q
+resource "numspot_service_account" "test%[1]s" {
+  space_id = %[2]q
   name     = "My Service Account"
 }
 
-resource "numspot_vpc" "vpc" {
+resource "numspot_vpc" "test%[1]s" {
   ip_range = "10.101.0.0/24"
 }
 
-resource "numspot_vpc" "vpc2" {
-  ip_range = "10.101.0.0/24"
-}
-
-data "numspot_permissions" "perm_getIAMPolicy_vpc" {
-  space_id = %[1]q
-  action   = %[4]q
-  service  = %[2]q
-  resource = %[3]q
-}
-
-resource "numspot_acls" "acls_network" {
-  space_id           = %[1]q
-  service_account_id = numspot_service_account.test.service_account_id
-  service            = %[2]q
-  resource           = %[3]q
-  acls = [
-    {
-      resource_id   = %[5]s
-      permission_id = data.numspot_permissions.perm_getIAMPolicy_vpc.items.0.id
-    }
-  ]
-
-}`, spaceID, testData.service, testData.resource, testData.actions[0], testData.resourceID)
-}
-
-func testACLsConfig_NoSubResource(spaceID string, testData stepData) string {
-	return fmt.Sprintf(`
-resource "numspot_service_account" "test" {
-  space_id = %[1]q
-  name     = "My Service Account"
-}
-
-
-resource "numspot_acls" "acls_network" {
-  space_id           = %[1]q
-  service_account_id = numspot_service_account.test.service_account_id
-  service            = %[2]q
-  resource           = %[3]q
-  acls               = []
-
-}`, spaceID, testData.service, testData.resource)
-}
-
-func testACLsConfigVolume(spaceID string, testData stepData) string {
-	return fmt.Sprintf(`
-resource "numspot_service_account" "test" {
-  space_id = %[1]q
-  name     = "My Service Account"
-}
-
-resource "numspot_volume" "volume" {
+resource "numspot_volume" "test%[1]s" {
   type                   = "standard"
   size                   = "11"
   availability_zone_name = "cloudgouv-eu-west-1a"
 }
 
-resource "numspot_volume" "volume2" {
-  type                   = "standard"
-  size                   = "22"
-  availability_zone_name = "cloudgouv-eu-west-1a"
+// list of permission datasources from list of action
+%[5]s
+
+resource "numspot_acls" "acls_network" {
+  space_id           = %[2]q
+  service_account_id = numspot_service_account.test.service_account_id
+  service            = %[3]q
+  resource           = %[4]q
+  acls = [
+    %[6]s
+  ]
+
+}`, subresourceSuffix, data.spaceId, data.service, data.resource, permissionDatasources, aclList)
 }
 
-data "numspot_permissions" "perm_1" {
+// <== If resource has optional dependencies ==>
+func testACLsConfig_DeletedDependencies(data StepDataACLs) string {
+	return fmt.Sprintf(`
+resource "numspot_service_account" "test" {
   space_id = %[1]q
-  action   = %[4]q
-  service  = %[2]q
-  resource = %[3]q
-}
-
-data "numspot_permissions" "perm_2" {
-  space_id = %[1]q
-  action   = %[5]q
-  service  = %[2]q
-  resource = %[3]q
-}
-
-data "numspot_permissions" "perm_3" {
-  space_id = %[1]q
-  action   = %[6]q
-  service  = %[2]q
-  resource = %[3]q
+  name     = "My Service Account"
 }
 
 resource "numspot_acls" "acls_network" {
@@ -220,26 +246,27 @@ resource "numspot_acls" "acls_network" {
   service_account_id = numspot_service_account.test.service_account_id
   service            = %[2]q
   resource           = %[3]q
-  acls = [
-    {
-      resource_id   = %[7]s
-      permission_id = data.numspot_permissions.perm_1.items.0.id
-    },
-    {
-      resource_id   = %[7]s
-      permission_id = data.numspot_permissions.perm_2.items.0.id
-    },
-    {
-      resource_id   = %[7]s
-      permission_id = data.numspot_permissions.perm_3.items.0.id
-    }
-  ]
+}`, data.spaceId, data.service, data.resource)
+}
 
-}`, spaceID,
-		testData.service,
-		testData.resource,
-		testData.actions[0],
-		testData.actions[1],
-		testData.actions[2],
-		testData.resourceID)
+func generatePermissionName(action, service, resource string) string {
+	return fmt.Sprintf("perm_%[1]s_%[2]s_%[3]s", action, service, resource)
+}
+
+func getPermissionHCLBLock(spaceId, action, service, resource, permissionName string) string {
+	return fmt.Sprintf(`
+data "numspot_permissions" "%[5]s" {
+  space_id = %[1]q
+  action   = %[2]q
+  service  = %[3]q
+  resource = %[4]q
+}`, spaceId, action, service, resource, permissionName)
+}
+
+func getACLBlock(resourceId, permissionName string) string {
+	return fmt.Sprintf(`{
+      resource_id   = %[1]s
+      permission_id = data.numspot_permissions.%[2]s.items.0.id
+    }
+`, resourceId, permissionName)
 }

@@ -28,7 +28,6 @@ func getFieldMatchChecksKeyPair(data StepDataKeyPair) []resource.TestCheckFunc {
 }
 
 func TestAccKeyPairResource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	var resourceId string

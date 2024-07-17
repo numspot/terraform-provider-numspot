@@ -37,10 +37,10 @@ data "numspot_service_accounts" "testdata" {
 
 ### Read-Only
 
-- `service_accounts` (Attributes List) (see [below for nested schema](#nestedatt--service_accounts))
+- `items` (Attributes List) (see [below for nested schema](#nestedatt--items))
 
-<a id="nestedatt--service_accounts"></a>
-### Nested Schema for `service_accounts`
+<a id="nestedatt--items"></a>
+### Nested Schema for `items`
 
 Required:
 
