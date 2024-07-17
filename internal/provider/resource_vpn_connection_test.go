@@ -3,433 +3,245 @@
 package provider
 
 import (
-	"errors"
 	"fmt"
+	"slices"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
-func TestAccVpnConnectionResource_UpdateStaticRouteOnly(t *testing.T) {
-	t.Parallel()
+// This struct will store the input data that will be used in your tests (all fields as string)
+type StepDataVpnConnection struct {
+	routes []string
+	staticRoutesOnly,
+	preSharedKey,
+	tunnelInsideIpRange,
+	tagKey,
+	tagValue string
+}
+
+// Generate checks to validate that resource 'numspot_vpn_connection.test' has input data values
+func getFieldMatchChecksVpnConnection(data StepDataVpnConnection) []resource.TestCheckFunc {
+	checks := []resource.TestCheckFunc{
+		resource.TestCheckResourceAttr("numspot_vpn_connection.test", "static_routes_only", data.staticRoutesOnly),
+
+		resource.TestCheckResourceAttr("numspot_vpn_connection.test", "vpn_options.phase2options.pre_shared_key", data.preSharedKey),
+		resource.TestCheckResourceAttr("numspot_vpn_connection.test", "vpn_options.tunnel_inside_ip_range", data.tunnelInsideIpRange),
+		resource.TestCheckResourceAttr("numspot_vpn_connection.test", "tags.#", "1"),
+		resource.TestCheckTypeSetElemNestedAttrs("numspot_vpn_connection.test", "tags.*", map[string]string{
+			"key":   data.tagKey,
+			"value": data.tagValue,
+		}),
+		resource.TestCheckResourceAttr("numspot_vpn_connection.test", "routes.#", strconv.Itoa(len(data.routes))),
+	}
+
+	for _, route := range data.routes {
+		checks = append(checks, resource.TestCheckTypeSetElemNestedAttrs("numspot_vpn_connection.test", "routes.*", map[string]string{
+			"destination_ip_range": route,
+		}))
+	}
+
+	return checks
+}
+
+// Generate checks to validate that resource 'numspot_vpn_connection.test' is properly linked to given subresources
+// If resource has no dependencies, return empty array
+func getDependencyChecksVpnConnection(dependenciesPrefix string) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttrPair("numspot_vpn_connection.test", "client_gateway_id", "numspot_client_gateway.test"+dependenciesPrefix, "id"),   // If field is an id
+		resource.TestCheckResourceAttrPair("numspot_vpn_connection.test", "virtual_gateway_id", "numspot_virtual_gateway.test"+dependenciesPrefix, "id"), // If field is an id
+	}
+}
+
+func TestAccVpnConnectionResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
-	static_route_only := "false"
-	static_route_only_updated := "true"
-	var vpn_connection_id string
 
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testVpnConnectionConfig_UpdateStaticRouteOnly(static_route_only),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "static_routes_only", static_route_only),
-					resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
-						if v == "" {
-							return errors.New("Id should not be empty")
-						}
-						vpn_connection_id = v
-						return nil
-					}),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_vpn_connection.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"state"},
-			},
-			// Update testing
-			{
-				Config: testVpnConnectionConfig_UpdateStaticRouteOnly(static_route_only_updated),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "static_routes_only", static_route_only_updated),
-					resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
-						if v == "" {
-							return errors.New("Id should not be empty")
-						}
-						if vpn_connection_id == v {
-							return errors.New("Id should be different after Update")
-						}
-						return nil
-					}),
-				),
-			},
-		},
-	})
-}
+	var resourceId string
 
-func testVpnConnectionConfig_UpdateStaticRouteOnly(static_route_only string) string {
-	return fmt.Sprintf(`
+	////////////// Define input data that will be used in the test sequence //////////////
+	// resource fields that can be updated in-place
+	routes := []string{"10.12.0.0/16"}
+	routesUpdated := []string{"192.0.2.0/24", "192.168.255.0/24"}
 
-
-resource "numspot_client_gateway" "test" {
-  connection_type = "ipsec.1"
-  public_ip       = "192.0.2.0"
-  bgp_asn         = 65000
-}
-
-resource "numspot_virtual_gateway" "test" {
-  connection_type = "ipsec.1"
-}
-
-resource "numspot_vpn_connection" "test" {
-  client_gateway_id  = numspot_client_gateway.test.id
-  connection_type    = "ipsec.1"
-  virtual_gateway_id = numspot_virtual_gateway.test.id
-  static_routes_only = %[1]q
-}`, static_route_only)
-}
-
-func TestAccVpnConnectionResource_WithRoute(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-	destinationIPRange := "10.12.0.0/16"
-	updatedRoutes := []string{"192.0.2.0/24", "192.168.255.0/24"}
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testVpnConnectionConfig_WithSingleRoute(destinationIPRange),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "routes.#", "1"),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "routes.0.destination_ip_range", destinationIPRange),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_vpn_connection.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"state"},
-			},
-			{
-				Config: testVpnConnectionConfig_WithMultiRoutes(updatedRoutes),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "routes.#", "2"),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "routes.0.destination_ip_range", updatedRoutes[0]),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "routes.1.destination_ip_range", updatedRoutes[1]),
-				),
-			},
-		},
-	})
-}
-
-func testVpnConnectionConfig_WithSingleRoute(ipRange string) string {
-	return fmt.Sprintf(`
-
-
-resource "numspot_client_gateway" "test" {
-  connection_type = "ipsec.1"
-  public_ip       = "192.0.2.0"
-  bgp_asn         = 65000
-}
-
-resource "numspot_virtual_gateway" "test" {
-  connection_type = "ipsec.1"
-}
-
-resource "numspot_vpn_connection" "test" {
-  client_gateway_id  = numspot_client_gateway.test.id
-  connection_type    = "ipsec.1"
-  virtual_gateway_id = numspot_virtual_gateway.test.id
-  static_routes_only = "true"
-  routes = [
-    {
-      destination_ip_range = %[1]q
-    }
-  ]
-}`, ipRange)
-}
-
-func testVpnConnectionConfig_WithMultiRoutes(routes []string) string {
-	return fmt.Sprintf(`
-
-
-resource "numspot_client_gateway" "test" {
-  connection_type = "ipsec.1"
-  public_ip       = "192.0.2.0"
-  bgp_asn         = 65000
-}
-
-resource "numspot_virtual_gateway" "test" {
-  connection_type = "ipsec.1"
-}
-
-resource "numspot_vpn_connection" "test" {
-  client_gateway_id  = numspot_client_gateway.test.id
-  connection_type    = "ipsec.1"
-  virtual_gateway_id = numspot_virtual_gateway.test.id
-  static_routes_only = "true"
-  routes = [
-    {
-      destination_ip_range = %[1]q
-    },
-    {
-      destination_ip_range = %[2]q
-    }
-  ]
-}`, routes[0], routes[1])
-}
-
-func TestAccVpnConnectionResource_UpdateTunnelEndpoints(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-	var vpn_connection_id string
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testVpnConnectionConfig_UpdateTunnelEndpoints("client_gateway_before", "virtual_gateway_before"),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
-						if v == "" {
-							return errors.New("Id should not be empty")
-						}
-						vpn_connection_id = v
-						return nil
-					}),
-					resource.TestCheckTypeSetElemAttrPair(
-						"numspot_vpn_connection.test", "client_gateway_id",
-						"numspot_client_gateway.client_gateway_before", "id"),
-					resource.TestCheckTypeSetElemAttrPair(
-						"numspot_vpn_connection.test", "virtual_gateway_id",
-						"numspot_virtual_gateway.virtual_gateway_before", "id"),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_vpn_connection.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"state"},
-			},
-			// Update testing
-			{
-				Config: testVpnConnectionConfig_UpdateTunnelEndpoints("client_gateway_after", "virtual_gateway_after"),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
-						if v == "" {
-							return errors.New("Id should not be empty")
-						}
-
-						if vpn_connection_id == v {
-							return errors.New("Id should be different after Update")
-						}
-
-						return nil
-					}),
-					resource.TestCheckTypeSetElemAttrPair(
-						"numspot_vpn_connection.test", "client_gateway_id",
-						"numspot_client_gateway.client_gateway_after", "id"),
-					resource.TestCheckTypeSetElemAttrPair(
-						"numspot_vpn_connection.test", "virtual_gateway_id",
-						"numspot_virtual_gateway.virtual_gateway_after", "id"),
-				),
-			},
-		},
-	})
-}
-
-func testVpnConnectionConfig_UpdateTunnelEndpoints(clientGatewayName string, virtualGatewayName string) string {
-	return fmt.Sprintf(`
-resource "numspot_client_gateway" "client_gateway_before" {
-  connection_type = "ipsec.1"
-  public_ip       = "192.0.2.0"
-  bgp_asn         = 65000
-}
-
-resource "numspot_virtual_gateway" "virtual_gateway_before" {
-  connection_type = "ipsec.1"
-}
-
-resource "numspot_client_gateway" "client_gateway_after" {
-  connection_type = "ipsec.1"
-  public_ip       = "192.0.2.1"
-  bgp_asn         = 65001
-}
-
-resource "numspot_virtual_gateway" "virtual_gateway_after" {
-  connection_type = "ipsec.1"
-}
-
-resource "numspot_vpn_connection" "test" {
-  client_gateway_id  = numspot_client_gateway.%[1]s.id
-  connection_type    = "ipsec.1"
-  virtual_gateway_id = numspot_virtual_gateway.%[2]s.id
-  static_routes_only = "false"
-}
-	`, clientGatewayName, virtualGatewayName)
-}
-
-func TestAccVpnConnectionResource_UpdateVPNOptions(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
 	tunnelInsideIpRange := "169.254.254.22/30"
-	presharedKey := "sample key !"
 	tunnelInsideIpRangeUpdated := "169.254.254.20/30"
+
+	presharedKey := "sample key !"
 	presharedKeyUpdated := "another key !"
-	var vpn_connection_id string
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testVpnConnectionConfig_UpdateVPNOptions(tunnelInsideIpRange, presharedKey),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
-						if v == "" {
-							return errors.New("Id should not be empty")
-						}
-						vpn_connection_id = v
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "vpn_options.phase2options.pre_shared_key", presharedKey),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "vpn_options.tunnel_inside_ip_range", tunnelInsideIpRange),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_vpn_connection.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"state"},
-			},
-			// Update testing
-			{
-				Config: testVpnConnectionConfig_UpdateVPNOptions(tunnelInsideIpRangeUpdated, presharedKeyUpdated),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
-						if v == "" {
-							return errors.New("Id should not be empty")
-						}
-
-						if vpn_connection_id != v {
-							return errors.New("Id should be identical after Update")
-						}
-
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "vpn_options.phase2options.pre_shared_key", presharedKeyUpdated),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "vpn_options.tunnel_inside_ip_range", tunnelInsideIpRangeUpdated),
-				),
-			},
-		},
-	})
-}
-
-func testVpnConnectionConfig_UpdateVPNOptions(tunnelInsideIPRange, presharedKey string) string {
-	return fmt.Sprintf(`
-resource "numspot_client_gateway" "test" {
-  connection_type = "ipsec.1"
-  public_ip       = "192.0.2.0"
-  bgp_asn         = 65000
-}
-
-resource "numspot_virtual_gateway" "test" {
-  connection_type = "ipsec.1"
-}
-
-resource "numspot_vpn_connection" "test" {
-  client_gateway_id  = numspot_client_gateway.test.id
-  connection_type    = "ipsec.1"
-  virtual_gateway_id = numspot_virtual_gateway.test.id
-  static_routes_only = "false"
-  vpn_options = {
-    phase2options = {
-      pre_shared_key = %[2]q
-    }
-    tunnel_inside_ip_range = %[1]q
-  }
-}
-`, tunnelInsideIPRange, presharedKey)
-}
-
-func TestAccVpnConnectionResource_Tags(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-	static_route_only := "false"
-	var vpn_connection_id string
 
 	tagKey := "Name"
 	tagValue := "Terraform-Test-Volume"
 	tagValueUpdated := tagValue + "-Updated"
 
+	// resource fields that cannot be updated in-place (requires replace)
+	staticRouteOnly := "false"
+	staticRouteOnlyUpdated := "true"
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	////////////// Define plan values and generate associated attribute checks  //////////////
+	// The base plan (used in first create and to reset resource state before some tests)
+	basePlanValues := StepDataVpnConnection{
+		staticRoutesOnly:    staticRouteOnly,
+		routes:              routes,
+		preSharedKey:        presharedKey,
+		tunnelInsideIpRange: tunnelInsideIpRange,
+		tagKey:              tagKey,
+		tagValue:            tagValue,
+	}
+	createChecks := append(
+		getFieldMatchChecksVpnConnection(basePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			resourceId = v
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
+	updatePlanValues := StepDataVpnConnection{
+		staticRoutesOnly:    staticRouteOnly,
+		routes:              routesUpdated,
+		preSharedKey:        presharedKeyUpdated,
+		tunnelInsideIpRange: tunnelInsideIpRangeUpdated,
+		tagKey:              tagKey,
+		tagValue:            tagValueUpdated,
+	}
+	updateChecks := append(
+		getFieldMatchChecksVpnConnection(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.Equal(t, v, resourceId)
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
+	replacePlanValues := StepDataVpnConnection{
+		staticRoutesOnly:    staticRouteOnlyUpdated,
+		routes:              routes,
+		preSharedKey:        presharedKey,
+		tunnelInsideIpRange: tunnelInsideIpRange,
+		tagKey:              tagKey,
+		tagValue:            tagValue,
+	}
+	replaceChecks := append(
+		getFieldMatchChecksVpnConnection(replacePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
+	/////////////////////////////////////////////////////////////////////////////////////
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{
-				Config: testVpnConnectionConfig_Tags(static_route_only, tagKey, tagValue),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "static_routes_only", static_route_only),
-					resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
-						if v == "" {
-							return errors.New("id should not be empty")
-						}
-						vpn_connection_id = v
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "tags.0.value", tagValue),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "tags.#", "1"),
-				),
+			{ // Create testing
+				Config: testVpnConnectionConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					createChecks,
+					getDependencyChecksVpnConnection(utils_acctest.BASE_SUFFIX),
+				)...),
 			},
 			// ImportState testing
 			{
 				ResourceName:            "numspot_vpn_connection.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"state"},
+				ImportStateVerifyIgnore: []string{"id"},
 			},
-			// Update testing
+			// Update testing Without Replace (if needed)
 			{
-				Config: testVpnConnectionConfig_Tags(static_route_only, tagKey, tagValueUpdated),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "static_routes_only", static_route_only),
-					resource.TestCheckResourceAttrWith("numspot_vpn_connection.test", "id", func(v string) error {
-						if v == "" {
-							return errors.New("Id should not be empty")
-						}
-						if vpn_connection_id != v {
-							return errors.New("id should not be different after Update")
-						}
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "tags.0.value", tagValueUpdated),
-					resource.TestCheckResourceAttr("numspot_vpn_connection.test", "tags.#", "1"),
-				),
+				Config: testVpnConnectionConfig(utils_acctest.BASE_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksVpnConnection(utils_acctest.BASE_SUFFIX),
+				)...),
+			},
+			// Update testing With Replace (if needed)
+			{
+				Config: testVpnConnectionConfig(utils_acctest.BASE_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksVpnConnection(utils_acctest.BASE_SUFFIX),
+				)...),
+			},
+
+			// <== If resource has required dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testVpnConnectionConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testVpnConnectionConfig(utils_acctest.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksVpnConnection(utils_acctest.NEW_SUFFIX),
+				)...),
+			},
+			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			{
+				Config: testVpnConnectionConfig(utils_acctest.NEW_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksVpnConnection(utils_acctest.NEW_SUFFIX),
+				)...),
 			},
 		},
 	})
 }
 
-func testVpnConnectionConfig_Tags(static_route_only, tagKey, tagValue string) string {
+func testVpnConnectionConfig(subresourceSuffix string, data StepDataVpnConnection) string {
+	routes := "["
+	for _, route := range data.routes {
+		routes += fmt.Sprintf("{destination_ip_range = %[1]q}", route)
+		routes += ","
+	}
+	routes = strings.TrimSuffix(routes, ",")
+
+	routes += "]"
+
 	return fmt.Sprintf(`
-resource "numspot_client_gateway" "test" {
+resource "numspot_client_gateway" "test%[1]s" {
   connection_type = "ipsec.1"
   public_ip       = "192.0.2.0"
   bgp_asn         = 65000
 }
 
-resource "numspot_virtual_gateway" "test" {
+resource "numspot_virtual_gateway" "test%[1]s" {
   connection_type = "ipsec.1"
 }
 
 resource "numspot_vpn_connection" "test" {
-  client_gateway_id  = numspot_client_gateway.test.id
+  client_gateway_id  = numspot_client_gateway.test%[1]s.id
   connection_type    = "ipsec.1"
-  virtual_gateway_id = numspot_virtual_gateway.test.id
-  static_routes_only = %[1]q
-
+  virtual_gateway_id = numspot_virtual_gateway.test%[1]s.id
+  static_routes_only = %[3]q
+  routes             = %[2]s
   tags = [
     {
-      key   = %[2]q
-      value = %[3]q
+      key   = %[4]q
+      value = %[5]q
     }
   ]
-}`, static_route_only, tagKey, tagValue)
+  vpn_options = {
+    phase2options = {
+      pre_shared_key = %[6]q
+    }
+    tunnel_inside_ip_range = %[7]q
+  }
+}`, subresourceSuffix, routes, data.staticRoutesOnly, data.tagKey, data.tagValue, data.preSharedKey, data.tunnelInsideIpRange)
 }

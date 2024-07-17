@@ -3,457 +3,318 @@
 package provider
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
+	"slices"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
-func TestAccSecurityGroupResource_SingleInboundRule_WithReplace(t *testing.T) {
-	t.Parallel()
+// This struct will store the input data that will be used in your tests (all fields as string)
+type StepDataSecurityGroup struct {
+	name, description, tagKey, tagValue   string
+	inboundRulesPorts, outboundRulesPorts []string
+}
+
+// Generate checks to validate that resource 'numspot_security_group.test' has input data values
+func getFieldMatchChecksSecurityGroup(data StepDataSecurityGroup) []resource.TestCheckFunc {
+	checks := []resource.TestCheckFunc{
+		resource.TestCheckResourceAttr("numspot_security_group.test", "name", data.name),
+		resource.TestCheckResourceAttr("numspot_security_group.test", "description", data.description),
+		resource.TestCheckResourceAttr("numspot_security_group.test", "tags.#", "1"),
+		resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test", "tags.*", map[string]string{
+			"key":   data.tagKey,
+			"value": data.tagValue,
+		}),
+		resource.TestCheckResourceAttr("numspot_security_group.test", "inbound_rules.#", strconv.Itoa(len(data.inboundRulesPorts))),
+		resource.TestCheckResourceAttr("numspot_security_group.test", "outbound_rules.#", strconv.Itoa(len(data.outboundRulesPorts))),
+	}
+
+	for _, inboundRulePort := range data.inboundRulesPorts {
+		checks = append(checks, resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test", "inbound_rules.*", map[string]string{
+			"from_port_range": inboundRulePort,
+			"to_port_range":   inboundRulePort,
+		}))
+	}
+
+	for _, outboundRulePort := range data.outboundRulesPorts {
+		checks = append(checks, resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test", "outbound_rules.*", map[string]string{
+			"from_port_range": outboundRulePort,
+			"to_port_range":   outboundRulePort,
+		}))
+	}
+
+	return checks
+}
+
+// Generate checks to validate that resource 'numspot_security_group.test' is properly linked to given subresources
+// If resource has no dependencies, return empty array
+func getDependencyChecksSecurityGroup(dependenciesPrefix string) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test"+dependenciesPrefix, "id"),
+	}
+}
+
+func TestAccSecurityGroupResource(t *testing.T) {
 	pr := TestAccProtoV6ProviderFactories
 
-	netIpRange := "10.101.0.0/16"
+	var resourceId string
 
+	////////////// Define input data that will be used in the test sequence //////////////
+	// resource fields that can be updated in-place
+
+	inboundRulesPorts := []string{"453", "80", "22"}
+	inboundRulesPortsUpdated_1 := []string{"453", "20"}
+	inboundRulesPortsUpdated_2 := []string{}
+
+	outboundRulesPorts := []string{"455", "90"}
+	outboundRulesPortsUpdated_1 := []string{}
+	outboundRulesPortsUpdated_2 := []string{"455", "90", "80", "70"}
+
+	tagKey := "name"
+	tagValue := "Terraform-Test-SecurityGroup"
+	tagValueUpdated := "Terraform-Test-SecurityGroup-Updated"
+
+	// resource fields that cannot be updated in-place (requires replace)
 	randName := rand.Intn(9999-1000) + 1000
 	name := fmt.Sprintf("security-group-name-%d", randName)
 	description := fmt.Sprintf("security-group-description-%d", randName)
 
 	nameUpdated := name + "_updated"
 	descriptionUpdated := description + "_updated"
+	/////////////////////////////////////////////////////////////////////////////////////
 
-	var securityGroupId string
+	////////////// Define plan values and generate associated attribute checks  //////////////
+	// The base plan (used in first create and to reset resource state before some tests)
+	basePlanValues := StepDataSecurityGroup{
+		name:               name,
+		description:        description,
+		tagKey:             tagKey,
+		tagValue:           tagValue,
+		inboundRulesPorts:  inboundRulesPorts,
+		outboundRulesPorts: outboundRulesPorts,
+	}
+	createChecks := append(
+		getFieldMatchChecksSecurityGroup(basePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			resourceId = v
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
+	updatePlanValues_1 := StepDataSecurityGroup{
+		name:               name,
+		description:        description,
+		tagKey:             tagKey,
+		tagValue:           tagValueUpdated,
+		inboundRulesPorts:  inboundRulesPortsUpdated_1,
+		outboundRulesPorts: outboundRulesPortsUpdated_1,
+	}
+	updateChecks_1 := append(
+		getFieldMatchChecksSecurityGroup(updatePlanValues_1),
+
+		resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.Equal(t, v, resourceId)
+			return nil
+		}),
+	)
+
+	updatePlanValues_2 := StepDataSecurityGroup{
+		name:               name,
+		description:        description,
+		tagKey:             tagKey,
+		tagValue:           tagValueUpdated,
+		inboundRulesPorts:  inboundRulesPortsUpdated_2,
+		outboundRulesPorts: outboundRulesPortsUpdated_2,
+	}
+	updateChecks_2 := append(
+		getFieldMatchChecksSecurityGroup(updatePlanValues_2),
+
+		resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.Equal(t, v, resourceId)
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
+	replacePlanValues := StepDataSecurityGroup{
+		name:               nameUpdated,
+		description:        descriptionUpdated,
+		tagKey:             tagKey,
+		tagValue:           tagValue,
+		inboundRulesPorts:  inboundRulesPorts,
+		outboundRulesPorts: outboundRulesPorts,
+	}
+	replaceChecks := append(
+		getFieldMatchChecksSecurityGroup(replacePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{
-				Config: testSecurityGroupConfig_SingleInboundRule(netIpRange, name, description),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_security_group.test", "name", name),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "description", description),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						securityGroupId = v
-						return nil
-					}),
-				),
+			{ // Create testing
+				Config: testSecurityGroupConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					createChecks,
+					getDependencyChecksSecurityGroup(utils_acctest.BASE_SUFFIX),
+				)...),
 			},
 			// ImportState testing
 			{
 				ResourceName:            "numspot_security_group.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
+				ImportStateVerifyIgnore: []string{"id"},
 			},
-			// Update testing
+			// Update testing Without Replace (if needed)
 			{
-				Config: testSecurityGroupConfig_SingleInboundRule(netIpRange, nameUpdated, descriptionUpdated),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						if v == securityGroupId {
-							return errors.New("Id should be different after Update with replace")
-						}
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "name", nameUpdated),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "description", descriptionUpdated),
-				),
+				Config: testSecurityGroupConfig(utils_acctest.BASE_SUFFIX, updatePlanValues_1),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks_1,
+					getDependencyChecksSecurityGroup(utils_acctest.BASE_SUFFIX),
+				)...),
+			},
+			// Update testing Without Replace (if needed)
+			{
+				Config: testSecurityGroupConfig(utils_acctest.BASE_SUFFIX, updatePlanValues_2),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks_2,
+					getDependencyChecksSecurityGroup(utils_acctest.BASE_SUFFIX),
+				)...),
+			},
+			// Update testing With Replace (if needed)
+			{
+				Config: testSecurityGroupConfig(utils_acctest.BASE_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksSecurityGroup(utils_acctest.BASE_SUFFIX),
+				)...),
+			},
+			// <== If resource has required dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testSecurityGroupConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testSecurityGroupConfig(utils_acctest.NEW_SUFFIX, updatePlanValues_1),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks_1,
+					getDependencyChecksSecurityGroup(utils_acctest.NEW_SUFFIX),
+				)...),
+			},
+			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			{
+				Config: testSecurityGroupConfig(utils_acctest.NEW_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksSecurityGroup(utils_acctest.NEW_SUFFIX),
+				)...),
+			},
+
+			// <== If resource has optional dependencies ==>
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testSecurityGroupConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testSecurityGroupConfig_DeletedDependencies(updatePlanValues_1),
+				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks_1...),
+			},
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testSecurityGroupConfig(utils_acctest.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
+			{
+				Config: testSecurityGroupConfig_DeletedDependencies(replacePlanValues),
+				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
 			},
 		},
 	})
 }
 
-func testSecurityGroupConfig_SingleInboundRule(netIpRange, name, description string) string {
+func testSecurityGroupConfig(subresourceSuffix string, data StepDataSecurityGroup) string {
+	inboundRules, outboundRules := getRules(data)
+
 	return fmt.Sprintf(`
-resource "numspot_vpc" "net" {
-  ip_range = %[1]q
+resource "numspot_vpc" "test%[1]s" {
+  ip_range = "10.101.0.0/16"
 }
 
 resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.net.id
-  name        = %[2]q
-  description = %[3]q
-  inbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    }
-  ]
-}
-`, netIpRange, name, description)
+  vpc_id         = numspot_vpc.test%[1]s.id
+  name           = %[2]q
+  description    = %[3]q
+  inbound_rules  = %[4]s
+  outbound_rules = %[5]s
+}`, subresourceSuffix, data.name, data.description, inboundRules, outboundRules)
 }
 
-func TestAccSecurityGroupResource_CoupleInboundRule(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
+// <== If resource has optional dependencies ==>
+func testSecurityGroupConfig_DeletedDependencies(data StepDataSecurityGroup) string {
+	inboundRules, outboundRules := getRules(data)
 
-	netIpRange := "10.101.0.0/16"
-
-	randName := rand.Intn(9999-1000) + 1000
-	name := fmt.Sprintf("security-group-name-%d", randName)
-	descrition := fmt.Sprintf("security-group-description-%d", randName)
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testSecurityGroupConfig_CoupleInboundRule(netIpRange, name, descrition),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_security_group.test", "name", name),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "description", descrition),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_security_group.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"inbound_rules", "outbound_rules"},
-			},
-			// Update testing
-			{
-				Config: testSecurityGroupConfig_CoupleInboundRule(netIpRange, name, descrition),
-				Check:  resource.ComposeAggregateTestCheckFunc(),
-			},
-		},
-	})
-}
-
-func testSecurityGroupConfig_CoupleInboundRule(netIpRange, name, description string) string {
 	return fmt.Sprintf(`
-resource "numspot_vpc" "net" {
-  ip_range = %[1]q
-}
-
 resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.net.id
-  name        = %[2]q
-  description = %[3]q
-  inbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    },
-    {
-      from_port_range = 22
-      to_port_range   = 22
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    },
-  ]
-}`, netIpRange, name, description)
+  name           = %[1]q
+  description    = %[2]q
+  inbound_rules  = %[3]s
+  outbound_rules = %[4]s
+}`, data.name, data.description, inboundRules, outboundRules)
 }
 
-func TestAccSecurityGroupResource_SingleOutboundRule(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
+func getRules(data StepDataSecurityGroup) (string, string) {
+	inboundRules := "["
+	outboundRules := "["
 
-	netIpRange := "10.101.0.0/16"
+	for _, port := range data.inboundRulesPorts {
+		inboundRules += ruleFromPort(port)
+		inboundRules += ","
+	}
 
-	randName := rand.Intn(9999-1000) + 1000
-	name := fmt.Sprintf("security-group-name-%d", randName)
-	descrition := fmt.Sprintf("security-group-description-%d", randName)
+	for _, port := range data.outboundRulesPorts {
+		outboundRules += ruleFromPort(port)
+		outboundRules += ","
+	}
 
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testSecurityGroupConfig_SingleOutboundRule(netIpRange, name, descrition),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_security_group.test", "name", name),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "description", descrition),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_security_group.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
-			},
-			// Update testing
-			{
-				Config: testSecurityGroupConfig_SingleOutboundRule(netIpRange, name, descrition),
-				Check:  resource.ComposeAggregateTestCheckFunc(),
-			},
-		},
-	})
+	outboundRules = strings.TrimSuffix(outboundRules, ",")
+	inboundRules = strings.TrimSuffix(inboundRules, ",")
+
+	inboundRules += "]"
+	outboundRules += "]"
+
+	return inboundRules, outboundRules
 }
 
-func testSecurityGroupConfig_SingleOutboundRule(netIpRange, name, description string) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "net" {
-  ip_range = %[1]q
-}
-
-resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.net.id
-  name        = %[2]q
-  description = %[3]q
-  outbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    }
-  ]
-}`, netIpRange, name, description)
-}
-
-func TestAccSecurityGroupResource_CoupleOutboundRule(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-
-	netIpRange := "10.101.0.0/16"
-
-	randName := rand.Intn(9999-1000) + 1000
-	name := fmt.Sprintf("security-group-name-%d", randName)
-	descrition := fmt.Sprintf("security-group-description-%d", randName)
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testSecurityGroupConfig_CoupleOutboundRule(netIpRange, name, descrition),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_security_group.test", "name", name),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "description", descrition),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_security_group.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
-			},
-			// Update testing
-			{
-				Config: testSecurityGroupConfig_CoupleOutboundRule(netIpRange, name, descrition),
-				Check:  resource.ComposeAggregateTestCheckFunc(),
-			},
-		},
-	})
-}
-
-func testSecurityGroupConfig_CoupleOutboundRule(netIpRange, name, description string) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "net" {
-  ip_range = %[1]q
-}
-
-resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.net.id
-  name        = %[2]q
-  description = %[3]q
-  outbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    },
-    {
-      from_port_range = 443
-      to_port_range   = 443
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    }
-  ]
-}`, netIpRange, name, description)
-}
-
-func TestAccSecurityGroupResource_MultipleRules_NoReplace(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-
-	netIpRange := "10.101.0.0/16"
-
-	randName := rand.Intn(9999-1000) + 1000
-	name := fmt.Sprintf("security-group-name-%d", randName)
-	description := fmt.Sprintf("security-group-description-%d", randName)
-
-	rule1PortRange := "443"
-	rule2PortRange := "80"
-
-	rule1PortRangeUpdated := "453"
-	rule2PortRangeUpdated := "90"
-
-	var securityGroupId string
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testSecurityGroupConfig_MultipleRules_NoReplace(netIpRange, name, description, rule1PortRange, rule2PortRange),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_security_group.test", "name", name),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "description", description),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						securityGroupId = v
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "inbound_rules.0.from_port_range", rule1PortRange),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "inbound_rules.1.from_port_range", rule2PortRange),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_security_group.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
-			},
-			// Update testing
-			{
-				Config: testSecurityGroupConfig_MultipleRules_NoReplace(netIpRange, name, description, rule1PortRangeUpdated, rule2PortRangeUpdated),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						if v != securityGroupId {
-							return errors.New("Id should be the same after Update without replace")
-						}
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "inbound_rules.0.from_port_range", rule1PortRangeUpdated),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "inbound_rules.1.from_port_range", rule2PortRangeUpdated),
-				),
-			},
-		},
-	})
-}
-
-func testSecurityGroupConfig_MultipleRules_NoReplace(netIpRange, name, description, rule1PortRange, rule2PortRange string) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "net" {
-  ip_range = %[1]q
-}
-
-resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.net.id
-  name        = %[2]q
-  description = %[3]q
-
-  inbound_rules = [
-    {
-      from_port_range = %[4]s
-      to_port_range   = %[4]s
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    },
-    {
-      from_port_range = %[5]s
-      to_port_range   = %[5]s
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    },
-  ]
-
-  outbound_rules = [
-    {
-      from_port_range = %[4]s
-      to_port_range   = %[4]s
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    },
-    {
-      from_port_range = %[5]s
-      to_port_range   = %[5]s
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    }
-  ]
-}`, netIpRange, name, description, rule1PortRange, rule2PortRange)
-}
-
-func TestAccSecurityGroupResource_Tags(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-
-	netIpRange := "10.101.0.0/16"
-
-	randName := rand.Intn(9999-1000) + 1000
-	name := fmt.Sprintf("security-group-name-%d", randName)
-	descrition := fmt.Sprintf("security-group-description-%d", randName)
-
-	tagKey := "name"
-	tagValue := "Terraform-Test-SecurityGroup"
-	tagValueUpdate := "Terraform-Test-SecurityGroup-Updated"
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: testSecurityGroupConfig_Tags(netIpRange, name, descrition, tagKey, tagValue),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_security_group.test", "name", name),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "description", descrition),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						require.NotEmpty(t, v)
-						return nil
-					}),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.0.value", tagValue),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.#", "1"),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_security_group.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{},
-			},
-			// Update testing
-			{
-				Config: testSecurityGroupConfig_Tags(netIpRange, name, descrition, tagKey, tagValueUpdate),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.0.value", tagValueUpdate),
-					resource.TestCheckResourceAttr("numspot_security_group.test", "tags.#", "1"),
-				),
-			},
-		},
-	})
-}
-
-func testSecurityGroupConfig_Tags(netIpRange, name, description, tagKey, tagValue string) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "net" {
-  ip_range = %[1]q
-}
-
-resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.net.id
-  name        = %[2]q
-  description = %[3]q
-  tags = [
-    {
-      key   = %[4]q
-      value = %[5]q
-    }
-  ]
-}`, netIpRange, name, description, tagKey, tagValue)
+func ruleFromPort(port string) string {
+	return fmt.Sprintf(`{
+		from_port_range = %[1]s
+		to_port_range   = %[1]s
+		ip_ranges       = ["0.0.0.0/0"]
+		ip_protocol     = "tcp"
+	  }`, port)
 }

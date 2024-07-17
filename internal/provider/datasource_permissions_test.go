@@ -9,10 +9,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccPermissionsDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
@@ -38,7 +39,6 @@ func TestAccPermissionsDatasource(t *testing.T) {
 }
 
 func TestAccPermissionsDatasource_WithFilter(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
@@ -52,9 +52,12 @@ func TestAccPermissionsDatasource_WithFilter(t *testing.T) {
 				Config: testAccPermissionsDatasourceConfig_WithFilter(spaceID, action, service, resourceName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_permissions.testdata", "items.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_permissions.testdata", "items.0.action", action),
-					resource.TestCheckResourceAttr("data.numspot_permissions.testdata", "items.0.service", service),
-					resource.TestCheckResourceAttr("data.numspot_permissions.testdata", "items.0.resource", resourceName),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_permissions.testdata", "items.*", map[string]string{
+						"action":   action,
+						"service":  service,
+						"resource": resourceName,
+						"space_id": spaceID,
+					}),
 				),
 			},
 		},

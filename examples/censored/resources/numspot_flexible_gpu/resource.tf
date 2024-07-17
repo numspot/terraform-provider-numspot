@@ -1,5 +1,5 @@
 resource "numspot_vm" "vm" {
-  image_id = "ami-026ce760"
+  image_id = "ami-0b7df82c"
   type     = "ns-mus6-2c16r"
 }
 

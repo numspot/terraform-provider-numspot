@@ -7,10 +7,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccVPCsDatasource_Basic(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 	ipRange := "10.101.0.0/16"
 
@@ -21,7 +22,10 @@ func TestAccVPCsDatasource_Basic(t *testing.T) {
 				Config: testAccVPCsDatasourceConfig_Basic(ipRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_vpcs.test", "items.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_vpcs.test", "items.0.ip_range", ipRange),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vpcs.testdata", "items.*", map[string]string{
+						"id":       utils_acctest.PAIR_PREFIX + "numspot_vpc.test.id",
+						"ip_range": ipRange,
+					}),
 				),
 			},
 		},

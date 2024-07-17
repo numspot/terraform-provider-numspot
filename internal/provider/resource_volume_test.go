@@ -4,110 +4,136 @@ package provider
 
 import (
 	"fmt"
+	"slices"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
+// This struct will store the input data that will be used in your tests (all fields as string)
+type StepDataVolume struct {
+	volumeType,
+	volumeSize,
+	tagKey,
+	tagValue,
+	az string
+}
+
+// Generate checks to validate that resource 'numspot_volume.test' has input data values
+func getFieldMatchChecksVolume(data StepDataVolume) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", data.az),
+		resource.TestCheckResourceAttr("numspot_volume.test", "type", data.volumeType),
+		resource.TestCheckResourceAttr("numspot_volume.test", "size", data.volumeSize),
+		resource.TestCheckResourceAttr("numspot_volume.test", "tags.#", "1"),
+		resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.test", "tags.*", map[string]string{
+			"key":   data.tagKey,
+			"value": data.tagValue,
+		}),
+	}
+}
+
+// Generate checks to validate that resource 'numspot_volume.test' is properly linked to given subresources
+// If resource has no dependencies, return empty array
+func getDependencyChecksVolume(dependenciesPrefix string) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{}
+}
+
 func TestAccVolumeResource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
+	var resourceId string
+
+	////////////// Define input data that will be used in the test sequence //////////////
+	// resource fields that can be updated in-place
+	tagKey := "Name"
+	tagValue := "terraform-vm"
+	tagValueUpdated := tagValue + "-Updated"
 	volumeType := "standard"
-	volumeSize := 11
-	updatedVolumeSize := 22
-	volumeAZ := "eu-west-2a"
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: pr,
-		Steps: []resource.TestStep{
-			{
-				Config: createVolumeConfig(volumeType, volumeSize, volumeAZ),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_volume.test", "type", volumeType),
-					// resource.TestCheckResourceAttr("numspot_volume.test", "size", fmt.Sprintf("%d", volumeSize)),
-					resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", volumeAZ),
-				),
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_volume.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"state"},
-			},
-			// Update testing
-			{
-				Config: createVolumeConfig(volumeType, updatedVolumeSize, volumeAZ),
-				Check:  resource.ComposeAggregateTestCheckFunc(
-				//resource.TestCheckResourceAttr("numspot_volume.test", "field", "value"),
-				//resource.TestCheckResourceAttrWith("numspot_volume.test", "field", func(v string) error {
-				//	return nil
-				//}),
-				),
-			},
-		},
-	})
-}
-
-func createVolumeConfig(volumeType string, volumeSize int, volumeAZ string) string {
-	t := fmt.Sprintf(`
-resource "numspot_volume" "test" {
-  type                   = %[1]q
-  size                   = %[2]d
-  availability_zone_name = %[3]q
-}`, volumeType, volumeSize, volumeAZ)
-	return t
-}
-
-func TestAccVolumeResource_Tags(t *testing.T) {
-	t.Parallel()
-	pr := TestAccProtoV6ProviderFactories
-
-	volumeType := "standard"
-	volumeSize := 11
-	updatedVolumeSize := 22
+	volumeTypeUpdated := "gp2"
+	volumeSize := "11"
+	volumeSizeUpdated := "22"
 	volumeAZ := "cloudgouv-eu-west-1a"
-	tagKey := "name"
-	tagValue := "Terraform-Test-Volume"
+	volumeAZUpdated := "cloudgouv-eu-west-1a"
+	// resource fields that cannot be updated in-place (requires replace)
+	// None
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	////////////// Define plan values and generate associated attribute checks  //////////////
+	// The base plan (used in first create and to reset resource state before some tests)
+	basePlanValues := StepDataVolume{
+		volumeType: volumeType,
+		volumeSize: volumeSize,
+		az:         volumeAZ,
+		tagKey:     tagKey,
+		tagValue:   tagValue,
+	}
+	createChecks := append(
+		getFieldMatchChecksVolume(basePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			resourceId = v
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
+	updatePlanValues := StepDataVolume{
+		volumeType: volumeTypeUpdated,
+		volumeSize: volumeSizeUpdated,
+		az:         volumeAZUpdated,
+		tagKey:     tagKey,
+		tagValue:   tagValueUpdated,
+	}
+	updateChecks := append(
+		getFieldMatchChecksVolume(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.Equal(t, v, resourceId)
+			return nil
+		}),
+	)
+	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{
-				Config: createVolumeConfig_Tags(volumeType, volumeSize, volumeAZ, tagKey, tagValue),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_volume.test", "type", volumeType),
-					resource.TestCheckResourceAttr("numspot_volume.test", "size", fmt.Sprintf("%d", volumeSize)),
-					resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", volumeAZ),
-					resource.TestCheckResourceAttr("numspot_volume.test", "tags.0.key", tagKey),
-					resource.TestCheckResourceAttr("numspot_volume.test", "tags.0.value", tagValue),
-					resource.TestCheckResourceAttr("numspot_volume.test", "tags.#", "1"),
-				),
+			{ // Create testing
+				Config: testVolumeConfig(basePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					createChecks,
+					getDependencyChecksVolume(utils_acctest.BASE_SUFFIX),
+				)...),
 			},
 			// ImportState testing
 			{
 				ResourceName:            "numspot_volume.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"state"},
+				ImportStateVerifyIgnore: []string{"id"},
 			},
-			// Update testing
+			// Update testing Without Replace (if needed)
 			{
-				Config: createVolumeConfig(volumeType, updatedVolumeSize, volumeAZ),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_volume.test", "type", volumeType),
-					resource.TestCheckResourceAttr("numspot_volume.test", "size", fmt.Sprintf("%d", updatedVolumeSize)),
-					resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", volumeAZ),
-					resource.TestCheckResourceAttr("numspot_volume.test", "tags.#", "0"),
-				),
+				Config: testVolumeConfig(updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksVolume(utils_acctest.BASE_SUFFIX),
+				)...),
 			},
 		},
 	})
 }
 
-func createVolumeConfig_Tags(volumeType string, volumeSize int, volumeAZ, tagKey, tagValue string) string {
-	t := fmt.Sprintf(`
+func testVolumeConfig(data StepDataVolume) string {
+	volumeSize, _ := strconv.Atoi(data.volumeSize)
+	return fmt.Sprintf(`
 resource "numspot_volume" "test" {
   type                   = %[1]q
   size                   = %[2]d
@@ -118,6 +144,5 @@ resource "numspot_volume" "test" {
       value = %[5]q
     }
   ]
-}`, volumeType, volumeSize, volumeAZ, tagKey, tagValue)
-	return t
+}`, data.volumeType, volumeSize, data.az, data.tagKey, data.tagValue)
 }

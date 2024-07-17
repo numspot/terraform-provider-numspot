@@ -8,10 +8,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccVolumesDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 	volumeType := "standard"
 	volumeSize := 11
@@ -22,10 +23,13 @@ func TestAccVolumesDatasource(t *testing.T) {
 			{
 				Config: fetchVolumesConfigById(volumeType, volumeSize, volumeAZ),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "items.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "items.0.type", volumeType),
-					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "items.0.size", strconv.Itoa(volumeSize)),
-					resource.TestCheckResourceAttr("data.numspot_volumes.datasource_test", "items.0.availability_zone_name", volumeAZ),
+					resource.TestCheckResourceAttr("data.numspot_volumes.testdata", "items.#", "1"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_volumes.testdata", "items.*", map[string]string{
+						"id":                     utils_acctest.PAIR_PREFIX + "numspot_volume.test.id",
+						"type":                   volumeType,
+						"size":                   strconv.Itoa(volumeSize),
+						"availability_zone_name": volumeAZ,
+					}),
 				),
 			},
 		},
@@ -40,7 +44,7 @@ resource "numspot_volume" "test" {
   availability_zone_name = %[3]q
 }
 
-data "numspot_volumes" "datasource_test" {
+data "numspot_volumes" "testdata" {
   ids = [numspot_volume.test.id]
 }
 `, volumeType, volumeSize, volumeAZ)

@@ -16,7 +16,7 @@ import (
 )
 
 func TestAccNetAccessPointResource(t *testing.T) {
-	t.Parallel()
+
 	pr := TestAccProtoV6ProviderFactories
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
@@ -62,7 +62,7 @@ func testNetAccessPointConfig_Update() string {
 }
 
 func TestAccNetAccessPointResource_Tags(t *testing.T) {
-	t.Parallel()
+
 	pr := TestAccProtoV6ProviderFactories
 
 	tagKey := "name"

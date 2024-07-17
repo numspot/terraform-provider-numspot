@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccRouteTablesDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -17,6 +18,9 @@ func TestAccRouteTablesDatasource(t *testing.T) {
 				Config: fetchRouteTableConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_route_tables.testdata", "items.#", "1"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_route_tables.testdata", "items.*", map[string]string{
+						"id": utils_acctest.PAIR_PREFIX + "numspot_route_table.test.id",
+					}),
 				),
 			},
 		},

@@ -1,22 +1,32 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccVmsDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
+
+	image_id := "ami-0b7df82c"
+	vm_type := "ns-cus6-2c4r"
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchVmConfig(),
+				Config: fetchVmConfig(image_id, vm_type),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_vms.testdata", "items.#", "1"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vms.testdata", "items.*", map[string]string{
+						"id":       utils_acctest.PAIR_PREFIX + "numspot_vm.test.id",
+						"vm_type":  vm_type,
+						"image_id": image_id,
+					}),
 				),
 				ExpectNonEmptyPlan: true,
 			},
@@ -24,16 +34,16 @@ func TestAccVmsDatasource(t *testing.T) {
 	})
 }
 
-func fetchVmConfig() string {
-	return `
+func fetchVmConfig(image_id, vm_type string) string {
+	return fmt.Sprintf(`
 resource "numspot_vm" "test" {
-  image_id = "ami-026ce760"
-  vm_type  = "ns-cus6-2c4r"
+  image_id = %[1]q
+  type     = %[2]q
 }
 
 data "numspot_vms" "testdata" {
   ids        = [numspot_vm.test.id]
   depends_on = [numspot_vm.test]
 }
-`
+`, image_id, vm_type)
 }

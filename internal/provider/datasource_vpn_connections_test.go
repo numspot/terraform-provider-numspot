@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccVpnConnectionDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -17,6 +18,11 @@ func TestAccVpnConnectionDatasource(t *testing.T) {
 				Config: fetchVpnConnectionConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_vpn_connections.testdata", "items.#", "1"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vpn_connections.testdata", "items.*", map[string]string{
+						"id":                 utils_acctest.PAIR_PREFIX + "numspot_vpn_connection.test.id",
+						"client_gateway_id":  utils_acctest.PAIR_PREFIX + "numspot_client_gateway.test.id",
+						"virtual_gateway_id": utils_acctest.PAIR_PREFIX + "numspot_virtual_gateway.test.id",
+					}),
 				),
 			},
 		},
@@ -43,8 +49,7 @@ resource "numspot_vpn_connection" "test" {
 }
 
 data "numspot_vpn_connections" "testdata" {
-  ids        = [numspot_vpn_connection.test.id]
-  depends_on = [numspot_vpn_connection.test]
+  ids = [numspot_vpn_connection.test.id]
 }
 `
 }

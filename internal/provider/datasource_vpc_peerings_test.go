@@ -6,10 +6,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccVpcPeeringsDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	resource.Test(t, resource.TestCase{
@@ -19,6 +20,9 @@ func TestAccVpcPeeringsDatasource(t *testing.T) {
 				Config: fetchVpcPeeringConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_vpc_peerings.testdata", "items.#", "1"),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vpc_peerings.testdata", "items.*", map[string]string{
+						"id": utils_acctest.PAIR_PREFIX + "numspot_vpc_peering.test.id",
+					}),
 				),
 			},
 		},
@@ -41,8 +45,7 @@ resource "numspot_vpc_peering" "test" {
 }
 
 data "numspot_vpc_peerings" "testdata" {
-  ids        = [numspot_vpc_peering.test.id]
-  depends_on = [numspot_vpc_peering.test]
+  ids = [numspot_vpc_peering.test.id]
 }
 `
 }

@@ -9,10 +9,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/stretchr/testify/require"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider/utils_acctest"
 )
 
 func TestAccRolesDatasource(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
@@ -38,7 +39,6 @@ func TestAccRolesDatasource(t *testing.T) {
 }
 
 func TestAccRolesDatasource_WithFilter(t *testing.T) {
-	t.Parallel()
 	pr := TestAccProtoV6ProviderFactories
 
 	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
@@ -50,7 +50,10 @@ func TestAccRolesDatasource_WithFilter(t *testing.T) {
 				Config: testAccRolesDatasourceConfig_WithFilter(spaceID, name),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_roles.testdata", "items.#", "1"),
-					resource.TestCheckResourceAttr("data.numspot_roles.testdata", "items.0.name", name),
+					utils_acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_roles.testdata", "items.*", map[string]string{
+						"name":     name,
+						"space_id": spaceID,
+					}),
 				),
 			},
 		},
