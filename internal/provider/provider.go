@@ -18,6 +18,32 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/acl"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/clientgateway"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/dhcpoptions"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/flexiblegpu"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/image"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/internetgateway"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/keypair"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/listenerrule"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/loadbalancer"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/natgateway"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/nic"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/permission"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/publicip"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/role"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/routetable"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/securitygroup"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/serviceaccount"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/snapshot"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/space"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/subnet"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/virtualgateway"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vm"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/volume"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vpc"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vpcpeering"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vpnconnection"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -99,6 +125,14 @@ func buildBasicAuth(username, password string) string {
 type Provider struct {
 	SpaceID       numspot.SpaceId
 	NumspotClient *numspot.ClientWithResponses
+}
+
+func (p Provider) GetSpaceID() numspot.SpaceId {
+	return p.SpaceID
+}
+
+func (p Provider) GetNumspotClient() *numspot.ClientWithResponses {
+	return p.NumspotClient
 }
 
 func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -288,57 +322,57 @@ func (p *numspotProvider) Metadata(ctx context.Context, req provider.MetadataReq
 
 func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		NewLoadBalancersDataSource,
-		NewDHCPOptionsDataSource,
-		NewVolumesDataSource,
-		NewVPCsDataSource,
-		NewSubnetsDataSource,
-		NewPublicIpsDataSource,
-		NewVirtualGatewaysDataSource,
-		NewNicsDataSource,
-		NewNatGatewaysDataSource,
-		NewVpcPeeringsDataSource,
-		NewInternetGatewaysDataSource,
-		NewSnapshotsDataSource,
-		NewKeypairsDataSource,
-		NewClientGatewaysDataSource,
-		NewSecurityGroupsDataSource,
-		NewRouteTablesDataSource,
-		NewVpnConnectionsDataSource,
-		NewSpaceDataSource,
-		NewVmsDataSource,
-		NewFlexibleGpusDataSource,
-		NewServiceAccountsDataSource,
-		NewPermissionsDataSource,
-		NewRolesDatasource,
+		loadbalancer.NewLoadBalancersDataSource,
+		dhcpoptions.NewDHCPOptionsDataSource,
+		volume.NewVolumesDataSource,
+		vpc.NewVPCsDataSource,
+		subnet.NewSubnetsDataSource,
+		publicip.NewPublicIpsDataSource,
+		virtualgateway.NewVirtualGatewaysDataSource,
+		nic.NewNicsDataSource,
+		natgateway.NewNatGatewaysDataSource,
+		vpcpeering.NewVpcPeeringsDataSource,
+		internetgateway.NewInternetGatewaysDataSource,
+		snapshot.NewSnapshotsDataSource,
+		keypair.NewKeypairsDataSource,
+		clientgateway.NewClientGatewaysDataSource,
+		securitygroup.NewSecurityGroupsDataSource,
+		routetable.NewRouteTablesDataSource,
+		vpnconnection.NewVpnConnectionsDataSource,
+		space.NewSpaceDataSource,
+		vm.NewVmsDataSource,
+		flexiblegpu.NewFlexibleGpusDataSource,
+		serviceaccount.NewServiceAccountsDataSource,
+		permission.NewPermissionsDataSource,
+		role.NewRolesDatasource,
 	}
 }
 
 func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		NewClientGatewayResource,
-		NewFlexibleGpuResource,
-		NewImageResource,
-		NewInternetGatewayResource,
-		NewListenerRuleResource,
-		NewLoadBalancerResource,
-		NewNatGatewayResource,
-		NewNetResource,
-		NewNicResource,
-		NewPublicIpResource,
-		NewRouteTableResource,
-		NewSecurityGroupResource,
-		NewSnapshotResource,
-		NewSubnetResource,
-		NewVolumeResource,
-		NewVpnConnectionResource,
-		NewVmResource,
-		NewKeyPairResource,
-		NewDhcpOptionsResource,
-		NewVirtualGatewayResource,
-		NewVpcPeeringResource,
-		NewSpaceResource,
-		NewServiceAccountResource,
-		NewAclsResource,
+		clientgateway.NewClientGatewayResource,
+		flexiblegpu.NewFlexibleGpuResource,
+		image.NewImageResource,
+		internetgateway.NewInternetGatewayResource,
+		listenerrule.NewListenerRuleResource,
+		loadbalancer.NewLoadBalancerResource,
+		natgateway.NewNatGatewayResource,
+		vpc.NewNetResource,
+		nic.NewNicResource,
+		publicip.NewPublicIpResource,
+		routetable.NewRouteTableResource,
+		securitygroup.NewSecurityGroupResource,
+		snapshot.NewSnapshotResource,
+		subnet.NewSubnetResource,
+		volume.NewVolumeResource,
+		vpnconnection.NewVpnConnectionResource,
+		vm.NewVmResource,
+		keypair.NewKeyPairResource,
+		dhcpoptions.NewDhcpOptionsResource,
+		virtualgateway.NewVirtualGatewayResource,
+		vpcpeering.NewVpcPeeringResource,
+		space.NewSpaceResource,
+		serviceaccount.NewServiceAccountResource,
+		acl.NewAclsResource,
 	}
 }
