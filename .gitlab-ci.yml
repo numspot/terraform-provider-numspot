@@ -23,7 +23,11 @@ fmt:
     - apt update
     - apt install terraform -y
     - go install github.com/katbyte/terrafmt@latest
+    - go install mvdan.cc/gofumpt@latest
+    - go install github.com/daixiang0/gci@latest
   script:
+    - gofumpt -l -w .
+    - gci write --skip-generated --skip-vendor -s standard -s default -s "prefix(gitlab.numspot.cloud/cloud/terraform-provider-numspot)" -s blank -s dot .
     - find . | egrep "test.go" | sort | while read f; do terrafmt fmt -fv $f; done
     - terraform fmt -recursive examples/
     - git diff --compact-summary --exit-code || (echo; echo "Unexpected difference in directories after code formatting. Run 'make fmt' command and commit."; exit 1)
