@@ -16,7 +16,7 @@ import (
 func TestAccPermissionsDatasource(t *testing.T) {
 	pr := provider.TestAccProtoV6ProviderFactories
 
-	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
+	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
@@ -41,10 +41,10 @@ func TestAccPermissionsDatasource(t *testing.T) {
 func TestAccPermissionsDatasource_WithFilter(t *testing.T) {
 	pr := provider.TestAccProtoV6ProviderFactories
 
-	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
+	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	action := "get"
-	service := "network"
-	resourceName := "link"
+	service := "postgresql"
+	resourceName := "backup"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
@@ -52,11 +52,11 @@ func TestAccPermissionsDatasource_WithFilter(t *testing.T) {
 				Config: testAccPermissionsDatasourceConfig_WithFilter(spaceID, action, service, resourceName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_permissions.testdata", "items.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_permissions.testdata", "space_id", spaceID),
 					provider.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_permissions.testdata", "items.*", map[string]string{
 						"action":   action,
 						"service":  service,
 						"resource": resourceName,
-						"space_id": spaceID,
 					}),
 				),
 			},

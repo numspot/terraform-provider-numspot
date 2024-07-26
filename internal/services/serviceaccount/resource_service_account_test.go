@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -28,15 +29,30 @@ func getFieldMatchChecksServiceAccount(data StepDataServiceAccount) []resource.T
 	checks := []resource.TestCheckFunc{
 		resource.TestCheckResourceAttr("numspot_service_account.test", "name", data.name),
 		resource.TestCheckResourceAttr("numspot_service_account.test", "roles.#", strconv.Itoa(len(data.roles))),
-		resource.TestCheckResourceAttr("numspot_service_account.test", "global_permissions.#", strconv.Itoa(len(data.roles))),
+		resource.TestCheckResourceAttr("numspot_service_account.test", "global_permissions.#", strconv.Itoa(len(data.permissions))),
 	}
 
 	for _, role := range data.roles {
-		checks = append(checks, resource.TestCheckTypeSetElemAttr("numspot_service_account.test", "roles.*", role))
+		checks = append(
+			checks,
+			resource.TestCheckTypeSetElemAttrPair(
+				"numspot_service_account.test",
+				"roles.*", "data.numspot_roles."+strings.Replace(role, " ", "_", -1),
+				"items.0.id",
+			), // If field is a slice of ids
+		)
 	}
 
 	for _, permission := range data.permissions {
-		checks = append(checks, resource.TestCheckTypeSetElemAttr("numspot_service_account.test", "global_permissions.*", permission))
+		name := strings.Split(permission, ".")
+		serviceName := name[0]
+		resourceName := name[1]
+		actionName := name[2]
+		permName := generatePermissionName(serviceName, resourceName, actionName)
+		checks = append(
+			checks,
+			resource.TestCheckTypeSetElemAttrPair("numspot_service_account.test", "global_permissions.*", "data.numspot_permissions."+permName, "items.0.id"), // If field is a slice of ids
+		)
 	}
 
 	return checks
@@ -58,23 +74,22 @@ func TestAccServiceAccountResource(t *testing.T) {
 	name := "My Service Account"
 	nameUpdated := "My New Service Account"
 
-	// TODO : use permissions/roles datasource instead of hardcoded UUID
 	permissions := []string{
-		"0288e52e-3853-49d0-b1d1-2daef11be8ab",
-		"33fe3c63-4a3b-4e46-a28d-c24d7d2d64de",
+		"postgresql.backup.delete",
+		"postgresql.backup.get",
 	}
 	permissionsUpdated_1 := permissions[:len(permissions)-1]
 	permissionsUpdated_2 := []string{}
 
 	roles := []string{
-		"6f275ef2-6651-4150-86e7-9e6a51fa1f56",
-		"92061163-c643-481f-96e2-37788864fd78",
+		"Postgres Admin",
+		"Postgres Viewer",
 	}
 	rolesUpdated_1 := roles[:len(roles)-1]
 	rolesUpdated_2 := []string{}
 	rolesUpdated_3 := []string{
-		"31b75fdd-319d-4517-b543-80e18b88a410",
-		"708696a9-cb19-4d57-861e-ba5212d6b933",
+		"OCP Viewer",
+		"OCP Admin",
 	}
 
 	// resource fields that cannot be updated in-place (requires replace)
@@ -152,7 +167,7 @@ func TestAccServiceAccountResource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{ // Create testing
-				Config: testServiceAccountConfig(basePlanValues),
+				Config: config(t, basePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					createChecks,
 					getDependencyChecksServiceAccount(provider.BASE_SUFFIX),
@@ -163,11 +178,11 @@ func TestAccServiceAccountResource(t *testing.T) {
 				ResourceName:            "numspot_service_account.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"id"},
+				ImportStateVerifyIgnore: []string{"secret"},
 			},
 			// Update testing Without Replace (if needed)
 			{
-				Config: testServiceAccountConfig(updatePlanValues_1),
+				Config: config(t, updatePlanValues_1),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					updateChecks_1,
 					getDependencyChecksServiceAccount(provider.BASE_SUFFIX),
@@ -175,7 +190,7 @@ func TestAccServiceAccountResource(t *testing.T) {
 			},
 			// Update testing Without Replace (if needed)
 			{
-				Config: testServiceAccountConfig(updatePlanValues_2),
+				Config: config(t, updatePlanValues_2),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					updateChecks_2,
 					getDependencyChecksServiceAccount(provider.BASE_SUFFIX),
@@ -183,7 +198,7 @@ func TestAccServiceAccountResource(t *testing.T) {
 			},
 			// Update testing Without Replace (if needed)
 			{
-				Config: testServiceAccountConfig(updatePlanValues_3),
+				Config: config(t, updatePlanValues_3),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					updateChecks_3,
 					getDependencyChecksServiceAccount(provider.BASE_SUFFIX),
@@ -193,16 +208,83 @@ func TestAccServiceAccountResource(t *testing.T) {
 	})
 }
 
-func testServiceAccountConfig(data StepDataServiceAccount) string {
-	permissions := provider.ListToStringList(data.permissions)
-	roles := provider.ListToStringList(data.roles)
+func testServiceAccountConfig(data StepDataServiceAccount) (string, error) {
+	permissionsDataSource, permissionsIDs, err := initPermissions(data.permissions)
+	if err != nil {
+		return "", err
+	}
+	rolesDataSource, rolesIDs, err := initRoles(data.roles)
+	if err != nil {
+		return "", err
+	}
 
-	return fmt.Sprintf(`
+	conf := fmt.Sprintf(`
 resource "numspot_service_account" "test" {
   space_id           = %[1]q
   name               = %[2]q
-  global_permissions = %[3]s
-  roles              = %[4]s
+  global_permissions = [%[3]s]
+  roles              = [%[4]s]
+}
+`, spaceID, data.name, strings.Join(permissionsIDs, ","), strings.Join(rolesIDs, ","),
+	)
+	conf += permissionsDataSource + "\n" + rolesDataSource
+	return conf, nil
+}
 
-}`, spaceID, data.name, permissions, roles)
+func initPermissions(permissions []string) (string, []string, error) {
+	permissionsIDs := make([]string, len(permissions))
+	var permissionDataSource string
+
+	for idx, permissionName := range permissions {
+		splitPermissionName := strings.Split(permissionName, ".")
+		if len(splitPermissionName) != 3 {
+			return "", nil, fmt.Errorf("permission name: %s is not valid", permissionName)
+		}
+
+		permissionService := splitPermissionName[0]
+		permissionResource := splitPermissionName[1]
+		permissionAction := splitPermissionName[2]
+
+		datasourceName := generatePermissionName(permissionService, permissionResource, permissionAction)
+		permissionsIDs[idx] = fmt.Sprintf("data.numspot_permissions.%s.items.0.id", datasourceName)
+
+		permissionDataSource += fmt.Sprintf(`data "numspot_permissions" %[1]q {
+  space_id = %[2]q
+  action   = %[3]q
+  service  = %[4]q
+  resource = %[5]q
+}
+`, datasourceName, spaceID, permissionAction, permissionService, permissionResource)
+	}
+
+	return permissionDataSource, permissionsIDs, nil
+}
+
+func initRoles(roles []string) (string, []string, error) {
+	rolesIDs := make([]string, len(roles))
+	var rolesDataSource string
+	for idx, roleName := range roles {
+		roleSerialized := strings.Replace(roleName, " ", "_", -1)
+		rolesIDs[idx] = fmt.Sprintf("data.numspot_roles.%s.items.0.id", roleSerialized)
+		rolesDataSource += fmt.Sprintf(`
+data "numspot_roles" %[1]q {
+  space_id = %[2]q
+  name     = %[3]q
+}
+`, roleSerialized, spaceID, roleName)
+	}
+
+	return rolesDataSource, rolesIDs, nil
+}
+
+func generatePermissionName(service, resource, action string) string {
+	return fmt.Sprintf("perm_%[1]s_%[2]s_%[3]s", service, resource, action)
+}
+
+func config(t *testing.T, param StepDataServiceAccount) string {
+	c, err := testServiceAccountConfig(param)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return c
 }
