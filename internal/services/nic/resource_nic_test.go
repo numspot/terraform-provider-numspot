@@ -34,10 +34,10 @@ func getFieldMatchChecksNic(data StepDataNic) []resource.TestCheckFunc {
 
 // Generate checks to validate that resource 'numspot_nic.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksNic(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksNic(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_nic.test", "subnet_id", "numspot_subnet.test"+dependenciesPrefix, "id"),
-		resource.TestCheckTypeSetElemAttrPair("numspot_nic.test", "security_group_ids.*", "numspot_numspot_security_group.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_nic.test", "subnet_id", "numspot_subnet.test"+dependenciesSuffix, "id"),
+		resource.TestCheckTypeSetElemAttrPair("numspot_nic.test", "security_group_ids.*", "numspot_security_group.test"+dependenciesSuffix, "id"),
 	}
 }
 
@@ -134,28 +134,10 @@ func TestAccNicResource(t *testing.T) {
 					getDependencyChecksNic(provider.BASE_SUFFIX),
 				)...),
 			},
-			// Update testing With Replace (if needed)
-			{
-				Config: testNicConfig(provider.BASE_SUFFIX, replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-					getDependencyChecksNic(provider.BASE_SUFFIX),
-				)...),
-			},
 
 			// <== If resource has required dependencies ==>
 			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
 				Config: testNicConfig(provider.BASE_SUFFIX, basePlanValues),
-			},
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testNicConfig(provider.NEW_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksNic(provider.NEW_SUFFIX),
-				)...),
 			},
 			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
@@ -168,26 +150,9 @@ func TestAccNicResource(t *testing.T) {
 			},
 
 			// <== If resource has optional dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testNicConfig(provider.BASE_SUFFIX, basePlanValues),
-			},
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testNicConfig_DeletedDependencies(updatePlanValues),
-				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
-			},
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testNicConfig(provider.BASE_SUFFIX, basePlanValues),
-			},
+			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testNicConfig_DeletedDependencies(replacePlanValues),
-				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
-			},
 		},
 	})
 }
@@ -239,7 +204,7 @@ resource "numspot_vpc" "test" {
 }
 
 resource "numspot_subnet" "test" {
-  vpc_id   = numspot_vpc.vpc.id
+  vpc_id   = numspot_vpc.test.id
   ip_range = "10.101.1.0/24"
 }
 

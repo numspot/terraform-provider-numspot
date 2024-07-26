@@ -14,24 +14,24 @@ import (
 )
 
 type RouteTablesDataSourceModel struct {
-	Items                       []RouteTableModel `tfsdk:"items"`
-	TagKeys                     types.List        `tfsdk:"tag_keys"`
-	TagValues                   types.List        `tfsdk:"tag_values"`
-	Tags                        types.List        `tfsdk:"tags"`
-	Ids                         types.List        `tfsdk:"ids"`
-	RouteVpcPeeringIds          types.List        `tfsdk:"route_vpc_peering_ids"`
-	RouteNatGatewayIds          types.List        `tfsdk:"route_nat_gateway_ids"`
-	RouteVmIds                  types.List        `tfsdk:"route_vm_ids"`
-	RouteCreationMethods        types.List        `tfsdk:"route_creation_methods"`
-	RouteDestinationIpRanges    types.List        `tfsdk:"route_destination_ip_ranges"`
-	RouteDestinationServiceIds  types.List        `tfsdk:"route_destination_service_ids"`
-	RouteGatewayIds             types.List        `tfsdk:"route_gateway_ids"`
-	RouteStates                 types.List        `tfsdk:"route_states"`
-	VpcIds                      types.List        `tfsdk:"vpc_ids"`
-	LinkRouteTableIds           types.List        `tfsdk:"link_route_table_ids"`
-	LinkRouteTableMain          types.Bool        `tfsdk:"link_route_table_main"`
-	LinkRouteTableRouteTableIds types.List        `tfsdk:"link_route_table_route_table_ids"`
-	LinkRouteTableSubnetIds     types.List        `tfsdk:"link_route_table_subnet_ids"`
+	Items                           []RouteTableModelDatasource `tfsdk:"items"`
+	Ids                             types.List                  `tfsdk:"ids"`
+	LinkRouteTableIds               types.List                  `tfsdk:"link_route_table_ids"`
+	LinkRouteTableLinkRouteTableIds types.List                  `tfsdk:"link_route_table_link_route_table_ids"`
+	LinkRouteTableMain              types.Bool                  `tfsdk:"link_route_table_main"`
+	LinkSubnetIds                   types.List                  `tfsdk:"link_subnet_ids"`
+	RouteCreationMethods            types.List                  `tfsdk:"route_creation_methods"`
+	RouteDestinationIpRanges        types.List                  `tfsdk:"route_destination_ip_ranges"`
+	RouteDestinationServiceIds      types.List                  `tfsdk:"route_destination_service_ids"`
+	RouteGatewayIds                 types.List                  `tfsdk:"route_gateway_ids"`
+	RouteNatGatewayIds              types.List                  `tfsdk:"route_nat_gateway_ids"`
+	RouteStates                     types.List                  `tfsdk:"route_states"`
+	RouteVmIds                      types.List                  `tfsdk:"route_vm_ids"`
+	RouteVpcPeeringIds              types.List                  `tfsdk:"route_vpc_peering_ids"`
+	TagKeys                         types.List                  `tfsdk:"tag_keys"`
+	TagValues                       types.List                  `tfsdk:"tag_values"`
+	Tags                            types.List                  `tfsdk:"tags"`
+	VpcIds                          types.List                  `tfsdk:"vpc_ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.

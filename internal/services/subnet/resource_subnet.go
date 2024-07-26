@@ -164,6 +164,18 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 		}
 	}
 
+	if !state.MapPublicIpOnLaunch.Equal(plan.MapPublicIpOnLaunch) {
+		res := utils2.ExecuteRequest(func() (*numspot.UpdateSubnetResponse, error) {
+			return r.provider.GetNumspotClient().UpdateSubnetWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString(),
+				numspot.UpdateSubnet{
+					MapPublicIpOnLaunch: plan.MapPublicIpOnLaunch.ValueBool(),
+				})
+		}, http.StatusOK, &response.Diagnostics)
+		if res == nil {
+			return
+		}
+	}
+
 	res := utils2.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadSubnetsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)

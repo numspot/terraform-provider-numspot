@@ -3,7 +3,6 @@
 package keypair_test
 
 import (
-	b64 "encoding/base64"
 	"fmt"
 	"testing"
 
@@ -16,15 +15,13 @@ import (
 // This struct will store the input data that will be used in your tests (all fields as string)
 type StepDataKeyPair struct {
 	name,
-	publicKey,
-	id string
+	publicKey string
 }
 
 // Generate checks to validate that resource 'numspot_keypair.test' has input data values
 func getFieldMatchChecksKeyPair(data StepDataKeyPair) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
 		resource.TestCheckResourceAttr("numspot_keypair.test", "name", data.name),
-		resource.TestCheckResourceAttr("numspot_keypair.test", "id", data.id),
 		resource.TestCheckResourceAttr("numspot_keypair.test", "public_key", data.publicKey),
 	}
 }
@@ -36,46 +33,27 @@ func TestAccKeyPairResource(t *testing.T) {
 
 	////////////// Define input data that will be used in the test sequence //////////////
 	// resource fields that can be updated in-place	{{not updatable resource fields}}
-	id := "the-id"
-	idUpdated := "the-id-updated"
+	// None
 
 	// resource fields that cannot be updated in-place (requires replace)
 	name := "key-pair-name-terraform"
 	nameUpdated := "key-pair-name-terraform-updated"
-	publicKey := b64.StdEncoding.EncodeToString([]byte("publicKey"))
-	publicKeyUpdated := b64.StdEncoding.EncodeToString([]byte("publicKey-updated"))
+	publicKey := "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEm78d7vfikcOXDdvT0yioYUDm3spxjVws/xnL0J5f0P"
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	////////////// Define plan values and generate associated attribute checks  //////////////
 	// The base plan (used in first create and to reset resource state before some tests)
 	basePlanValues := StepDataKeyPair{
 		name:      name,
-		id:        id,
 		publicKey: publicKey,
 	}
 
 	createChecks := append(
 		getFieldMatchChecksKeyPair(basePlanValues),
 
-		resource.TestCheckResourceAttrWith("numspot_keypair.test", "private_key", func(v string) error {
+		resource.TestCheckResourceAttrWith("numspot_keypair.test", "name", func(v string) error {
 			require.NotEmpty(t, v)
 			resourceId = v
-			return nil
-		}),
-	)
-
-	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
-	updatePlanValues := StepDataKeyPair{
-		name:      name, // Update values for updatable fields
-		id:        idUpdated,
-		publicKey: publicKey,
-	}
-	updateChecks := append(
-		getFieldMatchChecksKeyPair(updatePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_keypair.test", "private_key", func(v string) error {
-			require.NotEmpty(t, v)
-			require.Equal(t, v, resourceId)
 			return nil
 		}),
 	)
@@ -83,13 +61,12 @@ func TestAccKeyPairResource(t *testing.T) {
 	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
 	replacePlanValues := StepDataKeyPair{
 		name:      nameUpdated, // Update values for non-updatable fields
-		id:        id,
-		publicKey: publicKeyUpdated,
+		publicKey: publicKey,
 	}
 	replaceChecks := append(
 		getFieldMatchChecksKeyPair(replacePlanValues),
 
-		resource.TestCheckResourceAttrWith("numspot_keypair.test", "private_key", func(v string) error {
+		resource.TestCheckResourceAttrWith("numspot_keypair.test", "name", func(v string) error {
 			require.NotEmpty(t, v)
 			require.NotEqual(t, v, resourceId)
 			return nil
@@ -109,12 +86,7 @@ func TestAccKeyPairResource(t *testing.T) {
 				ResourceName:            "numspot_keypair.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"private_key"},
-			},
-			// Update testing Without Replace
-			{
-				Config: testKeyPairConfig(updatePlanValues),
-				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
+				ImportStateVerifyIgnore: []string{""},
 			},
 			// Update testing With Replace
 			{
@@ -128,9 +100,8 @@ func TestAccKeyPairResource(t *testing.T) {
 func testKeyPairConfig(data StepDataKeyPair) string {
 	return fmt.Sprintf(`
 resource "numspot_keypair" "test" {
-  id         = %[1]q
-  name       = %[2]q
-  public_key = %[3]q
-}`, data.id, data.name, data.publicKey,
+  name       = %[1]q
+  public_key = %[2]q
+}`, data.name, data.publicKey,
 	)
 }

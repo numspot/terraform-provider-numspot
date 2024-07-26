@@ -4,17 +4,16 @@ package securitygroup
 
 import (
 	"context"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 )
 
 func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"items": schema.ListNestedAttribute{
-				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"description": schema.StringAttribute{
@@ -23,41 +22,46 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The description of the security group.",
 						},
 						"id": schema.StringAttribute{
-							Required:            true,
-							Description:         "ID for ReadSecurityGroups",
-							MarkdownDescription: "ID for ReadSecurityGroups",
+							Computed:            true,
+							Description:         "The ID of the security group.",
+							MarkdownDescription: "The ID of the security group.",
 						},
 						"inbound_rules": schema.SetNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"from_port_range": schema.Int64Attribute{
 										Computed:            true,
+										Optional:            true,
 										Description:         "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 										MarkdownDescription: "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 									},
 									"ip_protocol": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
-										MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
+										Optional:            true,
+										Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
+										MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 									},
 									"ip_ranges": schema.ListAttribute{
 										ElementType:         types.StringType,
 										Computed:            true,
+										Optional:            true,
 										Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 										MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 									},
 									"security_groups_members": schema.ListNestedAttribute{
 										NestedObject: schema.NestedAttributeObject{
 											Attributes: map[string]schema.Attribute{
-												"account_id": schema.StringAttribute{
-													Computed:            true,
-													Description:         "The account ID that owns the source or destination security group.",
-													MarkdownDescription: "The account ID that owns the source or destination security group.",
-												},
 												"security_group_id": schema.StringAttribute{
 													Computed:            true,
+													Optional:            true,
 													Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
 													MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
+												},
+												"security_group_name": schema.StringAttribute{
+													Computed:            true,
+													Optional:            true,
+													Description:         "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
+													MarkdownDescription: "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
 												},
 											},
 											CustomType: SecurityGroupsMembersType{
@@ -67,17 +71,20 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 											},
 										},
 										Computed:            true,
+										Optional:            true,
 										Description:         "Information about one or more source or destination security groups.",
 										MarkdownDescription: "Information about one or more source or destination security groups.",
 									},
 									"service_ids": schema.ListAttribute{
 										ElementType:         types.StringType,
 										Computed:            true,
-										Description:         "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
-										MarkdownDescription: "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
+										Optional:            true,
+										Description:         "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.",
+										MarkdownDescription: "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.",
 									},
 									"to_port_range": schema.Int64Attribute{
 										Computed:            true,
+										Optional:            true,
 										Description:         "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 										MarkdownDescription: "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 									},
@@ -89,6 +96,7 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 							Computed:            true,
+							Optional:            true,
 							Description:         "The inbound rules associated with the security group.",
 							MarkdownDescription: "The inbound rules associated with the security group.",
 						},
@@ -102,32 +110,37 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 								Attributes: map[string]schema.Attribute{
 									"from_port_range": schema.Int64Attribute{
 										Computed:            true,
+										Optional:            true,
 										Description:         "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 										MarkdownDescription: "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 									},
 									"ip_protocol": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
-										MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
+										Optional:            true,
+										Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
+										MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 									},
 									"ip_ranges": schema.ListAttribute{
 										ElementType:         types.StringType,
 										Computed:            true,
+										Optional:            true,
 										Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 										MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 									},
 									"security_groups_members": schema.ListNestedAttribute{
 										NestedObject: schema.NestedAttributeObject{
 											Attributes: map[string]schema.Attribute{
-												"account_id": schema.StringAttribute{
-													Computed:            true,
-													Description:         "The account ID that owns the source or destination security group.",
-													MarkdownDescription: "The account ID that owns the source or destination security group.",
-												},
 												"security_group_id": schema.StringAttribute{
 													Computed:            true,
+													Optional:            true,
 													Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
 													MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
+												},
+												"security_group_name": schema.StringAttribute{
+													Computed:            true,
+													Optional:            true,
+													Description:         "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
+													MarkdownDescription: "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
 												},
 											},
 											CustomType: SecurityGroupsMembersType{
@@ -137,17 +150,20 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 											},
 										},
 										Computed:            true,
+										Optional:            true,
 										Description:         "Information about one or more source or destination security groups.",
 										MarkdownDescription: "Information about one or more source or destination security groups.",
 									},
 									"service_ids": schema.ListAttribute{
 										ElementType:         types.StringType,
 										Computed:            true,
-										Description:         "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
-										MarkdownDescription: "One or more service IDs to allow traffic from a Net to access the corresponding OUTSCALE services. For more information, see [ReadNetAccessPointServices](#readnetaccesspointservices).",
+										Optional:            true,
+										Description:         "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.",
+										MarkdownDescription: "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.",
 									},
 									"to_port_range": schema.Int64Attribute{
 										Computed:            true,
+										Optional:            true,
 										Description:         "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 										MarkdownDescription: "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 									},
@@ -159,131 +175,154 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 							Computed:            true,
+							Optional:            true,
 							Description:         "The outbound rules associated with the security group.",
 							MarkdownDescription: "The outbound rules associated with the security group.",
 						},
 						"tags": tags.TagsSchema(ctx),
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the Net for the security group.",
-							MarkdownDescription: "The ID of the Net for the security group.",
+							Description:         "The ID of the Vpc for the security group.",
+							MarkdownDescription: "The ID of the Vpc for the security group.",
 						},
 					},
 				},
+				Computed:            true,
+				Description:         "Information about one or more security groups.",
+				MarkdownDescription: "Information about one or more security groups.",
 			},
 			"descriptions": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The description of the security group.",
-				MarkdownDescription: "The description of the security group.",
-			},
-			"inbound_rules_account_ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The account ID that owns the source or destination security group.",
-				MarkdownDescription: "The account ID that owns the source or destination security group.",
-			},
-			"inbound_rules_from_port_ranges": schema.ListAttribute{
-				ElementType:         types.Int64Type,
-				Optional:            true,
-				Description:         "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
-				MarkdownDescription: "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
-			},
-			"inbound_rules_rule_protocols": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
-				MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
-			},
-			"inbound_rules_ip_ranges": schema.ListAttribute{
-				ElementType:         types.StringType,
 				Computed:            true,
-				Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
-				MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
+				Description:         "The descriptions of the security groups.",
+				MarkdownDescription: "The descriptions of the security groups.",
 			},
-			"inbound_rules_security_group_ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
-				MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
-			},
-			"inbound_rules_to_port_ranges": schema.ListAttribute{
+			"inbound_rule_from_port_ranges": schema.ListAttribute{
 				ElementType:         types.Int64Type,
 				Optional:            true,
-				Description:         "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
-				MarkdownDescription: "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
-			},
-			"ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The ID of the security group.",
-				MarkdownDescription: "The ID of the security group.",
-			},
-			"names": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The name of the security group.",
-				MarkdownDescription: "The name of the security group.",
-			},
-			"outbound_rules_from_port_ranges": schema.ListAttribute{
-				ElementType:         types.Int64Type,
-				Optional:            true,
-				Description:         "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
-				MarkdownDescription: "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
-			},
-			"outbound_rules_rule_protocols": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
-				MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Net, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
-			},
-			"outbound_rules_ip_ranges": schema.ListAttribute{
-				ElementType:         types.StringType,
 				Computed:            true,
-				Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
-				MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
+				Description:         "The beginnings of the port ranges for the TCP and UDP protocols, or the ICMP type numbers.",
+				MarkdownDescription: "The beginnings of the port ranges for the TCP and UDP protocols, or the ICMP type numbers.",
 			},
-			"outbound_rules_account_ids": schema.ListAttribute{
+			"inbound_rule_ip_ranges": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The account ID that owns the source or destination security group.",
-				MarkdownDescription: "The account ID that owns the source or destination security group.",
+				Computed:            true,
+				Description:         "The IP ranges that have been granted permissions, in CIDR notation (for example, `10.0.0.0/24`).",
+				MarkdownDescription: "The IP ranges that have been granted permissions, in CIDR notation (for example, `10.0.0.0/24`).",
 			},
-			"outbound_rules_security_group_ids": schema.ListAttribute{
+			"inbound_rule_protocols": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
-				MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
+				Computed:            true,
+				Description:         "The IP protocols for the permissions (`tcp` \\| `udp` \\| `icmp`, or a protocol number, or `-1` for all protocols).",
+				MarkdownDescription: "The IP protocols for the permissions (`tcp` \\| `udp` \\| `icmp`, or a protocol number, or `-1` for all protocols).",
 			},
-			"outbound_rules_to_port_ranges": schema.ListAttribute{
+			"inbound_rule_security_group_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the security groups that have been granted permissions.",
+				MarkdownDescription: "The IDs of the security groups that have been granted permissions.",
+			},
+			"inbound_rule_security_group_names": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The names of the security groups that have been granted permissions.",
+				MarkdownDescription: "The names of the security groups that have been granted permissions.",
+			},
+			"inbound_rule_to_port_ranges": schema.ListAttribute{
 				ElementType:         types.Int64Type,
 				Optional:            true,
-				Description:         "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
-				MarkdownDescription: "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
+				Computed:            true,
+				Description:         "The ends of the port ranges for the TCP and UDP protocols, or the ICMP code numbers.",
+				MarkdownDescription: "The ends of the port ranges for the TCP and UDP protocols, or the ICMP code numbers.",
 			},
-			"vpc_ids": schema.ListAttribute{
+			"outbound_rule_from_port_ranges": schema.ListAttribute{
+				ElementType:         types.Int64Type,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The beginnings of the port ranges for the TCP and UDP protocols, or the ICMP type numbers.",
+				MarkdownDescription: "The beginnings of the port ranges for the TCP and UDP protocols, or the ICMP type numbers.",
+			},
+			"outbound_rule_ip_ranges": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the Net for the security group.",
-				MarkdownDescription: "The ID of the Net for the security group.",
+				Computed:            true,
+				Description:         "The IP ranges that have been granted permissions, in CIDR notation (for example, `10.0.0.0/24`).",
+				MarkdownDescription: "The IP ranges that have been granted permissions, in CIDR notation (for example, `10.0.0.0/24`).",
+			},
+			"outbound_rule_protocols": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IP protocols for the permissions (`tcp` \\| `udp` \\| `icmp`, or a protocol number, or `-1` for all protocols).",
+				MarkdownDescription: "The IP protocols for the permissions (`tcp` \\| `udp` \\| `icmp`, or a protocol number, or `-1` for all protocols).",
+			},
+			"outbound_rule_security_group_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the security groups that have been granted permissions.",
+				MarkdownDescription: "The IDs of the security groups that have been granted permissions.",
+			},
+			"outbound_rule_security_group_names": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The names of the security groups that have been granted permissions.",
+				MarkdownDescription: "The names of the security groups that have been granted permissions.",
+			},
+			"outbound_rule_to_port_ranges": schema.ListAttribute{
+				ElementType:         types.Int64Type,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The ends of the port ranges for the TCP and UDP protocols, or the ICMP code numbers.",
+				MarkdownDescription: "The ends of the port ranges for the TCP and UDP protocols, or the ICMP code numbers.",
+			},
+			"security_group_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the security groups.",
+				MarkdownDescription: "The IDs of the security groups.",
+			},
+			"security_group_names": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The names of the security groups.",
+				MarkdownDescription: "The names of the security groups.",
 			},
 			"tag_keys": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The keys of the tags associated with the Security Groups.",
-				MarkdownDescription: "The keys of the tags associated with the Security Groups.",
+				Computed:            true,
+				Description:         "The keys of the tags associated with the security groups.",
+				MarkdownDescription: "The keys of the tags associated with the security groups.",
 			},
 			"tag_values": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The values of the tags associated with the Security Groups.",
-				MarkdownDescription: "The values of the tags associated with the Security Groups.",
+				Computed:            true,
+				Description:         "The values of the tags associated with the security groups.",
+				MarkdownDescription: "The values of the tags associated with the security groups.",
 			},
 			"tags": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         `The key/value combination of the tags associated with the Security Groups, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.`,
-				MarkdownDescription: `The key/value combination of the tags associated with the Security Groups, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.`,
+				Computed:            true,
+				Description:         "The key/value combination of the tags associated with the security groups, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				MarkdownDescription: "The key/value combination of the tags associated with the security groups, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+			},
+			"vpc_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the Vpcs specified when the security groups were created.",
+				MarkdownDescription: "The IDs of the Vpcs specified when the security groups were created.",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",

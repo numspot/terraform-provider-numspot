@@ -4,6 +4,7 @@ package subnet
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -21,7 +22,7 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The name of the Subregion in which you want to create the Subnet.",
 				MarkdownDescription: "The name of the Subregion in which you want to create the Subnet.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
 			},
 			"available_ips_count": schema.Int64Attribute{
@@ -36,8 +37,8 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"ip_range": schema.StringAttribute{
 				Required:            true,
-				Description:         "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About Nets](https://docs.outscale.com/en/userguide/About-Nets.html).",
-				MarkdownDescription: "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Net one if you create only a single Subnet in this Net, or a subset of the Net one. In case of several Subnets in a Net, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs). For more information, see [About Nets](https://docs.outscale.com/en/userguide/About-Nets.html).",
+				Description:         "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Vpc one if you create only a single Subnet in this Net, or a subset of the Vpc one. In case of several Subnets in a Vpc, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs).",
+				MarkdownDescription: "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Vpc one if you create only a single Subnet in this Net, or a subset of the Vpc one. In case of several Subnets in a Vpc, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs).",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -55,8 +56,8 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"vpc_id": schema.StringAttribute{
 				Required:            true,
-				Description:         "The ID of the Net for which you want to create a Subnet.",
-				MarkdownDescription: "The ID of the Net for which you want to create a Subnet.",
+				Description:         "The ID of the Vpc for which you want to create a Subnet.",
+				MarkdownDescription: "The ID of the Vpc for which you want to create a Subnet.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -74,6 +75,6 @@ type SubnetModel struct {
 	IpRange              types.String `tfsdk:"ip_range"`
 	MapPublicIpOnLaunch  types.Bool   `tfsdk:"map_public_ip_on_launch"`
 	State                types.String `tfsdk:"state"`
-	VpcId                types.String `tfsdk:"vpc_id"`
 	Tags                 types.List   `tfsdk:"tags"`
+	VpcId                types.String `tfsdk:"vpc_id"`
 }

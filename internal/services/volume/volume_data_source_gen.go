@@ -4,7 +4,9 @@ package volume
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
@@ -12,8 +14,28 @@ import (
 func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"availability_zone_names": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The names of the Subregions in which the volumes were created.",
+				MarkdownDescription: "The names of the Subregions in which the volumes were created.",
+			},
+			"creation_dates": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`).",
+				MarkdownDescription: "The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`).",
+			},
+			"ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the volumes.",
+				MarkdownDescription: "The IDs of the volumes.",
+			},
 			"items": schema.ListNestedAttribute{
-				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"availability_zone_name": schema.StringAttribute{
@@ -27,9 +49,9 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The date and time of creation of the volume.",
 						},
 						"id": schema.StringAttribute{
-							Required:            true,
-							Description:         "ID for ReadVolumes",
-							MarkdownDescription: "ID for ReadVolumes",
+							Computed:            true,
+							Description:         "The ID of the volume.",
+							MarkdownDescription: "The ID of the volume.",
 						},
 						"iops": schema.Int64Attribute{
 							Computed:            true,
@@ -90,6 +112,7 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 							MarkdownDescription: "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 						},
+						"tags": tags.TagsSchema(ctx),
 						"type": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The type of the volume (`standard` \\| `gp2` \\| `io1`).",
@@ -97,77 +120,92 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-			},
-			"creation_dates": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The dates and times of creation of the volumes.",
-				MarkdownDescription: "The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, 2020-06-30T00:00:00.000Z).",
+				Computed:            true,
+				Description:         "Information about one or more volumes.",
+				MarkdownDescription: "Information about one or more volumes.",
 			},
 			"link_volume_delete_on_vm_deletion": schema.BoolAttribute{
 				Optional:            true,
+				Computed:            true,
 				Description:         "Whether the volumes are deleted or not when terminating the VMs.",
 				MarkdownDescription: "Whether the volumes are deleted or not when terminating the VMs.",
 			},
 			"link_volume_device_names": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The VM device names.",
 				MarkdownDescription: "The VM device names.",
 			},
 			"link_volume_link_dates": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The dates and times of creation of the volumes.",
-				MarkdownDescription: "The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, 2020-06-30T00:00:00.000Z).",
+				Computed:            true,
+				Description:         "The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`).",
+				MarkdownDescription: "The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`).",
 			},
 			"link_volume_link_states": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The attachment states of the volumes (attaching | detaching | attached | detached).",
-				MarkdownDescription: "The attachment states of the volumes (attaching | detaching | attached | detached).",
+				Computed:            true,
+				Description:         "The attachment states of the volumes (`attaching` \\| `detaching` \\| `attached` \\| `detached`).",
+				MarkdownDescription: "The attachment states of the volumes (`attaching` \\| `detaching` \\| `attached` \\| `detached`).",
 			},
 			"link_volume_vm_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "One or more IDs of VMs.",
 				MarkdownDescription: "One or more IDs of VMs.",
 			},
 			"snapshot_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The snapshots from which the volumes were created.",
 				MarkdownDescription: "The snapshots from which the volumes were created.",
+			},
+			"tag_keys": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The keys of the tags associated with the volumes.",
+				MarkdownDescription: "The keys of the tags associated with the volumes.",
+			},
+			"tag_values": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The values of the tags associated with the volumes.",
+				MarkdownDescription: "The values of the tags associated with the volumes.",
+			},
+			"tags": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The key/value combination of the tags associated with the volumes, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				MarkdownDescription: "The key/value combination of the tags associated with the volumes, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
 			},
 			"volume_sizes": schema.ListAttribute{
 				ElementType:         types.Int64Type,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The sizes of the volumes, in gibibytes (GiB).",
 				MarkdownDescription: "The sizes of the volumes, in gibibytes (GiB).",
 			},
 			"volume_states": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The states of the volumes (creating | available | in-use | updating | deleting | error).",
-				MarkdownDescription: "The states of the volumes (creating | available | in-use | updating | deleting | error).",
+				Computed:            true,
+				Description:         "The states of the volumes (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
+				MarkdownDescription: "The states of the volumes (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 			},
 			"volume_types": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The types of the volumes (standard | gp2 | io1).",
-				MarkdownDescription: "The types of the volumes (standard | gp2 | io1).",
-			},
-			"availability_zone_names": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The names of the Subregions in which the volumes were created.",
-				MarkdownDescription: "The names of the Subregions in which the volumes were created.",
-			},
-			"ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The IDs of the volumes.",
-				MarkdownDescription: "The IDs of the volumes.",
+				Computed:            true,
+				Description:         "The types of the volumes (`standard` \\| `gp2` \\| `io1`).",
+				MarkdownDescription: "The types of the volumes (`standard` \\| `gp2` \\| `io1`).",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",

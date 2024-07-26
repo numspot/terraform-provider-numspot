@@ -149,18 +149,27 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Di
 }
 
 func NicFromTfToCreateRequest(ctx context.Context, tf *NicModel) numspot.CreateNicJSONRequestBody {
-	privateIps := utils.TfListToGenericList(func(a PrivateIpsValue) numspot.PrivateIpLight {
-		return numspot.PrivateIpLight{
-			IsPrimary: a.IsPrimary.ValueBoolPointer(),
-			PrivateIp: a.PrivateIp.ValueStringPointer(),
-		}
-	}, ctx, tf.PrivateIps)
-	securityGroupIds := utils.TfStringListToStringList(ctx, tf.SecurityGroupIds)
+	var privateIpsPtr *[]numspot.PrivateIpLight
+	var securityGroupIdsPtr *[]string
 
+	if !(tf.PrivateIps.IsNull() || tf.PrivateIps.IsUnknown()) {
+		privateIps := utils.TfListToGenericList(func(a PrivateIpsValue) numspot.PrivateIpLight {
+			return numspot.PrivateIpLight{
+				IsPrimary: a.IsPrimary.ValueBoolPointer(),
+				PrivateIp: a.PrivateIp.ValueStringPointer(),
+			}
+		}, ctx, tf.PrivateIps)
+		privateIpsPtr = &privateIps
+	}
+
+	if !(tf.SecurityGroupIds.IsNull() || tf.SecurityGroupIds.IsUnknown()) {
+		securityGroupIds := utils.TfStringListToStringList(ctx, tf.SecurityGroupIds)
+		securityGroupIdsPtr = &securityGroupIds
+	}
 	return numspot.CreateNicJSONRequestBody{
 		Description:      tf.Description.ValueStringPointer(),
-		PrivateIps:       &privateIps,
-		SecurityGroupIds: &securityGroupIds,
+		PrivateIps:       privateIpsPtr,
+		SecurityGroupIds: securityGroupIdsPtr,
 		SubnetId:         tf.SubnetId.ValueString(),
 	}
 }
@@ -169,26 +178,26 @@ func NicsFromTfToAPIReadParams(ctx context.Context, tf NicsDataSourceModel) nums
 	return numspot.ReadNicsParams{
 		Descriptions: utils.TfStringListToStringPtrList(ctx, tf.Descriptions),
 
-		IsSourceDestCheck:               utils.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
-		LinkNicDeleteOnVmDeletion:       utils.FromTfBoolToBoolPtr(tf.LinkNicDeleteOnVMDeletion),
+		IsSourceDestCheck:               utils.FromTfBoolToBoolPtr(tf.IsSourceDestCheck),
+		LinkNicDeleteOnVmDeletion:       utils.FromTfBoolToBoolPtr(tf.LinkNicDeleteOnVmDeletion),
 		LinkNicDeviceNumbers:            utils.TFInt64ListToIntListPointer(ctx, tf.LinkNicDeviceNumbers),
-		LinkNicLinkNicIds:               utils.TfStringListToStringPtrList(ctx, tf.LinkNicIds),
+		LinkNicLinkNicIds:               utils.TfStringListToStringPtrList(ctx, tf.LinkNicLinkNicIds),
 		LinkNicStates:                   utils.TfStringListToStringPtrList(ctx, tf.LinkNicStates),
-		LinkNicVmIds:                    utils.TfStringListToStringPtrList(ctx, tf.LinkNicVMIds),
+		LinkNicVmIds:                    utils.TfStringListToStringPtrList(ctx, tf.LinkNicVmIds),
 		MacAddresses:                    utils.TfStringListToStringPtrList(ctx, tf.MacAddresses),
 		LinkPublicIpLinkPublicIpIds:     utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpLinkPublicIpIds),
 		LinkPublicIpPublicIpIds:         utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpPublicIpIds),
 		LinkPublicIpPublicIps:           utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpPublicIps),
 		PrivateDnsNames:                 utils.TfStringListToStringPtrList(ctx, tf.PrivateDnsNames),
-		PrivateIpsPrimaryIp:             utils.FromTfBoolToBoolPtr(tf.PrivateIpIsPrimary),
-		PrivateIpsLinkPublicIpPublicIps: utils.TfStringListToStringPtrList(ctx, tf.PrivateIpLinkPublicIpPublicIps),
-		PrivateIpsPrivateIps:            utils.TfStringListToStringPtrList(ctx, tf.PrivateIpPrivateIps),
+		PrivateIpsPrimaryIp:             utils.FromTfBoolToBoolPtr(tf.PrivateIpsPrimaryIp),
+		PrivateIpsLinkPublicIpPublicIps: utils.TfStringListToStringPtrList(ctx, tf.PrivateIpsLinkPublicIpPublicIps),
+		PrivateIpsPrivateIps:            utils.TfStringListToStringPtrList(ctx, tf.PrivateIpsPrivateIps),
 		SecurityGroupIds:                utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
 		SecurityGroupNames:              utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupNames),
 		States:                          utils.TfStringListToStringPtrList(ctx, tf.States),
 		SubnetIds:                       utils.TfStringListToStringPtrList(ctx, tf.SubnetIds),
 		VpcIds:                          utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
-		Ids:                             utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		Ids:                             utils.TfStringListToStringPtrList(ctx, tf.Ids),
 		AvailabilityZoneNames:           utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames),
 		Tags:                            utils.TfStringListToStringPtrList(ctx, tf.Tags),
 		TagKeys:                         utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
@@ -237,7 +246,7 @@ func securityGroupsFromHTTP(ctx context.Context, http numspot.SecurityGroupLight
 		})
 }
 
-func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Diagnostics) {
+func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic) (*NicModelDatasource, diag.Diagnostics) {
 	if http == nil {
 		return nil, nil
 	}
@@ -293,7 +302,7 @@ func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic) (*NicMod
 		return nil, diags
 	}
 
-	return &NicModel{
+	return &NicModelDatasource{
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		Description:          types.StringPointerValue(http.Description),
 		Id:                   types.StringPointerValue(http.Id),

@@ -37,16 +37,16 @@ func getFieldMatchChecksImage(data StepDataImage) []resource.TestCheckFunc {
 
 // Generate checks to validate that resource 'numspot_image.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksImage_FromVm(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksImage_FromVm(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_image.test", "vm_id", "numspot_vm.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_image.test", "vm_id", "numspot_vm.test"+dependenciesSuffix, "id"),
 	}
 }
 
-func getDependencyChecksImage_FromSnapshot(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksImage_FromSnapshot(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
 		provider.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test", "block_device_mappings.*", map[string]string{
-			"bsu.snapshot_id": fmt.Sprintf(provider.PAIR_PREFIX+"numspot_snapshot.test%[1]s.id", dependenciesPrefix),
+			"bsu.snapshot_id": fmt.Sprintf(provider.PAIR_PREFIX+"numspot_snapshot.test%[1]s.id", dependenciesSuffix),
 		}),
 	}
 }
@@ -225,9 +225,20 @@ resource "numspot_image" "test" {
 
 func testImageConfig_FromVm(subresourceSuffix string, data StepDataImage) string {
 	return fmt.Sprintf(`
+
+
+resource "numspot_vpc" "vpc" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "subnet" {
+  vpc_id   = numspot_vpc.vpc.id
+  ip_range = "10.101.1.0/24"
+}
 resource "numspot_vm" "test%[1]s" {
-  image_id = %[3]q
-  type     = "ns-cus6-2c4r"
+  image_id  = %[3]q
+  type      = "ns-cus6-2c4r"
+  subnet_id = numspot_subnet.subnet.id
 }
 resource "numspot_image" "test" {
   name  = %[2]q

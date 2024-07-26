@@ -91,12 +91,6 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the snapshot from which you want to create the volume.",
 				MarkdownDescription: "The ID of the snapshot from which you want to create the volume.",
 			},
-			"space_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "space identifier",
-				MarkdownDescription: "space identifier",
-			},
 			"state": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
@@ -106,8 +100,8 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 			"type": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />\n For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).",
-				MarkdownDescription: "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />\n For more information about volume types, see [About Volumes > Volume Types and IOPS](https://docs.outscale.com/en/userguide/About-Volumes.html#_volume_types_and_iops).",
+				Description:         "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />",
+				MarkdownDescription: "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
@@ -122,7 +116,6 @@ type VolumeModel struct {
 	LinkedVolumes        types.List   `tfsdk:"linked_volumes"`
 	Size                 types.Int64  `tfsdk:"size"`
 	SnapshotId           types.String `tfsdk:"snapshot_id"`
-	SpaceId              types.String `tfsdk:"space_id"`
 	State                types.String `tfsdk:"state"`
 	Tags                 types.List   `tfsdk:"tags"`
 	Type                 types.String `tfsdk:"type"`

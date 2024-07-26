@@ -32,12 +32,12 @@ func getFieldMatchChecksRouteTable(data StepDataRouteTable) []resource.TestCheck
 
 // Generate checks to validate that resource 'numspot_route_table.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksRouteTable(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksRouteTable(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test"+dependenciesPrefix, "id"),
-		resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test"+dependenciesSuffix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test"+dependenciesSuffix, "id"),
 		provider.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test", "routes.*", map[string]string{ // If field is a list of objects (containing id and/or other fields)
-			"gateway_id": fmt.Sprintf(provider.PAIR_PREFIX+"numspot_internet_gateway.test%[1]s.id", dependenciesPrefix),
+			"gateway_id": fmt.Sprintf(provider.PAIR_PREFIX+"numspot_internet_gateway.test%[1]s.id", dependenciesSuffix),
 		}),
 	}
 }

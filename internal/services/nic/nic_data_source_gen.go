@@ -12,8 +12,34 @@ import (
 func NicDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"availability_zone_names": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The Subregions where the NICs are located.",
+				MarkdownDescription: "The Subregions where the NICs are located.",
+			},
+			"descriptions": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The descriptions of the NICs.",
+				MarkdownDescription: "The descriptions of the NICs.",
+			},
+			"ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the NICs.",
+				MarkdownDescription: "The IDs of the NICs.",
+			},
+			"is_source_dest_check": schema.BoolAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "Whether the source/destination checking is enabled (true) or disabled (false).",
+				MarkdownDescription: "Whether the source/destination checking is enabled (true) or disabled (false).",
+			},
 			"items": schema.ListNestedAttribute{
-				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"availability_zone_name": schema.StringAttribute{
@@ -22,10 +48,9 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The Subregion in which the NIC is located.",
 						},
 						"description": schema.StringAttribute{
-							Optional:            true,
 							Computed:            true,
-							Description:         "A description for the NIC.",
-							MarkdownDescription: "A description for the NIC.",
+							Description:         "The description of the NIC.",
+							MarkdownDescription: "The description of the NIC.",
 						},
 						"id": schema.StringAttribute{
 							Computed:            true,
@@ -34,8 +59,8 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"is_source_dest_checked": schema.BoolAttribute{
 							Computed:            true,
-							Description:         "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
-							MarkdownDescription: "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
+							Description:         "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.",
+							MarkdownDescription: "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.",
 						},
 						"link_nic": schema.SingleNestedAttribute{
 							Attributes: map[string]schema.Attribute{
@@ -78,8 +103,8 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 							Attributes: map[string]schema.Attribute{
 								"id": schema.StringAttribute{
 									Computed:            true,
-									Description:         "(Required in a Net) The ID representing the association of the public IP with the VM or the NIC.",
-									MarkdownDescription: "(Required in a Net) The ID representing the association of the public IP with the VM or the NIC.",
+									Description:         "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.",
+									MarkdownDescription: "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.",
 								},
 								"public_dns_name": schema.StringAttribute{
 									Computed:            true,
@@ -120,7 +145,6 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"is_primary": schema.BoolAttribute{
-										Optional:            true,
 										Computed:            true,
 										Description:         "If true, the IP is the primary private IP of the NIC.",
 										MarkdownDescription: "If true, the IP is the primary private IP of the NIC.",
@@ -129,8 +153,8 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 										Attributes: map[string]schema.Attribute{
 											"id": schema.StringAttribute{
 												Computed:            true,
-												Description:         "(Required in a Net) The ID representing the association of the public IP with the VM or the NIC.",
-												MarkdownDescription: "(Required in a Net) The ID representing the association of the public IP with the VM or the NIC.",
+												Description:         "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.",
+												MarkdownDescription: "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.",
 											},
 											"public_dns_name": schema.StringAttribute{
 												Computed:            true,
@@ -163,7 +187,6 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 										MarkdownDescription: "The name of the private DNS.",
 									},
 									"private_ip": schema.StringAttribute{
-										Optional:            true,
 										Computed:            true,
 										Description:         "The private IP of the NIC.",
 										MarkdownDescription: "The private IP of the NIC.",
@@ -175,10 +198,9 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 							},
-							Optional:            true,
 							Computed:            true,
-							Description:         "The primary private IP for the NIC.<br />\nThis IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.<br />\nIf you do not specify this attribute, a random private IP is selected within the IP range of the Subnet.",
-							MarkdownDescription: "The primary private IP for the NIC.<br />\nThis IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.<br />\nIf you do not specify this attribute, a random private IP is selected within the IP range of the Subnet.",
+							Description:         "The private IPs of the NIC.",
+							MarkdownDescription: "The private IPs of the NIC.",
 						},
 						"security_groups": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
@@ -210,168 +232,186 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The state of the NIC (`available` \\| `attaching` \\| `in-use` \\| `detaching`).",
 						},
 						"subnet_id": schema.StringAttribute{
-							Required:            true,
-							Description:         "The ID of the Subnet in which you want to create the NIC.",
-							MarkdownDescription: "The ID of the Subnet in which you want to create the NIC.",
+							Computed:            true,
+							Description:         "The ID of the Subnet.",
+							MarkdownDescription: "The ID of the Subnet.",
 						},
 						"tags": tags.TagsSchema(ctx),
+
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the Net for the NIC.",
-							MarkdownDescription: "The ID of the Net for the NIC.",
+							Description:         "The ID of the Vpc for the NIC.",
+							MarkdownDescription: "The ID of the Vpc for the NIC.",
 						},
 					},
 				},
-			},
-			"availability_zone_names": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The Subregion in which the NIC is located.",
-				MarkdownDescription: "The Subregion in which the NIC is located.",
-			},
-			"descriptions": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The description of the NIC.",
-				MarkdownDescription: "The description of the NIC.",
-			},
-			"ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "ID for ReadNics",
-				MarkdownDescription: "ID for ReadNics",
-			},
-			"is_source_dest_checked": schema.BoolAttribute{
-				Optional:            true,
-				Description:         "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
-				MarkdownDescription: "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
+				Computed:            true,
+				Description:         "Information about one or more NICs.",
+				MarkdownDescription: "Information about one or more NICs.",
 			},
 			"link_nic_delete_on_vm_deletion": schema.BoolAttribute{
 				Optional:            true,
-				Description:         "If true, the NIC is deleted when the VM is terminated.",
-				MarkdownDescription: "If true, the NIC is deleted when the VM is terminated.",
+				Computed:            true,
+				Description:         "Whether the NICs are deleted when the VMs they are attached to are terminated.",
+				MarkdownDescription: "Whether the NICs are deleted when the VMs they are attached to are terminated.",
 			},
 			"link_nic_device_numbers": schema.ListAttribute{
 				ElementType:         types.Int64Type,
 				Optional:            true,
-				Description:         "The device index for the NIC attachment (between `1` and `7`, both included).",
-				MarkdownDescription: "The device index for the NIC attachment (between `1` and `7`, both included).",
+				Computed:            true,
+				Description:         "The device numbers the NICs are attached to.",
+				MarkdownDescription: "The device numbers the NICs are attached to.",
 			},
 			"link_nic_link_nic_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the NIC to attach.",
-				MarkdownDescription: "The ID of the NIC to attach.",
+				Computed:            true,
+				Description:         "The attachment IDs of the NICs.",
+				MarkdownDescription: "The attachment IDs of the NICs.",
 			},
 			"link_nic_states": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
-				MarkdownDescription: "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
+				Computed:            true,
+				Description:         "The states of the attachments.",
+				MarkdownDescription: "The states of the attachments.",
 			},
 			"link_nic_vm_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the VM.",
-				MarkdownDescription: "The ID of the VM.",
+				Computed:            true,
+				Description:         "The IDs of the VMs the NICs are attached to.",
+				MarkdownDescription: "The IDs of the VMs the NICs are attached to.",
 			},
-
-			"link_public_ip_ids": schema.ListAttribute{
+			"link_public_ip_link_public_ip_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "(Required in a Net) The ID representing the association of the public IP with the VM or the NIC.",
-				MarkdownDescription: "(Required in a Net) The ID representing the association of the public IP with the VM or the NIC.",
-			},
-			"link_public_ip_public_ips": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The public IP associated with the NIC.",
-				MarkdownDescription: "The public IP associated with the NIC.",
+				Computed:            true,
+				Description:         "The association IDs returned when the public IPs were associated with the NICs.",
+				MarkdownDescription: "The association IDs returned when the public IPs were associated with the NICs.",
 			},
 			"link_public_ip_public_ip_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The allocation ID of the public IP.",
-				MarkdownDescription: "The allocation ID of the public IP.",
+				Computed:            true,
+				Description:         "The allocation IDs returned when the public IPs were allocated to their accounts.",
+				MarkdownDescription: "The allocation IDs returned when the public IPs were allocated to their accounts.",
+			},
+			"link_public_ip_public_ips": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The public IPs associated with the NICs.",
+				MarkdownDescription: "The public IPs associated with the NICs.",
 			},
 			"mac_addresses": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The Media Access Control (MAC) address of the NIC.",
-				MarkdownDescription: "The Media Access Control (MAC) address of the NIC.",
+				Computed:            true,
+				Description:         "The Media Access Control (MAC) addresses of the NICs.",
+				MarkdownDescription: "The Media Access Control (MAC) addresses of the NICs.",
 			},
 			"private_dns_names": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The name of the private DNS.",
-				MarkdownDescription: "The name of the private DNS.",
-			},
-			"private_ips_is_primary": schema.BoolAttribute{
-				Optional:            true,
-				Description:         "If true, the IP is the primary private IP of the NIC.",
-				MarkdownDescription: "If true, the IP is the primary private IP of the NIC.",
+				Computed:            true,
+				Description:         "The private DNS names associated with the primary private IPs.",
+				MarkdownDescription: "The private DNS names associated with the primary private IPs.",
 			},
 			"private_ips_link_public_ip_public_ips": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The public IPs associated with the private IPs.",
 				MarkdownDescription: "The public IPs associated with the private IPs.",
+			},
+			"private_ips_primary_ip": schema.BoolAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "Whether the private IP is the primary IP associated with the NIC.",
+				MarkdownDescription: "Whether the private IP is the primary IP associated with the NIC.",
 			},
 			"private_ips_private_ips": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The private IP of the NIC.",
-				MarkdownDescription: "The private IP of the NIC.",
+				Computed:            true,
+				Description:         "The private IPs of the NICs.",
+				MarkdownDescription: "The private IPs of the NICs.",
 			},
 			"security_group_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the security group.",
-				MarkdownDescription: "The ID of the security group.",
+				Computed:            true,
+				Description:         "The IDs of the security groups associated with the NICs.",
+				MarkdownDescription: "The IDs of the security groups associated with the NICs.",
 			},
 			"security_group_names": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The name of the security group.",
-				MarkdownDescription: "The name of the security group.",
+				Computed:            true,
+				Description:         "The names of the security groups associated with the NICs.",
+				MarkdownDescription: "The names of the security groups associated with the NICs.",
 			},
 			"states": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The state of the NIC (`available` \\| `attaching` \\| `in-use` \\| `detaching`).",
-				MarkdownDescription: "The state of the NIC (`available` \\| `attaching` \\| `in-use` \\| `detaching`).",
+				Computed:            true,
+				Description:         "The states of the NICs.",
+				MarkdownDescription: "The states of the NICs.",
 			},
 			"subnet_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the Subnet.",
-				MarkdownDescription: "The ID of the Subnet.",
+				Computed:            true,
+				Description:         "The IDs of the Subnets for the NICs.",
+				MarkdownDescription: "The IDs of the Subnets for the NICs.",
 			},
 			"tag_keys": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The key of the tag, with a minimum of 1 character.",
-				MarkdownDescription: "The key of the tag, with a minimum of 1 character.",
+				Computed:            true,
+				Description:         "The keys of the tags associated with the NICs.",
+				MarkdownDescription: "The keys of the tags associated with the NICs.",
 			},
 			"tag_values": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The value of the tag, between 0 and 255 characters.",
-				MarkdownDescription: "The value of the tag, between 0 and 255 characters.",
+				Computed:            true,
+				Description:         "The values of the tags associated with the NICs.",
+				MarkdownDescription: "The values of the tags associated with the NICs.",
 			},
 			"tags": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         `The key/value combination of the tags associated with the DHCP options sets, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.`,
-				MarkdownDescription: `The key/value combination of the tags associated with the DHCP options sets, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.`,
+				Computed:            true,
+				Description:         "The key/value combination of the tags associated with the NICs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				MarkdownDescription: "The key/value combination of the tags associated with the NICs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
 			},
 			"vpc_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the Net for the NIC.",
-				MarkdownDescription: "The ID of the Net for the NIC.",
+				Computed:            true,
+				Description:         "The IDs of the Vpcs where the NICs are located.",
+				MarkdownDescription: "The IDs of the Vpcs where the NICs are located.",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
+}
+
+type NicModelDatasource struct {
+	AvailabilityZoneName types.String      `tfsdk:"availability_zone_name"`
+	Description          types.String      `tfsdk:"description"`
+	Id                   types.String      `tfsdk:"id"`
+	IsSourceDestChecked  types.Bool        `tfsdk:"is_source_dest_checked"`
+	LinkNic              LinkNicValue      `tfsdk:"link_nic"`
+	LinkPublicIp         LinkPublicIpValue `tfsdk:"link_public_ip"`
+	MacAddress           types.String      `tfsdk:"mac_address"`
+	PrivateDnsName       types.String      `tfsdk:"private_dns_name"`
+	PrivateIps           types.List        `tfsdk:"private_ips"`
+	SecurityGroups       types.List        `tfsdk:"security_groups"`
+	State                types.String      `tfsdk:"state"`
+	SubnetId             types.String      `tfsdk:"subnet_id"`
+	Tags                 types.List        `tfsdk:"tags"`
+	VpcId                types.String      `tfsdk:"vpc_id"`
 }

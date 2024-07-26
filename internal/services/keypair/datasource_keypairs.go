@@ -14,10 +14,10 @@ import (
 )
 
 type KeypairsDataSourceModel struct {
-	Items        []KeyPairDatasourceItemModel `tfsdk:"items"`
-	Fingerprints types.List                   `tfsdk:"fingerprints"`
-	Names        types.List                   `tfsdk:"names"`
-	Types        types.List                   `tfsdk:"types"`
+	Items               []KeyPairDatasourceItemModel `tfsdk:"items"`
+	KeypairFingerprints types.List                   `tfsdk:"keypair_fingerprints"`
+	KeypairNames        types.List                   `tfsdk:"keypair_names"`
+	KeypairTypes        types.List                   `tfsdk:"keypair_types"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.

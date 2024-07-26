@@ -170,6 +170,10 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, d
 		ProductCodes:        productCodesTf,
 		BlockDeviceMappings: blockDeviceMappingsTf,
 		Tags:                tagsTf,
+
+		Access: AccessValue{
+			IsPublic: types.BoolPointerValue(http.Access.IsPublic),
+		},
 	}, diags
 }
 

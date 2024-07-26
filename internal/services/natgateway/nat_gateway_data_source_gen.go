@@ -4,40 +4,43 @@ package natgateway
 
 import (
 	"context"
-	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
+
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
 
 func NatGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the NAT gateways.",
+				MarkdownDescription: "The IDs of the NAT gateways.",
+			},
 			"items": schema.ListNestedAttribute{
-				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Required:            true,
-							Description:         "ID for ReadNatServices",
-							MarkdownDescription: "ID for ReadNatServices",
-						},
-						"public_ip_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The allocation ID of the public IP to associate with the NAT service.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
-							MarkdownDescription: "The allocation ID of the public IP to associate with the NAT service.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
+							Description:         "The ID of the NAT gateway.",
+							MarkdownDescription: "The ID of the NAT gateway.",
 						},
 						"public_ips": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"public_ip": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The public IP associated with the NAT service.",
-										MarkdownDescription: "The public IP associated with the NAT service.",
+										Description:         "The public IP associated with the NAT gateway.",
+										MarkdownDescription: "The public IP associated with the NAT gateway.",
 									},
 									"public_ip_id": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The allocation ID of the public IP associated with the NAT service.",
-										MarkdownDescription: "The allocation ID of the public IP associated with the NAT service.",
+										Description:         "The allocation ID of the public IP associated with the NAT gateway.",
+										MarkdownDescription: "The allocation ID of the public IP associated with the NAT gateway.",
 									},
 								},
 								CustomType: PublicIpsType{
@@ -47,71 +50,84 @@ func NatGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 							Computed:            true,
-							Description:         "Information about the public IP or IPs associated with the NAT service.",
-							MarkdownDescription: "Information about the public IP or IPs associated with the NAT service.",
+							Description:         "Information about the public IP or IPs associated with the NAT gateway.",
+							MarkdownDescription: "Information about the public IP or IPs associated with the NAT gateway.",
 						},
 						"state": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The state of the NAT service (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
-							MarkdownDescription: "The state of the NAT service (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
+							Description:         "The state of the NAT gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
+							MarkdownDescription: "The state of the NAT gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 						},
 						"subnet_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the Subnet in which the NAT service is.",
-							MarkdownDescription: "The ID of the Subnet in which the NAT service is.",
+							Description:         "The ID of the Subnet in which the NAT gateway is.",
+							MarkdownDescription: "The ID of the Subnet in which the NAT gateway is.",
 						},
 						"tags": tags.TagsSchema(ctx),
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the Net in which the NAT service is.",
-							MarkdownDescription: "The ID of the Net in which the NAT service is.",
+							Description:         "The ID of the Vpc in which the NAT gateway is.",
+							MarkdownDescription: "The ID of the Vpc in which the NAT gateway is.",
 						},
 					},
 				},
+				Computed:            true,
+				Description:         "Information about one or more NAT gateways.",
+				MarkdownDescription: "Information about one or more NAT gateways.",
 			},
-			"ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The IDs of the NAT services.",
-				MarkdownDescription: "The IDs of the NAT services.",
-			},
+
 			"states": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The states of the NAT services (pending | available | deleting | deleted).",
-				MarkdownDescription: "The states of the NAT services (pending | available | deleting | deleted).",
+				Computed:            true,
+				Description:         "The states of the NAT gateways (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
+				MarkdownDescription: "The states of the NAT gateways (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 			},
 			"subnet_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The IDs of the Subnets in which the NAT services are.",
-				MarkdownDescription: "The IDs of the Subnets in which the NAT services are.",
+				Computed:            true,
+				Description:         "The IDs of the Subnets in which the NAT gateways are.",
+				MarkdownDescription: "The IDs of the Subnets in which the NAT gateways are.",
 			},
 			"tag_keys": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The keys of the tags associated with the NAT services.",
-				MarkdownDescription: "The keys of the tags associated with the NAT services.",
+				Computed:            true,
+				Description:         "The keys of the tags associated with the NAT gateways.",
+				MarkdownDescription: "The keys of the tags associated with the NAT gateways.",
 			},
 			"tag_values": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The values of the tags associated with the NAT services.",
-				MarkdownDescription: "The values of the tags associated with the NAT services.",
+				Computed:            true,
+				Description:         "The values of the tags associated with the NAT gateways.",
+				MarkdownDescription: "The values of the tags associated with the NAT gateways.",
 			},
 			"tags": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         `The key/value combination of the tags associated with the NAT services, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.`,
-				MarkdownDescription: `The key/value combination of the tags associated with the NAT services, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.`,
+				Computed:            true,
+				Description:         "The key/value combination of the tags associated with the NAT gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				MarkdownDescription: "The key/value combination of the tags associated with the NAT gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
 			},
 			"vpc_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The IDs of the Nets in which the NAT services are.",
-				MarkdownDescription: "The IDs of the Nets in which the NAT services are.",
+				Computed:            true,
+				Description:         "The IDs of the Vpcs in which the NAT gateways are.",
+				MarkdownDescription: "The IDs of the Vpcs in which the NAT gateways are.",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
+}
+
+type NatGatewayModelDatasource struct {
+	Id        types.String `tfsdk:"id"`
+	PublicIps types.List   `tfsdk:"public_ips"`
+	State     types.String `tfsdk:"state"`
+	SubnetId  types.String `tfsdk:"subnet_id"`
+	Tags      types.List   `tfsdk:"tags"`
+	VpcId     types.String `tfsdk:"vpc_id"`
 }

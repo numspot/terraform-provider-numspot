@@ -185,7 +185,6 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		}
 	}
 
-	// Create rules and delete the default one
 	diags := r.updateAllRules(ctx, data, id)
 
 	if diags.HasError() {

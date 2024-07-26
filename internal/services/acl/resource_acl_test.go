@@ -34,16 +34,16 @@ func getFieldMatchChecksACLs(data StepDataACLs) []resource.TestCheckFunc {
 
 // Generate checks to validate that resource 'numspot_acls.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksACLs(dependenciesPrefix string, data StepDataACLs) []resource.TestCheckFunc {
+func getDependencyChecksACLs(dependenciesSuffix string, data StepDataACLs) []resource.TestCheckFunc {
 	checks := []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_acls.test", "service_account_id", "numspot_service_account.test"+dependenciesPrefix, "service_account_id"),
+		resource.TestCheckResourceAttrPair("numspot_acls.test", "service_account_id", "numspot_service_account.test"+dependenciesSuffix, "service_account_id"),
 		resource.TestCheckResourceAttr("numspot_acls.test", "acls.#", strconv.Itoa(len(data.actions))),
 	}
 
 	for _, action := range data.actions {
 		checks = append(checks, resource.TestCheckTypeSetElemNestedAttrs("numspot_acls.test", "acls.*", map[string]string{
 			"permission_id": fmt.Sprintf(provider.PAIR_PREFIX+"data.numspot_permissions.%s.items.0.id", generatePermissionName(action, data.service, data.resource)),
-			"resource_id":   fmt.Sprintf(provider.PAIR_PREFIX+"numspot_%s.test%s.id", data.resource, dependenciesPrefix),
+			"resource_id":   fmt.Sprintf(provider.PAIR_PREFIX+"numspot_%s.test%s.id", data.resource, dependenciesSuffix),
 		}))
 	}
 

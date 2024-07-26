@@ -28,12 +28,12 @@ func getFieldMatchChecks{{Resource}}(data StepData{{Resource}}) []resource.TestC
 
 // Generate checks to validate that resource 'numspot_{{resource}}.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecks{{Resource}}(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecks{{Resource}}(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_{{resource}}.test", "{{subresource id}}", "numspot_{{subresource}}.test"+dependenciesPrefix, "id"), // If field is an id
-		resource.TestCheckTypeSetElemAttrPair("numspot_{{resource}}.test", "{{subresource id}}.*", "numspot_{{subresource}}.test"+dependenciesPrefix, "id"), // If field is a slice of ids
+		resource.TestCheckResourceAttrPair("numspot_{{resource}}.test", "{{subresource id}}", "numspot_{{subresource}}.test"+dependenciesSuffix, "id"), // If field is an id
+		resource.TestCheckTypeSetElemAttrPair("numspot_{{resource}}.test", "{{subresource id}}.*", "numspot_{{subresource}}.test"+dependenciesSuffix, "id"), // If field is a slice of ids
 		provider.TestCheckTypeSetElemNestedAttrsWithPair("numspot_{{resource}}.test", "{{subresource id}}.*", map[string]string{ // If field is a list of objects (containing id and/or other fields)
-			"id":          fmt.Sprintf(provider.PAIR_PREFIX+"numspot_{{subresource}}.test%[1]s.id",dependenciesPrefix),
+			"id":          fmt.Sprintf(provider.PAIR_PREFIX+"numspot_{{subresource}}.test%[1]s.id",dependenciesSuffix),
 			{{match other resource fields}}
 		}),
 		

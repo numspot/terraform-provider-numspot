@@ -14,15 +14,15 @@ import (
 )
 
 type PublicIpsDataSourceModel struct {
-	Items           []PublicIpModel `tfsdk:"items"`
-	LinkPublicIpIds types.List      `tfsdk:"link_public_ip_ids"`
-	NicIds          types.List      `tfsdk:"nic_ids"`
-	TagKeys         types.List      `tfsdk:"tag_keys"`
-	TagValues       types.List      `tfsdk:"tag_values"`
-	Tags            types.List      `tfsdk:"tags"`
-	PrivateIps      types.List      `tfsdk:"private_ips"`
-	VmIds           types.List      `tfsdk:"vm_ids"`
-	IDs             types.List      `tfsdk:"ids"`
+	Items           []PublicIpModelDatasource `tfsdk:"items"`
+	LinkPublicIpIds types.List                `tfsdk:"link_public_ip_ids"`
+	NicIds          types.List                `tfsdk:"nic_ids"`
+	TagKeys         types.List                `tfsdk:"tag_keys"`
+	TagValues       types.List                `tfsdk:"tag_values"`
+	Tags            types.List                `tfsdk:"tags"`
+	PrivateIps      types.List                `tfsdk:"private_ips"`
+	VmIds           types.List                `tfsdk:"vm_ids"`
+	IDs             types.List                `tfsdk:"ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.

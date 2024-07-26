@@ -14,26 +14,26 @@ import (
 )
 
 type SecurityGroupsDataSourceModel struct {
-	Items                         []SecurityGroupModel `tfsdk:"items"`
-	Descriptions                  types.List           `tfsdk:"descriptions"`
-	InboundRulesAccountIds        types.List           `tfsdk:"inbound_rules_account_ids"`
-	InboundRulesFromPortRanges    types.List           `tfsdk:"inbound_rules_from_port_ranges"`
-	InboundRulesRuleProtocols     types.List           `tfsdk:"inbound_rules_rule_protocols"`
-	InboundRulesIpRanges          types.List           `tfsdk:"inbound_rules_ip_ranges"`
-	InboundRulesSecurityGroupIds  types.List           `tfsdk:"inbound_rules_security_group_ids"`
-	InboundRulesToPortRanges      types.List           `tfsdk:"inbound_rules_to_port_ranges"`
-	Ids                           types.List           `tfsdk:"ids"`
-	Names                         types.List           `tfsdk:"names"`
-	OutboundRulesFromPortRanges   types.List           `tfsdk:"outbound_rules_from_port_ranges"`
-	OutboundRulesRuleProtocols    types.List           `tfsdk:"outbound_rules_rule_protocols"`
-	OutboundRulesIpRanges         types.List           `tfsdk:"outbound_rules_ip_ranges"`
-	OutboundRulesAccountIds       types.List           `tfsdk:"outbound_rules_account_ids"`
-	OutboundRulesSecurityGroupIds types.List           `tfsdk:"outbound_rules_security_group_ids"`
-	OutboundRulesToPortRanges     types.List           `tfsdk:"outbound_rules_to_port_ranges"`
-	VpcIds                        types.List           `tfsdk:"vpc_ids"`
-	TagKeys                       types.List           `tfsdk:"tag_keys"`
-	TagValues                     types.List           `tfsdk:"tag_values"`
-	Tags                          types.List           `tfsdk:"tags"`
+	Items                          []SecurityGroupModel `tfsdk:"items"`
+	Descriptions                   types.List           `tfsdk:"descriptions"`
+	InboundRuleFromPortRanges      types.List           `tfsdk:"inbound_rule_from_port_ranges"`
+	InboundRuleIpRanges            types.List           `tfsdk:"inbound_rule_ip_ranges"`
+	InboundRuleProtocols           types.List           `tfsdk:"inbound_rule_protocols"`
+	InboundRuleSecurityGroupIds    types.List           `tfsdk:"inbound_rule_security_group_ids"`
+	InboundRuleSecurityGroupNames  types.List           `tfsdk:"inbound_rule_security_group_names"`
+	InboundRuleToPortRanges        types.List           `tfsdk:"inbound_rule_to_port_ranges"`
+	OutboundRuleFromPortRanges     types.List           `tfsdk:"outbound_rule_from_port_ranges"`
+	OutboundRuleIpRanges           types.List           `tfsdk:"outbound_rule_ip_ranges"`
+	OutboundRuleProtocols          types.List           `tfsdk:"outbound_rule_protocols"`
+	OutboundRuleSecurityGroupIds   types.List           `tfsdk:"outbound_rule_security_group_ids"`
+	OutboundRuleSecurityGroupNames types.List           `tfsdk:"outbound_rule_security_group_names"`
+	OutboundRuleToPortRanges       types.List           `tfsdk:"outbound_rule_to_port_ranges"`
+	SecurityGroupIds               types.List           `tfsdk:"security_group_ids"`
+	SecurityGroupNames             types.List           `tfsdk:"security_group_names"`
+	TagKeys                        types.List           `tfsdk:"tag_keys"`
+	TagValues                      types.List           `tfsdk:"tag_values"`
+	Tags                           types.List           `tfsdk:"tags"`
+	VpcIds                         types.List           `tfsdk:"vpc_ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.

@@ -36,9 +36,9 @@ func getFieldMatchChecksVpc(data StepDataVpc) []resource.TestCheckFunc {
 
 // Generate checks to validate that resource 'numspot_vpc.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksVpc(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksVpc(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_vpc.test", "dhcp_options_set_id", "numspot_dhcp_options.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_vpc.test", "dhcp_options_set_id", "numspot_dhcp_options.test"+dependenciesSuffix, "id"),
 	}
 }
 

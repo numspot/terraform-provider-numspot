@@ -4,15 +4,16 @@ package loadbalancer
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 )
 
 func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"items": schema.ListNestedAttribute{
-				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"application_sticky_cookie_policies": schema.ListNestedAttribute{
@@ -109,11 +110,6 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "Information about the health check configuration.",
 							MarkdownDescription: "Information about the health check configuration.",
 						},
-						"id": schema.StringAttribute{
-							Computed:            true,
-							Description:         "ID for ReadLoadBalancers",
-							MarkdownDescription: "ID for ReadLoadBalancers",
-						},
 						"listeners": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
@@ -145,8 +141,8 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 									},
 									"server_certificate_id": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The OUTSCALE Resource Name (ORN) of the server certificate. For more information, see [Resource Identifiers > OUTSCALE Resource Names (ORNs)](https://docs.outscale.com/en/userguide/Resource-Identifiers.html#_outscale_resource_names_orns).",
-										MarkdownDescription: "The OUTSCALE Resource Name (ORN) of the server certificate. For more information, see [Resource Identifiers > OUTSCALE Resource Names (ORNs)](https://docs.outscale.com/en/userguide/Resource-Identifiers.html#_outscale_resource_names_orns).",
+										Description:         "The NumSpot Resource Name of the server certificate.",
+										MarkdownDescription: "The NumSpot Resource Name of the server certificate.",
 									},
 								},
 								CustomType: ListenersType{
@@ -177,8 +173,8 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 						"security_groups": schema.ListAttribute{
 							ElementType:         types.StringType,
 							Computed:            true,
-							Description:         "One or more IDs of security groups for the load balancers. Valid only for load balancers in a Net.",
-							MarkdownDescription: "One or more IDs of security groups for the load balancers. Valid only for load balancers in a Net.",
+							Description:         "One or more IDs of security groups for the load balancers. Valid only for load balancers in a Vpc.",
+							MarkdownDescription: "One or more IDs of security groups for the load balancers. Valid only for load balancers in a Vpc.",
 						},
 						"source_security_group": schema.SingleNestedAttribute{
 							Attributes: map[string]schema.Attribute{
@@ -227,24 +223,29 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The ID of the Subnet in which the load balancer was created.",
 							MarkdownDescription: "The ID of the Subnet in which the load balancer was created.",
 						},
+						"tags": tags.TagsSchema(ctx),
 						"type": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The type of load balancer. Valid only for load balancers in a Net.<br />\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.",
-							MarkdownDescription: "The type of load balancer. Valid only for load balancers in a Net.<br />\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.",
+							Description:         "The type of load balancer. Valid only for load balancers in a Vpc.<br />\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.",
+							MarkdownDescription: "The type of load balancer. Valid only for load balancers in a Vpc.<br />\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.",
 						},
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the Net for the load balancer.",
-							MarkdownDescription: "The ID of the Net for the load balancer.",
+							Description:         "The ID of the Vpc for the load balancer.",
+							MarkdownDescription: "The ID of the Vpc for the load balancer.",
 						},
 					},
 				},
+				Computed:            true,
+				Description:         "Information about one or more load balancers.",
+				MarkdownDescription: "Information about one or more load balancers.",
 			},
 			"load_balancer_names": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "Load balancer names to filter with.",
-				MarkdownDescription: "Load balancer names to filter with.",
+				Computed:            true,
+				Description:         "The names of the load balancers.",
+				MarkdownDescription: "The names of the load balancers.",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",

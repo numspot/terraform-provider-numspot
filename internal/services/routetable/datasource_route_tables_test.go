@@ -58,7 +58,5 @@ resource "numspot_route_table" "test" {
 data "numspot_route_tables" "testdata" {
   ids        = [numspot_route_table.test.id]
   depends_on = [numspot_route_table.test]
-}
-
-`
+}`
 }

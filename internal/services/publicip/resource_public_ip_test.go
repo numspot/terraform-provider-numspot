@@ -32,10 +32,10 @@ func getFieldMatchChecksPublicIp(data StepDataPublicIp) []resource.TestCheckFunc
 
 // Generate checks to validate that resource 'numspot_public_ip.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksPublicIp(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksPublicIp(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_public_ip.test", "nic_id", "numspot_nic.test"+dependenciesPrefix, "id"),
-		resource.TestCheckResourceAttrPair("numspot_public_ip.test", "vm_id", "numspot_vm.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_public_ip.test", "nic_id", "numspot_nic.test"+dependenciesSuffix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_public_ip.test", "vm_id", "numspot_vm.test"+dependenciesSuffix, "id"),
 	}
 }
 
@@ -114,31 +114,14 @@ func TestAccPublicIpResource(t *testing.T) {
 				)...),
 			},
 			// <== If resource has required dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testPublicIpConfig(provider.BASE_SUFFIX, basePlanValues),
-			},
+			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testPublicIpConfig(provider.NEW_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksPublicIp(provider.NEW_SUFFIX),
-				)...),
-			},
 
 			// <== If resource has optional dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testPublicIpConfig(provider.BASE_SUFFIX, basePlanValues),
-			},
+			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testPublicIpConfig_DeletedDependencies(updatePlanValues),
-				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
-			},
 		},
 	})
 }
@@ -146,14 +129,24 @@ func TestAccPublicIpResource(t *testing.T) {
 func testPublicIpConfig(subresourceSuffix string, data StepDataPublicIp) string {
 	return fmt.Sprintf(`
 resource "numspot_image" "test" {
-  name               = "terraform-generated-image-for-public-ip-test"
+  name               = "terraform-generated-image-for-public-ip-acctest"
   source_image_id    = "ami-0b7df82c"
   source_region_name = "cloudgouv-eu-west-1"
 }
 
+resource "numspot_vpc" "test" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "test" {
+  vpc_id   = numspot_vpc.test.id
+  ip_range = "10.101.1.0/24"
+}
+
 resource "numspot_vm" "test%[1]s" {
-  image_id = numspot_image.test.id
-  type     = "ns-cus6-2c4r"
+  image_id  = numspot_image.test.id
+  type      = "ns-cus6-2c4r"
+  subnet_id = numspot_subnet.test.id
 }
 
 resource "numspot_public_ip" "test" {

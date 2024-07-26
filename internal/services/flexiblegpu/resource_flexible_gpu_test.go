@@ -33,9 +33,9 @@ func getFieldMatchChecksFlexibleGpu(data StepDataFlexibleGpu) []resource.TestChe
 
 // Generate checks to validate that resource 'numspot_flexible_gpu.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksFlexibleGpu(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksFlexibleGpu(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_flexible_gpu.test", "vm_id", "numspot_vm.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_flexible_gpu.test", "vm_id", "numspot_vm.test"+dependenciesSuffix, "id"),
 	}
 }
 

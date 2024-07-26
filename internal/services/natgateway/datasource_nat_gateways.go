@@ -14,14 +14,14 @@ import (
 )
 
 type NatGatewaysDataSourceModel struct {
-	Items     []NatGatewayModel `tfsdk:"items"`
-	IDs       types.List        `tfsdk:"ids"`
-	States    types.List        `tfsdk:"states"`
-	TagKeys   types.List        `tfsdk:"tag_keys"`
-	TagValues types.List        `tfsdk:"tag_values"`
-	Tags      types.List        `tfsdk:"tags"`
-	SubnetIds types.List        `tfsdk:"subnet_ids"`
-	VpcIds    types.List        `tfsdk:"vpc_ids"`
+	Items     []NatGatewayModelDatasource `tfsdk:"items"`
+	Ids       types.List                  `tfsdk:"ids"`
+	States    types.List                  `tfsdk:"states"`
+	SubnetIds types.List                  `tfsdk:"subnet_ids"`
+	TagKeys   types.List                  `tfsdk:"tag_keys"`
+	TagValues types.List                  `tfsdk:"tag_values"`
+	Tags      types.List                  `tfsdk:"tags"`
+	VpcIds    types.List                  `tfsdk:"vpc_ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -84,7 +84,7 @@ func (d *natGatewaysDataSource) Read(ctx context.Context, request datasource.Rea
 		response.Diagnostics.AddError("HTTP call failed", "got empty Nat Gateways list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, NatGatewayFromHttpToTf)
+	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, NatGatewayFromHttpToTfDatasource)
 
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)

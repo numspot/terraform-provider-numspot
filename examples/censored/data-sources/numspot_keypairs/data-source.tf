@@ -3,8 +3,8 @@ resource "numspot_keypair" "test" {
 }
 
 data "numspot_keypairs" "testdata" {
-  names      = [numspot_keypair.test.name]
-  depends_on = [numspot_keypair.test]
+  keypair_names = [numspot_keypair.test.name]
+  depends_on    = [numspot_keypair.test]
 }
 
 # How to use the datasource in another field

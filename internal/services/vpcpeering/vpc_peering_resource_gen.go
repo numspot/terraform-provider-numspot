@@ -5,17 +5,18 @@ package vpcpeering
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
 func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
@@ -30,8 +31,8 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"vpc_id": schema.StringAttribute{
 						Computed:            true,
-						Description:         "The ID of the accepter Net.",
-						MarkdownDescription: "The ID of the accepter Net.",
+						Description:         "The ID of the accepter Vpc.",
+						MarkdownDescription: "The ID of the accepter Vpc.",
 					},
 				},
 				CustomType: AccepterVpcType{
@@ -40,26 +41,26 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Description:         "Information about the accepter Net.",
-				MarkdownDescription: "Information about the accepter Net.",
+				Description:         "Information about the accepter Vpc.",
+				MarkdownDescription: "Information about the accepter Vpc.",
 			},
 			"accepter_vpc_id": schema.StringAttribute{
 				Required:            true,
-				Description:         "The ID of the Net you want to connect with.",
-				MarkdownDescription: "The ID of the Net you want to connect with.",
+				Description:         "The ID of the Vpc you want to connect with.",
+				MarkdownDescription: "The ID of the Vpc you want to connect with.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"expiration_date": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The date and time at which the Net peerings expire.",
-				MarkdownDescription: "The date and time at which the Net peerings expire.",
+				Description:         "The date and time at which the Vpc peerings expire.",
+				MarkdownDescription: "The date and time at which the Vpc peerings expire.",
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The ID of the Net peering.",
-				MarkdownDescription: "The ID of the Net peering.",
+				Description:         "The ID of the Vpc peering.",
+				MarkdownDescription: "The ID of the Vpc peering.",
 			},
 			"source_vpc": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
@@ -70,8 +71,8 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"vpc_id": schema.StringAttribute{
 						Computed:            true,
-						Description:         "The ID of the source Net.",
-						MarkdownDescription: "The ID of the source Net.",
+						Description:         "The ID of the source Vpc.",
+						MarkdownDescription: "The ID of the source Vpc.",
 					},
 				},
 				CustomType: SourceVpcType{
@@ -80,13 +81,13 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Description:         "Information about the source Net.",
-				MarkdownDescription: "Information about the source Net.",
+				Description:         "Information about the source Vpc.",
+				MarkdownDescription: "Information about the source Vpc.",
 			},
 			"source_vpc_id": schema.StringAttribute{
 				Required:            true,
-				Description:         "The ID of the Net you send the peering request from.",
-				MarkdownDescription: "The ID of the Net you send the peering request from.",
+				Description:         "The ID of the Vpc you send the peering request from.",
+				MarkdownDescription: "The ID of the Vpc you send the peering request from.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
@@ -95,13 +96,13 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 				Attributes: map[string]schema.Attribute{
 					"message": schema.StringAttribute{
 						Computed:            true,
-						Description:         "Additional information about the state of the Net peering.",
-						MarkdownDescription: "Additional information about the state of the Net peering.",
+						Description:         "Additional information about the state of the Vpc peering.",
+						MarkdownDescription: "Additional information about the state of the Vpc peering.",
 					},
 					"name": schema.StringAttribute{
 						Computed:            true,
-						Description:         "The state of the Net peering (`pending-acceptance` \\| `active` \\| `rejected` \\| `failed` \\| `expired` \\| `deleted`).",
-						MarkdownDescription: "The state of the Net peering (`pending-acceptance` \\| `active` \\| `rejected` \\| `failed` \\| `expired` \\| `deleted`).",
+						Description:         "The state of the Vpc peering (`pending-acceptance` \\| `active` \\| `rejected` \\| `failed` \\| `expired` \\| `deleted`).",
+						MarkdownDescription: "The state of the Vpc peering (`pending-acceptance` \\| `active` \\| `rejected` \\| `failed` \\| `expired` \\| `deleted`).",
 					},
 				},
 				CustomType: StateType{
@@ -110,8 +111,8 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Description:         "Information about the state of the Net peering.",
-				MarkdownDescription: "Information about the state of the Net peering.",
+				Description:         "Information about the state of the Vpc peering.",
+				MarkdownDescription: "Information about the state of the Vpc peering.",
 			},
 			"tags": tags.TagsSchema(ctx),
 		},

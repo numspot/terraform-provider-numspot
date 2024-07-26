@@ -13,7 +13,6 @@ func DhcpOptionsDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"items": schema.ListNestedAttribute{
-				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"default": schema.BoolAttribute{
@@ -34,8 +33,8 @@ func DhcpOptionsDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "ID for ReadDhcpOptions",
-							MarkdownDescription: "ID for ReadDhcpOptions",
+							Description:         "The ID of the DHCP options set.",
+							MarkdownDescription: "The ID of the DHCP options set.",
 						},
 						"log_servers": schema.ListAttribute{
 							ElementType:         types.StringType,
@@ -52,57 +51,70 @@ func DhcpOptionsDataSourceSchema(ctx context.Context) schema.Schema {
 						"tags": tags.TagsSchema(ctx),
 					},
 				},
+				Computed:            true,
+				Description:         "Information about one or more DHCP options sets.",
+				MarkdownDescription: "Information about one or more DHCP options sets.",
 			},
 			"ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The IDs of the DHCP options sets.",
 				MarkdownDescription: "The IDs of the DHCP options sets.",
 			},
 			"default": schema.BoolAttribute{
 				Optional:            true,
+				Computed:            true,
 				Description:         "If true, lists all default DHCP options set. If false, lists all non-default DHCP options set.",
 				MarkdownDescription: "If true, lists all default DHCP options set. If false, lists all non-default DHCP options set.",
 			},
 			"domain_name_servers": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The IPs of the domain name servers used for the DHCP options sets.",
 				MarkdownDescription: "The IPs of the domain name servers used for the DHCP options sets.",
 			},
 			"domain_names": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The domain names used for the DHCP options sets.",
 				MarkdownDescription: "The domain names used for the DHCP options sets.",
 			},
+
 			"log_servers": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The IPs of the log servers used for the DHCP options sets.",
 				MarkdownDescription: "The IPs of the log servers used for the DHCP options sets.",
 			},
 			"ntp_servers": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The IPs of the Network Time Protocol (NTP) servers used for the DHCP options sets.",
 				MarkdownDescription: "The IPs of the Network Time Protocol (NTP) servers used for the DHCP options sets.",
 			},
 			"tag_keys": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The keys of the tags associated with the DHCP options sets.",
 				MarkdownDescription: "The keys of the tags associated with the DHCP options sets.",
 			},
 			"tag_values": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The values of the tags associated with the DHCP options sets.",
 				MarkdownDescription: "The values of the tags associated with the DHCP options sets.",
 			},
 			"tags": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
+				Computed:            true,
 				Description:         "The key/value combination of the tags associated with the DHCP options sets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
 				MarkdownDescription: "The key/value combination of the tags associated with the DHCP options sets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
 			},

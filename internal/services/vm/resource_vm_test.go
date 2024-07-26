@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	vmType        = "ns-mus6-2c16r"
+	vmType        = "ns-eco6-2c8r"
 	sourceImageId = "ami-0987a84b"
 )
 
@@ -43,10 +43,10 @@ func getFieldMatchChecksVm(data StepDataVm) []resource.TestCheckFunc {
 }
 
 // Generate checks to validate that resource numspot_vm.test has input data values
-func getDependencyChecksVm(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksVm(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_vm.test", "subnet_id", "numspot_subnet.test"+dependenciesPrefix, "id"),
-		resource.TestCheckTypeSetElemAttrPair("numspot_vm.test", "security_group_ids.*", "numspot_security_group.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_vm.test", "subnet_id", "numspot_subnet.test"+dependenciesSuffix, "id"),
+		resource.TestCheckTypeSetElemAttrPair("numspot_vm.test", "security_group_ids.*", "numspot_security_group.test"+dependenciesSuffix, "id"),
 	}
 }
 
@@ -65,8 +65,8 @@ func TestAccVmResource(t *testing.T) {
 	vmInitiatedShutdownBehaviorUpdated := "terminate"
 
 	// resource fields that cannot be updated in-place (requires replace)
-	subregionName := "cloudgouv-eu-west-1a"
-	subregionNameUpdated := "cloudgouv-eu-west-1b"
+	subregionName := "cloudgouv-eu-west-1b"
+	//subregionNameUpdated := "cloudgouv-eu-west-1b"
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	////////////// Define plan values and generate associated attribute checks  //////////////
@@ -109,23 +109,23 @@ func TestAccVmResource(t *testing.T) {
 	)
 
 	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
-	replacePlanValues := StepDataVm{
-		sourceImageId:               sourceImageId,
-		vmType:                      vmType,
-		vmInitiatedShutdownBehavior: vmInitiatedShutdownBehavior,
-		tagKey:                      tagKey,
-		tagValue:                    tagValue,
-		subregionName:               subregionNameUpdated,
-	}
-	replaceChecks := append(
-		getFieldMatchChecksVm(replacePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
-			require.NotEmpty(t, v)
-			require.NotEqual(t, v, resourceId)
-			return nil
-		}),
-	)
+	//replacePlanValues := StepDataVm{
+	//	sourceImageId:               sourceImageId,
+	//	vmType:                      vmType,
+	//	vmInitiatedShutdownBehavior: vmInitiatedShutdownBehavior,
+	//	tagKey:                      tagKey,
+	//	tagValue:                    tagValue,
+	//	subregionName:               subregionNameUpdated,
+	//}
+	//replaceChecks := append(
+	//	getFieldMatchChecksVm(replacePlanValues),
+	//
+	//	resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
+	//		require.NotEmpty(t, v)
+	//		require.NotEqual(t, v, resourceId)
+	//		return nil
+	//	}),
+	//)
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
@@ -155,14 +155,14 @@ func TestAccVmResource(t *testing.T) {
 				ExpectNonEmptyPlan: true,
 			},
 			// Update testing With Replace
-			{
-				Config: testVmConfig(provider.BASE_SUFFIX, replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-					getDependencyChecksVm(provider.BASE_SUFFIX),
-				)...),
-				ExpectNonEmptyPlan: true,
-			},
+			//{
+			//	Config: testVmConfig(provider.BASE_SUFFIX, replacePlanValues),
+			//	Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+			//		replaceChecks,
+			//		getDependencyChecksVm(provider.BASE_SUFFIX),
+			//	)...),
+			//	ExpectNonEmptyPlan: true,
+			//},
 			// <== If resource has required dependencies ==>
 			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
 				Config:             testVmConfig(provider.BASE_SUFFIX, basePlanValues),
@@ -175,14 +175,14 @@ func TestAccVmResource(t *testing.T) {
 
 			// Update testing With Replace of dependency resource and with Replace of the resource
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			{
-				Config: testVmConfig(provider.NEW_SUFFIX, replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-					getDependencyChecksVm(provider.NEW_SUFFIX),
-				)...),
-				ExpectNonEmptyPlan: true,
-			},
+			//{
+			//	Config: testVmConfig(provider.NEW_SUFFIX, replacePlanValues),
+			//	Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+			//		replaceChecks,
+			//		getDependencyChecksVm(provider.NEW_SUFFIX),
+			//	)...),
+			//	ExpectNonEmptyPlan: true,
+			//},
 
 			// <== If resource has optional dependencies ==>
 

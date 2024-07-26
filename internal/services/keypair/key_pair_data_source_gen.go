@@ -13,18 +13,12 @@ func KeyPairDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"items": schema.ListNestedAttribute{
-				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"fingerprint": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The MD5 public key fingerprint as specified in section 4 of RFC 4716.",
 							MarkdownDescription: "The MD5 public key fingerprint as specified in section 4 of RFC 4716.",
-						},
-						"id": schema.StringAttribute{
-							Required:            true,
-							Description:         "ID for ReadKeypairs",
-							MarkdownDescription: "ID for ReadKeypairs",
 						},
 						"name": schema.StringAttribute{
 							Computed:            true,
@@ -38,24 +32,30 @@ func KeyPairDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
+				Computed:            true,
+				Description:         "Information about one or more keypairs.",
+				MarkdownDescription: "Information about one or more keypairs.",
 			},
-			"fingerprints": schema.ListAttribute{
+			"keypair_fingerprints": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The MD5 public key fingerprint as specified in section 4 of RFC 4716.",
-				MarkdownDescription: "The MD5 public key fingerprint as specified in section 4 of RFC 4716.",
+				Computed:            true,
+				Description:         "The fingerprints of the keypairs.",
+				MarkdownDescription: "The fingerprints of the keypairs.",
 			},
-			"names": schema.ListAttribute{
+			"keypair_names": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The name of the keypair.",
-				MarkdownDescription: "The name of the keypair.",
+				Computed:            true,
+				Description:         "The names of the keypairs.",
+				MarkdownDescription: "The names of the keypairs.",
 			},
-			"types": schema.ListAttribute{
+			"keypair_types": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The type of the keypair (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
-				MarkdownDescription: "The type of the keypair (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
+				Computed:            true,
+				Description:         "The types of the keypairs (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
+				MarkdownDescription: "The types of the keypairs (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
@@ -64,7 +64,6 @@ func KeyPairDataSourceSchema(ctx context.Context) schema.Schema {
 
 type KeyPairDatasourceItemModel struct {
 	Fingerprint types.String `tfsdk:"fingerprint"`
-	Id          types.String `tfsdk:"id"`
 	Name        types.String `tfsdk:"name"`
 	Type        types.String `tfsdk:"type"`
 }

@@ -34,15 +34,15 @@ func getFieldMatchChecksSnapshot(data StepDataSnapshot) []resource.TestCheckFunc
 
 // Generate checks to validate that resource 'numspot_snapshot.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksSnapshot_FromSnapshot(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksSnapshot_FromSnapshot(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_snapshot.test", "source_snapshot_id", "numspot_snapshot.snapshot"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_snapshot.test", "source_snapshot_id", "numspot_snapshot.snapshot"+dependenciesSuffix, "id"),
 	}
 }
 
-func getDependencyChecksSnapshot_FromVolume(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksSnapshot_FromVolume(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_snapshot.test", "volume_id", "numspot_volume.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_snapshot.test", "volume_id", "numspot_volume.test"+dependenciesSuffix, "id"),
 	}
 }
 

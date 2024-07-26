@@ -32,10 +32,10 @@ func getFieldMatchChecksVpcPeering(data StepDataVpcPeering) []resource.TestCheck
 
 // Generate checks to validate that resource 'numspot_vpc_peering.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksVpcPeering(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksVpcPeering(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_vpc_peering.test", "accepter_vpc_id", "numspot_vpc.accepter"+dependenciesPrefix, "id"),
-		resource.TestCheckResourceAttrPair("numspot_vpc_peering.test", "source_vpc_id", "numspot_vpc.source"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_vpc_peering.test", "accepter_vpc_id", "numspot_vpc.accepter"+dependenciesSuffix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_vpc_peering.test", "source_vpc_id", "numspot_vpc.source"+dependenciesSuffix, "id"),
 	}
 }
 

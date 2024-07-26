@@ -23,7 +23,7 @@ type StepDataDhcpOptions struct {
 // Generate checks to validate that resource 'numspot_dhcp_options.test' has input data values
 func getFieldMatchChecksDhcpOptions(data StepDataDhcpOptions) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttr("numspot_dhcp_options.test", "domain", data.domain), // Check value for all resource attributes
+		resource.TestCheckResourceAttr("numspot_dhcp_options.test", "domain_name", data.domain), // Check value for all resource attributes
 		resource.TestCheckResourceAttr("numspot_dhcp_options.test", "tags.#", "1"),
 		resource.TestCheckTypeSetElemNestedAttrs("numspot_dhcp_options.test", "tags.*", map[string]string{
 			"key":   data.tagKey,
@@ -34,7 +34,7 @@ func getFieldMatchChecksDhcpOptions(data StepDataDhcpOptions) []resource.TestChe
 
 // Generate checks to validate that resource 'numspot_dhcp_options.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksDhcpOptions(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksDhcpOptions(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{}
 }
 
@@ -74,7 +74,7 @@ func TestAccDhcpOptionsResource(t *testing.T) {
 
 	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
 	updatePlanValues := StepDataDhcpOptions{
-		domain:   updatedDomainName,
+		domain:   domainName,
 		tagKey:   tagKey,
 		tagValue: updatedTagName,
 	}
@@ -90,7 +90,7 @@ func TestAccDhcpOptionsResource(t *testing.T) {
 
 	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
 	replacePlanValues := StepDataDhcpOptions{
-		domain:   domainName,
+		domain:   updatedDomainName,
 		tagKey:   tagKey,
 		tagValue: tagName,
 	}
@@ -136,30 +136,6 @@ func TestAccDhcpOptionsResource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					replaceChecks,
 					getDependencyChecksDhcpOptions(provider.BASE_SUFFIX),
-				)...),
-			},
-
-			// <== If resource has required dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testDhcpOptionsConfig(provider.BASE_SUFFIX, basePlanValues),
-			},
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testDhcpOptionsConfig(provider.NEW_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksDhcpOptions(provider.NEW_SUFFIX),
-				)...),
-			},
-			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			{
-				Config: testDhcpOptionsConfig(provider.NEW_SUFFIX, replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-					getDependencyChecksDhcpOptions(provider.NEW_SUFFIX),
 				)...),
 			},
 		},

@@ -60,12 +60,50 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *numspot.NatGateway) (*Nat
 
 	return &NatGatewayModel{
 		Id:         types.StringPointerValue(http.Id),
-		PublicIpId: types.StringPointerValue(publicIpId),
 		PublicIps:  publicIpsTf,
 		State:      types.StringPointerValue(http.State),
 		SubnetId:   types.StringPointerValue(http.SubnetId),
 		VpcId:      types.StringPointerValue(http.VpcId),
 		Tags:       tagsTf,
+		PublicIpId: types.StringPointerValue(publicIpId),
+	}, diags
+}
+
+func NatGatewayFromHttpToTfDatasource(ctx context.Context, http *numspot.NatGateway) (*NatGatewayModelDatasource, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+
+	var publicIp []numspot.PublicIpLight
+	if http.PublicIps != nil {
+		publicIp = *http.PublicIps
+	}
+	// Public Ips
+	publicIpsTf, diags := utils.GenericListToTfListValue(
+		ctx,
+		PublicIpsValue{},
+		publicIpFromApi,
+		publicIp,
+	)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	return &NatGatewayModelDatasource{
+		Id:        types.StringPointerValue(http.Id),
+		PublicIps: publicIpsTf,
+		State:     types.StringPointerValue(http.State),
+		SubnetId:  types.StringPointerValue(http.SubnetId),
+		VpcId:     types.StringPointerValue(http.VpcId),
+		Tags:      tagsTf,
 	}, diags
 }
 
@@ -84,6 +122,6 @@ func NatGatewaysFromTfToAPIReadParams(ctx context.Context, tf NatGatewaysDataSou
 		TagKeys:   utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
 		TagValues: utils.TfStringListToStringPtrList(ctx, tf.TagValues),
 		Tags:      utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:       utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		Ids:       utils.TfStringListToStringPtrList(ctx, tf.Ids),
 	}
 }
