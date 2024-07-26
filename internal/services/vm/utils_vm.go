@@ -335,17 +335,18 @@ func VmFromHttpToTf(ctx context.Context, http *numspot.Vm) (*VmModel, diag.Diagn
 
 	// Block Device Mapping
 	var blockDeviceMappings []numspot.BlockDeviceMappingCreated
+	blockDeviceMappingTf := types.ListNull(BlockDeviceMappingsValue{}.Type(ctx))
 	if http.BlockDeviceMappings != nil {
 		blockDeviceMappings = *http.BlockDeviceMappings
-	}
-	blockDeviceMappingTf, diags := utils2.GenericListToTfListValue(
-		ctx,
-		BlockDeviceMappingsValue{},
-		vmBlockDeviceMappingFromApi,
-		blockDeviceMappings,
-	)
-	if diags.HasError() {
-		return nil, diags
+		blockDeviceMappingTf, diags = utils2.GenericListToTfListValue(
+			ctx,
+			BlockDeviceMappingsValue{},
+			vmBlockDeviceMappingFromApi,
+			blockDeviceMappings,
+		)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 
 	// Creation Date
@@ -439,13 +440,21 @@ func VmFromHttpToTf(ctx context.Context, http *numspot.Vm) (*VmModel, diag.Diagn
 }
 
 func VmFromTfToCreateRequest(ctx context.Context, tf *VmModel, diags *diag.Diagnostics) numspot.CreateVmsJSONRequestBody {
-	nics := make([]numspot.NicForVmCreation, 0, len(tf.Nics.Elements()))
-	diags.Append(tf.Nics.ElementsAs(ctx, &nics, true)...)
-
-	blockDeviceMapping := make([]numspot.BlockDeviceMappingVmCreation, 0, len(tf.BlockDeviceMappings.Elements()))
-	diags.Append(tf.BlockDeviceMappings.ElementsAs(ctx, &blockDeviceMapping, true)...)
-
+	var nicsPtr *[]numspot.NicForVmCreation
+	var blockDeviceMappingPtr *[]numspot.BlockDeviceMappingVmCreation
 	var placement *numspot.Placement
+
+	if !(tf.Nics.IsNull() || tf.Nics.IsUnknown()) {
+		nics := make([]numspot.NicForVmCreation, 0, len(tf.Nics.Elements()))
+		diags.Append(tf.Nics.ElementsAs(ctx, &nics, true)...)
+		nicsPtr = &nics
+	}
+	if !(tf.BlockDeviceMappings.IsNull() || tf.BlockDeviceMappings.IsUnknown()) {
+		blockDeviceMapping := make([]numspot.BlockDeviceMappingVmCreation, 0, len(tf.BlockDeviceMappings.Elements()))
+		diags.Append(tf.BlockDeviceMappings.ElementsAs(ctx, &blockDeviceMapping, true)...)
+		blockDeviceMappingPtr = &blockDeviceMapping
+	}
+
 	if !(tf.Placement.IsNull() || tf.Placement.IsUnknown()) {
 		placement = &numspot.Placement{
 			AvailabilityZoneName: utils2.FromTfStringToStringPtr(tf.Placement.AvailabilityZoneName),
@@ -461,7 +470,7 @@ func VmFromTfToCreateRequest(ctx context.Context, tf *VmModel, diags *diag.Diagn
 		ImageId:                     tf.ImageId.ValueString(),
 		KeypairName:                 utils2.FromTfStringToStringPtr(tf.KeypairName),
 		NestedVirtualization:        utils2.FromTfBoolToBoolPtr(tf.NestedVirtualization),
-		Nics:                        &nics,
+		Nics:                        nicsPtr,
 		Placement:                   placement,
 		PrivateIps:                  utils2.TfStringListToStringPtrList(ctx, tf.PrivateIps),
 		SecurityGroupIds:            utils2.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
@@ -470,24 +479,20 @@ func VmFromTfToCreateRequest(ctx context.Context, tf *VmModel, diags *diag.Diagn
 		UserData:                    utils2.FromTfStringToStringPtr(tf.UserData),
 		VmInitiatedShutdownBehavior: utils2.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
 		Type:                        utils2.FromTfStringToStringPtr(tf.Type),
-		BlockDeviceMappings:         &blockDeviceMapping,
+		BlockDeviceMappings:         blockDeviceMappingPtr,
 		MaxVmsCount:                 utils2.FromTfInt64ToIntPtr(tf.MaxVmsCount),
 		MinVmsCount:                 utils2.FromTfInt64ToIntPtr(tf.MinVmsCount),
 	}
 }
 
 func VmFromTfToUpdaterequest(ctx context.Context, tf *VmModel, diagnostics *diag.Diagnostics) numspot.UpdateVmJSONRequestBody {
-	blockDeviceMapping := utils2.TfListToGenericList(func(a BlockDeviceMappingsValue) numspot.BlockDeviceMappingVmUpdate {
-		var bsu numspot.BsuToUpdateVm
-		a.Bsu.As(ctx, &bsu, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: false, UnhandledUnknownAsEmpty: false})
+	var blockDeviceMappingPtr *[]numspot.BlockDeviceMappingVmUpdate
 
-		return numspot.BlockDeviceMappingVmUpdate{
-			Bsu:               &bsu,
-			DeviceName:        utils2.FromTfStringToStringPtr(a.DeviceName),
-			NoDevice:          utils2.FromTfStringToStringPtr(a.NoDevice),
-			VirtualDeviceName: utils2.FromTfStringToStringPtr(a.VirtualDeviceName),
-		}
-	}, ctx, tf.BlockDeviceMappings)
+	if !(tf.BlockDeviceMappings.IsNull() || tf.BlockDeviceMappings.IsUnknown()) {
+		blockDeviceMapping := make([]numspot.BlockDeviceMappingVmUpdate, 0, len(tf.BlockDeviceMappings.Elements()))
+		diagnostics.Append(tf.BlockDeviceMappings.ElementsAs(ctx, &blockDeviceMapping, true)...)
+		blockDeviceMappingPtr = &blockDeviceMapping
+	}
 
 	return numspot.UpdateVmJSONRequestBody{
 		DeletionProtection:          utils2.FromTfBoolToBoolPtr(tf.DeletionProtection),
@@ -497,7 +502,7 @@ func VmFromTfToUpdaterequest(ctx context.Context, tf *VmModel, diagnostics *diag
 		UserData:                    utils2.FromTfStringToStringPtr(tf.UserData),
 		VmInitiatedShutdownBehavior: utils2.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
 		Type:                        utils2.FromTfStringToStringPtr(tf.Type),
-		BlockDeviceMappings:         &blockDeviceMapping,
+		BlockDeviceMappings:         blockDeviceMappingPtr,
 		IsSourceDestChecked:         utils2.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
 	}
 }
@@ -790,7 +795,6 @@ func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm) (*VmModel,
 		Tags:                      tagsList,
 		Architecture:              types.StringPointerValue(http.Architecture),
 		BlockDeviceMappings:       blockDeviceMappings,
-		BsuOptimized:              types.BoolPointerValue(http.BsuOptimized),
 		ClientToken:               types.StringPointerValue(http.ClientToken),
 		CreationDate:              creationDateTf,
 		DeletionProtection:        types.BoolPointerValue(http.DeletionProtection),
@@ -803,7 +807,6 @@ func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm) (*VmModel,
 		NestedVirtualization:      types.BoolPointerValue(http.NestedVirtualization),
 		Nics:                      nics,
 		OsFamily:                  types.StringPointerValue(http.OsFamily),
-		Performance:               types.StringPointerValue(http.Performance),
 		Placement:                 placement,
 		PrivateDnsName:            types.StringPointerValue(http.PrivateDnsName),
 		PrivateIp:                 types.StringPointerValue(http.PrivateIp),

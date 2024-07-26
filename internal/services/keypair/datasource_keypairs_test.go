@@ -38,7 +38,7 @@ resource "numspot_keypair" "test" {
 }
 
 data "numspot_keypairs" "testdata" {
-  names = [numspot_keypair.test.name]
+  keypair_names = [numspot_keypair.test.name]
 }
 `, name)
 }

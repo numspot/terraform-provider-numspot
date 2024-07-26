@@ -38,9 +38,19 @@ func TestAccVmsDatasource(t *testing.T) {
 
 func fetchVmConfig(image_id, vm_type string) string {
 	return fmt.Sprintf(`
+resource "numspot_vpc" "vpc" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "subnet" {
+  vpc_id   = numspot_vpc.vpc.id
+  ip_range = "10.101.1.0/24"
+}
 resource "numspot_vm" "test" {
-  image_id = %[1]q
-  type     = %[2]q
+  image_id  = %[1]q
+  type      = %[2]q
+  subnet_id = numspot_subnet.subnet.id
+
 }
 
 data "numspot_vms" "testdata" {

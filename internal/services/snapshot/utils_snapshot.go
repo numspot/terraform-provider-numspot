@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
@@ -56,7 +57,7 @@ func SnapshotsFromTfToAPIReadParams(ctx context.Context, tf SnapshotsDataSourceM
 	return numspot.ReadSnapshotsParams{
 		Descriptions:     utils.TfStringListToStringPtrList(ctx, tf.Descriptions),
 		FromCreationDate: utils.FromTfStringToStringPtr(tf.FromCreationDate),
-		IsPublic:         utils.FromTfBoolToBoolPtr(tf.PermissionsToCreateVolumeGlobalPermission),
+		IsPublic:         utils.FromTfBoolToBoolPtr(tf.IsPublic),
 		Progresses:       utils.TFInt64ListToIntListPointer(ctx, tf.Progresses),
 		States:           utils.TfStringListToStringPtrList(ctx, tf.States),
 		ToCreationDate:   utils.FromTfStringToStringPtr(tf.ToCreationDate),
@@ -65,11 +66,11 @@ func SnapshotsFromTfToAPIReadParams(ctx context.Context, tf SnapshotsDataSourceM
 		TagKeys:          utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
 		TagValues:        utils.TfStringListToStringPtrList(ctx, tf.TagValues),
 		Tags:             utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:              utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		Ids:              utils.TfStringListToStringPtrList(ctx, tf.Ids),
 	}
 }
 
-func SnapshotsFromHttpToTfDatasource(ctx context.Context, http *numspot.Snapshot) (*SnapshotModel, diag.Diagnostics) {
+func SnapshotsFromHttpToTfDatasource(ctx context.Context, http *numspot.Snapshot) (*SnapshotModelDatasource, diag.Diagnostics) {
 	var (
 		diags          diag.Diagnostics
 		tagsList       types.List
@@ -101,7 +102,15 @@ func SnapshotsFromHttpToTfDatasource(ctx context.Context, http *numspot.Snapshot
 		volumeSizeTf = types.Int64PointerValue(&volumeSize)
 	}
 
-	return &SnapshotModel{
+	access, err := NewAccessValue(AccessValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"is_public": types.BoolPointerValue(http.Access.IsPublic),
+		})
+	if err != nil {
+		return nil, diags
+	}
+
+	return &SnapshotModelDatasource{
 		Id:           types.StringPointerValue(http.Id),
 		State:        types.StringPointerValue(http.State),
 		Tags:         tagsList,
@@ -110,5 +119,6 @@ func SnapshotsFromHttpToTfDatasource(ctx context.Context, http *numspot.Snapshot
 		VolumeId:     types.StringPointerValue(http.VolumeId),
 		Progress:     progressTf,
 		VolumeSize:   volumeSizeTf,
+		Access:       access,
 	}, nil
 }

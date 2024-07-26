@@ -82,8 +82,8 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 					"path_pattern": schema.StringAttribute{
 						Optional:            true,
 						Computed:            true,
-						Description:         "A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~&quot;'@:+?].",
-						MarkdownDescription: "A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~&quot;'@:+?].",
+						Description:         "A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~\"'@:+?].",
+						MarkdownDescription: "A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~\"'@:+?].",
 					},
 					"priority": schema.Int64Attribute{
 						Required:            true,
@@ -107,8 +107,8 @@ func ListenerRuleResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"path_pattern": schema.StringAttribute{
 				Computed:            true,
-				Description:         "A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~&quot;'@:+?].",
-				MarkdownDescription: "A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~&quot;'@:+?].",
+				Description:         "A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~\"'@:+?].",
+				MarkdownDescription: "A path pattern for the rule, with a maximum length of 128 characters. This path pattern supports maximum three wildcards, and must not contain any special characters except [_-.$/~\"'@:+?].",
 			},
 			"priority": schema.Int64Attribute{
 				Computed:            true,

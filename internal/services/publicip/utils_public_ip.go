@@ -137,7 +137,7 @@ func PublicIpsFromTfToAPIReadParams(ctx context.Context, tf PublicIpsDataSourceM
 	}
 }
 
-func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *numspot.PublicIp) (*PublicIpModel, diag.Diagnostics) {
+func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *numspot.PublicIp) (*PublicIpModelDatasource, diag.Diagnostics) {
 	var (
 		tagsList types.List
 		diag     diag.Diagnostics
@@ -150,7 +150,7 @@ func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *numspot.PublicIp
 		}
 	}
 
-	return &PublicIpModel{
+	return &PublicIpModelDatasource{
 		Id:             types.StringPointerValue(http.Id),
 		NicId:          types.StringPointerValue(http.NicId),
 		PrivateIp:      types.StringPointerValue(http.PrivateIp),

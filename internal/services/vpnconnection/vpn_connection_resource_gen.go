@@ -5,7 +5,6 @@ package vpnconnection
 import (
 	"context"
 	"fmt"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -13,10 +12,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
@@ -42,7 +40,7 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The type of VPN connection (only `ipsec.1` is supported).",
 				MarkdownDescription: "The type of VPN connection (only `ipsec.1` is supported).",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
 			},
 			"id": schema.StringAttribute{
@@ -76,8 +74,8 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Computed:            true,
 				Optional:            true,
+				Computed:            true,
 				Description:         "Information about one or more static routes associated with the VPN connection, if any.",
 				MarkdownDescription: "Information about one or more static routes associated with the VPN connection, if any.",
 			},
@@ -89,12 +87,10 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 			"static_routes_only": schema.BoolAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
-				MarkdownDescription: "If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
-				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.RequiresReplace(),
-				},
+				Description:         "By default or if false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
+				MarkdownDescription: "By default or if false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
 			},
+			"tags": tags.TagsSchema(ctx),
 			"vgw_telemetries": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -110,8 +106,8 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"outside_ip_address": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The IP on the OUTSCALE side of the tunnel.",
-							MarkdownDescription: "The IP on the OUTSCALE side of the tunnel.",
+							Description:         "The IP on the NumSpot side of the tunnel.",
+							MarkdownDescription: "The IP on the NumSpot side of the tunnel.",
 						},
 						"state": schema.StringAttribute{
 							Computed:            true,
@@ -231,10 +227,11 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 								MarkdownDescription: "The lifetime for phase 2 of the Internet Key Exchange (IKE) negociation process, in seconds.",
 							},
 							"pre_shared_key": schema.StringAttribute{
-								Computed:            true,
-								Optional:            true,
-								Description:         "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (&quot;).",
-								MarkdownDescription: "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (&quot;).",
+								Computed: true,
+								Optional: true,
+
+								Description:         "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").",
+								MarkdownDescription: "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").",
 							},
 						},
 						CustomType: Phase2optionsType{
@@ -242,14 +239,16 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 								AttrTypes: Phase2optionsValue{}.AttributeTypes(ctx),
 							},
 						},
-						Computed:            true,
-						Optional:            true,
+						Computed: true,
+						Optional: true,
+
 						Description:         "Information about Phase 2 of the Internet Key Exchange (IKE) negotiation. ",
 						MarkdownDescription: "Information about Phase 2 of the Internet Key Exchange (IKE) negotiation. ",
 					},
 					"tunnel_inside_ip_range": schema.StringAttribute{
-						Computed:            true,
-						Optional:            true,
+						Computed: true,
+						Optional: true,
+
 						Description:         "The range of inside IPs for the tunnel. This must be a /30 CIDR block from the 169.254.254.0/24 range.",
 						MarkdownDescription: "The range of inside IPs for the tunnel. This must be a /30 CIDR block from the 169.254.254.0/24 range.",
 					},
@@ -264,7 +263,6 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about the VPN options.",
 				MarkdownDescription: "Information about the VPN options.",
 			},
-			"tags": tags.TagsSchema(ctx),
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
@@ -278,10 +276,10 @@ type VpnConnectionModel struct {
 	Routes                     types.Set       `tfsdk:"routes"`
 	State                      types.String    `tfsdk:"state"`
 	StaticRoutesOnly           types.Bool      `tfsdk:"static_routes_only"`
+	Tags                       types.List      `tfsdk:"tags"`
 	VgwTelemetries             types.List      `tfsdk:"vgw_telemetries"`
 	VirtualGatewayId           types.String    `tfsdk:"virtual_gateway_id"`
 	VpnOptions                 VpnOptionsValue `tfsdk:"vpn_options"`
-	Tags                       types.List      `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = RoutesType{}

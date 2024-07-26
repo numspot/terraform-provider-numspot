@@ -18,7 +18,7 @@ type VpnConnectionsDataSourceModel struct {
 	BgpAsns                  types.List           `tfsdk:"bgp_asns"`
 	ClientGatewayIds         types.List           `tfsdk:"client_gateway_ids"`
 	ConnectionTypes          types.List           `tfsdk:"connection_types"`
-	RouteDestinationIpRanges types.List           `tfsdk:"routes_destination_ip_ranges"`
+	RouteDestinationIpRanges types.List           `tfsdk:"route_destination_ip_ranges"`
 	StaticRouteOnly          types.Bool           `tfsdk:"static_routes_only"`
 	VirtualGatewayIds        types.List           `tfsdk:"virtual_gateway_ids"`
 	States                   types.List           `tfsdk:"states"`

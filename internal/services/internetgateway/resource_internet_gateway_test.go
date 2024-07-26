@@ -32,9 +32,9 @@ func getFieldMatchChecksInternetGateway(data StepDataInternetGateway) []resource
 
 // Generate checks to validate that resource 'numspot_internet_gateway.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksInternetGateway(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksInternetGateway(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_internet_gateway.test", "vpc_id", "numspot_vpc.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_internet_gateway.test", "vpc_id", "numspot_vpc.test"+dependenciesSuffix, "id"),
 	}
 }
 

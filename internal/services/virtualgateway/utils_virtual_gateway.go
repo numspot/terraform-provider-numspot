@@ -3,6 +3,7 @@ package virtualgateway
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
@@ -36,13 +37,20 @@ func getVpcId(vpcToVirtualGatewayLinks *[]numspot.VpcToVirtualGatewayLink) *stri
 	return vpcId
 }
 
+func VpcToVirtualGatewayLinksFromHttpToTf(ctx context.Context, http numspot.VpcToVirtualGatewayLink) (VpcToVirtualGatewayLinksValue, diag.Diagnostics) {
+	return NewVpcToVirtualGatewayLinksValue(VpcToVirtualGatewayLinksValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"state":  types.StringPointerValue(http.State),
+			"vpc_id": types.StringPointerValue(http.VpcId),
+		},
+	)
+}
+
 func VirtualGatewayFromHttpToTf(ctx context.Context, http *numspot.VirtualGateway) (*VirtualGatewayModel, diag.Diagnostics) {
 	var (
-		diags  diag.Diagnostics
-		tagsTf types.List
+		diags                              diag.Diagnostics
+		tagsTf, vpcToVirtualGatewayLinksTf types.List
 	)
-
-	vpcId := getVpcId(http.VpcToVirtualGatewayLinks)
 
 	if http.Tags != nil {
 		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
@@ -51,12 +59,22 @@ func VirtualGatewayFromHttpToTf(ctx context.Context, http *numspot.VirtualGatewa
 		}
 	}
 
+	if http.VpcToVirtualGatewayLinks != nil {
+		vpcToVirtualGatewayLinksTf, diags = utils.GenericListToTfListValue(ctx, VpcToVirtualGatewayLinksValue{}, VpcToVirtualGatewayLinksFromHttpToTf, *http.VpcToVirtualGatewayLinks)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	vpcId := getVpcId(http.VpcToVirtualGatewayLinks)
+
 	return &VirtualGatewayModel{
-		ConnectionType: types.StringPointerValue(http.ConnectionType),
-		Id:             types.StringPointerValue(http.Id),
-		VpcId:          types.StringPointerValue(vpcId),
-		State:          types.StringPointerValue(http.State),
-		Tags:           tagsTf,
+		ConnectionType:           types.StringPointerValue(http.ConnectionType),
+		Id:                       types.StringPointerValue(http.Id),
+		VpcToVirtualGatewayLinks: vpcToVirtualGatewayLinksTf,
+		VpcId:                    types.StringPointerValue(vpcId),
+		State:                    types.StringPointerValue(http.State),
+		Tags:                     tagsTf,
 	}, diags
 }
 
@@ -77,28 +95,4 @@ func VirtualGatewaysFromTfToAPIReadParams(ctx context.Context, tf VirtualGateway
 		LinkStates:      utils.TfStringListToStringPtrList(ctx, tf.LinkStates),
 		LinkVpcIds:      utils.TfStringListToStringPtrList(ctx, tf.LinkVpcIds),
 	}
-}
-
-func VirtualGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.VirtualGateway) (*VirtualGatewayModel, diag.Diagnostics) {
-	var (
-		diags    diag.Diagnostics
-		tagsList types.List
-	)
-
-	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
-	}
-
-	vpcId := getVpcId(http.VpcToVirtualGatewayLinks)
-
-	return &VirtualGatewayModel{
-		Id:             types.StringPointerValue(http.Id),
-		State:          types.StringPointerValue(http.State),
-		ConnectionType: types.StringPointerValue(http.ConnectionType),
-		VpcId:          types.StringPointerValue(vpcId),
-		Tags:           tagsList,
-	}, nil
 }

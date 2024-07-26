@@ -36,7 +36,7 @@ func getFieldMatchChecksClientGateway(data StepDataClientGateway) []resource.Tes
 
 // Generate checks to validate that resource 'numspot_client_gateway.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksClientGateway(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksClientGateway(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{}
 }
 

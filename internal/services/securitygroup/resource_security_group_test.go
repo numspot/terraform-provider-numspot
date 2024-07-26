@@ -49,15 +49,14 @@ func getFieldMatchChecksSecurityGroup(data StepDataSecurityGroup) []resource.Tes
 			"to_port_range":   outboundRulePort,
 		}))
 	}
-
 	return checks
 }
 
 // Generate checks to validate that resource 'numspot_security_group.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksSecurityGroup(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksSecurityGroup(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test"+dependenciesSuffix, "id"),
 	}
 }
 

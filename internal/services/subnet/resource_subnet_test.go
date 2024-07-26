@@ -1,4 +1,4 @@
-//go:build acc
+///go:build acc
 
 package subnet_test
 
@@ -26,7 +26,7 @@ type StepDataSubnet struct {
 func getFieldMatchChecksSubnet(data StepDataSubnet) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
 		resource.TestCheckResourceAttr("numspot_subnet.test", "map_public_ip_on_launch", data.mapPublicIpOnLaunch),
-		resource.TestCheckResourceAttr("numspot_subnet.test", "net_ip_range", data.netIpRange),
+		resource.TestCheckResourceAttr("numspot_subnet.test", "ip_range", data.subnetIpRange),
 		resource.TestCheckResourceAttr("numspot_subnet.test", "tags.#", "1"),
 		resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.test", "tags.*", map[string]string{
 			"key":   data.tagKey,
@@ -37,15 +37,15 @@ func getFieldMatchChecksSubnet(data StepDataSubnet) []resource.TestCheckFunc {
 
 // Generate checks to validate that resource 'numspot_subnet.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksSubnet(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksSubnet(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_subnet.test", "vpc_id", "numspot_vpc.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_subnet.test", "vpc_id", "numspot_vpc.test"+dependenciesSuffix, "id"),
 	}
 }
 
 func TestAccSubnetResource(t *testing.T) {
 	pr := provider.TestAccProtoV6ProviderFactories
-	subnetIpRange := "10.101.1.0/24"
+	netIpRange := "10.101.0.0/16"
 
 	var resourceId string
 
@@ -59,8 +59,8 @@ func TestAccSubnetResource(t *testing.T) {
 	mapPublicIpOnLaunchUpdated := "false"
 
 	// resource fields that cannot be updated in-place (requires replace)
-	netIpRange := "10.101.0.0/16"
-	netIpRangeUpdated := "10.101.2.0/24"
+	subnetIpRange := "10.101.1.0/24"
+	subnetIpRangeUpdated := "10.101.2.0/24"
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -106,8 +106,8 @@ func TestAccSubnetResource(t *testing.T) {
 		tagKey:              tagName,
 		tagValue:            tagValue,
 		mapPublicIpOnLaunch: mapPublicIpOnLaunch,
-		netIpRange:          netIpRangeUpdated,
-		subnetIpRange:       subnetIpRange,
+		netIpRange:          netIpRange,
+		subnetIpRange:       subnetIpRangeUpdated,
 	}
 	replaceChecks := append(
 		getFieldMatchChecksSubnet(replacePlanValues),
@@ -174,12 +174,12 @@ func TestAccSubnetResource(t *testing.T) {
 func testSubnetConfig(subresourceSuffix string, data StepDataSubnet) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "test%[1]s" {
-  ip_range = %[2]q
+  ip_range = %[3]q
 }
 
 resource "numspot_subnet" "test" {
   vpc_id                  = numspot_vpc.test%[1]s.id
-  ip_range                = %[3]q
+  ip_range                = %[2]q
   map_public_ip_on_launch = %[4]s
   tags = [
     {
@@ -187,6 +187,5 @@ resource "numspot_subnet" "test" {
       value = %[6]q
     }
   ]
-
 }`, subresourceSuffix, data.subnetIpRange, data.netIpRange, data.mapPublicIpOnLaunch, data.tagKey, data.tagValue)
 }

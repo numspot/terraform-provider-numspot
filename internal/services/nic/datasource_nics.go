@@ -14,32 +14,32 @@ import (
 )
 
 type NicsDataSourceModel struct {
-	Items                          []NicModel `tfsdk:"items"`
-	Descriptions                   types.List `tfsdk:"descriptions"`
-	IsSourceDestChecked            types.Bool `tfsdk:"is_source_dest_checked"`
-	LinkNicDeleteOnVMDeletion      types.Bool `tfsdk:"link_nic_delete_on_vm_deletion"`
-	LinkNicDeviceNumbers           types.List `tfsdk:"link_nic_device_numbers"`
-	LinkNicIds                     types.List `tfsdk:"link_nic_link_nic_ids"`
-	LinkNicStates                  types.List `tfsdk:"link_nic_states"`
-	LinkNicVMIds                   types.List `tfsdk:"link_nic_vm_ids"`
-	LinkPublicIpLinkPublicIpIds    types.List `tfsdk:"link_public_ip_ids"`
-	LinkPublicIpPublicIpIds        types.List `tfsdk:"link_public_ip_public_ip_ids"`
-	LinkPublicIpPublicIps          types.List `tfsdk:"link_public_ip_public_ips"`
-	MacAddresses                   types.List `tfsdk:"mac_addresses"`
-	PrivateDnsNames                types.List `tfsdk:"private_dns_names"`
-	PrivateIpIsPrimary             types.Bool `tfsdk:"private_ips_is_primary"`
-	PrivateIpLinkPublicIpPublicIps types.List `tfsdk:"private_ips_link_public_ip_public_ips"`
-	PrivateIpPrivateIps            types.List `tfsdk:"private_ips_private_ips"`
-	SecurityGroupIds               types.List `tfsdk:"security_group_ids"`
-	SecurityGroupNames             types.List `tfsdk:"security_group_names"`
-	States                         types.List `tfsdk:"states"`
-	SubnetIds                      types.List `tfsdk:"subnet_ids"`
-	VpcIds                         types.List `tfsdk:"vpc_ids"`
-	IDs                            types.List `tfsdk:"ids"`
-	AvailabilityZoneNames          types.List `tfsdk:"tags"`
-	Tags                           types.List `tfsdk:"availability_zone_names"`
-	TagKeys                        types.List `tfsdk:"tag_keys"`
-	TagValues                      types.List `tfsdk:"tag_values"`
+	Items                           []NicModelDatasource `tfsdk:"items"`
+	AvailabilityZoneNames           types.List           `tfsdk:"availability_zone_names"`
+	Descriptions                    types.List           `tfsdk:"descriptions"`
+	Ids                             types.List           `tfsdk:"ids"`
+	IsSourceDestCheck               types.Bool           `tfsdk:"is_source_dest_check"`
+	LinkNicDeleteOnVmDeletion       types.Bool           `tfsdk:"link_nic_delete_on_vm_deletion"`
+	LinkNicDeviceNumbers            types.List           `tfsdk:"link_nic_device_numbers"`
+	LinkNicLinkNicIds               types.List           `tfsdk:"link_nic_link_nic_ids"`
+	LinkNicStates                   types.List           `tfsdk:"link_nic_states"`
+	LinkNicVmIds                    types.List           `tfsdk:"link_nic_vm_ids"`
+	LinkPublicIpLinkPublicIpIds     types.List           `tfsdk:"link_public_ip_link_public_ip_ids"`
+	LinkPublicIpPublicIpIds         types.List           `tfsdk:"link_public_ip_public_ip_ids"`
+	LinkPublicIpPublicIps           types.List           `tfsdk:"link_public_ip_public_ips"`
+	MacAddresses                    types.List           `tfsdk:"mac_addresses"`
+	PrivateDnsNames                 types.List           `tfsdk:"private_dns_names"`
+	PrivateIpsLinkPublicIpPublicIps types.List           `tfsdk:"private_ips_link_public_ip_public_ips"`
+	PrivateIpsPrimaryIp             types.Bool           `tfsdk:"private_ips_primary_ip"`
+	PrivateIpsPrivateIps            types.List           `tfsdk:"private_ips_private_ips"`
+	SecurityGroupIds                types.List           `tfsdk:"security_group_ids"`
+	SecurityGroupNames              types.List           `tfsdk:"security_group_names"`
+	States                          types.List           `tfsdk:"states"`
+	SubnetIds                       types.List           `tfsdk:"subnet_ids"`
+	TagKeys                         types.List           `tfsdk:"tag_keys"`
+	TagValues                       types.List           `tfsdk:"tag_values"`
+	Tags                            types.List           `tfsdk:"tags"`
+	VpcIds                          types.List           `tfsdk:"vpc_ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.

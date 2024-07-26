@@ -14,20 +14,18 @@ import (
 )
 
 type VpcPeeringsDataSourceModel struct {
-	Items                 []VpcPeeringDatasourceItemModel `tfsdk:"items"`
-	ExpirationDates       types.List                      `tfsdk:"expiration_dates"`
-	StateMessages         types.List                      `tfsdk:"state_messages"`
-	StateNames            types.List                      `tfsdk:"state_names"`
-	AccepterVpcAccountIds types.List                      `tfsdk:"accepter_vpc_account_ids"`
-	AccepterVpcIpRanges   types.List                      `tfsdk:"accepter_vpc_ip_ranges"`
-	AccepterVpcVpcIds     types.List                      `tfsdk:"accepter_vpc_vpc_ids"`
-	IDs                   types.List                      `tfsdk:"ids"`
-	SourceVpcAccountIds   types.List                      `tfsdk:"source_vpc_account_ids"`
-	SourceVpcIpRanges     types.List                      `tfsdk:"source_vpc_ip_ranges"`
-	SourceVpcVpcIds       types.List                      `tfsdk:"source_vpc_vpc_ids"`
-	TagKeys               types.List                      `tfsdk:"tag_keys"`
-	TagValues             types.List                      `tfsdk:"tag_values"`
-	Tags                  types.List                      `tfsdk:"tags"`
+	Items               []VpcPeeringDatasourceItemModel `tfsdk:"items"`
+	AccepterVpcIpRanges types.List                      `tfsdk:"accepter_vpc_ip_ranges"`
+	AccepterVpcVpcIds   types.List                      `tfsdk:"accepter_vpc_vpc_ids"`
+	ExpirationDates     types.List                      `tfsdk:"expiration_dates"`
+	Ids                 types.List                      `tfsdk:"ids"`
+	SourceVpcIpRanges   types.List                      `tfsdk:"source_vpc_ip_ranges"`
+	SourceVpcVpcIds     types.List                      `tfsdk:"source_vpc_vpc_ids"`
+	StateMessages       types.List                      `tfsdk:"state_messages"`
+	StateNames          types.List                      `tfsdk:"state_names"`
+	TagKeys             types.List                      `tfsdk:"tag_keys"`
+	TagValues           types.List                      `tfsdk:"tag_values"`
+	Tags                types.List                      `tfsdk:"tags"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -53,12 +51,10 @@ func (d *vpcPeeringsDataSource) Configure(_ context.Context, request datasource.
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewVpcPeeringsDataSource() datasource.DataSource {
 	return &vpcPeeringsDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type vpcPeeringsDataSource struct {
 	provider services.IProvider
 }

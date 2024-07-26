@@ -32,10 +32,10 @@ func getFieldMatchChecksNatGateway(data StepDataNatGateway) []resource.TestCheck
 
 // Generate checks to validate that resource 'numspot_nat_gateway.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksNatGateway(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksNatGateway(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_nat_gateway.test", "subnet_id", "numspot_subnet.test"+dependenciesPrefix, "id"),
-		resource.TestCheckResourceAttrPair("numspot_nat_gateway.test", "public_ip_id", "numspot_public_ip.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_nat_gateway.test", "subnet_id", "numspot_subnet.test"+dependenciesSuffix, "id"),
+		resource.TestCheckResourceAttrPair("numspot_nat_gateway.test", "public_ip_id", "numspot_public_ip.test"+dependenciesSuffix, "id"),
 	}
 }
 

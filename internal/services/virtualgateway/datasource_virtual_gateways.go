@@ -85,7 +85,7 @@ func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource
 		response.Diagnostics.AddError("HTTP call failed", "got empty Virtual Gateways list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VirtualGatewaysFromHttpToTfDatasource)
+	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VirtualGatewayFromHttpToTf)
 
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)

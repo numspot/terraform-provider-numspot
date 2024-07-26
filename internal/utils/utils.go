@@ -133,6 +133,9 @@ func TFInt64ListToIntList(ctx context.Context, list types.List) []int {
 }
 
 func TFInt64ListToIntListPointer(ctx context.Context, list types.List) *[]int {
+	if list.IsNull() {
+		return nil
+	}
 	arr := TfListToGenericList(func(a types.Int64) int {
 		return int(a.ValueInt64())
 	}, ctx, list)
@@ -195,6 +198,9 @@ func TfStringListToStringList(ctx context.Context, list types.List) []string {
 }
 
 func TfStringSetToStringPtrSet(ctx context.Context, set types.Set) *[]string {
+	if set.IsNull() {
+		return nil
+	}
 	slice := TfSetToGenericSet(func(a types.String) string {
 		return a.ValueString()
 	}, ctx, set)
@@ -202,6 +208,9 @@ func TfStringSetToStringPtrSet(ctx context.Context, set types.Set) *[]string {
 }
 
 func TfStringListToStringPtrList(ctx context.Context, list types.List) *[]string {
+	if list.IsNull() || list.IsUnknown() {
+		return nil
+	}
 	slice := TfListToGenericList(func(a types.String) string {
 		return a.ValueString()
 	}, ctx, list)
@@ -209,6 +218,9 @@ func TfStringListToStringPtrList(ctx context.Context, list types.List) *[]string
 }
 
 func TfStringListToTimeList(ctx context.Context, list types.List, format string) []time.Time {
+	if list.IsNull() {
+		return nil
+	}
 	slice := TfListToGenericList(func(a types.String) time.Time {
 		t, err := time.Parse(format, a.ValueString())
 		if err != nil {

@@ -15,18 +15,18 @@ func InternetGatewayResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The ID of the Internet service.",
-				MarkdownDescription: "The ID of the Internet service.",
+				Description:         "The ID of the Internet gateway.",
+				MarkdownDescription: "The ID of the Internet gateway.",
 			},
 			"vpc_id": schema.StringAttribute{
 				Optional:            true,
-				Description:         "The ID of the Net attached to the Internet service.",
-				MarkdownDescription: "The ID of the Net attached to the Internet service.",
+				Description:         "The ID of the Vpc attached to the Internet gateway.",
+				MarkdownDescription: "The ID of the Vpc attached to the Internet gateway.",
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The state of the attachment of the Internet service to the Net (always `available`).",
-				MarkdownDescription: "The state of the attachment of the Internet service to the Net (always `available`).",
+				Description:         "The state of the attachment of the Internet gateway to the Vpc (always `available`).",
+				MarkdownDescription: "The state of the attachment of the Internet gateway to the Vpc (always `available`).",
 			},
 			"tags": tags.TagsSchema(ctx),
 		},

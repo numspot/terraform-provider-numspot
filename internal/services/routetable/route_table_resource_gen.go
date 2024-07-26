@@ -5,16 +5,14 @@ package routetable
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-
-	//"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
-	//"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	"strings"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -52,8 +50,8 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the Net.",
-							MarkdownDescription: "The ID of the Net.",
+							Description:         "The ID of the Vpc.",
+							MarkdownDescription: "The ID of the Vpc.",
 						},
 					},
 					CustomType: LinkRouteTablesType{
@@ -62,7 +60,6 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Optional:            true,
 				Computed:            true,
 				Description:         "One or more associations between the route table and Subnets.",
 				MarkdownDescription: "One or more associations between the route table and Subnets.",
@@ -101,20 +98,20 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"destination_service_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the OUTSCALE service.",
-							MarkdownDescription: "The ID of the OUTSCALE service.",
+							Description:         "The ID of the NumSpot service.",
+							MarkdownDescription: "The ID of the NumSpot service.",
 						},
 						"gateway_id": schema.StringAttribute{
 							Computed:            true,
 							Optional:            true,
-							Description:         "The ID of the Internet service or virtual gateway attached to the Net.",
-							MarkdownDescription: "The ID of the Internet service or virtual gateway attached to the Net.",
+							Description:         "The ID of the Internet gateway or virtual gateway attached to the Vpc.",
+							MarkdownDescription: "The ID of the Internet gateway or virtual gateway attached to the Vpc.",
 						},
 						"nat_gateway_id": schema.StringAttribute{
 							Computed:            true,
 							Optional:            true,
-							Description:         "The ID of a NAT service attached to the Net.",
-							MarkdownDescription: "The ID of a NAT service attached to the Net.",
+							Description:         "The ID of a NAT gateway attached to the Vpc.",
+							MarkdownDescription: "The ID of a NAT gateway attached to the Vpc.",
 						},
 						"nic_id": schema.StringAttribute{
 							Computed:            true,
@@ -136,8 +133,8 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						"vpc_peering_id": schema.StringAttribute{
 							Computed:            true,
 							Optional:            true,
-							Description:         "The ID of the Net peering.",
-							MarkdownDescription: "The ID of the Net peering.",
+							Description:         "The ID of the Vpc peering.",
+							MarkdownDescription: "The ID of the Vpc peering.",
 						},
 					},
 					CustomType: RoutesType{
@@ -150,6 +147,23 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Optional:            true,
 				Description:         "One or more routes in the route table.",
 				MarkdownDescription: "One or more routes in the route table.",
+			},
+			"space_id": schema.StringAttribute{
+				Optional:            true,
+				Computed:            true,
+				Description:         "Identifier of the Space",
+				MarkdownDescription: "Identifier of the Space",
+			},
+			"tags": tags.TagsSchema(ctx),
+			"vpc_id": schema.StringAttribute{
+				Required:            true,
+				Description:         "The ID of the Vpc for which you want to create a route table.",
+				MarkdownDescription: "The ID of the Vpc for which you want to create a route table.",
+			},
+			"subnet_id": schema.StringAttribute{
+				Optional:            true,
+				Description:         "The ID of the SubNet for which you want to link the route table.",
+				MarkdownDescription: "The ID of the SubNet for which you want to link the route table.",
 			},
 			"local_route": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
@@ -211,23 +225,6 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				},
 				Computed: true,
 			},
-			"space_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "space identifier",
-				MarkdownDescription: "space identifier",
-			},
-			"vpc_id": schema.StringAttribute{
-				Required:            true,
-				Description:         "The ID of the Net for which you want to create a route table.",
-				MarkdownDescription: "The ID of the Net for which you want to create a route table.",
-			},
-			"subnet_id": schema.StringAttribute{
-				Optional:            true,
-				Description:         "The ID of the SubNet for which you want to link the route table.",
-				MarkdownDescription: "The ID of the SubNet for which you want to link the route table.",
-			},
-			"tags": tags.TagsSchema(ctx),
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
@@ -238,11 +235,11 @@ type RouteTableModel struct {
 	LinkRouteTables                 types.List   `tfsdk:"link_route_tables"`
 	RoutePropagatingVirtualGateways types.List   `tfsdk:"route_propagating_virtual_gateways"`
 	Routes                          types.Set    `tfsdk:"routes"`
-	LocalRoute                      RoutesValue  `tfsdk:"local_route"`
 	SpaceId                         types.String `tfsdk:"space_id"`
+	Tags                            types.List   `tfsdk:"tags"`
 	VpcId                           types.String `tfsdk:"vpc_id"`
 	SubnetId                        types.String `tfsdk:"subnet_id"`
-	Tags                            types.List   `tfsdk:"tags"`
+	LocalRoute                      RoutesValue  `tfsdk:"local_route"`
 }
 
 var _ basetypes.ObjectTypable = LinkRouteTablesType{}
@@ -704,14 +701,24 @@ func (v LinkRouteTablesValue) String() string {
 func (v LinkRouteTablesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	attributeTypes := map[string]attr.Type{
+		"id":             basetypes.StringType{},
+		"main":           basetypes.BoolType{},
+		"route_table_id": basetypes.StringType{},
+		"subnet_id":      basetypes.StringType{},
+		"vpc_id":         basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
 	objVal, diags := types.ObjectValue(
-		map[string]attr.Type{
-			"id":             basetypes.StringType{},
-			"main":           basetypes.BoolType{},
-			"route_table_id": basetypes.StringType{},
-			"subnet_id":      basetypes.StringType{},
-			"vpc_id":         basetypes.StringType{},
-		},
+		attributeTypes,
 		map[string]attr.Value{
 			"id":             v.Id,
 			"main":           v.Main,
@@ -1046,10 +1053,20 @@ func (v RoutePropagatingVirtualGatewaysValue) String() string {
 func (v RoutePropagatingVirtualGatewaysValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	attributeTypes := map[string]attr.Type{
+		"virtual_gateway_id": basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
 	objVal, diags := types.ObjectValue(
-		map[string]attr.Type{
-			"virtual_gateway_id": basetypes.StringType{},
-		},
+		attributeTypes,
 		map[string]attr.Value{
 			"virtual_gateway_id": v.VirtualGatewayId,
 		})
@@ -1622,7 +1639,7 @@ type RoutesValue struct {
 }
 
 func (v RoutesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 11)
+	attrTypes := make(map[string]tftypes.Type, 9)
 
 	var val tftypes.Value
 	var err error
@@ -1641,7 +1658,7 @@ func (v RoutesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 11)
+		vals := make(map[string]tftypes.Value, 9)
 
 		val, err = v.CreationMethod.ToTerraformValue(ctx)
 
@@ -1744,18 +1761,28 @@ func (v RoutesValue) String() string {
 func (v RoutesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	attributeTypes := map[string]attr.Type{
+		"creation_method":        basetypes.StringType{},
+		"destination_ip_range":   basetypes.StringType{},
+		"destination_service_id": basetypes.StringType{},
+		"gateway_id":             basetypes.StringType{},
+		"nat_gateway_id":         basetypes.StringType{},
+		"nic_id":                 basetypes.StringType{},
+		"state":                  basetypes.StringType{},
+		"vm_id":                  basetypes.StringType{},
+		"vpc_peering_id":         basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
 	objVal, diags := types.ObjectValue(
-		map[string]attr.Type{
-			"creation_method":        basetypes.StringType{},
-			"destination_ip_range":   basetypes.StringType{},
-			"destination_service_id": basetypes.StringType{},
-			"gateway_id":             basetypes.StringType{},
-			"nat_gateway_id":         basetypes.StringType{},
-			"nic_id":                 basetypes.StringType{},
-			"state":                  basetypes.StringType{},
-			"vm_id":                  basetypes.StringType{},
-			"vpc_peering_id":         basetypes.StringType{},
-		},
+		attributeTypes,
 		map[string]attr.Value{
 			"creation_method":        v.CreationMethod,
 			"destination_ip_range":   v.DestinationIpRange,

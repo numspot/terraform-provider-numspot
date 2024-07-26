@@ -46,11 +46,11 @@ func getFieldMatchChecksLoadBalancer(data StepDataLoadBalancer) []resource.TestC
 
 // Generate checks to validate that resource 'numspot_load_balancer.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksLoadBalancer(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksLoadBalancer(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test"+dependenciesPrefix, "id"),
-		resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test"+dependenciesPrefix, "id"),
-		resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "backend_vm_ids.*", "numspot_vm.test"+dependenciesPrefix, "id"),
+		resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test"+dependenciesSuffix, "id"),
+		resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test"+dependenciesSuffix, "id"),
+		resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "backend_vm_ids.*", "numspot_vm.test"+dependenciesSuffix, "id"),
 	}
 }
 

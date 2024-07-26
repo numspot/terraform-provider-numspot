@@ -14,19 +14,19 @@ import (
 )
 
 type SnapshotsDataSourceModel struct {
-	Items                                     []SnapshotModel `tfsdk:"items"`
-	Descriptions                              types.List      `tfsdk:"descriptions"`
-	FromCreationDate                          types.String    `tfsdk:"from_creation_date"`
-	PermissionsToCreateVolumeGlobalPermission types.Bool      `tfsdk:"permissions_to_create_volume_global_permission"`
-	Progresses                                types.List      `tfsdk:"progresses"`
-	States                                    types.List      `tfsdk:"states"`
-	ToCreationDate                            types.String    `tfsdk:"to_creation_date"`
-	VolumeIds                                 types.List      `tfsdk:"volume_ids"`
-	VolumeSizes                               types.List      `tfsdk:"volume_sizes"`
-	TagKeys                                   types.List      `tfsdk:"tag_keys"`
-	TagValues                                 types.List      `tfsdk:"tag_values"`
-	Tags                                      types.List      `tfsdk:"tags"`
-	IDs                                       types.List      `tfsdk:"ids"`
+	Items            []SnapshotModelDatasource `tfsdk:"items"`
+	Descriptions     types.List                `tfsdk:"descriptions"`
+	FromCreationDate types.String              `tfsdk:"from_creation_date"`
+	Ids              types.List                `tfsdk:"ids"`
+	IsPublic         types.Bool                `tfsdk:"is_public"`
+	Progresses       types.List                `tfsdk:"progresses"`
+	States           types.List                `tfsdk:"states"`
+	TagKeys          types.List                `tfsdk:"tag_keys"`
+	TagValues        types.List                `tfsdk:"tag_values"`
+	Tags             types.List                `tfsdk:"tags"`
+	ToCreationDate   types.String              `tfsdk:"to_creation_date"`
+	VolumeIds        types.List                `tfsdk:"volume_ids"`
+	VolumeSizes      types.List                `tfsdk:"volume_sizes"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.

@@ -49,12 +49,24 @@ func SubnetsFromTfToAPIReadParams(ctx context.Context, tf SubnetsDataSourceModel
 		IpRanges:              utils.TfStringListToStringPtrList(ctx, tf.IpRanges),
 		States:                utils.TfStringListToStringPtrList(ctx, tf.States),
 		VpcIds:                utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
-		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.Ids),
 		AvailabilityZoneNames: utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames),
 	}
 }
 
 func SubnetsFromHttpToTfDatasource(ctx context.Context, http *numspot.Subnet) (*SubnetModel, diag.Diagnostics) {
+	var (
+		diags    diag.Diagnostics
+		tagsList types.List
+	)
+
+	if http.Tags != nil {
+		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
 	return &SubnetModel{
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		AvailableIpsCount:    utils.FromIntPtrToTfInt64(http.AvailableIpsCount),
@@ -63,5 +75,6 @@ func SubnetsFromHttpToTfDatasource(ctx context.Context, http *numspot.Subnet) (*
 		MapPublicIpOnLaunch:  types.BoolPointerValue(http.MapPublicIpOnLaunch),
 		State:                types.StringPointerValue(http.State),
 		VpcId:                types.StringPointerValue(http.VpcId),
+		Tags:                 tagsList,
 	}, nil
 }

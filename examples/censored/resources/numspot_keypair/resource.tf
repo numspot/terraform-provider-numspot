@@ -6,5 +6,5 @@ resource "numspot_kepair" "create" {
 # Import key pair
 resource "numspot_keypair" "import" {
   name       = "keypair-example"
-  public_key = "ssh-rsa ..."
+  public_key = "ssh-ed25519 ..."
 }

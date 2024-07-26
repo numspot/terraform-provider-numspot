@@ -5,17 +5,18 @@ package loadbalancer
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
 func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
@@ -47,9 +48,10 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"availability_zone_names": schema.ListAttribute{
 				ElementType:         types.StringType,
+				Optional:            true,
 				Computed:            true,
-				Description:         "The ID of the Subregion in which the load balancer was created.",
-				MarkdownDescription: "The ID of the Subregion in which the load balancer was created.",
+				Description:         "(public Cloud only) The Subregion in which you want to create the load balancer. Regardless of this Subregion, the load balancer can distribute traffic to all Subregions. This parameter is required in the public Cloud.",
+				MarkdownDescription: "(public Cloud only) The Subregion in which you want to create the load balancer. Regardless of this Subregion, the load balancer can distribute traffic to all Subregions. This parameter is required in the public Cloud.",
 			},
 			"backend_ips": schema.SetAttribute{
 				ElementType:         types.StringType,
@@ -162,9 +164,10 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The names of the policies. If there are no policies enabled, the list is empty.",
 						},
 						"server_certificate_id": schema.StringAttribute{
+							Optional:            true,
 							Computed:            true,
-							Description:         "The OUTSCALE Resource Name (ORN) of the server certificate. For more information, see [Resource Identifiers > OUTSCALE Resource Names (ORNs)](https://docs.outscale.com/en/userguide/Resource-Identifiers.html#_outscale_resource_names_orns).",
-							MarkdownDescription: "The OUTSCALE Resource Name (ORN) of the server certificate. For more information, see [Resource Identifiers > OUTSCALE Resource Names (ORNs)](https://docs.outscale.com/en/userguide/Resource-Identifiers.html#_outscale_resource_names_orns).",
+							Description:         "The server certificate orn",
+							MarkdownDescription: "The server certificate orn",
 						},
 					},
 					CustomType: ListenersType{
@@ -188,8 +191,8 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 			"public_ip": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "(internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by 3DS OUTSCALE is associated.",
-				MarkdownDescription: "(internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by 3DS OUTSCALE is associated.",
+				Description:         "(internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by NumSpot is associated.",
+				MarkdownDescription: "(internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by NumSpot is associated.",
 			},
 			"secured_cookies": schema.BoolAttribute{
 				Computed:            true,
@@ -200,8 +203,8 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "(Net only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Net is assigned to the load balancer.",
-				MarkdownDescription: "(Net only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Net is assigned to the load balancer.	",
+				Description:         "(Vpc only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Vpc is assigned to the load balancer.",
+				MarkdownDescription: "(Vpc only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Vpc is assigned to the load balancer.",
 			},
 			"source_security_group": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
@@ -223,8 +226,8 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 			"space_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "space identifier",
-				MarkdownDescription: "space identifier",
+				Description:         "Identifier of the Space",
+				MarkdownDescription: "Identifier of the Space",
 			},
 			"sticky_cookie_policies": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -252,23 +255,22 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"subnets": schema.ListAttribute{
 				ElementType:         types.StringType,
-				Optional:            true,
-				Computed:            true,
-				Description:         "(Net only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Net.",
-				MarkdownDescription: "(Net only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Net.",
+				Required:            true,
+				Description:         "(Vpc only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Vpc.",
+				MarkdownDescription: "(Vpc only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Vpc.",
 			},
+			"tags": tags.TagsSchema(ctx),
 			"type": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.",
-				MarkdownDescription: "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Net.",
+				Description:         "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Vpc.",
+				MarkdownDescription: "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Vpc.",
 			},
 			"vpc_id": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The ID of the Net for the load balancer.",
-				MarkdownDescription: "The ID of the Net for the load balancer.",
+				Description:         "The ID of the Vpc for the load balancer.",
+				MarkdownDescription: "The ID of the Vpc for the load balancer.",
 			},
-			"tags": tags.TagsSchema(ctx),
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
@@ -291,9 +293,9 @@ type LoadBalancerModel struct {
 	SpaceId                         types.String             `tfsdk:"space_id"`
 	StickyCookiePolicies            types.List               `tfsdk:"sticky_cookie_policies"`
 	Subnets                         types.List               `tfsdk:"subnets"`
+	Tags                            types.List               `tfsdk:"tags"`
 	Type                            types.String             `tfsdk:"type"`
 	VpcId                           types.String             `tfsdk:"vpc_id"`
-	Tags                            types.List               `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = ApplicationStickyCookiePoliciesType{}
@@ -521,14 +523,12 @@ func (t ApplicationStickyCookiePoliciesType) ValueFromTerraform(ctx context.Cont
 	val := map[string]tftypes.Value{}
 
 	err := in.As(&val)
-
 	if err != nil {
 		return nil, err
 	}
 
 	for k, v := range val {
 		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
 		if err != nil {
 			return nil, err
 		}
@@ -567,7 +567,6 @@ func (v ApplicationStickyCookiePoliciesValue) ToTerraformValue(ctx context.Conte
 		vals := make(map[string]tftypes.Value, 2)
 
 		val, err = v.CookieName.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -575,7 +574,6 @@ func (v ApplicationStickyCookiePoliciesValue) ToTerraformValue(ctx context.Conte
 		vals["cookie_name"] = val
 
 		val, err = v.PolicyName.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1080,14 +1078,12 @@ func (t HealthCheckType) ValueFromTerraform(ctx context.Context, in tftypes.Valu
 	val := map[string]tftypes.Value{}
 
 	err := in.As(&val)
-
 	if err != nil {
 		return nil, err
 	}
 
 	for k, v := range val {
 		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
 		if err != nil {
 			return nil, err
 		}
@@ -1136,7 +1132,6 @@ func (v HealthCheckValue) ToTerraformValue(ctx context.Context) (tftypes.Value, 
 		vals := make(map[string]tftypes.Value, 7)
 
 		val, err = v.CheckInterval.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1144,7 +1139,6 @@ func (v HealthCheckValue) ToTerraformValue(ctx context.Context) (tftypes.Value, 
 		vals["check_interval"] = val
 
 		val, err = v.HealthyThreshold.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1152,7 +1146,6 @@ func (v HealthCheckValue) ToTerraformValue(ctx context.Context) (tftypes.Value, 
 		vals["healthy_threshold"] = val
 
 		val, err = v.Path.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1160,7 +1153,6 @@ func (v HealthCheckValue) ToTerraformValue(ctx context.Context) (tftypes.Value, 
 		vals["path"] = val
 
 		val, err = v.Port.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1168,7 +1160,6 @@ func (v HealthCheckValue) ToTerraformValue(ctx context.Context) (tftypes.Value, 
 		vals["port"] = val
 
 		val, err = v.Protocol.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1176,7 +1167,6 @@ func (v HealthCheckValue) ToTerraformValue(ctx context.Context) (tftypes.Value, 
 		vals["protocol"] = val
 
 		val, err = v.Timeout.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1184,7 +1174,6 @@ func (v HealthCheckValue) ToTerraformValue(ctx context.Context) (tftypes.Value, 
 		vals["timeout"] = val
 
 		val, err = v.UnhealthyThreshold.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1686,14 +1675,12 @@ func (t ListenersType) ValueFromTerraform(ctx context.Context, in tftypes.Value)
 	val := map[string]tftypes.Value{}
 
 	err := in.As(&val)
-
 	if err != nil {
 		return nil, err
 	}
 
 	for k, v := range val {
 		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
 		if err != nil {
 			return nil, err
 		}
@@ -1742,7 +1729,6 @@ func (v ListenersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, er
 		vals := make(map[string]tftypes.Value, 6)
 
 		val, err = v.BackendPort.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1750,7 +1736,6 @@ func (v ListenersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, er
 		vals["backend_port"] = val
 
 		val, err = v.BackendProtocol.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1758,7 +1743,6 @@ func (v ListenersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, er
 		vals["backend_protocol"] = val
 
 		val, err = v.LoadBalancerPort.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1766,7 +1750,6 @@ func (v ListenersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, er
 		vals["load_balancer_port"] = val
 
 		val, err = v.LoadBalancerProtocol.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1774,7 +1757,6 @@ func (v ListenersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, er
 		vals["load_balancer_protocol"] = val
 
 		val, err = v.PolicyNames.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -1782,7 +1764,6 @@ func (v ListenersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, er
 		vals["policy_names"] = val
 
 		val, err = v.ServerCertificateId.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -2108,14 +2089,12 @@ func (t SourceSecurityGroupType) ValueFromTerraform(ctx context.Context, in tfty
 	val := map[string]tftypes.Value{}
 
 	err := in.As(&val)
-
 	if err != nil {
 		return nil, err
 	}
 
 	for k, v := range val {
 		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
 		if err != nil {
 			return nil, err
 		}
@@ -2152,7 +2131,6 @@ func (v SourceSecurityGroupValue) ToTerraformValue(ctx context.Context) (tftypes
 		vals := make(map[string]tftypes.Value, 2)
 
 		val, err = v.SecurityGroupName.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -2460,14 +2438,12 @@ func (t StickyCookiePoliciesType) ValueFromTerraform(ctx context.Context, in tft
 	val := map[string]tftypes.Value{}
 
 	err := in.As(&val)
-
 	if err != nil {
 		return nil, err
 	}
 
 	for k, v := range val {
 		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
 		if err != nil {
 			return nil, err
 		}
@@ -2506,7 +2482,6 @@ func (v StickyCookiePoliciesValue) ToTerraformValue(ctx context.Context) (tftype
 		vals := make(map[string]tftypes.Value, 2)
 
 		val, err = v.CookieExpirationPeriod.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -2514,7 +2489,6 @@ func (v StickyCookiePoliciesValue) ToTerraformValue(ctx context.Context) (tftype
 		vals["cookie_expiration_period"] = val
 
 		val, err = v.PolicyName.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}

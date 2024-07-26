@@ -15,12 +15,15 @@ import (
 
 type SubnetsDataSourceModel struct {
 	Items                 []SubnetModel `tfsdk:"items"`
+	AvailabilityZoneNames types.List    `tfsdk:"availability_zone_names"`
 	AvailableIpsCounts    types.List    `tfsdk:"available_ips_counts"`
+	Ids                   types.List    `tfsdk:"ids"`
 	IpRanges              types.List    `tfsdk:"ip_ranges"`
 	States                types.List    `tfsdk:"states"`
+	TagKeys               types.List    `tfsdk:"tag_keys"`
+	TagValues             types.List    `tfsdk:"tag_values"`
+	Tags                  types.List    `tfsdk:"tags"`
 	VpcIds                types.List    `tfsdk:"vpc_ids"`
-	IDs                   types.List    `tfsdk:"ids"`
-	AvailabilityZoneNames types.List    `tfsdk:"availability_zone_names"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.

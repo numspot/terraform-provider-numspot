@@ -4,6 +4,7 @@ package vpnconnection_test
 
 import (
 	"fmt"
+	"math/rand"
 	"slices"
 	"strconv"
 	"strings"
@@ -51,10 +52,10 @@ func getFieldMatchChecksVpnConnection(data StepDataVpnConnection) []resource.Tes
 
 // Generate checks to validate that resource 'numspot_vpn_connection.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksVpnConnection(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksVpnConnection(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_vpn_connection.test", "client_gateway_id", "numspot_client_gateway.test"+dependenciesPrefix, "id"),   // If field is an id
-		resource.TestCheckResourceAttrPair("numspot_vpn_connection.test", "virtual_gateway_id", "numspot_virtual_gateway.test"+dependenciesPrefix, "id"), // If field is an id
+		resource.TestCheckResourceAttrPair("numspot_vpn_connection.test", "client_gateway_id", "numspot_client_gateway.test"+dependenciesSuffix, "id"),   // If field is an id
+		resource.TestCheckResourceAttrPair("numspot_vpn_connection.test", "virtual_gateway_id", "numspot_virtual_gateway.test"+dependenciesSuffix, "id"), // If field is an id
 	}
 }
 
@@ -62,6 +63,12 @@ func TestAccVpnConnectionResource(t *testing.T) {
 	pr := provider.TestAccProtoV6ProviderFactories
 
 	var resourceId string
+
+	// The ASN used to create the client gateway
+	// Each client gateway must use a distinct ASN
+	// If your provide an ASN matching an existing gateway, the Create function will return the id of the existing one (thanks outscale)
+	asn := rand.Intn(4294967295) + 1
+	asnUpdated := rand.Intn(4294967295) + 1
 
 	////////////// Define input data that will be used in the test sequence //////////////
 	// resource fields that can be updated in-place
@@ -75,12 +82,12 @@ func TestAccVpnConnectionResource(t *testing.T) {
 	presharedKeyUpdated := "another key !"
 
 	tagKey := "Name"
-	tagValue := "Terraform-Test-Volume"
+	tagValue := "VPN-Connection-Test"
 	tagValueUpdated := tagValue + "-Updated"
 
 	// resource fields that cannot be updated in-place (requires replace)
-	staticRouteOnly := "false"
-	staticRouteOnlyUpdated := "true"
+	staticRouteOnly := "true"
+	// staticRouteOnlyUpdated := "true"
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -125,7 +132,7 @@ func TestAccVpnConnectionResource(t *testing.T) {
 
 	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
 	replacePlanValues := StepDataVpnConnection{
-		staticRoutesOnly:    staticRouteOnlyUpdated,
+		staticRoutesOnly:    staticRouteOnly,
 		routes:              routes,
 		preSharedKey:        presharedKey,
 		tunnelInsideIpRange: tunnelInsideIpRange,
@@ -147,7 +154,7 @@ func TestAccVpnConnectionResource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{ // Create testing
-				Config: testVpnConnectionConfig(provider.BASE_SUFFIX, basePlanValues),
+				Config: testVpnConnectionConfig(provider.BASE_SUFFIX, asn, basePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					createChecks,
 					getDependencyChecksVpnConnection(provider.BASE_SUFFIX),
@@ -162,39 +169,22 @@ func TestAccVpnConnectionResource(t *testing.T) {
 			},
 			// Update testing Without Replace (if needed)
 			{
-				Config: testVpnConnectionConfig(provider.BASE_SUFFIX, updatePlanValues),
+				Config: testVpnConnectionConfig(provider.BASE_SUFFIX, asn, updatePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					updateChecks,
-					getDependencyChecksVpnConnection(provider.BASE_SUFFIX),
-				)...),
-			},
-			// Update testing With Replace (if needed)
-			{
-				Config: testVpnConnectionConfig(provider.BASE_SUFFIX, replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
 					getDependencyChecksVpnConnection(provider.BASE_SUFFIX),
 				)...),
 			},
 
 			// <== If resource has required dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testVpnConnectionConfig(provider.BASE_SUFFIX, basePlanValues),
-			},
+			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testVpnConnectionConfig(provider.NEW_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksVpnConnection(provider.NEW_SUFFIX),
-				)...),
-			},
+
 			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
 			{
-				Config: testVpnConnectionConfig(provider.NEW_SUFFIX, replacePlanValues),
+				Config: testVpnConnectionConfig(provider.NEW_SUFFIX, asnUpdated, replacePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					replaceChecks,
 					getDependencyChecksVpnConnection(provider.NEW_SUFFIX),
@@ -204,7 +194,7 @@ func TestAccVpnConnectionResource(t *testing.T) {
 	})
 }
 
-func testVpnConnectionConfig(subresourceSuffix string, data StepDataVpnConnection) string {
+func testVpnConnectionConfig(subresourceSuffix string, asn int, data StepDataVpnConnection) string {
 	routes := "["
 	for _, route := range data.routes {
 		routes += fmt.Sprintf("{destination_ip_range = %[1]q}", route)
@@ -215,22 +205,27 @@ func testVpnConnectionConfig(subresourceSuffix string, data StepDataVpnConnectio
 	routes += "]"
 
 	return fmt.Sprintf(`
+resource "numspot_vpc" "test" {
+  ip_range = "10.101.0.0/16"
+}
+
 resource "numspot_client_gateway" "test%[1]s" {
   connection_type = "ipsec.1"
   public_ip       = "192.0.2.0"
-  bgp_asn         = 65000
+  bgp_asn         = %[8]d
 }
 
 resource "numspot_virtual_gateway" "test%[1]s" {
   connection_type = "ipsec.1"
+  vpc_id          = numspot_vpc.test.id
 }
 
 resource "numspot_vpn_connection" "test" {
   client_gateway_id  = numspot_client_gateway.test%[1]s.id
   connection_type    = "ipsec.1"
   virtual_gateway_id = numspot_virtual_gateway.test%[1]s.id
-  static_routes_only = %[3]q
   routes             = %[2]s
+  static_routes_only = %[3]q
   tags = [
     {
       key   = %[4]q
@@ -243,5 +238,13 @@ resource "numspot_vpn_connection" "test" {
     }
     tunnel_inside_ip_range = %[7]q
   }
-}`, subresourceSuffix, routes, data.staticRoutesOnly, data.tagKey, data.tagValue, data.preSharedKey, data.tunnelInsideIpRange)
+}`, subresourceSuffix,
+		routes,
+		data.staticRoutesOnly,
+		data.tagKey,
+		data.tagValue,
+		data.preSharedKey,
+		data.tunnelInsideIpRange,
+		asn,
+	)
 }

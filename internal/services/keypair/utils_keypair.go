@@ -58,9 +58,9 @@ func KeyPairFromTfToCreateRequest(tf *KeyPairModel) numspot.CreateKeypairJSONReq
 
 func KeypairsFromTfToAPIReadParams(ctx context.Context, tf KeypairsDataSourceModel) numspot.ReadKeypairsParams {
 	return numspot.ReadKeypairsParams{
-		KeypairFingerprints: utils.TfStringListToStringPtrList(ctx, tf.Fingerprints),
-		KeypairNames:        utils.TfStringListToStringPtrList(ctx, tf.Names),
-		KeypairTypes:        utils.TfStringListToStringPtrList(ctx, tf.Types),
+		KeypairFingerprints: utils.TfStringListToStringPtrList(ctx, tf.KeypairFingerprints),
+		KeypairNames:        utils.TfStringListToStringPtrList(ctx, tf.KeypairNames),
+		KeypairTypes:        utils.TfStringListToStringPtrList(ctx, tf.KeypairTypes),
 	}
 }
 

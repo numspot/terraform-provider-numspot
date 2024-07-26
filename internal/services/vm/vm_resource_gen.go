@@ -5,6 +5,8 @@ package vm
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -17,7 +19,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -170,8 +171,8 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"is_source_dest_checked": schema.BoolAttribute{
 				Computed:            true,
-				Description:         "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
-				MarkdownDescription: "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
+				Description:         "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.",
+				MarkdownDescription: "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.",
 			},
 			"keypair_name": schema.StringAttribute{
 				Optional:            true,
@@ -226,8 +227,8 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"is_source_dest_checked": schema.BoolAttribute{
 							Computed:            true,
-							Description:         "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
-							MarkdownDescription: "(Net only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Net.",
+							Description:         "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.",
+							MarkdownDescription: "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.",
 						},
 						"link_nic": schema.SingleNestedAttribute{
 							Attributes: map[string]schema.Attribute{
@@ -403,8 +404,8 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the Net for the NIC.",
-							MarkdownDescription: "The ID of the Net for the NIC.",
+							Description:         "The ID of the Vpc for the NIC.",
+							MarkdownDescription: "The ID of the Vpc for the NIC.",
 						},
 					},
 					CustomType: NicsType{
@@ -536,8 +537,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The reason explaining the current state of the VM.",
 			},
 			"subnet_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.",
 			},
@@ -563,8 +563,8 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"vpc_id": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The ID of the Net in which the VM is running.",
-				MarkdownDescription: "The ID of the Net in which the VM is running.",
+				Description:         "The ID of the Vpc in which the VM is running.",
+				MarkdownDescription: "The ID of the Vpc in which the VM is running.",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
@@ -574,7 +574,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 type VmModel struct {
 	Architecture                types.String   `tfsdk:"architecture"`
 	BlockDeviceMappings         types.List     `tfsdk:"block_device_mappings"`
-	BsuOptimized                types.Bool     `tfsdk:"bsu_optimized"`
 	ClientToken                 types.String   `tfsdk:"client_token"`
 	CreationDate                types.String   `tfsdk:"creation_date"`
 	DeletionProtection          types.Bool     `tfsdk:"deletion_protection"`
@@ -590,7 +589,6 @@ type VmModel struct {
 	NestedVirtualization        types.Bool     `tfsdk:"nested_virtualization"`
 	Nics                        types.List     `tfsdk:"nics"`
 	OsFamily                    types.String   `tfsdk:"os_family"`
-	Performance                 types.String   `tfsdk:"performance"`
 	Placement                   PlacementValue `tfsdk:"placement"`
 	PrivateDnsName              types.String   `tfsdk:"private_dns_name"`
 	PrivateIp                   types.String   `tfsdk:"private_ip"`
@@ -3641,6 +3639,385 @@ func (v LinkNicValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	}
 }
 
+var _ basetypes.ObjectTypable = LinkPublicIpType{}
+
+type LinkPublicIpType struct {
+	basetypes.ObjectType
+}
+
+func (t LinkPublicIpType) Equal(o attr.Type) bool {
+	other, ok := o.(LinkPublicIpType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t LinkPublicIpType) String() string {
+	return "LinkPublicIpType"
+}
+
+func (t LinkPublicIpType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	publicDnsNameAttribute, ok := attributes["public_dns_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`public_dns_name is missing from object`)
+
+		return nil, diags
+	}
+
+	publicDnsNameVal, ok := publicDnsNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`public_dns_name expected to be basetypes.StringValue, was: %T`, publicDnsNameAttribute))
+	}
+
+	publicIpAttribute, ok := attributes["public_ip"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`public_ip is missing from object`)
+
+		return nil, diags
+	}
+
+	publicIpVal, ok := publicIpAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return LinkPublicIpValue{
+		PublicDnsName: publicDnsNameVal,
+		PublicIp:      publicIpVal,
+		state:         attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkPublicIpValueNull() LinkPublicIpValue {
+	return LinkPublicIpValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewLinkPublicIpValueUnknown() LinkPublicIpValue {
+	return LinkPublicIpValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewLinkPublicIpValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (LinkPublicIpValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing LinkPublicIpValue Attribute Value",
+				"While creating a LinkPublicIpValue value, a missing attribute value was detected. "+
+					"A LinkPublicIpValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid LinkPublicIpValue Attribute Type",
+				"While creating a LinkPublicIpValue value, an invalid attribute value was detected. "+
+					"A LinkPublicIpValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra LinkPublicIpValue Attribute Value",
+				"While creating a LinkPublicIpValue value, an extra attribute value was detected. "+
+					"A LinkPublicIpValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra LinkPublicIpValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewLinkPublicIpValueUnknown(), diags
+	}
+
+	publicDnsNameAttribute, ok := attributes["public_dns_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`public_dns_name is missing from object`)
+
+		return NewLinkPublicIpValueUnknown(), diags
+	}
+
+	publicDnsNameVal, ok := publicDnsNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`public_dns_name expected to be basetypes.StringValue, was: %T`, publicDnsNameAttribute))
+	}
+
+	publicIpAttribute, ok := attributes["public_ip"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`public_ip is missing from object`)
+
+		return NewLinkPublicIpValueUnknown(), diags
+	}
+
+	publicIpVal, ok := publicIpAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
+	}
+
+	if diags.HasError() {
+		return NewLinkPublicIpValueUnknown(), diags
+	}
+
+	return LinkPublicIpValue{
+		PublicDnsName: publicDnsNameVal,
+		PublicIp:      publicIpVal,
+		state:         attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkPublicIpValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) LinkPublicIpValue {
+	object, diags := NewLinkPublicIpValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewLinkPublicIpValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t LinkPublicIpType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewLinkPublicIpValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewLinkPublicIpValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewLinkPublicIpValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewLinkPublicIpValueMust(LinkPublicIpValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t LinkPublicIpType) ValueType(ctx context.Context) attr.Value {
+	return LinkPublicIpValue{}
+}
+
+var _ basetypes.ObjectValuable = LinkPublicIpValue{}
+
+type LinkPublicIpValue struct {
+	PublicDnsName basetypes.StringValue `tfsdk:"public_dns_name"`
+	PublicIp      basetypes.StringValue `tfsdk:"public_ip"`
+	state         attr.ValueState
+}
+
+func (v LinkPublicIpValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 2)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["public_dns_name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["public_ip"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 2)
+
+		val, err = v.PublicDnsName.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["public_dns_name"] = val
+
+		val, err = v.PublicIp.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["public_ip"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v LinkPublicIpValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v LinkPublicIpValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v LinkPublicIpValue) String() string {
+	return "LinkPublicIpValue"
+}
+
+func (v LinkPublicIpValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"public_dns_name": basetypes.StringType{},
+		"public_ip":       basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"public_dns_name": v.PublicDnsName,
+			"public_ip":       v.PublicIp,
+		})
+
+	return objVal, diags
+}
+
+func (v LinkPublicIpValue) Equal(o attr.Value) bool {
+	other, ok := o.(LinkPublicIpValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.PublicDnsName.Equal(other.PublicDnsName) {
+		return false
+	}
+
+	if !v.PublicIp.Equal(other.PublicIp) {
+		return false
+	}
+
+	return true
+}
+
+func (v LinkPublicIpValue) Type(ctx context.Context) attr.Type {
+	return LinkPublicIpType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v LinkPublicIpValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"public_dns_name": basetypes.StringType{},
+		"public_ip":       basetypes.StringType{},
+	}
+}
+
 var _ basetypes.ObjectTypable = PrivateIpsType{}
 
 type PrivateIpsType struct {
@@ -4154,385 +4531,6 @@ func (v PrivateIpsValue) AttributeTypes(ctx context.Context) map[string]attr.Typ
 		},
 		"private_dns_name": basetypes.StringType{},
 		"private_ip":       basetypes.StringType{},
-	}
-}
-
-var _ basetypes.ObjectTypable = LinkPublicIpType{}
-
-type LinkPublicIpType struct {
-	basetypes.ObjectType
-}
-
-func (t LinkPublicIpType) Equal(o attr.Type) bool {
-	other, ok := o.(LinkPublicIpType)
-
-	if !ok {
-		return false
-	}
-
-	return t.ObjectType.Equal(other.ObjectType)
-}
-
-func (t LinkPublicIpType) String() string {
-	return "LinkPublicIpType"
-}
-
-func (t LinkPublicIpType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributes := in.Attributes()
-
-	publicDnsNameAttribute, ok := attributes["public_dns_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_dns_name is missing from object`)
-
-		return nil, diags
-	}
-
-	publicDnsNameVal, ok := publicDnsNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_dns_name expected to be basetypes.StringValue, was: %T`, publicDnsNameAttribute))
-	}
-
-	publicIpAttribute, ok := attributes["public_ip"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_ip is missing from object`)
-
-		return nil, diags
-	}
-
-	publicIpVal, ok := publicIpAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
-	}
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	return LinkPublicIpValue{
-		PublicDnsName: publicDnsNameVal,
-		PublicIp:      publicIpVal,
-		state:         attr.ValueStateKnown,
-	}, diags
-}
-
-func NewLinkPublicIpValueNull() LinkPublicIpValue {
-	return LinkPublicIpValue{
-		state: attr.ValueStateNull,
-	}
-}
-
-func NewLinkPublicIpValueUnknown() LinkPublicIpValue {
-	return LinkPublicIpValue{
-		state: attr.ValueStateUnknown,
-	}
-}
-
-func NewLinkPublicIpValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (LinkPublicIpValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
-	ctx := context.Background()
-
-	for name, attributeType := range attributeTypes {
-		attribute, ok := attributes[name]
-
-		if !ok {
-			diags.AddError(
-				"Missing LinkPublicIpValue Attribute Value",
-				"While creating a LinkPublicIpValue value, a missing attribute value was detected. "+
-					"A LinkPublicIpValue must contain values for all attributes, even if null or unknown. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
-			)
-
-			continue
-		}
-
-		if !attributeType.Equal(attribute.Type(ctx)) {
-			diags.AddError(
-				"Invalid LinkPublicIpValue Attribute Type",
-				"While creating a LinkPublicIpValue value, an invalid attribute value was detected. "+
-					"A LinkPublicIpValue must use a matching attribute type for the value. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
-					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
-			)
-		}
-	}
-
-	for name := range attributes {
-		_, ok := attributeTypes[name]
-
-		if !ok {
-			diags.AddError(
-				"Extra LinkPublicIpValue Attribute Value",
-				"While creating a LinkPublicIpValue value, an extra attribute value was detected. "+
-					"A LinkPublicIpValue must not contain values beyond the expected attribute types. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("Extra LinkPublicIpValue Attribute Name: %s", name),
-			)
-		}
-	}
-
-	if diags.HasError() {
-		return NewLinkPublicIpValueUnknown(), diags
-	}
-
-	publicDnsNameAttribute, ok := attributes["public_dns_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_dns_name is missing from object`)
-
-		return NewLinkPublicIpValueUnknown(), diags
-	}
-
-	publicDnsNameVal, ok := publicDnsNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_dns_name expected to be basetypes.StringValue, was: %T`, publicDnsNameAttribute))
-	}
-
-	publicIpAttribute, ok := attributes["public_ip"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_ip is missing from object`)
-
-		return NewLinkPublicIpValueUnknown(), diags
-	}
-
-	publicIpVal, ok := publicIpAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
-	}
-
-	if diags.HasError() {
-		return NewLinkPublicIpValueUnknown(), diags
-	}
-
-	return LinkPublicIpValue{
-		PublicDnsName: publicDnsNameVal,
-		PublicIp:      publicIpVal,
-		state:         attr.ValueStateKnown,
-	}, diags
-}
-
-func NewLinkPublicIpValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) LinkPublicIpValue {
-	object, diags := NewLinkPublicIpValue(attributeTypes, attributes)
-
-	if diags.HasError() {
-		// This could potentially be added to the diag package.
-		diagsStrings := make([]string, 0, len(diags))
-
-		for _, diagnostic := range diags {
-			diagsStrings = append(diagsStrings, fmt.Sprintf(
-				"%s | %s | %s",
-				diagnostic.Severity(),
-				diagnostic.Summary(),
-				diagnostic.Detail()))
-		}
-
-		panic("NewLinkPublicIpValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
-	}
-
-	return object
-}
-
-func (t LinkPublicIpType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
-	if in.Type() == nil {
-		return NewLinkPublicIpValueNull(), nil
-	}
-
-	if !in.Type().Equal(t.TerraformType(ctx)) {
-		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
-	}
-
-	if !in.IsKnown() {
-		return NewLinkPublicIpValueUnknown(), nil
-	}
-
-	if in.IsNull() {
-		return NewLinkPublicIpValueNull(), nil
-	}
-
-	attributes := map[string]attr.Value{}
-
-	val := map[string]tftypes.Value{}
-
-	err := in.As(&val)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for k, v := range val {
-		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
-		if err != nil {
-			return nil, err
-		}
-
-		attributes[k] = a
-	}
-
-	return NewLinkPublicIpValueMust(LinkPublicIpValue{}.AttributeTypes(ctx), attributes), nil
-}
-
-func (t LinkPublicIpType) ValueType(ctx context.Context) attr.Value {
-	return LinkPublicIpValue{}
-}
-
-var _ basetypes.ObjectValuable = LinkPublicIpValue{}
-
-type LinkPublicIpValue struct {
-	PublicDnsName basetypes.StringValue `tfsdk:"public_dns_name"`
-	PublicIp      basetypes.StringValue `tfsdk:"public_ip"`
-	state         attr.ValueState
-}
-
-func (v LinkPublicIpValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 2)
-
-	var val tftypes.Value
-	var err error
-
-	attrTypes["public_dns_name"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["public_ip"] = basetypes.StringType{}.TerraformType(ctx)
-
-	objectType := tftypes.Object{AttributeTypes: attrTypes}
-
-	switch v.state {
-	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 2)
-
-		val, err = v.PublicDnsName.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["public_dns_name"] = val
-
-		val, err = v.PublicIp.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["public_ip"] = val
-
-		if err := tftypes.ValidateValue(objectType, vals); err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		return tftypes.NewValue(objectType, vals), nil
-	case attr.ValueStateNull:
-		return tftypes.NewValue(objectType, nil), nil
-	case attr.ValueStateUnknown:
-		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
-	default:
-		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
-	}
-}
-
-func (v LinkPublicIpValue) IsNull() bool {
-	return v.state == attr.ValueStateNull
-}
-
-func (v LinkPublicIpValue) IsUnknown() bool {
-	return v.state == attr.ValueStateUnknown
-}
-
-func (v LinkPublicIpValue) String() string {
-	return "LinkPublicIpValue"
-}
-
-func (v LinkPublicIpValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributeTypes := map[string]attr.Type{
-		"public_dns_name": basetypes.StringType{},
-		"public_ip":       basetypes.StringType{},
-	}
-
-	if v.IsNull() {
-		return types.ObjectNull(attributeTypes), diags
-	}
-
-	if v.IsUnknown() {
-		return types.ObjectUnknown(attributeTypes), diags
-	}
-
-	objVal, diags := types.ObjectValue(
-		attributeTypes,
-		map[string]attr.Value{
-			"public_dns_name": v.PublicDnsName,
-			"public_ip":       v.PublicIp,
-		})
-
-	return objVal, diags
-}
-
-func (v LinkPublicIpValue) Equal(o attr.Value) bool {
-	other, ok := o.(LinkPublicIpValue)
-
-	if !ok {
-		return false
-	}
-
-	if v.state != other.state {
-		return false
-	}
-
-	if v.state != attr.ValueStateKnown {
-		return true
-	}
-
-	if !v.PublicDnsName.Equal(other.PublicDnsName) {
-		return false
-	}
-
-	if !v.PublicIp.Equal(other.PublicIp) {
-		return false
-	}
-
-	return true
-}
-
-func (v LinkPublicIpValue) Type(ctx context.Context) attr.Type {
-	return LinkPublicIpType{
-		basetypes.ObjectType{
-			AttrTypes: v.AttributeTypes(ctx),
-		},
-	}
-}
-
-func (v LinkPublicIpValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
-	return map[string]attr.Type{
-		"public_dns_name": basetypes.StringType{},
-		"public_ip":       basetypes.StringType{},
 	}
 }
 
@@ -5291,384 +5289,5 @@ func (v PlacementValue) AttributeTypes(ctx context.Context) map[string]attr.Type
 	return map[string]attr.Type{
 		"availability_zone_name": basetypes.StringType{},
 		"tenancy":                basetypes.StringType{},
-	}
-}
-
-var _ basetypes.ObjectTypable = TagsType{}
-
-type TagsType struct {
-	basetypes.ObjectType
-}
-
-func (t TagsType) Equal(o attr.Type) bool {
-	other, ok := o.(TagsType)
-
-	if !ok {
-		return false
-	}
-
-	return t.ObjectType.Equal(other.ObjectType)
-}
-
-func (t TagsType) String() string {
-	return "TagsType"
-}
-
-func (t TagsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributes := in.Attributes()
-
-	keyAttribute, ok := attributes["key"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`key is missing from object`)
-
-		return nil, diags
-	}
-
-	keyVal, ok := keyAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
-	}
-
-	valueAttribute, ok := attributes["value"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`value is missing from object`)
-
-		return nil, diags
-	}
-
-	valueVal, ok := valueAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`value expected to be basetypes.StringValue, was: %T`, valueAttribute))
-	}
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	return TagsValue{
-		Key:   keyVal,
-		Value: valueVal,
-		state: attr.ValueStateKnown,
-	}, diags
-}
-
-func NewTagsValueNull() TagsValue {
-	return TagsValue{
-		state: attr.ValueStateNull,
-	}
-}
-
-func NewTagsValueUnknown() TagsValue {
-	return TagsValue{
-		state: attr.ValueStateUnknown,
-	}
-}
-
-func NewTagsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (TagsValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
-	ctx := context.Background()
-
-	for name, attributeType := range attributeTypes {
-		attribute, ok := attributes[name]
-
-		if !ok {
-			diags.AddError(
-				"Missing TagsValue Attribute Value",
-				"While creating a TagsValue value, a missing attribute value was detected. "+
-					"A TagsValue must contain values for all attributes, even if null or unknown. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("TagsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
-			)
-
-			continue
-		}
-
-		if !attributeType.Equal(attribute.Type(ctx)) {
-			diags.AddError(
-				"Invalid TagsValue Attribute Type",
-				"While creating a TagsValue value, an invalid attribute value was detected. "+
-					"A TagsValue must use a matching attribute type for the value. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("TagsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
-					fmt.Sprintf("TagsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
-			)
-		}
-	}
-
-	for name := range attributes {
-		_, ok := attributeTypes[name]
-
-		if !ok {
-			diags.AddError(
-				"Extra TagsValue Attribute Value",
-				"While creating a TagsValue value, an extra attribute value was detected. "+
-					"A TagsValue must not contain values beyond the expected attribute types. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("Extra TagsValue Attribute Name: %s", name),
-			)
-		}
-	}
-
-	if diags.HasError() {
-		return NewTagsValueUnknown(), diags
-	}
-
-	keyAttribute, ok := attributes["key"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`key is missing from object`)
-
-		return NewTagsValueUnknown(), diags
-	}
-
-	keyVal, ok := keyAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
-	}
-
-	valueAttribute, ok := attributes["value"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`value is missing from object`)
-
-		return NewTagsValueUnknown(), diags
-	}
-
-	valueVal, ok := valueAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`value expected to be basetypes.StringValue, was: %T`, valueAttribute))
-	}
-
-	if diags.HasError() {
-		return NewTagsValueUnknown(), diags
-	}
-
-	return TagsValue{
-		Key:   keyVal,
-		Value: valueVal,
-		state: attr.ValueStateKnown,
-	}, diags
-}
-
-func NewTagsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) TagsValue {
-	object, diags := NewTagsValue(attributeTypes, attributes)
-
-	if diags.HasError() {
-		// This could potentially be added to the diag package.
-		diagsStrings := make([]string, 0, len(diags))
-
-		for _, diagnostic := range diags {
-			diagsStrings = append(diagsStrings, fmt.Sprintf(
-				"%s | %s | %s",
-				diagnostic.Severity(),
-				diagnostic.Summary(),
-				diagnostic.Detail()))
-		}
-
-		panic("NewTagsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
-	}
-
-	return object
-}
-
-func (t TagsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
-	if in.Type() == nil {
-		return NewTagsValueNull(), nil
-	}
-
-	if !in.Type().Equal(t.TerraformType(ctx)) {
-		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
-	}
-
-	if !in.IsKnown() {
-		return NewTagsValueUnknown(), nil
-	}
-
-	if in.IsNull() {
-		return NewTagsValueNull(), nil
-	}
-
-	attributes := map[string]attr.Value{}
-
-	val := map[string]tftypes.Value{}
-
-	err := in.As(&val)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for k, v := range val {
-		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
-		if err != nil {
-			return nil, err
-		}
-
-		attributes[k] = a
-	}
-
-	return NewTagsValueMust(TagsValue{}.AttributeTypes(ctx), attributes), nil
-}
-
-func (t TagsType) ValueType(ctx context.Context) attr.Value {
-	return TagsValue{}
-}
-
-var _ basetypes.ObjectValuable = TagsValue{}
-
-type TagsValue struct {
-	Key   basetypes.StringValue `tfsdk:"key"`
-	Value basetypes.StringValue `tfsdk:"value"`
-	state attr.ValueState
-}
-
-func (v TagsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 2)
-
-	var val tftypes.Value
-	var err error
-
-	attrTypes["key"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["value"] = basetypes.StringType{}.TerraformType(ctx)
-
-	objectType := tftypes.Object{AttributeTypes: attrTypes}
-
-	switch v.state {
-	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 2)
-
-		val, err = v.Key.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["key"] = val
-
-		val, err = v.Value.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["value"] = val
-
-		if err := tftypes.ValidateValue(objectType, vals); err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		return tftypes.NewValue(objectType, vals), nil
-	case attr.ValueStateNull:
-		return tftypes.NewValue(objectType, nil), nil
-	case attr.ValueStateUnknown:
-		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
-	default:
-		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
-	}
-}
-
-func (v TagsValue) IsNull() bool {
-	return v.state == attr.ValueStateNull
-}
-
-func (v TagsValue) IsUnknown() bool {
-	return v.state == attr.ValueStateUnknown
-}
-
-func (v TagsValue) String() string {
-	return "TagsValue"
-}
-
-func (v TagsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributeTypes := map[string]attr.Type{
-		"key":   basetypes.StringType{},
-		"value": basetypes.StringType{},
-	}
-
-	if v.IsNull() {
-		return types.ObjectNull(attributeTypes), diags
-	}
-
-	if v.IsUnknown() {
-		return types.ObjectUnknown(attributeTypes), diags
-	}
-
-	objVal, diags := types.ObjectValue(
-		attributeTypes,
-		map[string]attr.Value{
-			"key":   v.Key,
-			"value": v.Value,
-		})
-
-	return objVal, diags
-}
-
-func (v TagsValue) Equal(o attr.Value) bool {
-	other, ok := o.(TagsValue)
-
-	if !ok {
-		return false
-	}
-
-	if v.state != other.state {
-		return false
-	}
-
-	if v.state != attr.ValueStateKnown {
-		return true
-	}
-
-	if !v.Key.Equal(other.Key) {
-		return false
-	}
-
-	if !v.Value.Equal(other.Value) {
-		return false
-	}
-
-	return true
-}
-
-func (v TagsValue) Type(ctx context.Context) attr.Type {
-	return TagsType{
-		basetypes.ObjectType{
-			AttrTypes: v.AttributeTypes(ctx),
-		},
-	}
-}
-
-func (v TagsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
-	return map[string]attr.Type{
-		"key":   basetypes.StringType{},
-		"value": basetypes.StringType{},
 	}
 }

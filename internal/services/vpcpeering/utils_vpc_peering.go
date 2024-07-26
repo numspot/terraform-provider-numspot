@@ -144,7 +144,7 @@ func VpcPeeringsFromTfToAPIReadParams(ctx context.Context, tf VpcPeeringsDataSou
 		StateNames:          utils.TfStringListToStringPtrList(ctx, tf.StateNames),
 		AccepterVpcIpRanges: utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcIpRanges),
 		AccepterVpcVpcIds:   utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcVpcIds),
-		Ids:                 utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		Ids:                 utils.TfStringListToStringPtrList(ctx, tf.Ids),
 		SourceVpcIpRanges:   utils.TfStringListToStringPtrList(ctx, tf.SourceVpcIpRanges),
 		SourceVpcVpcIds:     utils.TfStringListToStringPtrList(ctx, tf.SourceVpcVpcIds),
 		TagKeys:             utils.TfStringListToStringPtrList(ctx, tf.TagKeys),

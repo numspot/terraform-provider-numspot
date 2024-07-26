@@ -4,17 +4,44 @@ package vpnconnection
 
 import (
 	"context"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 )
 
 func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"bgp_asns": schema.ListAttribute{
+				ElementType:         types.Int64Type,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The Border Gateway Protocol (BGP) Autonomous System Numbers (ASNs) of the connections.",
+				MarkdownDescription: "The Border Gateway Protocol (BGP) Autonomous System Numbers (ASNs) of the connections.",
+			},
+			"client_gateway_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the client gateways.",
+				MarkdownDescription: "The IDs of the client gateways.",
+			},
+			"connection_types": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The types of the VPN connections (only `ipsec.1` is supported).",
+				MarkdownDescription: "The types of the VPN connections (only `ipsec.1` is supported).",
+			},
+			"ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the VPN connections.",
+				MarkdownDescription: "The IDs of the VPN connections.",
+			},
 			"items": schema.ListNestedAttribute{
-				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"client_gateway_configuration": schema.StringAttribute{
@@ -33,11 +60,11 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The type of VPN connection (always `ipsec.1`).",
 						},
 						"id": schema.StringAttribute{
-							Required:            true,
-							Description:         "ID for ReadVpnConnections",
-							MarkdownDescription: "ID for ReadVpnConnections",
+							Computed:            true,
+							Description:         "The ID of the VPN connection.",
+							MarkdownDescription: "The ID of the VPN connection.",
 						},
-						"routes": schema.ListNestedAttribute{
+						"routes": schema.SetNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"destination_ip_range": schema.StringAttribute{
@@ -92,8 +119,8 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 									},
 									"outside_ip_address": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The IP on the OUTSCALE side of the tunnel.",
-										MarkdownDescription: "The IP on the OUTSCALE side of the tunnel.",
+										Description:         "The IP on the NumSpot side of the tunnel.",
+										MarkdownDescription: "The IP on the NumSpot side of the tunnel.",
 									},
 									"state": schema.StringAttribute{
 										Computed:            true,
@@ -118,8 +145,8 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"virtual_gateway_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the virtual gateway used on the OUTSCALE end of the connection.",
-							MarkdownDescription: "The ID of the virtual gateway used on the OUTSCALE end of the connection.",
+							Description:         "The ID of the virtual gateway used on the NumSpot end of the connection.",
+							MarkdownDescription: "The ID of the virtual gateway used on the NumSpot end of the connection.",
 						},
 						"vpn_options": schema.SingleNestedAttribute{
 							Attributes: map[string]schema.Attribute{
@@ -211,8 +238,8 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 										},
 										"pre_shared_key": schema.StringAttribute{
 											Computed:            true,
-											Description:         "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (&quot;).",
-											MarkdownDescription: "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (&quot;).",
+											Description:         "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").",
+											MarkdownDescription: "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").",
 										},
 									},
 									CustomType: Phase2optionsType{
@@ -241,71 +268,57 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
+				Computed:            true,
+				Description:         "Information about one or more VPN connections.",
+				MarkdownDescription: "Information about one or more VPN connections.",
 			},
-			"client_gateway_ids": schema.ListAttribute{
+			"route_destination_ip_ranges": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the client gateway used on the client end of the connection.",
-				MarkdownDescription: "The ID of the client gateway used on the client end of the connection.",
-			},
-			"connection_types": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The type of VPN connection (always `ipsec.1`).",
-				MarkdownDescription: "The type of VPN connection (always `ipsec.1`).",
-			},
-			"routes_destination_ip_ranges": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
-				MarkdownDescription: "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
+				Computed:            true,
+				Description:         "The destination IP ranges.",
+				MarkdownDescription: "The destination IP ranges.",
 			},
 			"states": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The state of the VPN connection (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
-				MarkdownDescription: "The state of the VPN connection (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
+				Computed:            true,
+				Description:         "The states of the VPN connections (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
+				MarkdownDescription: "The states of the VPN connections (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 			},
 			"static_routes_only": schema.BoolAttribute{
 				Optional:            true,
+				Computed:            true,
 				Description:         "If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
 				MarkdownDescription: "If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
 			},
 			"tag_keys": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The keys of the tags associated with the vpn connections.",
-				MarkdownDescription: "The keys of the tags associated with the vpn connections.",
+				Computed:            true,
+				Description:         "The keys of the tags associated with the VPN connections.",
+				MarkdownDescription: "The keys of the tags associated with the VPN connections.",
 			},
 			"tag_values": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The values of the tags associated with the vpn connections.",
-				MarkdownDescription: "The values of the tags associated with the vpn connections.",
+				Computed:            true,
+				Description:         "The values of the tags associated with the VPN connections.",
+				MarkdownDescription: "The values of the tags associated with the VPN connections.",
 			},
 			"tags": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The key/value combination of the tags associated with the vpn connections, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the vpn connections, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-			},
-			"ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "ID for ReadVpnConnections",
-				MarkdownDescription: "ID for ReadVpnConnections",
+				Computed:            true,
+				Description:         "The key/value combination of the tags associated with the VPN connections, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				MarkdownDescription: "The key/value combination of the tags associated with the VPN connections, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
 			},
 			"virtual_gateway_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the virtual gateway used on the OUTSCALE end of the connection.",
-				MarkdownDescription: "The ID of the virtual gateway used on the OUTSCALE end of the connection.",
-			},
-			"bgp_asns": schema.ListAttribute{
-				ElementType:         types.Int64Type,
-				Optional:            true,
-				Description:         "The Border Gateway Protocol (BGP) Autonomous System Numbers (ASNs) of the connections.",
-				MarkdownDescription: "The Border Gateway Protocol (BGP) Autonomous System Numbers (ASNs) of the connections.",
+				Computed:            true,
+				Description:         "The IDs of the virtual gateways.",
+				MarkdownDescription: "The IDs of the virtual gateways.",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",

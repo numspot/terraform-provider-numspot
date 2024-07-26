@@ -39,7 +39,7 @@ func getFieldMatchChecksVolume(data StepDataVolume) []resource.TestCheckFunc {
 
 // Generate checks to validate that resource 'numspot_volume.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksVolume(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksVolume(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{}
 }
 

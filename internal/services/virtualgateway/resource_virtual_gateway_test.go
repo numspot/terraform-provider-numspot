@@ -1,4 +1,4 @@
-//go:build acc
+///go:build acc
 
 package virtualgateway_test
 
@@ -34,9 +34,10 @@ func getFieldMatchChecksVirtualGateway(data StepDataVirtualGateway) []resource.T
 
 // Generate checks to validate that resource 'numspot_virtual_gateway.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksVirtualGateway(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksVirtualGateway(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_virtual_gateway.test", "vpc_id", "numspot_vpc.test"+dependenciesPrefix, "id"),
+		resource.TestCheckResourceAttr("numspot_virtual_gateway.test", "vpc_to_virtual_gateway_links.#", "1"),
+		resource.TestCheckResourceAttrPair("numspot_virtual_gateway.test", "vpc_id", "numspot_vpc.test"+dependenciesSuffix, "id"),
 	}
 }
 
@@ -145,18 +146,4 @@ resource "numspot_virtual_gateway" "test" {
     }
   ]
 }`, subresourceSuffix, data.connectionType, data.tagKey, data.tagValue)
-}
-
-// <== If resource has optional dependencies ==>
-func testVirtualGatewayConfig_DeletedDependencies(data StepDataVirtualGateway) string {
-	return fmt.Sprintf(`
-resource "numspot_virtual_gateway" "test" {
-  connection_type = %[1]q
-  tags = [
-    {
-      key   = %[2]q
-      value = %[3]q
-    }
-  ]
-}`, data.connectionType, data.tagKey, data.tagValue)
 }

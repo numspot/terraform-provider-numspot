@@ -146,18 +146,18 @@ func RouteTablesFromTfToAPIReadParams(ctx context.Context, tf RouteTablesDataSou
 		VpcIds:                          utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
 		LinkRouteTableIds:               utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableIds),
 		LinkRouteTableMain:              utils.FromTfBoolToBoolPtr(tf.LinkRouteTableMain),
-		LinkRouteTableLinkRouteTableIds: utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableRouteTableIds),
-		LinkSubnetIds:                   utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableSubnetIds),
+		LinkRouteTableLinkRouteTableIds: utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableLinkRouteTableIds),
+		LinkSubnetIds:                   utils.TfStringListToStringPtrList(ctx, tf.LinkSubnetIds),
 	}
 }
 
-func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *numspot.RouteTable) (*RouteTableModel, diag.Diagnostics) {
+func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *numspot.RouteTable) (*RouteTableModelDatasource, diag.Diagnostics) {
 	var (
 		diags                               diag.Diagnostics
 		tagsList                            = types.ListNull(tags.TagsValue{}.Type(ctx))
 		linkRouteTablesList                 = types.ListNull(LinkRouteTablesValue{}.Type(ctx))
+		routes                              = types.ListNull(RoutesValue{}.Type(ctx))
 		routePropagatingVirtualGatewaysList = types.ListNull(RoutePropagatingVirtualGatewaysValue{}.Type(ctx))
-		routesList                          = types.SetNull(RoutesValue{}.Type(ctx))
 	)
 
 	if http.Tags != nil {
@@ -185,20 +185,37 @@ func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *numspot.RouteT
 	}
 
 	if http.Routes != nil {
-		routesList, diags = utils.GenericSetToTfSetValue(ctx, RoutesValue{}, routeTableRouteFromAPIDatasource, *http.Routes)
+		routes, diags = utils.GenericListToTfListValue(ctx, RoutesValue{}, routeFromAPIDatasource, *http.Routes)
 		if diags.HasError() {
 			return nil, diags
 		}
 	}
 
-	return &RouteTableModel{
+	return &RouteTableModelDatasource{
 		Id:                              types.StringPointerValue(http.Id),
 		Tags:                            tagsList,
 		LinkRouteTables:                 linkRouteTablesList,
 		RoutePropagatingVirtualGateways: routePropagatingVirtualGatewaysList,
-		Routes:                          routesList,
 		VpcId:                           types.StringPointerValue(http.VpcId),
+		Routes:                          routes,
 	}, nil
+}
+
+func routeFromAPIDatasource(ctx context.Context, route numspot.Route) (RoutesValue, diag.Diagnostics) {
+	return NewRoutesValue(
+		RoutesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"creation_method":        types.StringPointerValue(route.CreationMethod),
+			"destination_ip_range":   types.StringPointerValue(route.DestinationIpRange),
+			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
+			"gateway_id":             types.StringPointerValue(route.GatewayId),
+			"nat_gateway_id":         types.StringPointerValue(route.NatGatewayId),
+			"nic_id":                 types.StringPointerValue(route.NicId),
+			"state":                  types.StringPointerValue(route.State),
+			"vm_id":                  types.StringPointerValue(route.VmId),
+			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
+		},
+	)
 }
 
 func routeTableLinkFromAPIDatasource(ctx context.Context, link numspot.LinkRouteTable) (LinkRouteTablesValue, diag.Diagnostics) {
@@ -210,23 +227,6 @@ func routeTableLinkFromAPIDatasource(ctx context.Context, link numspot.LinkRoute
 			"route_table_id": types.StringPointerValue(link.RouteTableId),
 			"subnet_id":      types.StringPointerValue(link.SubnetId),
 			"vpc_id":         types.StringPointerValue(link.VpcId),
-		},
-	)
-}
-
-func routeTableRouteFromAPIDatasource(ctx context.Context, route numspot.Route) (RoutesValue, diag.Diagnostics) {
-	return NewRoutesValue(
-		RoutesValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"creation_method":        types.StringPointerValue(route.CreationMethod),
-			"destination_ip_range":   types.StringPointerValue(route.DestinationIpRange),
-			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
-			"gateway_id":             types.StringPointerValue(route.GatewayId),
-			"nat_gateway_id":         types.StringPointerValue(route.NatGatewayId),
-			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
-			"nic_id":                 types.StringPointerValue(route.NicId),
-			"state":                  types.StringPointerValue(route.State),
-			"vm_id":                  types.StringPointerValue(route.VmId),
 		},
 	)
 }

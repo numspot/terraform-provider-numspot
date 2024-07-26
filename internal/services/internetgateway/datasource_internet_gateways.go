@@ -46,12 +46,10 @@ func (d *internetGatewaysDataSource) Configure(_ context.Context, request dataso
 	d.provider = provider
 }
 
-// NewCoffeesDataSource is a helper function to simplify the provider implementation.
 func NewInternetGatewaysDataSource() datasource.DataSource {
 	return &internetGatewaysDataSource{}
 }
 
-// coffeesDataSource is the data source implementation.
 type internetGatewaysDataSource struct {
 	provider services.IProvider
 }

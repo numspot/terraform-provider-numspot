@@ -4,6 +4,7 @@ package routetable
 
 import (
 	"context"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -13,14 +14,20 @@ import (
 func RouteTableDataSourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the route tables.",
+				MarkdownDescription: "The IDs of the route tables.",
+			},
 			"items": schema.ListNestedAttribute{
-				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.StringAttribute{
-							Required:            true,
-							Description:         "ID for ReadRouteTables",
-							MarkdownDescription: "ID for ReadRouteTables",
+							Computed:            true,
+							Description:         "The ID of the route table.",
+							MarkdownDescription: "The ID of the route table.",
 						},
 						"link_route_tables": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
@@ -47,8 +54,8 @@ func RouteTableDataSourceSchema(ctx context.Context) schema.Schema {
 									},
 									"vpc_id": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The ID of the Net.",
-										MarkdownDescription: "The ID of the Net.",
+										Description:         "The ID of the Vpc.",
+										MarkdownDescription: "The ID of the Vpc.",
 									},
 								},
 								CustomType: LinkRouteTablesType{
@@ -95,18 +102,18 @@ func RouteTableDataSourceSchema(ctx context.Context) schema.Schema {
 									},
 									"destination_service_id": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The ID of the OUTSCALE service.",
-										MarkdownDescription: "The ID of the OUTSCALE service.",
+										Description:         "The ID of the NumSpot service.",
+										MarkdownDescription: "The ID of the NumSpot service.",
 									},
 									"gateway_id": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The ID of the Internet service or virtual gateway attached to the Net.",
-										MarkdownDescription: "The ID of the Internet service or virtual gateway attached to the Net.",
+										Description:         "The ID of the Internet gateway or virtual gateway attached to the Vpc.",
+										MarkdownDescription: "The ID of the Internet gateway or virtual gateway attached to the Vpc.",
 									},
 									"nat_gateway_id": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The ID of a NAT service attached to the Net.",
-										MarkdownDescription: "The ID of a NAT service attached to the Net.",
+										Description:         "The ID of a NAT gateway attached to the Vpc.",
+										MarkdownDescription: "The ID of a NAT gateway attached to the Vpc.",
 									},
 									"nic_id": schema.StringAttribute{
 										Computed:            true,
@@ -118,25 +125,15 @@ func RouteTableDataSourceSchema(ctx context.Context) schema.Schema {
 										Description:         "The state of a route in the route table (always `active`). ",
 										MarkdownDescription: "The state of a route in the route table (always `active`). ",
 									},
-									"vm_account_id": schema.StringAttribute{
-										Computed:            true,
-										Description:         "The account ID of the owner of the VM.",
-										MarkdownDescription: "The account ID of the owner of the VM.",
-									},
 									"vm_id": schema.StringAttribute{
 										Computed:            true,
 										Description:         "The ID of a VM specified in a route in the table.",
 										MarkdownDescription: "The ID of a VM specified in a route in the table.",
 									},
-									"vpc_access_point_id": schema.StringAttribute{
-										Computed:            true,
-										Description:         "The ID of the Net access point.",
-										MarkdownDescription: "The ID of the Net access point.",
-									},
 									"vpc_peering_id": schema.StringAttribute{
 										Computed:            true,
-										Description:         "The ID of the Net peering.",
-										MarkdownDescription: "The ID of the Net peering.",
+										Description:         "The ID of the Vpc peering.",
+										MarkdownDescription: "The ID of the Vpc peering.",
 									},
 								},
 								CustomType: RoutesType{
@@ -152,114 +149,136 @@ func RouteTableDataSourceSchema(ctx context.Context) schema.Schema {
 						"tags": tags.TagsSchema(ctx),
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
-							Description:         "The ID of the Net for the route table.",
-							MarkdownDescription: "The ID of the Net for the route table.",
+							Description:         "The ID of the Vpc for the route table.",
+							MarkdownDescription: "The ID of the Vpc for the route table.",
 						},
 					},
 				},
-			},
-			"ids": schema.ListAttribute{
-				Optional:            true,
-				ElementType:         types.StringType,
-				Description:         "ID for ReadRouteTables",
-				MarkdownDescription: "ID for ReadRouteTables",
-			},
-			"tag_keys": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The keys of the tags associated with the route table.",
-				MarkdownDescription: "The keys of the tags associated with the route table.",
-			},
-			"tag_values": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The values of the tags associated with the virtual gateways.",
-				MarkdownDescription: "The values of the tags associated with the virtual gateways.",
-			},
-			"tags": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The key/value combination of the tags associated with the virtual gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the virtual gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-			},
-			"route_vpc_peering_ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The IDs of the Net peering.",
-				MarkdownDescription: "The IDs of the Net peering.",
-			},
-			"route_nat_gateway_ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The ID of a NAT service attached to the Net.",
-				MarkdownDescription: "The ID of a NAT service attached to the Net.",
-			},
-			"route_vm_ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The ID of a VM specified in a route in the table.",
-				MarkdownDescription: "The ID of a VM specified in a route in the table.",
-			},
-			"route_creation_methods": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The method used to create the route.",
-				MarkdownDescription: "The method used to create the route.",
-			},
-			"route_destination_ip_ranges": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
-				MarkdownDescription: "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
-			},
-			"route_destination_service_ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The ID of the OUTSCALE service.",
-				MarkdownDescription: "The ID of the OUTSCALE service.",
-			},
-			"route_gateway_ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The ID of the Internet service or virtual gateway attached to the Net.",
-				MarkdownDescription: "The ID of the Internet service or virtual gateway attached to the Net.",
-			},
-			"route_states": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The state of a route in the route table (always `active`). ",
-				MarkdownDescription: "The state of a route in the route table (always `active`). ",
-			},
-			"vpc_ids": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Description:         "The ID of the Net for the route table.",
-				MarkdownDescription: "The ID of the Net for the route table.",
+				Computed:            true,
+				Description:         "Information about one or more route tables.",
+				MarkdownDescription: "Information about one or more route tables.",
 			},
 			"link_route_table_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the association between the route table and the Subnet.",
-				MarkdownDescription: "The ID of the association between the route table and the Subnet.",
+				Computed:            true,
+				Description:         "The IDs of the route tables involved in the associations.",
+				MarkdownDescription: "The IDs of the route tables involved in the associations.",
+			},
+			"link_route_table_link_route_table_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the associations between the route tables and the Subnets.",
+				MarkdownDescription: "The IDs of the associations between the route tables and the Subnets.",
 			},
 			"link_route_table_main": schema.BoolAttribute{
 				Optional:            true,
-				Description:         "If true, the route table is the main one.",
-				MarkdownDescription: "If true, the route table is the main one.",
+				Computed:            true,
+				Description:         "If true, the route tables are the main ones for their Vpcs.",
+				MarkdownDescription: "If true, the route tables are the main ones for their Vpcs.",
 			},
-			"link_route_table_route_table_ids": schema.ListAttribute{
+			"link_subnet_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the route table.",
-				MarkdownDescription: "The ID of the route table.",
+				Computed:            true,
+				Description:         "The IDs of the Subnets involved in the associations.",
+				MarkdownDescription: "The IDs of the Subnets involved in the associations.",
 			},
-			"link_route_table_subnet_ids": schema.ListAttribute{
+			"route_creation_methods": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "The ID of the Subnet.",
-				MarkdownDescription: "The ID of the Subnet.",
+				Computed:            true,
+				Description:         "The methods used to create a route.",
+				MarkdownDescription: "The methods used to create a route.",
+			},
+			"route_destination_ip_ranges": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IP ranges specified in routes in the tables.",
+				MarkdownDescription: "The IP ranges specified in routes in the tables.",
+			},
+			"route_destination_service_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The service IDs specified in routes in the tables.",
+				MarkdownDescription: "The service IDs specified in routes in the tables.",
+			},
+			"route_gateway_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the gateways specified in routes in the tables.",
+				MarkdownDescription: "The IDs of the gateways specified in routes in the tables.",
+			},
+			"route_nat_gateway_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the NAT gateways specified in routes in the tables.",
+				MarkdownDescription: "The IDs of the NAT gateways specified in routes in the tables.",
+			},
+			"route_states": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The states of routes in the route tables (always `active`).",
+				MarkdownDescription: "The states of routes in the route tables (always `active`).",
+			},
+			"route_vm_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the VMs specified in routes in the tables.",
+				MarkdownDescription: "The IDs of the VMs specified in routes in the tables.",
+			},
+			"route_vpc_peering_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the Vpc peerings specified in routes in the tables.",
+				MarkdownDescription: "The IDs of the Vpc peerings specified in routes in the tables.",
+			},
+			"tag_keys": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The keys of the tags associated with the route tables.",
+				MarkdownDescription: "The keys of the tags associated with the route tables.",
+			},
+			"tag_values": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The values of the tags associated with the route tables.",
+				MarkdownDescription: "The values of the tags associated with the route tables.",
+			},
+			"tags": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The key/value combination of the tags associated with the route tables, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				MarkdownDescription: "The key/value combination of the tags associated with the route tables, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+			},
+			"vpc_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "The IDs of the Vpcs for the route tables.",
+				MarkdownDescription: "The IDs of the Vpcs for the route tables.",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
+}
+
+type RouteTableModelDatasource struct {
+	Id                              types.String `tfsdk:"id"`
+	LinkRouteTables                 types.List   `tfsdk:"link_route_tables"`
+	RoutePropagatingVirtualGateways types.List   `tfsdk:"route_propagating_virtual_gateways"`
+	Routes                          types.List   `tfsdk:"routes"`
+	Tags                            types.List   `tfsdk:"tags"`
+	VpcId                           types.String `tfsdk:"vpc_id"`
 }

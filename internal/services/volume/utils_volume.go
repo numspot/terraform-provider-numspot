@@ -2,6 +2,7 @@ package volume
 
 import (
 	"context"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -103,19 +104,33 @@ func ValueFromTfToUpdaterequest(tf *VolumeModel) numspot.UpdateVolumeJSONRequest
 }
 
 func VolumeFromTfToAPIReadParams(ctx context.Context, tf VolumesDataSourceModel) numspot.ReadVolumesParams {
-	creationDates := utils.TfStringListToTimeList(ctx, tf.CreationDates, "2020-06-30T00:00:00.000Z")
-	linkVolumeLinkDates := utils.TfStringListToTimeList(ctx, tf.LinkVolumeLinkDates, "2020-06-30T00:00:00.000Z")
-	volumeSizes := utils.TFInt64ListToIntList(ctx, tf.VolumeSizes)
+	var creationDatesPtr *[]time.Time
+	var linkVolumeLinkDatesPtr *[]time.Time
+	var volumeSizesPtr *[]int
 
+	if !(tf.CreationDates.IsNull() || tf.CreationDates.IsUnknown()) {
+		creationDates := utils.TfStringListToTimeList(ctx, tf.CreationDates, "2020-06-30T00:00:00.000Z")
+		creationDatesPtr = &creationDates
+	}
+
+	if !(tf.LinkVolumeLinkDates.IsNull() || tf.LinkVolumeLinkDates.IsUnknown()) {
+		linkVolumeLinkDates := utils.TfStringListToTimeList(ctx, tf.LinkVolumeLinkDates, "2020-06-30T00:00:00.000Z")
+		linkVolumeLinkDatesPtr = &linkVolumeLinkDates
+	}
+
+	if !(tf.VolumeSizes.IsNull() || tf.VolumeSizes.IsUnknown()) {
+		volumeSizes := utils.TFInt64ListToIntList(ctx, tf.VolumeSizes)
+		volumeSizesPtr = &volumeSizes
+	}
 	return numspot.ReadVolumesParams{
-		CreationDates:                &creationDates,
+		CreationDates:                creationDatesPtr,
 		LinkVolumeDeleteOnVmDeletion: tf.LinkVolumeDeleteOnVmDeletion.ValueBoolPointer(),
 		LinkVolumeDeviceNames:        utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeDeviceNames),
-		LinkVolumeLinkDates:          &linkVolumeLinkDates,
+		LinkVolumeLinkDates:          linkVolumeLinkDatesPtr,
 		LinkVolumeLinkStates:         utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeLinkStates),
 		LinkVolumeVmIds:              utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeVmIds),
 		SnapshotIds:                  utils.TfStringListToStringPtrList(ctx, tf.SnapshotIds),
-		VolumeSizes:                  &volumeSizes,
+		VolumeSizes:                  volumeSizesPtr,
 		VolumeStates:                 utils.TfStringListToStringPtrList(ctx, tf.VolumeStates),
 		VolumeTypes:                  utils.TfStringListToStringPtrList(ctx, tf.VolumeTypes),
 		AvailabilityZoneNames:        utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames),
@@ -127,7 +142,16 @@ func VolumesFromHttpToTfDatasource(ctx context.Context, http *numspot.Volume) (*
 	var (
 		linkedVolumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
 		diags         diag.Diagnostics
+		tagsList      types.List
 	)
+
+	if http.Tags != nil {
+		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
 	if http.LinkedVolumes != nil {
 		linkedVolumes, diags = utils.GenericListToTfListValue(
 			ctx,
@@ -150,5 +174,6 @@ func VolumesFromHttpToTfDatasource(ctx context.Context, http *numspot.Volume) (*
 		SnapshotId:           types.StringPointerValue(http.SnapshotId),
 		State:                types.StringPointerValue(http.State),
 		Type:                 types.StringPointerValue(http.Type),
+		Tags:                 tagsList,
 	}, nil
 }

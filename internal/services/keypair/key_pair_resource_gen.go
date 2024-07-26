@@ -4,6 +4,7 @@ package keypair
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -16,14 +17,13 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"fingerprint": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The MD5 public key fingerprint as specified in section 4 of RFC 4716.",
-				MarkdownDescription: "The MD5 public key fingerprint as specified in section 4 of RFC 4716.",
+				Description:         "The MD5 public key fingerprint, as specified in section 4 of RFC 4716.",
+				MarkdownDescription: "The MD5 public key fingerprint, as specified in section 4 of RFC 4716.",
 			},
 			"id": schema.StringAttribute{
-				Optional:            true,
 				Computed:            true,
-				Description:         "ID for /keypairs",
-				MarkdownDescription: "ID for /keypairs",
+				Description:         "ID for ReadKeypairs",
+				MarkdownDescription: "ID for ReadKeypairs",
 			},
 			"name": schema.StringAttribute{
 				Required:            true,
@@ -35,17 +35,22 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"private_key": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The private key. When saving the private key in a .rsa file, replace the `\\n` escape sequences with line breaks.",
-				MarkdownDescription: "The private key. When saving the private key in a .rsa file, replace the `\\n` escape sequences with line breaks.",
+				Description:         "The private key, returned only if you are creating a keypair (not if you are importing). When you save this private key in a .rsa file, make sure you replace the `\\n` escape sequences with real line breaks.",
+				MarkdownDescription: "The private key, returned only if you are creating a keypair (not if you are importing). When you save this private key in a .rsa file, make sure you replace the `\\n` escape sequences with real line breaks.",
 			},
 			"public_key": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The public key. It must be Base64-encoded.",
-				MarkdownDescription: "The public key. It must be Base64-encoded.",
+				Description:         "The public key to import in your account, if you are importing an existing keypair. This value must be Base64-encoded.",
+				MarkdownDescription: "The public key to import in your account, if you are importing an existing keypair. This value must be Base64-encoded.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
+			},
+			"type": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The type of the keypair (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
+				MarkdownDescription: "The type of the keypair (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
@@ -58,4 +63,5 @@ type KeyPairModel struct {
 	Name        types.String `tfsdk:"name"`
 	PrivateKey  types.String `tfsdk:"private_key"`
 	PublicKey   types.String `tfsdk:"public_key"`
+	Type        types.String `tfsdk:"type"`
 }

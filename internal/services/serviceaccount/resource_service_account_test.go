@@ -60,7 +60,7 @@ func getFieldMatchChecksServiceAccount(data StepDataServiceAccount) []resource.T
 
 // Generate checks to validate that resource 'numspot_service_account.test' is properly linked to given subresources
 // If resource has no dependencies, return empty array
-func getDependencyChecksServiceAccount(dependenciesPrefix string) []resource.TestCheckFunc {
+func getDependencyChecksServiceAccount(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{}
 }
 

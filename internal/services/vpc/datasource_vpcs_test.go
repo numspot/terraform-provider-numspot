@@ -21,7 +21,7 @@ func TestAccVPCsDatasource_Basic(t *testing.T) {
 			{
 				Config: testAccVPCsDatasourceConfig_Basic(ipRange),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_vpcs.test", "items.#", "1"),
+					resource.TestCheckResourceAttr("data.numspot_vpcs.testdata", "items.#", "1"),
 					provider.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vpcs.testdata", "items.*", map[string]string{
 						"id":       provider.PAIR_PREFIX + "numspot_vpc.test.id",
 						"ip_range": ipRange,
@@ -38,7 +38,7 @@ resource "numspot_vpc" "test" {
   ip_range = %[1]q
 }
 
-data "numspot_vpcs" "test" {
+data "numspot_vpcs" "testdata" {
   ids = [numspot_vpc.test.id]
 }`, ipRange)
 }

@@ -4,8 +4,10 @@ package flexiblegpu
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
@@ -36,14 +38,14 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"model_name": schema.StringAttribute{
 				Required:            true,
-				Description:         "The model of fGPU you want to allocate. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).",
-				MarkdownDescription: "The model of fGPU you want to allocate. For more information, see [About Flexible GPUs](https://docs.outscale.com/en/userguide/About-Flexible-GPUs.html).",
+				Description:         "The model of fGPU you want to allocate.",
+				MarkdownDescription: "The model of fGPU you want to allocate.",
 			},
 			"space_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "space identifier",
-				MarkdownDescription: "space identifier",
+				Description:         "Identifier of the Space",
+				MarkdownDescription: "Identifier of the Space",
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,
@@ -52,11 +54,21 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"vm_id": schema.StringAttribute{
 				Computed:            true,
-				Optional:            true,
 				Description:         "The ID of the VM the fGPU is attached to, if any.",
 				MarkdownDescription: "The ID of the VM the fGPU is attached to, if any.",
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}
+}
+
+type FlexibleGpuModel struct {
+	AvailabilityZoneName types.String `tfsdk:"availability_zone_name"`
+	DeleteOnVmDeletion   types.Bool   `tfsdk:"delete_on_vm_deletion"`
+	Generation           types.String `tfsdk:"generation"`
+	Id                   types.String `tfsdk:"id"`
+	ModelName            types.String `tfsdk:"model_name"`
+	SpaceId              types.String `tfsdk:"space_id"`
+	State                types.String `tfsdk:"state"`
+	VmId                 types.String `tfsdk:"vm_id"`
 }

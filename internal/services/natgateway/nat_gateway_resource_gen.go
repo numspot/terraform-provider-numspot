@@ -5,17 +5,18 @@ package natgateway
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
 func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
@@ -23,32 +24,32 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The ID of the NAT service.",
-				MarkdownDescription: "The ID of the NAT service.",
+				Description:         "The ID of the NAT gateway.",
+				MarkdownDescription: "The ID of the NAT gateway.",
 			},
 			"public_ip_id": schema.StringAttribute{
 				Required:            true,
-				Description:         "The allocation ID of the public IP to associate with the NAT service.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
-				MarkdownDescription: "The allocation ID of the public IP to associate with the NAT service.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
+				Description:         "The allocation ID of the public IP to associate with the NAT gateway.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
+				MarkdownDescription: "The allocation ID of the public IP to associate with the NAT gateway.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
 			},
 			"public_ips": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"public_ip": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The public IP associated with the NAT service.",
-							MarkdownDescription: "The public IP associated with the NAT service.",
+							Computed: true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.RequiresReplace(),
 							},
+							Description:         "The public IP associated with the NAT gateway.",
+							MarkdownDescription: "The public IP associated with the NAT gateway.",
 						},
 						"public_ip_id": schema.StringAttribute{
-							Computed:            true,
-							Description:         "The allocation ID of the public IP associated with the NAT service.",
-							MarkdownDescription: "The allocation ID of the public IP associated with the NAT service.",
+							Computed: true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.RequiresReplace(),
 							},
+							Description:         "The allocation ID of the public IP associated with the NAT gateway.",
+							MarkdownDescription: "The allocation ID of the public IP associated with the NAT gateway.",
 						},
 					},
 					CustomType: PublicIpsType{
@@ -58,25 +59,25 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Description:         "Information about the public IP or IPs associated with the NAT service.",
-				MarkdownDescription: "Information about the public IP or IPs associated with the NAT service.",
+				Description:         "Information about the public IP or IPs associated with the NAT gateway.",
+				MarkdownDescription: "Information about the public IP or IPs associated with the NAT gateway.",
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The state of the NAT service (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
-				MarkdownDescription: "The state of the NAT service (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
+				Description:         "The state of the NAT gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
+				MarkdownDescription: "The state of the NAT gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 			},
 			"subnet_id": schema.StringAttribute{
 				Required:            true,
-				Description:         "The ID of the Subnet in which you want to create the NAT service.",
-				MarkdownDescription: "The ID of the Subnet in which you want to create the NAT service.",
-			},
-			"vpc_id": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The ID of the Net in which the NAT service is.",
-				MarkdownDescription: "The ID of the Net in which the NAT service is.",
+				Description:         "The ID of the Subnet in which you want to create the NAT gateway.",
+				MarkdownDescription: "The ID of the Subnet in which you want to create the NAT gateway.",
 			},
 			"tags": tags.TagsSchema(ctx),
+			"vpc_id": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The ID of the Vpc in which the NAT gateway is.",
+				MarkdownDescription: "The ID of the Vpc in which the NAT gateway is.",
+			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
 	}

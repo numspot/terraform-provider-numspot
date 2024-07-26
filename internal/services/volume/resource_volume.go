@@ -163,6 +163,8 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		return
 	}
 
+	time.Sleep(3 * time.Second) // TODO remove when outscale fixes the State field => https://numsproduct.atlassian.net/browse/CLSEXP-612
+
 	volumeId := state.Id.ValueString()
 	// Retries read on resource until state is OK
 	read, err := utils2.RetryReadUntilStateValid(
@@ -177,8 +179,6 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		response.Diagnostics.AddError("Failed to update volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
 		return
 	}
-
-	time.Sleep(3 * time.Second) // TODO remove when outscale fixes the State field => https://numsproduct.atlassian.net/browse/CLSEXP-612
 
 	rr, ok := read.(*numspot.Volume)
 	if !ok {

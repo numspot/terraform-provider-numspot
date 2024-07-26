@@ -56,9 +56,11 @@ resource "numspot_security_group" "test" {
 }
 
 data "numspot_security_groups" "testdata" {
-  ids        = [numspot_security_group.test.id]
-  depends_on = [numspot_security_group.test]
+  security_group_ids = [numspot_security_group.test.id]
+  depends_on         = [numspot_security_group.test]
 }
+
+
 
 
 `

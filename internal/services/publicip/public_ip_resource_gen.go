@@ -55,8 +55,8 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"link_public_ip_id": schema.StringAttribute{
 				Computed:            true,
-				Description:         "The ID of the association between the public IP and VM/NIC (if any).",
-				MarkdownDescription: "The ID of the association between the public IP and VM/NIC (if any).",
+				Description:         "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.",
+				MarkdownDescription: "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.",
 			},
 			"tags": tags.TagsSchema(ctx),
 		},
