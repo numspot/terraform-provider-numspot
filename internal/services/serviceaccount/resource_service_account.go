@@ -238,6 +238,9 @@ func (r *ServiceAccountResource) Read(ctx context.Context, request resource.Read
 	tf := ServiceAccountEditedResponseFromHTTPToTF(ctx, *res.JSON200)
 	state.ServiceAccountId = tf.ServiceAccountId
 	state.Name = tf.Name
+
+	state.Id = types.StringValue(fmt.Sprintf("%s,%s", state.SpaceId.ValueString(), state.ServiceAccountId.ValueString()))
+
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
