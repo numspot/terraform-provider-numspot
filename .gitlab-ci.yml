@@ -101,7 +101,7 @@ push_to_github:
     - mkdir -p ~/.ssh
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
-    - git remote add github git@github.com:numspot/terraform-provider-numspot.git
+    - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
     - git push github HEAD:main
     - git push github HEAD:main --tags
   rules:
