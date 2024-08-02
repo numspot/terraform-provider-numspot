@@ -18,7 +18,7 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"dhcp_options_set_id": schema.StringAttribute{
 				Computed:            true,
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : add Optional attributes
 				Description:         "The ID of the DHCP options set (or `default` if you want to associate the default one).",
 				MarkdownDescription: "The ID of the DHCP options set (or `default` if you want to associate the default one).",
 			},
@@ -32,7 +32,7 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IP range for the Vpc, in CIDR notation (for example, `10.0.0.0/16`).",
 				MarkdownDescription: "The IP range for the Vpc, in CIDR notation (for example, `10.0.0.0/16`).",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"state": schema.StringAttribute{
@@ -40,15 +40,16 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the Vpc (`pending` \\| `available` \\| `deleting`).",
 				MarkdownDescription: "The state of the Vpc (`pending` \\| `available` \\| `deleting`).",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"tenancy": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
 				Description:         "The tenancy options for the VMs:<br />\n- `default` if a VM created in a Vpc can be launched with any tenancy.<br />\n- `dedicated` if it can be launched with dedicated tenancy VMs running on single-tenant hardware.<br />\n- `dedicated group ID`: if it can be launched in a dedicated group on single-tenant hardware.",
 				MarkdownDescription: "The tenancy options for the VMs:<br />\n- `default` if a VM created in a Vpc can be launched with any tenancy.<br />\n- `dedicated` if it can be launched with dedicated tenancy VMs running on single-tenant hardware.<br />\n- `dedicated group ID`: if it can be launched in a dedicated group on single-tenant hardware.",
 			},
+			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -59,4 +60,5 @@ type VpcModel struct {
 	State            types.String `tfsdk:"state"`
 	Tags             types.List   `tfsdk:"tags"`
 	Tenancy          types.String `tfsdk:"tenancy"`
+	// MANUALLY EDITED : spaceId removed
 }

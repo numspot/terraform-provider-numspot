@@ -121,9 +121,9 @@ func VpcPeeringDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "Information about the state of the Vpc peering.",
 							MarkdownDescription: "Information about the state of the Vpc peering.",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more Vpc peerings.",
 				MarkdownDescription: "Information about one or more Vpc peerings.",
@@ -174,15 +174,16 @@ func VpcPeeringDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the Vpc peerings, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the Vpc peerings, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the Vpc peerings, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the Vpc peerings, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
+			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
-type VpcPeeringDatasourceItemModel struct {
+type VpcPeeringDatasourceItemModel struct { // MANUALLY EDITED : Create Model from ItemsValue struct
 	AccepterVpc    AccepterVpcValue `tfsdk:"accepter_vpc"`
 	ExpirationDate types.String     `tfsdk:"expiration_date"`
 	Id             types.String     `tfsdk:"id"`
@@ -190,3 +191,7 @@ type VpcPeeringDatasourceItemModel struct {
 	State          StateValue       `tfsdk:"state"`
 	Tags           types.List       `tfsdk:"tags"`
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

@@ -62,7 +62,7 @@ func PermissionsDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "last update",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 			},
 			"action": schema.StringAttribute{
 				Optional:            true,
@@ -104,3 +104,5 @@ type PermissionModel struct {
 	CreatedOn   types.String `tfsdk:"created_on"`
 	UpdatedOn   types.String `tfsdk:"updated_on"`
 }
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

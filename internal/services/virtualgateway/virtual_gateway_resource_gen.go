@@ -36,8 +36,8 @@ func VirtualGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the virtual gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 				MarkdownDescription: "The state of the virtual gateway (`pending` \\| `available` \\| `deleting` \\| `deleted`).",
 			},
-			"tags": tags.TagsSchema(ctx),
-			"vpc_id": schema.StringAttribute{
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
+			"vpc_id": schema.StringAttribute{ // MANUALLY EDITED : add vpc_id attribute
 				Computed:            true,
 				Optional:            true,
 				Description:         "The ID of the Vpc to which the virtual gateway is attached.",
@@ -67,8 +67,9 @@ func VirtualGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "the Vpc to which the virtual gateway is attached.",
 				MarkdownDescription: "the Vpc to which the virtual gateway is attached.",
 			},
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -78,7 +79,8 @@ type VirtualGatewayModel struct {
 	State                    types.String `tfsdk:"state"`
 	Tags                     types.List   `tfsdk:"tags"`
 	VpcToVirtualGatewayLinks types.List   `tfsdk:"vpc_to_virtual_gateway_links"`
-	VpcId                    types.String `tfsdk:"vpc_id"`
+	VpcId                    types.String `tfsdk:"vpc_id"` // MANUALLY EDITED : add vpc_id attribute
+	// MANUALLY EDITED : SpaceId Removed
 }
 
 var _ basetypes.ObjectTypable = VpcToVirtualGatewayLinksType{}

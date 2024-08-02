@@ -63,14 +63,14 @@ func NatGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The ID of the Subnet in which the NAT gateway is.",
 							MarkdownDescription: "The ID of the Subnet in which the NAT gateway is.",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The ID of the Vpc in which the NAT gateway is.",
 							MarkdownDescription: "The ID of the Vpc in which the NAT gateway is.",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more NAT gateways.",
 				MarkdownDescription: "Information about one or more NAT gateways.",
@@ -108,8 +108,8 @@ func NatGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the NAT gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the NAT gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the NAT gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the NAT gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 			"vpc_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -118,8 +118,9 @@ func NatGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the Vpcs in which the NAT gateways are.",
 				MarkdownDescription: "The IDs of the Vpcs in which the NAT gateways are.",
 			},
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -130,4 +131,7 @@ type NatGatewayModelDatasource struct {
 	SubnetId  types.String `tfsdk:"subnet_id"`
 	Tags      types.List   `tfsdk:"tags"`
 	VpcId     types.String `tfsdk:"vpc_id"`
+	// MANUALLY EDITED : SpaceId Removed
 }
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

@@ -64,7 +64,7 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The ID of the VPN connection.",
 							MarkdownDescription: "The ID of the VPN connection.",
 						},
-						"routes": schema.SetNestedAttribute{
+						"routes": schema.SetNestedAttribute{ // MANUALLY EDITED : Use Set type instead of List
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"destination_ip_range": schema.StringAttribute{
@@ -103,7 +103,7 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
 							MarkdownDescription: "If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"vgw_telemetries": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
@@ -238,8 +238,8 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 										},
 										"pre_shared_key": schema.StringAttribute{
 											Computed:            true,
-											Description:         "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").",
-											MarkdownDescription: "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").",
+											Description:         "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").", // MANUALLY EDITED : parse HTML encoded characters
+											MarkdownDescription: "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").", // MANUALLY EDITED : parse HTML encoded characters
 										},
 									},
 									CustomType: Phase2optionsType{
@@ -267,7 +267,7 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "Information about the VPN options.",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more VPN connections.",
 				MarkdownDescription: "Information about one or more VPN connections.",
@@ -310,8 +310,8 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the VPN connections, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the VPN connections, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the VPN connections, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the VPN connections, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 			"virtual_gateway_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -320,7 +320,12 @@ func VpnConnectionDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the virtual gateways.",
 				MarkdownDescription: "The IDs of the virtual gateways.",
 			},
+			// MANUALLY EDITED : remove spaceId
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

@@ -96,15 +96,16 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 				MarkdownDescription: "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"type": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
 				Description:         "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />",
 				MarkdownDescription: "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />",
 			},
+			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -119,6 +120,7 @@ type VolumeModel struct {
 	State                types.String `tfsdk:"state"`
 	Tags                 types.List   `tfsdk:"tags"`
 	Type                 types.String `tfsdk:"type"`
+	// MANUALLY EDITED : spaceId removed
 }
 
 var _ basetypes.ObjectTypable = LinkedVolumesType{}

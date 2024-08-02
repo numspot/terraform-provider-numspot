@@ -146,14 +146,14 @@ func RouteTableDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "One or more routes in the route table.",
 							MarkdownDescription: "One or more routes in the route table.",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The ID of the Vpc for the route table.",
 							MarkdownDescription: "The ID of the Vpc for the route table.",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more route tables.",
 				MarkdownDescription: "Information about one or more route tables.",
@@ -259,8 +259,8 @@ func RouteTableDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the route tables, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the route tables, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the route tables, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the route tables, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 			"vpc_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -269,12 +269,13 @@ func RouteTableDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the Vpcs for the route tables.",
 				MarkdownDescription: "The IDs of the Vpcs for the route tables.",
 			},
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
-type RouteTableModelDatasource struct {
+type RouteTableModelDatasource struct { // MANUALLY EDITED : Create Model from ItemsValue struct
 	Id                              types.String `tfsdk:"id"`
 	LinkRouteTables                 types.List   `tfsdk:"link_route_tables"`
 	RoutePropagatingVirtualGateways types.List   `tfsdk:"route_propagating_virtual_gateways"`
@@ -282,3 +283,5 @@ type RouteTableModelDatasource struct {
 	Tags                            types.List   `tfsdk:"tags"`
 	VpcId                           types.String `tfsdk:"vpc_id"`
 }
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

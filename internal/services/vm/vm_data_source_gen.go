@@ -495,7 +495,7 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The ID of the Subnet for the VM.",
 							MarkdownDescription: "The ID of the Subnet for the VM.",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"type": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The type of VM.",
@@ -512,7 +512,7 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The ID of the Vpc in which the VM is running.",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more VMs.",
 				MarkdownDescription: "Information about one or more VMs.",
@@ -791,8 +791,8 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the VMs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the VMs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the VMs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the VMs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 			"tenancies": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -843,7 +843,12 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the Vpcs in which the VMs are running.",
 				MarkdownDescription: "The IDs of the Vpcs in which the VMs are running.",
 			},
+			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

@@ -43,7 +43,7 @@ func ProductTypeDataSourceSchema(ctx context.Context) schema.Schema {
 							AttrTypes: ItemsValue{}.AttributeTypes(ctx),
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Description:         "Information about one or more product types.",
 				MarkdownDescription: "Information about one or more product types.",
 			},
@@ -55,7 +55,7 @@ func ProductTypeDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The IDs of the product types.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

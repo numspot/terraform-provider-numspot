@@ -24,7 +24,7 @@ func ServiceAccountDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "Service Account name",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 			},
 			"space_id": schema.StringAttribute{
 				Required:            true,
@@ -39,3 +39,7 @@ func ServiceAccountDataSourceSchema(ctx context.Context) schema.Schema {
 		},
 	}
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

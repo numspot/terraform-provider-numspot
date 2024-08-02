@@ -42,7 +42,7 @@ func RolesDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "last update",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 			},
 			"space_id": schema.StringAttribute{
 				Required:            true,
@@ -65,3 +65,5 @@ type RolesModel struct {
 	CreatedOn   types.String `tfsdk:"created_on"`
 	UpdatedOn   types.String `tfsdk:"updated_on"`
 }
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

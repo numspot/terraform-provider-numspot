@@ -47,7 +47,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "**(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the OMI (`i386` or `x84_64`).",
 				MarkdownDescription: "**(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the OMI (`i386` or `x84_64`).",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"block_device_mappings": schema.ListNestedAttribute{
@@ -119,7 +119,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplace(),
+					listplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when registering from a snapshot, or from a bucket without using a manifest file)** One or more block device mappings.",
 				MarkdownDescription: "**(when registering from a snapshot, or from a bucket without using a manifest file)** One or more block device mappings.",
@@ -133,7 +133,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "A description for the new OMI.",
 				MarkdownDescription: "A description for the new OMI.",
@@ -147,7 +147,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "A unique name for the new OMI.<br />\nConstraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), parentheses (`()`), slashes (`/`), periods (`.`), or dashes (`-`).",
 				MarkdownDescription: "A unique name for the new OMI.<br />\nConstraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), parentheses (`()`), slashes (`/`), periods (`.`), or dashes (`-`).",
@@ -156,7 +156,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.RequiresReplace(),
+					boolplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when creating from a VM)** If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.",
 				MarkdownDescription: "**(when creating from a VM)** If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.",
@@ -172,7 +172,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new OMI.",
 				MarkdownDescription: "**(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new OMI.",
@@ -186,7 +186,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when copying an OMI)** The ID of the OMI you want to copy.",
 				MarkdownDescription: "**(when copying an OMI)** The ID of the OMI you want to copy.",
@@ -195,7 +195,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when copying an OMI)** The name of the source Region (always the same as the Region of your account).",
 				MarkdownDescription: "**(when copying an OMI)** The name of the source Region (always the same as the Region of your account).",
@@ -204,7 +204,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "Identifier of the Space",
 				MarkdownDescription: "Identifier of the Space",
@@ -245,14 +245,14 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when creating from a VM)** The ID of the VM from which you want to create the OMI.",
 				MarkdownDescription: "**(when creating from a VM)** The ID of the VM from which you want to create the OMI.",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -277,6 +277,8 @@ type ImageModel struct {
 	Type                types.String      `tfsdk:"type"`
 	VmId                types.String      `tfsdk:"vm_id"`
 }
+
+// MANUALLY EDITED : Functions associated with Tags removed
 
 var _ basetypes.ObjectTypable = AccessType{}
 

@@ -32,7 +32,7 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the client gateway.",
 				MarkdownDescription: "The ID of the client gateway.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"connection_type": schema.StringAttribute{
@@ -40,7 +40,7 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The type of VPN connection (only `ipsec.1` is supported).",
 				MarkdownDescription: "The type of VPN connection (only `ipsec.1` is supported).",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"id": schema.StringAttribute{
@@ -48,12 +48,12 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the VPN connection.",
 				MarkdownDescription: "The ID of the VPN connection.",
 			},
-			"routes": schema.SetNestedAttribute{
+			"routes": schema.SetNestedAttribute{ // MANUALLY EDITED : Use Set type instead of List
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"destination_ip_range": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
 							MarkdownDescription: "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
 						},
@@ -74,7 +74,7 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : Add Optional attribute
 				Computed:            true,
 				Description:         "Information about one or more static routes associated with the VPN connection, if any.",
 				MarkdownDescription: "Information about one or more static routes associated with the VPN connection, if any.",
@@ -90,7 +90,7 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "By default or if false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
 				MarkdownDescription: "By default or if false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"vgw_telemetries": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -135,7 +135,7 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the virtual gateway.",
 				MarkdownDescription: "The ID of the virtual gateway.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"vpn_options": schema.SingleNestedAttribute{
@@ -228,10 +228,10 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 							},
 							"pre_shared_key": schema.StringAttribute{
 								Computed: true,
-								Optional: true,
+								Optional: true, // MANUALLY EDITED : Add Optional attribute
 
-								Description:         "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").",
-								MarkdownDescription: "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").",
+								Description:         "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").", // MANUALLY EDITED : parse html encoded character
+								MarkdownDescription: "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\").", // MANUALLY EDITED : parse html encoded character
 							},
 						},
 						CustomType: Phase2optionsType{
@@ -240,14 +240,14 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 							},
 						},
 						Computed: true,
-						Optional: true,
+						Optional: true, // MANUALLY EDITED : Add Optional attribute
 
 						Description:         "Information about Phase 2 of the Internet Key Exchange (IKE) negotiation. ",
 						MarkdownDescription: "Information about Phase 2 of the Internet Key Exchange (IKE) negotiation. ",
 					},
 					"tunnel_inside_ip_range": schema.StringAttribute{
 						Computed: true,
-						Optional: true,
+						Optional: true, // MANUALLY EDITED : Add Optional attribute
 
 						Description:         "The range of inside IPs for the tunnel. This must be a /30 CIDR block from the 169.254.254.0/24 range.",
 						MarkdownDescription: "The range of inside IPs for the tunnel. This must be a /30 CIDR block from the 169.254.254.0/24 range.",
@@ -259,12 +259,13 @@ func VpnConnectionResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : Add Optional attribute
 				Description:         "Information about the VPN options.",
 				MarkdownDescription: "Information about the VPN options.",
 			},
+			// MANUALLY EDITED : remove spaceId
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -273,13 +274,14 @@ type VpnConnectionModel struct {
 	ClientGatewayId            types.String    `tfsdk:"client_gateway_id"`
 	ConnectionType             types.String    `tfsdk:"connection_type"`
 	Id                         types.String    `tfsdk:"id"`
-	Routes                     types.Set       `tfsdk:"routes"`
+	Routes                     types.Set       `tfsdk:"routes"` // MANUALLY EDITED : use 'Set' type
 	State                      types.String    `tfsdk:"state"`
 	StaticRoutesOnly           types.Bool      `tfsdk:"static_routes_only"`
 	Tags                       types.List      `tfsdk:"tags"`
 	VgwTelemetries             types.List      `tfsdk:"vgw_telemetries"`
 	VirtualGatewayId           types.String    `tfsdk:"virtual_gateway_id"`
 	VpnOptions                 VpnOptionsValue `tfsdk:"vpn_options"`
+	// MANUALLY EDITED : remove spaceId
 }
 
 var _ basetypes.ObjectTypable = RoutesType{}

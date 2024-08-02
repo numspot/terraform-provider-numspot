@@ -27,7 +27,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "A description for the security group.<br />\nThis description can contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, accented letters, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
 				MarkdownDescription: "A description for the security group.<br />\nThis description can contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, accented letters, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"id": schema.StringAttribute{
@@ -35,25 +35,25 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the security group.",
 				MarkdownDescription: "The ID of the security group.",
 			},
-			"inbound_rules": schema.SetNestedAttribute{
+			"inbound_rules": schema.SetNestedAttribute{ // MANUALLY EDITED : Use Set type instead of List
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"from_port_range": schema.Int64Attribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 							MarkdownDescription: "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 						},
 						"ip_protocol": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 							MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 						},
 						"ip_ranges": schema.ListAttribute{
 							ElementType:         types.StringType,
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 							MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 						},
@@ -62,13 +62,13 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 								Attributes: map[string]schema.Attribute{
 									"security_group_id": schema.StringAttribute{
 										Computed:            true,
-										Optional:            true,
+										Optional:            true, // MANUALLY EDITED : Add Optional attribute
 										Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
 										MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
 									},
 									"security_group_name": schema.StringAttribute{
 										Computed:            true,
-										Optional:            true,
+										Optional:            true, // MANUALLY EDITED : Add Optional attribute
 										Description:         "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
 										MarkdownDescription: "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
 									},
@@ -80,20 +80,20 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "Information about one or more source or destination security groups.",
 							MarkdownDescription: "Information about one or more source or destination security groups.",
 						},
 						"service_ids": schema.ListAttribute{
 							ElementType:         types.StringType,
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.",
 							MarkdownDescription: "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.",
 						},
 						"to_port_range": schema.Int64Attribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 							MarkdownDescription: "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 						},
@@ -105,7 +105,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : Add Optional attribute
 				Description:         "The inbound rules associated with the security group.",
 				MarkdownDescription: "The inbound rules associated with the security group.",
 			},
@@ -114,28 +114,28 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The name of the security group.<br />\nThis name must not start with `sg-`.<br />\nThis name must be unique and contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
 				MarkdownDescription: "The name of the security group.<br />\nThis name must not start with `sg-`.<br />\nThis name must be unique and contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
-			"outbound_rules": schema.SetNestedAttribute{
+			"outbound_rules": schema.SetNestedAttribute{ // MANUALLY EDITED : Use Set type instead of List
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"from_port_range": schema.Int64Attribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 							MarkdownDescription: "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 						},
 						"ip_protocol": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 							MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 						},
 						"ip_ranges": schema.ListAttribute{
 							ElementType:         types.StringType,
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 							MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 						},
@@ -144,13 +144,13 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 								Attributes: map[string]schema.Attribute{
 									"security_group_id": schema.StringAttribute{
 										Computed:            true,
-										Optional:            true,
+										Optional:            true, // MANUALLY EDITED : Add Optional attribute
 										Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
 										MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
 									},
 									"security_group_name": schema.StringAttribute{
 										Computed:            true,
-										Optional:            true,
+										Optional:            true, // MANUALLY EDITED : Add Optional attribute
 										Description:         "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
 										MarkdownDescription: "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
 									},
@@ -162,20 +162,20 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 								},
 							},
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "Information about one or more source or destination security groups.",
 							MarkdownDescription: "Information about one or more source or destination security groups.",
 						},
 						"service_ids": schema.ListAttribute{
 							ElementType:         types.StringType,
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.",
 							MarkdownDescription: "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.",
 						},
 						"to_port_range": schema.Int64Attribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add Optional attribute
 							Description:         "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 							MarkdownDescription: "The end of the port range for the TCP and UDP protocols, or an ICMP code number.",
 						},
@@ -187,27 +187,27 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : Add Optional attribute
 				Description:         "The outbound rules associated with the security group.",
 				MarkdownDescription: "The outbound rules associated with the security group.",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"vpc_id": schema.StringAttribute{
 				Required:            true,
 				Description:         "The ID of the Vpc for the security group.",
 				MarkdownDescription: "The ID of the Vpc for the security group.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
 type SecurityGroupModel struct {
 	Description   types.String `tfsdk:"description"`
 	Id            types.String `tfsdk:"id"`
-	InboundRules  types.Set    `tfsdk:"inbound_rules"`
+	InboundRules  types.Set    `tfsdk:"inbound_rules"` // MANUALLY EDITED : use 'Set' type
 	Name          types.String `tfsdk:"name"`
-	OutboundRules types.Set    `tfsdk:"outbound_rules"`
+	OutboundRules types.Set    `tfsdk:"outbound_rules"` // MANUALLY EDITED : use 'Set' type
 	Tags          types.List   `tfsdk:"tags"`
 	VpcId         types.String `tfsdk:"vpc_id"`
 }

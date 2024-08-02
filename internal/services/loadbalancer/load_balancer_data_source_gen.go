@@ -223,7 +223,7 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The ID of the Subnet in which the load balancer was created.",
 							MarkdownDescription: "The ID of the Subnet in which the load balancer was created.",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"type": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The type of load balancer. Valid only for load balancers in a Vpc.<br />\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.",
@@ -235,7 +235,7 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The ID of the Vpc for the load balancer.",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more load balancers.",
 				MarkdownDescription: "Information about one or more load balancers.",
@@ -247,8 +247,13 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The names of the load balancers.",
 				MarkdownDescription: "The names of the load balancers.",
 			},
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : All functions associated with ItemsType / ItemsValue and Tags removed

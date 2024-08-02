@@ -25,7 +25,6 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/image"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/internetgateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/keypair"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/listenerrule"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/loadbalancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/natgateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/nic"
@@ -354,7 +353,6 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		flexiblegpu.NewFlexibleGpuResource,
 		image.NewImageResource,
 		internetgateway.NewInternetGatewayResource,
-		listenerrule.NewListenerRuleResource,
 		loadbalancer.NewLoadBalancerResource,
 		natgateway.NewNatGatewayResource,
 		vpc.NewNetResource,

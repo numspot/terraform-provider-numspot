@@ -28,9 +28,9 @@ func InternetGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the attachment of the Internet gateway to the Vpc (always `available`).",
 				MarkdownDescription: "The state of the attachment of the Internet gateway to the Vpc (always `available`).",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
