@@ -64,14 +64,14 @@ func VpcDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The state of the Vpc (`pending` \\| `available` \\| `deleting`).",
 							MarkdownDescription: "The state of the Vpc (`pending` \\| `available` \\| `deleting`).",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"tenancy": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The VM tenancy in a Vpc.",
 							MarkdownDescription: "The VM tenancy in a Vpc.",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about the described Vpcs.",
 				MarkdownDescription: "Information about the described Vpcs.",
@@ -101,10 +101,15 @@ func VpcDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the Vpcs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the Vpcs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the Vpcs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the Vpcs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
+			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

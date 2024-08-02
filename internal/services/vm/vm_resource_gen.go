@@ -43,7 +43,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 									MarkdownDescription: "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.",
 									Default:             booldefault.StaticBool(true),
 									PlanModifiers: []planmodifier.Bool{
-										boolplanmodifier.RequiresReplaceIfConfigured(),
+										boolplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 									},
 								},
 								"iops": schema.Int64Attribute{
@@ -132,7 +132,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "A unique identifier which enables you to manage the idempotency.",
 				MarkdownDescription: "A unique identifier which enables you to manage the idempotency.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"creation_date": schema.StringAttribute{
@@ -161,7 +161,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
 				MarkdownDescription: "The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"initiated_shutdown_behavior": schema.StringAttribute{
@@ -419,7 +419,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "One or more NICs. If you specify this parameter, you must not specify the `SubnetId` and `SubregionName` parameters. You also must define one NIC as the primary network interface of the VM with `0` as its device number.",
 				MarkdownDescription: "One or more NICs. If you specify this parameter, you must not specify the `SubnetId` and `SubregionName` parameters. You also must define one NIC as the primary network interface of the VM with `0` as its device number.",
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(),
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"os_family": schema.StringAttribute{
@@ -435,7 +435,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						Description:         "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
 						MarkdownDescription: "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
 						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.RequiresReplaceIfConfigured(),
+							stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 						},
 					},
 					"tenancy": schema.StringAttribute{
@@ -444,7 +444,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						Description:         "The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID).",
 						MarkdownDescription: "The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID).",
 						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.RequiresReplaceIfConfigured(),
+							stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 						},
 					},
 				},
@@ -475,7 +475,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "One or more private IPs of the VM.",
 				MarkdownDescription: "One or more private IPs of the VM.",
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(),
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"product_codes": schema.ListAttribute{
@@ -484,7 +484,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The product codes associated with the OMI used to create the VM.",
 				MarkdownDescription: "The product codes associated with the OMI used to create the VM.",
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(),
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"public_dns_name": schema.StringAttribute{
@@ -541,7 +541,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"type": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -566,8 +566,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Vpc in which the VM is running.",
 				MarkdownDescription: "The ID of the Vpc in which the VM is running.",
 			},
+			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -609,6 +610,7 @@ type VmModel struct {
 	UserData                    types.String   `tfsdk:"user_data"`
 	VmInitiatedShutdownBehavior types.String   `tfsdk:"vm_initiated_shutdown_behavior"`
 	VpcId                       types.String   `tfsdk:"vpc_id"`
+	// MANUALLY EDITED : spaceId removed
 }
 
 var _ basetypes.ObjectTypable = BlockDeviceMappingsType{}

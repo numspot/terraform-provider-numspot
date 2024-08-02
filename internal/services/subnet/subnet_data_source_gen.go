@@ -47,14 +47,14 @@ func SubnetDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The state of the Subnet (`pending` \\| `available` \\| `deleted`).",
 							MarkdownDescription: "The state of the Subnet (`pending` \\| `available` \\| `deleted`).",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The ID of the Vpc in which the Subnet is.",
 							MarkdownDescription: "The ID of the Vpc in which the Subnet is.",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more Subnets.",
 				MarkdownDescription: "Information about one or more Subnets.",
@@ -112,8 +112,8 @@ func SubnetDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the Subnets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the Subnets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the Subnets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the Subnets, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 			"vpc_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -123,6 +123,10 @@ func SubnetDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The IDs of the Vpcs in which the Subnets are.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

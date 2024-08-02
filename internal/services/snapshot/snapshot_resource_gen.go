@@ -43,7 +43,7 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The date and time of creation of the snapshot.",
 				MarkdownDescription: "The date and time of creation of the snapshot.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"description": schema.StringAttribute{
@@ -52,7 +52,7 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "A description for the snapshot.",
 				MarkdownDescription: "A description for the snapshot.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"id": schema.StringAttribute{
@@ -71,7 +71,7 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "**(when copying a snapshot)** The name of the source Region, which must be the same as the Region of your account.",
 				MarkdownDescription: "**(when copying a snapshot)** The name of the source Region, which must be the same as the Region of your account.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"source_snapshot_id": schema.StringAttribute{
@@ -80,7 +80,7 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "**(when copying a snapshot)** The ID of the snapshot you want to copy.",
 				MarkdownDescription: "**(when copying a snapshot)** The ID of the snapshot you want to copy.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"state": schema.StringAttribute{
@@ -88,14 +88,14 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the snapshot (`in-queue` \\| `completed` \\| `error`).",
 				MarkdownDescription: "The state of the snapshot (`in-queue` \\| `completed` \\| `error`).",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"volume_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
 				Description:         "**(when creating from a volume)** The ID of the volume you want to create a snapshot of.",
 				MarkdownDescription: "**(when creating from a volume)** The ID of the volume you want to create a snapshot of.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"volume_size": schema.Int64Attribute{
@@ -104,7 +104,7 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The size of the volume used to create the snapshot, in gibibytes (GiB).",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

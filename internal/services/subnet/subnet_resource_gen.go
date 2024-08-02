@@ -22,7 +22,7 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The name of the Subregion in which you want to create the Subnet.",
 				MarkdownDescription: "The name of the Subregion in which you want to create the Subnet.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"available_ips_count": schema.Int64Attribute{
@@ -40,12 +40,12 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Vpc one if you create only a single Subnet in this Net, or a subset of the Vpc one. In case of several Subnets in a Vpc, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs).",
 				MarkdownDescription: "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).<br />\nThe IP range of the Subnet can be either the same as the Vpc one if you create only a single Subnet in this Net, or a subset of the Vpc one. In case of several Subnets in a Vpc, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs).",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"map_public_ip_on_launch": schema.BoolAttribute{
 				Computed:            true,
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : Add Optional attribute
 				Description:         "If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.",
 				MarkdownDescription: "If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.",
 			},
@@ -59,12 +59,13 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Vpc for which you want to create a Subnet.",
 				MarkdownDescription: "The ID of the Vpc for which you want to create a Subnet.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
+			// MANUALLY EDITED : SpaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -77,4 +78,7 @@ type SubnetModel struct {
 	State                types.String `tfsdk:"state"`
 	Tags                 types.List   `tfsdk:"tags"`
 	VpcId                types.String `tfsdk:"vpc_id"`
+	// MANUALLY EDITED : SpaceId removed
 }
+
+// MANUALLY EDITED : removed functions related to Tags

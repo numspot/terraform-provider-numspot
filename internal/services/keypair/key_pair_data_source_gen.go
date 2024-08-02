@@ -31,7 +31,7 @@ func KeyPairDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The type of the keypair (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more keypairs.",
 				MarkdownDescription: "Information about one or more keypairs.",
@@ -57,13 +57,16 @@ func KeyPairDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The types of the keypairs (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
 				MarkdownDescription: "The types of the keypairs (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
 			},
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
-type KeyPairDatasourceItemModel struct {
+type KeyPairDatasourceItemModel struct { // MANUALLY EDITED : Create Model from ItemsValue struct
 	Fingerprint types.String `tfsdk:"fingerprint"`
 	Name        types.String `tfsdk:"name"`
 	Type        types.String `tfsdk:"type"`
 }
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

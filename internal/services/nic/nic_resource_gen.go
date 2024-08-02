@@ -187,7 +187,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The primary private IP for the NIC.<br />\nThis IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.<br />\nIf you do not specify this attribute, a random private IP is selected within the IP range of the Subnet.",
 				MarkdownDescription: "The primary private IP for the NIC.<br />\nThis IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.<br />\nIf you do not specify this attribute, a random private IP is selected within the IP range of the Subnet.",
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(),
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"security_group_ids": schema.ListAttribute{
@@ -225,7 +225,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "Identifier of the Space",
 				MarkdownDescription: "Identifier of the Space",
@@ -240,17 +240,17 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Subnet in which you want to create the NIC.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the NIC.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"vpc_id": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The ID of the Vpc for the NIC.",
 				MarkdownDescription: "The ID of the Vpc for the NIC.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -273,6 +273,7 @@ type NicModel struct {
 	VpcId                types.String      `tfsdk:"vpc_id"`
 }
 
+// MANUALLY EDITED : All functions associated with LinkPublicIp and tags removed
 var _ basetypes.ObjectTypable = LinkNicType{}
 
 type LinkNicType struct {

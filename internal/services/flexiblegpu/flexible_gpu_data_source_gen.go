@@ -78,8 +78,9 @@ func FlexibleGpuDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The ID of the VM the fGPU is attached to, if any.",
 							MarkdownDescription: "The ID of the VM the fGPU is attached to, if any.",
 						},
+						// MANUALLY EDITED : SpaceId Removed
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more fGPUs.",
 				MarkdownDescription: "Information about one or more fGPUs.",
@@ -106,6 +107,10 @@ func FlexibleGpuDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "One or more IDs of VMs.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

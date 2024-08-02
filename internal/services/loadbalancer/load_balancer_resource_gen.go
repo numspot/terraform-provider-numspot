@@ -53,17 +53,17 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "(public Cloud only) The Subregion in which you want to create the load balancer. Regardless of this Subregion, the load balancer can distribute traffic to all Subregions. This parameter is required in the public Cloud.",
 				MarkdownDescription: "(public Cloud only) The Subregion in which you want to create the load balancer. Regardless of this Subregion, the load balancer can distribute traffic to all Subregions. This parameter is required in the public Cloud.",
 			},
-			"backend_ips": schema.SetAttribute{
+			"backend_ips": schema.SetAttribute{ // MANUALLY EDITED : use 'Set' type instead of 'List'
 				ElementType:         types.StringType,
 				Computed:            true,
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : Add optional attribute
 				Description:         "One or more public IPs of back-end VMs.",
 				MarkdownDescription: "One or more public IPs of back-end VMs.",
 			},
-			"backend_vm_ids": schema.SetAttribute{
+			"backend_vm_ids": schema.SetAttribute{ // MANUALLY EDITED : use 'Set' type instead of 'List'
 				ElementType:         types.StringType,
 				Computed:            true,
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : Add optional attribute
 				Description:         "One or more IDs of back-end VMs for the load balancer.",
 				MarkdownDescription: "One or more IDs of back-end VMs for the load balancer.",
 			},
@@ -76,43 +76,43 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Attributes: map[string]schema.Attribute{
 					"check_interval": schema.Int64Attribute{
 						Computed:            true,
-						Optional:            true,
+						Optional:            true, // MANUALLY EDITED : Add optional attribute
 						Description:         "The number of seconds between two requests (between `5` and `600` both included).",
 						MarkdownDescription: "The number of seconds between two requests (between `5` and `600` both included).",
 					},
 					"healthy_threshold": schema.Int64Attribute{
 						Computed:            true,
-						Optional:            true,
+						Optional:            true, // MANUALLY EDITED : Add optional attribute
 						Description:         "The number of consecutive successful requests before considering the VM as healthy (between `2` and `10` both included).",
 						MarkdownDescription: "The number of consecutive successful requests before considering the VM as healthy (between `2` and `10` both included).",
 					},
 					"path": schema.StringAttribute{
 						Computed:            true,
-						Optional:            true,
+						Optional:            true, // MANUALLY EDITED : Add optional attribute
 						Description:         "If you use the HTTP or HTTPS protocols, the request URL path.",
 						MarkdownDescription: "If you use the HTTP or HTTPS protocols, the request URL path.",
 					},
 					"port": schema.Int64Attribute{
 						Computed:            true,
-						Optional:            true,
+						Optional:            true, // MANUALLY EDITED : Add optional attribute
 						Description:         "The port number (between `1` and `65535`, both included).",
 						MarkdownDescription: "The port number (between `1` and `65535`, both included).",
 					},
 					"protocol": schema.StringAttribute{
 						Computed:            true,
-						Optional:            true,
+						Optional:            true, // MANUALLY EDITED : Add optional attribute
 						Description:         "The protocol for the URL of the VM (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`).",
 						MarkdownDescription: "The protocol for the URL of the VM (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`).",
 					},
 					"timeout": schema.Int64Attribute{
 						Computed:            true,
-						Optional:            true,
+						Optional:            true, // MANUALLY EDITED : Add optional attribute
 						Description:         "The maximum waiting time for a response before considering the VM as unhealthy, in seconds (between `2` and `60` both included).",
 						MarkdownDescription: "The maximum waiting time for a response before considering the VM as unhealthy, in seconds (between `2` and `60` both included).",
 					},
 					"unhealthy_threshold": schema.Int64Attribute{
 						Computed:            true,
-						Optional:            true,
+						Optional:            true, // MANUALLY EDITED : Add optional attribute
 						Description:         "The number of consecutive failed requests before considering the VM as unhealthy (between `2` and `10` both included).",
 						MarkdownDescription: "The number of consecutive failed requests before considering the VM as unhealthy (between `2` and `10` both included).",
 					},
@@ -123,7 +123,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : Add optional attribute
 				Description:         "Information about the health check configuration.",
 				MarkdownDescription: "Information about the health check configuration.",
 			},
@@ -133,7 +133,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "ID for ReadLoadBalancers",
 				MarkdownDescription: "ID for ReadLoadBalancers",
 			},
-			"listeners": schema.SetNestedAttribute{
+			"listeners": schema.SetNestedAttribute{ // MANUALLY EDITED : Use Set type instead of List
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"backend_port": schema.Int64Attribute{
@@ -185,7 +185,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).",
 				MarkdownDescription: "The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"public_ip": schema.StringAttribute{
@@ -259,7 +259,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "(Vpc only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Vpc.",
 				MarkdownDescription: "(Vpc only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Vpc.",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"type": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -272,19 +272,19 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Vpc for the load balancer.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
 type LoadBalancerModel struct {
 	ApplicationStickyCookiePolicies types.List               `tfsdk:"application_sticky_cookie_policies"`
 	AvailabilityZoneNames           types.List               `tfsdk:"availability_zone_names"`
-	BackendIps                      types.Set                `tfsdk:"backend_ips"`
-	BackendVmIds                    types.Set                `tfsdk:"backend_vm_ids"`
+	BackendIps                      types.Set                `tfsdk:"backend_ips"`    // MANUALLY EDITED : use 'Set' type instead of 'List'
+	BackendVmIds                    types.Set                `tfsdk:"backend_vm_ids"` // MANUALLY EDITED : use 'Set' type instead of 'List'
 	DnsName                         types.String             `tfsdk:"dns_name"`
 	HealthCheck                     HealthCheckValue         `tfsdk:"health_check"`
 	Id                              types.String             `tfsdk:"id"`
-	Listeners                       types.Set                `tfsdk:"listeners"`
+	Listeners                       types.Set                `tfsdk:"listeners"` // MANUALLY EDITED : use 'Set' type instead of 'List'
 	Name                            types.String             `tfsdk:"name"`
 	PublicIp                        types.String             `tfsdk:"public_ip"`
 	SecuredCookies                  types.Bool               `tfsdk:"secured_cookies"`

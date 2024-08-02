@@ -54,3 +54,7 @@ func SpaceDataSourceSchema(ctx context.Context) schema.Schema {
 		},
 	}
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

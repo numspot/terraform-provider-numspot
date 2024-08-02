@@ -28,7 +28,7 @@ func DhcpOptionsResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Specify a domain name (for example, `MyCompany.com`). You can specify only one domain name. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
 				MarkdownDescription: "Specify a domain name (for example, `MyCompany.com`). You can specify only one domain name. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"domain_name_servers": schema.ListAttribute{
@@ -50,7 +50,7 @@ func DhcpOptionsResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IPs of the log servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
 				MarkdownDescription: "The IPs of the log servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(),
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"ntp_servers": schema.ListAttribute{
@@ -60,12 +60,13 @@ func DhcpOptionsResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IPs of the Network Time Protocol (NTP) servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
 				MarkdownDescription: "The IPs of the Network Time Protocol (NTP) servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(),
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -77,4 +78,7 @@ type DhcpOptionsModel struct {
 	LogServers        types.List   `tfsdk:"log_servers"`
 	NtpServers        types.List   `tfsdk:"ntp_servers"`
 	Tags              types.List   `tfsdk:"tags"`
+	// MANUALLY EDITED : SpaceId Removed
 }
+
+// MANUALLY EDITED : Functions associated with Tags removed

@@ -41,14 +41,14 @@ func PublicIpDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The public IP.",
 							MarkdownDescription: "The public IP.",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"vm_id": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The ID of the VM the public IP is associated with (if any).",
 							MarkdownDescription: "The ID of the VM the public IP is associated with (if any).",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more public IPs.",
 				MarkdownDescription: "Information about one or more public IPs.",
@@ -99,8 +99,8 @@ func PublicIpDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the public IPs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the public IPs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the public IPs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the public IPs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 			"vm_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -109,12 +109,13 @@ func PublicIpDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the VMs.",
 				MarkdownDescription: "The IDs of the VMs.",
 			},
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
-type PublicIpModelDatasource struct {
+type PublicIpModelDatasource struct { // MANUALLY EDITED : Create Model from ItemsValue struct
 	Id             types.String `tfsdk:"id"`
 	NicId          types.String `tfsdk:"nic_id"`
 	PrivateIp      types.String `tfsdk:"private_ip"`
@@ -123,3 +124,5 @@ type PublicIpModelDatasource struct {
 	LinkPublicIpId types.String `tfsdk:"link_public_ip_id"`
 	Tags           types.List   `tfsdk:"tags"`
 }
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

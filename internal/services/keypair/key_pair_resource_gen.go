@@ -30,7 +30,7 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
 				MarkdownDescription: "A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"private_key": schema.StringAttribute{
@@ -44,7 +44,7 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The public key to import in your account, if you are importing an existing keypair. This value must be Base64-encoded.",
 				MarkdownDescription: "The public key to import in your account, if you are importing an existing keypair. This value must be Base64-encoded.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"type": schema.StringAttribute{
@@ -52,8 +52,9 @@ func KeyPairResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The type of the keypair (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
 				MarkdownDescription: "The type of the keypair (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).",
 			},
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -64,4 +65,5 @@ type KeyPairModel struct {
 	PrivateKey  types.String `tfsdk:"private_key"`
 	PublicKey   types.String `tfsdk:"public_key"`
 	Type        types.String `tfsdk:"type"`
+	// MANUALLY EDITED : SpaceId Removed
 }

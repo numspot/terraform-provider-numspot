@@ -38,7 +38,7 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 						"public_ip": schema.StringAttribute{
 							Computed: true,
 							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplace(),
+								stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 							},
 							Description:         "The public IP associated with the NAT gateway.",
 							MarkdownDescription: "The public IP associated with the NAT gateway.",
@@ -46,7 +46,7 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 						"public_ip_id": schema.StringAttribute{
 							Computed: true,
 							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplace(),
+								stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 							},
 							Description:         "The allocation ID of the public IP associated with the NAT gateway.",
 							MarkdownDescription: "The allocation ID of the public IP associated with the NAT gateway.",
@@ -72,14 +72,15 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Subnet in which you want to create the NAT gateway.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the NAT gateway.",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"vpc_id": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The ID of the Vpc in which the NAT gateway is.",
 				MarkdownDescription: "The ID of the Vpc in which the NAT gateway is.",
 			},
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -91,7 +92,10 @@ type NatGatewayModel struct {
 	SubnetId   types.String `tfsdk:"subnet_id"`
 	VpcId      types.String `tfsdk:"vpc_id"`
 	Tags       types.List   `tfsdk:"tags"`
+	// MANUALLY EDITED : SpaceId Removed
 }
+
+// MANUALLY EDITED : All functions associated with Tags removed
 
 var _ basetypes.ObjectTypable = PublicIpsType{}
 

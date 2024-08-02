@@ -236,7 +236,7 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The ID of the Subnet.",
 							MarkdownDescription: "The ID of the Subnet.",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
@@ -244,7 +244,7 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The ID of the Vpc for the NIC.",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more NICs.",
 				MarkdownDescription: "Information about one or more NICs.",
@@ -384,8 +384,8 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the NICs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the NICs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the NICs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the NICs, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 			"vpc_ids": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -394,12 +394,13 @@ func NicDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the Vpcs where the NICs are located.",
 				MarkdownDescription: "The IDs of the Vpcs where the NICs are located.",
 			},
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
-type NicModelDatasource struct {
+type NicModelDatasource struct { // MANUALLY EDITED : Create Model from ItemsValue struct
 	AvailabilityZoneName types.String      `tfsdk:"availability_zone_name"`
 	Description          types.String      `tfsdk:"description"`
 	Id                   types.String      `tfsdk:"id"`
@@ -415,3 +416,5 @@ type NicModelDatasource struct {
 	Tags                 types.List        `tfsdk:"tags"`
 	VpcId                types.String      `tfsdk:"vpc_id"`
 }
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

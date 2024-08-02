@@ -49,7 +49,7 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Vpc you want to connect with.",
 				MarkdownDescription: "The ID of the Vpc you want to connect with.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"expiration_date": schema.StringAttribute{
@@ -89,7 +89,7 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Vpc you send the peering request from.",
 				MarkdownDescription: "The ID of the Vpc you send the peering request from.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"state": schema.SingleNestedAttribute{
@@ -114,9 +114,10 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about the state of the Vpc peering.",
 				MarkdownDescription: "Information about the state of the Vpc peering.",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
+			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -129,6 +130,7 @@ type VpcPeeringModel struct {
 	SourceVpcId    types.String     `tfsdk:"source_vpc_id"`
 	State          StateValue       `tfsdk:"state"`
 	Tags           types.List       `tfsdk:"tags"`
+	// MANUALLY EDITED : spaceId removed
 }
 
 var _ basetypes.ObjectTypable = AccepterVpcType{}

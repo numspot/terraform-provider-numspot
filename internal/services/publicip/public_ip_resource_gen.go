@@ -58,9 +58,10 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.",
 				MarkdownDescription: "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
+			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -73,4 +74,5 @@ type PublicIpModel struct {
 	LinkPublicIP   types.String `tfsdk:"link_public_ip"`
 	LinkPublicIpId types.String `tfsdk:"link_public_ip_id"`
 	Tags           types.List   `tfsdk:"tags"`
+	// MANUALLY EDITED : SpaceId Removed
 }

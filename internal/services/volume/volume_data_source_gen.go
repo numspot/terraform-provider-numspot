@@ -112,14 +112,14 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 							MarkdownDescription: "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"type": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The type of the volume (`standard` \\| `gp2` \\| `io1`).",
 							MarkdownDescription: "The type of the volume (`standard` \\| `gp2` \\| `io1`).",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more volumes.",
 				MarkdownDescription: "Information about one or more volumes.",
@@ -183,8 +183,8 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the volumes, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the volumes, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the volumes, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the volumes, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 			"volume_sizes": schema.ListAttribute{
 				ElementType:         types.Int64Type,
@@ -207,7 +207,12 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The types of the volumes (`standard` \\| `gp2` \\| `io1`).",
 				MarkdownDescription: "The types of the volumes (`standard` \\| `gp2` \\| `io1`).",
 			},
+			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
+
+// MANUALLY EDITED : Model declaration removed
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

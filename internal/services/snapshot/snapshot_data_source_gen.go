@@ -58,7 +58,7 @@ func SnapshotDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The state of the snapshot (`in-queue` \\| `completed` \\| `error`).",
 							MarkdownDescription: "The state of the snapshot (`in-queue` \\| `completed` \\| `error`).",
 						},
-						"tags": tags.TagsSchema(ctx),
+						"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 						"volume_id": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The ID of the volume used to create the snapshot.",
@@ -70,7 +70,7 @@ func SnapshotDataSourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The size of the volume used to create the snapshot, in gibibytes (GiB).",
 						},
 					},
-				},
+				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
 				Description:         "Information about one or more snapshots and their permissions.",
 				MarkdownDescription: "Information about one or more snapshots and their permissions.",
@@ -133,8 +133,8 @@ func SnapshotDataSourceSchema(ctx context.Context) schema.Schema {
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
-				Description:         "The key/value combination of the tags associated with the snapshots, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
-				MarkdownDescription: "The key/value combination of the tags associated with the snapshots, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.",
+				Description:         "The key/value combination of the tags associated with the snapshots, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
+				MarkdownDescription: "The key/value combination of the tags associated with the snapshots, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 			"to_creation_date": schema.StringAttribute{
 				Optional:            true,
@@ -156,12 +156,13 @@ func SnapshotDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The sizes of the volumes used to create the snapshots, in gibibytes (GiB).",
 				MarkdownDescription: "The sizes of the volumes used to create the snapshots, in gibibytes (GiB).",
 			},
+			// MANUALLY EDITED : SpaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
-type SnapshotModelDatasource struct {
+type SnapshotModelDatasource struct { // MANUALLY EDITED : Create Model from ItemsValue struct
 	Access       AccessValue  `tfsdk:"access"`
 	CreationDate types.String `tfsdk:"creation_date"`
 	Description  types.String `tfsdk:"description"`
@@ -172,3 +173,5 @@ type SnapshotModelDatasource struct {
 	VolumeId     types.String `tfsdk:"volume_id"`
 	VolumeSize   types.Int64  `tfsdk:"volume_size"`
 }
+
+// MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

@@ -83,7 +83,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about virtual gateways propagating routes.",
 				MarkdownDescription: "Information about virtual gateways propagating routes.",
 			},
-			"routes": schema.SetNestedAttribute{
+			"routes": schema.SetNestedAttribute{ // MANUALLY EDITED : Use Set type instead of List
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"creation_method": schema.StringAttribute{
@@ -92,7 +92,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The method used to create the route.",
 						},
 						"destination_ip_range": schema.StringAttribute{
-							Required:            true,
+							Required:            true, // MANUALLY EDITED : Set to required instead of Computed
 							Description:         "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
 							MarkdownDescription: "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).",
 						},
@@ -103,19 +103,19 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"gateway_id": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add optional attribute
 							Description:         "The ID of the Internet gateway or virtual gateway attached to the Vpc.",
 							MarkdownDescription: "The ID of the Internet gateway or virtual gateway attached to the Vpc.",
 						},
 						"nat_gateway_id": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add optional attribute
 							Description:         "The ID of a NAT gateway attached to the Vpc.",
 							MarkdownDescription: "The ID of a NAT gateway attached to the Vpc.",
 						},
 						"nic_id": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add optional attribute
 							Description:         "The ID of the NIC.",
 							MarkdownDescription: "The ID of the NIC.",
 						},
@@ -126,13 +126,13 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 						},
 						"vm_id": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add optional attribute
 							Description:         "The ID of a VM specified in a route in the table.",
 							MarkdownDescription: "The ID of a VM specified in a route in the table.",
 						},
 						"vpc_peering_id": schema.StringAttribute{
 							Computed:            true,
-							Optional:            true,
+							Optional:            true, // MANUALLY EDITED : Add optional attribute
 							Description:         "The ID of the Vpc peering.",
 							MarkdownDescription: "The ID of the Vpc peering.",
 						},
@@ -144,7 +144,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Optional:            true,
+				Optional:            true, // MANUALLY EDITED : Add optional attribute
 				Description:         "One or more routes in the route table.",
 				MarkdownDescription: "One or more routes in the route table.",
 			},
@@ -154,18 +154,18 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Identifier of the Space",
 				MarkdownDescription: "Identifier of the Space",
 			},
-			"tags": tags.TagsSchema(ctx),
+			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"vpc_id": schema.StringAttribute{
 				Required:            true,
 				Description:         "The ID of the Vpc for which you want to create a route table.",
 				MarkdownDescription: "The ID of the Vpc for which you want to create a route table.",
 			},
-			"subnet_id": schema.StringAttribute{
+			"subnet_id": schema.StringAttribute{ // MANUALLY EDITED : Add subnet_id attribute
 				Optional:            true,
 				Description:         "The ID of the SubNet for which you want to link the route table.",
 				MarkdownDescription: "The ID of the SubNet for which you want to link the route table.",
 			},
-			"local_route": schema.SingleNestedAttribute{
+			"local_route": schema.SingleNestedAttribute{ // MANUALLY EDITED : Add local_route attribute (used as buffer value in provider)
 				Attributes: map[string]schema.Attribute{
 					"creation_method": schema.StringAttribute{
 						Computed:            true,
@@ -226,7 +226,7 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated",
+		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -234,14 +234,15 @@ type RouteTableModel struct {
 	Id                              types.String `tfsdk:"id"`
 	LinkRouteTables                 types.List   `tfsdk:"link_route_tables"`
 	RoutePropagatingVirtualGateways types.List   `tfsdk:"route_propagating_virtual_gateways"`
-	Routes                          types.Set    `tfsdk:"routes"`
+	Routes                          types.Set    `tfsdk:"routes"` // MANUALLY EDITED : use 'Set' type instead of 'List'
 	SpaceId                         types.String `tfsdk:"space_id"`
 	Tags                            types.List   `tfsdk:"tags"`
 	VpcId                           types.String `tfsdk:"vpc_id"`
-	SubnetId                        types.String `tfsdk:"subnet_id"`
-	LocalRoute                      RoutesValue  `tfsdk:"local_route"`
+	SubnetId                        types.String `tfsdk:"suxbnet_id"`  // MANUALLY EDITED : add subnet_id attribute
+	LocalRoute                      RoutesValue  `tfsdk:"local_route"` // MANUALLY EDITED : add local_route attribute
 }
 
+// MANUALLY EDITED : Remove functions associated with Tags
 var _ basetypes.ObjectTypable = LinkRouteTablesType{}
 
 type LinkRouteTablesType struct {

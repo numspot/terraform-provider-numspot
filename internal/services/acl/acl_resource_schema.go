@@ -59,7 +59,7 @@ func ACLsResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"acls": schema.SetNestedAttribute{
+			"acls": schema.SetNestedAttribute{ // MANUALLY EDITED : Use Set type instead of List
 				Optional:            true,
 				Computed:            true,
 				Description:         "List of ACLs",
