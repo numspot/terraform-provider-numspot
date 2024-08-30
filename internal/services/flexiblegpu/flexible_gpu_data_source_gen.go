@@ -111,6 +111,16 @@ func FlexibleGpuDataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
+type FlexibleGpuModelItemDataSource struct {
+	AvailabilityZoneName types.String `tfsdk:"availability_zone_name"`
+	DeleteOnVmDeletion   types.Bool   `tfsdk:"delete_on_vm_deletion"`
+	Generation           types.String `tfsdk:"generation"`
+	Id                   types.String `tfsdk:"id"`
+	ModelName            types.String `tfsdk:"model_name"`
+	State                types.String `tfsdk:"state"`
+	VmId                 types.String `tfsdk:"vm_id"`
+}
+
 // MANUALLY EDITED : Model declaration removed
 
 // MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

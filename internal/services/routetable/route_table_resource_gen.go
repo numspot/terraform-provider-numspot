@@ -238,7 +238,7 @@ type RouteTableModel struct {
 	SpaceId                         types.String `tfsdk:"space_id"`
 	Tags                            types.List   `tfsdk:"tags"`
 	VpcId                           types.String `tfsdk:"vpc_id"`
-	SubnetId                        types.String `tfsdk:"suxbnet_id"`  // MANUALLY EDITED : add subnet_id attribute
+	SubnetId                        types.String `tfsdk:"subnet_id"`   // MANUALLY EDITED : add subnet_id attribute
 	LocalRoute                      RoutesValue  `tfsdk:"local_route"` // MANUALLY EDITED : add local_route attribute
 }
 

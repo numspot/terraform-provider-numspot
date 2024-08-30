@@ -14,15 +14,15 @@ import (
 )
 
 type VirtualGatewaysDataSourceModel struct {
-	Items           []VirtualGatewayModel `tfsdk:"items"`
-	ConnectionTypes types.List            `tfsdk:"connection_types"`
-	LinkStates      types.List            `tfsdk:"link_states"`
-	States          types.List            `tfsdk:"states"`
-	TagKeys         types.List            `tfsdk:"tag_keys"`
-	TagValues       types.List            `tfsdk:"tag_values"`
-	Tags            types.List            `tfsdk:"tags"`
-	LinkVpcIds      types.List            `tfsdk:"link_vpc_ids"`
-	IDs             types.List            `tfsdk:"ids"`
+	Items           []VirtualGatewayModelItemDataSource `tfsdk:"items"`
+	ConnectionTypes types.List                          `tfsdk:"connection_types"`
+	LinkStates      types.List                          `tfsdk:"link_states"`
+	States          types.List                          `tfsdk:"states"`
+	TagKeys         types.List                          `tfsdk:"tag_keys"`
+	TagValues       types.List                          `tfsdk:"tag_values"`
+	Tags            types.List                          `tfsdk:"tags"`
+	LinkVpcIds      types.List                          `tfsdk:"link_vpc_ids"`
+	IDs             types.List                          `tfsdk:"ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -85,7 +85,7 @@ func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource
 		response.Diagnostics.AddError("HTTP call failed", "got empty Virtual Gateways list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VirtualGatewayFromHttpToTf)
+	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VirtualGatewayDataSourceFromHttpToTf)
 
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)

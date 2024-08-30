@@ -14,6 +14,8 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
 )
 
+// This test sequence is quite long (~8 minutes)
+
 // This struct will store the input data that will be used in your tests (all fields as string)
 type StepDataLoadBalancer struct {
 	name,
@@ -54,11 +56,13 @@ func getDependencyChecksLoadBalancer(dependenciesSuffix string) []resource.TestC
 	}
 }
 
-func TestAccLoadBalancerResource_Internal(t *testing.T) {
+func TestAccLoadBalancerResource(t *testing.T) {
 	pr := provider.TestAccProtoV6ProviderFactories
 
 	var resourceId string
 
+	subnetIpRange := "10.101.1.0/24"
+	subnetIpRangeUpdated := "10.101.2.0/24"
 	////////////// Define input data that will be used in the test sequence //////////////
 	// resource fields that can be updated in-place
 	tagKey := "Name"
@@ -129,7 +133,7 @@ func TestAccLoadBalancerResource_Internal(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{ // Create testing
-				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, basePlanValues),
+				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, subnetIpRange, basePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					createChecks,
 					getDependencyChecksLoadBalancer(provider.BASE_SUFFIX),
@@ -144,14 +148,7 @@ func TestAccLoadBalancerResource_Internal(t *testing.T) {
 			},
 			// Update testing Without Replace (if needed)
 			{
-				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksLoadBalancer(provider.BASE_SUFFIX),
-				)...),
-			},
-			{
-				Config: testLoadBalancerConfig_Public(provider.BASE_SUFFIX, updatePlanValues),
+				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, subnetIpRange, updatePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					updateChecks,
 					getDependencyChecksLoadBalancer(provider.BASE_SUFFIX),
@@ -159,38 +156,32 @@ func TestAccLoadBalancerResource_Internal(t *testing.T) {
 			},
 			// Update testing With Replace (if needed)
 			{
-				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, replacePlanValues),
+				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, subnetIpRange, replacePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					replaceChecks,
 					getDependencyChecksLoadBalancer(provider.BASE_SUFFIX),
 				)...),
 			},
-
+			// Update from Internal Load Balancer to Public Load Balancer
+			{
+				Config: testLoadBalancerConfig_Public(provider.BASE_SUFFIX, subnetIpRange, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksLoadBalancer(provider.BASE_SUFFIX),
+				)...),
+			},
 			// <== If resource has required dependencies ==>
 			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, basePlanValues),
+				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, subnetIpRange, basePlanValues),
 			},
+			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testLoadBalancerConfig(provider.NEW_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksLoadBalancer(provider.NEW_SUFFIX),
-				)...),
-			},
-			{
-				Config: testLoadBalancerConfig_Public(provider.NEW_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksLoadBalancer(provider.NEW_SUFFIX),
-				)...),
-			},
+
 			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
 			{
-				Config: testLoadBalancerConfig(provider.NEW_SUFFIX, replacePlanValues),
+				Config: testLoadBalancerConfig(provider.NEW_SUFFIX, subnetIpRangeUpdated, replacePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
 					replaceChecks,
 					getDependencyChecksLoadBalancer(provider.NEW_SUFFIX),
@@ -198,31 +189,19 @@ func TestAccLoadBalancerResource_Internal(t *testing.T) {
 			},
 
 			// <== If resource has optional dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, basePlanValues),
-			},
+			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testLoadBalancerConfig_DeletedDependencies(updatePlanValues),
-				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
-			},
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testLoadBalancerConfig(provider.BASE_SUFFIX, basePlanValues),
-			},
+
+			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			{
-				Config: testLoadBalancerConfig_DeletedDependencies(replacePlanValues),
-				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
-			},
+
 		},
 	})
 }
 
-func testLoadBalancerConfig(subresourceSuffix string, data StepDataLoadBalancer) string {
+func testLoadBalancerConfig(subresourceSuffix string, subnetIpRange string, data StepDataLoadBalancer) string {
 	listeners := "["
 
 	for _, port := range data.ports {
@@ -243,7 +222,7 @@ resource "numspot_vpc" "vpc" {
 
 resource "numspot_subnet" "test%[1]s" {
   vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
+  ip_range = %[6]q
 }
 
 resource "numspot_security_group" "test%[1]s" {
@@ -258,10 +237,6 @@ resource "numspot_security_group" "test%[1]s" {
       ip_protocol     = "tcp"
     }
   ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "numspot_vm" "test%[1]s" {
@@ -291,18 +266,16 @@ resource "numspot_load_balancer" "test" {
     unhealthy_threshold = 5
   }
 
-
-
   tags = [
     {
       key   = %[3]q
       value = %[4]q
     }
   ]
-}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners)
+}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners, subnetIpRange)
 }
 
-func testLoadBalancerConfig_Public(subresourceSuffix string, data StepDataLoadBalancer) string {
+func testLoadBalancerConfig_Public(subresourceSuffix string, subnetIpRange string, data StepDataLoadBalancer) string {
 	listeners := "["
 
 	for _, port := range data.ports {
@@ -327,7 +300,7 @@ resource "numspot_internet_gateway" "ig" {
 
 resource "numspot_subnet" "test%[1]s" {
   vpc_id                  = numspot_vpc.vpc.id
-  ip_range                = "10.101.1.0/24"
+  ip_range                = %[6]q
   map_public_ip_on_launch = true
 }
 
@@ -343,10 +316,6 @@ resource "numspot_security_group" "test%[1]s" {
       ip_protocol     = "tcp"
     }
   ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "numspot_route_table" "test" {
@@ -361,7 +330,7 @@ resource "numspot_route_table" "test" {
   ]
 }
 
-resource "numspot_vm" "example" {
+resource "numspot_vm" "test%[1]s" {
   image_id = "ami-8ef5b47e"
   type     = "ns-cus6-2c4r"
 
@@ -374,7 +343,7 @@ resource "numspot_load_balancer" "test" {
 
   subnets         = [numspot_subnet.test%[1]s.id]
   security_groups = [numspot_security_group.test%[1]s.id]
-  backend_vm_ids  = [numspot_vm.example.id]
+  backend_vm_ids  = [numspot_vm.test%[1]s.id]
 
   type = "internet-facing"
 
@@ -394,7 +363,9 @@ resource "numspot_load_balancer" "test" {
       value = %[4]q
     }
   ]
-}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners)
+
+  depends_on = [numspot_internet_gateway.ig]
+}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners, subnetIpRange)
 }
 
 // <== If resource has optional dependencies ==>

@@ -7,18 +7,15 @@ import (
 	"fmt"
 	"strings"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -42,9 +39,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 									Description:         "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.",
 									MarkdownDescription: "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.",
 									Default:             booldefault.StaticBool(true),
-									PlanModifiers: []planmodifier.Bool{
-										boolplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-									},
 								},
 								"iops": schema.Int64Attribute{
 									Optional:            true,
@@ -131,9 +125,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "A unique identifier which enables you to manage the idempotency.",
 				MarkdownDescription: "A unique identifier which enables you to manage the idempotency.",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-				},
 			},
 			"creation_date": schema.StringAttribute{
 				Computed:            true,
@@ -160,9 +151,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
 				MarkdownDescription: "The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-				},
 			},
 			"initiated_shutdown_behavior": schema.StringAttribute{
 				Computed:            true,
@@ -207,23 +195,10 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 			"nics": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"delete_on_vm_deletion": schema.BoolAttribute{
-							Optional:            true,
-							Computed:            true,
-							Description:         "If true, the NIC is deleted when the VM is terminated. You can specify this parameter only for a new NIC. To modify this value for an existing NIC, see [UpdateNic](#updatenic).",
-							MarkdownDescription: "If true, the NIC is deleted when the VM is terminated. You can specify this parameter only for a new NIC. To modify this value for an existing NIC, see [UpdateNic](#updatenic).",
-						},
 						"description": schema.StringAttribute{
-							Optional:            true,
 							Computed:            true,
-							Description:         "The description of the NIC, if you are creating a NIC when creating the VM.",
-							MarkdownDescription: "The description of the NIC, if you are creating a NIC when creating the VM.",
-						},
-						"device_number": schema.Int64Attribute{
-							Optional:            true,
-							Computed:            true,
-							Description:         "The index of the VM device for the NIC attachment (between `0` and `7`, both included). This parameter is required if you create a NIC when creating the VM.",
-							MarkdownDescription: "The index of the VM device for the NIC attachment (between `0` and `7`, both included). This parameter is required if you create a NIC when creating the VM.",
+							Description:         "The description of the NIC.",
+							MarkdownDescription: "The description of the NIC.",
 						},
 						"is_source_dest_checked": schema.BoolAttribute{
 							Computed:            true,
@@ -290,10 +265,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The Media Access Control (MAC) address of the NIC.",
 						},
 						"nic_id": schema.StringAttribute{
-							Optional:            true,
 							Computed:            true,
-							Description:         "The ID of the NIC, if you are attaching an existing NIC when creating a VM.",
-							MarkdownDescription: "The ID of the NIC, if you are attaching an existing NIC when creating a VM.",
+							Description:         "The ID of the NIC.",
+							MarkdownDescription: "The ID of the NIC.",
 						},
 						"private_dns_name": schema.StringAttribute{
 							Computed:            true,
@@ -304,7 +278,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"is_primary": schema.BoolAttribute{
-										Optional:            true,
 										Computed:            true,
 										Description:         "If true, the IP is the primary private IP of the NIC.",
 										MarkdownDescription: "If true, the IP is the primary private IP of the NIC.",
@@ -337,10 +310,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 										MarkdownDescription: "The name of the private DNS.",
 									},
 									"private_ip": schema.StringAttribute{
-										Optional:            true,
 										Computed:            true,
-										Description:         "The private IP of the NIC.",
-										MarkdownDescription: "The private IP of the NIC.",
+										Description:         "The private IP.",
+										MarkdownDescription: "The private IP.",
 									},
 								},
 								CustomType: PrivateIpsType{
@@ -349,23 +321,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 									},
 								},
 							},
-							Optional:            true,
 							Computed:            true,
-							Description:         "One or more private IPs to assign to the NIC, if you create a NIC when creating a VM. Only one private IP can be the primary private IP.",
-							MarkdownDescription: "One or more private IPs to assign to the NIC, if you create a NIC when creating a VM. Only one private IP can be the primary private IP.",
-						},
-						"secondary_private_ip_count": schema.Int64Attribute{
-							Optional:            true,
-							Computed:            true,
-							Description:         "The number of secondary private IPs, if you create a NIC when creating a VM. This parameter cannot be specified if you specified more than one private IP in the `PrivateIps` parameter.",
-							MarkdownDescription: "The number of secondary private IPs, if you create a NIC when creating a VM. This parameter cannot be specified if you specified more than one private IP in the `PrivateIps` parameter.",
-						},
-						"security_group_ids": schema.ListAttribute{
-							ElementType:         types.StringType,
-							Optional:            true,
-							Computed:            true,
-							Description:         "One or more IDs of security groups for the NIC, if you create a NIC when creating a VM.",
-							MarkdownDescription: "One or more IDs of security groups for the NIC, if you create a NIC when creating a VM.",
+							Description:         "The private IP or IPs of the NIC.",
+							MarkdownDescription: "The private IP or IPs of the NIC.",
 						},
 						"security_groups": schema.ListNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
@@ -397,10 +355,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 							MarkdownDescription: "The state of the NIC (`available` \\| `attaching` \\| `in-use` \\| `detaching`).",
 						},
 						"subnet_id": schema.StringAttribute{
-							Optional:            true,
 							Computed:            true,
-							Description:         "The ID of the Subnet for the NIC, if you create a NIC when creating a VM. This parameter is required if you create a NIC when creating the VM.",
-							MarkdownDescription: "The ID of the Subnet for the NIC, if you create a NIC when creating a VM. This parameter is required if you create a NIC when creating the VM.",
+							Description:         "The ID of the Subnet for the NIC.",
+							MarkdownDescription: "The ID of the Subnet for the NIC.",
 						},
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
@@ -414,13 +371,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Optional:            true,
 				Computed:            true,
-				Description:         "One or more NICs. If you specify this parameter, you must not specify the `SubnetId` and `SubregionName` parameters. You also must define one NIC as the primary network interface of the VM with `0` as its device number.",
-				MarkdownDescription: "One or more NICs. If you specify this parameter, you must not specify the `SubnetId` and `SubregionName` parameters. You also must define one NIC as the primary network interface of the VM with `0` as its device number.",
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-				},
+				Description:         "(Vpc only) The network interface cards (NICs) the VMs are attached to.",
+				MarkdownDescription: "(Vpc only) The network interface cards (NICs) the VMs are attached to.",
 			},
 			"os_family": schema.StringAttribute{
 				Computed:            true,
@@ -434,18 +387,12 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						Computed:            true,
 						Description:         "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
 						MarkdownDescription: "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-						},
 					},
 					"tenancy": schema.StringAttribute{
 						Optional:            true,
 						Computed:            true,
 						Description:         "The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID).",
 						MarkdownDescription: "The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID).",
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-						},
 					},
 				},
 				CustomType: PlacementType{
@@ -474,18 +421,12 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "One or more private IPs of the VM.",
 				MarkdownDescription: "One or more private IPs of the VM.",
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-				},
 			},
 			"product_codes": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Computed:            true,
 				Description:         "The product codes associated with the OMI used to create the VM.",
 				MarkdownDescription: "The product codes associated with the OMI used to create the VM.",
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-				},
 			},
 			"public_dns_name": schema.StringAttribute{
 				Computed:            true,
@@ -526,6 +467,12 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "One or more names of security groups for the VMs.",
 				MarkdownDescription: "One or more names of security groups for the VMs.",
 			},
+			//"space_id": schema.StringAttribute{
+			//	Optional:            true,
+			//	Computed:            true,
+			//	Description:         "Identifier of the Space",
+			//	MarkdownDescription: "Identifier of the Space",
+			//},
 			"state": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The state of the VM (`pending` \\| `running` \\| `stopping` \\| `stopped` \\| `shutting-down` \\| `terminated` \\| `quarantine`).",
@@ -541,7 +488,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.",
 			},
-			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
+			"tags": tags.TagsSchema(ctx),
 			"type": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
@@ -566,51 +513,49 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Vpc in which the VM is running.",
 				MarkdownDescription: "The ID of the Vpc in which the VM is running.",
 			},
-			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
 type VmModel struct {
-	Architecture                types.String   `tfsdk:"architecture"`
-	BlockDeviceMappings         types.List     `tfsdk:"block_device_mappings"`
-	ClientToken                 types.String   `tfsdk:"client_token"`
-	CreationDate                types.String   `tfsdk:"creation_date"`
-	DeletionProtection          types.Bool     `tfsdk:"deletion_protection"`
-	Hypervisor                  types.String   `tfsdk:"hypervisor"`
-	Id                          types.String   `tfsdk:"id"`
-	ImageId                     types.String   `tfsdk:"image_id"`
-	InitiatedShutdownBehavior   types.String   `tfsdk:"initiated_shutdown_behavior"`
-	IsSourceDestChecked         types.Bool     `tfsdk:"is_source_dest_checked"`
-	KeypairName                 types.String   `tfsdk:"keypair_name"`
-	LaunchNumber                types.Int64    `tfsdk:"launch_number"`
-	MaxVmsCount                 types.Int64    `tfsdk:"max_vms_count"`
-	MinVmsCount                 types.Int64    `tfsdk:"min_vms_count"`
-	NestedVirtualization        types.Bool     `tfsdk:"nested_virtualization"`
-	Nics                        types.List     `tfsdk:"nics"`
-	OsFamily                    types.String   `tfsdk:"os_family"`
-	Placement                   PlacementValue `tfsdk:"placement"`
-	PrivateDnsName              types.String   `tfsdk:"private_dns_name"`
-	PrivateIp                   types.String   `tfsdk:"private_ip"`
-	PrivateIps                  types.List     `tfsdk:"private_ips"`
-	ProductCodes                types.List     `tfsdk:"product_codes"`
-	PublicDnsName               types.String   `tfsdk:"public_dns_name"`
-	PublicIp                    types.String   `tfsdk:"public_ip"`
-	ReservationId               types.String   `tfsdk:"reservation_id"`
-	RootDeviceName              types.String   `tfsdk:"root_device_name"`
-	RootDeviceType              types.String   `tfsdk:"root_device_type"`
-	SecurityGroupIds            types.List     `tfsdk:"security_group_ids"`
-	SecurityGroups              types.List     `tfsdk:"security_groups"`
-	State                       types.String   `tfsdk:"state"`
-	StateReason                 types.String   `tfsdk:"state_reason"`
-	SubnetId                    types.String   `tfsdk:"subnet_id"`
-	Tags                        types.List     `tfsdk:"tags"`
-	Type                        types.String   `tfsdk:"type"`
-	UserData                    types.String   `tfsdk:"user_data"`
-	VmInitiatedShutdownBehavior types.String   `tfsdk:"vm_initiated_shutdown_behavior"`
-	VpcId                       types.String   `tfsdk:"vpc_id"`
-	// MANUALLY EDITED : spaceId removed
+	Architecture              types.String   `tfsdk:"architecture"`
+	BlockDeviceMappings       types.List     `tfsdk:"block_device_mappings"`
+	ClientToken               types.String   `tfsdk:"client_token"`
+	CreationDate              types.String   `tfsdk:"creation_date"`
+	DeletionProtection        types.Bool     `tfsdk:"deletion_protection"`
+	Hypervisor                types.String   `tfsdk:"hypervisor"`
+	Id                        types.String   `tfsdk:"id"`
+	ImageId                   types.String   `tfsdk:"image_id"`
+	InitiatedShutdownBehavior types.String   `tfsdk:"initiated_shutdown_behavior"`
+	IsSourceDestChecked       types.Bool     `tfsdk:"is_source_dest_checked"`
+	KeypairName               types.String   `tfsdk:"keypair_name"`
+	LaunchNumber              types.Int64    `tfsdk:"launch_number"`
+	MaxVmsCount               types.Int64    `tfsdk:"max_vms_count"`
+	MinVmsCount               types.Int64    `tfsdk:"min_vms_count"`
+	NestedVirtualization      types.Bool     `tfsdk:"nested_virtualization"`
+	Nics                      types.List     `tfsdk:"nics"`
+	OsFamily                  types.String   `tfsdk:"os_family"`
+	Placement                 PlacementValue `tfsdk:"placement"`
+	PrivateDnsName            types.String   `tfsdk:"private_dns_name"`
+	PrivateIp                 types.String   `tfsdk:"private_ip"`
+	PrivateIps                types.List     `tfsdk:"private_ips"`
+	ProductCodes              types.List     `tfsdk:"product_codes"`
+	PublicDnsName             types.String   `tfsdk:"public_dns_name"`
+	PublicIp                  types.String   `tfsdk:"public_ip"`
+	ReservationId             types.String   `tfsdk:"reservation_id"`
+	RootDeviceName            types.String   `tfsdk:"root_device_name"`
+	RootDeviceType            types.String   `tfsdk:"root_device_type"`
+	SecurityGroupIds          types.List     `tfsdk:"security_group_ids"`
+	SecurityGroups            types.List     `tfsdk:"security_groups"`
+	//SpaceId                     types.String   `tfsdk:"space_id"`
+	State                       types.String `tfsdk:"state"`
+	StateReason                 types.String `tfsdk:"state_reason"`
+	SubnetId                    types.String `tfsdk:"subnet_id"`
+	Tags                        types.List   `tfsdk:"tags"`
+	Type                        types.String `tfsdk:"type"`
+	UserData                    types.String `tfsdk:"user_data"`
+	VmInitiatedShutdownBehavior types.String `tfsdk:"vm_initiated_shutdown_behavior"`
+	VpcId                       types.String `tfsdk:"vpc_id"`
 }
 
 var _ basetypes.ObjectTypable = BlockDeviceMappingsType{}
@@ -1863,24 +1808,6 @@ func (t NicsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 
 	attributes := in.Attributes()
 
-	deleteOnVmDeletionAttribute, ok := attributes["delete_on_vm_deletion"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`delete_on_vm_deletion is missing from object`)
-
-		return nil, diags
-	}
-
-	deleteOnVmDeletionVal, ok := deleteOnVmDeletionAttribute.(basetypes.BoolValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`delete_on_vm_deletion expected to be basetypes.BoolValue, was: %T`, deleteOnVmDeletionAttribute))
-	}
-
 	descriptionAttribute, ok := attributes["description"]
 
 	if !ok {
@@ -1897,24 +1824,6 @@ func (t NicsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`description expected to be basetypes.StringValue, was: %T`, descriptionAttribute))
-	}
-
-	deviceNumberAttribute, ok := attributes["device_number"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`device_number is missing from object`)
-
-		return nil, diags
-	}
-
-	deviceNumberVal, ok := deviceNumberAttribute.(basetypes.Int64Value)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`device_number expected to be basetypes.Int64Value, was: %T`, deviceNumberAttribute))
 	}
 
 	isSourceDestCheckedAttribute, ok := attributes["is_source_dest_checked"]
@@ -2043,42 +1952,6 @@ func (t NicsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 			fmt.Sprintf(`private_ips expected to be basetypes.ListValue, was: %T`, privateIpsAttribute))
 	}
 
-	secondaryPrivateIpCountAttribute, ok := attributes["secondary_private_ip_count"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`secondary_private_ip_count is missing from object`)
-
-		return nil, diags
-	}
-
-	secondaryPrivateIpCountVal, ok := secondaryPrivateIpCountAttribute.(basetypes.Int64Value)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`secondary_private_ip_count expected to be basetypes.Int64Value, was: %T`, secondaryPrivateIpCountAttribute))
-	}
-
-	securityGroupIdsAttribute, ok := attributes["security_group_ids"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_ids is missing from object`)
-
-		return nil, diags
-	}
-
-	securityGroupIdsVal, ok := securityGroupIdsAttribute.(basetypes.ListValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_ids expected to be basetypes.ListValue, was: %T`, securityGroupIdsAttribute))
-	}
-
 	securityGroupsAttribute, ok := attributes["security_groups"]
 
 	if !ok {
@@ -2156,23 +2029,19 @@ func (t NicsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue)
 	}
 
 	return NicsValue{
-		DeleteOnVmDeletion:      deleteOnVmDeletionVal,
-		Description:             descriptionVal,
-		DeviceNumber:            deviceNumberVal,
-		IsSourceDestChecked:     isSourceDestCheckedVal,
-		LinkNic:                 linkNicVal,
-		LinkPublicIp:            linkPublicIpVal,
-		MacAddress:              macAddressVal,
-		NicId:                   nicIdVal,
-		PrivateDnsName:          privateDnsNameVal,
-		PrivateIps:              privateIpsVal,
-		SecondaryPrivateIpCount: secondaryPrivateIpCountVal,
-		SecurityGroupIds:        securityGroupIdsVal,
-		SecurityGroups:          securityGroupsVal,
-		State:                   stateVal,
-		SubnetId:                subnetIdVal,
-		VpcId:                   vpcIdVal,
-		state:                   attr.ValueStateKnown,
+		Description:         descriptionVal,
+		IsSourceDestChecked: isSourceDestCheckedVal,
+		LinkNic:             linkNicVal,
+		LinkPublicIp:        linkPublicIpVal,
+		MacAddress:          macAddressVal,
+		NicId:               nicIdVal,
+		PrivateDnsName:      privateDnsNameVal,
+		PrivateIps:          privateIpsVal,
+		SecurityGroups:      securityGroupsVal,
+		State:               stateVal,
+		SubnetId:            subnetIdVal,
+		VpcId:               vpcIdVal,
+		state:               attr.ValueStateKnown,
 	}, diags
 }
 
@@ -2239,24 +2108,6 @@ func NewNicsValue(attributeTypes map[string]attr.Type, attributes map[string]att
 		return NewNicsValueUnknown(), diags
 	}
 
-	deleteOnVmDeletionAttribute, ok := attributes["delete_on_vm_deletion"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`delete_on_vm_deletion is missing from object`)
-
-		return NewNicsValueUnknown(), diags
-	}
-
-	deleteOnVmDeletionVal, ok := deleteOnVmDeletionAttribute.(basetypes.BoolValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`delete_on_vm_deletion expected to be basetypes.BoolValue, was: %T`, deleteOnVmDeletionAttribute))
-	}
-
 	descriptionAttribute, ok := attributes["description"]
 
 	if !ok {
@@ -2273,24 +2124,6 @@ func NewNicsValue(attributeTypes map[string]attr.Type, attributes map[string]att
 		diags.AddError(
 			"Attribute Wrong Type",
 			fmt.Sprintf(`description expected to be basetypes.StringValue, was: %T`, descriptionAttribute))
-	}
-
-	deviceNumberAttribute, ok := attributes["device_number"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`device_number is missing from object`)
-
-		return NewNicsValueUnknown(), diags
-	}
-
-	deviceNumberVal, ok := deviceNumberAttribute.(basetypes.Int64Value)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`device_number expected to be basetypes.Int64Value, was: %T`, deviceNumberAttribute))
 	}
 
 	isSourceDestCheckedAttribute, ok := attributes["is_source_dest_checked"]
@@ -2419,42 +2252,6 @@ func NewNicsValue(attributeTypes map[string]attr.Type, attributes map[string]att
 			fmt.Sprintf(`private_ips expected to be basetypes.ListValue, was: %T`, privateIpsAttribute))
 	}
 
-	secondaryPrivateIpCountAttribute, ok := attributes["secondary_private_ip_count"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`secondary_private_ip_count is missing from object`)
-
-		return NewNicsValueUnknown(), diags
-	}
-
-	secondaryPrivateIpCountVal, ok := secondaryPrivateIpCountAttribute.(basetypes.Int64Value)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`secondary_private_ip_count expected to be basetypes.Int64Value, was: %T`, secondaryPrivateIpCountAttribute))
-	}
-
-	securityGroupIdsAttribute, ok := attributes["security_group_ids"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_ids is missing from object`)
-
-		return NewNicsValueUnknown(), diags
-	}
-
-	securityGroupIdsVal, ok := securityGroupIdsAttribute.(basetypes.ListValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_ids expected to be basetypes.ListValue, was: %T`, securityGroupIdsAttribute))
-	}
-
 	securityGroupsAttribute, ok := attributes["security_groups"]
 
 	if !ok {
@@ -2532,23 +2329,19 @@ func NewNicsValue(attributeTypes map[string]attr.Type, attributes map[string]att
 	}
 
 	return NicsValue{
-		DeleteOnVmDeletion:      deleteOnVmDeletionVal,
-		Description:             descriptionVal,
-		DeviceNumber:            deviceNumberVal,
-		IsSourceDestChecked:     isSourceDestCheckedVal,
-		LinkNic:                 linkNicVal,
-		LinkPublicIp:            linkPublicIpVal,
-		MacAddress:              macAddressVal,
-		NicId:                   nicIdVal,
-		PrivateDnsName:          privateDnsNameVal,
-		PrivateIps:              privateIpsVal,
-		SecondaryPrivateIpCount: secondaryPrivateIpCountVal,
-		SecurityGroupIds:        securityGroupIdsVal,
-		SecurityGroups:          securityGroupsVal,
-		State:                   stateVal,
-		SubnetId:                subnetIdVal,
-		VpcId:                   vpcIdVal,
-		state:                   attr.ValueStateKnown,
+		Description:         descriptionVal,
+		IsSourceDestChecked: isSourceDestCheckedVal,
+		LinkNic:             linkNicVal,
+		LinkPublicIp:        linkPublicIpVal,
+		MacAddress:          macAddressVal,
+		NicId:               nicIdVal,
+		PrivateDnsName:      privateDnsNameVal,
+		PrivateIps:          privateIpsVal,
+		SecurityGroups:      securityGroupsVal,
+		State:               stateVal,
+		SubnetId:            subnetIdVal,
+		VpcId:               vpcIdVal,
+		state:               attr.ValueStateKnown,
 	}, diags
 }
 
@@ -2620,34 +2413,28 @@ func (t NicsType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = NicsValue{}
 
 type NicsValue struct {
-	DeleteOnVmDeletion      basetypes.BoolValue   `tfsdk:"delete_on_vm_deletion"`
-	Description             basetypes.StringValue `tfsdk:"description"`
-	DeviceNumber            basetypes.Int64Value  `tfsdk:"device_number"`
-	IsSourceDestChecked     basetypes.BoolValue   `tfsdk:"is_source_dest_checked"`
-	LinkNic                 basetypes.ObjectValue `tfsdk:"link_nic"`
-	LinkPublicIp            basetypes.ObjectValue `tfsdk:"link_public_ip"`
-	MacAddress              basetypes.StringValue `tfsdk:"mac_address"`
-	NicId                   basetypes.StringValue `tfsdk:"nic_id"`
-	PrivateDnsName          basetypes.StringValue `tfsdk:"private_dns_name"`
-	PrivateIps              basetypes.ListValue   `tfsdk:"private_ips"`
-	SecondaryPrivateIpCount basetypes.Int64Value  `tfsdk:"secondary_private_ip_count"`
-	SecurityGroupIds        basetypes.ListValue   `tfsdk:"security_group_ids"`
-	SecurityGroups          basetypes.ListValue   `tfsdk:"security_groups"`
-	State                   basetypes.StringValue `tfsdk:"state"`
-	SubnetId                basetypes.StringValue `tfsdk:"subnet_id"`
-	VpcId                   basetypes.StringValue `tfsdk:"vpc_id"`
-	state                   attr.ValueState
+	Description         basetypes.StringValue `tfsdk:"description"`
+	IsSourceDestChecked basetypes.BoolValue   `tfsdk:"is_source_dest_checked"`
+	LinkNic             basetypes.ObjectValue `tfsdk:"link_nic"`
+	LinkPublicIp        basetypes.ObjectValue `tfsdk:"link_public_ip"`
+	MacAddress          basetypes.StringValue `tfsdk:"mac_address"`
+	NicId               basetypes.StringValue `tfsdk:"nic_id"`
+	PrivateDnsName      basetypes.StringValue `tfsdk:"private_dns_name"`
+	PrivateIps          basetypes.ListValue   `tfsdk:"private_ips"`
+	SecurityGroups      basetypes.ListValue   `tfsdk:"security_groups"`
+	State               basetypes.StringValue `tfsdk:"state"`
+	SubnetId            basetypes.StringValue `tfsdk:"subnet_id"`
+	VpcId               basetypes.StringValue `tfsdk:"vpc_id"`
+	state               attr.ValueState
 }
 
 func (v NicsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 16)
+	attrTypes := make(map[string]tftypes.Type, 12)
 
 	var val tftypes.Value
 	var err error
 
-	attrTypes["delete_on_vm_deletion"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["description"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["device_number"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["is_source_dest_checked"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["link_nic"] = basetypes.ObjectType{
 		AttrTypes: LinkNicValue{}.AttributeTypes(ctx),
@@ -2661,10 +2448,6 @@ func (v NicsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 	attrTypes["private_ips"] = basetypes.ListType{
 		ElemType: PrivateIpsValue{}.Type(ctx),
 	}.TerraformType(ctx)
-	attrTypes["secondary_private_ip_count"] = basetypes.Int64Type{}.TerraformType(ctx)
-	attrTypes["security_group_ids"] = basetypes.ListType{
-		ElemType: types.StringType,
-	}.TerraformType(ctx)
 	attrTypes["security_groups"] = basetypes.ListType{
 		ElemType: SecurityGroupsValue{}.Type(ctx),
 	}.TerraformType(ctx)
@@ -2676,15 +2459,7 @@ func (v NicsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 16)
-
-		val, err = v.DeleteOnVmDeletion.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["delete_on_vm_deletion"] = val
+		vals := make(map[string]tftypes.Value, 12)
 
 		val, err = v.Description.ToTerraformValue(ctx)
 
@@ -2693,14 +2468,6 @@ func (v NicsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 		}
 
 		vals["description"] = val
-
-		val, err = v.DeviceNumber.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["device_number"] = val
 
 		val, err = v.IsSourceDestChecked.ToTerraformValue(ctx)
 
@@ -2757,22 +2524,6 @@ func (v NicsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 		}
 
 		vals["private_ips"] = val
-
-		val, err = v.SecondaryPrivateIpCount.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["secondary_private_ip_count"] = val
-
-		val, err = v.SecurityGroupIds.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["security_group_ids"] = val
 
 		val, err = v.SecurityGroups.ToTerraformValue(ctx)
 
@@ -2935,45 +2686,8 @@ func (v NicsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 		)
 	}
 
-	securityGroupIdsVal, d := types.ListValue(types.StringType, v.SecurityGroupIds.Elements())
-
-	diags.Append(d...)
-
-	if d.HasError() {
-		return types.ObjectUnknown(map[string]attr.Type{
-			"delete_on_vm_deletion":  basetypes.BoolType{},
-			"description":            basetypes.StringType{},
-			"device_number":          basetypes.Int64Type{},
-			"is_source_dest_checked": basetypes.BoolType{},
-			"link_nic": basetypes.ObjectType{
-				AttrTypes: LinkNicValue{}.AttributeTypes(ctx),
-			},
-			"link_public_ip": basetypes.ObjectType{
-				AttrTypes: LinkPublicIpValue{}.AttributeTypes(ctx),
-			},
-			"mac_address":      basetypes.StringType{},
-			"nic_id":           basetypes.StringType{},
-			"private_dns_name": basetypes.StringType{},
-			"private_ips": basetypes.ListType{
-				ElemType: PrivateIpsValue{}.Type(ctx),
-			},
-			"secondary_private_ip_count": basetypes.Int64Type{},
-			"security_group_ids": basetypes.ListType{
-				ElemType: types.StringType,
-			},
-			"security_groups": basetypes.ListType{
-				ElemType: SecurityGroupsValue{}.Type(ctx),
-			},
-			"state":     basetypes.StringType{},
-			"subnet_id": basetypes.StringType{},
-			"vpc_id":    basetypes.StringType{},
-		}), diags
-	}
-
 	attributeTypes := map[string]attr.Type{
-		"delete_on_vm_deletion":  basetypes.BoolType{},
 		"description":            basetypes.StringType{},
-		"device_number":          basetypes.Int64Type{},
 		"is_source_dest_checked": basetypes.BoolType{},
 		"link_nic": basetypes.ObjectType{
 			AttrTypes: LinkNicValue{}.AttributeTypes(ctx),
@@ -2986,10 +2700,6 @@ func (v NicsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 		"private_dns_name": basetypes.StringType{},
 		"private_ips": basetypes.ListType{
 			ElemType: PrivateIpsValue{}.Type(ctx),
-		},
-		"secondary_private_ip_count": basetypes.Int64Type{},
-		"security_group_ids": basetypes.ListType{
-			ElemType: types.StringType,
 		},
 		"security_groups": basetypes.ListType{
 			ElemType: SecurityGroupsValue{}.Type(ctx),
@@ -3010,22 +2720,18 @@ func (v NicsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"delete_on_vm_deletion":      v.DeleteOnVmDeletion,
-			"description":                v.Description,
-			"device_number":              v.DeviceNumber,
-			"is_source_dest_checked":     v.IsSourceDestChecked,
-			"link_nic":                   linkNic,
-			"link_public_ip":             linkPublicIp,
-			"mac_address":                v.MacAddress,
-			"nic_id":                     v.NicId,
-			"private_dns_name":           v.PrivateDnsName,
-			"private_ips":                privateIps,
-			"secondary_private_ip_count": v.SecondaryPrivateIpCount,
-			"security_group_ids":         securityGroupIdsVal,
-			"security_groups":            securityGroups,
-			"state":                      v.State,
-			"subnet_id":                  v.SubnetId,
-			"vpc_id":                     v.VpcId,
+			"description":            v.Description,
+			"is_source_dest_checked": v.IsSourceDestChecked,
+			"link_nic":               linkNic,
+			"link_public_ip":         linkPublicIp,
+			"mac_address":            v.MacAddress,
+			"nic_id":                 v.NicId,
+			"private_dns_name":       v.PrivateDnsName,
+			"private_ips":            privateIps,
+			"security_groups":        securityGroups,
+			"state":                  v.State,
+			"subnet_id":              v.SubnetId,
+			"vpc_id":                 v.VpcId,
 		})
 
 	return objVal, diags
@@ -3046,15 +2752,7 @@ func (v NicsValue) Equal(o attr.Value) bool {
 		return true
 	}
 
-	if !v.DeleteOnVmDeletion.Equal(other.DeleteOnVmDeletion) {
-		return false
-	}
-
 	if !v.Description.Equal(other.Description) {
-		return false
-	}
-
-	if !v.DeviceNumber.Equal(other.DeviceNumber) {
 		return false
 	}
 
@@ -3083,14 +2781,6 @@ func (v NicsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.PrivateIps.Equal(other.PrivateIps) {
-		return false
-	}
-
-	if !v.SecondaryPrivateIpCount.Equal(other.SecondaryPrivateIpCount) {
-		return false
-	}
-
-	if !v.SecurityGroupIds.Equal(other.SecurityGroupIds) {
 		return false
 	}
 
@@ -3123,9 +2813,7 @@ func (v NicsValue) Type(ctx context.Context) attr.Type {
 
 func (v NicsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"delete_on_vm_deletion":  basetypes.BoolType{},
 		"description":            basetypes.StringType{},
-		"device_number":          basetypes.Int64Type{},
 		"is_source_dest_checked": basetypes.BoolType{},
 		"link_nic": basetypes.ObjectType{
 			AttrTypes: LinkNicValue{}.AttributeTypes(ctx),
@@ -3138,10 +2826,6 @@ func (v NicsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"private_dns_name": basetypes.StringType{},
 		"private_ips": basetypes.ListType{
 			ElemType: PrivateIpsValue{}.Type(ctx),
-		},
-		"secondary_private_ip_count": basetypes.Int64Type{},
-		"security_group_ids": basetypes.ListType{
-			ElemType: types.StringType,
 		},
 		"security_groups": basetypes.ListType{
 			ElemType: SecurityGroupsValue{}.Type(ctx),
@@ -3638,385 +3322,6 @@ func (v LinkNicValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"device_number":         basetypes.Int64Type{},
 		"link_nic_id":           basetypes.StringType{},
 		"state":                 basetypes.StringType{},
-	}
-}
-
-var _ basetypes.ObjectTypable = LinkPublicIpType{}
-
-type LinkPublicIpType struct {
-	basetypes.ObjectType
-}
-
-func (t LinkPublicIpType) Equal(o attr.Type) bool {
-	other, ok := o.(LinkPublicIpType)
-
-	if !ok {
-		return false
-	}
-
-	return t.ObjectType.Equal(other.ObjectType)
-}
-
-func (t LinkPublicIpType) String() string {
-	return "LinkPublicIpType"
-}
-
-func (t LinkPublicIpType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributes := in.Attributes()
-
-	publicDnsNameAttribute, ok := attributes["public_dns_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_dns_name is missing from object`)
-
-		return nil, diags
-	}
-
-	publicDnsNameVal, ok := publicDnsNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_dns_name expected to be basetypes.StringValue, was: %T`, publicDnsNameAttribute))
-	}
-
-	publicIpAttribute, ok := attributes["public_ip"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_ip is missing from object`)
-
-		return nil, diags
-	}
-
-	publicIpVal, ok := publicIpAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
-	}
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	return LinkPublicIpValue{
-		PublicDnsName: publicDnsNameVal,
-		PublicIp:      publicIpVal,
-		state:         attr.ValueStateKnown,
-	}, diags
-}
-
-func NewLinkPublicIpValueNull() LinkPublicIpValue {
-	return LinkPublicIpValue{
-		state: attr.ValueStateNull,
-	}
-}
-
-func NewLinkPublicIpValueUnknown() LinkPublicIpValue {
-	return LinkPublicIpValue{
-		state: attr.ValueStateUnknown,
-	}
-}
-
-func NewLinkPublicIpValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (LinkPublicIpValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
-	ctx := context.Background()
-
-	for name, attributeType := range attributeTypes {
-		attribute, ok := attributes[name]
-
-		if !ok {
-			diags.AddError(
-				"Missing LinkPublicIpValue Attribute Value",
-				"While creating a LinkPublicIpValue value, a missing attribute value was detected. "+
-					"A LinkPublicIpValue must contain values for all attributes, even if null or unknown. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
-			)
-
-			continue
-		}
-
-		if !attributeType.Equal(attribute.Type(ctx)) {
-			diags.AddError(
-				"Invalid LinkPublicIpValue Attribute Type",
-				"While creating a LinkPublicIpValue value, an invalid attribute value was detected. "+
-					"A LinkPublicIpValue must use a matching attribute type for the value. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
-					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
-			)
-		}
-	}
-
-	for name := range attributes {
-		_, ok := attributeTypes[name]
-
-		if !ok {
-			diags.AddError(
-				"Extra LinkPublicIpValue Attribute Value",
-				"While creating a LinkPublicIpValue value, an extra attribute value was detected. "+
-					"A LinkPublicIpValue must not contain values beyond the expected attribute types. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("Extra LinkPublicIpValue Attribute Name: %s", name),
-			)
-		}
-	}
-
-	if diags.HasError() {
-		return NewLinkPublicIpValueUnknown(), diags
-	}
-
-	publicDnsNameAttribute, ok := attributes["public_dns_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_dns_name is missing from object`)
-
-		return NewLinkPublicIpValueUnknown(), diags
-	}
-
-	publicDnsNameVal, ok := publicDnsNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_dns_name expected to be basetypes.StringValue, was: %T`, publicDnsNameAttribute))
-	}
-
-	publicIpAttribute, ok := attributes["public_ip"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`public_ip is missing from object`)
-
-		return NewLinkPublicIpValueUnknown(), diags
-	}
-
-	publicIpVal, ok := publicIpAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
-	}
-
-	if diags.HasError() {
-		return NewLinkPublicIpValueUnknown(), diags
-	}
-
-	return LinkPublicIpValue{
-		PublicDnsName: publicDnsNameVal,
-		PublicIp:      publicIpVal,
-		state:         attr.ValueStateKnown,
-	}, diags
-}
-
-func NewLinkPublicIpValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) LinkPublicIpValue {
-	object, diags := NewLinkPublicIpValue(attributeTypes, attributes)
-
-	if diags.HasError() {
-		// This could potentially be added to the diag package.
-		diagsStrings := make([]string, 0, len(diags))
-
-		for _, diagnostic := range diags {
-			diagsStrings = append(diagsStrings, fmt.Sprintf(
-				"%s | %s | %s",
-				diagnostic.Severity(),
-				diagnostic.Summary(),
-				diagnostic.Detail()))
-		}
-
-		panic("NewLinkPublicIpValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
-	}
-
-	return object
-}
-
-func (t LinkPublicIpType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
-	if in.Type() == nil {
-		return NewLinkPublicIpValueNull(), nil
-	}
-
-	if !in.Type().Equal(t.TerraformType(ctx)) {
-		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
-	}
-
-	if !in.IsKnown() {
-		return NewLinkPublicIpValueUnknown(), nil
-	}
-
-	if in.IsNull() {
-		return NewLinkPublicIpValueNull(), nil
-	}
-
-	attributes := map[string]attr.Value{}
-
-	val := map[string]tftypes.Value{}
-
-	err := in.As(&val)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for k, v := range val {
-		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
-		if err != nil {
-			return nil, err
-		}
-
-		attributes[k] = a
-	}
-
-	return NewLinkPublicIpValueMust(LinkPublicIpValue{}.AttributeTypes(ctx), attributes), nil
-}
-
-func (t LinkPublicIpType) ValueType(ctx context.Context) attr.Value {
-	return LinkPublicIpValue{}
-}
-
-var _ basetypes.ObjectValuable = LinkPublicIpValue{}
-
-type LinkPublicIpValue struct {
-	PublicDnsName basetypes.StringValue `tfsdk:"public_dns_name"`
-	PublicIp      basetypes.StringValue `tfsdk:"public_ip"`
-	state         attr.ValueState
-}
-
-func (v LinkPublicIpValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 2)
-
-	var val tftypes.Value
-	var err error
-
-	attrTypes["public_dns_name"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["public_ip"] = basetypes.StringType{}.TerraformType(ctx)
-
-	objectType := tftypes.Object{AttributeTypes: attrTypes}
-
-	switch v.state {
-	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 2)
-
-		val, err = v.PublicDnsName.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["public_dns_name"] = val
-
-		val, err = v.PublicIp.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["public_ip"] = val
-
-		if err := tftypes.ValidateValue(objectType, vals); err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		return tftypes.NewValue(objectType, vals), nil
-	case attr.ValueStateNull:
-		return tftypes.NewValue(objectType, nil), nil
-	case attr.ValueStateUnknown:
-		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
-	default:
-		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
-	}
-}
-
-func (v LinkPublicIpValue) IsNull() bool {
-	return v.state == attr.ValueStateNull
-}
-
-func (v LinkPublicIpValue) IsUnknown() bool {
-	return v.state == attr.ValueStateUnknown
-}
-
-func (v LinkPublicIpValue) String() string {
-	return "LinkPublicIpValue"
-}
-
-func (v LinkPublicIpValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributeTypes := map[string]attr.Type{
-		"public_dns_name": basetypes.StringType{},
-		"public_ip":       basetypes.StringType{},
-	}
-
-	if v.IsNull() {
-		return types.ObjectNull(attributeTypes), diags
-	}
-
-	if v.IsUnknown() {
-		return types.ObjectUnknown(attributeTypes), diags
-	}
-
-	objVal, diags := types.ObjectValue(
-		attributeTypes,
-		map[string]attr.Value{
-			"public_dns_name": v.PublicDnsName,
-			"public_ip":       v.PublicIp,
-		})
-
-	return objVal, diags
-}
-
-func (v LinkPublicIpValue) Equal(o attr.Value) bool {
-	other, ok := o.(LinkPublicIpValue)
-
-	if !ok {
-		return false
-	}
-
-	if v.state != other.state {
-		return false
-	}
-
-	if v.state != attr.ValueStateKnown {
-		return true
-	}
-
-	if !v.PublicDnsName.Equal(other.PublicDnsName) {
-		return false
-	}
-
-	if !v.PublicIp.Equal(other.PublicIp) {
-		return false
-	}
-
-	return true
-}
-
-func (v LinkPublicIpValue) Type(ctx context.Context) attr.Type {
-	return LinkPublicIpType{
-		basetypes.ObjectType{
-			AttrTypes: v.AttributeTypes(ctx),
-		},
-	}
-}
-
-func (v LinkPublicIpValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
-	return map[string]attr.Type{
-		"public_dns_name": basetypes.StringType{},
-		"public_ip":       basetypes.StringType{},
 	}
 }
 
@@ -4533,6 +3838,385 @@ func (v PrivateIpsValue) AttributeTypes(ctx context.Context) map[string]attr.Typ
 		},
 		"private_dns_name": basetypes.StringType{},
 		"private_ip":       basetypes.StringType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = LinkPublicIpType{}
+
+type LinkPublicIpType struct {
+	basetypes.ObjectType
+}
+
+func (t LinkPublicIpType) Equal(o attr.Type) bool {
+	other, ok := o.(LinkPublicIpType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t LinkPublicIpType) String() string {
+	return "LinkPublicIpType"
+}
+
+func (t LinkPublicIpType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	publicDnsNameAttribute, ok := attributes["public_dns_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`public_dns_name is missing from object`)
+
+		return nil, diags
+	}
+
+	publicDnsNameVal, ok := publicDnsNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`public_dns_name expected to be basetypes.StringValue, was: %T`, publicDnsNameAttribute))
+	}
+
+	publicIpAttribute, ok := attributes["public_ip"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`public_ip is missing from object`)
+
+		return nil, diags
+	}
+
+	publicIpVal, ok := publicIpAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return LinkPublicIpValue{
+		PublicDnsName: publicDnsNameVal,
+		PublicIp:      publicIpVal,
+		state:         attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkPublicIpValueNull() LinkPublicIpValue {
+	return LinkPublicIpValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewLinkPublicIpValueUnknown() LinkPublicIpValue {
+	return LinkPublicIpValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewLinkPublicIpValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (LinkPublicIpValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing LinkPublicIpValue Attribute Value",
+				"While creating a LinkPublicIpValue value, a missing attribute value was detected. "+
+					"A LinkPublicIpValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid LinkPublicIpValue Attribute Type",
+				"While creating a LinkPublicIpValue value, an invalid attribute value was detected. "+
+					"A LinkPublicIpValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("LinkPublicIpValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra LinkPublicIpValue Attribute Value",
+				"While creating a LinkPublicIpValue value, an extra attribute value was detected. "+
+					"A LinkPublicIpValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra LinkPublicIpValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewLinkPublicIpValueUnknown(), diags
+	}
+
+	publicDnsNameAttribute, ok := attributes["public_dns_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`public_dns_name is missing from object`)
+
+		return NewLinkPublicIpValueUnknown(), diags
+	}
+
+	publicDnsNameVal, ok := publicDnsNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`public_dns_name expected to be basetypes.StringValue, was: %T`, publicDnsNameAttribute))
+	}
+
+	publicIpAttribute, ok := attributes["public_ip"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`public_ip is missing from object`)
+
+		return NewLinkPublicIpValueUnknown(), diags
+	}
+
+	publicIpVal, ok := publicIpAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`public_ip expected to be basetypes.StringValue, was: %T`, publicIpAttribute))
+	}
+
+	if diags.HasError() {
+		return NewLinkPublicIpValueUnknown(), diags
+	}
+
+	return LinkPublicIpValue{
+		PublicDnsName: publicDnsNameVal,
+		PublicIp:      publicIpVal,
+		state:         attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkPublicIpValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) LinkPublicIpValue {
+	object, diags := NewLinkPublicIpValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewLinkPublicIpValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t LinkPublicIpType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewLinkPublicIpValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewLinkPublicIpValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewLinkPublicIpValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewLinkPublicIpValueMust(LinkPublicIpValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t LinkPublicIpType) ValueType(ctx context.Context) attr.Value {
+	return LinkPublicIpValue{}
+}
+
+var _ basetypes.ObjectValuable = LinkPublicIpValue{}
+
+type LinkPublicIpValue struct {
+	PublicDnsName basetypes.StringValue `tfsdk:"public_dns_name"`
+	PublicIp      basetypes.StringValue `tfsdk:"public_ip"`
+	state         attr.ValueState
+}
+
+func (v LinkPublicIpValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 2)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["public_dns_name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["public_ip"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 2)
+
+		val, err = v.PublicDnsName.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["public_dns_name"] = val
+
+		val, err = v.PublicIp.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["public_ip"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v LinkPublicIpValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v LinkPublicIpValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v LinkPublicIpValue) String() string {
+	return "LinkPublicIpValue"
+}
+
+func (v LinkPublicIpValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"public_dns_name": basetypes.StringType{},
+		"public_ip":       basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"public_dns_name": v.PublicDnsName,
+			"public_ip":       v.PublicIp,
+		})
+
+	return objVal, diags
+}
+
+func (v LinkPublicIpValue) Equal(o attr.Value) bool {
+	other, ok := o.(LinkPublicIpValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.PublicDnsName.Equal(other.PublicDnsName) {
+		return false
+	}
+
+	if !v.PublicIp.Equal(other.PublicIp) {
+		return false
+	}
+
+	return true
+}
+
+func (v LinkPublicIpValue) Type(ctx context.Context) attr.Type {
+	return LinkPublicIpType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v LinkPublicIpValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"public_dns_name": basetypes.StringType{},
+		"public_ip":       basetypes.StringType{},
 	}
 }
 
@@ -5291,5 +4975,384 @@ func (v PlacementValue) AttributeTypes(ctx context.Context) map[string]attr.Type
 	return map[string]attr.Type{
 		"availability_zone_name": basetypes.StringType{},
 		"tenancy":                basetypes.StringType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = TagsType{}
+
+type TagsType struct {
+	basetypes.ObjectType
+}
+
+func (t TagsType) Equal(o attr.Type) bool {
+	other, ok := o.(TagsType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t TagsType) String() string {
+	return "TagsType"
+}
+
+func (t TagsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	keyAttribute, ok := attributes["key"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`key is missing from object`)
+
+		return nil, diags
+	}
+
+	keyVal, ok := keyAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
+	}
+
+	valueAttribute, ok := attributes["value"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`value is missing from object`)
+
+		return nil, diags
+	}
+
+	valueVal, ok := valueAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`value expected to be basetypes.StringValue, was: %T`, valueAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return TagsValue{
+		Key:   keyVal,
+		Value: valueVal,
+		state: attr.ValueStateKnown,
+	}, diags
+}
+
+func NewTagsValueNull() TagsValue {
+	return TagsValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewTagsValueUnknown() TagsValue {
+	return TagsValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewTagsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (TagsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing TagsValue Attribute Value",
+				"While creating a TagsValue value, a missing attribute value was detected. "+
+					"A TagsValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("TagsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid TagsValue Attribute Type",
+				"While creating a TagsValue value, an invalid attribute value was detected. "+
+					"A TagsValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("TagsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("TagsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra TagsValue Attribute Value",
+				"While creating a TagsValue value, an extra attribute value was detected. "+
+					"A TagsValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra TagsValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewTagsValueUnknown(), diags
+	}
+
+	keyAttribute, ok := attributes["key"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`key is missing from object`)
+
+		return NewTagsValueUnknown(), diags
+	}
+
+	keyVal, ok := keyAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
+	}
+
+	valueAttribute, ok := attributes["value"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`value is missing from object`)
+
+		return NewTagsValueUnknown(), diags
+	}
+
+	valueVal, ok := valueAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`value expected to be basetypes.StringValue, was: %T`, valueAttribute))
+	}
+
+	if diags.HasError() {
+		return NewTagsValueUnknown(), diags
+	}
+
+	return TagsValue{
+		Key:   keyVal,
+		Value: valueVal,
+		state: attr.ValueStateKnown,
+	}, diags
+}
+
+func NewTagsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) TagsValue {
+	object, diags := NewTagsValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewTagsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t TagsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewTagsValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewTagsValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewTagsValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewTagsValueMust(TagsValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t TagsType) ValueType(ctx context.Context) attr.Value {
+	return TagsValue{}
+}
+
+var _ basetypes.ObjectValuable = TagsValue{}
+
+type TagsValue struct {
+	Key   basetypes.StringValue `tfsdk:"key"`
+	Value basetypes.StringValue `tfsdk:"value"`
+	state attr.ValueState
+}
+
+func (v TagsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 2)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["key"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["value"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 2)
+
+		val, err = v.Key.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["key"] = val
+
+		val, err = v.Value.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["value"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v TagsValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v TagsValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v TagsValue) String() string {
+	return "TagsValue"
+}
+
+func (v TagsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"key":   basetypes.StringType{},
+		"value": basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"key":   v.Key,
+			"value": v.Value,
+		})
+
+	return objVal, diags
+}
+
+func (v TagsValue) Equal(o attr.Value) bool {
+	other, ok := o.(TagsValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Key.Equal(other.Key) {
+		return false
+	}
+
+	if !v.Value.Equal(other.Value) {
+		return false
+	}
+
+	return true
+}
+
+func (v TagsValue) Type(ctx context.Context) attr.Type {
+	return TagsType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v TagsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"key":   basetypes.StringType{},
+		"value": basetypes.StringType{},
 	}
 }

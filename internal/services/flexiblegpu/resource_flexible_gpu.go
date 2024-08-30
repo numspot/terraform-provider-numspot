@@ -204,14 +204,36 @@ func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.Updat
 			}
 
 		} else if plan.VmId.IsNull() || plan.VmId.IsUnknown() { // If GPU is linked to a VM and we want to unlink it
-			response.Diagnostics.Append(r.unlinkVm(ctx, state.Id.ValueString(), state)...)
-			if response.Diagnostics.HasError() {
-				return
+			diags := r.unlinkVm(ctx, state.Id.ValueString(), state)
+			if diags.HasError() {
+				_, err := utils2.RetryReadUntilStateValid(
+					ctx,
+					state.Id.ValueString(),
+					r.provider.GetSpaceID(),
+					[]string{"detaching"},
+					[]string{"allocated"},
+					r.provider.GetNumspotClient().ReadFlexibleGpusByIdWithResponse,
+				)
+				if err != nil {
+					response.Diagnostics.Append(diags...)
+					response.Diagnostics.AddError("Failed while waiting for GPU to get unlinked", err.Error())
+				}
 			}
 		} else { // Gpu is linked to a VM and we want to link it to another
-			response.Diagnostics.Append(r.unlinkVm(ctx, state.Id.ValueString(), state)...)
-			if response.Diagnostics.HasError() {
-				return
+			diags := r.unlinkVm(ctx, state.Id.ValueString(), state)
+			if diags.HasError() {
+				_, err := utils2.RetryReadUntilStateValid(
+					ctx,
+					state.Id.ValueString(),
+					r.provider.GetSpaceID(),
+					[]string{"detaching"},
+					[]string{"allocated"},
+					r.provider.GetNumspotClient().ReadFlexibleGpusByIdWithResponse,
+				)
+				if err != nil {
+					response.Diagnostics.Append(diags...)
+					response.Diagnostics.AddError("Failed while waiting for GPU to get unlinked", err.Error())
+				}
 			}
 			response.Diagnostics.Append(r.linkVm(ctx, state.Id.ValueString(), plan)...)
 			if response.Diagnostics.HasError() {
@@ -249,8 +271,22 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	if !(data.VmId.IsNull() || data.VmId.IsUnknown()) {
-		response.Diagnostics.Append(r.unlinkVm(ctx, data.Id.ValueString(), data)...)
-		// Even if there is an error on unlink, we will try to delete the GPU
+		diags := r.unlinkVm(ctx, data.Id.ValueString(), data)
+		if diags.HasError() {
+			_, err := utils2.RetryReadUntilStateValid(
+				ctx,
+				data.Id.ValueString(),
+				r.provider.GetSpaceID(),
+				[]string{"detaching"},
+				[]string{"allocated"},
+				r.provider.GetNumspotClient().ReadFlexibleGpusByIdWithResponse,
+			)
+			if err != nil {
+				response.Diagnostics.Append(diags...)
+				response.Diagnostics.AddError("Failed while waiting for GPU to get unlinked", err.Error())
+				return
+			}
+		}
 	}
 
 	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteFlexibleGpuWithResponse)

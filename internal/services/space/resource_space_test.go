@@ -88,10 +88,9 @@ func TestAccSpaceResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:            "numspot_space.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"id"},
+				ResourceName:      "numspot_space.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 
 			// Update testing With Replace (if needed)

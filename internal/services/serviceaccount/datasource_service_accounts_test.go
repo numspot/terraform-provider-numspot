@@ -4,6 +4,7 @@ package serviceaccount_test
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -15,7 +16,9 @@ func TestAccServiceAccountDatasource(t *testing.T) {
 	pr := provider.TestAccProtoV6ProviderFactories
 
 	spaceID := "67d97ad4-3005-48dc-a392-60a97ab5097c"
-	name := "My custom TF svc account"
+	randint := rand.Intn(9999-1000) + 1000
+	name := fmt.Sprintf("terraform-service-account-test-%d", randint)
+	// name := "My custom TF svc account"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
@@ -24,7 +27,7 @@ func TestAccServiceAccountDatasource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_service_accounts.testdata", "items.#", "1"),
 					provider.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_service_accounts.testdata", "items.*", map[string]string{
-						"id":   provider.PAIR_PREFIX + "numspot_service_account.test.id",
+						"id":   provider.PAIR_PREFIX + "numspot_service_account.test.service_account_id",
 						"name": name,
 					}),
 				),
@@ -41,8 +44,8 @@ resource "numspot_service_account" "test" {
 }
 
 data "numspot_service_accounts" "testdata" {
-  space_id             = numspot_service_account.test.space_id
-  service_account_name = numspot_service_account.test.name
+  space_id            = numspot_service_account.test.space_id
+  service_account_ids = [numspot_service_account.test.service_account_id]
 }
 	`, spaceID, name)
 }

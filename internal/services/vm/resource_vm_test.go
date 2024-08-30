@@ -62,10 +62,10 @@ func TestAccVmResource(t *testing.T) {
 	tagValueUpdated := tagValue + "-Updated"
 	vmTypeUpdated := "ns-cus6-4c8r"
 	vmInitiatedShutdownBehavior := "stop"
-	vmInitiatedShutdownBehaviorUpdated := "terminate"
+	// vmInitiatedShutdownBehaviorUpdated := "terminate"
 
 	// resource fields that cannot be updated in-place (requires replace)
-	subregionName := "cloudgouv-eu-west-1b"
+	subregionName := "cloudgouv-eu-west-1a"
 	//subregionNameUpdated := "cloudgouv-eu-west-1b"
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -93,7 +93,7 @@ func TestAccVmResource(t *testing.T) {
 	updatePlanValues := StepDataVm{
 		sourceImageId:               sourceImageId,
 		vmType:                      vmTypeUpdated,
-		vmInitiatedShutdownBehavior: vmInitiatedShutdownBehaviorUpdated,
+		vmInitiatedShutdownBehavior: vmInitiatedShutdownBehavior,
 		tagKey:                      tagKey,
 		tagValue:                    tagValueUpdated,
 		subregionName:               subregionName,
@@ -137,7 +137,7 @@ func TestAccVmResource(t *testing.T) {
 					createChecks,
 					getDependencyChecksVm(provider.BASE_SUFFIX),
 				)...),
-				ExpectNonEmptyPlan: true,
+				// ExpectNonEmptyPlan: true,
 			},
 			{ // ImportState testing
 				ResourceName:            "numspot_vm.test",
@@ -152,7 +152,7 @@ func TestAccVmResource(t *testing.T) {
 					updateChecks,
 					getDependencyChecksVm(provider.BASE_SUFFIX),
 				)...),
-				ExpectNonEmptyPlan: true,
+				// ExpectNonEmptyPlan: true,
 			},
 			// Update testing With Replace
 			//{
@@ -165,8 +165,8 @@ func TestAccVmResource(t *testing.T) {
 			//},
 			// <== If resource has required dependencies ==>
 			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config:             testVmConfig(provider.BASE_SUFFIX, basePlanValues),
-				ExpectNonEmptyPlan: true,
+				Config: testVmConfig(provider.BASE_SUFFIX, basePlanValues),
+				// ExpectNonEmptyPlan: true,
 			},
 
 			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this

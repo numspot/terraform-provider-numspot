@@ -176,7 +176,14 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 	}
 
 	body := VmFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	bodyFromState := VmFromTfToUpdaterequest(ctx, &state, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	if isUpdateNeeded(body, bodyFromState) {
 		// Stop VM before doing update

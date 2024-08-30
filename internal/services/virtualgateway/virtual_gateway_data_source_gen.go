@@ -125,6 +125,15 @@ func VirtualGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
+type VirtualGatewayModelItemDataSource struct {
+	ConnectionType           types.String `tfsdk:"connection_type"`
+	Id                       types.String `tfsdk:"id"`
+	State                    types.String `tfsdk:"state"`
+	Tags                     types.List   `tfsdk:"tags"`
+	VpcToVirtualGatewayLinks types.List   `tfsdk:"vpc_to_virtual_gateway_links"`
+	// MANUALLY EDITED : SpaceId Removed
+}
+
 // MANUALLY EDITED : Model declaration removed
 
 // MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

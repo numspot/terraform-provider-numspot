@@ -49,8 +49,8 @@ func FlexibleGpusFromTfToAPIReadParams(ctx context.Context, tf FlexibleGpuDataSo
 	}
 }
 
-func FlexibleGpusFromHttpToTfDatasource(ctx context.Context, http *numspot.FlexibleGpu) (*FlexibleGpuModel, diag.Diagnostics) {
-	return &FlexibleGpuModel{
+func FlexibleGpusFromHttpToTfDatasource(ctx context.Context, http *numspot.FlexibleGpu) (*FlexibleGpuModelItemDataSource, diag.Diagnostics) {
+	return &FlexibleGpuModelItemDataSource{
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		Id:                   types.StringPointerValue(http.Id),
 		State:                types.StringPointerValue(http.State),

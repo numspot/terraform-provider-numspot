@@ -265,6 +265,9 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Vpc.",
 				MarkdownDescription: "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Vpc.",
+				PlanModifiers: []planmodifier.String{ // MANUALLY EDITED : add RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 			},
 			"vpc_id": schema.StringAttribute{
 				Computed:            true,

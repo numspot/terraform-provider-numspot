@@ -26,7 +26,6 @@ type StepDataImage struct {
 func getFieldMatchChecksImage(data StepDataImage) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
 		resource.TestCheckResourceAttr("numspot_image.test", "name", data.name),
-		resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", data.sourceImageId),
 		resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
 		resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
 			"key":   data.tagKey,
@@ -113,9 +112,12 @@ func TestAccImageResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			{ // Create testing
 				Config: testImageConfig_FromImage(basePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					createChecks,
-				)...),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					append(
+						slices.Concat(createChecks),
+						resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", basePlanValues.sourceImageId),
+					)...,
+				),
 				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
@@ -128,9 +130,12 @@ func TestAccImageResource(t *testing.T) {
 			// Update testing With Replace (create image from Image)
 			{
 				Config: testImageConfig_FromImage(replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-				)...),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					append(
+						slices.Concat(replaceChecks),
+						resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", replacePlanValues.sourceImageId),
+					)...,
+				),
 				ExpectNonEmptyPlan: true,
 			},
 			// Update testing With Replace (create image from Vm)
@@ -149,12 +154,12 @@ func TestAccImageResource(t *testing.T) {
 					replaceChecks,
 					getDependencyChecksImage_FromSnapshot(provider.BASE_SUFFIX),
 				)...),
-				ExpectNonEmptyPlan: true,
 			},
 
 			// <== If resource has required dependencies ==>
 			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testImageConfig_FromVm(provider.BASE_SUFFIX, basePlanValues),
+				Config:             testImageConfig_FromVm(provider.BASE_SUFFIX, basePlanValues),
+				ExpectNonEmptyPlan: true,
 			},
 			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
@@ -177,12 +182,12 @@ func TestAccImageResource(t *testing.T) {
 					replaceChecks,
 					getDependencyChecksImage_FromSnapshot(provider.NEW_SUFFIX),
 				)...),
-				ExpectNonEmptyPlan: true,
 			},
 
 			// <== If resource has optional dependencies ==>
 			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testImageConfig_FromVm(provider.BASE_SUFFIX, basePlanValues),
+				Config:             testImageConfig_FromVm(provider.BASE_SUFFIX, basePlanValues),
+				ExpectNonEmptyPlan: true,
 			},
 			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
@@ -223,10 +228,9 @@ resource "numspot_image" "test" {
 }`, data.name, data.sourceImageId, data.tagKey, data.tagValue)
 }
 
+// TODO test availability zone with placement VM directly instead of nested subnet
 func testImageConfig_FromVm(subresourceSuffix string, data StepDataImage) string {
 	return fmt.Sprintf(`
-
-
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
@@ -257,7 +261,7 @@ func testImageConfig_FromSnapshot(subresourceSuffix string, data StepDataImage) 
 resource "numspot_volume" "test" {
   type                   = "standard"
   size                   = 11
-  availability_zone_name = "cloudgouv-eu-west-1a"
+  availability_zone_name = "cloudgouv-eu-west-1b"
 }
 
 resource "numspot_snapshot" "test%[1]s" {

@@ -33,7 +33,7 @@ data "numspot_service_accounts" "testdata" {
 
 ### Optional
 
-- `service_account_name` (String) Service account name
+- `service_account_ids` (Set of String) Service account IDs
 
 ### Read-Only
 

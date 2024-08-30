@@ -40,8 +40,8 @@ func ServiceAccountEditedResponseFromHTTPToTF(ctx context.Context, http numspot.
 	}
 }
 
-func ServiceAccountEditedResponseFromHTTPToTFDataSource(http numspot.ServiceAccountEdited) ServiceAccountModel {
-	return ServiceAccountModel{
+func ServiceAccountEditedResponseFromHTTPToTFDataSource(http numspot.ServiceAccountEdited) ServiceAccountDataSourceModel {
+	return ServiceAccountDataSourceModel{
 		Id:   types.StringValue(http.Id),
 		Name: types.StringValue(http.Name),
 	}

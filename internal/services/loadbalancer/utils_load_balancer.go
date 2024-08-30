@@ -10,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -146,7 +147,19 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *numspot.LoadBalancer) (
 	}, diags
 }
 
-func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadBalancer) (*LoadBalancerModel, diag.Diagnostics) {
+func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadBalancer) (*LoadBalancerModelDatasource, diag.Diagnostics) {
+	var (
+		tagsList types.List
+		diags    diag.Diagnostics
+	)
+
+	if http.Tags != nil {
+		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
 	applicationStickyCookiePoliciestypes, diags := utils2.GenericListToTfListValue(ctx, ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
 	if diags.HasError() {
 		return nil, diags
@@ -184,13 +197,12 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadB
 	subnets, _ := utils2.FromStringListPointerToTfStringList(ctx, http.Subnets)
 	azNames, _ := utils2.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames)
 
-	return &LoadBalancerModel{
+	return &LoadBalancerModelDatasource{
 		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciestypes,
 		BackendIps:                      backendIps,
 		BackendVmIds:                    backendVmIds,
 		DnsName:                         types.StringPointerValue(http.DnsName),
 		HealthCheck:                     healthCheck,
-		Id:                              types.StringPointerValue(http.Name),
 		Listeners:                       listeners,
 		Name:                            types.StringPointerValue(http.Name),
 		VpcId:                           types.StringPointerValue(http.VpcId),
@@ -201,12 +213,17 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadB
 		StickyCookiePolicies:            stickyCookiePolicies,
 		Subnets:                         subnets,
 		AvailabilityZoneNames:           azNames,
-		Type:                            types.StringPointerValue(http.Type),
+		ItemsType:                       types.StringPointerValue(http.Type),
+		Tags:                            tagsList,
 	}, nil
 }
 
 func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *LoadBalancerModel) numspot.CreateLoadBalancerJSONRequestBody {
-	securityGroups := utils2.TfStringListToStringList(ctx, tf.SecurityGroups)
+	var securityGroupsPtr *[]string
+	if !(tf.SecurityGroups.IsNull() || tf.SecurityGroups.IsUnknown()) {
+		securityGroups := utils2.TfStringListToStringList(ctx, tf.SecurityGroups)
+		securityGroupsPtr = &securityGroups
+	}
 	subnets := utils2.TfStringListToStringList(ctx, tf.Subnets)
 	listeners := utils2.TfSetToGenericList(func(a ListenersValue) numspot.ListenerForCreation {
 		return numspot.ListenerForCreation{
@@ -221,7 +238,7 @@ func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *LoadBalancerMode
 		Listeners:      listeners,
 		Name:           tf.Name.ValueString(),
 		PublicIp:       tf.PublicIp.ValueStringPointer(),
-		SecurityGroups: &securityGroups,
+		SecurityGroups: securityGroupsPtr,
 		Subnets:        subnets,
 		Type:           tf.Type.ValueStringPointer(),
 	}

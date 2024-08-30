@@ -78,6 +78,35 @@ func VirtualGatewayFromHttpToTf(ctx context.Context, http *numspot.VirtualGatewa
 	}, diags
 }
 
+func VirtualGatewayDataSourceFromHttpToTf(ctx context.Context, http *numspot.VirtualGateway) (*VirtualGatewayModelItemDataSource, diag.Diagnostics) {
+	var (
+		diags                              diag.Diagnostics
+		tagsTf, vpcToVirtualGatewayLinksTf types.List
+	)
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	if http.VpcToVirtualGatewayLinks != nil {
+		vpcToVirtualGatewayLinksTf, diags = utils.GenericListToTfListValue(ctx, VpcToVirtualGatewayLinksValue{}, VpcToVirtualGatewayLinksFromHttpToTf, *http.VpcToVirtualGatewayLinks)
+		if diags.HasError() {
+			return nil, diags
+		}
+	}
+
+	return &VirtualGatewayModelItemDataSource{
+		ConnectionType:           types.StringPointerValue(http.ConnectionType),
+		Id:                       types.StringPointerValue(http.Id),
+		VpcToVirtualGatewayLinks: vpcToVirtualGatewayLinksTf,
+		State:                    types.StringPointerValue(http.State),
+		Tags:                     tagsTf,
+	}, diags
+}
+
 func VirtualGatewayFromTfToCreateRequest(tf VirtualGatewayModel) numspot.CreateVirtualGatewayJSONRequestBody {
 	return numspot.CreateVirtualGatewayJSONRequestBody{
 		ConnectionType: tf.ConnectionType.ValueString(),

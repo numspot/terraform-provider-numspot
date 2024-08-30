@@ -28,6 +28,7 @@ func SpaceFromHttpToTf(http *numspot.Space) SpaceModel {
 		Id:             types.StringValue(http.Id.String()),
 		Name:           types.StringValue(http.Name),
 		Description:    types.StringValue(http.Description),
+		SpaceId:        types.StringValue(http.Id.String()),
 		OrganisationId: types.StringValue(http.OrganisationId.String()),
 		Status:         types.StringValue(string(http.Status)),
 		CreatedOn:      types.StringValue(http.CreatedOn.String()),
@@ -55,8 +56,8 @@ func RetryReadSpaceUntilReady(ctx context.Context, client *numspot.ClientWithRes
 	return createStateConf.WaitForStateContext(ctx)
 }
 
-func SpaceFromHttpToTfDatasource(ctx context.Context, http *numspot.Space) (*SpaceModel, diag.Diagnostics) {
-	return &SpaceModel{
+func SpaceFromHttpToTfDatasource(ctx context.Context, http *numspot.Space) (*SpaceModelDataSource, diag.Diagnostics) {
+	return &SpaceModelDataSource{
 		Id:             types.StringValue(http.Id.String()),
 		Name:           types.StringValue(http.Name),
 		Description:    types.StringValue(http.Description),

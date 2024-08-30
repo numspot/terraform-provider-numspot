@@ -16,7 +16,7 @@ import (
 func TestAccRolesDatasource(t *testing.T) {
 	pr := provider.TestAccProtoV6ProviderFactories
 
-	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
+	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
@@ -41,7 +41,7 @@ func TestAccRolesDatasource(t *testing.T) {
 func TestAccRolesDatasource_WithFilter(t *testing.T) {
 	pr := provider.TestAccProtoV6ProviderFactories
 
-	spaceID := "68134f98-205b-4de4-8b85-f6a786ef6481"
+	spaceID := "bba8c1df-609f-4775-9638-952d488502e6"
 	name := "kubernetes Viewer"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
