@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
@@ -47,7 +49,19 @@ func (r *SpaceResource) Configure(ctx context.Context, request resource.Configur
 }
 
 func (r *SpaceResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
+	idParts := strings.Split(request.ID, ",")
+
+	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {
+		response.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			fmt.Sprintf("Expected import identifier with format: space_id,service_account_id. Got: %q", request.ID),
+		)
+		return
+	}
+
+	response.Diagnostics.Append(response.State.SetAttribute(ctx, path.Root("organisation_id"), idParts[0])...)
+	// response.Diagnostics.Append(response.State.SetAttribute(ctx, path.Root("id"), idParts[1])...)
+	response.Diagnostics.Append(response.State.SetAttribute(ctx, path.Root("space_id"), idParts[1])...)
 }
 
 func (r *SpaceResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
@@ -94,6 +108,14 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 	}
 
 	tf := SpaceFromHttpToTf(space)
+
+	// Read operation requires organisation_id_id and space_id to be able to fetch data from the API
+	// As the import state operation will take into consideration only one ID attribute,
+	// We have to combine the two attributes in a single ID attribute
+	// Convention for combined ID is: organisation_id, space_id
+	tf.SpaceId = tf.Id
+	tf.Id = types.StringValue(fmt.Sprintf("%s,%s", tf.OrganisationId.ValueString(), tf.Id.ValueString()))
+
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -101,7 +123,7 @@ func (r *SpaceResource) Read(ctx context.Context, request resource.ReadRequest, 
 	var data SpaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	spaceId, err := uuid.Parse(data.Id.ValueString())
+	spaceId, err := uuid.Parse(data.SpaceId.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Invalid space_id", "space_id should be in UUID format")
 		return
@@ -121,6 +143,7 @@ func (r *SpaceResource) Read(ctx context.Context, request resource.ReadRequest, 
 	}
 
 	tf := SpaceFromHttpToTf(res.JSON200)
+	tf.Id = types.StringValue(fmt.Sprintf("%s,%s", tf.OrganisationId.ValueString(), tf.SpaceId.ValueString()))
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
@@ -132,7 +155,7 @@ func (r *SpaceResource) Delete(ctx context.Context, request resource.DeleteReque
 	var data SpaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	spaceId, err := uuid.Parse(data.Id.ValueString())
+	spaceId, err := uuid.Parse(data.SpaceId.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Invalid space_id", "space_id should be in UUID format")
 		return

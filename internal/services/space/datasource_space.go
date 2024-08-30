@@ -55,7 +55,7 @@ func (d *spaceDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest
 
 // Read refreshes the Terraform state with the latest data.
 func (d *spaceDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	var state, plan SpaceModel
+	var state, plan SpaceModelDataSource
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 
 	if response.Diagnostics.HasError() {

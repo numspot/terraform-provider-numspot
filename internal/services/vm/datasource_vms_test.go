@@ -26,11 +26,11 @@ func TestAccVmsDatasource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.numspot_vms.testdata", "items.#", "1"),
 					provider.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vms.testdata", "items.*", map[string]string{
 						"id":       provider.PAIR_PREFIX + "numspot_vm.test.id",
-						"vm_type":  vm_type,
+						"type":     vm_type,
 						"image_id": image_id,
 					}),
 				),
-				ExpectNonEmptyPlan: true,
+				// ExpectNonEmptyPlan: true,
 			},
 		},
 	})
@@ -43,14 +43,15 @@ resource "numspot_vpc" "vpc" {
 }
 
 resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
+  vpc_id                 = numspot_vpc.vpc.id
+  ip_range               = "10.101.1.0/24"
+  availability_zone_name = "cloudgouv-eu-west-1a"
 }
+
 resource "numspot_vm" "test" {
   image_id  = %[1]q
   type      = %[2]q
   subnet_id = numspot_subnet.subnet.id
-
 }
 
 data "numspot_vms" "testdata" {

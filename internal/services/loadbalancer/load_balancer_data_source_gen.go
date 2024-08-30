@@ -46,13 +46,13 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The ID of the Subregion in which the load balancer was created.",
 							MarkdownDescription: "The ID of the Subregion in which the load balancer was created.",
 						},
-						"backend_ips": schema.ListAttribute{
+						"backend_ips": schema.SetAttribute{ // MANUALLY EDITED : use a Set instead of a List
 							ElementType:         types.StringType,
 							Computed:            true,
 							Description:         "One or more public IPs of back-end VMs.",
 							MarkdownDescription: "One or more public IPs of back-end VMs.",
 						},
-						"backend_vm_ids": schema.ListAttribute{
+						"backend_vm_ids": schema.SetAttribute{ // MANUALLY EDITED : use a Set instead of a List
 							ElementType:         types.StringType,
 							Computed:            true,
 							Description:         "One or more IDs of back-end VMs for the load balancer.",
@@ -110,7 +110,7 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "Information about the health check configuration.",
 							MarkdownDescription: "Information about the health check configuration.",
 						},
-						"listeners": schema.ListNestedAttribute{
+						"listeners": schema.SetNestedAttribute{ // MANUALLY EDITED : use a Set instead of a List
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"backend_port": schema.Int64Attribute{
@@ -251,7 +251,26 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
+}
 
+type LoadBalancerModelDatasource struct { // MANUALLY EDITED : Create Model from ItemsValue struct
+	ApplicationStickyCookiePolicies types.List               `tfsdk:"application_sticky_cookie_policies"`
+	AvailabilityZoneNames           types.List               `tfsdk:"availability_zone_names"`
+	BackendIps                      types.Set                `tfsdk:"backend_ips"`    // MANUALLY EDITED : use a Set instead of a List
+	BackendVmIds                    types.Set                `tfsdk:"backend_vm_ids"` // MANUALLY EDITED : use a Set instead of a List
+	DnsName                         types.String             `tfsdk:"dns_name"`
+	HealthCheck                     HealthCheckValue         `tfsdk:"health_check"`
+	Listeners                       types.Set                `tfsdk:"listeners"` // MANUALLY EDITED : use a Set instead of a List
+	Name                            types.String             `tfsdk:"name"`
+	PublicIp                        types.String             `tfsdk:"public_ip"`
+	SecuredCookies                  types.Bool               `tfsdk:"secured_cookies"`
+	SecurityGroups                  types.List               `tfsdk:"security_groups"`
+	SourceSecurityGroup             SourceSecurityGroupValue `tfsdk:"source_security_group"`
+	StickyCookiePolicies            types.List               `tfsdk:"sticky_cookie_policies"`
+	Subnets                         types.List               `tfsdk:"subnets"`
+	Tags                            types.List               `tfsdk:"tags"`
+	ItemsType                       types.String             `tfsdk:"type"`
+	VpcId                           types.String             `tfsdk:"vpc_id"`
 }
 
 // MANUALLY EDITED : Model declaration removed

@@ -23,7 +23,7 @@ func TestAccSpaceDatasource(t *testing.T) {
 			{
 				Config: fetchSpaceConfig(organisationId, name, description),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrPair("data.numspot_space.testdata", "id", "numspot_space.test", "id"),
+					resource.TestCheckResourceAttrPair("data.numspot_space.testdata", "id", "numspot_space.test", "space_id"),
 					resource.TestCheckResourceAttr("data.numspot_space.testdata", "organisation_id", organisationId),
 					resource.TestCheckResourceAttr("data.numspot_space.testdata", "name", name),
 					resource.TestCheckResourceAttr("data.numspot_space.testdata", "description", description),
@@ -42,7 +42,7 @@ resource "numspot_space" "test" {
 }
 
 data "numspot_space" "testdata" {
-  space_id        = numspot_space.test.id
+  space_id        = numspot_space.test.space_id
   organisation_id = numspot_space.test.organisation_id
 }`, organisationId, name, description)
 }

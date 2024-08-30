@@ -34,8 +34,14 @@ func TestAccVirtualGatewaysDatasource(t *testing.T) {
 
 func fetchVirtualGatewayConfig(connection_type string) string {
 	return fmt.Sprintf(`
+
+resource "numspot_vpc" "test" {
+  ip_range = "10.101.0.0/16"
+}
+
 resource "numspot_virtual_gateway" "test" {
   connection_type = %[1]q
+  vpc_id          = numspot_vpc.test.id
 }
 
 data "numspot_virtual_gateways" "testdata" {

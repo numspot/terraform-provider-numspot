@@ -17,17 +17,15 @@ import (
 type StepDataFlexibleGpu struct {
 	modelName,
 	generation,
-	az,
-	deleteOnVMDeletion string
+	az string
 }
 
 // Generate checks to validate that resource 'numspot_flexible_gpu.test' has input data values
 func getFieldMatchChecksFlexibleGpu(data StepDataFlexibleGpu) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "model_name", data.modelName),                     // Check value for all resource attributes
-		resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "generation", data.generation),                    // Check value for all resource attributes
-		resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "availability_zone_name", data.az),                // Check value for all resource attributes
-		resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "delete_on_vm_deletion", data.deleteOnVMDeletion), // Check value for all resource attributes
+		resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "model_name", data.modelName),      // Check value for all resource attributes
+		resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "generation", data.generation),     // Check value for all resource attributes
+		resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "availability_zone_name", data.az), // Check value for all resource attributes
 	}
 }
 
@@ -50,8 +48,6 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 	modelName := "nvidia-a100-80"
 	generation := "v6"
 	az := "cloudgouv-eu-west-1a"
-	deleteOnVMDeletion := "false"
-	deleteOnVMDeletionUpdated := "true"
 
 	// resource fields that cannot be updated in-place (requires replace)
 	// None
@@ -61,10 +57,9 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 	////////////// Define plan values and generate associated attribute checks  //////////////
 	// The base plan (used in first create and to reset resource state before some tests)
 	basePlanValues := StepDataFlexibleGpu{
-		modelName:          modelName,
-		generation:         generation,
-		az:                 az,
-		deleteOnVMDeletion: deleteOnVMDeletion,
+		modelName:  modelName,
+		generation: generation,
+		az:         az,
 	}
 	createChecks := append(
 		getFieldMatchChecksFlexibleGpu(basePlanValues),
@@ -78,10 +73,9 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 
 	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
 	updatePlanValues := StepDataFlexibleGpu{
-		modelName:          modelName,
-		generation:         generation,
-		az:                 az,
-		deleteOnVMDeletion: deleteOnVMDeletionUpdated,
+		modelName:  modelName,
+		generation: generation,
+		az:         az,
 	}
 	updateChecks := append(
 		getFieldMatchChecksFlexibleGpu(updatePlanValues),
@@ -154,19 +148,32 @@ func testFlexibleGpuConfig(subresourceSuffix string, data StepDataFlexibleGpu) s
 	return fmt.Sprintf(`
 
 
+
+
 // <== If resource has dependencies ==> 
+
+resource "numspot_vpc" "net" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "test" {
+  vpc_id                 = numspot_vpc.net.id
+  ip_range               = "10.101.1.0/24"
+  availability_zone_name = %[4]q
+}
+
 resource "numspot_vm" "test%[1]s" {
-  image_id = "ami-0b7df82c"
-  type     = "ns-mus6-2c16r"
+  image_id  = "ami-0b7df82c"
+  type      = "ns-cus6-4c8r"
+  subnet_id = numspot_subnet.test.id
 }
 
 resource "numspot_flexible_gpu" "test" {
   model_name             = %[2]q
   generation             = %[3]q
   availability_zone_name = %[4]q
-  delete_on_vm_deletion  = %[5]q
   vm_id                  = numspot_vm.test%[1]s.id
-}`, subresourceSuffix, data.modelName, data.generation, data.az, data.deleteOnVMDeletion)
+}`, subresourceSuffix, data.modelName, data.generation, data.az)
 }
 
 // <== If resource has optional dependencies ==>
@@ -176,6 +183,5 @@ resource "numspot_flexible_gpu" "test" {
   model_name             = %[1]q
   generation             = %[2]q
   availability_zone_name = %[3]q
-  delete_on_vm_deletion  = %[4]q
-}`, data.modelName, data.generation, data.az, data.deleteOnVMDeletion)
+}`, data.modelName, data.generation, data.az)
 }

@@ -14,14 +14,14 @@ import (
 )
 
 type FlexibleGpuDataSourceModel struct {
-	Items                 []FlexibleGpuModel `tfsdk:"items"`
-	AvailabilityZoneNames types.List         `tfsdk:"availability_zone_names"`
-	DeleteOnVmDeletion    types.Bool         `tfsdk:"delete_on_vm_deletion"`
-	Generations           types.List         `tfsdk:"generations"`
-	Ids                   types.List         `tfsdk:"ids"`
-	ModelNames            types.List         `tfsdk:"model_names"`
-	States                types.List         `tfsdk:"states"`
-	VmIds                 types.List         `tfsdk:"vm_ids"`
+	Items                 []FlexibleGpuModelItemDataSource `tfsdk:"items"`
+	AvailabilityZoneNames types.List                       `tfsdk:"availability_zone_names"`
+	DeleteOnVmDeletion    types.Bool                       `tfsdk:"delete_on_vm_deletion"`
+	Generations           types.List                       `tfsdk:"generations"`
+	Ids                   types.List                       `tfsdk:"ids"`
+	ModelNames            types.List                       `tfsdk:"model_names"`
+	States                types.List                       `tfsdk:"states"`
+	VmIds                 types.List                       `tfsdk:"vm_ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.

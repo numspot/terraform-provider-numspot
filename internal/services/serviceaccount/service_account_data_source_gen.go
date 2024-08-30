@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func ServiceAccountDataSourceSchema(ctx context.Context) schema.Schema {
@@ -31,15 +32,19 @@ func ServiceAccountDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Space ID",
 				MarkdownDescription: "Space ID",
 			},
-			"service_account_name": schema.StringAttribute{
+			"service_account_ids": schema.SetAttribute{
+				ElementType:         types.StringType,
 				Optional:            true,
-				Description:         "Service account name",
-				MarkdownDescription: "Service account name",
+				Description:         "Service account IDs",
+				MarkdownDescription: "Service account IDs",
 			},
 		},
 	}
 }
 
-// MANUALLY EDITED : Model declaration removed
+type ServiceAccountDataSourceModel struct {
+	Id   types.String `tfsdk:"id"`
+	Name types.String `tfsdk:"name"`
+}
 
 // MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

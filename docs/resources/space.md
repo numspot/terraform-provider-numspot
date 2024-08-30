@@ -27,11 +27,12 @@ resource "numspot_space" "test" {
 
 - `description` (String) Space description
 - `name` (String) Space name
-- `organisation_id` (String) Space description
+- `organisation_id` (String) Organisation ID
 
 ### Read-Only
 
 - `created_on` (String) Space creation date.
 - `id` (String) The ID of the space.
+- `space_id` (String) Space ID
 - `status` (String) status of the space, the space can only be used when the status is ready. Enum: "QUEUED" "RUNNING" "READY" "FAILED"
 - `updated_on` (String) Space last update.

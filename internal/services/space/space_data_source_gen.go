@@ -5,6 +5,8 @@ package space
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/types"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
 
@@ -53,6 +55,17 @@ func SpaceDataSourceSchema(ctx context.Context) schema.Schema {
 			},
 		},
 	}
+}
+
+type SpaceModelDataSource struct {
+	CreatedOn      types.String `tfsdk:"created_on"`
+	Description    types.String `tfsdk:"description"`
+	Id             types.String `tfsdk:"id"`
+	Name           types.String `tfsdk:"name"`
+	OrganisationId types.String `tfsdk:"organisation_id"`
+	SpaceId        types.String `tfsdk:"space_id"`
+	Status         types.String `tfsdk:"status"`
+	UpdatedOn      types.String `tfsdk:"updated_on"`
 }
 
 // MANUALLY EDITED : Model declaration removed

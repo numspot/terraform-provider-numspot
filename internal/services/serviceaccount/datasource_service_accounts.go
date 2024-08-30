@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
@@ -15,9 +16,9 @@ import (
 )
 
 type ServiceAccountsDataSourceModel struct {
-	Items              []ServiceAccountModel `tfsdk:"items"`
-	SpaceID            types.String          `tfsdk:"space_id"`
-	ServiceAccountName types.String          `tfsdk:"service_account_name"`
+	Items             []ServiceAccountDataSourceModel `tfsdk:"items"`
+	SpaceID           types.String                    `tfsdk:"space_id"`
+	ServiceAccountIDs types.Set                       `tfsdk:"service_account_ids"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -75,27 +76,47 @@ func (d *serviceAccountsDataSource) Read(ctx context.Context, request datasource
 		return
 	}
 
-	serviceAccounts := []ServiceAccountModel{}
-	params := ServiceAccountsFromTfToAPIReadParams(plan)
-	d.fetchPaginatedServiceAccounts(ctx, spaceId, &params, &serviceAccounts, response)
+	serviceAccounts := []ServiceAccountDataSourceModel{}
+	d.fetchPaginatedServiceAccounts(ctx, spaceId, &plan, &serviceAccounts, response)
 
 	state.Items = serviceAccounts
 	state.SpaceID = plan.SpaceID
-	state.ServiceAccountName = plan.ServiceAccountName
+	state.ServiceAccountIDs = plan.ServiceAccountIDs
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func getServiceAccountIDs(ctx context.Context, tfIDs types.Set) ([]openapi_types.UUID, error) {
+	strIDs := make([]string, len(tfIDs.Elements()))
+	uuids := make([]openapi_types.UUID, len(tfIDs.Elements()))
+	tfIDs.ElementsAs(ctx, &strIDs, false)
+	for i := range strIDs {
+		svcAccUUID, err := uuid.Parse(strIDs[i])
+		if err != nil {
+			return nil, err
+		}
+		uuids[i] = svcAccUUID
+	}
+	return uuids, nil
 }
 
 func (d *serviceAccountsDataSource) fetchPaginatedServiceAccounts(
 	ctx context.Context,
 	spaceID uuid.UUID,
-	requestParams *numspot.ListServiceAccountSpaceParams,
-	svcAccountsHolder *[]ServiceAccountModel,
+	plan *ServiceAccountsDataSourceModel,
+	svcAccountsHolder *[]ServiceAccountDataSourceModel,
 	response *datasource.ReadResponse,
 ) {
-	body := numspot.ListServiceAccountSpaceJSONRequestBody{}
+	svcAccountIDs, err := getServiceAccountIDs(ctx, plan.ServiceAccountIDs)
+	if err != nil {
+		response.Diagnostics.AddError("failed to deserialize service accounts IDs", err.Error())
+		return
+	}
+	body := numspot.ListServiceAccountSpaceJSONRequestBody{Items: svcAccountIDs}
+	params := ServiceAccountsFromTfToAPIReadParams(*plan)
+
 	res := utils.ExecuteRequest(func() (*numspot.ListServiceAccountSpaceResponse, error) {
-		return d.provider.GetNumspotClient().ListServiceAccountSpaceWithResponse(ctx, spaceID, requestParams, body)
+		return d.provider.GetNumspotClient().ListServiceAccountSpaceWithResponse(ctx, spaceID, &params, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -110,8 +131,8 @@ func (d *serviceAccountsDataSource) fetchPaginatedServiceAccounts(
 	}
 
 	if res.JSON200.NextPageToken != nil {
-		requestParams.Page = new(numspot.ListServiceAccounts)
-		requestParams.Page.NextToken = res.JSON200.NextPageToken
-		d.fetchPaginatedServiceAccounts(ctx, spaceID, requestParams, svcAccountsHolder, response)
+		params.Page = new(numspot.ListServiceAccounts)
+		params.Page.NextToken = res.JSON200.NextPageToken
+		d.fetchPaginatedServiceAccounts(ctx, spaceID, plan, svcAccountsHolder, response)
 	}
 }

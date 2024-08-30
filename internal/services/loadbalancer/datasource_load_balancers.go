@@ -14,8 +14,8 @@ import (
 )
 
 type loadBalancersDataSourceModel struct {
-	Items             []LoadBalancerModel `tfsdk:"items"`
-	LoadBalancerNames types.List          `tfsdk:"load_balancer_names"`
+	Items             []LoadBalancerModelDatasource `tfsdk:"items"`
+	LoadBalancerNames types.List                    `tfsdk:"load_balancer_names"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.

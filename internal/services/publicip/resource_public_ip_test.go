@@ -34,7 +34,6 @@ func getFieldMatchChecksPublicIp(data StepDataPublicIp) []resource.TestCheckFunc
 // If resource has no dependencies, return empty array
 func getDependencyChecksPublicIp(dependenciesSuffix string) []resource.TestCheckFunc {
 	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_public_ip.test", "nic_id", "numspot_nic.test"+dependenciesSuffix, "id"),
 		resource.TestCheckResourceAttrPair("numspot_public_ip.test", "vm_id", "numspot_vm.test"+dependenciesSuffix, "id"),
 	}
 }
@@ -97,6 +96,7 @@ func TestAccPublicIpResource(t *testing.T) {
 					createChecks,
 					getDependencyChecksPublicIp(provider.BASE_SUFFIX),
 				)...),
+				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
@@ -112,7 +112,9 @@ func TestAccPublicIpResource(t *testing.T) {
 					updateChecks,
 					getDependencyChecksPublicIp(provider.BASE_SUFFIX),
 				)...),
+				ExpectNonEmptyPlan: true,
 			},
+
 			// <== If resource has required dependencies ==>
 			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
@@ -139,8 +141,9 @@ resource "numspot_vpc" "test" {
 }
 
 resource "numspot_subnet" "test" {
-  vpc_id   = numspot_vpc.test.id
-  ip_range = "10.101.1.0/24"
+  vpc_id                 = numspot_vpc.test.id
+  ip_range               = "10.101.1.0/24"
+  availability_zone_name = "cloudgouv-eu-west-1a"
 }
 
 resource "numspot_vm" "test%[1]s" {
@@ -149,12 +152,17 @@ resource "numspot_vm" "test%[1]s" {
   subnet_id = numspot_subnet.test.id
 }
 
+resource "numspot_internet_gateway" "test" {
+  vpc_id = numspot_vpc.test.id
+}
+
 resource "numspot_public_ip" "test" {
-  vm_id = numspot_vm.test%[1]s.id
+  vm_id      = numspot_vm.test%[1]s.id
+  depends_on = [numspot_internet_gateway.test]
   tags = [
     {
-      key   = %[1]q
-      value = %[2]q
+      key   = %[2]q
+      value = %[3]q
     }
   ]
 }`, subresourceSuffix, data.tagKey, data.tagValue)

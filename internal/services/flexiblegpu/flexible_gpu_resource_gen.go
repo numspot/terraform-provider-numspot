@@ -19,8 +19,7 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The Subregion in which you want to create the fGPU.",
 			},
 			"delete_on_vm_deletion": schema.BoolAttribute{
-				Optional:            true,
-				Computed:            true,
+				Computed:            true, // MANUALLY EDITED : Set it as readonly as it does not make sense to use it with terraform
 				Description:         "If true, the fGPU is deleted when the VM is terminated.",
 				MarkdownDescription: "If true, the fGPU is deleted when the VM is terminated.",
 				Default:             booldefault.StaticBool(false),
@@ -54,6 +53,7 @@ func FlexibleGpuResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"vm_id": schema.StringAttribute{
 				Computed:            true,
+				Optional:            true, // MANUALLY EDITED : Set field editable
 				Description:         "The ID of the VM the fGPU is attached to, if any.",
 				MarkdownDescription: "The ID of the VM the fGPU is attached to, if any.",
 			},

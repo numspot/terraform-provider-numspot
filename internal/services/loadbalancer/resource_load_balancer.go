@@ -314,6 +314,7 @@ func (r *LoadBalancerResource) shouldUpdate(state, plan LoadBalancerModel) bool 
 	return shouldUpdate
 }
 
+// Outscale only allows one update at a time for loadbalancer (don't ask why), so we call the update function multiple time
 func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var plan, state LoadBalancerModel
 

@@ -35,11 +35,16 @@ func SpaceResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"organisation_id": schema.StringAttribute{
 				Required:            true,
-				Description:         "Space description",
-				MarkdownDescription: "Space description",
+				Description:         "Organisation ID",
+				MarkdownDescription: "Organisation ID",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
+			},
+			"space_id": schema.StringAttribute{
+				Computed:            true,
+				Description:         "Space ID",
+				MarkdownDescription: "Space ID",
 			},
 			"status": schema.StringAttribute{
 				Computed:            true,

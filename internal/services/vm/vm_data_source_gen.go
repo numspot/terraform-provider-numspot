@@ -4,6 +4,13 @@ package vm
 
 import (
 	"context"
+	"fmt"
+	"strings"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -20,6 +27,11 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The architectures of the VMs (`i386` \\| `x86_64`).",
 				MarkdownDescription: "The architectures of the VMs (`i386` \\| `x86_64`).",
 			},
+			//"creation_date": schema.StringAttribute{
+			//	Computed:            true,
+			//	Description:         "The date and time of creation of the VM.",
+			//	MarkdownDescription: "The date and time of creation of the VM.",
+			//},
 			"availability_zone_names": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
@@ -115,9 +127,9 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 												MarkdownDescription: "The ID of the volume.",
 											},
 										},
-										CustomType: BsuType{
+										CustomType: BsuDataSourceType{
 											ObjectType: types.ObjectType{
-												AttrTypes: BsuValue{}.AttributeTypes(ctx),
+												AttrTypes: BsuDataSourceValue{}.AttributeTypes(ctx),
 											},
 										},
 										Computed:            true,
@@ -130,9 +142,9 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 										MarkdownDescription: "The name of the device.",
 									},
 								},
-								CustomType: BlockDeviceMappingsType{
+								CustomType: BlockDeviceMappingsDataSourceType{
 									ObjectType: types.ObjectType{
-										AttrTypes: BlockDeviceMappingsValue{}.AttributeTypes(ctx),
+										AttrTypes: BlockDeviceMappingsDataSourceValue{}.AttributeTypes(ctx),
 									},
 								},
 							},
@@ -849,6 +861,1002 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
+type VmsDataSourceModel struct {
+	Items                                []VmModelItemDataSource `tfsdk:"items"`
+	Architectures                        types.List              `tfsdk:"architectures"`
+	AvailabilityZoneNames                types.List              `tfsdk:"availability_zone_names"`
+	BlockDeviceMappingDeleteOnVmDeletion types.Bool              `tfsdk:"block_device_mapping_delete_on_vm_deletion"`
+	BlockDeviceMappingDeviceNames        types.List              `tfsdk:"block_device_mapping_device_names"`
+	BlockDeviceMappingsDataSourcetates   types.List              `tfsdk:"block_device_mapping_states"`
+	BlockDeviceMappingVolumeIds          types.List              `tfsdk:"block_device_mapping_volume_ids"`
+	ClientTokens                         types.List              `tfsdk:"client_tokens"`
+	Ids                                  types.List              `tfsdk:"ids"`
+	ImageIds                             types.List              `tfsdk:"image_ids"`
+	IsSourceDestChecked                  types.Bool              `tfsdk:"is_source_dest_checked"`
+	KeypairNames                         types.List              `tfsdk:"keypair_names"`
+	LaunchNumbers                        types.List              `tfsdk:"launch_numbers"`
+	Lifecycles                           types.List              `tfsdk:"lifecycles"`
+	NicAvailabilityZoneNames             types.List              `tfsdk:"nic_availability_zone_names"`
+	NicDescriptions                      types.List              `tfsdk:"nic_descriptions"`
+	NicIsSourceDestChecked               types.Bool              `tfsdk:"nic_is_source_dest_checked"`
+	NicLinkNicDeleteOnVmDeletion         types.Bool              `tfsdk:"nic_link_nic_delete_on_vm_deletion"`
+	NicLinkNicDeviceNumbers              types.List              `tfsdk:"nic_link_nic_device_numbers"`
+	NicLinkNicLinkNicIds                 types.List              `tfsdk:"nic_link_nic_link_nic_ids"`
+	NicLinkNicStates                     types.List              `tfsdk:"nic_link_nic_states"`
+	NicLinkNicVmIds                      types.List              `tfsdk:"nic_link_nic_vm_ids"`
+	NicLinkPublicIpLinkPublicIpIds       types.List              `tfsdk:"nic_link_public_ip_link_public_ip_ids"`
+	NicLinkPublicIpPublicIpIds           types.List              `tfsdk:"nic_link_public_ip_public_ip_ids"`
+	NicLinkPublicIpPublicIps             types.List              `tfsdk:"nic_link_public_ip_public_ips"`
+	NicMacAddresses                      types.List              `tfsdk:"nic_mac_addresses"`
+	NicNicIds                            types.List              `tfsdk:"nic_nic_ids"`
+	NicPrivateIpsLinkPublicIpIds         types.List              `tfsdk:"nic_private_ips_link_public_ip_ids"`
+	NicPrivateIpsPrimaryIp               types.Bool              `tfsdk:"nic_private_ips_primary_ip"`
+	NicPrivateIpsPrivateIps              types.List              `tfsdk:"nic_private_ips_private_ips"`
+	NicSecurityGroupIds                  types.List              `tfsdk:"nic_security_group_ids"`
+	NicSecurityGroupNames                types.List              `tfsdk:"nic_security_group_names"`
+	NicStates                            types.List              `tfsdk:"nic_states"`
+	NicSubnetIds                         types.List              `tfsdk:"nic_subnet_ids"`
+	NicVpcIds                            types.List              `tfsdk:"nic_vpc_ids"`
+	Platforms                            types.List              `tfsdk:"platforms"`
+	PrivateIps                           types.List              `tfsdk:"private_ips"`
+	ProductCodes                         types.List              `tfsdk:"product_codes"`
+	PublicIps                            types.List              `tfsdk:"public_ips"`
+	ReservationIds                       types.List              `tfsdk:"reservation_ids"`
+	RootDeviceNames                      types.List              `tfsdk:"root_device_names"`
+	RootDeviceTypes                      types.List              `tfsdk:"root_device_types"`
+	SecurityGroupIds                     types.List              `tfsdk:"security_group_ids"`
+	SecurityGroupNames                   types.List              `tfsdk:"security_group_names"`
+	//SpaceId                              types.String `tfsdk:"space_id"`
+	StateReasonCodes     types.List `tfsdk:"state_reason_codes"`
+	StateReasonMessages  types.List `tfsdk:"state_reason_messages"`
+	StateReasons         types.List `tfsdk:"state_reasons"`
+	SubnetIds            types.List `tfsdk:"subnet_ids"`
+	TagKeys              types.List `tfsdk:"tag_keys"`
+	TagValues            types.List `tfsdk:"tag_values"`
+	Tags                 types.List `tfsdk:"tags"`
+	Tenancies            types.List `tfsdk:"tenancies"`
+	Types                types.List `tfsdk:"types"`
+	VmSecurityGroupIds   types.List `tfsdk:"vm_security_group_ids"`
+	VmSecurityGroupNames types.List `tfsdk:"vm_security_group_names"`
+	VmStateCodes         types.List `tfsdk:"vm_state_codes"`
+	VmStateNames         types.List `tfsdk:"vm_state_names"`
+	VpcIds               types.List `tfsdk:"vpc_ids"`
+}
+
+type VmModelItemDataSource struct {
+	Architecture                  types.String `tfsdk:"architecture"`
+	BlockDeviceMappingsDataSource types.List   `tfsdk:"block_device_mappings"`
+	BsuOptimized                  types.Bool   `tfsdk:"bsu_optimized"`
+	Performance                   types.String `tfsdk:"performance"`
+	ClientToken                   types.String `tfsdk:"client_token"`
+	CreationDate                  types.String `tfsdk:"creation_date"`
+	DeletionProtection            types.Bool   `tfsdk:"deletion_protection"`
+	Hypervisor                    types.String `tfsdk:"hypervisor"`
+	Id                            types.String `tfsdk:"id"`
+	ImageId                       types.String `tfsdk:"image_id"`
+	InitiatedShutdownBehavior     types.String `tfsdk:"initiated_shutdown_behavior"`
+	IsSourceDestChecked           types.Bool   `tfsdk:"is_source_dest_checked"`
+	KeypairName                   types.String `tfsdk:"keypair_name"`
+	LaunchNumber                  types.Int64  `tfsdk:"launch_number"`
+	//MaxVmsCount               types.Int64    `tfsdk:"max_vms_count"`
+	//MinVmsCount               types.Int64    `tfsdk:"min_vms_count"`
+	NestedVirtualization types.Bool     `tfsdk:"nested_virtualization"`
+	Nics                 types.List     `tfsdk:"nics"`
+	OsFamily             types.String   `tfsdk:"os_family"`
+	Placement            PlacementValue `tfsdk:"placement"`
+	PrivateDnsName       types.String   `tfsdk:"private_dns_name"`
+	PrivateIp            types.String   `tfsdk:"private_ip"`
+	//PrivateIps           types.List     `tfsdk:"private_ips"`
+	ProductCodes   types.List   `tfsdk:"product_codes"`
+	PublicDnsName  types.String `tfsdk:"public_dns_name"`
+	PublicIp       types.String `tfsdk:"public_ip"`
+	ReservationId  types.String `tfsdk:"reservation_id"`
+	RootDeviceName types.String `tfsdk:"root_device_name"`
+	RootDeviceType types.String `tfsdk:"root_device_type"`
+	//SecurityGroupIds     types.List     `tfsdk:"security_group_ids"`
+	SecurityGroups types.List `tfsdk:"security_groups"`
+	//SpaceId                     types.String   `tfsdk:"space_id"`
+	State       types.String `tfsdk:"state"`
+	StateReason types.String `tfsdk:"state_reason"`
+	SubnetId    types.String `tfsdk:"subnet_id"`
+	Tags        types.List   `tfsdk:"tags"`
+	Type        types.String `tfsdk:"type"`
+	UserData    types.String `tfsdk:"user_data"`
+	//VmInitiatedShutdownBehavior types.String `tfsdk:"vm_initiated_shutdown_behavior"`
+	VpcId types.String `tfsdk:"vpc_id"`
+}
+
 // MANUALLY EDITED : Model declaration removed
 
 // MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed
+
+var _ basetypes.ObjectTypable = BlockDeviceMappingsDataSourceType{}
+
+type BlockDeviceMappingsDataSourceType struct {
+	basetypes.ObjectType
+}
+
+func (t BlockDeviceMappingsDataSourceType) Equal(o attr.Type) bool {
+	other, ok := o.(BlockDeviceMappingsDataSourceType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t BlockDeviceMappingsDataSourceType) String() string {
+	return "BlockDeviceMappingsDataSourceType"
+}
+
+func (t BlockDeviceMappingsDataSourceType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	bsuAttribute, ok := attributes["bsu"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`bsu is missing from object`)
+
+		return nil, diags
+	}
+
+	bsuVal, ok := bsuAttribute.(basetypes.ObjectValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`bsu expected to be basetypes.ObjectValue, was: %T`, bsuAttribute))
+	}
+
+	deviceNameAttribute, ok := attributes["device_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`device_name is missing from object`)
+
+		return nil, diags
+	}
+
+	deviceNameVal, ok := deviceNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`device_name expected to be basetypes.StringValue, was: %T`, deviceNameAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return BlockDeviceMappingsDataSourceValue{
+		Bsu:        bsuVal,
+		DeviceName: deviceNameVal,
+		state:      attr.ValueStateKnown,
+	}, diags
+}
+
+func NewBlockDeviceMappingsDataSourceValueNull() BlockDeviceMappingsDataSourceValue {
+	return BlockDeviceMappingsDataSourceValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewBlockDeviceMappingsDataSourceValueUnknown() BlockDeviceMappingsDataSourceValue {
+	return BlockDeviceMappingsDataSourceValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewBlockDeviceMappingsDataSourceValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (BlockDeviceMappingsDataSourceValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing BlockDeviceMappingsDataSourceValue Attribute Value",
+				"While creating a BlockDeviceMappingsDataSourceValue value, a missing attribute value was detected. "+
+					"A BlockDeviceMappingsDataSourceValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("BlockDeviceMappingsDataSourceValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid BlockDeviceMappingsDataSourceValue Attribute Type",
+				"While creating a BlockDeviceMappingsDataSourceValue value, an invalid attribute value was detected. "+
+					"A BlockDeviceMappingsDataSourceValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("BlockDeviceMappingsDataSourceValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("BlockDeviceMappingsDataSourceValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra BlockDeviceMappingsDataSourceValue Attribute Value",
+				"While creating a BlockDeviceMappingsDataSourceValue value, an extra attribute value was detected. "+
+					"A BlockDeviceMappingsDataSourceValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra BlockDeviceMappingsDataSourceValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewBlockDeviceMappingsDataSourceValueUnknown(), diags
+	}
+
+	bsuAttribute, ok := attributes["bsu"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`bsu is missing from object`)
+
+		return NewBlockDeviceMappingsDataSourceValueUnknown(), diags
+	}
+
+	bsuVal, ok := bsuAttribute.(basetypes.ObjectValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`bsu expected to be basetypes.ObjectValue, was: %T`, bsuAttribute))
+	}
+
+	deviceNameAttribute, ok := attributes["device_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`device_name is missing from object`)
+
+		return NewBlockDeviceMappingsDataSourceValueUnknown(), diags
+	}
+
+	deviceNameVal, ok := deviceNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`device_name expected to be basetypes.StringValue, was: %T`, deviceNameAttribute))
+	}
+
+	return BlockDeviceMappingsDataSourceValue{
+		Bsu:        bsuVal,
+		DeviceName: deviceNameVal,
+		state:      attr.ValueStateKnown,
+	}, diags
+}
+
+func NewBlockDeviceMappingsDataSourceValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) BlockDeviceMappingsDataSourceValue {
+	object, diags := NewBlockDeviceMappingsDataSourceValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewBlockDeviceMappingsDataSourceValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t BlockDeviceMappingsDataSourceType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewBlockDeviceMappingsDataSourceValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewBlockDeviceMappingsDataSourceValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewBlockDeviceMappingsDataSourceValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewBlockDeviceMappingsDataSourceValueMust(BlockDeviceMappingsDataSourceValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t BlockDeviceMappingsDataSourceType) ValueType(ctx context.Context) attr.Value {
+	return BlockDeviceMappingsDataSourceValue{}
+}
+
+var _ basetypes.ObjectValuable = BlockDeviceMappingsDataSourceValue{}
+
+type BlockDeviceMappingsDataSourceValue struct {
+	Bsu        basetypes.ObjectValue `tfsdk:"bsu"`
+	DeviceName basetypes.StringValue `tfsdk:"device_name"`
+	state      attr.ValueState
+}
+
+func (v BlockDeviceMappingsDataSourceValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 4)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["bsu"] = basetypes.ObjectType{
+		AttrTypes: BsuDataSourceValue{}.AttributeTypes(ctx),
+	}.TerraformType(ctx)
+	attrTypes["device_name"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 4)
+
+		val, err = v.Bsu.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["bsu"] = val
+
+		val, err = v.DeviceName.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["device_name"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v BlockDeviceMappingsDataSourceValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v BlockDeviceMappingsDataSourceValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v BlockDeviceMappingsDataSourceValue) String() string {
+	return "BlockDeviceMappingsDataSourceValue"
+}
+
+func (v BlockDeviceMappingsDataSourceValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	var bsu basetypes.ObjectValue
+
+	if v.Bsu.IsNull() {
+		bsu = types.ObjectNull(
+			BsuDataSourceValue{}.AttributeTypes(ctx),
+		)
+	}
+
+	if v.Bsu.IsUnknown() {
+		bsu = types.ObjectUnknown(
+			BsuDataSourceValue{}.AttributeTypes(ctx),
+		)
+	}
+
+	if !v.Bsu.IsNull() && !v.Bsu.IsUnknown() {
+		bsu = types.ObjectValueMust(
+			BsuDataSourceValue{}.AttributeTypes(ctx),
+			v.Bsu.Attributes(),
+		)
+	}
+
+	attributeTypes := map[string]attr.Type{
+		"bsu": basetypes.ObjectType{
+			AttrTypes: BsuDataSourceValue{}.AttributeTypes(ctx),
+		},
+		"device_name": basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"bsu":         bsu,
+			"device_name": v.DeviceName,
+		})
+
+	return objVal, diags
+}
+
+func (v BlockDeviceMappingsDataSourceValue) Equal(o attr.Value) bool {
+	other, ok := o.(BlockDeviceMappingsDataSourceValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Bsu.Equal(other.Bsu) {
+		return false
+	}
+
+	if !v.DeviceName.Equal(other.DeviceName) {
+		return false
+	}
+
+	return true
+}
+
+func (v BlockDeviceMappingsDataSourceValue) Type(ctx context.Context) attr.Type {
+	return BlockDeviceMappingsDataSourceType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v BlockDeviceMappingsDataSourceValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"bsu": basetypes.ObjectType{
+			AttrTypes: BsuDataSourceValue{}.AttributeTypes(ctx),
+		},
+		"device_name": basetypes.StringType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = BsuDataSourceType{}
+
+type BsuDataSourceType struct {
+	basetypes.ObjectType
+}
+
+func (t BsuDataSourceType) Equal(o attr.Type) bool {
+	other, ok := o.(BsuDataSourceType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t BsuDataSourceType) String() string {
+	return "BsuDataSourceType"
+}
+
+func (t BsuDataSourceType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	deleteOnVmDeletionAttribute, ok := attributes["delete_on_vm_deletion"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`delete_on_vm_deletion is missing from object`)
+
+		return nil, diags
+	}
+
+	deleteOnVmDeletionVal, ok := deleteOnVmDeletionAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`delete_on_vm_deletion expected to be basetypes.BoolValue, was: %T`, deleteOnVmDeletionAttribute))
+	}
+
+	linkDateAttribute, ok := attributes["link_date"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`link_date is missing from object`)
+
+		return nil, diags
+	}
+
+	linkDateVal, ok := linkDateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`link_date expected to be basetypes.StringValue, was: %T`, linkDateAttribute))
+	}
+
+	stateAttribute, ok := attributes["state"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`state is missing from object`)
+
+		return nil, diags
+	}
+
+	stateVal, ok := stateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
+	}
+
+	volumeIdAttribute, ok := attributes["volume_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`volume_id is missing from object`)
+
+		return nil, diags
+	}
+
+	volumeIdVal, ok := volumeIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`volume_id expected to be basetypes.StringValue, was: %T`, volumeIdAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return BsuDataSourceValue{
+		DeleteOnVmDeletion: deleteOnVmDeletionVal,
+		LinkDate:           linkDateVal,
+		State:              stateVal,
+		VolumeId:           volumeIdVal,
+		state:              attr.ValueStateKnown,
+	}, diags
+}
+
+func NewBsuDataSourceValueNull() BsuDataSourceValue {
+	return BsuDataSourceValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewBsuDataSourceValueUnknown() BsuDataSourceValue {
+	return BsuDataSourceValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewBsuDataSourceValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (BsuDataSourceValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing BsuDataSourceValue Attribute Value",
+				"While creating a BsuDataSourceValue value, a missing attribute value was detected. "+
+					"A BsuDataSourceValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("BsuDataSourceValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid BsuDataSourceValue Attribute Type",
+				"While creating a BsuDataSourceValue value, an invalid attribute value was detected. "+
+					"A BsuDataSourceValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("BsuDataSourceValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("BsuDataSourceValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra BsuDataSourceValue Attribute Value",
+				"While creating a BsuDataSourceValue value, an extra attribute value was detected. "+
+					"A BsuDataSourceValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra BsuDataSourceValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewBsuDataSourceValueUnknown(), diags
+	}
+
+	deleteOnVmDeletionAttribute, ok := attributes["delete_on_vm_deletion"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`delete_on_vm_deletion is missing from object`)
+
+		return NewBsuDataSourceValueUnknown(), diags
+	}
+
+	deleteOnVmDeletionVal, ok := deleteOnVmDeletionAttribute.(basetypes.BoolValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`delete_on_vm_deletion expected to be basetypes.BoolValue, was: %T`, deleteOnVmDeletionAttribute))
+	}
+
+	linkDateAttribute, ok := attributes["link_date"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`link_date is missing from object`)
+
+		return NewBsuDataSourceValueUnknown(), diags
+	}
+
+	linkDateVal, ok := linkDateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`link_date expected to be basetypes.StringValue, was: %T`, linkDateAttribute))
+	}
+
+	stateAttribute, ok := attributes["state"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`state is missing from object`)
+
+		return NewBsuDataSourceValueUnknown(), diags
+	}
+
+	stateVal, ok := stateAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
+	}
+
+	volumeIdAttribute, ok := attributes["volume_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`volume_id is missing from object`)
+
+		return NewBsuDataSourceValueUnknown(), diags
+	}
+
+	volumeIdVal, ok := volumeIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`volume_id expected to be basetypes.StringValue, was: %T`, volumeIdAttribute))
+	}
+
+	if diags.HasError() {
+		return NewBsuDataSourceValueUnknown(), diags
+	}
+
+	return BsuDataSourceValue{
+		DeleteOnVmDeletion: deleteOnVmDeletionVal,
+		LinkDate:           linkDateVal,
+		State:              stateVal,
+		VolumeId:           volumeIdVal,
+		state:              attr.ValueStateKnown,
+	}, diags
+}
+
+func NewBsuDataSourceValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) BsuDataSourceValue {
+	object, diags := NewBsuDataSourceValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewBsuDataSourceValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t BsuDataSourceType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewBsuDataSourceValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewBsuDataSourceValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewBsuDataSourceValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewBsuDataSourceValueMust(BsuDataSourceValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t BsuDataSourceType) ValueType(ctx context.Context) attr.Value {
+	return BsuDataSourceValue{}
+}
+
+var _ basetypes.ObjectValuable = BsuDataSourceValue{}
+
+type BsuDataSourceValue struct {
+	DeleteOnVmDeletion basetypes.BoolValue   `tfsdk:"delete_on_vm_deletion"`
+	LinkDate           basetypes.StringValue `tfsdk:"link_date"`
+	State              basetypes.StringValue `tfsdk:"state"`
+	VolumeId           basetypes.StringValue `tfsdk:"volume_id"`
+	state              attr.ValueState
+}
+
+func (v BsuDataSourceValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 4)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["delete_on_vm_deletion"] = basetypes.BoolType{}.TerraformType(ctx)
+	attrTypes["link_date"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["volume_id"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 4)
+
+		val, err = v.DeleteOnVmDeletion.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["delete_on_vm_deletion"] = val
+
+		val, err = v.LinkDate.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["link_date"] = val
+
+		val, err = v.State.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["state"] = val
+
+		val, err = v.VolumeId.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["volume_id"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v BsuDataSourceValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v BsuDataSourceValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v BsuDataSourceValue) String() string {
+	return "BsuDataSourceValue"
+}
+
+func (v BsuDataSourceValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"delete_on_vm_deletion": basetypes.BoolType{},
+		"link_date":             basetypes.StringType{},
+		"state":                 basetypes.StringType{},
+		"volume_id":             basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"delete_on_vm_deletion": v.DeleteOnVmDeletion,
+			"link_date":             v.LinkDate,
+			"state":                 v.State,
+			"volume_id":             v.VolumeId,
+		})
+
+	return objVal, diags
+}
+
+func (v BsuDataSourceValue) Equal(o attr.Value) bool {
+	other, ok := o.(BsuDataSourceValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.DeleteOnVmDeletion.Equal(other.DeleteOnVmDeletion) {
+		return false
+	}
+
+	if !v.LinkDate.Equal(other.LinkDate) {
+		return false
+	}
+
+	if !v.State.Equal(other.State) {
+		return false
+	}
+
+	if !v.VolumeId.Equal(other.VolumeId) {
+		return false
+	}
+
+	return true
+}
+
+func (v BsuDataSourceValue) Type(ctx context.Context) attr.Type {
+	return BsuDataSourceType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v BsuDataSourceValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"delete_on_vm_deletion": basetypes.BoolType{},
+		"link_date":             basetypes.StringType{},
+		"state":                 basetypes.StringType{},
+		"volume_id":             basetypes.StringType{},
+	}
+}

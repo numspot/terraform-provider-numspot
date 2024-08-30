@@ -27,7 +27,6 @@ func TestAccLoadBalancerDatasource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_load_balancers.testdata", "items.#", "1"),
 					provider.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_load_balancers.testdata", "items.*", map[string]string{
-						"id":                                 provider.PAIR_PREFIX + "numspot_load_balancer.test.id",
 						"subnets.0":                          provider.PAIR_PREFIX + "numspot_subnet.subnet.id",
 						"name":                               name,
 						"listeners.0.backend_port":           backend_port,

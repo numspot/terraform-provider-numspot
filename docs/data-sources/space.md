@@ -20,7 +20,7 @@ resource "numspot_space" "test" {
 }
 
 data "numspot_space" "testdata" {
-  space_id        = numspot_space.test.id
+  space_id        = numspot_space.test.space_id
   organisation_id = numspot_space.test.organisation_id
 }
 
