@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -28,6 +28,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Attributes: map[string]schema.Attribute{
 					"is_public": schema.BoolAttribute{
 						Computed:            true,
+						Optional:            true, // MANUALLY EDITED : set access field editable
 						Description:         "A global permission for all accounts.<br />\n(Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).<br />\n(Response) If true, the resource is public. If false, the resource is private.",
 						MarkdownDescription: "A global permission for all accounts.<br />\n(Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).<br />\n(Response) If true, the resource is public. If false, the resource is private.",
 					},
@@ -38,6 +39,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
+				Optional:            true, // MANUALLY EDITED : set access field editable
 				Description:         "Permissions for the resource.",
 				MarkdownDescription: "Permissions for the resource.",
 			},
@@ -47,7 +49,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "**(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the OMI (`i386` or `x84_64`).",
 				MarkdownDescription: "**(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the OMI (`i386` or `x84_64`).",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"block_device_mappings": schema.ListNestedAttribute{
@@ -61,30 +63,45 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 									Description:         "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.",
 									MarkdownDescription: "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.",
 									Default:             booldefault.StaticBool(true),
+									PlanModifiers: []planmodifier.Bool{
+										boolplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+									},
 								},
 								"iops": schema.Int64Attribute{
 									Optional:            true,
 									Computed:            true,
 									Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
 									MarkdownDescription: "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
+									PlanModifiers: []planmodifier.Int64{
+										int64planmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+									},
 								},
 								"snapshot_id": schema.StringAttribute{
 									Optional:            true,
 									Computed:            true,
 									Description:         "The ID of the snapshot used to create the volume.",
 									MarkdownDescription: "The ID of the snapshot used to create the volume.",
+									PlanModifiers: []planmodifier.String{
+										stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+									},
 								},
 								"volume_size": schema.Int64Attribute{
 									Optional:            true,
 									Computed:            true,
 									Description:         "The size of the volume, in gibibytes (GiB).<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
 									MarkdownDescription: "The size of the volume, in gibibytes (GiB).<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
+									PlanModifiers: []planmodifier.Int64{
+										int64planmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+									},
 								},
 								"volume_type": schema.StringAttribute{
 									Optional:            true,
 									Computed:            true,
 									Description:         "The type of the volume (`standard` \\| `io1` \\| `gp2`). If not specified in the request, a `standard` volume is created.<br />",
 									MarkdownDescription: "The type of the volume (`standard` \\| `io1` \\| `gp2`). If not specified in the request, a `standard` volume is created.<br />",
+									PlanModifiers: []planmodifier.String{
+										stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+									},
 								},
 							},
 							CustomType: BsuType{
@@ -102,12 +119,18 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "The device name for the volume. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`).",
 							MarkdownDescription: "The device name for the volume. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`).",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+							},
 						},
 						"virtual_device_name": schema.StringAttribute{
 							Optional:            true,
 							Computed:            true,
 							Description:         "The name of the virtual device (`ephemeralN`).",
 							MarkdownDescription: "The name of the virtual device (`ephemeralN`).",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+							},
 						},
 					},
 					CustomType: BlockDeviceMappingsType{
@@ -116,11 +139,8 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
-				Optional: true,
-				Computed: true,
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
-				},
+				Optional:            true,
+				Computed:            true,
 				Description:         "**(when registering from a snapshot, or from a bucket without using a manifest file)** One or more block device mappings.",
 				MarkdownDescription: "**(when registering from a snapshot, or from a bucket without using a manifest file)** One or more block device mappings.",
 			},
@@ -133,7 +153,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "A description for the new OMI.",
 				MarkdownDescription: "A description for the new OMI.",
@@ -147,7 +167,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "A unique name for the new OMI.<br />\nConstraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), parentheses (`()`), slashes (`/`), periods (`.`), or dashes (`-`).",
 				MarkdownDescription: "A unique name for the new OMI.<br />\nConstraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), parentheses (`()`), slashes (`/`), periods (`.`), or dashes (`-`).",
@@ -156,7 +176,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					boolplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when creating from a VM)** If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.",
 				MarkdownDescription: "**(when creating from a VM)** If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.",
@@ -172,7 +192,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new OMI.",
 				MarkdownDescription: "**(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new OMI.",
@@ -186,7 +206,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when copying an OMI)** The ID of the OMI you want to copy.",
 				MarkdownDescription: "**(when copying an OMI)** The ID of the OMI you want to copy.",
@@ -195,7 +215,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when copying an OMI)** The name of the source Region (always the same as the Region of your account).",
 				MarkdownDescription: "**(when copying an OMI)** The name of the source Region (always the same as the Region of your account).",
@@ -204,7 +224,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "Identifier of the Space",
 				MarkdownDescription: "Identifier of the Space",
@@ -245,7 +265,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 				Description:         "**(when creating from a VM)** The ID of the VM from which you want to create the OMI.",
 				MarkdownDescription: "**(when creating from a VM)** The ID of the VM from which you want to create the OMI.",
@@ -467,14 +487,12 @@ func (t AccessType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (a
 	val := map[string]tftypes.Value{}
 
 	err := in.As(&val)
-
 	if err != nil {
 		return nil, err
 	}
 
 	for k, v := range val {
 		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
 		if err != nil {
 			return nil, err
 		}
@@ -511,7 +529,6 @@ func (v AccessValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 		vals := make(map[string]tftypes.Value, 1)
 
 		val, err = v.IsPublic.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}

@@ -216,7 +216,6 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 	if !modifications {
 		return
 	}
-
 	res := utils2.ExecuteRequest(func() (*numspot.ReadVirtualGatewaysByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)

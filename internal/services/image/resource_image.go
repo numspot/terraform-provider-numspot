@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -84,6 +86,13 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		}
 	}
 
+	if !utils.IsTfValueNull(data.Access) {
+		response.Diagnostics.Append(r.updateImageAccess(ctx, createdId, data)...)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	// Retries read on resource until state is OK
 	waitedImage, err := utils2.RetryReadUntilStateValid(
 		ctx,
@@ -103,37 +112,92 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		response.Diagnostics.AddError("Failed to create Image", fmt.Sprintf("Error waiting for instance (%s) to be created", createdId))
 	}
 
-	tf, diagnostics := ImageFromHttpToTf(ctx, image)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	// Must set those values to keep it:
-	tf.SourceImageId = utils2.FromTfStringValueToTfOrNull(data.SourceImageId)
-	tf.SourceRegionName = utils2.FromTfStringValueToTfOrNull(data.SourceRegionName)
-	tf.VmId = utils2.FromTfStringValueToTfOrNull(data.VmId)
-	tf.NoReboot = utils2.FromTfBoolValueToTfOrNull(data.NoReboot)
-	//
+	tf, diags := r.parseImageObjectToTf(ctx, data, *image)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
+func (r *ImageResource) parseImageObjectToTf(ctx context.Context, data ImageModel, image numspot.Image) (*ImageModel, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	tf, diagnostics := ImageFromHttpToTf(ctx, &image)
+	if diagnostics.HasError() {
+		diags.Append(diagnostics...)
+		return nil, diags
+	}
+
+	tf.SourceImageId = utils2.FromTfStringValueToTfOrNull(data.SourceImageId)
+	tf.SourceRegionName = utils2.FromTfStringValueToTfOrNull(data.SourceRegionName)
+	tf.VmId = utils2.FromTfStringValueToTfOrNull(data.VmId)
+	tf.NoReboot = utils2.FromTfBoolValueToTfOrNull(data.NoReboot)
+
+	return tf, nil
+}
+
 func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data ImageModel
+	var diags diag.Diagnostics
+
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	res := utils2.ExecuteRequest(func() (*numspot.ReadImagesByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadImagesByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
-	tf, diagnostics := ImageFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	tf, diags := r.parseImageObjectToTf(ctx, data, *res.JSON200)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 		return
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+}
+
+func (r *ImageResource) updateImageAccess(ctx context.Context, id string, data ImageModel) diag.Diagnostics {
+	var body numspot.UpdateImageJSONRequestBody
+	var diags diag.Diagnostics
+	if data.Access.IsPublic.ValueBool() { // If IsPublic is set to True
+		body = numspot.UpdateImageJSONRequestBody{
+			AccessCreation: numspot.AccessCreation{
+				Additions: &numspot.Access{
+					IsPublic: utils.EmptyTrueBoolPointer(),
+				},
+				Removals: nil,
+			},
+		}
+	} else { // If IsPublic is set to False or removed
+		body = numspot.UpdateImageJSONRequestBody{
+			AccessCreation: numspot.AccessCreation{
+				Additions: nil,
+				Removals: &numspot.Access{
+					IsPublic: utils.EmptyTrueBoolPointer(),
+				},
+			},
+		}
+	}
+
+	_ = utils2.ExecuteRequest(func() (*numspot.UpdateImageResponse, error) {
+		return r.provider.GetNumspotClient().UpdateImageWithResponse(ctx,
+			r.provider.GetSpaceID(),
+			id,
+			body,
+		)
+	}, http.StatusOK, &diags)
+
+	return diags
 }
 
 func (r *ImageResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
@@ -162,6 +226,14 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 		modifications = true
 	}
 
+	if !state.Access.Equal(plan.Access) {
+		response.Diagnostics.Append(r.updateImageAccess(ctx, state.Id.ValueString(), plan)...)
+		if response.Diagnostics.HasError() {
+			return
+		}
+		modifications = true
+	}
+
 	if !modifications {
 		return
 	}
@@ -170,9 +242,14 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 		return r.provider.GetNumspotClient().ReadImagesByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
-	tf, diagnostics := ImageFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	tf, diags := r.parseImageObjectToTf(ctx, state, *res.JSON200)
+
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 		return
 	}
 
