@@ -125,6 +125,9 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, d
 	// Product Codes
 	if http.ProductCodes != nil {
 		productCodesTf, diags = utils.StringListToTfListValue(ctx, *http.ProductCodes)
+		if diags.HasError() {
+			return nil, diags
+		}
 	} else {
 		productCodesTf = types.ListNull(types.StringType)
 	}
@@ -147,6 +150,12 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, d
 		}
 	}
 
+	access, diags := NewAccessValue(AccessValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"is_public": types.BoolPointerValue(http.Access.IsPublic),
+		},
+	)
+
 	return &ImageModel{
 		Architecture:   types.StringPointerValue(http.Architecture),
 		CreationDate:   creationDateTf,
@@ -163,17 +172,13 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, d
 		// SourceRegionName: types.StringPointerValue(http.),
 		// VmId:  types.StringPointerValue(http.),
 		// NoReboot:       types.BoolPointerValue(http.),
-
 		//
 		StateComment: stateCommentTf,
 		//
 		ProductCodes:        productCodesTf,
 		BlockDeviceMappings: blockDeviceMappingsTf,
 		Tags:                tagsTf,
-
-		Access: AccessValue{
-			IsPublic: types.BoolPointerValue(http.Access.IsPublic),
-		},
+		Access:              access,
 	}, diags
 }
 
