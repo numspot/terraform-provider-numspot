@@ -53,6 +53,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"device_number": schema.Int64Attribute{
 						Computed:            true,
+						Optional:            true,
 						Description:         "The device index for the NIC attachment (between `1` and `7`, both included).",
 						MarkdownDescription: "The device index for the NIC attachment (between `1` and `7`, both included).",
 					},
@@ -68,6 +69,8 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 					},
 					"vm_id": schema.StringAttribute{
 						Computed:            true,
+						Optional:            true,
+						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						Description:         "The ID of the VM.",
 						MarkdownDescription: "The ID of the VM.",
 					},
@@ -78,6 +81,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
+				Optional:            true,
 				Description:         "Information about the NIC attachment.",
 				MarkdownDescription: "Information about the NIC attachment.",
 			},
@@ -110,6 +114,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
+				Optional:            true,
 				Description:         "Information about the public IP association.",
 				MarkdownDescription: "Information about the public IP association.",
 			},

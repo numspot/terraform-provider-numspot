@@ -75,6 +75,7 @@ func linkPublicIpFromApi(ctx context.Context, elt numspot.LinkPublicIp) (LinkPub
 func NicFromHttpToTf(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Diagnostics) {
 	var (
 		linkPublicIpTf LinkPublicIpValue
+		linkNicTf      LinkNicValue
 		tagsTf         types.List
 		diags          diag.Diagnostics
 	)
@@ -117,6 +118,16 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Di
 		linkPublicIpTf = NewLinkPublicIpValueNull()
 	}
 
+	// Link NIC
+	if http.LinkNic != nil {
+		linkNicTf, diags = linkNICFromHTTP(ctx, *http.LinkNic)
+		if diags.HasError() {
+			return nil, diags
+		}
+	} else {
+		linkNicTf = NewLinkNicValueNull()
+	}
+
 	var macAddress *string
 	if http.MacAddress != nil {
 		lowerMacAddr := strings.ToLower(*http.MacAddress)
@@ -131,6 +142,7 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Di
 	}
 
 	return &NicModel{
+		LinkNic:              linkNicTf,
 		Description:          types.StringPointerValue(http.Description),
 		Id:                   types.StringPointerValue(http.Id),
 		IsSourceDestChecked:  types.BoolPointerValue(http.IsSourceDestChecked),
@@ -213,6 +225,18 @@ func linkPublicIpFromHTTP(ctx context.Context, http numspot.LinkPublicIp) (LinkP
 			"public_dns_name": types.StringPointerValue(http.PublicDnsName),
 			"public_ip":       types.StringPointerValue(http.PublicIp),
 			"public_ip_id":    types.StringPointerValue(http.PublicIpId),
+		})
+}
+
+func linkNICFromHTTP(ctx context.Context, http numspot.LinkNic) (LinkNicValue, diag.Diagnostics) {
+	return NewLinkNicValue(
+		LinkNicValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"id":                    types.StringPointerValue(http.Id),
+			"delete_on_vm_deletion": types.BoolPointerValue(http.DeleteOnVmDeletion),
+			"device_number":         utils.FromIntPtrToTfInt64(http.DeviceNumber),
+			"state":                 types.StringPointerValue(http.State),
+			"vm_id":                 types.StringPointerValue(http.VmId),
 		})
 }
 
@@ -320,7 +344,7 @@ func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic) (*NicMod
 	}, nil
 }
 
-func NicFromTfToUpdaterequest(ctx context.Context, tf *NicModel, diagnostics *diag.Diagnostics) numspot.UpdateNicJSONRequestBody {
+func NicFromTfToUpdaterequest(ctx context.Context, tf *NicModel) numspot.UpdateNicJSONRequestBody {
 	linkNic := numspot.LinkNicToUpdate{
 		DeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(tf.LinkNic.DeleteOnVmDeletion),
 		LinkNicId:          utils.FromTfStringToStringPtr(tf.LinkNic.Id),
@@ -330,5 +354,12 @@ func NicFromTfToUpdaterequest(ctx context.Context, tf *NicModel, diagnostics *di
 		SecurityGroupIds: utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
 		Description:      utils.FromTfStringToStringPtr(tf.Description),
 		LinkNic:          &linkNic,
+	}
+}
+
+func NicFromTfToLinkNICRequest(tf *NicModel) numspot.LinkNicJSONRequestBody {
+	return numspot.LinkNicJSONRequestBody{
+		DeviceNumber: utils.FromTfInt64ToInt(tf.LinkNic.DeviceNumber),
+		VmId:         tf.LinkNic.VmId.ValueString(),
 	}
 }
