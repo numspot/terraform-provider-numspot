@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -129,6 +130,7 @@ func modulePrimaryInstanceState(ms *terraform.ModuleState, name string) (*terraf
 // In case of map[string]string, this function can be used to match attribute from another resource (TestCheckResourceAttrPair behavior's)
 // Returns nil if all attributes match, else an error.
 func testCheckTypeSetElemNestedAttrsInStateWithPair(s *terraform.State, name string, attr string, matchCount int, values interface{}) error {
+	var errs []error
 	matches := make(map[string]int)
 
 	is, err := primaryInstanceState(s, name)
@@ -180,7 +182,7 @@ func testCheckTypeSetElemNestedAttrsInStateWithPair(s *terraform.State, name str
 				}
 				err = testCheckResourceAttrPair(is, name, stateKey, isSecond, nameSecond, attrSec)
 				if err != nil {
-					return err
+					errs = append(errs, err)
 				} else {
 					match = true
 				}
@@ -201,5 +203,5 @@ func testCheckTypeSetElemNestedAttrsInStateWithPair(s *terraform.State, name str
 		}
 	}
 
-	return fmt.Errorf("%q no TypeSet element %q, with nested attrs %#v in state", name, attr, values)
+	return fmt.Errorf("%q no TypeSet element %q, with nested attrs %#v in state: %v", name, attr, values, errors.Join(errs...))
 }
