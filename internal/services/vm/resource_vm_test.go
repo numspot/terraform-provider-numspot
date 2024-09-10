@@ -269,7 +269,6 @@ func TestAccVmResource_NetSubnetSGRouteTable(t *testing.T) {
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "subnet_id"),
 					resource.TestCheckResourceAttrSet("numspot_vm.test", "id"),
 				),
-				ExpectNonEmptyPlan: true,
 			},
 		},
 	})

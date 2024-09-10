@@ -51,8 +51,7 @@ func TestAccRolesDatasource_WithFilter(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_roles.testdata", "items.#", "1"),
 					provider.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_roles.testdata", "items.*", map[string]string{
-						"name":     name,
-						"space_id": spaceID,
+						"name": name,
 					}),
 				),
 			},

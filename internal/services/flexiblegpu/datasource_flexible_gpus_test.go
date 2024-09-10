@@ -37,7 +37,7 @@ func fetchFlexibleGpusConfig(model_name string) string {
 resource "numspot_flexible_gpu" "test" {
   model_name             = %[1]q
   generation             = "v6"
-  availability_zone_name = "cloudgouv-eu-west-1a"
+  availability_zone_name = "cloudgouv-eu-west-1b"
 }
 
 data "numspot_flexible_gpus" "testdata" {

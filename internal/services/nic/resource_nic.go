@@ -91,7 +91,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	if !plan.LinkNic.VmId.IsUnknown() && !plan.LinkNic.DeviceNumber.IsUnknown() {
+	if !utils.IsTfValueNull(plan.LinkNic.VmId) && !utils.IsTfValueNull(plan.LinkNic.DeviceNumber) {
 		tf, diags = r.linkNIC(ctx, &plan, tf)
 
 		response.Diagnostics.Append(diags...)

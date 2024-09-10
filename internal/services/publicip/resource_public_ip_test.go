@@ -96,7 +96,6 @@ func TestAccPublicIpResource(t *testing.T) {
 					createChecks,
 					getDependencyChecksPublicIp(provider.BASE_SUFFIX),
 				)...),
-				ExpectNonEmptyPlan: true,
 			},
 			// ImportState testing
 			{
@@ -112,7 +111,6 @@ func TestAccPublicIpResource(t *testing.T) {
 					updateChecks,
 					getDependencyChecksPublicIp(provider.BASE_SUFFIX),
 				)...),
-				ExpectNonEmptyPlan: true,
 			},
 
 			// <== If resource has required dependencies ==>
