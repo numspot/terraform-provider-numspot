@@ -6,13 +6,15 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vm"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -66,7 +68,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		VolumeFromTfToCreateRequest(&data),
@@ -85,8 +87,8 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		}
 	}
 
-	// Retries read on resource until state is OK
-	read, err := utils2.RetryReadUntilStateValid(
+	// Wait for volume to be ready before linking to VM
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -97,6 +99,36 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", *res.JSON201.Id, err))
 		return
+	}
+
+	// Link Volume to a VM
+	if linkVmConfigured(data) {
+		utils.ExecuteRequest(func() (*numspot.LinkVolumeResponse, error) {
+			return r.provider.GetNumspotClient().LinkVolumeWithResponse(
+				ctx,
+				r.provider.GetSpaceID(),
+				createdId,
+				VolumeFromTfToLinkRequest(&data),
+			)
+		}, http.StatusNoContent, &response.Diagnostics)
+
+		if response.Diagnostics.HasError() {
+			return
+		}
+
+		// Wait for volume to be linked to VM
+		read, err = utils.RetryReadUntilStateValid(
+			ctx,
+			createdId,
+			r.provider.GetSpaceID(),
+			[]string{"creating"},
+			[]string{"in-use"},
+			r.provider.GetNumspotClient().ReadVolumesByIdWithResponse,
+		)
+		if err != nil {
+			response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be linked: %s", *res.JSON201.Id, err))
+			return
+		}
 	}
 
 	rr, ok := read.(*numspot.Volume)
@@ -117,7 +149,7 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data VolumeModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadVolumesByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadVolumesByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -132,8 +164,18 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
+func shouldUpdate(plan, state VolumeModel) bool {
+	shouldUpdate := false
+	shouldUpdate = shouldUpdate || (!utils.IsTfValueNull(plan.Size) && !plan.Size.Equal(state.Size))
+	shouldUpdate = shouldUpdate || (!utils.IsTfValueNull(plan.Type) && !plan.Type.Equal(state.Type))
+	shouldUpdate = shouldUpdate || (!utils.IsTfValueNull(plan.Iops) && !plan.Iops.Equal(state.Iops))
+
+	return shouldUpdate
+}
+
 func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan VolumeModel
+	var diags diag.Diagnostics
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -155,24 +197,75 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		}
 	}
 
-	updatedRes := utils2.ExecuteRequest(func() (*numspot.UpdateVolumeResponse, error) {
-		body := ValueFromTfToUpdaterequest(&plan)
-		return r.provider.GetNumspotClient().UpdateVolumeWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString(), body)
-	}, http.StatusOK, &response.Diagnostics)
-	if updatedRes == nil {
-		return
+	stateVmExists := true
+	if linkVmConfigured(state) {
+		// Stop linked VM before unlinking Volume
+		diags, stateVmExists = r.stopVm(ctx, state.LinkVM.VmID.ValueString())
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
+			return
+		}
+	}
+
+	if shouldUpdate(plan, state) {
+		updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVolumeResponse, error) {
+			body := ValueFromTfToUpdaterequest(&plan)
+			return r.provider.GetNumspotClient().UpdateVolumeWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString(), body)
+		}, http.StatusOK, &response.Diagnostics)
+		if updatedRes == nil {
+			return
+		}
 	}
 
 	time.Sleep(3 * time.Second) // TODO remove when outscale fixes the State field => https://numsproduct.atlassian.net/browse/CLSEXP-612
 
+	// Update Link to VM
+	if !state.LinkVM.Equal(plan.LinkVM) {
+		var diags diag.Diagnostics
+		if linkVmConfigured(state) && stateVmExists {
+			utils.ExecuteRequest(func() (*numspot.UnlinkVolumeResponse, error) {
+				return r.provider.GetNumspotClient().UnlinkVolumeWithResponse(
+					ctx,
+					r.provider.GetSpaceID(),
+					state.Id.ValueString(),
+					VolumeFromTfToUnlinkRequest(&state),
+				)
+			}, http.StatusNoContent, &diags)
+		}
+
+		if linkVmConfigured(plan) {
+			utils.ExecuteRequest(func() (*numspot.LinkVolumeResponse, error) {
+				return r.provider.GetNumspotClient().LinkVolumeWithResponse(
+					ctx,
+					r.provider.GetSpaceID(),
+					state.Id.ValueString(),
+					VolumeFromTfToLinkRequest(&plan),
+				)
+			}, http.StatusNoContent, &response.Diagnostics)
+		}
+
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
+	if linkVmConfigured(plan) {
+		// Start linked VM after updating Volume
+		diags := vm.StartVm(ctx, r.provider, plan.LinkVM.VmID.ValueString())
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
+			return
+		}
+	}
+
 	volumeId := state.Id.ValueString()
 	// Retries read on resource until state is OK
-	read, err := utils2.RetryReadUntilStateValid(
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		volumeId,
 		r.provider.GetSpaceID(),
 		[]string{"creating", "updating"},
-		[]string{"available"},
+		[]string{"available", "in-use"},
 		r.provider.GetNumspotClient().ReadVolumesByIdWithResponse,
 	)
 	if err != nil {
@@ -196,11 +289,61 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
+func (r *VolumeResource) stopVm(ctx context.Context, vmId string) (diag.Diagnostics, bool) {
+	diags := vm.StopVm(ctx, r.provider, vmId)
+	if diags.HasError() {
+		if !vm.VmIsDeleted(vmId) {
+			return diags, true
+		} else { // Else, the VM got removed, which is OK
+			return nil, false
+		}
+	}
+
+	return nil, true
+}
+
+func linkVmConfigured(data VolumeModel) bool {
+	return !utils.IsTfValueNull(data.LinkVM) && !utils.IsTfValueNull(data.LinkVM.VmID)
+}
+
 func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data VolumeModel
+
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVolumeWithResponse)
+	if linkVmConfigured(data) {
+		// Stop linked VM before unlinking Volume
+		diags, stateVmExists := r.stopVm(ctx, data.LinkVM.VmID.ValueString())
+
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
+			return
+		}
+
+		if stateVmExists {
+			// Unlink VM
+			utils.ExecuteRequest(func() (*numspot.UnlinkVolumeResponse, error) {
+				return r.provider.GetNumspotClient().UnlinkVolumeWithResponse(
+					ctx,
+					r.provider.GetSpaceID(),
+					data.Id.ValueString(),
+					VolumeFromTfToUnlinkRequest(&data),
+				)
+			}, http.StatusNoContent, &response.Diagnostics)
+			if response.Diagnostics.HasError() {
+				return
+			}
+			diags = vm.StartVm(ctx, r.provider, data.LinkVM.VmID.ValueString())
+			response.Diagnostics.Append(diags...)
+
+			if response.Diagnostics.HasError() {
+				return
+			}
+
+		}
+	}
+
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVolumeWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Volume", err.Error())
 		return
