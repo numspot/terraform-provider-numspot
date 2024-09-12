@@ -467,12 +467,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "One or more names of security groups for the VMs.",
 				MarkdownDescription: "One or more names of security groups for the VMs.",
 			},
-			//"space_id": schema.StringAttribute{
-			//	Optional:            true,
-			//	Computed:            true,
-			//	Description:         "Identifier of the Space",
-			//	MarkdownDescription: "Identifier of the Space",
-			//},
+			// MANUALLY EDITED : remove space_id
 			"state": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The state of the VM (`pending` \\| `running` \\| `stopping` \\| `stopped` \\| `shutting-down` \\| `terminated` \\| `quarantine`).",

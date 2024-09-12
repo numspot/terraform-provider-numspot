@@ -5,13 +5,14 @@ package volume
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -104,6 +105,31 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />",
 			},
 			// MANUALLY EDITED : spaceId removed
+			"link_vm": schema.SingleNestedAttribute{ // MANUALLY EDITED : Add link_vm attribute
+				Attributes: map[string]schema.Attribute{
+					"device_name": schema.StringAttribute{
+						Optional:            true,
+						Computed:            true,
+						Description:         "The name of the device. For a root device, you must use /dev/sda1. For other volumes, you must use /dev/sdX, /dev/sdXX, /dev/xvdX, or /dev/xvdXX (where the first X is a letter between b and z, and the second X is a letter between a and z).",
+						MarkdownDescription: "The name of the device. For a root device, you must use /dev/sda1. For other volumes, you must use /dev/sdX, /dev/sdXX, /dev/xvdX, or /dev/xvdXX (where the first X is a letter between b and z, and the second X is a letter between a and z).",
+					},
+					"vm_id": schema.StringAttribute{
+						Optional:            true,
+						Computed:            true,
+						Description:         "The ID of the VM you want to attach the volume to.",
+						MarkdownDescription: "The ID of the VM you want to attach the volume to.",
+					},
+				},
+				CustomType: LinkVMType{
+					ObjectType: types.ObjectType{
+						AttrTypes: LinkVMValue{}.AttributeTypes(ctx),
+					},
+				},
+				Optional:            true,
+				Computed:            true,
+				Description:         "VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded.",
+				MarkdownDescription: "VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded.",
+			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
@@ -120,7 +146,371 @@ type VolumeModel struct {
 	State                types.String `tfsdk:"state"`
 	Tags                 types.List   `tfsdk:"tags"`
 	Type                 types.String `tfsdk:"type"`
+	LinkVM               LinkVMValue  `tfsdk:"link_vm"` // MANUALLY EDITED : Add link_vm attribute
 	// MANUALLY EDITED : spaceId removed
+
+}
+
+// MANUALLY EDITED : add LinkVMType/LinkVMValue functions
+var _ basetypes.ObjectTypable = LinkVMType{}
+
+type LinkVMType struct {
+	basetypes.ObjectType
+}
+
+func (t LinkVMType) Equal(o attr.Type) bool {
+	other, ok := o.(LinkVMType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t LinkVMType) String() string {
+	return "LinkVMType"
+}
+
+func (t LinkVMType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	deviceNameAttribute, ok := attributes["device_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`device_name is missing from object`)
+
+		return nil, diags
+	}
+
+	deviceNameVal, ok := deviceNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`deviceName expected to be basetypes.StringValue, was: %T`, deviceNameAttribute))
+	}
+
+	vmIdAttribute, ok := attributes["vm_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vm_id is missing from object`)
+
+		return nil, diags
+	}
+
+	vmIdVal, ok := vmIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`deviceName expected to be basetypes.StringValue, was: %T`, deviceNameAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return LinkVMValue{
+		DeviceName: deviceNameVal,
+		VmID:       vmIdVal,
+		state:      attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkVMValueNull() LinkVMValue {
+	return LinkVMValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewLinkVMValueUnknown() LinkVMValue {
+	return LinkVMValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewLinkVMValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (LinkVMValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing LinkVMValue Attribute Value",
+				"While creating a LinkVMValue value, a missing attribute value was detected. "+
+					"A LinkVMValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkVMValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid LinkVMValue Attribute Type",
+				"While creating a LinkVMValue value, an invalid attribute value was detected. "+
+					"A LinkVMValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("LinkVMValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("LinkVMValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra LinkVMValue Attribute Value",
+				"While creating a LinkVMValue value, an extra attribute value was detected. "+
+					"A LinkVMValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra LinkVMValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewLinkVMValueUnknown(), diags
+	}
+
+	deviceNameAttribute, ok := attributes["device_name"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`device_name is missing from object`)
+
+		return NewLinkVMValueUnknown(), diags
+	}
+
+	deviceNameVal, ok := deviceNameAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`device_name expected to be basetypes.StringValue, was: %T`, deviceNameAttribute))
+	}
+
+	vmIdAttribute, ok := attributes["vm_id"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`vm_id is missing from object`)
+
+		return NewLinkVMValueUnknown(), diags
+	}
+
+	vmIdVal, ok := vmIdAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`vm_id expected to be basetypes.StringValue, was: %T`, vmIdAttribute))
+	}
+
+	if diags.HasError() {
+		return NewLinkVMValueUnknown(), diags
+	}
+
+	return LinkVMValue{
+		DeviceName: deviceNameVal,
+		VmID:       vmIdVal,
+		state:      attr.ValueStateKnown,
+	}, diags
+}
+
+func NewLinkVMValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) LinkVMValue {
+	object, diags := NewLinkVMValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewLinkVMValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t LinkVMType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewLinkVMValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewLinkVMValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewLinkVMValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewLinkVMValueMust(LinkVMValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t LinkVMType) ValueType(ctx context.Context) attr.Value {
+	return LinkVMValue{}
+}
+
+var _ basetypes.ObjectValuable = LinkVMValue{}
+
+type LinkVMValue struct {
+	DeviceName basetypes.StringValue `tfsdk:"device_name"`
+	VmID       basetypes.StringValue `tfsdk:"vm_id"`
+	state      attr.ValueState
+}
+
+func (v LinkVMValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 7)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["device_name"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["vm_id"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 2)
+
+		val, err = v.DeviceName.ToTerraformValue(ctx)
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["device_name"] = val
+
+		val, err = v.VmID.ToTerraformValue(ctx)
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["vm_id"] = val
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v LinkVMValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v LinkVMValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v LinkVMValue) String() string {
+	return "LinkVMValue"
+}
+
+func (v LinkVMValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	objVal, diags := types.ObjectValue(
+		map[string]attr.Type{
+			"device_name": basetypes.StringType{},
+			"vm_id":       basetypes.StringType{},
+		},
+		map[string]attr.Value{
+			"device_name": v.DeviceName,
+			"vm_id":       v.VmID,
+		})
+
+	return objVal, diags
+}
+
+func (v LinkVMValue) Equal(o attr.Value) bool {
+	other, ok := o.(LinkVMValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.DeviceName.Equal(other.DeviceName) {
+		return false
+	}
+
+	if !v.VmID.Equal(other.VmID) {
+		return false
+	}
+
+	return true
+}
+
+func (v LinkVMValue) Type(ctx context.Context) attr.Type {
+	return LinkVMType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v LinkVMValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"device_name": basetypes.StringType{},
+		"vm_id":       basetypes.StringType{},
+	}
 }
 
 var _ basetypes.ObjectTypable = LinkedVolumesType{}

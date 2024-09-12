@@ -37,7 +37,7 @@ func StopVm(ctx context.Context, provider services.IProvider, id string) diag.Di
 		id,
 		provider.GetSpaceID(),
 		[]string{"stopping"},
-		[]string{"stopped"},
+		[]string{"stopped", "terminated"},
 		provider.GetNumspotClient().ReadVmsByIdWithResponse,
 	)
 	if err != nil {
@@ -74,6 +74,11 @@ func StartVm(ctx context.Context, provider services.IProvider, id string) diag.D
 	}
 
 	return diags
+}
+
+func VmIsDeleted(id string) bool {
+	// TODO : Implement this function once Inventory allows us to check for deleted resources
+	return true
 }
 
 func vmBsuFromApi(ctx context.Context, elt numspot.BsuCreated) (basetypes.ObjectValue, diag.Diagnostics) {

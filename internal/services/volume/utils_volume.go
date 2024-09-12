@@ -25,7 +25,7 @@ func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http numspot.Lin
 			"device_name":           types.StringPointerValue(http.DeviceName),
 			"state":                 types.StringPointerValue(http.State),
 			"vm_id":                 types.StringPointerValue(http.VmId),
-			"volume_id":             types.StringPointerValue(http.Id),
+			"id":                    types.StringPointerValue(http.Id),
 		})
 }
 
@@ -34,6 +34,7 @@ func VolumeFromHttpToTf(ctx context.Context, http *numspot.Volume) (*VolumeModel
 		volumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
 		tagsTf  types.List
 		diags   diag.Diagnostics
+		linkVm  LinkVMValue
 	)
 
 	if http.LinkedVolumes != nil {
@@ -43,6 +44,24 @@ func VolumeFromHttpToTf(ctx context.Context, http *numspot.Volume) (*VolumeModel
 			fromLinkedVolumeSchemaToTFVolumesList,
 			*http.LinkedVolumes,
 		)
+
+		if diags.HasError() {
+			return nil, diags
+		}
+
+		nbLinkedVolumes := len((*http.LinkedVolumes))
+		if nbLinkedVolumes > 0 {
+			linkVm, diags = NewLinkVMValue(LinkVMValue{}.AttributeTypes(ctx),
+				map[string]attr.Value{
+					"device_name": types.StringPointerValue((*http.LinkedVolumes)[0].DeviceName),
+					"vm_id":       types.StringPointerValue((*http.LinkedVolumes)[0].VmId),
+				})
+			if diags.HasError() {
+				return nil, diags
+			}
+
+		}
+
 		if diags.HasError() {
 			return nil, diags
 		}
@@ -66,6 +85,7 @@ func VolumeFromHttpToTf(ctx context.Context, http *numspot.Volume) (*VolumeModel
 		Type:                 types.StringPointerValue(http.Type),
 		LinkedVolumes:        volumes,
 		Tags:                 tagsTf,
+		LinkVM:               linkVm,
 	}, diags
 }
 
@@ -101,6 +121,27 @@ func ValueFromTfToUpdaterequest(tf *VolumeModel) numspot.UpdateVolumeJSONRequest
 		Size:       utils.FromTfInt64ToIntPtr(tf.Size),
 		VolumeType: tf.Type.ValueStringPointer(),
 	}
+}
+
+func VolumeFromTfToLinkRequest(tf *VolumeModel) numspot.LinkVolumeJSONRequestBody {
+	var (
+		deviceName string
+		vmId       string
+	)
+
+	if !utils.IsTfValueNull(tf.LinkVM) {
+		deviceName = tf.LinkVM.DeviceName.ValueString()
+		vmId = tf.LinkVM.VmID.ValueString()
+	}
+
+	return numspot.LinkVolumeJSONRequestBody{
+		DeviceName: deviceName,
+		VmId:       vmId,
+	}
+}
+
+func VolumeFromTfToUnlinkRequest(tf *VolumeModel) numspot.UnlinkVolumeJSONRequestBody {
+	return numspot.UnlinkVolumeJSONRequestBody{}
 }
 
 func VolumeFromTfToAPIReadParams(ctx context.Context, tf VolumesDataSourceModel) numspot.ReadVolumesParams {
