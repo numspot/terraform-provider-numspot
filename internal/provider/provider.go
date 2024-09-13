@@ -50,11 +50,12 @@ var _ provider.Provider = (*numspotProvider)(nil)
 
 type Key string
 
-func New(version string, development bool) func() provider.Provider {
+func New(version string, development bool, client *http.Client) func() provider.Provider {
 	return func() provider.Provider {
 		return &numspotProvider{
 			version:     version,
 			development: development,
+			client:      client,
 		}
 	}
 }
@@ -62,6 +63,7 @@ func New(version string, development bool) func() provider.Provider {
 type numspotProvider struct {
 	version     string
 	development bool
+	client      *http.Client
 }
 
 type NumspotProviderModel struct {
@@ -242,15 +244,21 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	// Create a new Numspot provider using the configuration values
 	var (
-		numspotClient *numspot.ClientWithResponses
+		numspotClient     *numspot.ClientWithResponses
+		defaulthttpclient *http.Client
 	)
 
-	httpClient := func(c *numspot.Client) error {
-		c.Client = &http.Client{
+	if p.client != nil {
+		defaulthttpclient = p.client
+	} else {
+		defaulthttpclient = &http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
 		}
+	}
+	httpClient := func(c *numspot.Client) error {
+		c.Client = defaulthttpclient
 		return nil
 	}
 

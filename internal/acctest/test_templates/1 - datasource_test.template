@@ -1,0 +1,55 @@
+
+
+package provider
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
+)
+
+func TestAcc{{Datasource}}Datasource(t *testing.T) {
+	
+	acct := acctest.NewAccTest(t, true, "record")
+    defer func() {
+		err := acct.Cleanup()
+		require.NoError(t, err)
+	}()
+	pr := acct.TestProvider
+
+	{{resource fields}} // Define wanted resource fields 
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{
+				Config: fetch{{Datasource}}Config({{resource fields}}),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					// If datasource returns a single element
+					resource.TestCheckResourceAttrPair("data.numspot_{{datasource}}.testdata", "id", "numspot_{{resource}}.test", "id"),
+					resource.TestCheckResourceAttr("data.numspot_{{datasource}}.testdata", "{{resource field X}}", {{resource field X}}), // Check attribute value for all resource fields
+				
+					// If datasource returns multiple elements 
+					resource.TestCheckResourceAttr("data.numspot_{{datasource}}.testdata", "items.#", "1"),
+					provider.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_{{datasource}}.testdata", "items.*", map[string]string{
+						"id":          provider.PAIR_PREFIX+"numspot_{{resource}}.test.id",
+						{{match all resource fields}}
+					}),
+				),
+			},
+		},
+	})
+}
+
+func datasource{{Datasource}}Config({{resource fields}}) string {
+	return fmt.Sprintf(`
+resource "numspot_{{resource}}" "test" {
+	{{set resource fields with params}}
+}
+
+data "numspot_{{datasource}}" "testdata" {
+    {{search fields matching resource above}}
+}`, {{resource fields}})
+}

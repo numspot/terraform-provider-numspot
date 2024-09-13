@@ -20,6 +20,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/zclconf/go-cty v1.14.3
 	gitlab.numspot.cloud/cloud/numspot-sdk-go v0.1.4
+	gopkg.in/dnaeon/go-vcr.v3 v3.2.0
 )
 
 require (

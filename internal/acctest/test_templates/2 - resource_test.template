@@ -1,0 +1,219 @@
+
+
+package provider
+
+import (
+	"fmt"
+	"math/rand"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/require"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
+)
+
+// This struct will store the input data that will be used in your tests (all fields as string)
+type StepData{{Resource}} struct {
+	field1,
+	field2,
+	... string
+}
+
+// Generate checks to validate that resource 'numspot_{{resource}}.test' has input data values
+func getFieldMatchChecks{{Resource}}(data StepData{{Resource}}) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttr("numspot_{{resource}}.test", "{{field X}}", data.{{field X}}), // Check value for all resource attributes
+		{{You can add aditional tests on fields here, for exemple tests on array size}}
+	}
+}
+
+// Generate checks to validate that resource 'numspot_{{resource}}.test' is properly linked to given subresources
+// If resource has no dependencies, return empty array
+func getDependencyChecks{{Resource}}(dependenciesSuffix string) []resource.TestCheckFunc {
+	return []resource.TestCheckFunc{
+		resource.TestCheckResourceAttrPair("numspot_{{resource}}.test", "{{subresource id}}", "numspot_{{subresource}}.test"+dependenciesSuffix, "id"), // If field is an id
+		resource.TestCheckTypeSetElemAttrPair("numspot_{{resource}}.test", "{{subresource id}}.*", "numspot_{{subresource}}.test"+dependenciesSuffix, "id"), // If field is a slice of ids
+		provider.TestCheckTypeSetElemNestedAttrsWithPair("numspot_{{resource}}.test", "{{subresource id}}.*", map[string]string{ // If field is a list of objects (containing id and/or other fields)
+			"id":          fmt.Sprintf(provider.PAIR_PREFIX+"numspot_{{subresource}}.test%[1]s.id",dependenciesSuffix),
+			{{match other resource fields}}
+		}),
+		
+		{{You can test multiple dependencies if needed}}
+	}
+}
+
+func TestAcc{{Resource}}Resource(t *testing.T) {
+    acct := acctest.NewAccTest(t, true, "record")
+    defer func() {
+		err := acct.Cleanup()
+		require.NoError(t, err)
+	}()
+	
+	pr := acct.TestProvider
+
+	var resourceId string
+
+	////////////// Define input data that will be used in the test sequence //////////////
+	// resource fields that can be updated in-place	
+	{{updatable resource fields}} 
+	{{updatable resource fields with updated value}} 
+
+	// resource fields that cannot be updated in-place (requires replace)
+	{{not updatable resource fields}} 
+	{{not updatable resource fields with updated value}} 
+
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	////////////// Define plan values and generate associated attribute checks  //////////////
+	// The base plan (used in first create and to reset resource state before some tests)
+	basePlanValues := StepData{{Resource}}{
+		field1:               field1Value,
+		field2:               field2BValue,
+		...
+	}
+	createChecks := append(
+		getFieldMatchChecks{{Resource}}(basePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_{{resource}}.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			resourceId = v
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
+	updatePlanValues := StepData{{Resource}}{
+		field1:               field1Value,	// Update values for updatable fields
+		field2:               field2BValue,
+		...
+	}
+	updateChecks := append(
+		getFieldMatchChecks{{Resource}}(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_{{resource}}.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.Equal(t, v, resourceId)
+			return nil
+		}),
+	)
+
+	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
+	replacePlanValues := StepData{{Resource}}{
+		field1:               field1Value,	// Update values for non-updatable fields
+		field2:               field2BValue,
+		...
+	}
+	replaceChecks := append(
+		getFieldMatchChecks{{Resource}}(replacePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_{{resource}}.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
+	/////////////////////////////////////////////////////////////////////////////////////
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: pr,
+		Steps: []resource.TestStep{
+			{ // Create testing
+				Config: test{{Resource}}Config(provider.BASE_SUFFIX, basePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					createChecks,
+					getDependencyChecks{{Resource}}(provider.BASE_SUFFIX),
+				)...),
+			},
+			// ImportState testing
+			{
+				ResourceName:            "numspot_{{resource}}.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"id"},
+			},
+			// Update testing Without Replace (if needed)
+			{
+				Config: test{{Resource}}Config(provider.BASE_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecks{{Resource}}(provider.BASE_SUFFIX),
+				)...),
+			},
+			// Update testing With Replace (if needed)
+			{
+				Config: test{{Resource}}Config(provider.BASE_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecks{{Resource}}(provider.BASE_SUFFIX),
+				)...),
+			},
+
+			// <== If resource has required dependencies ==> 
+			{	// Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: test{{Resource}}Config(provider.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this 
+			{
+				Config: test{{Resource}}Config(provider.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecks{{Resource}}(provider.NEW_SUFFIX),
+				)...),
+			},
+			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			{
+				Config: test{{Resource}}Config(provider.NEW_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecks{{Resource}}(provider.NEW_SUFFIX),
+				)...),
+			},
+
+			// <== If resource has optional dependencies ==> 
+			{	// Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: test{{Resource}}Config(provider.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this 
+			{
+				Config: test{{Resource}}Config_DeletedDependencies(updatePlanValues),
+				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
+			},
+			{	// Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: test{{Resource}}Config(provider.BASE_SUFFIX, basePlanValues),
+			},
+			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
+			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this 
+			{
+				Config: test{{Resource}}Config_DeletedDependencies(replacePlanValues),
+				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
+			},
+		},
+	})
+}
+
+func test{{Resource}}Config(subresourceSuffix string, data StepData{{Resource}}) string {
+	return fmt.Sprintf(`
+
+// <== If resource has dependencies ==> 
+resource "numspot_{{dependency_resource}}" "test%[1]s" {
+	{{set resource fields with params}}
+}
+
+resource "numspot_{{resource}}" "test" {
+	{{set resource fields with params}}
+}`, subresourceSuffix, {{resource fields}})
+}
+
+// <== If resource has optional dependencies ==> 
+func test{{Resource}}Config_DeletedDependencies(data StepData{{Resource}}) string {
+	return fmt.Sprintf(`
+resource "numspot_{{resource}}" "test" {
+	{{set resource fields with params}}
+}`, {{resource fields}})
+}
