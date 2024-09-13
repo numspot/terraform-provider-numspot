@@ -1,5 +1,3 @@
-//go:build acc
-
 package loadbalancer_test
 
 import (
@@ -20,7 +18,8 @@ import (
 type StepDataLoadBalancer struct {
 	name,
 	tagKey,
-	tagValue string
+	tagValue,
+	backendVmType string
 	ports []string
 }
 
@@ -71,7 +70,8 @@ func TestAccLoadBalancerResource(t *testing.T) {
 
 	ports := []string{"80"}
 	portsUpdated := []string{"443", "8080"}
-
+	backendVmType := "ns-cus6-2c4r"
+	backendVmTypeUpdated := "ns-cus6-4c8r"
 	// resource fields that cannot be updated in-place (requires replace)
 	name := "elb-terraform-test"
 	nameUpdated := "elb-terraform-test-updated"
@@ -81,10 +81,11 @@ func TestAccLoadBalancerResource(t *testing.T) {
 	////////////// Define plan values and generate associated attribute checks  //////////////
 	// The base plan (used in first create and to reset resource state before some tests)
 	basePlanValues := StepDataLoadBalancer{
-		tagKey:   tagKey,
-		tagValue: tagValue,
-		name:     name,
-		ports:    ports,
+		tagKey:        tagKey,
+		tagValue:      tagValue,
+		name:          name,
+		ports:         ports,
+		backendVmType: backendVmType,
 	}
 	createChecks := append(
 		getFieldMatchChecksLoadBalancer(basePlanValues),
@@ -98,10 +99,11 @@ func TestAccLoadBalancerResource(t *testing.T) {
 
 	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
 	updatePlanValues := StepDataLoadBalancer{
-		tagKey:   tagKey,
-		tagValue: tagValueUpdated,
-		name:     name,
-		ports:    portsUpdated,
+		tagKey:        tagKey,
+		tagValue:      tagValueUpdated,
+		name:          name,
+		ports:         portsUpdated,
+		backendVmType: backendVmTypeUpdated,
 	}
 	updateChecks := append(
 		getFieldMatchChecksLoadBalancer(updatePlanValues),
@@ -114,10 +116,11 @@ func TestAccLoadBalancerResource(t *testing.T) {
 	)
 	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
 	replacePlanValues := StepDataLoadBalancer{
-		tagKey:   tagKey,
-		tagValue: tagValue,
-		name:     nameUpdated,
-		ports:    ports,
+		tagKey:        tagKey,
+		tagValue:      tagValue,
+		name:          nameUpdated,
+		ports:         ports,
+		backendVmType: backendVmType,
 	}
 	replaceChecks := append(
 		getFieldMatchChecksLoadBalancer(replacePlanValues),
@@ -218,6 +221,12 @@ func testLoadBalancerConfig(subresourceSuffix string, subnetIpRange string, data
 	return fmt.Sprintf(`
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-loadbalancer-acctest"
+    }
+  ]
 }
 
 resource "numspot_subnet" "test%[1]s" {
@@ -241,9 +250,15 @@ resource "numspot_security_group" "test%[1]s" {
 
 resource "numspot_vm" "test%[1]s" {
   image_id = "ami-8ef5b47e"
-  type     = "ns-cus6-2c4r"
+  type     = %[7]q
 
   subnet_id = numspot_subnet.test%[1]s.id
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-loadbalancer-acctest"
+    }
+  ]
 }
 
 resource "numspot_load_balancer" "test" {
@@ -272,7 +287,7 @@ resource "numspot_load_balancer" "test" {
       value = %[4]q
     }
   ]
-}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners, subnetIpRange)
+}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners, subnetIpRange, data.backendVmType)
 }
 
 func testLoadBalancerConfig_Public(subresourceSuffix string, subnetIpRange string, data StepDataLoadBalancer) string {
@@ -292,6 +307,12 @@ func testLoadBalancerConfig_Public(subresourceSuffix string, subnetIpRange strin
 	return fmt.Sprintf(`
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-loadbalancer-acctest"
+    }
+  ]
 }
 
 resource "numspot_internet_gateway" "ig" {
@@ -332,9 +353,15 @@ resource "numspot_route_table" "test" {
 
 resource "numspot_vm" "test%[1]s" {
   image_id = "ami-8ef5b47e"
-  type     = "ns-cus6-2c4r"
+  type     = %[7]q
 
   subnet_id = numspot_subnet.test%[1]s.id
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-loadbalancer-acctest"
+    }
+  ]
 }
 
 resource "numspot_load_balancer" "test" {
@@ -365,29 +392,5 @@ resource "numspot_load_balancer" "test" {
   ]
 
   depends_on = [numspot_internet_gateway.ig]
-}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners, subnetIpRange)
-}
-
-// <== If resource has optional dependencies ==>
-func testLoadBalancerConfig_DeletedDependencies(data StepDataLoadBalancer) string {
-	return fmt.Sprintf(`
-resource "numspot_load_balancer" "test" {
-  name = "%s"
-  listeners = [
-    {
-      backend_port           = 80
-      load_balancer_port     = 80
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  type = "internal"
-
-  tags = [
-    {
-      key   = %[2]q
-      value = %[3]q
-    }
-  ]
-}`, data.name, data.tagKey, data.tagValue)
+}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners, subnetIpRange, data.backendVmType)
 }
