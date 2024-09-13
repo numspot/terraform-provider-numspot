@@ -12,7 +12,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -67,7 +67,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailable(
+	res, err := utils.RetryCreateUntilResourceAvailable(
 		ctx,
 		r.provider.GetSpaceID(),
 		r.provider.GetNumspotClient().CreateInternetGatewayWithResponse)
@@ -87,7 +87,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 	// Call Link Internet Service to VPC
 	vpcId := data.VpcId
 	if !vpcId.IsNull() {
-		linRes := utils2.ExecuteRequest(func() (*numspot.LinkInternetGatewayResponse, error) {
+		linRes := utils.ExecuteRequest(func() (*numspot.LinkInternetGatewayResponse, error) {
 			return r.provider.GetNumspotClient().LinkInternetGatewayWithResponse(
 				ctx,
 				r.provider.GetSpaceID(),
@@ -102,7 +102,7 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 		}
 	}
 
-	read, err := utils2.RetryReadUntilStateValid(
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -135,7 +135,7 @@ func (r *InternetGatewayResource) Read(ctx context.Context, request resource.Rea
 	var data InternetGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadInternetGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadInternetGatewaysByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadInternetGatewaysByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -177,11 +177,47 @@ func (r *InternetGatewayResource) Update(ctx context.Context, request resource.U
 		modifications = true
 	}
 
+	if !state.VpcId.Equal(plan.VpcId) {
+		if !utils.IsTfValueNull(state.VpcId) {
+			err := utils.RetryUnlinkUntilSuccess(
+				ctx,
+				r.provider.GetSpaceID(),
+				state.Id.ValueString(),
+				numspot.UnlinkInternetGatewayJSONRequestBody{
+					VpcId: state.VpcId.ValueString(),
+				},
+				r.provider.GetNumspotClient().UnlinkInternetGatewayWithResponse,
+			)
+			if err != nil {
+				response.Diagnostics.AddError("Failed to unlink Internet Gateway to VPC", err.Error())
+				return
+			}
+		}
+
+		if !utils.IsTfValueNull(plan.VpcId) {
+			linRes := utils.ExecuteRequest(func() (*numspot.LinkInternetGatewayResponse, error) {
+				return r.provider.GetNumspotClient().LinkInternetGatewayWithResponse(
+					ctx,
+					r.provider.GetSpaceID(),
+					state.Id.ValueString(),
+					numspot.LinkInternetGatewayJSONRequestBody{
+						VpcId: plan.VpcId.ValueString(),
+					},
+				)
+			}, http.StatusNoContent, &response.Diagnostics)
+			if linRes == nil {
+				return
+			}
+		}
+
+		modifications = true
+	}
+
 	if !modifications {
 		return
 	}
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadInternetGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadInternetGatewaysByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadInternetGatewaysByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -206,7 +242,7 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 	if !data.VpcId.IsNull() {
 		tflog.Debug(ctx, fmt.Sprintf("Detaching vpc: %s, from internet gateway: %s", data.VpcId.ValueString(), data.Id.ValueString()))
 
-		err := utils2.RetryUnlinkUntilSuccess(
+		err := utils.RetryUnlinkUntilSuccess(
 			ctx,
 			r.provider.GetSpaceID(),
 			data.Id.ValueString(),
@@ -216,12 +252,12 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 			r.provider.GetNumspotClient().UnlinkInternetGatewayWithResponse,
 		)
 		if err != nil {
-			response.Diagnostics.AddError("Failed to delete Internet Gateway", err.Error())
+			response.Diagnostics.AddError("Failed to unlink Internet Gateway from VPC", err.Error())
 			return
 		}
 	}
 
-	err := utils2.RetryDeleteUntilResourceAvailable(
+	err := utils.RetryDeleteUntilResourceAvailable(
 		ctx,
 		r.provider.GetSpaceID(),
 		data.Id.ValueString(),
