@@ -1,5 +1,3 @@
-//go:build acc
-
 package internetgateway_test
 
 import (
@@ -112,10 +110,15 @@ func TestAccInternetGatewayResource(t *testing.T) {
 				)...),
 			},
 			// <== If resource has required dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-
+			{
+				Config: testInternetGatewayConfig(provider.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					updateChecks,
+					getDependencyChecksInternetGateway(provider.NEW_SUFFIX),
+				)...),
+			},
 			// <== If resource has optional dependencies ==>
 			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
@@ -128,8 +131,24 @@ func testInternetGatewayConfig(subresourceSuffix string, data StepDataInternetGa
 	return fmt.Sprintf(`
 
 // <== If resource has dependencies ==> 
-resource "numspot_vpc" "test%[1]s" {
+resource "numspot_vpc" "test%[4]s" {
   ip_range = "10.101.0.0/16"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-internetgateway-acctest"
+    }
+  ]
+}
+
+resource "numspot_vpc" "test%[5]s" {
+  ip_range = "10.101.0.0/16"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-internetgateway-acctest"
+    }
+  ]
 }
 
 resource "numspot_internet_gateway" "test" {
@@ -140,18 +159,5 @@ resource "numspot_internet_gateway" "test" {
       value = %[3]q
     }
   ]
-}`, subresourceSuffix, data.tagKey, data.tagValue)
-}
-
-// <== If resource has optional dependencies ==>
-func testInternetGatewayConfig_DeletedDependencies(data StepDataInternetGateway) string {
-	return fmt.Sprintf(`
-resource "numspot_internet_gateway" "test" {
-  tags = [
-    {
-      key   = %[1]q
-      value = %[2]q
-    }
-  ]
-}`, data.tagKey, data.tagValue)
+}`, subresourceSuffix, data.tagKey, data.tagValue, provider.BASE_SUFFIX, provider.NEW_SUFFIX)
 }
