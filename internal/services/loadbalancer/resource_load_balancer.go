@@ -14,7 +14,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -66,7 +66,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	// Retries create until request response is OK
-	_, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	_, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		LoadBalancerFromTfToCreateRequest(ctx, &data),
@@ -78,7 +78,11 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 
 	// Backends
 	if len(data.BackendVmIds.Elements()) > 0 || len(data.BackendIps.Elements()) > 0 {
-		diags := r.linkBackendMachines(ctx, data)
+		diags := r.linkBackendMachines(ctx,
+			data.Name.ValueString(),
+			utils.TfStringSetToStringPtrSet(ctx, data.BackendIps),
+			utils.TfStringSetToStringPtrSet(ctx, data.BackendVmIds),
+		)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
 			return
@@ -113,7 +117,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 }
 
 func (r *LoadBalancerResource) readLoadBalancer(ctx context.Context, id string, diagnostic diag.Diagnostics) *LoadBalancerModel {
-	res := utils2.ExecuteRequest(func() (*numspot.ReadLoadBalancersByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadLoadBalancersByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadLoadBalancersByIdWithResponse(ctx, r.provider.GetSpaceID(), id)
 	}, http.StatusOK, &diagnostic)
 	if res == nil {
@@ -172,7 +176,7 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 			return
 		}
 
-		toCreate, toDelete := utils2.Diff(stateTags, planTags)
+		toCreate, toDelete := utils.Diff(stateTags, planTags)
 		var toDeleteTf, toCreateTf types.List
 		tagType := tags.TagsValue{}.Type(ctx)
 
@@ -217,7 +221,7 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 			return
 		}
 
-		toCreate, toDelete := utils2.Diff(stateListeners, planListeners)
+		toCreate, toDelete := utils.Diff(stateListeners, planListeners)
 
 		if len(toCreate) > 0 {
 			response.Diagnostics.Append(r.createListeners(ctx, state.Id.ValueString(), toCreate)...)
@@ -234,6 +238,14 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 		}
 
 		modifs = true
+	}
+
+	if (!plan.BackendIps.IsUnknown() && !plan.BackendIps.Equal(state.BackendIps)) ||
+		(!plan.BackendVmIds.IsUnknown() && !plan.BackendVmIds.Equal(state.BackendVmIds)) {
+		diags := r.updateBackendMachines(ctx, plan, state)
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
+		}
 	}
 
 	if r.shouldUpdate(state, plan) {
@@ -261,14 +273,14 @@ func (r *LoadBalancerResource) createListeners(ctx context.Context, loadBalancer
 	listenersForCreation := make([]numspot.ListenerForCreation, 0, len(listeners))
 	for _, e := range listeners {
 		listenersForCreation = append(listenersForCreation, numspot.ListenerForCreation{
-			BackendPort:          utils2.FromTfInt64ToInt(e.BackendPort),
-			BackendProtocol:      utils2.FromTfStringToStringPtr(e.BackendProtocol),
-			LoadBalancerPort:     utils2.FromTfInt64ToInt(e.LoadBalancerPort),
+			BackendPort:          utils.FromTfInt64ToInt(e.BackendPort),
+			BackendProtocol:      utils.FromTfStringToStringPtr(e.BackendProtocol),
+			LoadBalancerPort:     utils.FromTfInt64ToInt(e.LoadBalancerPort),
 			LoadBalancerProtocol: e.LoadBalancerProtocol.ValueString(),
 		})
 	}
 
-	utils2.ExecuteRequest(func() (*numspot.CreateLoadBalancerListenersResponse, error) {
+	utils.ExecuteRequest(func() (*numspot.CreateLoadBalancerListenersResponse, error) {
 		return r.provider.GetNumspotClient().CreateLoadBalancerListenersWithResponse(
 			ctx,
 			r.provider.GetSpaceID(),
@@ -287,10 +299,10 @@ func (r *LoadBalancerResource) deleteListeners(ctx context.Context, loadBalancer
 
 	listenersLoadBalancerPortToDelete := make([]int, 0, len(listeners))
 	for _, e := range listeners {
-		listenersLoadBalancerPortToDelete = append(listenersLoadBalancerPortToDelete, utils2.FromTfInt64ToInt(e.LoadBalancerPort))
+		listenersLoadBalancerPortToDelete = append(listenersLoadBalancerPortToDelete, utils.FromTfInt64ToInt(e.LoadBalancerPort))
 	}
 
-	utils2.ExecuteRequest(func() (*numspot.DeleteLoadBalancerListenersResponse, error) {
+	utils.ExecuteRequest(func() (*numspot.DeleteLoadBalancerListenersResponse, error) {
 		return r.provider.GetNumspotClient().DeleteLoadBalancerListenersWithResponse(
 			ctx,
 			r.provider.GetSpaceID(),
@@ -330,16 +342,16 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 
 	// HealthCheck:
 	if !plan.HealthCheck.IsUnknown() && !state.HealthCheck.Equal(plan.HealthCheck) {
-		res := utils2.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
+		res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
 			return r.provider.GetNumspotClient().UpdateLoadBalancerWithResponse(ctx, r.provider.GetSpaceID(), plan.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
 				HealthCheck: &numspot.HealthCheck{
-					CheckInterval:      utils2.FromTfInt64ToInt(plan.HealthCheck.CheckInterval),
-					HealthyThreshold:   utils2.FromTfInt64ToInt(plan.HealthCheck.HealthyThreshold),
+					CheckInterval:      utils.FromTfInt64ToInt(plan.HealthCheck.CheckInterval),
+					HealthyThreshold:   utils.FromTfInt64ToInt(plan.HealthCheck.HealthyThreshold),
 					Path:               plan.HealthCheck.Path.ValueStringPointer(),
-					Port:               utils2.FromTfInt64ToInt(plan.HealthCheck.Port),
+					Port:               utils.FromTfInt64ToInt(plan.HealthCheck.Port),
 					Protocol:           plan.HealthCheck.Protocol.ValueString(),
-					Timeout:            utils2.FromTfInt64ToInt(plan.HealthCheck.Timeout),
-					UnhealthyThreshold: utils2.FromTfInt64ToInt(plan.HealthCheck.UnhealthyThreshold),
+					Timeout:            utils.FromTfInt64ToInt(plan.HealthCheck.Timeout),
+					UnhealthyThreshold: utils.FromTfInt64ToInt(plan.HealthCheck.UnhealthyThreshold),
 				},
 			})
 		}, http.StatusOK, &response.Diagnostics)
@@ -350,8 +362,8 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 
 	// Security Groups
 	if !plan.SecurityGroups.IsUnknown() && !state.SecurityGroups.Equal(plan.SecurityGroups) {
-		res := utils2.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
-			securityGroups := utils2.FromTfStringListToStringList(ctx, plan.SecurityGroups)
+		res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
+			securityGroups := utils.FromTfStringListToStringList(ctx, plan.SecurityGroups)
 			return r.provider.GetNumspotClient().UpdateLoadBalancerWithResponse(ctx, r.provider.GetSpaceID(), plan.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
 				SecurityGroups: &securityGroups,
 			})
@@ -362,19 +374,69 @@ func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request r
 	}
 }
 
-func (r *LoadBalancerResource) linkBackendMachines(ctx context.Context, plan LoadBalancerModel) diag.Diagnostics {
+func (r *LoadBalancerResource) updateBackendMachines(ctx context.Context, plan, state LoadBalancerModel) diag.Diagnostics {
+	var diags diag.Diagnostics
+	var backendIpstoLink, backendIpstoUnlink, backendVmIdstoLink, backendVmIdstoUnlink []string
+
+	stateBackendIps := utils.TfStringSetToStringPtrSet(ctx, state.BackendIps)
+	planBackendIps := utils.TfStringSetToStringPtrSet(ctx, plan.BackendIps)
+	stateBackendVmIds := utils.TfStringSetToStringPtrSet(ctx, state.BackendVmIds)
+	planBackendVmIds := utils.TfStringSetToStringPtrSet(ctx, plan.BackendVmIds)
+
+	if planBackendIps != nil && stateBackendIps != nil {
+		backendIpstoLink, backendIpstoUnlink = utils.DiffComparable(*planBackendIps, *stateBackendIps)
+	}
+	if planBackendIps != nil && stateBackendIps != nil {
+		backendVmIdstoLink, backendVmIdstoUnlink = utils.DiffComparable(*planBackendVmIds, *stateBackendVmIds)
+	}
+
+	diags = r.unlinkBackendMachines(ctx, state.Name.ValueString(), &backendIpstoUnlink, &backendVmIdstoUnlink)
+	if diags.HasError() {
+		return diags
+	}
+
+	diags = r.linkBackendMachines(ctx, state.Name.ValueString(), &backendIpstoLink, &backendVmIdstoLink)
+	if diags.HasError() {
+		return diags
+	}
+
+	return nil
+}
+
+func (r *LoadBalancerResource) unlinkBackendMachines(ctx context.Context, lbName string, backendIps, backendVmIds *[]string) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	payload := numspot.UnlinkLoadBalancerBackendMachinesJSONRequestBody{}
+
+	if backendIps != nil && len(*backendIps) > 0 {
+		payload.BackendIps = backendIps
+	}
+
+	if backendVmIds != nil && len(*backendVmIds) > 0 {
+		payload.BackendVmIds = backendVmIds
+	}
+
+	utils.ExecuteRequest(func() (*numspot.UnlinkLoadBalancerBackendMachinesResponse, error) {
+		return r.provider.GetNumspotClient().UnlinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.GetSpaceID(), lbName, payload)
+	}, http.StatusNoContent, &diags)
+	return diags
+}
+
+func (r *LoadBalancerResource) linkBackendMachines(ctx context.Context, lbName string, backendIps, backendVmIds *[]string) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	payload := numspot.LinkLoadBalancerBackendMachinesJSONRequestBody{}
-	if !plan.BackendIps.IsUnknown() {
-		payload.BackendIps = utils2.TfStringSetToStringPtrSet(ctx, plan.BackendIps)
-	}
-	if !plan.BackendVmIds.IsUnknown() {
-		payload.BackendVmIds = utils2.TfStringSetToStringPtrSet(ctx, plan.BackendVmIds)
+
+	if backendIps != nil && len(*backendIps) > 0 {
+		payload.BackendIps = backendIps
 	}
 
-	utils2.ExecuteRequest(func() (*numspot.LinkLoadBalancerBackendMachinesResponse, error) {
-		return r.provider.GetNumspotClient().LinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.GetSpaceID(), plan.Name.ValueString(), payload)
+	if backendVmIds != nil && len(*backendVmIds) > 0 {
+		payload.BackendVmIds = backendVmIds
+	}
+
+	utils.ExecuteRequest(func() (*numspot.LinkLoadBalancerBackendMachinesResponse, error) {
+		return r.provider.GetNumspotClient().LinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.GetSpaceID(), lbName, payload)
 	}, http.StatusNoContent, &diags)
 	return diags
 }
@@ -384,17 +446,17 @@ func (r *LoadBalancerResource) AttachHealthCheck(ctx context.Context, lbName str
 
 	payload := numspot.UpdateLoadBalancerJSONRequestBody{
 		HealthCheck: &numspot.HealthCheck{
-			CheckInterval:      utils2.FromTfInt64ToInt(healthCheck.CheckInterval),
-			HealthyThreshold:   utils2.FromTfInt64ToInt(healthCheck.HealthyThreshold),
+			CheckInterval:      utils.FromTfInt64ToInt(healthCheck.CheckInterval),
+			HealthyThreshold:   utils.FromTfInt64ToInt(healthCheck.HealthyThreshold),
 			Path:               healthCheck.Path.ValueStringPointer(),
-			Port:               utils2.FromTfInt64ToInt(healthCheck.Port),
+			Port:               utils.FromTfInt64ToInt(healthCheck.Port),
 			Protocol:           healthCheck.Protocol.ValueString(),
-			Timeout:            utils2.FromTfInt64ToInt(healthCheck.Timeout),
-			UnhealthyThreshold: utils2.FromTfInt64ToInt(healthCheck.UnhealthyThreshold),
+			Timeout:            utils.FromTfInt64ToInt(healthCheck.Timeout),
+			UnhealthyThreshold: utils.FromTfInt64ToInt(healthCheck.UnhealthyThreshold),
 		},
 	}
 
-	updatedLoadBalancer := utils2.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
+	updatedLoadBalancer := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
 		return r.provider.GetNumspotClient().UpdateLoadBalancerWithResponse(ctx, r.provider.GetSpaceID(), lbName, payload)
 	}, http.StatusOK, &diags)
 
@@ -409,7 +471,7 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 
 	// Detach security groups
 	emptyList := []string{}
-	res := utils2.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
 		return r.provider.GetNumspotClient().UpdateLoadBalancerWithResponse(ctx, r.provider.GetSpaceID(), data.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
 			SecurityGroups: &emptyList,
 		})
@@ -418,7 +480,7 @@ func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.Dele
 		return
 	}
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteLoadBalancerWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteLoadBalancerWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Load Balancer", err.Error())
 		return
