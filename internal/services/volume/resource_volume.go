@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
@@ -117,20 +118,31 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		}
 
 		// Wait for volume to be linked to VM
-		read, err = utils.RetryReadUntilStateValid(
-			ctx,
-			createdId,
-			r.provider.GetSpaceID(),
-			[]string{"creating"},
-			[]string{"in-use"},
-			r.provider.GetNumspotClient().ReadVolumesByIdWithResponse,
-		)
+		createStateConf := &retry.StateChangeConf{
+			Pending: []string{"attaching"},
+			Target:  []string{"attached"},
+			Refresh: func() (interface{}, string, error) {
+				readRes, err := r.provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, r.provider.GetSpaceID(), createdId)
+				if err != nil {
+					return nil, "", fmt.Errorf("failed to read volume : %v", err)
+				}
+
+				if len(*readRes.JSON200.LinkedVolumes) > 0 {
+					linkState := (*readRes.JSON200.LinkedVolumes)[0].State
+					return readRes.JSON200, *linkState, nil
+				}
+
+				return nil, "", fmt.Errorf("Volume not linked to any VM : %v", err)
+			},
+			Timeout: utils.TfRequestRetryTimeout,
+			Delay:   utils.TfRequestRetryDelay,
+		}
+		read, err = createStateConf.WaitForStateContext(ctx)
 		if err != nil {
 			response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be linked: %s", *res.JSON201.Id, err))
 			return
 		}
 	}
-
 	rr, ok := read.(*numspot.Volume)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create volume", "object conversion error")
