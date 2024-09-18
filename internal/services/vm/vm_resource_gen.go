@@ -12,7 +12,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -151,6 +154,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
 				MarkdownDescription: "The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"initiated_shutdown_behavior": schema.StringAttribute{
 				Computed:            true,
@@ -459,6 +465,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "One or more IDs of security group for the VMs.",
 				MarkdownDescription: "One or more IDs of security group for the VMs.",
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"security_groups": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -466,6 +475,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "One or more names of security groups for the VMs.",
 				MarkdownDescription: "One or more names of security groups for the VMs.",
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			// MANUALLY EDITED : remove space_id
 			"state": schema.StringAttribute{
@@ -482,6 +494,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"tags": tags.TagsSchema(ctx),
 			"type": schema.StringAttribute{

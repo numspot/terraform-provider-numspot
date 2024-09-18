@@ -21,6 +21,9 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 				Optional:            true, // MANUALLY EDITED : add Optional attributes
 				Description:         "The ID of the DHCP options set (or `default` if you want to associate the default one).",
 				MarkdownDescription: "The ID of the DHCP options set (or `default` if you want to associate the default one).",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,

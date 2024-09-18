@@ -127,7 +127,6 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 			},
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			{
 				Config: testFlexibleGpuConfig(acctest.NEW_SUFFIX, updatePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
@@ -142,7 +141,6 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 			},
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			{
 				Config: testFlexibleGpuConfig_DeletedDependencies(updatePlanValues),
 				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
@@ -153,10 +151,6 @@ func TestAccFlexibleGpuResource(t *testing.T) {
 
 func testFlexibleGpuConfig(subresourceSuffix string, data StepDataFlexibleGpu) string {
 	return fmt.Sprintf(`
-
-
-
-
 // <== If resource has dependencies ==> 
 
 resource "numspot_vpc" "net" {

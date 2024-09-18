@@ -411,7 +411,7 @@ func updateNICLinkUnlinkVM(t *testing.T) (string, []resource.TestCheckFunc) {
 
 		resource.TestCheckResourceAttrWith("numspot_nic.test", "id", func(v string) error {
 			require.NotEmpty(t, v)
-			require.Equal(t, v, nicResourceID)
+			require.NotEqual(t, v, nicResourceID)
 			return nil
 		}),
 	)

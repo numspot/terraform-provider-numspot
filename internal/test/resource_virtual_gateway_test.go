@@ -94,6 +94,16 @@ func TestAccVirtualGatewayResource(t *testing.T) {
 			return nil
 		}),
 	)
+
+	replaceChecks := append(
+		getFieldMatchChecksVirtualGateway(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_virtual_gateway.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
@@ -122,13 +132,15 @@ func TestAccVirtualGatewayResource(t *testing.T) {
 				)...),
 			},
 			// <== If resource has required dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-
-			// <== If resource has optional dependencies ==>
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
+			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly
+			{
+				Config: testVirtualGatewayConfig(acctest.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksVirtualGateway(acctest.NEW_SUFFIX),
+				)...),
+			},
 		},
 	})
 }

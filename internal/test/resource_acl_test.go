@@ -179,7 +179,6 @@ package test
 //			},
 //			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
 //			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
-//			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 //			{
 //				Config: testACLsConfig_DeletedDependencies(replacePlanValues1),
 //				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks1...),

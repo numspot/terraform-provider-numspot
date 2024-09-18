@@ -4,6 +4,7 @@ package publicip
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -11,6 +12,8 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
 func PublicIpResourceSchema(ctx context.Context) schema.Schema {
@@ -29,6 +32,9 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				Validators: []validator.String{
 					stringvalidator.ConflictsWith(path.MatchRoot("vm_id")),
 				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"private_ip": schema.StringAttribute{
 				Computed:            true,
@@ -46,6 +52,9 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the VM the public IP is associated with (if any).",
 				Validators: []validator.String{
 					stringvalidator.ConflictsWith(path.MatchRoot("nic_id")),
+				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"link_public_ip": schema.StringAttribute{

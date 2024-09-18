@@ -178,14 +178,6 @@ func TestAccLoadBalancerResource(t *testing.T) {
 					getDependencyChecksLoadBalancer(acctest.BASE_SUFFIX),
 				)...),
 			},
-			// <== If resource has required dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testLoadBalancerConfig(acctest.BASE_SUFFIX, subnetIpRange, basePlanValues),
-			},
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-
 			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
 			{
@@ -197,22 +189,21 @@ func TestAccLoadBalancerResource(t *testing.T) {
 			},
 
 			// <== If resource has optional dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
-
+			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: testLoadBalancerConfig(acctest.BASE_SUFFIX, subnetIpRange, basePlanValues),
+			},
+			{
+				Config: testLoadBalancerConfig_DeletedDependencies(subnetIpRange, updatePlanValues),
+				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
+			},
 		},
 	})
 }
 
-func testLoadBalancerConfig(subresourceSuffix string, subnetIpRange string, data StepDataLoadBalancer) string {
+func getListener(ports []string) string {
 	listeners := "["
 
-	for _, port := range data.ports {
+	for _, port := range ports {
 		listeners += fmt.Sprintf(`
     {
       backend_port           = %[1]s
@@ -223,6 +214,10 @@ func testLoadBalancerConfig(subresourceSuffix string, subnetIpRange string, data
 	}
 	listeners += "]"
 
+	return listeners
+}
+
+func testLoadBalancerConfig(subresourceSuffix string, subnetIpRange string, data StepDataLoadBalancer) string {
 	return fmt.Sprintf(`
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
@@ -292,23 +287,10 @@ resource "numspot_load_balancer" "test" {
       value = %[4]q
     }
   ]
-}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners, subnetIpRange, data.backendVmType)
+}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, getListener(data.ports), subnetIpRange, data.backendVmType)
 }
 
 func testLoadBalancerConfig_Public(subresourceSuffix string, subnetIpRange string, data StepDataLoadBalancer) string {
-	listeners := "["
-
-	for _, port := range data.ports {
-		listeners += fmt.Sprintf(`
-    {
-      backend_port           = %[1]s
-      load_balancer_port     = %[1]s
-      load_balancer_protocol = "TCP"
-    }`, port)
-		listeners += ","
-	}
-	listeners += "]"
-
 	return fmt.Sprintf(`
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
@@ -397,5 +379,33 @@ resource "numspot_load_balancer" "test" {
   ]
 
   depends_on = [numspot_internet_gateway.ig]
-}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, listeners, subnetIpRange, data.backendVmType)
+}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, getListener(data.ports), subnetIpRange, data.backendVmType)
+}
+
+// <== If resource has optional dependencies ==>
+func testLoadBalancerConfig_DeletedDependencies(subnetIpRange string, data StepDataLoadBalancer) string {
+	return fmt.Sprintf(`
+resource "numspot_vpc" "vpc" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "test" {
+  vpc_id   = numspot_vpc.vpc.id
+  ip_range = %[4]q
+}
+resource "numspot_load_balancer" "test" {
+  name    = %[1]q
+  subnets = [numspot_subnet.test.id]
+
+  listeners = %[5]s
+
+  type = "internal"
+
+  tags = [
+    {
+      key   = %[2]q
+      value = %[3]q
+    }
+  ]
+}`, data.name, data.tagKey, data.tagValue, subnetIpRange, getListener(data.ports))
 }

@@ -15,6 +15,8 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
 func RouteTableResourceSchema(ctx context.Context) schema.Schema {
@@ -47,11 +49,17 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "The ID of the Subnet.",
 							MarkdownDescription: "The ID of the Subnet.",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+							},
 						},
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The ID of the Vpc.",
 							MarkdownDescription: "The ID of the Vpc.",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+							},
 						},
 					},
 					CustomType: LinkRouteTablesType{
@@ -106,6 +114,9 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							Optional:            true, // MANUALLY EDITED : Add optional attribute
 							Description:         "The ID of the Internet gateway or virtual gateway attached to the Vpc.",
 							MarkdownDescription: "The ID of the Internet gateway or virtual gateway attached to the Vpc.",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+							},
 						},
 						"nat_gateway_id": schema.StringAttribute{
 							Computed:            true,

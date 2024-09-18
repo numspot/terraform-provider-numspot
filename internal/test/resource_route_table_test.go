@@ -91,6 +91,16 @@ func TestAccRouteTableResource(t *testing.T) {
 			return nil
 		}),
 	)
+
+	replaceChecks := append(
+		getFieldMatchChecksRouteTable(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
@@ -118,15 +128,17 @@ func TestAccRouteTableResource(t *testing.T) {
 					getDependencyChecksRouteTable(acctest.BASE_SUFFIX),
 				)...),
 			},
-			// <== If resource has required dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
 
 			// <== If resource has optional dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
+			{
+				Config: testRouteTableConfig(acctest.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksRouteTable(acctest.NEW_SUFFIX),
+				)...),
+			},
 		},
 	})
 }

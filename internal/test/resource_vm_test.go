@@ -112,23 +112,16 @@ func TestAccVmResource(t *testing.T) {
 	)
 
 	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
-	//replacePlanValues := StepDataVm{
-	//	sourceImageId:               sourceImageId,
-	//	vmType:                      vmType,
-	//	vmInitiatedShutdownBehavior: vmInitiatedShutdownBehavior,
-	//	tagKey:                      tagKey,
-	//	tagValue:                    tagValue,
-	//	subregionName:               subregionNameUpdated,
-	//}
-	//replaceChecks := append(
-	//	getFieldMatchChecksVm(replacePlanValues),
-	//
-	//	resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
-	//		require.NotEmpty(t, v)
-	//		require.NotEqual(t, v, resourceId)
-	//		return nil
-	//	}),
-	//)
+
+	replaceChecks := append(
+		getFieldMatchChecksVm(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_vm.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
@@ -140,7 +133,6 @@ func TestAccVmResource(t *testing.T) {
 					createChecks,
 					getDependencyChecksVm(acctest.BASE_SUFFIX),
 				)...),
-				// ExpectNonEmptyPlan: true,
 			},
 			{ // ImportState testing
 				ResourceName:            "numspot_vm.test",
@@ -155,47 +147,19 @@ func TestAccVmResource(t *testing.T) {
 					updateChecks,
 					getDependencyChecksVm(acctest.BASE_SUFFIX),
 				)...),
-				// ExpectNonEmptyPlan: true,
-			},
-			// Update testing With Replace
-			//{
-			//	Config: testVmConfig(provider.BASE_SUFFIX, replacePlanValues),
-			//	Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-			//		replaceChecks,
-			//		getDependencyChecksVm(provider.BASE_SUFFIX),
-			//	)...),
-			//	ExpectNonEmptyPlan: true,
-			//},
-			// <== If resource has required dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testVmConfig(acctest.BASE_SUFFIX, basePlanValues),
-				// ExpectNonEmptyPlan: true,
 			},
 
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
+			// <== If resource has required dependencies ==>
 
 			// Update testing With Replace of dependency resource and with Replace of the resource
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			//{
-			//	Config: testVmConfig(provider.NEW_SUFFIX, replacePlanValues),
-			//	Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-			//		replaceChecks,
-			//		getDependencyChecksVm(provider.NEW_SUFFIX),
-			//	)...),
-			//	ExpectNonEmptyPlan: true,
-			//},
-
-			// <== If resource has optional dependencies ==>
-
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Deletion of dependency resource and with Replace of the resource
-			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
+			{
+				Config: testVmConfig(acctest.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksVm(acctest.NEW_SUFFIX),
+				)...),
+			},
 		},
 	})
 }

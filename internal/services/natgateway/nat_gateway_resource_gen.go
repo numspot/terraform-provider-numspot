@@ -31,6 +31,9 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The allocation ID of the public IP to associate with the NAT gateway.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
 				MarkdownDescription: "The allocation ID of the public IP to associate with the NAT gateway.<br />\nIf the public IP is already associated with another resource, you must first disassociate it.",
+				PlanModifiers: []planmodifier.String{ // MANUALLY EDITED : Add requires replace
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"public_ips": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -71,6 +74,9 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The ID of the Subnet in which you want to create the NAT gateway.",
 				MarkdownDescription: "The ID of the Subnet in which you want to create the NAT gateway.",
+				PlanModifiers: []planmodifier.String{ // MANUALLY EDITED : Add requires replace
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"vpc_id": schema.StringAttribute{
