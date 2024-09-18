@@ -68,9 +68,12 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 						MarkdownDescription: "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`).",
 					},
 					"vm_id": schema.StringAttribute{
-						Computed:            true,
-						Optional:            true,
-						PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						Computed: true,
+						Optional: true,
+						PlanModifiers: []planmodifier.String{ // MANUALLY EDITED : Add plan modifier
+							stringplanmodifier.UseStateForUnknown(),
+							stringplanmodifier.RequiresReplace(),
+						},
 						Description:         "The ID of the VM.",
 						MarkdownDescription: "The ID of the VM.",
 					},
@@ -201,6 +204,9 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "One or more IDs of security groups for the NIC.",
 				MarkdownDescription: "One or more IDs of security groups for the NIC.",
+				PlanModifiers: []planmodifier.List{ // MANUALLY EDITED : Add requires replace
+					listplanmodifier.RequiresReplace(),
+				},
 			},
 			"security_groups": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{

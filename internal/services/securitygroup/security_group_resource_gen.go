@@ -196,6 +196,9 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "The ID of the Vpc for the security group.",
 				MarkdownDescription: "The ID of the Vpc for the security group.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 		},
 		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message

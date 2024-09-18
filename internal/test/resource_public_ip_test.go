@@ -88,6 +88,16 @@ func TestAccPublicIpResource(t *testing.T) {
 			return nil
 		}),
 	)
+
+	replaceChecks := append(
+		getFieldMatchChecksPublicIp(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
@@ -117,14 +127,20 @@ func TestAccPublicIpResource(t *testing.T) {
 			},
 
 			// <== If resource has required dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-
-			// <== If resource has optional dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
+			{
+				Config: testPublicIpConfig(acctest.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksPublicIp(acctest.NEW_SUFFIX),
+				)...),
+			},
+
+			{
+				Config: testPublicIpConfig_DeletedDependencies(updatePlanValues),
+				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
+			},
 		},
 	})
 }
@@ -167,4 +183,17 @@ resource "numspot_public_ip" "test" {
     }
   ]
 }`, subresourceSuffix, data.tagKey, data.tagValue)
+}
+
+// <== If resource has optional dependencies ==>
+func testPublicIpConfig_DeletedDependencies(data StepDataPublicIp) string {
+	return fmt.Sprintf(`
+resource "numspot_public_ip" "test" {
+  tags = [
+    {
+      key   = %[1]q
+      value = %[2]q
+    }
+  ]
+}`, data.tagKey, data.tagValue)
 }

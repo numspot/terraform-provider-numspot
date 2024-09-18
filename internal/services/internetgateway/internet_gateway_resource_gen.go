@@ -4,10 +4,13 @@ package internetgateway
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
 func InternetGatewayResourceSchema(ctx context.Context) schema.Schema {
@@ -22,6 +25,9 @@ func InternetGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Optional:            true,
 				Description:         "The ID of the Vpc attached to the Internet gateway.",
 				MarkdownDescription: "The ID of the Vpc attached to the Internet gateway.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"state": schema.StringAttribute{
 				Computed:            true,

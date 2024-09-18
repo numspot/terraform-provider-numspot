@@ -88,6 +88,16 @@ func TestAccNatGatewayResource(t *testing.T) {
 			return nil
 		}),
 	)
+
+	replaceChecks := append(
+		getFieldMatchChecksNatGateway(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_nat_gateway.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
@@ -117,9 +127,15 @@ func TestAccNatGatewayResource(t *testing.T) {
 			},
 
 			// <== If resource has required dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
+			{
+				Config: testNatGatewayConfig(acctest.NEW_SUFFIX, updatePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksNatGateway(acctest.NEW_SUFFIX),
+				)...),
+			},
 		},
 	})
 }

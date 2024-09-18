@@ -87,6 +87,18 @@ func TestAccInternetGatewayResource(t *testing.T) {
 			return nil
 		}),
 	)
+
+	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
+
+	replaceChecks := append(
+		getFieldMatchChecksInternetGateway(updatePlanValues),
+
+		resource.TestCheckResourceAttrWith("numspot_internet_gateway.test", "id", func(v string) error {
+			require.NotEmpty(t, v)
+			require.NotEqual(t, v, resourceId)
+			return nil
+		}),
+	)
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	resource.Test(t, resource.TestCase{
@@ -120,14 +132,10 @@ func TestAccInternetGatewayResource(t *testing.T) {
 			{
 				Config: testInternetGatewayConfig(acctest.NEW_SUFFIX, updatePlanValues),
 				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
+					replaceChecks,
 					getDependencyChecksInternetGateway(acctest.NEW_SUFFIX),
 				)...),
 			},
-			// <== If resource has optional dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
 		},
 	})
 }

@@ -179,10 +179,6 @@ func TestAccVpnConnectionResource(t *testing.T) {
 			},
 
 			// <== If resource has required dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-
 			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
 			{

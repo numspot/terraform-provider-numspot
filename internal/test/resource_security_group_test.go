@@ -210,22 +210,15 @@ func TestAccSecurityGroupResource(t *testing.T) {
 				)...),
 			},
 			// <== If resource has required dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly
-
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
 			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
 			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-
-			// <== If resource has optional dependencies ==>
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-
-			// --> DELETED TEST <-- : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
+			{
+				Config: testSecurityGroupConfig(acctest.NEW_SUFFIX, replacePlanValues),
+				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
+					replaceChecks,
+					getDependencyChecksSecurityGroup(acctest.NEW_SUFFIX),
+				)...),
+			},
 		},
 	})
 }
