@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"reflect"
 	"slices"
 	"time"
@@ -18,10 +19,7 @@ type TfRequestResp interface {
 	StatusCode() int
 }
 
-const (
-	TfRequestRetryTimeout = 5 * time.Minute
-	TfRequestRetryDelay   = 5 * time.Second
-)
+const TfRequestRetryTimeout = 5 * time.Minute
 
 var (
 	StatusCodeRetryOnDelete     = []int{http.StatusConflict, http.StatusFailedDependency}
@@ -29,6 +27,41 @@ var (
 	StatusCodeRetryOnCreate     = []int{http.StatusConflict, http.StatusFailedDependency}
 	StatusCodeStopRetryOnCreate = []int{http.StatusNoContent, http.StatusCreated}
 )
+
+// ParseRetryBackoff retrieves the retry backoff duration from the
+// "RETRY_BACKOFF" environment variable. If the environment variable is not set
+// or contains an invalid value, it defaults to 5 seconds.
+//
+// The environment variable "RETRY_BACKOFF" should be a valid string representing
+// a duration, such as "500ms", "1s", "2m", etc., as accepted by time.ParseDuration.
+//
+// Returns:
+//   - time.Duration: The duration parsed from the environment variable, or 5 seconds if
+//     the environment variable is not set or contains an invalid value.
+//
+// Example environment variable:
+//
+//	RETRY_BACKOFF="2s"  // This sets the retry backoff to 2 seconds.
+//
+// TODO:
+//
+// A refactoring should be made later to this,
+// All this logic should be encapsulated into an object.
+//
+// env variable parsing should be done provider bootstrapping phase.
+func ParseRetryBackoff() time.Duration {
+	// Default retry backoff set to 5s
+	retryBackoff := 5 * time.Second
+
+	retryBackoffStr := os.Getenv("RETRY_BACKOFF")
+	// Parse the string into time.Duration
+	val, err := time.ParseDuration(retryBackoffStr)
+	if err == nil {
+		retryBackoff = val
+	}
+
+	return retryBackoff
+}
 
 func getErrorMessage(res TfRequestResp) (string, error) {
 	errorResponse, err := getFieldFromReflectStructPtr(reflect.ValueOf(res), "Body")
@@ -58,7 +91,7 @@ func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, ret
 		}
 
 		if slices.Contains(retryCodes, res.StatusCode()) {
-			time.Sleep(TfRequestRetryDelay) // Delay not handled in RetryContext. Might find a better solution later
+			time.Sleep(ParseRetryBackoff()) // Delay not handled in RetryContext. Might find a better solution later
 			return retry.RetryableError(fmt.Errorf("error : retry timeout reached (%v). Error message : %v", TfRequestRetryTimeout, errorMessage))
 		} else {
 			return retry.NonRetryableError(errors.New(errorMessage))
@@ -202,7 +235,7 @@ func RetryReadUntilStateValid[R TfRequestResp](
 			return ReadResourceUtils(ctx, createdId, spaceID, readFunction)
 		},
 		Timeout: TfRequestRetryTimeout,
-		Delay:   TfRequestRetryDelay,
+		Delay:   ParseRetryBackoff(),
 	}
 
 	return createStateConf.WaitForStateContext(ctx)

@@ -69,9 +69,6 @@ acc-tests:
   image: golang:1.21.0
   stage: test
   before_script:
-    - echo "machine ${CI_SERVER_HOST} login gitlab-ci-token password
-      ${CI_JOB_TOKEN}" > ~/.netrc
-    - go mod download
     - go install gotest.tools/gotestsum@latest
   variables:
     NUMSPOT_API_HOST: $NUMSPOT_API_HOST
@@ -80,8 +77,12 @@ acc-tests:
     NUMSPOT_CLIENT_SECRET: $NUMSPOT_CLIENT_SECRET
     NUMSPOT_SPACE_ID: $NUMSPOT_SPACE_ID
     TF_ACC: "1"
+    PARALLEL_TEST: "true"
+    RETRY_BACKOFF: "5ms"
+    VCR_MODE : "replay"
+    CI: "true"
   script:
-    - gotestsum --junitfile acc-tests-report.xml --format testname -- --tags=acc ./...
+    - gotestsum --junitfile acc-tests-report.xml --format testname -- -timeout 30m --tags=acc ./...
   artifacts:
     when: always
     reports:
