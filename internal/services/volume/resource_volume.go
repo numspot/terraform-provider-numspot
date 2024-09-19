@@ -135,7 +135,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 				return nil, "", fmt.Errorf("Volume not linked to any VM : %v", err)
 			},
 			Timeout: utils.TfRequestRetryTimeout,
-			Delay:   utils.TfRequestRetryDelay,
+			Delay:   utils.ParseRetryBackoff(),
 		}
 		read, err = createStateConf.WaitForStateContext(ctx)
 		if err != nil {
