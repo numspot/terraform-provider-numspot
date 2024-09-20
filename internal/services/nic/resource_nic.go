@@ -150,7 +150,9 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 		}
 	}
 
-	if !state.LinkNic.VmId.Equal(plan.LinkNic.VmId) || !state.LinkNic.DeviceNumber.Equal(plan.LinkNic.DeviceNumber) {
+	if !utils.IsTfValueNull(plan.LinkNic) &&
+		!utils.IsTfValueNull(plan.LinkNic.VmId) && !state.LinkNic.VmId.Equal(plan.LinkNic.VmId) ||
+		!utils.IsTfValueNull(plan.LinkNic.DeviceNumber) && !state.LinkNic.DeviceNumber.Equal(plan.LinkNic.DeviceNumber) {
 		_, diags := r.updateLinkNIC(ctx, &plan, &state)
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)

@@ -21,7 +21,18 @@ func TestAccInternetGatewaysDatasource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchInternetGatewaysConfig(),
+				Config: `
+resource "numspot_vpc" "test" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_internet_gateway" "test" {
+  vpc_id = numspot_vpc.test.id
+}
+
+data "numspot_internet_gateways" "testdata" {
+  ids = [numspot_internet_gateway.test.id]
+}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_internet_gateways.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_internet_gateways.testdata", "items.*", map[string]string{
@@ -32,21 +43,4 @@ func TestAccInternetGatewaysDatasource(t *testing.T) {
 			},
 		},
 	})
-}
-
-func fetchInternetGatewaysConfig() string {
-	return `
-resource "numspot_vpc" "test" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_internet_gateway" "test" {
-  vpc_id = numspot_vpc.test.id
-}
-
-data "numspot_internet_gateways" "testdata" {
-  ids        = [numspot_internet_gateway.test.id]
-  depends_on = [numspot_internet_gateway.test]
-}
-`
 }

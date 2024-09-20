@@ -21,21 +21,7 @@ func TestAccPublicIpsDatasource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchPublicIpsConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_public_ips.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_public_ips.testdata", "items.*", map[string]string{
-						"id":        acctest.PAIR_PREFIX + "numspot_public_ip.test.id",
-						"public_ip": acctest.PAIR_PREFIX + "numspot_public_ip.test.public_ip",
-					}),
-				),
-			},
-		},
-	})
-}
-
-func fetchPublicIpsConfig() string {
-	return `
+				Config: `
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
@@ -56,11 +42,20 @@ resource "numspot_nic" "nic" {
 
 resource "numspot_public_ip" "test" {
   nic_id     = numspot_nic.nic.id
-  depends_on = [numspot_nic.nic, numspot_internet_gateway.internet_gateway]
+  depends_on = [numspot_internet_gateway.internet_gateway]
 }
 
 data "numspot_public_ips" "testdata" {
   ids = [numspot_public_ip.test.id]
-}
-`
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_public_ips.testdata", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_public_ips.testdata", "items.*", map[string]string{
+						"id":        acctest.PAIR_PREFIX + "numspot_public_ip.test.id",
+						"public_ip": acctest.PAIR_PREFIX + "numspot_public_ip.test.public_ip",
+					}),
+				),
+			},
+		},
+	})
 }

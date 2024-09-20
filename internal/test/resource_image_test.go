@@ -2,52 +2,14 @@ package test
 
 import (
 	"fmt"
-	"slices"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 )
-
-// This struct will store the input data that will be used in your tests (all fields as string)
-type StepDataImage struct {
-	name,
-	sourceImageId,
-	isPublic,
-	tagKey,
-	tagValue string
-}
-
-// Generate checks to validate that resource 'numspot_image.test' has input data values
-func getFieldMatchChecksImage(data StepDataImage) []resource.TestCheckFunc {
-	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttr("numspot_image.test", "name", data.name),
-		resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", data.isPublic),
-		resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
-		resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
-			"key":   data.tagKey,
-			"value": data.tagValue,
-		}),
-	}
-}
-
-// Generate checks to validate that resource 'numspot_image.test' is properly linked to given subresources
-// If resource has no dependencies, return empty array
-func getDependencyChecksImage_FromVm(dependenciesSuffix string) []resource.TestCheckFunc {
-	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_image.test", "vm_id", "numspot_vm.test"+dependenciesSuffix, "id"),
-	}
-}
-
-func getDependencyChecksImage_FromSnapshot(dependenciesSuffix string) []resource.TestCheckFunc {
-	return []resource.TestCheckFunc{
-		acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test", "block_device_mappings.*", map[string]string{
-			"bsu.snapshot_id": fmt.Sprintf(acctest.PAIR_PREFIX+"numspot_snapshot.test%[1]s.id", dependenciesSuffix),
-		}),
-	}
-}
 
 func TestAccImageResource(t *testing.T) {
 	acct := acctest.NewAccTest(t, false, "")
@@ -59,224 +21,132 @@ func TestAccImageResource(t *testing.T) {
 
 	var resourceId string
 
-	////////////// Define input data that will be used in the test sequence //////////////
-	// resource fields that can be updated in-place
-
-	// resource fields that cannot be updated in-place (requires replace)
-
-	name := "terraform-image-test"
-	nameUpdated := "terraform-image-test-Updated"
-	sourceImageId := "ami-0b7df82c"
-	sourceImageIdUpdated := "ami-0987a84b"
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	tagKey := "name"
-	tagValue := "Terraform-Test-Image"
-	tagValueUpdated := tagValue + "-Updated"
-	isPublic := "true"
-	isPublicUpdated := "false"
-
-	////////////// Define plan values and generate associated attribute checks  //////////////
-	// The base plan (used in first create and to reset resource state before some tests)
-	basePlanValues := StepDataImage{
-		name:          name,
-		sourceImageId: sourceImageId,
-		tagKey:        tagKey,
-		tagValue:      tagValue,
-		isPublic:      isPublic,
-	}
-	createChecks := append(
-		getFieldMatchChecksImage(basePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
-			require.NotEmpty(t, v)
-			resourceId = v
-			return nil
-		}),
-	)
-
-	// The plan that should trigger Replace behavior (based on basePlanValues or updatePlanValues). Update the value for as much non-updatable fields as possible here.
-	replacePlanValues := StepDataImage{
-		name:          nameUpdated,
-		sourceImageId: sourceImageIdUpdated,
-		tagKey:        tagKey,
-		tagValue:      tagValue,
-		isPublic:      isPublic,
-	}
-	replaceChecks := append(
-		getFieldMatchChecksImage(replacePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
-			require.NotEmpty(t, v)
-			require.NotEqual(t, v, resourceId)
-			resourceId = v
-			return nil
-		}),
-	)
-	// The plan that should trigger Update behavior (based on replacePlanValues). Update the value for as much updatable fields as possible here.
-	updatePlanValues := StepDataImage{
-		name:          nameUpdated,
-		sourceImageId: sourceImageIdUpdated,
-		tagKey:        tagKey,
-		tagValue:      tagValueUpdated,
-		isPublic:      isPublicUpdated,
-	}
-	updateChecks := append(
-		getFieldMatchChecksImage(updatePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
-			require.NotEmpty(t, v)
-			require.Equal(t, v, resourceId)
-			resourceId = v
-			return nil
-		}),
-	)
-	/////////////////////////////////////////////////////////////////////////////////////
-
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{ // Create testing
-				Config: testImageConfig_FromImage(basePlanValues),
+			{ // 1 - Create testing
+				Config: `
+resource "numspot_image" "test" {
+  name               = "terraform-image-test"
+  source_image_id    = "ami-0b7df82c"
+  source_region_name = "cloudgouv-eu-west-1"
+  access = {
+    is_public = "true"
+  }
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Image"
+    }
+  ]
+}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					append(
-						slices.Concat(createChecks),
-						resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", basePlanValues.sourceImageId),
-					)...,
+					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform-image-test"),
+					resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", "ami-0b7df82c"),
+					resource.TestCheckResourceAttr("numspot_image.test", "source_region_name", "cloudgouv-eu-west-1"),
+					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "true"),
+					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Image",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						resourceId = v
+						return nil
+					}),
 				),
 			},
-			// ImportState testing
+			// 2 - ImportState testing
 			{
 				ResourceName:            "numspot_image.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"source_image_id", "source_region_name"},
 			},
-			// Update testing With Replace (create image from Image)
+			// 3 - Update testing With Replace (create image from Image)
 			{
-				Config: testImageConfig_FromImage(replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					append(
-						slices.Concat(replaceChecks),
-						resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", replacePlanValues.sourceImageId),
-					)...,
-				),
-			},
-			// Update testing Without Replace (create image from Image)
-			{
-				Config: testImageConfig_FromImage(updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					append(
-						slices.Concat(updateChecks),
-						resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", replacePlanValues.sourceImageId),
-					)...,
-				),
-			},
-			// Update testing With Replace (create image from Vm)
-			{
-				Config: testImageConfig_FromVm(acctest.BASE_SUFFIX, replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-					getDependencyChecksImage_FromVm(acctest.BASE_SUFFIX),
-				)...),
-			},
-			// Update testing Without Replace (create image from Vm)
-			{
-				Config: testImageConfig_FromVm(acctest.BASE_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksImage_FromVm(acctest.BASE_SUFFIX),
-				)...),
-			},
-
-			// Update testing With Replace (create image from Snapshot)
-			{
-				Config: testImageConfig_FromSnapshot(acctest.BASE_SUFFIX, replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-					getDependencyChecksImage_FromSnapshot(acctest.BASE_SUFFIX),
-				)...),
-			},
-			// Update testing Without Replace (create image from Snapshot)
-			{
-				Config: testImageConfig_FromSnapshot(acctest.BASE_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksImage_FromSnapshot(acctest.BASE_SUFFIX),
-				)...),
-			},
-
-			// <== If resource has required dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testImageConfig_FromVm(acctest.BASE_SUFFIX, basePlanValues),
-			},
-			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			{
-				Config: testImageConfig_FromVm(acctest.NEW_SUFFIX, replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-					getDependencyChecksImage_FromVm(acctest.NEW_SUFFIX),
-				)...),
-			},
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testImageConfig_FromSnapshot(acctest.BASE_SUFFIX, basePlanValues),
-			},
-			// Update testing With Replace of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			{
-				Config: testImageConfig_FromSnapshot(acctest.NEW_SUFFIX, replacePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-					getDependencyChecksImage_FromSnapshot(acctest.NEW_SUFFIX),
-				)...),
-			},
-
-			// <== If resource has optional dependencies ==>
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testImageConfig_FromVm(acctest.BASE_SUFFIX, basePlanValues),
-			},
-			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
-			{
-				Config: testImageConfig_FromImage(replacePlanValues),
-				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
-			},
-
-			{ // Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: testImageConfig_FromSnapshot(acctest.BASE_SUFFIX, basePlanValues),
-			},
-			// Update testing With Deletion of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the replace of the main resource works properly (empty dependency)
-			{
-				Config: testImageConfig_FromImage(replacePlanValues),
-				Check:  resource.ComposeAggregateTestCheckFunc(replaceChecks...),
-			},
-		},
-	})
-}
-
-func testImageConfig_FromImage(data StepDataImage) string {
-	return fmt.Sprintf(`
+				Config: `
 resource "numspot_image" "test" {
-  name               = %[1]q
-  source_image_id    = %[2]q
+  name               = "terraform-image-test-updated"
+  source_image_id    = "ami-0987a84b"
   source_region_name = "cloudgouv-eu-west-1"
   access = {
-    is_public = %[5]s
+    is_public = "true"
   }
   tags = [
     {
-      key   = %[3]q
-      value = %[4]q
+      key   = "name"
+      value = "Terraform-Test-Image"
     }
   ]
-}`, data.name, data.sourceImageId, data.tagKey, data.tagValue, data.isPublic)
-}
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform-image-test-updated"),
+					resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", "ami-0987a84b"),
+					resource.TestCheckResourceAttr("numspot_image.test", "source_region_name", "cloudgouv-eu-west-1"),
+					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "true"),
+					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Image",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.NotEqual(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
+			},
+			// 4 - Update testing Without Replace (create image from Image)
+			{
+				Config: `
+resource "numspot_image" "test" {
+  name               = "terraform-image-test-updated"
+  source_image_id    = "ami-0987a84b"
+  source_region_name = "cloudgouv-eu-west-1"
+  access = {
+    is_public = "false"
+  }
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Image-Updated"
+    }
+  ]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform-image-test-updated"),
+					resource.TestCheckResourceAttr("numspot_image.test", "source_image_id", "ami-0987a84b"),
+					resource.TestCheckResourceAttr("numspot_image.test", "source_region_name", "cloudgouv-eu-west-1"),
+					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "false"),
+					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Image-Updated",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.Equal(t, resourceId, v) {
+							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
+						}
+						return nil
+					}),
+				),
+			},
 
-// TODO test availability zone with placement VM directly instead of nested subnet
-func testImageConfig_FromVm(subresourceSuffix string, data StepDataImage) string {
-	return fmt.Sprintf(`
+			// 5 - Update testing With Replace (create image from Vm)
+			{
+				Config: `
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
@@ -285,47 +155,117 @@ resource "numspot_subnet" "subnet" {
   vpc_id   = numspot_vpc.vpc.id
   ip_range = "10.101.1.0/24"
 }
-resource "numspot_vm" "test%[1]s" {
-  image_id  = %[3]q
+resource "numspot_vm" "test" {
+  image_id  = "ami-0987a84b"
   type      = "ns-cus6-2c4r"
   subnet_id = numspot_subnet.subnet.id
 }
 resource "numspot_image" "test" {
-  name  = %[2]q
-  vm_id = numspot_vm.test%[1]s.id
+  name  = "terraform-image-test-updated"
+  vm_id = numspot_vm.test.id
   access = {
-    is_public = %[6]s
+    is_public = "true"
   }
   tags = [
     {
-      key   = %[4]q
-      value = %[5]q
+      key   = "name"
+      value = "Terraform-Test-Image"
     }
   ]
-}`, subresourceSuffix, data.name, data.sourceImageId, data.tagKey, data.tagValue, data.isPublic)
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair("numspot_image.test", "vm_id", "numspot_vm.test", "id"),
+					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform-image-test-updated"),
+					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "true"),
+					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Image",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.NotEqual(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
+			},
+			// 6 - Update testing Without Replace (create image from Vm)
+			{
+				Config: `
+resource "numspot_vpc" "vpc" {
+  ip_range = "10.101.0.0/16"
 }
 
-func testImageConfig_FromSnapshot(subresourceSuffix string, data StepDataImage) string {
-	return fmt.Sprintf(`
+resource "numspot_subnet" "subnet" {
+  vpc_id   = numspot_vpc.vpc.id
+  ip_range = "10.101.1.0/24"
+}
+resource "numspot_vm" "test" {
+  image_id  = "ami-0987a84b"
+  type      = "ns-cus6-2c4r"
+  subnet_id = numspot_subnet.subnet.id
+}
+resource "numspot_image" "test" {
+  name  = "terraform-image-test-updated"
+  vm_id = numspot_vm.test.id
+  access = {
+    is_public = "false"
+  }
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Image-Updated"
+    }
+  ]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair("numspot_image.test", "vm_id", "numspot_vm.test", "id"),
+					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform-image-test-updated"),
+					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "false"),
+					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Image-Updated",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.Equal(t, resourceId, v) {
+							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
+						}
+						return nil
+					}),
+				),
+			},
+
+			// 7 - Update testing With Replace (create image from Snapshot)
+			{
+				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
   size                   = 11
   availability_zone_name = "cloudgouv-eu-west-1b"
 }
 
-resource "numspot_snapshot" "test%[1]s" {
+resource "numspot_snapshot" "test" {
   volume_id   = numspot_volume.test.id
   description = "a numspot snapshot description"
 }
 
 resource "numspot_image" "test" {
-  name             = %[2]q
+  name             = "terraform-image-test-updated"
   root_device_name = "/dev/sda1"
   block_device_mappings = [
     {
       device_name = "/dev/sda1"
       bsu = {
-        snapshot_id           = numspot_snapshot.test%[1]s.id
+        snapshot_id           = numspot_snapshot.test.id
         volume_size           = 120
         volume_type           = "io1"
         iops                  = 150
@@ -334,13 +274,260 @@ resource "numspot_image" "test" {
     }
   ]
   access = {
-    is_public = %[5]s
+    is_public = "true"
   }
   tags = [
     {
-      key   = %[3]q
-      value = %[4]q
+      key   = "name"
+      value = "Terraform-Test-Image-Updated"
     }
   ]
-}`, subresourceSuffix, data.name, data.tagKey, data.tagValue, data.isPublic)
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test", "block_device_mappings.*", map[string]string{
+						"bsu.snapshot_id": acctest.PAIR_PREFIX + "numspot_snapshot.test.id",
+					}),
+					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform-image-test-updated"),
+					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "true"),
+					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Image-Updated",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.NotEqual(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
+			},
+			// 8 - Update testing Without Replace (create image from Snapshot)
+			{
+				Config: `
+resource "numspot_volume" "test" {
+  type                   = "standard"
+  size                   = 11
+  availability_zone_name = "cloudgouv-eu-west-1b"
+}
+
+resource "numspot_snapshot" "test" {
+  volume_id   = numspot_volume.test.id
+  description = "a numspot snapshot description"
+}
+
+resource "numspot_image" "test" {
+  name             = "terraform-image-test-updated"
+  root_device_name = "/dev/sda1"
+  block_device_mappings = [
+    {
+      device_name = "/dev/sda1"
+      bsu = {
+        snapshot_id           = numspot_snapshot.test.id
+        volume_size           = 120
+        volume_type           = "io1"
+        iops                  = 150
+        delete_on_vm_deletion = true
+      }
+    }
+  ]
+  access = {
+    is_public = "false"
+  }
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Image"
+    }
+  ]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test", "block_device_mappings.*", map[string]string{
+						"bsu.snapshot_id": acctest.PAIR_PREFIX + "numspot_snapshot.test.id",
+					}),
+					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform-image-test-updated"),
+					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "false"),
+					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Image",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.Equal(t, resourceId, v) {
+							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
+						}
+						return nil
+					}),
+				),
+			},
+
+			// <== If resource has required dependencies ==>
+			{ // 9 - Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: `
+resource "numspot_image" "test" {
+  name               = "terraform-image-test"
+  source_image_id    = "ami-0b7df82c"
+  source_region_name = "cloudgouv-eu-west-1"
+  access = {
+    is_public = "true"
+  }
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Image"
+    }
+  ]
+}`,
+			},
+			// 10 - Update testing With Replace of VM and with Replace of Image
+			// This test is useful to check wether or not the deletion of VM and then the deletion of the Image works properly
+			{
+				Config: `
+resource "numspot_vpc" "vpc" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "subnet" {
+  vpc_id   = numspot_vpc.vpc.id
+  ip_range = "10.101.1.0/24"
+}
+resource "numspot_vm" "test_new" {
+  image_id  = "ami-0987a84b"
+  type      = "ns-cus6-2c4r"
+  subnet_id = numspot_subnet.subnet.id
+}
+resource "numspot_image" "test" {
+  name  = "terraform-image-test-updated"
+  vm_id = numspot_vm.test_new.id
+  access = {
+    is_public = "true"
+  }
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Image"
+    }
+  ]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair("numspot_image.test", "vm_id", "numspot_vm.test_new", "id"),
+					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform-image-test-updated"),
+					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "true"),
+					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Image",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.NotEqual(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
+			},
+			{ // 11 - Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+				Config: `
+resource "numspot_vpc" "vpc" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "subnet" {
+  vpc_id   = numspot_vpc.vpc.id
+  ip_range = "10.101.1.0/24"
+}
+resource "numspot_vm" "test" {
+  image_id  = "ami-0987a84b"
+  type      = "ns-cus6-2c4r"
+  subnet_id = numspot_subnet.subnet.id
+}
+resource "numspot_image" "test" {
+  name  = "terraform-image-test"
+  vm_id = numspot_vm.test.id
+  access = {
+    is_public = "true"
+  }
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Image"
+    }
+  ]
+}`,
+			},
+			// 12 - Update testing With Replace of Snapshot and with Replace of the Image
+			// This test is useful to check wether or not the deletion of the Snapshot and then the deletion of the Image works properly
+			{
+				Config: `
+resource "numspot_volume" "test" {
+  type                   = "standard"
+  size                   = 11
+  availability_zone_name = "cloudgouv-eu-west-1b"
+}
+
+resource "numspot_snapshot" "test_new" {
+  volume_id   = numspot_volume.test.id
+  description = "a numspot snapshot description"
+}
+
+resource "numspot_image" "test" {
+  name             = "terraform-image-test-updated"
+  root_device_name = "/dev/sda1"
+  block_device_mappings = [
+    {
+      device_name = "/dev/sda1"
+      bsu = {
+        snapshot_id           = numspot_snapshot.test_new.id
+        volume_size           = 120
+        volume_type           = "io1"
+        iops                  = 150
+        delete_on_vm_deletion = true
+      }
+    }
+  ]
+  access = {
+    is_public = "false"
+  }
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Image"
+    }
+  ]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test", "block_device_mappings.*", map[string]string{
+						"bsu.snapshot_id": acctest.PAIR_PREFIX + "numspot_snapshot.test_new.id",
+					}),
+					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform-image-test-updated"),
+					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "false"),
+					resource.TestCheckResourceAttr("numspot_image.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_image.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Image",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_image.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.NotEqual(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						return nil
+					}),
+				),
+			},
+		},
+	})
 }

@@ -2,48 +2,14 @@ package test
 
 import (
 	"fmt"
-	"slices"
-	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 )
-
-// This struct will store the input data that will be used in your tests (all fields as string)
-type StepDataVolume struct {
-	volumeType,
-	volumeSize,
-	tagKey,
-	tagValue,
-	az,
-	deviceName string
-}
-
-// Generate checks to validate that resource 'numspot_volume.test' has input data values
-func getFieldMatchChecksVolume(data StepDataVolume) []resource.TestCheckFunc {
-	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", data.az),
-		resource.TestCheckResourceAttr("numspot_volume.test", "type", data.volumeType),
-		resource.TestCheckResourceAttr("numspot_volume.test", "size", data.volumeSize),
-		resource.TestCheckResourceAttr("numspot_volume.test", "link_vm.device_name", data.deviceName),
-		resource.TestCheckResourceAttr("numspot_volume.test", "tags.#", "1"),
-		resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.test", "tags.*", map[string]string{
-			"key":   data.tagKey,
-			"value": data.tagValue,
-		}),
-	}
-}
-
-// Generate checks to validate that resource 'numspot_volume.test' is properly linked to given subresources
-// If resource has no dependencies, return empty array
-func getDependencyChecksVolume(dependenciesSuffix string) []resource.TestCheckFunc {
-	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_volume.test", "link_vm.vm_id", "numspot_vm.test"+dependenciesSuffix, "id"),
-	}
-}
 
 func TestAccVolumeResource(t *testing.T) {
 	acct := acctest.NewAccTest(t, false, "")
@@ -55,114 +21,11 @@ func TestAccVolumeResource(t *testing.T) {
 
 	var resourceId string
 
-	////////////// Define input data that will be used in the test sequence //////////////
-	// resource fields that can be updated in-place
-	tagKey := "Name"
-	tagValue := "terraform-vm"
-	tagValueUpdated := tagValue + "-Updated"
-	volumeType := "standard"
-	volumeTypeUpdated := "gp2"
-	volumeSize := "11"
-	volumeSizeUpdated := "22"
-	volumeAZ := "cloudgouv-eu-west-1a"
-	volumeAZUpdated := "cloudgouv-eu-west-1a"
-	deviceName := "/dev/sdb"
-	deviceNameUpdated := "/dev/sdc"
-	// resource fields that cannot be updated in-place (requires replace)
-	// None
-
-	/////////////////////////////////////////////////////////////////////////////////////
-
-	////////////// Define plan values and generate associated attribute checks  //////////////
-	// The base plan (used in first create and to reset resource state before some tests)
-	basePlanValues := StepDataVolume{
-		volumeType: volumeType,
-		volumeSize: volumeSize,
-		az:         volumeAZ,
-		tagKey:     tagKey,
-		tagValue:   tagValue,
-		deviceName: deviceName,
-	}
-	createChecks := append(
-		getFieldMatchChecksVolume(basePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
-			require.NotEmpty(t, v)
-			resourceId = v
-			return nil
-		}),
-	)
-
-	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
-	updatePlanValues := StepDataVolume{
-		volumeType: volumeTypeUpdated,
-		volumeSize: volumeSizeUpdated,
-		az:         volumeAZUpdated,
-		tagKey:     tagKey,
-		tagValue:   tagValueUpdated,
-		deviceName: deviceNameUpdated,
-	}
-	updateChecks := append(
-		getFieldMatchChecksVolume(updatePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
-			require.NotEmpty(t, v)
-			require.Equal(t, v, resourceId)
-			return nil
-		}),
-	)
-	/////////////////////////////////////////////////////////////////////////////////////
-
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{ // Create testing
-				Config: testVolumeConfig(acctest.BASE_SUFFIX, basePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					createChecks,
-					getDependencyChecksVolume(acctest.BASE_SUFFIX),
-				)...),
-				ExpectNonEmptyPlan: true,
-			},
-			// ImportState testing
-			{
-				ResourceName:            "numspot_volume.test",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"id"},
-			},
-			// Update testing Without Replace (if needed)
-			{
-				Config: testVolumeConfig(acctest.BASE_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksVolume(acctest.BASE_SUFFIX),
-				)...),
-				ExpectNonEmptyPlan: true,
-			},
-			// Update testing With Replace of dependency resource and without Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			{
-				Config: testVolumeConfig(acctest.NEW_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksVolume(acctest.NEW_SUFFIX),
-				)...),
-				ExpectNonEmptyPlan: true,
-			},
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-			{
-				Config: testVolumeConfig_DeletedDependencies(updatePlanValues),
-				Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
-			},
-		},
-	})
-}
-
-func testVolumeConfig(subresourceSuffix string, data StepDataVolume) string {
-	volumeSize, _ := strconv.Atoi(data.volumeSize)
-	return fmt.Sprintf(`
+			{ // 1 - Create testing
+				Config: `
 resource "numspot_vpc" "test" {
   ip_range = "10.101.0.0/16"
   tags = [
@@ -179,7 +42,7 @@ resource "numspot_subnet" "test" {
   availability_zone_name = "cloudgouv-eu-west-1a"
 }
 
-resource "numspot_vm" "test%[7]s" {
+resource "numspot_vm" "test" {
   image_id  = "ami-0b7df82c"
   type      = "ns-cus6-2c4r"
   subnet_id = numspot_subnet.test.id
@@ -192,34 +55,222 @@ resource "numspot_vm" "test%[7]s" {
 }
 
 resource "numspot_volume" "test" {
-  type                   = %[1]q
-  size                   = %[2]d
-  availability_zone_name = %[3]q
+  type                   = "standard"
+  size                   = 11
+  availability_zone_name = "cloudgouv-eu-west-1a"
   tags = [
     {
-      key   = %[4]q
-      value = %[5]q
+      key   = "name"
+      value = "Terraform-Test-Volume"
     }
   ]
   link_vm = {
-    vm_id       = numspot_vm.test%[7]s.id
-    device_name = %[6]q
+    vm_id       = numspot_vm.test.id
+    device_name = "/dev/sdb"
   }
-}`, data.volumeType, volumeSize, data.az, data.tagKey, data.tagValue, data.deviceName, subresourceSuffix)
-}
-
-func testVolumeConfig_DeletedDependencies(data StepDataVolume) string {
-	volumeSize, _ := strconv.Atoi(data.volumeSize)
-	return fmt.Sprintf(`
-resource "numspot_volume" "test" {
-  type                   = %[1]q
-  size                   = %[2]d
-  availability_zone_name = %[3]q
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "type", "standard"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "size", "11"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "link_vm.device_name", "/dev/sdb"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Volume",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_volume.test", "link_vm.vm_id", "numspot_vm.test", "id"),
+					resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+			// 2 - ImportState testing
+			{
+				ResourceName:            "numspot_volume.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"id"},
+			},
+			// 3 - Update testing Without Replace (if needed)
+			{
+				Config: `
+resource "numspot_vpc" "test" {
+  ip_range = "10.101.0.0/16"
   tags = [
     {
-      key   = %[4]q
-      value = %[5]q
+      key   = "name"
+      value = "terraform-volume-acctest"
     }
   ]
-}`, data.volumeType, volumeSize, data.az, data.tagKey, data.tagValue)
+}
+
+resource "numspot_subnet" "test" {
+  vpc_id                 = numspot_vpc.test.id
+  ip_range               = "10.101.1.0/24"
+  availability_zone_name = "cloudgouv-eu-west-1a"
+}
+
+resource "numspot_vm" "test" {
+  image_id  = "ami-0b7df82c"
+  type      = "ns-cus6-2c4r"
+  subnet_id = numspot_subnet.test.id
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-volume-acctest"
+    }
+  ]
+}
+
+resource "numspot_volume" "test" {
+  type                   = "gp2"
+  size                   = 22
+  availability_zone_name = "cloudgouv-eu-west-1a"
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Volume-Updated"
+    }
+  ]
+  link_vm = {
+    vm_id       = numspot_vm.test.id
+    device_name = "/dev/sdc"
+  }
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "type", "gp2"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "size", "22"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "link_vm.device_name", "/dev/sdc"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Volume-Updated",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_volume.test", "link_vm.vm_id", "numspot_vm.test", "id"),
+					resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.Equal(t, resourceId, v) {
+							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
+						}
+						return nil
+					}),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+			// 4 - Update testing With Replace of dependency resource and without Replace of the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			{
+				Config: `
+resource "numspot_vpc" "test" {
+  ip_range = "10.101.0.0/16"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-volume-acctest"
+    }
+  ]
+}
+
+resource "numspot_subnet" "test" {
+  vpc_id                 = numspot_vpc.test.id
+  ip_range               = "10.101.1.0/24"
+  availability_zone_name = "cloudgouv-eu-west-1a"
+}
+
+resource "numspot_vm" "test_new" {
+  image_id  = "ami-0b7df82c"
+  type      = "ns-cus6-2c4r"
+  subnet_id = numspot_subnet.test.id
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-volume-acctest"
+    }
+  ]
+}
+
+resource "numspot_volume" "test" {
+  type                   = "gp2"
+  size                   = 22
+  availability_zone_name = "cloudgouv-eu-west-1a"
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Volume-Updated"
+    }
+  ]
+  link_vm = {
+    vm_id       = numspot_vm.test_new.id
+    device_name = "/dev/sdc"
+  }
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "type", "gp2"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "size", "22"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "link_vm.device_name", "/dev/sdc"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Volume-Updated",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_volume.test", "link_vm.vm_id", "numspot_vm.test_new", "id"),
+					resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.Equal(t, resourceId, v) {
+							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
+						}
+						return nil
+					}),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+			// 5 - Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
+			{
+				Config: `
+resource "numspot_volume" "test" {
+  type                   = "gp2"
+  size                   = 22
+  availability_zone_name = "cloudgouv-eu-west-1a"
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-Volume-Updated"
+    }
+  ]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "type", "gp2"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "size", "22"),
+					resource.TestCheckResourceAttr("numspot_volume.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Volume-Updated",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.Equal(t, resourceId, v) {
+							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
+						}
+						return nil
+					}),
+				),
+			},
+		},
+	})
 }

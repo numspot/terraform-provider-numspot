@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -18,31 +17,25 @@ func TestAccKeypairDatasource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
-	name := "key-pair-name-test-terraform"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchKeypairConfig(name),
+				Config: `
+resource "numspot_keypair" "test" {
+  name = "key-pair-name-test-terraform"
+}
+
+data "numspot_keypairs" "testdata" {
+  keypair_names = [numspot_keypair.test.name]
+}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_keypairs.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_keypairs.testdata", "items.*", map[string]string{
-						"name": name,
+						"name": "key-pair-name-test-terraform",
 					}),
 				),
 			},
 		},
 	})
-}
-
-func fetchKeypairConfig(name string) string {
-	return fmt.Sprintf(`
-resource "numspot_keypair" "test" {
-  name = %[1]q
-}
-
-data "numspot_keypairs" "testdata" {
-  keypair_names = [numspot_keypair.test.name]
-}
-`, name)
 }

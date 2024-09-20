@@ -85,7 +85,9 @@ package test
 //		getFieldMatchChecksACLs(basePlanValues),
 //
 //		resource.TestCheckResourceAttrWith("numspot_acls.test", "id", func(v string) error {
-//			require.NotEmpty(t, v)
+//			if !assert.NotEmpty(t, v) {
+//							return fmt.Errorf("Id field should not be empty")
+//						}
 //			// resourceId = v
 //			return nil
 //		}),
@@ -102,8 +104,12 @@ package test
 //		getFieldMatchChecksACLs(replacePlanValues1),
 //
 //		resource.TestCheckResourceAttrWith("numspot_acls.test", "id", func(v string) error {
-//			require.NotEmpty(t, v)
-//			require.NotEqual(t, v, resourceId)
+//			if !assert.NotEmpty(t, v) {
+//							return fmt.Errorf("Id field should not be empty")
+//						}
+//			if !assert.NotEqual(t, resourceId, v) {
+//							return fmt.Errorf("Id should have changed")
+//						}
 //			return nil
 //		}),
 //	)
@@ -118,8 +124,12 @@ package test
 //		getFieldMatchChecksACLs(replacePlanValues2),
 //
 //		resource.TestCheckResourceAttrWith("numspot_acls.test", "id", func(v string) error {
-//			require.NotEmpty(t, v)
-//			require.NotEqual(t, v, resourceId)
+//			if !assert.NotEmpty(t, v) {
+//							return fmt.Errorf("Id field should not be empty")
+//						}
+//			if !assert.NotEqual(t, resourceId, v) {
+//							return fmt.Errorf("Id should have changed")
+//						}
 //			return nil
 //		}),
 //	)

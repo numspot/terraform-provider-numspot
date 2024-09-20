@@ -21,20 +21,7 @@ func TestAccSecurityGroupsDatasource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchSecurityGroupConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_security_groups.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_security_groups.testdata", "items.*", map[string]string{
-						"id": acctest.PAIR_PREFIX + "numspot_security_group.test.id",
-					}),
-				),
-			},
-		},
-	})
-}
-
-func fetchSecurityGroupConfig() string {
-	return `
+				Config: `
 resource "numspot_vpc" "net" {
   ip_range = "10.101.0.0/16"
 }
@@ -61,11 +48,14 @@ resource "numspot_security_group" "test" {
 
 data "numspot_security_groups" "testdata" {
   security_group_ids = [numspot_security_group.test.id]
-  depends_on         = [numspot_security_group.test]
-}
-
-
-
-
-`
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_security_groups.testdata", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_security_groups.testdata", "items.*", map[string]string{
+						"id": acctest.PAIR_PREFIX + "numspot_security_group.test.id",
+					}),
+				),
+			},
+		},
+	})
 }
