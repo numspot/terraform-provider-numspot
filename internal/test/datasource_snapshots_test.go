@@ -21,21 +21,7 @@ func TestAccSnapshotsDatasource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchSnapshotConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_snapshots.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_snapshots.testdata", "items.*", map[string]string{
-						"id":        acctest.PAIR_PREFIX + "numspot_snapshot.test.id",
-						"volume_id": acctest.PAIR_PREFIX + "numspot_volume.test.id",
-					}),
-				),
-			},
-		},
-	})
-}
-
-func fetchSnapshotConfig() string {
-	return `
+				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
   size                   = 11
@@ -48,6 +34,15 @@ resource "numspot_snapshot" "test" {
 
 data "numspot_snapshots" "testdata" {
   ids = [numspot_snapshot.test.id]
-}
-`
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_snapshots.testdata", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_snapshots.testdata", "items.*", map[string]string{
+						"id":        acctest.PAIR_PREFIX + "numspot_snapshot.test.id",
+						"volume_id": acctest.PAIR_PREFIX + "numspot_volume.test.id",
+					}),
+				),
+			},
+		},
+	})
 }

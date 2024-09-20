@@ -21,21 +21,7 @@ func TestAccNatGatewaysDatasource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchNatGatewaysConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_nat_gateways.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_nat_gateways.testdata", "items.*", map[string]string{
-						"id":        acctest.PAIR_PREFIX + "numspot_nat_gateway.test.id",
-						"subnet_id": acctest.PAIR_PREFIX + "numspot_subnet.test.id",
-					}),
-				),
-			},
-		},
-	})
-}
-
-func fetchNatGatewaysConfig() string {
-	return `
+				Config: `
 resource "numspot_vpc" "test" {
   ip_range = "10.101.0.0/16"
 }
@@ -73,6 +59,15 @@ resource "numspot_nat_gateway" "test" {
 data "numspot_nat_gateways" "testdata" {
   subnet_ids = [numspot_subnet.test.id]
   depends_on = [numspot_nat_gateway.test]
-}
-`
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_nat_gateways.testdata", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_nat_gateways.testdata", "items.*", map[string]string{
+						"id":        acctest.PAIR_PREFIX + "numspot_nat_gateway.test.id",
+						"subnet_id": acctest.PAIR_PREFIX + "numspot_subnet.test.id",
+					}),
+				),
+			},
+		},
+	})
 }

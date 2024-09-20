@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -18,35 +17,28 @@ func TestAccFlexibleGpusDatasource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
-	model_name := "nvidia-a100-80"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchFlexibleGpusConfig(model_name),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_flexible_gpus.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_flexible_gpus.testdata", "items.*", map[string]string{
-						"id":         acctest.PAIR_PREFIX + "numspot_flexible_gpu.test.id",
-						"model_name": model_name,
-					}),
-				),
-			},
-		},
-	})
-}
-
-func fetchFlexibleGpusConfig(model_name string) string {
-	return fmt.Sprintf(`
+				Config: `
 resource "numspot_flexible_gpu" "test" {
-  model_name             = %[1]q
+  model_name             = "nvidia-a100-80"
   generation             = "v6"
   availability_zone_name = "cloudgouv-eu-west-1b"
 }
 
 data "numspot_flexible_gpus" "testdata" {
-  ids        = [numspot_flexible_gpu.test.id]
-  depends_on = [numspot_flexible_gpu.test]
-}
-`, model_name)
+  ids = [numspot_flexible_gpu.test.id]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_flexible_gpus.testdata", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_flexible_gpus.testdata", "items.*", map[string]string{
+						"id":         acctest.PAIR_PREFIX + "numspot_flexible_gpu.test.id",
+						"model_name": "nvidia-a100-80",
+					}),
+				),
+			},
+		},
+	})
 }
