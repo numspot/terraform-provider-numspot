@@ -161,13 +161,17 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 	}
 
 	// Update Nic
-	updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateNicResponse, error) {
+	if r.shouldUpdate(plan, state) {
 		body := NicFromTfToUpdaterequest(ctx, &plan)
-		return r.provider.GetNumspotClient().UpdateNicWithResponse(ctx, r.provider.GetSpaceID(), nicId, body)
-	}, http.StatusOK, &response.Diagnostics)
-
-	if updatedRes == nil || response.Diagnostics.HasError() {
-		return
+		res, err := r.provider.GetNumspotClient().UpdateNicWithResponse(ctx, r.provider.GetSpaceID(), nicId, body)
+		if err != nil {
+			response.Diagnostics.AddError("failed to update nic", err.Error())
+			return
+		}
+		if res.JSON200 == nil {
+			response.Diagnostics.AddError("failed to update nic", utils.HandleError(res.Body).Error())
+			return
+		}
 	}
 
 	// Read resource
@@ -297,4 +301,13 @@ func (r *NicResource) refreshNICState(ctx context.Context, id string, startState
 	}
 
 	return tf, diags
+}
+
+func (r *NicResource) shouldUpdate(plan, state NicModel) bool {
+	shouldUpdate := false
+	shouldUpdate = shouldUpdate || (!utils.IsTfValueNull(plan.SecurityGroupIds) && !plan.SecurityGroupIds.Equal(state.SecurityGroupIds))
+	shouldUpdate = shouldUpdate || (!utils.IsTfValueNull(plan.Description) && !plan.Description.Equal(state.Description))
+	shouldUpdate = shouldUpdate || (!utils.IsTfValueNull(plan.LinkNic) && !plan.LinkNic.Equal(state.LinkNic))
+
+	return shouldUpdate
 }
