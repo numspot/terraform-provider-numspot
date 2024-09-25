@@ -41,8 +41,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:22 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -54,7 +52,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 753.984942ms
+        duration: 5ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -95,8 +93,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:23 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -108,7 +104,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 521.133755ms
+        duration: 5ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -138,7 +134,7 @@ interactions:
         content_length: 255
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:23.784512Z","description":"A quiet space","id":"4ad21d25-fd88-4713-8292-642fe1b1539e","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"QUEUED","updatedOn":"2024-09-10T16:07:23.784512Z"}
+            {"createdOn":"2024-09-25T10:02:31.283625Z","description":"A quiet space","id":"3d7a34dc-3c69-43a5-908b-63d91c35a1cf","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"QUEUED","updatedOn":"2024-09-25T10:02:31.283625Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -148,8 +144,6 @@ interactions:
                 - "255"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:23 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -161,7 +155,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 90.854877ms
+        duration: 5ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -178,7 +172,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/4ad21d25-fd88-4713-8292-642fe1b1539e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3d7a34dc-3c69-43a5-908b-63d91c35a1cf
         method: GET
       response:
         proto: HTTP/1.1
@@ -189,7 +183,7 @@ interactions:
         content_length: 256
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:23.784512Z","description":"A quiet space","id":"4ad21d25-fd88-4713-8292-642fe1b1539e","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-10T16:07:23.784512Z"}
+            {"createdOn":"2024-09-25T10:02:31.283625Z","description":"A quiet space","id":"3d7a34dc-3c69-43a5-908b-63d91c35a1cf","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-25T10:02:31.283625Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -199,8 +193,6 @@ interactions:
                 - "256"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:25 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -212,7 +204,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 55.907304ms
+        duration: 5ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -229,7 +221,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/4ad21d25-fd88-4713-8292-642fe1b1539e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3d7a34dc-3c69-43a5-908b-63d91c35a1cf
         method: GET
       response:
         proto: HTTP/1.1
@@ -240,7 +232,7 @@ interactions:
         content_length: 256
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:23.784512Z","description":"A quiet space","id":"4ad21d25-fd88-4713-8292-642fe1b1539e","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-10T16:07:23.784512Z"}
+            {"createdOn":"2024-09-25T10:02:31.283625Z","description":"A quiet space","id":"3d7a34dc-3c69-43a5-908b-63d91c35a1cf","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-25T10:02:31.283625Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -250,8 +242,6 @@ interactions:
                 - "256"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:26 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -263,7 +253,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 306.87649ms
+        duration: 5ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -280,7 +270,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/4ad21d25-fd88-4713-8292-642fe1b1539e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3d7a34dc-3c69-43a5-908b-63d91c35a1cf
         method: GET
       response:
         proto: HTTP/1.1
@@ -291,7 +281,7 @@ interactions:
         content_length: 256
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:23.784512Z","description":"A quiet space","id":"4ad21d25-fd88-4713-8292-642fe1b1539e","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-10T16:07:23.784512Z"}
+            {"createdOn":"2024-09-25T10:02:31.283625Z","description":"A quiet space","id":"3d7a34dc-3c69-43a5-908b-63d91c35a1cf","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-25T10:02:31.283625Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -301,8 +291,6 @@ interactions:
                 - "256"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:26 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -314,7 +302,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 54.290968ms
+        duration: 5ms
     - id: 6
       request:
         proto: HTTP/1.1
@@ -331,7 +319,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/4ad21d25-fd88-4713-8292-642fe1b1539e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3d7a34dc-3c69-43a5-908b-63d91c35a1cf
         method: GET
       response:
         proto: HTTP/1.1
@@ -342,7 +330,7 @@ interactions:
         content_length: 254
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:23.784512Z","description":"A quiet space","id":"4ad21d25-fd88-4713-8292-642fe1b1539e","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-10T16:07:23.784512Z"}
+            {"createdOn":"2024-09-25T10:02:31.283625Z","description":"A quiet space","id":"3d7a34dc-3c69-43a5-908b-63d91c35a1cf","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-25T10:02:31.283625Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -352,8 +340,6 @@ interactions:
                 - "254"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:27 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -365,7 +351,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 59.620172ms
+        duration: 5ms
     - id: 7
       request:
         proto: HTTP/1.1
@@ -406,8 +392,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:28 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -419,7 +403,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 653.947902ms
+        duration: 5ms
     - id: 8
       request:
         proto: HTTP/1.1
@@ -460,8 +444,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:28 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -473,7 +455,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 535.8852ms
+        duration: 5ms
     - id: 9
       request:
         proto: HTTP/1.1
@@ -490,7 +472,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/4ad21d25-fd88-4713-8292-642fe1b1539e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3d7a34dc-3c69-43a5-908b-63d91c35a1cf
         method: GET
       response:
         proto: HTTP/1.1
@@ -501,7 +483,7 @@ interactions:
         content_length: 254
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:23.784512Z","description":"A quiet space","id":"4ad21d25-fd88-4713-8292-642fe1b1539e","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-10T16:07:23.784512Z"}
+            {"createdOn":"2024-09-25T10:02:31.283625Z","description":"A quiet space","id":"3d7a34dc-3c69-43a5-908b-63d91c35a1cf","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-25T10:02:31.283625Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -511,8 +493,6 @@ interactions:
                 - "254"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:29 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -524,7 +504,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 65.938673ms
+        duration: 5ms
     - id: 10
       request:
         proto: HTTP/1.1
@@ -565,8 +545,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:29 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -578,7 +556,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 559.814212ms
+        duration: 5ms
     - id: 11
       request:
         proto: HTTP/1.1
@@ -595,7 +573,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/4ad21d25-fd88-4713-8292-642fe1b1539e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3d7a34dc-3c69-43a5-908b-63d91c35a1cf
         method: GET
       response:
         proto: HTTP/1.1
@@ -606,7 +584,7 @@ interactions:
         content_length: 254
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:23.784512Z","description":"A quiet space","id":"4ad21d25-fd88-4713-8292-642fe1b1539e","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-10T16:07:23.784512Z"}
+            {"createdOn":"2024-09-25T10:02:31.283625Z","description":"A quiet space","id":"3d7a34dc-3c69-43a5-908b-63d91c35a1cf","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-25T10:02:31.283625Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -616,8 +594,6 @@ interactions:
                 - "254"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:29 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -629,7 +605,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 56.926357ms
+        duration: 5ms
     - id: 12
       request:
         proto: HTTP/1.1
@@ -670,8 +646,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:30 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -683,7 +657,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 667.082428ms
+        duration: 5ms
     - id: 13
       request:
         proto: HTTP/1.1
@@ -700,7 +674,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/4ad21d25-fd88-4713-8292-642fe1b1539e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3d7a34dc-3c69-43a5-908b-63d91c35a1cf
         method: GET
       response:
         proto: HTTP/1.1
@@ -711,7 +685,7 @@ interactions:
         content_length: 254
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:23.784512Z","description":"A quiet space","id":"4ad21d25-fd88-4713-8292-642fe1b1539e","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-10T16:07:23.784512Z"}
+            {"createdOn":"2024-09-25T10:02:31.283625Z","description":"A quiet space","id":"3d7a34dc-3c69-43a5-908b-63d91c35a1cf","name":"quiet space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-25T10:02:31.283625Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -721,8 +695,6 @@ interactions:
                 - "254"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:30 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -734,7 +706,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 60.690011ms
+        duration: 5ms
     - id: 14
       request:
         proto: HTTP/1.1
@@ -775,8 +747,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:31 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -788,7 +758,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 626.817324ms
+        duration: 5ms
     - id: 15
       request:
         proto: HTTP/1.1
@@ -805,7 +775,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/4ad21d25-fd88-4713-8292-642fe1b1539e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3d7a34dc-3c69-43a5-908b-63d91c35a1cf
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -821,8 +791,6 @@ interactions:
                 - "false"
             Connection:
                 - keep-alive
-            Date:
-                - Tue, 10 Sep 2024 16:07:31 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -834,19 +802,19 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 323.713757ms
+        duration: 5ms
     - id: 16
       request:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 53
+        content_length: 64
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"description":"A quieter space","name":"best space"}'
+        body: '{"description":"A new quiet space","name":"quiet space updated"}'
         form: {}
         headers:
             Content-Type:
@@ -861,21 +829,19 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 256
+        content_length: 267
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:31.840348Z","description":"A quieter space","id":"7bbf6b3d-cef4-4bb9-bafd-e81aff196775","name":"best space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"QUEUED","updatedOn":"2024-09-10T16:07:31.840348Z"}
+            {"createdOn":"2024-09-25T10:02:39.198074Z","description":"A new quiet space","id":"3a551874-6de9-4407-a567-1f4769483838","name":"quiet space updated","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"QUEUED","updatedOn":"2024-09-25T10:02:39.198074Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
             Content-Length:
-                - "256"
+                - "267"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:31 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -887,7 +853,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 51.896496ms
+        duration: 5ms
     - id: 17
       request:
         proto: HTTP/1.1
@@ -904,7 +870,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/7bbf6b3d-cef4-4bb9-bafd-e81aff196775
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3a551874-6de9-4407-a567-1f4769483838
         method: GET
       response:
         proto: HTTP/1.1
@@ -912,21 +878,19 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 257
+        content_length: 268
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:31.840348Z","description":"A quieter space","id":"7bbf6b3d-cef4-4bb9-bafd-e81aff196775","name":"best space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-10T16:07:31.840348Z"}
+            {"createdOn":"2024-09-25T10:02:39.198074Z","description":"A new quiet space","id":"3a551874-6de9-4407-a567-1f4769483838","name":"quiet space updated","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-25T10:02:39.198074Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
             Content-Length:
-                - "257"
+                - "268"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:33 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -938,7 +902,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 90.178739ms
+        duration: 5ms
     - id: 18
       request:
         proto: HTTP/1.1
@@ -955,7 +919,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/7bbf6b3d-cef4-4bb9-bafd-e81aff196775
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3a551874-6de9-4407-a567-1f4769483838
         method: GET
       response:
         proto: HTTP/1.1
@@ -963,21 +927,19 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 257
+        content_length: 268
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:31.840348Z","description":"A quieter space","id":"7bbf6b3d-cef4-4bb9-bafd-e81aff196775","name":"best space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-10T16:07:31.840348Z"}
+            {"createdOn":"2024-09-25T10:02:39.198074Z","description":"A new quiet space","id":"3a551874-6de9-4407-a567-1f4769483838","name":"quiet space updated","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-25T10:02:39.198074Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
             Content-Length:
-                - "257"
+                - "268"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:34 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -989,7 +951,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 314.69007ms
+        duration: 5ms
     - id: 19
       request:
         proto: HTTP/1.1
@@ -1006,7 +968,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/7bbf6b3d-cef4-4bb9-bafd-e81aff196775
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3a551874-6de9-4407-a567-1f4769483838
         method: GET
       response:
         proto: HTTP/1.1
@@ -1014,21 +976,19 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 257
+        content_length: 268
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:31.840348Z","description":"A quieter space","id":"7bbf6b3d-cef4-4bb9-bafd-e81aff196775","name":"best space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-10T16:07:31.840348Z"}
+            {"createdOn":"2024-09-25T10:02:39.198074Z","description":"A new quiet space","id":"3a551874-6de9-4407-a567-1f4769483838","name":"quiet space updated","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"RUNNING","updatedOn":"2024-09-25T10:02:39.198074Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
             Content-Length:
-                - "257"
+                - "268"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:35 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1040,7 +1000,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 410.507464ms
+        duration: 5ms
     - id: 20
       request:
         proto: HTTP/1.1
@@ -1057,7 +1017,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/7bbf6b3d-cef4-4bb9-bafd-e81aff196775
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3a551874-6de9-4407-a567-1f4769483838
         method: GET
       response:
         proto: HTTP/1.1
@@ -1065,21 +1025,19 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 255
+        content_length: 266
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:31.840348Z","description":"A quieter space","id":"7bbf6b3d-cef4-4bb9-bafd-e81aff196775","name":"best space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-10T16:07:31.840348Z"}
+            {"createdOn":"2024-09-25T10:02:39.198074Z","description":"A new quiet space","id":"3a551874-6de9-4407-a567-1f4769483838","name":"quiet space updated","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-25T10:02:39.198074Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
             Content-Length:
-                - "255"
+                - "266"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:36 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1091,7 +1049,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 57.248188ms
+        duration: 5ms
     - id: 21
       request:
         proto: HTTP/1.1
@@ -1132,8 +1090,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:36 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1145,7 +1101,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 662.246612ms
+        duration: 5ms
     - id: 22
       request:
         proto: HTTP/1.1
@@ -1186,8 +1142,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:37 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1199,7 +1153,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 608.956265ms
+        duration: 5ms
     - id: 23
       request:
         proto: HTTP/1.1
@@ -1216,7 +1170,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/7bbf6b3d-cef4-4bb9-bafd-e81aff196775
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3a551874-6de9-4407-a567-1f4769483838
         method: GET
       response:
         proto: HTTP/1.1
@@ -1224,21 +1178,19 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 255
+        content_length: 266
         uncompressed: false
         body: |
-            {"createdOn":"2024-09-10T16:07:31.840348Z","description":"A quieter space","id":"7bbf6b3d-cef4-4bb9-bafd-e81aff196775","name":"best space","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-10T16:07:31.840348Z"}
+            {"createdOn":"2024-09-25T10:02:39.198074Z","description":"A new quiet space","id":"3a551874-6de9-4407-a567-1f4769483838","name":"quiet space updated","organisationId":"67d97ad4-3005-48dc-a392-60a97ab5097c","status":"READY","updatedOn":"2024-09-25T10:02:39.198074Z"}
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
             Content-Length:
-                - "255"
+                - "266"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:37 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1250,7 +1202,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 54.929691ms
+        duration: 5ms
     - id: 24
       request:
         proto: HTTP/1.1
@@ -1291,8 +1243,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:38 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1304,7 +1254,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 643.446963ms
+        duration: 5ms
     - id: 25
       request:
         proto: HTTP/1.1
@@ -1345,8 +1295,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 16:07:39 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1358,7 +1306,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 706.633745ms
+        duration: 5ms
     - id: 26
       request:
         proto: HTTP/1.1
@@ -1375,7 +1323,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/7bbf6b3d-cef4-4bb9-bafd-e81aff196775
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/organisations/67d97ad4-3005-48dc-a392-60a97ab5097c/spaces/3a551874-6de9-4407-a567-1f4769483838
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1391,8 +1339,6 @@ interactions:
                 - "false"
             Connection:
                 - keep-alive
-            Date:
-                - Tue, 10 Sep 2024 16:07:39 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1404,4 +1350,4 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 300.253757ms
+        duration: 5ms

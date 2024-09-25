@@ -42,7 +42,7 @@ interactions:
             Content-Type:
                 - application/json
             Date:
-                - Tue, 10 Sep 2024 14:57:29 GMT
+                - Mon, 23 Sep 2024 08:58:01 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -54,7 +54,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 751.106677ms
+        duration: 743.10234ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -96,7 +96,7 @@ interactions:
             Content-Type:
                 - application/json
             Date:
-                - Tue, 10 Sep 2024 14:57:29 GMT
+                - Mon, 23 Sep 2024 08:58:02 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -108,7 +108,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 620.657626ms
+        duration: 550.955502ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -137,7 +137,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-e98e7ba5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-80f78a3a","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -150,7 +150,7 @@ interactions:
             Content-Type:
                 - application/json; charset=utf-8
             Date:
-                - Tue, 10 Sep 2024 14:57:30 GMT
+                - Mon, 23 Sep 2024 08:58:02 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -165,7 +165,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 726.112165ms
+        duration: 570.634826ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -182,7 +182,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-e98e7ba5
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-80f78a3a
         method: GET
       response:
         proto: HTTP/1.1
@@ -192,7 +192,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-e98e7ba5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-80f78a3a","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -205,7 +205,7 @@ interactions:
             Content-Type:
                 - application/json; charset=utf-8
             Date:
-                - Tue, 10 Sep 2024 14:57:35 GMT
+                - Mon, 23 Sep 2024 08:58:08 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -220,7 +220,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 307.967735ms
+        duration: 187.255139ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -232,7 +232,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-e98e7ba5"}'
+        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-80f78a3a"}'
         form: {}
         headers:
             Content-Type:
@@ -249,7 +249,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-f733652e","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-e98e7ba5"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-ea284159","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-80f78a3a"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -262,7 +262,7 @@ interactions:
             Content-Type:
                 - application/json; charset=utf-8
             Date:
-                - Tue, 10 Sep 2024 14:57:36 GMT
+                - Mon, 23 Sep 2024 08:58:08 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -277,7 +277,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 908.868197ms
+        duration: 212.516248ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -294,7 +294,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-f733652e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-ea284159
         method: GET
       response:
         proto: HTTP/1.1
@@ -304,7 +304,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-f733652e","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-e98e7ba5"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-ea284159","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-80f78a3a"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -317,7 +317,7 @@ interactions:
             Content-Type:
                 - application/json; charset=utf-8
             Date:
-                - Tue, 10 Sep 2024 14:57:42 GMT
+                - Mon, 23 Sep 2024 08:58:13 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -332,7 +332,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 316.621047ms
+        duration: 246.172307ms
     - id: 6
       request:
         proto: HTTP/1.1
@@ -349,7 +349,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-f733652e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-ea284159
         method: GET
       response:
         proto: HTTP/1.1
@@ -359,7 +359,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-f733652e","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-e98e7ba5"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-ea284159","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-80f78a3a"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -372,7 +372,7 @@ interactions:
             Content-Type:
                 - application/json; charset=utf-8
             Date:
-                - Tue, 10 Sep 2024 14:57:42 GMT
+                - Mon, 23 Sep 2024 08:58:13 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -387,7 +387,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 306.343713ms
+        duration: 176.999864ms
     - id: 7
       request:
         proto: HTTP/1.1
@@ -399,7 +399,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-f733652e"],"type":"internal"}'
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
         form: {}
         headers:
             Content-Type:
@@ -414,786 +414,20 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 684
+        content_length: 200
         uncompressed: false
-        body: '{"applicationStickyCookiePolicies":[],"availabilityZoneNames":["cloudgouv-eu-west-1a"],"backendVmIds":[],"dnsName":"internal-elb-test-506033360.cloudgouv-eu-west-1.lbu.outscale.com","healthCheck":{"checkInterval":30,"healthyThreshold":10,"port":80,"protocol":"TCP","timeout":5,"unhealthyThreshold":2},"listeners":[{"backendPort":80,"backendProtocol":"TCP","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","securedCookies":false,"securityGroups":["sg-6b285636"],"sourceSecurityGroup":{"securityGroupAccountId":"871025568304","securityGroupName":"default"},"stickyCookiePolicies":[],"subnets":["subnet-f733652e"],"tags":[],"type":"internal","vpcId":"vpc-e98e7ba5"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "684"
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:42 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 201 Created
-        code: 201
-        duration: 398.149542ms
-    - id: 8
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers/elb-test
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 684
-        uncompressed: false
-        body: '{"applicationStickyCookiePolicies":[],"availabilityZoneNames":["cloudgouv-eu-west-1a"],"backendVmIds":[],"dnsName":"internal-elb-test-506033360.cloudgouv-eu-west-1.lbu.outscale.com","healthCheck":{"checkInterval":30,"healthyThreshold":10,"port":80,"protocol":"TCP","timeout":5,"unhealthyThreshold":2},"listeners":[{"backendPort":80,"backendProtocol":"TCP","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","securedCookies":false,"securityGroups":["sg-6b285636"],"sourceSecurityGroup":{"securityGroupAccountId":"871025568304","securityGroupName":"default"},"stickyCookiePolicies":[],"subnets":["subnet-f733652e"],"tags":[],"type":"internal","vpcId":"vpc-e98e7ba5"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "684"
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:43 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 303.144157ms
-    - id: 9
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers?loadBalancerNames=elb-test
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 696
-        uncompressed: false
-        body: '{"items":[{"applicationStickyCookiePolicies":[],"availabilityZoneNames":["cloudgouv-eu-west-1a"],"backendVmIds":[],"dnsName":"internal-elb-test-506033360.cloudgouv-eu-west-1.lbu.outscale.com","healthCheck":{"checkInterval":30,"healthyThreshold":10,"port":80,"protocol":"TCP","timeout":5,"unhealthyThreshold":2},"listeners":[{"backendPort":80,"backendProtocol":"TCP","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","securedCookies":false,"securityGroups":["sg-6b285636"],"sourceSecurityGroup":{"securityGroupAccountId":"871025568304","securityGroupName":"default"},"stickyCookiePolicies":[],"subnets":["subnet-f733652e"],"tags":[],"type":"internal","vpcId":"vpc-e98e7ba5"}]}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "696"
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:43 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 135.870723ms
-    - id: 10
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
             Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:43 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
-        status: 200 OK
-        code: 200
-        duration: 661.769188ms
-    - id: 11
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers?loadBalancerNames=elb-test
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 696
-        uncompressed: false
-        body: '{"items":[{"applicationStickyCookiePolicies":[],"availabilityZoneNames":["cloudgouv-eu-west-1a"],"backendVmIds":[],"dnsName":"internal-elb-test-506033360.cloudgouv-eu-west-1.lbu.outscale.com","healthCheck":{"checkInterval":30,"healthyThreshold":10,"port":80,"protocol":"TCP","timeout":5,"unhealthyThreshold":2},"listeners":[{"backendPort":80,"backendProtocol":"TCP","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","securedCookies":false,"securityGroups":["sg-6b285636"],"sourceSecurityGroup":{"securityGroupAccountId":"871025568304","securityGroupName":"default"},"stickyCookiePolicies":[],"subnets":["subnet-f733652e"],"tags":[],"type":"internal","vpcId":"vpc-e98e7ba5"}]}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "696"
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:44 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 495.227414ms
-    - id: 12
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:45 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
-        status: 200 OK
-        code: 200
-        duration: 505.576671ms
-    - id: 13
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-e98e7ba5
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 132
-        uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-e98e7ba5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "132"
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:45 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 122.218013ms
-    - id: 14
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-f733652e
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 201
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":250,"id":"subnet-f733652e","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-e98e7ba5"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "201"
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:45 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 170.775951ms
-    - id: 15
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers/elb-test
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 684
-        uncompressed: false
-        body: '{"applicationStickyCookiePolicies":[],"availabilityZoneNames":["cloudgouv-eu-west-1a"],"backendVmIds":[],"dnsName":"internal-elb-test-506033360.cloudgouv-eu-west-1.lbu.outscale.com","healthCheck":{"checkInterval":30,"healthyThreshold":10,"port":80,"protocol":"TCP","timeout":5,"unhealthyThreshold":2},"listeners":[{"backendPort":80,"backendProtocol":"TCP","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","securedCookies":false,"securityGroups":["sg-6b285636"],"sourceSecurityGroup":{"securityGroupAccountId":"871025568304","securityGroupName":"default"},"stickyCookiePolicies":[],"subnets":["subnet-f733652e"],"tags":[],"type":"internal","vpcId":"vpc-e98e7ba5"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "684"
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:45 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 191.766751ms
-    - id: 16
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers?loadBalancerNames=elb-test
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 696
-        uncompressed: false
-        body: '{"items":[{"applicationStickyCookiePolicies":[],"availabilityZoneNames":["cloudgouv-eu-west-1a"],"backendVmIds":[],"dnsName":"internal-elb-test-506033360.cloudgouv-eu-west-1.lbu.outscale.com","healthCheck":{"checkInterval":30,"healthyThreshold":10,"port":80,"protocol":"TCP","timeout":5,"unhealthyThreshold":2},"listeners":[{"backendPort":80,"backendProtocol":"TCP","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","securedCookies":false,"securityGroups":["sg-6b285636"],"sourceSecurityGroup":{"securityGroupAccountId":"871025568304","securityGroupName":"default"},"stickyCookiePolicies":[],"subnets":["subnet-f733652e"],"tags":[],"type":"internal","vpcId":"vpc-e98e7ba5"}]}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "696"
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:45 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 196.167131ms
-    - id: 17
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:46 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
-        status: 200 OK
-        code: 200
-        duration: 763.757087ms
-    - id: 18
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:47 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
-        status: 200 OK
-        code: 200
-        duration: 589.722234ms
-    - id: 19
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 21
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: '{"securityGroups":[]}'
-        form: {}
-        headers:
-            Content-Type:
-                - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers/elb-test
-        method: PUT
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 659
-        uncompressed: false
-        body: '{"applicationStickyCookiePolicies":[],"availabilityZoneNames":["cloudgouv-eu-west-1a"],"backendVmIds":[],"dnsName":"internal-elb-test-506033360.cloudgouv-eu-west-1.lbu.outscale.com","healthCheck":{"checkInterval":30,"healthyThreshold":10,"port":80,"protocol":"TCP","timeout":5,"unhealthyThreshold":2},"listeners":[{"backendPort":80,"backendProtocol":"TCP","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","securedCookies":false,"sourceSecurityGroup":{"securityGroupAccountId":"outscale-elb","securityGroupName":"outscale-elb-sg"},"stickyCookiePolicies":[],"subnets":["subnet-f733652e"],"tags":[],"type":"internal","vpcId":"vpc-e98e7ba5"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "659"
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:47 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 204.631757ms
-    - id: 20
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers/elb-test
-        method: DELETE
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 0
-        uncompressed: false
-        body: ""
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Type:
-                - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:47 GMT
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Id:
-                - elb-test
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "false"
-        status: 204 No Content
-        code: 204
-        duration: 157.881743ms
-    - id: 21
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-f733652e
-        method: DELETE
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 210
-        uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-f733652e"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "210"
+                - "200"
             Content-Type:
                 - application/problem+json
             Date:
-                - Tue, 10 Sep 2024 14:57:48 GMT
+                - Mon, 23 Sep 2024 08:58:14 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1206,61 +440,1229 @@ interactions:
                 - "false"
         status: 409 Conflict
         code: 409
-        duration: 245.403796ms
+        duration: 715.390287ms
+    - id: 8
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 08:58:20 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 470.140191ms
+    - id: 9
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 08:58:26 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 327.054681ms
+    - id: 10
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 08:58:34 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 484.64899ms
+    - id: 11
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 08:58:43 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 530.489755ms
+    - id: 12
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 08:58:57 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 575.245185ms
+    - id: 13
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 08:59:12 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 217.653008ms
+    - id: 14
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 08:59:28 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 302.606803ms
+    - id: 15
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 08:59:44 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 1.303055679s
+    - id: 16
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:00:00 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 936.962339ms
+    - id: 17
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:00:15 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 501.697434ms
+    - id: 18
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:00:31 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 283.141478ms
+    - id: 19
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:00:48 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 2.241467137s
+    - id: 20
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:01:04 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 950.796101ms
+    - id: 21
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:01:19 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 535.578637ms
     - id: 22
       request:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 186
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
         form: {}
         headers:
+            Content-Type:
+                - application/json
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-f733652e
-        method: DELETE
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 0
+        content_length: 200
         uncompressed: false
-        body: ""
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
+            Content-Length:
+                - "200"
             Content-Type:
-                - application/json; charset=utf-8
+                - application/problem+json
             Date:
-                - Tue, 10 Sep 2024 14:57:54 GMT
+                - Mon, 23 Sep 2024 09:01:35 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
                 - Origin
-            X-Id:
-                - subnet-f733652e
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
-                - Version 2.6.3
             X-Krakend-Completed:
                 - "false"
-                - "false"
-        status: 204 No Content
-        code: 204
-        duration: 1.136625336s
+        status: 409 Conflict
+        code: 409
+        duration: 501.179477ms
     - id: 23
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:01:50 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 539.72612ms
+    - id: 24
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:02:06 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 339.494875ms
+    - id: 25
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:02:22 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 1.503403543s
+    - id: 26
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:02:38 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 278.962029ms
+    - id: 27
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:02:53 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 687.767684ms
+    - id: 28
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 186
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"listeners":[{"backendPort":80,"backendProtocol":"","loadBalancerPort":80,"loadBalancerProtocol":"TCP"}],"name":"elb-test","publicIp":"","subnets":["subnet-ea284159"],"type":"internal"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/loadBalancers"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/problem+json
+            Date:
+                - Mon, 23 Sep 2024 09:03:10 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 1.545868931s
+    - id: 29
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Date:
+                - Mon, 23 Sep 2024 09:03:16 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 200 OK
+        code: 200
+        duration: 621.319496ms
+    - id: 30
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Date:
+                - Mon, 23 Sep 2024 09:03:17 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 200 OK
+        code: 200
+        duration: 666.009999ms
+    - id: 31
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1276,7 +1678,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-e98e7ba5
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-ea284159
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1295,14 +1697,14 @@ interactions:
             Content-Type:
                 - application/json; charset=utf-8
             Date:
-                - Tue, 10 Sep 2024 14:57:54 GMT
+                - Mon, 23 Sep 2024 09:03:17 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
                 - Origin
             X-Id:
-                - vpc-e98e7ba5
+                - subnet-ea284159
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -1312,4 +1714,57 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 217.015051ms
+        duration: 214.528889ms
+    - id: 32
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-80f78a3a
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json; charset=utf-8
+            Date:
+                - Mon, 23 Sep 2024 09:03:17 GMT
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Id:
+                - vpc-80f78a3a
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "false"
+        status: 204 No Content
+        code: 204
+        duration: 207.671887ms

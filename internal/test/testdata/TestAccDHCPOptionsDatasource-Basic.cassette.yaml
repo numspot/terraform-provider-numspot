@@ -41,8 +41,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 12:08:58 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -54,7 +52,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 826.994865ms
+        duration: 5ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -95,8 +93,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 12:08:59 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -108,7 +104,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 558.948863ms
+        duration: 5ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -137,7 +133,7 @@ interactions:
         trailer: {}
         content_length: 147
         uncompressed: false
-        body: '{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-1633e08e","logServers":[],"ntpServers":[],"tags":[]}'
+        body: '{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-f280c19c","logServers":[],"ntpServers":[],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -149,8 +145,6 @@ interactions:
                 - "147"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 12:08:59 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -165,7 +159,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 227.807831ms
+        duration: 5ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -182,7 +176,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/tags?resourceIds=dopt-1633e08e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/tags?resourceIds=dopt-f280c19c
         method: GET
       response:
         proto: HTTP/1.1
@@ -204,8 +198,6 @@ interactions:
                 - "12"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 12:08:59 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -220,7 +212,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 231.113172ms
+        duration: 5ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -247,7 +239,7 @@ interactions:
         trailer: {}
         content_length: 159
         uncompressed: false
-        body: '{"items":[{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-1633e08e","logServers":[],"ntpServers":[],"tags":[]}]}'
+        body: '{"items":[{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-f280c19c","logServers":[],"ntpServers":[],"tags":[]}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -259,8 +251,6 @@ interactions:
                 - "159"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 12:08:59 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -275,7 +265,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 88.266488ms
+        duration: 5ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -316,8 +306,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 12:09:00 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -329,7 +317,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 600.552699ms
+        duration: 5ms
     - id: 6
       request:
         proto: HTTP/1.1
@@ -356,7 +344,7 @@ interactions:
         trailer: {}
         content_length: 159
         uncompressed: false
-        body: '{"items":[{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-1633e08e","logServers":[],"ntpServers":[],"tags":[]}]}'
+        body: '{"items":[{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-f280c19c","logServers":[],"ntpServers":[],"tags":[]}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -368,8 +356,6 @@ interactions:
                 - "159"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 12:09:00 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -384,7 +370,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 175.485537ms
+        duration: 5ms
     - id: 7
       request:
         proto: HTTP/1.1
@@ -425,8 +411,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 12:09:01 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -438,7 +422,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 515.716239ms
+        duration: 5ms
     - id: 8
       request:
         proto: HTTP/1.1
@@ -455,7 +439,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-1633e08e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-f280c19c
         method: GET
       response:
         proto: HTTP/1.1
@@ -465,7 +449,7 @@ interactions:
         trailer: {}
         content_length: 147
         uncompressed: false
-        body: '{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-1633e08e","logServers":[],"ntpServers":[],"tags":[]}'
+        body: '{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-f280c19c","logServers":[],"ntpServers":[],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -477,8 +461,6 @@ interactions:
                 - "147"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 12:09:01 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -493,7 +475,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 162.611333ms
+        duration: 5ms
     - id: 9
       request:
         proto: HTTP/1.1
@@ -520,7 +502,7 @@ interactions:
         trailer: {}
         content_length: 159
         uncompressed: false
-        body: '{"items":[{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-1633e08e","logServers":[],"ntpServers":[],"tags":[]}]}'
+        body: '{"items":[{"default":false,"domainName":"foo.bar","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-f280c19c","logServers":[],"ntpServers":[],"tags":[]}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -532,8 +514,6 @@ interactions:
                 - "159"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 12:09:01 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -548,7 +528,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 120.569393ms
+        duration: 5ms
     - id: 10
       request:
         proto: HTTP/1.1
@@ -589,8 +569,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 12:09:02 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -602,7 +580,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 552.339466ms
+        duration: 5ms
     - id: 11
       request:
         proto: HTTP/1.1
@@ -643,8 +621,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 12:09:03 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -656,7 +632,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 647.421235ms
+        duration: 5ms
     - id: 12
       request:
         proto: HTTP/1.1
@@ -673,7 +649,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-1633e08e
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-f280c19c
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -691,15 +667,13 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 12:09:03 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
                 - Origin
             X-Id:
-                - dopt-1633e08e
+                - dopt-f280c19c
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -709,4 +683,4 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 358.107551ms
+        duration: 5ms

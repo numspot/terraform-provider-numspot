@@ -10,6 +10,12 @@ import (
 )
 
 func TestAccLoadBalancerDatasource(t *testing.T) {
+	// We spotted a bug on Outscale side:
+	// When a load balancer is created, deleted and the recreated with the same name, the API returns 409 Resource conflict
+	// Bug reported to Outscale: https://support.outscale.com/hc/fr-fr/requests/378437
+	// Setting random name is not compliant with recorded test cassettes
+	// For instance We skip this test in the CI pipeline until Outscale fixes the bug or we foind a better solution
+	t.Skip()
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
 		err := acct.Cleanup()

@@ -41,8 +41,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:23 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -54,7 +52,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 654.106458ms
+        duration: 5ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -95,8 +93,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:23 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -108,7 +104,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 470.729544ms
+        duration: 5ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -137,7 +133,7 @@ interactions:
         trailer: {}
         content_length: 1828
         uncompressed: false
-        body: '{"fingerprint":"e8:61:a5:29:bd:84:c7:48:44:2c:bd:7c:97:88:57:a4","name":"key-pair-name-test-terraform","privateKey":"-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEAo7t4DB5Qgpcgev/XJV+1xHO4v1qZeHhSWZMNq4d48lItDMamdG2ojLpdgI7l\n2geL8d/QYKCRgjuxximR8ntQG1SNTNLflVf0YzlyXOklCJx/xx7DqdlEMm0Ya5r/LTLHqziS1jOf\nXY6x4onmOBlclR+GbgxwzSxJ/ccXkqsdZD0tlfkIOcgu4K6AMi8HeSgHDR9kFFFVrxB0BqLqrkiY\n5s2Is2pScg24VUI1qUuuM43LpQKUN5DhffCIpLs1zMxGzlEbPlS4pKroztGo76KmsqRdxg1TwfIy\npvaTsM6slDgD8iaiqGL/sBbZkzXhKHLa3YMRJzGdWrKpLEmIpfPRYwIDAQABAoIBAFskIuoUAdr/\nxyvQuHFseqEVjbSu+RkvWR/VlNlzuuagycT/226aECXuI9hJMzeP1d3ZKYRwPS9SjV3yi/R/ohLk\nmRc3lw/p+vc05i1D9sJ5Y0NzI5WrhKPRSLO1fvApAS6Vel9UMxUANpMVEhsOOxQjjVA7CpubWMC0\nj7GsINtHstcJ/7zdgfHlUKG7y3Rv7R9SP0OiRurjtclaBT+qOebLVN8zEe9Iot4j36Ilp3sy5tkO\nijIoAwy7AwJcDtMaa5K7MXq9YaBJ9GOXCWCF8+IQ7Cqr7wygg9a9P0AQFcMFabYUv75BEVIIpSKP\ncCxfV7ztP60Cz4Hu5cBUeKkUIYECgYEA0ZXB+YUB31OmhFcuWRDDH0wf/wUDXnPGVBuYpI+CSlaF\nvRnWdZTpy2KB8lDWvCk59LPeqaQyYIQOjvUZb7LkeMU+K3e3nECjHk9hlKNp8/OMNa3Fhclfcqxs\nBvvUJP1B+expZ6DExkE7qdKqV9Vu3+jZiNL9zlkFvbFBgNB3KyMCgYEAx/4hza8v5vRWvGBNIIIf\nxf+qwR8KabDBb5tTCiUma2lqrlASPL8WiRCY/tzxQOGd/dxIMboKUnzq03eKsUXGuGSTKcgfmJJ1\nzeW72IqDHxSIL993oTlzo4O3PkPLHVijhiRRTEV4Z1/6yp+mlUpKE2qTK8hCSe5o9YG9B3qtRMEC\ngYAlle7QearpSw4cw6m7LUdg0H0YdeSxxp91q/FG6bma7UNUs1KDia4X3FWjiB3KZrZPDQbMc3bZ\nWjVmK8xg/Lr+cZkBoJmb+veF0wST7G5u4mltovk+Ueu9G/DPm8/ixkxTrrMEc492YnJ5tR75W3xj\nyVVhtTzxCYP/Dc/Kcxg78wKBgFD4nWsPcM+LQcrHGrL8vCyIFPRXwvmDrO2o73f+Do4SgjTNCnU5\n0L/xzl/xyGPCdRshIsGvVxqKpPC1R5v6ajihz8ts0Q4Ozk9soh9MBUaCI5luWpsWDbG4VGqLPCNH\njf1zms7MmbEQ9RMwjFuJVnCCB9AEJoKUWj58JrJugtSBAoGAQR3PQgodjHnQ6/JUaaBMsKPxYUNg\n0buU8defX+ZAJFuhMEMbsxlmpVxnfSNLWAX4gbIBFCcnlS0oZ7vBQhKV5GbzCZ2OtCNutlfTqlgB\n/oLpFt2PgJnjlj98Bkg1SlhEpZEsfWoBLK8sdLM/LNTcTVO/GeTO0PpyyPAiLhGzcSY=\n-----END RSA PRIVATE KEY-----","type":"ssh-rsa"}'
+        body: '{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","privateKey":"-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEApuj3BZzREt92VsBaH7822c6OYPA01deRdJR2hr5AI/n4Y5xRQ6UjW4Dk9Nyy\nPMg4GmN/xYyixkdLXH1qkvfq4cHrUBUpBQWQG8f5kFYCrm+aJ6PWcqXQV/gMi9W3VkOHT6DuycnP\nnve0sUTuh68bbUYGwEG11bV09WHaowbRggH2wTFLRPfqzzt1hacwEXvVQMvOV5/MvFJPjy7t40lZ\n3g7jQDfkPABo9P7Jymklo9cvm5qZsBnhjU0cD2Eu3MmZV2TtTyvK6nvmEeUeQZw5wxPyNYfTQO1c\nJVL2+NixfLpEFKxoLx80f6Id/3DH56wUWo0OTdm+XF6wWSj9mBLBGwIDAQABAoIBAH0Ww2q1aAtY\n5fuGFQUN7TG3GAWWgEJzWFOioGHDW5aa1IjysgScUq9VHkJU1E+xTjqYrz2CdMtcyyH57FFQ8/tV\nteFCuodE8AeiC2scys2oXkOvChzKICaNg/mYpdpEqbgHyG36jVt6ETV5j7qohUmT3aNgm8IaSBlO\nyOi9R27Ci3pTrA51LQU3kSLdzaEPsn6O+enOGTssBz1VptWSvlthdd9onk2jk/YOmCoxrJsx2QFM\ntyj3K8RIXxQxiOdCYE+uwFRHHDSoz9OAYBC2USnSOSyp+7N1wAdOVQmStATARkSrz15bbbFGSoav\nVtUiw/lqs1N80wJysyR8lujOuAECgYEA3Ts0gKxejIMKQh1ezUe+4nNT5WuqK8ewRhO4SD4nCCQs\n7lcS3if7Zos0Hgy2/qBq/MGyWWa5mz7o54ceB6yRhsZN5/CTLS0AtGGNb4SKxpRaLtlDqGKze5SQ\npXc7HnHouoKyV6EUaa/ltki0Yz1mmxey2H7SJjvkaKxWnOKu+hsCgYEAwSRA7tyPImhwYXMBJMT0\n8zqKZm0d1HHtLwYExWbJ2+ZKhtiunZgV7h55JCiOZz5Ool/0bJ9yo3CVGTe4kRMDjqBFyMndegHB\nTi/vVmsO5YlQ5l77IgVPRUI7HQfnGV9mVscxRYUVYhB95u1Jd8KNOpGFZOpHK2JkXBxnqCuXxQEC\ngYASfDPy3HQ6AWkGBTY6qNgGS+SistBRQCo2cMdhIfBY+czXTWdCMM0M0GzWZfGUbQsDe5vPZIn1\nstf7IIsd0QmH3WH9E1j42V3JtK0AuG5wEU1HxNemZjjhBpTfforuDE6J5wnH0KnH+u6SwJhyAltk\nciJ7fH1KvI5lQKEsErTUKQKBgAe7q93kdtap19YPBLy0JhqW/XOcatVWumhnlUlSFEL5tYIwqs0k\nibw+/Bq2hP0dQYi+zsqKl8xzdYTM9lbYrAvJ3wFrE7MO3u6CfNK49p+6H8MZinSSQdpEDJnc9yPM\n7gwLba2a5oBGqMPWPFrPL1ho+y5PMwpJpjsJ6ByTokABAoGAe10lNqZh2emr3NLZlrIptC0zOc/g\nOCV1DyFJyMYRrVULtkvRe/p5HMfoIcJNFEoEzz+AXk1y6cnT3sDKxJF+5PRBsKtXGjv3qvdBRy99\n2eI8JOcX6m/q3ylDrjyxsC6Ys29Isq93JHzSqyK5isBLMeah1a6SUAlj/5xqQYbv5kE=\n-----END RSA PRIVATE KEY-----","type":"ssh-rsa"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -149,8 +145,6 @@ interactions:
                 - "1828"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:24 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -165,7 +159,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 549.682687ms
+        duration: 5ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -192,7 +186,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"items":[{"fingerprint":"e8:61:a5:29:bd:84:c7:48:44:2c:bd:7c:97:88:57:a4","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
+        body: '{"items":[{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -204,8 +198,6 @@ interactions:
                 - "132"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:24 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -220,7 +212,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 136.488665ms
+        duration: 5ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -261,8 +253,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:25 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -274,7 +264,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 679.039262ms
+        duration: 5ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -301,7 +291,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"items":[{"fingerprint":"e8:61:a5:29:bd:84:c7:48:44:2c:bd:7c:97:88:57:a4","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
+        body: '{"items":[{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -313,8 +303,6 @@ interactions:
                 - "132"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:25 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -329,7 +317,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 398.840368ms
+        duration: 5ms
     - id: 6
       request:
         proto: HTTP/1.1
@@ -370,8 +358,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:26 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -383,7 +369,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 621.963652ms
+        duration: 5ms
     - id: 7
       request:
         proto: HTTP/1.1
@@ -410,7 +396,7 @@ interactions:
         trailer: {}
         content_length: 120
         uncompressed: false
-        body: '{"fingerprint":"e8:61:a5:29:bd:84:c7:48:44:2c:bd:7c:97:88:57:a4","name":"key-pair-name-test-terraform","type":"ssh-rsa"}'
+        body: '{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","type":"ssh-rsa"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -422,8 +408,6 @@ interactions:
                 - "120"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:26 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -438,7 +422,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 103.86223ms
+        duration: 5ms
     - id: 8
       request:
         proto: HTTP/1.1
@@ -465,7 +449,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"items":[{"fingerprint":"e8:61:a5:29:bd:84:c7:48:44:2c:bd:7c:97:88:57:a4","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
+        body: '{"items":[{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -477,8 +461,6 @@ interactions:
                 - "132"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:26 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -493,7 +475,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 94.265551ms
+        duration: 5ms
     - id: 9
       request:
         proto: HTTP/1.1
@@ -534,8 +516,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:27 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -547,7 +527,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 532.760816ms
+        duration: 5ms
     - id: 10
       request:
         proto: HTTP/1.1
@@ -588,8 +568,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:57:28 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -601,7 +579,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 596.187442ms
+        duration: 5ms
     - id: 11
       request:
         proto: HTTP/1.1
@@ -636,8 +614,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 14:57:28 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -654,4 +630,4 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 159.938009ms
+        duration: 5ms

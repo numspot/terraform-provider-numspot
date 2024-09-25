@@ -41,8 +41,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:41:54 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -54,7 +52,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 688.563164ms
+        duration: 5ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -95,8 +93,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:41:55 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -108,7 +104,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 726.039821ms
+        duration: 5ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -149,8 +145,6 @@ interactions:
                 - "119"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 15:41:55 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -165,7 +159,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 303.032955ms
+        duration: 5ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -206,8 +200,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:41:56 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -219,7 +211,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 620.304389ms
+        duration: 5ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -260,8 +252,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:41:57 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -273,7 +263,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 590.194325ms
+        duration: 5ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -312,8 +302,6 @@ interactions:
                 - "119"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 15:41:57 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -328,7 +316,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 406.597843ms
+        duration: 5ms
     - id: 6
       request:
         proto: HTTP/1.1
@@ -369,8 +357,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:41:58 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -382,7 +368,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 578.146604ms
+        duration: 5ms
     - id: 7
       request:
         proto: HTTP/1.1
@@ -421,8 +407,6 @@ interactions:
                 - "119"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 15:41:59 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -437,7 +421,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 482.909835ms
+        duration: 5ms
     - id: 8
       request:
         proto: HTTP/1.1
@@ -478,8 +462,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:41:59 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -491,7 +473,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 705.293115ms
+        duration: 5ms
     - id: 9
       request:
         proto: HTTP/1.1
@@ -530,8 +512,6 @@ interactions:
                 - "119"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 15:42:00 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -546,7 +526,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 110.536517ms
+        duration: 5ms
     - id: 10
       request:
         proto: HTTP/1.1
@@ -587,8 +567,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:42:00 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -600,7 +578,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 698.647867ms
+        duration: 5ms
     - id: 11
       request:
         proto: HTTP/1.1
@@ -635,8 +613,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 15:42:01 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -653,7 +629,7 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 307.510765ms
+        duration: 5ms
     - id: 12
       request:
         proto: HTTP/1.1
@@ -694,8 +670,6 @@ interactions:
                 - "127"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 15:42:01 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -710,7 +684,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 253.673488ms
+        duration: 5ms
     - id: 13
       request:
         proto: HTTP/1.1
@@ -751,8 +725,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:42:02 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -764,7 +736,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 539.265598ms
+        duration: 5ms
     - id: 14
       request:
         proto: HTTP/1.1
@@ -805,8 +777,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:42:02 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -818,7 +788,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 614.386048ms
+        duration: 5ms
     - id: 15
       request:
         proto: HTTP/1.1
@@ -857,8 +827,6 @@ interactions:
                 - "127"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 15:42:03 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -873,7 +841,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 301.722406ms
+        duration: 5ms
     - id: 16
       request:
         proto: HTTP/1.1
@@ -914,8 +882,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:42:03 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -927,7 +893,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 583.626538ms
+        duration: 5ms
     - id: 17
       request:
         proto: HTTP/1.1
@@ -968,8 +934,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 15:42:04 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -981,7 +945,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 604.251819ms
+        duration: 5ms
     - id: 18
       request:
         proto: HTTP/1.1
@@ -1016,8 +980,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 15:42:04 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1034,4 +996,4 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 112.230854ms
+        duration: 5ms

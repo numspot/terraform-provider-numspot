@@ -41,8 +41,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 11:23:15 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -54,7 +52,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 659.153954ms
+        duration: 5ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -95,8 +93,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 11:23:16 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -108,7 +104,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 580.16574ms
+        duration: 5ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -137,7 +133,7 @@ interactions:
         trailer: {}
         content_length: 116
         uncompressed: false
-        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e8fd0b37","publicIp":"192.0.2.0","state":"available","tags":[]}'
+        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e41fefd5","publicIp":"192.0.2.0","state":"available","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -149,8 +145,6 @@ interactions:
                 - "116"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 11:23:16 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -165,7 +159,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 367.977596ms
+        duration: 5ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -182,7 +176,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-e8fd0b37
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-e41fefd5
         method: GET
       response:
         proto: HTTP/1.1
@@ -192,7 +186,7 @@ interactions:
         trailer: {}
         content_length: 116
         uncompressed: false
-        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e8fd0b37","publicIp":"192.0.2.0","state":"available","tags":[]}'
+        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e41fefd5","publicIp":"192.0.2.0","state":"available","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -204,8 +198,6 @@ interactions:
                 - "116"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 11:23:22 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -220,7 +212,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 456.334974ms
+        duration: 5ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -237,7 +229,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-e8fd0b37
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-e41fefd5
         method: GET
       response:
         proto: HTTP/1.1
@@ -247,7 +239,7 @@ interactions:
         trailer: {}
         content_length: 128
         uncompressed: false
-        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e8fd0b37","publicIp":"192.0.2.0","state":"available","tags":[]}]}'
+        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e41fefd5","publicIp":"192.0.2.0","state":"available","tags":[]}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -259,8 +251,6 @@ interactions:
                 - "128"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 11:23:22 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -275,7 +265,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 174.233838ms
+        duration: 5ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -316,8 +306,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 11:23:22 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -329,7 +317,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 448.956262ms
+        duration: 5ms
     - id: 6
       request:
         proto: HTTP/1.1
@@ -346,7 +334,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-e8fd0b37
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-e41fefd5
         method: GET
       response:
         proto: HTTP/1.1
@@ -356,7 +344,7 @@ interactions:
         trailer: {}
         content_length: 128
         uncompressed: false
-        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e8fd0b37","publicIp":"192.0.2.0","state":"available","tags":[]}]}'
+        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e41fefd5","publicIp":"192.0.2.0","state":"available","tags":[]}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -368,8 +356,6 @@ interactions:
                 - "128"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 11:23:23 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -384,7 +370,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 195.169869ms
+        duration: 5ms
     - id: 7
       request:
         proto: HTTP/1.1
@@ -425,8 +411,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 11:23:23 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -438,7 +422,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 828.206033ms
+        duration: 5ms
     - id: 8
       request:
         proto: HTTP/1.1
@@ -455,7 +439,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-e8fd0b37
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-e41fefd5
         method: GET
       response:
         proto: HTTP/1.1
@@ -465,7 +449,7 @@ interactions:
         trailer: {}
         content_length: 116
         uncompressed: false
-        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e8fd0b37","publicIp":"192.0.2.0","state":"available","tags":[]}'
+        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e41fefd5","publicIp":"192.0.2.0","state":"available","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -477,8 +461,6 @@ interactions:
                 - "116"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 11:23:24 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -493,7 +475,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 102.164607ms
+        duration: 5ms
     - id: 9
       request:
         proto: HTTP/1.1
@@ -510,7 +492,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-e8fd0b37
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-e41fefd5
         method: GET
       response:
         proto: HTTP/1.1
@@ -520,7 +502,7 @@ interactions:
         trailer: {}
         content_length: 128
         uncompressed: false
-        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e8fd0b37","publicIp":"192.0.2.0","state":"available","tags":[]}]}'
+        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-e41fefd5","publicIp":"192.0.2.0","state":"available","tags":[]}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -532,8 +514,6 @@ interactions:
                 - "128"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 11:23:24 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -548,7 +528,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 160.313467ms
+        duration: 5ms
     - id: 10
       request:
         proto: HTTP/1.1
@@ -589,8 +569,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 11:23:25 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -602,7 +580,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 532.820345ms
+        duration: 5ms
     - id: 11
       request:
         proto: HTTP/1.1
@@ -643,8 +621,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Wed, 11 Sep 2024 11:23:25 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -656,7 +632,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 681.440957ms
+        duration: 5ms
     - id: 12
       request:
         proto: HTTP/1.1
@@ -673,7 +649,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-e8fd0b37
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-e41fefd5
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -691,15 +667,13 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Wed, 11 Sep 2024 11:23:25 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
                 - Origin
             X-Id:
-                - cgw-e8fd0b37
+                - cgw-e41fefd5
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -709,4 +683,4 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 137.070289ms
+        duration: 5ms

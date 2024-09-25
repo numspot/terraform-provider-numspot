@@ -1,7 +1,6 @@
 package test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -11,9 +10,9 @@ import (
 )
 
 func TestAccServiceAccountDatasource(t *testing.T) {
-	if os.Getenv("CI") != "" {
-		t.Skipf("skipping %s test in CI", t.Name())
-	}
+	// Due to a breaking change on IAM side this datasource becomes useless
+	// We skip this test in CI pipeline waiting for a re-design for GET /serviceAccounts endpoint from IAM side
+	t.Skip()
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
 		err := acct.Cleanup()

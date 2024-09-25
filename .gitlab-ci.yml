@@ -71,8 +71,7 @@ acc-tests:
   before_script:
     - go install gotest.tools/gotestsum@latest
   variables:
-    NUMSPOT_API_HOST: $NUMSPOT_API_HOST
-    NUMSPOT_IAM_HOST: $NUMSPOT_IAM_HOST
+    NUMSPOT_HOST: $NUMSPOT_API_HOST
     NUMSPOT_CLIENT_ID: $NUMSPOT_CLIENT_ID
     NUMSPOT_CLIENT_SECRET: $NUMSPOT_CLIENT_SECRET
     NUMSPOT_SPACE_ID: $NUMSPOT_SPACE_ID
@@ -80,7 +79,6 @@ acc-tests:
     PARALLEL_TEST: "true"
     RETRY_BACKOFF: "5ms"
     VCR_MODE : "replay"
-    CI: "true"
   script:
     - gotestsum --junitfile acc-tests-report.xml --format testname -- -timeout 30m --tags=acc ./...
   artifacts:
@@ -88,7 +86,10 @@ acc-tests:
     reports:
       junit: acc-tests-report.xml
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - when: always
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 push_to_github:
   stage: deploy
