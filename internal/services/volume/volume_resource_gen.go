@@ -131,7 +131,6 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

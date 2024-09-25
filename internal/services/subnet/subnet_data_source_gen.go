@@ -123,7 +123,6 @@ func SubnetDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The IDs of the Vpcs in which the Subnets are.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

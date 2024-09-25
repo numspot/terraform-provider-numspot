@@ -24,7 +24,7 @@ func TestAccSubnetsDatasource(t *testing.T) {
 				Config: `
 data "numspot_subnets" "testdata" {
   vpc_ids    = [numspot_vpc.main.id]
-  depends_on = [numspot_vpc.main, numspot_subnet.test]
+  depends_on = [numspot_subnet.test]
 }
 resource "numspot_vpc" "main" {
   ip_range = "10.101.0.0/16"

@@ -261,7 +261,6 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Vpc for the NIC.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

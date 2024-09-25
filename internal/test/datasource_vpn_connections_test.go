@@ -35,7 +35,6 @@ resource "numspot_client_gateway" "test" {
 resource "numspot_virtual_gateway" "test" {
   connection_type = "ipsec.1"
   vpc_id          = numspot_vpc.test.id
-
 }
 
 resource "numspot_vpn_connection" "test" {

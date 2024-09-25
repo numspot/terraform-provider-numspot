@@ -272,7 +272,6 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

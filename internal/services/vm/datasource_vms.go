@@ -12,62 +12,6 @@ import (
 	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-//type VmsDataSourceModel struct {
-//	Items                                 []VmModel  `tfsdk:"items"`
-//	Architectures                         types.List `tfsdk:"architectures"`
-//	BlockDeviceMappingsDeleteOnVmDeletion types.Bool `tfsdk:"block_device_mappings_delete_on_vm_deletion"`
-//	BlockDeviceMappingsDeviceNames        types.List `tfsdk:"block_device_mappings_device_names"`
-//	BlockDeviceMappingsLinkDates          types.List `tfsdk:"block_device_mappings_link_dates"`
-//	BlockDeviceMappingsStates             types.List `tfsdk:"block_device_mappings_states"`
-//	BlockDeviceMappingsVolumeIds          types.List `tfsdk:"block_device_mappings_volume_ids"`
-//	ClientTokens                          types.List `tfsdk:"client_tokens"`
-//	CreationDates                         types.List `tfsdk:"creation_dates"`
-//	ImageIds                              types.List `tfsdk:"image_ids"`
-//	IsSourceDestChecked                   types.Bool `tfsdk:"is_source_dest_checked"`
-//	KeypairNames                          types.List `tfsdk:"keypair_names"`
-//	LaunchNumbers                         types.List `tfsdk:"launch_numbers"`
-//	NicAccountIds                         types.List `tfsdk:"nic_account_ids"`
-//	NicDescriptions                       types.List `tfsdk:"nic_descriptions"`
-//	NicIsSourceDestChecked                types.Bool `tfsdk:"nic_is_source_dest_checked"`
-//	NicLinkNicDeleteOnVmDeletion          types.Bool `tfsdk:"nic_link_nic_delete_on_vm_deletion"`
-//	NicLinkNicDeviceNumbers               types.List `tfsdk:"nic_link_nic_device_numbers"`
-//	NicLinkNicLinkNicIds                  types.List `tfsdk:"nic_link_nic_link_nic_ids"`
-//	NicLinkNicStates                      types.List `tfsdk:"nic_link_nic_states"`
-//	NicLinkPublicIpAccountIds             types.List `tfsdk:"nic_link_public_ip_account_ids"`
-//	NicLinkPublicIpsPublicIps             types.List `tfsdk:"nic_link_public_ips_public_ips"`
-//	NicMacAddresses                       types.List `tfsdk:"nic_mac_addresses"`
-//	NicNicIds                             types.List `tfsdk:"nic_nic_ids"`
-//	NicPrivateIpsLinkPublicIpAccountId    types.List `tfsdk:"nic_private_ips_link_public_ip_account_id"`
-//	NicPrivateIpsLinkPublicIps            types.List `tfsdk:"nic_private_ips_link_public_ips"`
-//	NicPrivateIpsIsPrimary                types.Bool `tfsdk:"nic_private_ips_is_primary"`
-//	NicPrivateIpsPrivateIps               types.List `tfsdk:"nic_private_ips_private_ips"`
-//	NicSecurityGroupIds                   types.List `tfsdk:"nic_security_group_ids"`
-//	NicSecurityGroupNames                 types.List `tfsdk:"nic_security_group_names"`
-//	NicStates                             types.List `tfsdk:"nic_states"`
-//	NicSubnetIds                          types.List `tfsdk:"nic_subnet_ids"`
-//	OsFamilies                            types.List `tfsdk:"os_families"`
-//	PrivateIps                            types.List `tfsdk:"private_ips"`
-//	ProductCodes                          types.List `tfsdk:"product_codes"`
-//	PublicIps                             types.List `tfsdk:"public_ips"`
-//	ReservationIds                        types.List `tfsdk:"reservation_ids"`
-//	RootDeviceNames                       types.List `tfsdk:"root_device_names"`
-//	RootDeviceTypes                       types.List `tfsdk:"root_device_types"`
-//	SecurityGroupIds                      types.List `tfsdk:"security_group_ids"`
-//	SecurityGroupNames                    types.List `tfsdk:"security_group_names"`
-//	StateReasonMessages                   types.List `tfsdk:"state_reason_messages"`
-//	SubnetIds                             types.List `tfsdk:"subnet_ids"`
-//	TagKeys                               types.List `tfsdk:"tag_keys"`
-//	TagValues                             types.List `tfsdk:"tag_values"`
-//	Tags                                  types.List `tfsdk:"tags"`
-//	Tenancies                             types.List `tfsdk:"tenancies"`
-//	VmStateNames                          types.List `tfsdk:"vm_state_names"`
-//	VmTypes                               types.List `tfsdk:"vm_types"`
-//	VpcIds                                types.List `tfsdk:"vpc_ids"`
-//	NicVpcIds                             types.List `tfsdk:"nic_vpc_ids"`
-//	AvailabilityZoneNames                 types.List `tfsdk:"availability_zone_names"`
-//	IDs                                   types.List `tfsdk:"ids"`
-//}
-
 // Ensure the implementation satisfies the expected interfaces.
 var (
 	_ datasource.DataSource = &vmsDataSource{}
