@@ -80,7 +80,6 @@ func InternetGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The key/value combination of the tags associated with the Internet gateways, in the following format: \"Filters\":{\"Tags\":[\"TAGKEY=TAGVALUE\"]}.", // MANUALLY EDITED : replaced HTML encoded character
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

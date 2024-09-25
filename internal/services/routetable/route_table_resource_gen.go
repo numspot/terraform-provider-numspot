@@ -237,7 +237,6 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Computed: true,
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

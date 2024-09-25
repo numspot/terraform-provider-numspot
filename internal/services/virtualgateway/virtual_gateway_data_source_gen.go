@@ -121,7 +121,6 @@ func VirtualGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			// MANUALLY EDITED : remove spaceId
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

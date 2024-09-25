@@ -234,7 +234,6 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

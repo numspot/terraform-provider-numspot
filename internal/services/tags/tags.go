@@ -42,7 +42,6 @@ func TagsSchema(ctx context.Context) schema.ListNestedAttribute {
 		Optional:            true,
 		Description:         "One or more tags associated with the resource.",
 		MarkdownDescription: "One or more tags associated with the resource.",
-		DeprecationMessage:  "Managing IAAS services with Terraform is deprecated",
 	}
 }
 
