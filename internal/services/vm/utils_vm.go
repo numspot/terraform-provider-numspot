@@ -15,6 +15,45 @@ import (
 	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
+func StopVmNoDiag(ctx context.Context, provider services.IProvider, id string) (err error) {
+	// Already stopped
+	var vmStatus *numspot.ReadVmsByIdResponse
+	if vmStatus, err = provider.GetNumspotClient().ReadVmsByIdWithResponse(
+		ctx,
+		provider.GetSpaceID(),
+		id,
+	); err != nil {
+		return err
+	}
+	if *vmStatus.JSON200.State == "stopped" || *vmStatus.JSON200.State == "terminated" {
+		return nil
+	}
+	//////////////////
+	//forceStop := true
+	// Stop the VM
+	if _, err = provider.GetNumspotClient().StopVmWithResponse(ctx, provider.GetSpaceID(), id,
+		numspot.StopVm{
+			//ForceStop: &forceStop,
+		},
+	); err != nil {
+		return err
+	}
+
+	_, err = utils2.RetryReadUntilStateValid(
+		ctx,
+		id,
+		provider.GetSpaceID(),
+		[]string{"stopping"},
+		[]string{"stopped", "terminated"},
+		provider.GetNumspotClient().ReadVmsByIdWithResponse,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func StopVm(ctx context.Context, provider services.IProvider, id string) diag.Diagnostics {
 	var diags diag.Diagnostics
 
@@ -46,6 +85,40 @@ func StopVm(ctx context.Context, provider services.IProvider, id string) diag.Di
 	}
 
 	return diags
+}
+
+func StartVmNoDiag(ctx context.Context, provider services.IProvider, id string) (err error) {
+	// Already running
+	var vmStatus *numspot.ReadVmsByIdResponse
+	if vmStatus, err = provider.GetNumspotClient().ReadVmsByIdWithResponse(
+		ctx,
+		provider.GetSpaceID(),
+		id,
+	); err != nil {
+		return err
+	}
+	if *vmStatus.JSON200.State == "running" {
+		return nil
+	}
+	//////////////////
+	// Start the VM
+	if _, err = provider.GetNumspotClient().StartVmWithResponse(ctx, provider.GetSpaceID(), id); err != nil {
+		return err
+	}
+
+	_, err = utils2.RetryReadUntilStateValid(
+		ctx,
+		id,
+		provider.GetSpaceID(),
+		[]string{"pending"},
+		[]string{"running"},
+		provider.GetNumspotClient().ReadVmsByIdWithResponse,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func StartVm(ctx context.Context, provider services.IProvider, id string) diag.Diagnostics {

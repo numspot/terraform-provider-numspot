@@ -3,6 +3,9 @@ package core
 import (
 	"context"
 	"errors"
+	"fmt"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
@@ -11,101 +14,60 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-//////////////////////
-// Create Volume
-//
-// Retry Create
-// Retry Read
-// If VM >
-// 			Link VM
-//			Retry Read
-//////////////////////
-// Read Volume
-//
-//////////////////////
-// Update Volume
-//
-//////////////////////
-// Delete Volume
-//
-//////////////////////
-
 func CreateVolume(ctx context.Context, provider services.IProvider, input numspot.CreateVolumeJSONRequestBody, vmID, deviceName string) (numSpotVolume *numspot.Volume, err error) {
-	var assert bool
 	spaceID := provider.GetSpaceID()
 
-	// Retry Create volume
 	var retryCreate *numspot.CreateVolumeResponse
-	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID,
-		input,
+	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, input,
 		provider.GetNumspotClient().CreateVolumeWithResponse); err != nil {
 		return nil, err
 	}
+
 	volumeID := *retryCreate.JSON201.Id
 
-	// Retry Read - Wait for volume to be ready
-	var retryRead any
-	if retryRead, err = utils.RetryReadUntilStateValid(ctx, volumeID, spaceID,
-		pendingState{creating},
-		targetState{available},
+	if vmID != "" {
+		err = link(ctx, provider, volumeID, vmID, deviceName)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var read any
+	if read, err = utils.RetryReadUntilStateValid(ctx, volumeID, spaceID, pendingState{creating, updating}, targetState{available, inUse},
 		provider.GetNumspotClient().ReadVolumesByIdWithResponse); err != nil {
 		return nil, err
 	}
-	if numSpotVolume, assert = retryRead.(*numspot.Volume); !assert {
-		return nil, errors.New("invalid read assertion")
+
+	var assert bool
+	if numSpotVolume, assert = read.(*numspot.Volume); !assert {
+		return nil, errors.New("invalid create volume assertion")
 	}
-
-	// Link current volume to a VM is specified
-	if vmID != "" {
-		linkBody := numspot.LinkVolumeJSONRequestBody{
-			DeviceName: deviceName,
-			VmId:       vmID,
-		}
-		if _, err = provider.GetNumspotClient().LinkVolumeWithResponse(ctx, spaceID, volumeID, linkBody); err != nil {
-			return nil, err
-		}
-
-		// Retry Read - Wait for volume to be linked to VM
-		var retryReadLink any
-		if retryReadLink, err = utils.RetryReadUntilStateValid(ctx, volumeID, spaceID,
-			pendingState{available},
-			targetState{inUse},
-			provider.GetNumspotClient().ReadVolumesByIdWithResponse); err != nil {
-			return nil, err
-		}
-		if numSpotVolume, assert = retryReadLink.(*numspot.Volume); !assert {
-			return nil, errors.New("invalid read link assertion")
-		}
-	}
-
 	return numSpotVolume, err
 }
 
 func UpdateVolumeAttributes(
 	ctx context.Context,
 	provider services.IProvider,
+	vmID string,
 	volumeID string,
 	numSpotVolumeUpdate numspot.UpdateVolumeJSONRequestBody,
-	vmID, deviceName string,
 ) (numSpotVolume *numspot.Volume, err error) {
 	// stateVmExists := true
 	var assert bool
+
 	if vmID != "" {
 		// Stop linked VM before unlinking Volume
-		if err, _ = stopVm(ctx, provider, vmID); err != nil {
+		if err = vm.StopVmNoDiag(ctx, provider, vmID); err != nil {
 			return nil, err
 		}
 	}
-
 	if _, err = provider.GetNumspotClient().UpdateVolumeWithResponse(ctx, provider.GetSpaceID(), volumeID, numSpotVolumeUpdate); err != nil {
 		return nil, err
 	}
-
 	if vmID != "" {
 		// Start linked VM after updating Volume
-		diags := vm.StartVm(ctx, provider, vmID)
-		if diags.HasError() {
-			return nil, errors.New("failed to start vm")
+		if err = vm.StartVmNoDiag(ctx, provider, vmID); err != nil {
+			return nil, err
 		}
 	}
 
@@ -123,97 +85,142 @@ func UpdateVolumeAttributes(
 	}
 
 	if numSpotVolume, assert = retryRead.(*numspot.Volume); !assert {
-		return nil, errors.New("invalid read update assertion")
+		return nil, errors.New("invalid update volume attributes assertion")
 	}
 
 	return numSpotVolume, nil
 }
 
-func UpdateVolumeLink(
-	ctx context.Context,
-	provider services.IProvider,
-	volumeID, vmOldID, vmNewID, deviceName string,
-) (numSpotVolume *numspot.Volume, err error) {
-	var assert bool
-	// stateVmExists := true
-	if vmOldID != "" {
-		// Stop linked VM before unlinking Volume
-		if err, _ = stopVm(ctx, provider, vmOldID); err != nil {
-			return nil, err
-		}
+func unlink(ctx context.Context, provider services.IProvider, volumeID, vmID string) (err error) {
+	if err = vm.StopVmNoDiag(ctx, provider, vmID); err != nil {
+		return err
 	}
-
-	_, err = provider.GetNumspotClient().UnlinkVolumeWithResponse(
+	if _, err = provider.GetNumspotClient().UnlinkVolumeWithResponse(
 		ctx,
 		provider.GetSpaceID(),
 		volumeID,
 		numspot.UnlinkVolumeJSONRequestBody{},
-	)
+	); err != nil {
+		return err
+	}
+	if err = vm.StartVmNoDiag(ctx, provider, vmID); err != nil {
+		return err
+	}
+	return nil
+}
 
-	if vmOldID != "" {
-		// Start linked VM after updating Volume
-		if err, _ = startVm(ctx, provider, vmOldID); err != nil {
-			return nil, err
+func link(ctx context.Context, provider services.IProvider, volumeID string, vmID, deviceName string) (err error) {
+	spaceID := provider.GetSpaceID()
+	linkBody := numspot.LinkVolumeJSONRequestBody{
+		DeviceName: deviceName,
+		VmId:       vmID,
+	}
+
+	if _, err = utils.RetryLinkUntilResourceAvailableWithBody(
+		ctx, spaceID, volumeID, linkBody, provider.GetNumspotClient().LinkVolumeWithResponse); err != nil {
+		return err
+	}
+
+	createStateConf := &retry.StateChangeConf{
+		Pending: []string{attaching},
+		Target:  []string{attached},
+		Refresh: func() (interface{}, string, error) {
+			var readRes *numspot.ReadVolumesByIdResponse
+			readRes, err = provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, spaceID, volumeID)
+			if err != nil {
+				return nil, "", fmt.Errorf("failed to read volume : %v", err)
+			}
+
+			if len(*readRes.JSON200.LinkedVolumes) > 0 {
+				linkState := (*readRes.JSON200.LinkedVolumes)[0].State
+				return readRes.JSON200, *linkState, nil
+			}
+			return nil, "", fmt.Errorf("Volume not linked to any VM : %v", err)
+		},
+		Timeout: utils.TfRequestRetryTimeout,
+		Delay:   utils.TfRequestRetryDelay,
+	}
+	_, err = createStateConf.WaitForStateContext(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateVolumeLink(ctx context.Context, provider services.IProvider,
+	volumeID, stateVMID, planVMID, planDeviceName string,
+) (numSpotVolume *numspot.Volume, err error) {
+	var assert bool
+
+	if stateVMID == "" {
+		if planVMID != "" {
+			// Nothing in the state and VM in the plan
+			// We link the volume to the VM in the plan
+			if err = link(ctx, provider, volumeID, planVMID, planDeviceName); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	_, err = provider.GetNumspotClient().LinkVolumeWithResponse(
-		ctx,
-		provider.GetSpaceID(),
-		volumeID,
-		numspot.LinkVolumeJSONRequestBody{
-			DeviceName: vmNewID,
-			VmId:       deviceName,
-		},
-	)
+	if stateVMID != "" {
+		if planVMID == "" {
+			// Nothing in the plan and VM in the state
+			// We need to unlink the volume to the VM in state
+			if err = unlink(ctx, provider, volumeID, stateVMID); err != nil {
+				return nil, err
+			}
+		} else {
+			// VM in the state, VM in the plan
+			// We need to unlink the volume from the previous VM (in state) and link it to the new VM (in plan) with the device name in the plan
+			if err = unlink(ctx, provider, volumeID, stateVMID); err != nil {
+				return nil, err
+			}
+			if err = link(ctx, provider, volumeID, planVMID, planDeviceName); err != nil {
+				return nil, err
+			}
+		}
+	}
 
-	// Retries read on resource until state is OK
-	retryRead, err := utils.RetryReadUntilStateValid(
-		ctx,
-		volumeID,
-		provider.GetSpaceID(),
-		pendingState{creating, updating},
-		targetState{available, inUse},
+	retryRead, err := utils.RetryReadUntilStateValid(ctx, volumeID, provider.GetSpaceID(), pendingState{creating, updating}, targetState{available, inUse},
 		provider.GetNumspotClient().ReadVolumesByIdWithResponse,
 	)
 	if err != nil {
-		//response.Diagnostics.AddError("Failed to update volume", fmt.Sprintf("Error waiting for volume (%s) to be created: %s", state.Id.ValueString(), err))
 		return nil, err
 	}
 
 	if numSpotVolume, assert = retryRead.(*numspot.Volume); !assert {
-		return nil, errors.New("invalid update read assertion")
+		return nil, errors.New("invalid update link assertion")
 	}
 
 	return numSpotVolume, nil
 }
 
-func stopVm(ctx context.Context, provider services.IProvider, vmId string) (error, bool) {
-	diags := vm.StopVm(ctx, provider, vmId)
-	if diags.HasError() {
-		if !vm.VmIsDeleted(vmId) {
-			return errors.New("unable to stop VM"), true
-		} else { // Else, the VM got removed, which is OK
-			return errors.New("unable to stop VM"), false
+func DeleteVolume(ctx context.Context,
+	provider services.IProvider,
+	volumeID, vmID string,
+) (err error) {
+
+	if vmID != "" {
+		if err = vm.StopVmNoDiag(ctx, provider, vmID); err != nil {
+			return err
+		}
+		if _, err = provider.GetNumspotClient().UnlinkVolumeWithResponse(
+			ctx,
+			provider.GetSpaceID(),
+			volumeID,
+			numspot.UnlinkVolumeJSONRequestBody{},
+		); err != nil {
+			return err
+		}
+		if err = vm.StartVmNoDiag(ctx, provider, vmID); err != nil {
+			return err
 		}
 	}
 
-	return nil, true
-}
-
-func startVm(ctx context.Context, provider services.IProvider, vmId string) (error, bool) {
-	diags := vm.StartVm(ctx, provider, vmId)
-	if diags.HasError() {
-		if !vm.VmIsDeleted(vmId) {
-			return errors.New("unable to start VM"), true
-		} else { // Else, the VM got removed, which is OK
-			return errors.New("unable to start VM"), false
-		}
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.GetSpaceID(), volumeID, provider.GetNumspotClient().DeleteVolumeWithResponse)
+	if err != nil {
+		return err
 	}
 
-	return nil, true
+	return nil
 }
-
-//func linkVmConfigured(data VolumeModel) bool {
-//	return !utils.IsTfValueNull(data.LinkVM) && !utils.IsTfValueNull(data.LinkVM.VmID)
-//}

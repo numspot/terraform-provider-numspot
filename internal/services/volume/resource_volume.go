@@ -71,7 +71,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	vmID := initialPlan.LinkVM.VmID.ValueString()
 	deviceName := initialPlan.LinkVM.DeviceName.ValueString()
 
-	numSpotVolume, err := core.CreateVolume(ctx, r.provider, deserializeCreateVolume(initialPlan), vmID, deviceName)
+	numSpotVolume, err := core.CreateVolume(ctx, r.provider, deserializeNumspotVolume(initialPlan), vmID, deviceName)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create volume", err.Error())
 		return
@@ -83,34 +83,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	// uhh
 	newPlan.Tags = initialPlan.Tags
-
-	//createStateConf := &retry.StateChangeConf{
-	//	Pending: []string{"attaching"},
-	//	Target:  []string{"attached"},
-	//	Refresh: func() (interface{}, string, error) {
-	//		readRes, err := r.provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, r.provider.GetSpaceID(), createdId)
-	//		if err != nil {
-	//			return nil, "", fmt.Errorf("failed to read volume : %v", err)
-	//		}
-	//
-	//		if len(*readRes.JSON200.LinkedVolumes) > 0 {
-	//			linkState := (*readRes.JSON200.LinkedVolumes)[0].State
-	//			return readRes.JSON200, *linkState, nil
-	//		}
-	//
-	//		return nil, "", fmt.Errorf("Volume not linked to any VM : %v", err)
-	//	},
-	//	Timeout: utils.TfRequestRetryTimeout,
-	//	Delay:   utils.TfRequestRetryDelay,
-	//}
-	//read, err = createStateConf.WaitForStateContext(ctx)
-	//if err != nil {
-	//	response.Diagnostics.AddError("Failed to create volume", fmt.Sprintf("Error waiting for volume (%s) to be linked: %s", *res.JSON201.Id, err))
-	//	return
-	//}
-
 	if len(initialPlan.Tags.Elements()) > 0 {
 		tags.CreateTagsFromTf(
 			ctx,
@@ -128,15 +101,20 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 }
 
 func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var initialState VolumeModel
-	response.Diagnostics.Append(request.State.Get(ctx, &initialState)...)
+	var state VolumeModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
-	res, err := r.provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, r.provider.GetSpaceID(), initialState.Id.ValueString())
+	res, err := r.provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	if err != nil {
+		// TODO
 		response.Diagnostics.AddError("", "")
 		return
 	}
 	if res.JSON200 == nil {
+		// TODO
 		response.Diagnostics.AddError("", "")
 		return
 	}
@@ -158,28 +136,38 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	volumeID := plan.Id.ValueString()
-	oldVM := plan.LinkVM.VmID.ValueString()
-	newVM := state.LinkVM.VmID.ValueString()
-	deviceName := state.LinkVM.DeviceName.ValueString()
+	volumeID := state.Id.ValueString()
+	vmID := state.LinkVM.VmID.ValueString()
 
 	if (!utils.IsTfValueNull(plan.Size) && !plan.Size.Equal(state.Size)) ||
 		(!utils.IsTfValueNull(plan.Type) && !plan.Type.Equal(state.Type)) ||
 		(!utils.IsTfValueNull(plan.Iops) && !plan.Iops.Equal(state.Iops)) {
 		body := ValueFromTfToUpdaterequest(&plan)
-		numSpotVolume, err = core.UpdateVolumeAttributes(ctx, r.provider, volumeID, body, oldVM, "")
+		numSpotVolume, err = core.UpdateVolumeAttributes(ctx, r.provider, vmID, volumeID, body)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update volume", err.Error())
+			response.Diagnostics.AddError("unable to update volume attributes", err.Error())
+			return
 		}
 	}
 
-	if !utils.IsTfValueNull(plan.LinkVM.VmID) && !plan.Size.Equal(state.LinkVM.VmID) {
-		numSpotVolume, err = core.UpdateVolumeLink(ctx, r.provider, volumeID, oldVM, newVM, deviceName)
+	if !plan.LinkVM.VmID.Equal(state.LinkVM.VmID) ||
+		!plan.LinkVM.DeviceName.Equal(state.LinkVM.DeviceName) {
+		newVM := plan.LinkVM.VmID.ValueString()
+		newDeviceName := plan.LinkVM.DeviceName.ValueString()
+		numSpotVolume, err = core.UpdateVolumeLink(ctx, r.provider, volumeID, vmID, newVM, newDeviceName)
+		if err != nil {
+			response.Diagnostics.AddError("unable to update volume link", err.Error())
+			return
+		}
 	}
 
 	newState, diags := serializeNumSpotVolume(ctx, numSpotVolume)
@@ -202,54 +190,27 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 			return
 		}
 	}
+
+	newState.Tags = plan.Tags
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
 func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	//var data VolumeModel
-	//
-	//response.Diagnostics.Append(request.State.Get(ctx, &data)...)
-	//
-	//if linkVmConfigured(data) {
-	//	// Stop linked VM before unlinking Volume
-	//	diags, stateVmExists := r.stopVm(ctx, data.LinkVM.VmID.ValueString())
-	//
-	//	if diags.HasError() {
-	//		response.Diagnostics.Append(diags...)
-	//		return
-	//	}
-	//
-	//	if stateVmExists {
-	//		// Unlink VM
-	//		utils.ExecuteRequest(func() (*numspot.UnlinkVolumeResponse, error) {
-	//			return r.provider.GetNumspotClient().UnlinkVolumeWithResponse(
-	//				ctx,
-	//				r.provider.GetSpaceID(),
-	//				data.Id.ValueString(),
-	//				VolumeFromTfToUnlinkRequest(&data),
-	//			)
-	//		}, http.StatusNoContent, &response.Diagnostics)
-	//		if response.Diagnostics.HasError() {
-	//			return
-	//		}
-	//		diags = vm.StartVm(ctx, r.provider, data.LinkVM.VmID.ValueString())
-	//		response.Diagnostics.Append(diags...)
-	//
-	//		if response.Diagnostics.HasError() {
-	//			return
-	//		}
-	//
-	//	}
-	//}
-	//
-	//err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVolumeWithResponse)
-	//if err != nil {
-	//	response.Diagnostics.AddError("Failed to delete Volume", err.Error())
-	//	return
-	//}
+	var state VolumeModel
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	err := core.DeleteVolume(ctx, r.provider, state.Id.ValueString(), state.LinkVM.VmID.ValueString())
+	if err != nil {
+		response.Diagnostics.AddError("failed to delete volume", err.Error())
+		return
+	}
 }
 
-func deserializeCreateVolume(tf VolumeModel) numspot.CreateVolumeJSONRequestBody {
+func deserializeNumspotVolume(tf VolumeModel) numspot.CreateVolumeJSONRequestBody {
 	var (
 		httpIOPS   *int
 		snapshotId *string

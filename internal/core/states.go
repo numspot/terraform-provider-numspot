@@ -1,6 +1,8 @@
 package core
 
 const (
+	attaching = "attaching"
+	attached  = "attached"
 	creating  = "creating"
 	updating  = "updating"
 	running   = "running"

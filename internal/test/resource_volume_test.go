@@ -9,37 +9,21 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 )
 
-// This struct will store the input data that will be used in your tests (all fields as string)
-//type StepDataVolume struct {
-//	volumeType,
-//	volumeSize,
-//	tagKey,
-//	tagValue,
-//	az,
-//	deviceName string
-//}
-// Generate checks to validate that resource 'numspot_volume.test' has input data values
-//func getFieldMatchChecksVolume(data StepDataVolume) []resource.TestCheckFunc {
-//	return []resource.TestCheckFunc{
-//		resource.TestCheckResourceAttr("numspot_volume.test", "availability_zone_name", data.az),
-//		resource.TestCheckResourceAttr("numspot_volume.test", "type", data.volumeType),
-//		resource.TestCheckResourceAttr("numspot_volume.test", "size", data.volumeSize),
-//		resource.TestCheckResourceAttr("numspot_volume.test", "link_vm.device_name", data.deviceName),
-//		resource.TestCheckResourceAttr("numspot_volume.test", "tags.#", "1"),
-//		resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.test", "tags.*", map[string]string{
-//			"key":   data.tagKey,
-//			"value": data.tagValue,
-//		}),
-//	}
-//}
-// Generate checks to validate that resource 'numspot_volume.test' is properly linked to given subresources
-// If resource has no dependencies, return empty array
-//func getDependencyChecksVolume(dependenciesSuffix string) []resource.TestCheckFunc {
-//	return []resource.TestCheckFunc{
-//		resource.TestCheckResourceAttrPair("numspot_volume.test", "link_vm.vm_id", "numspot_vm.test"+dependenciesSuffix, "id"),
-//	}
-//}
-
+// Test cases
+//
+// Create unlinked volume
+// Update attributes from unlinked volume
+// Replace attributes // no replace
+// Recreate unlinked volume
+// Link unlinked volume
+//
+// Create linked volume
+// Update attributes from linked volume
+// Replace attributes // no replace
+// Recreate linked volume
+// Unlink linked volume
+//
+// Unlink and link volume to a new VM
 func TestAccVolumeResource(t *testing.T) {
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
@@ -48,264 +32,364 @@ func TestAccVolumeResource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
-	//var resourceId string
-	////////////// Define input data that will be used in the test sequence //////////////
-	// resource fields that can be updated in-place
-	//tagKey := "Name"
-	//tagValue := "terraform-vm"
-	//tagValueUpdated := tagValue + "-Updated"
-	//volumeType := "standard"
-	//volumeTypeUpdated := "gp2"
-	//volumeSize := "11"
-	//volumeSizeUpdated := "22"
-	//volumeAZ := "cloudgouv-eu-west-1a"
-	//volumeAZUpdated := "cloudgouv-eu-west-1a"
-	//deviceName := "/dev/sdb"
-	//deviceNameUpdated := "/dev/sdc"
-	// resource fields that cannot be updated in-place (requires replace)
-	// None
-	/////////////////////////////////////////////////////////////////////////////////////
-	////////////// Define plan values and generate associated attribute checks  //////////////
-	// The base plan (used in first create and to reset resource state before some tests)
-	//basePlanValues := StepDataVolume{
-	//	volumeType: volumeType,
-	//	volumeSize: volumeSize,
-	//	az:         volumeAZ,
-	//	tagKey:     tagKey,
-	//	tagValue:   tagValue,
-	//	deviceName: deviceName,
-	//}
-	//createChecks := append(
-	//	getFieldMatchChecksVolume(basePlanValues),
+	volumeDependencies := `
+							resource "numspot_vpc" "terraform-dep-vpc-volume" {
+							  ip_range = "10.101.0.0/16"
+							  tags = [
+								{
+								  key   = "name"
+								  value = "terraform-dep-vpc-volume"
+								}
+							  ]
+							}
+	
+							resource "numspot_subnet" "terraform-dep-subnet-volume" {
+							  vpc_id                 = numspot_vpc.terraform-dep-vpc-volume.id
+							  ip_range               = "10.101.1.0/24"
+							  availability_zone_name = "cloudgouv-eu-west-1a"
+							  tags = [
+								{
+								  key   = "name"
+								  value = "terraform-dep-subnet-volume"
+								}
+							  ]
+							}
+	
+							resource "numspot_vm" "terraform-dep-vm-volume" {
+							  image_id  = "ami-0b7df82c"
+							  type      = "ns-cus6-2c4r"
+							  subnet_id = numspot_subnet.terraform-dep-subnet-volume.id
+							  tags = [
+								{
+								  key   = "name"
+								  value = "terraform-dep-vm-volume"
+								}
+							  ]
+							}
+	`
+
+	//volumeUpdateLinkDependencies := `
+	//							resource "numspot_vpc" "terraform-dep-vpc-volume" {
+	//							  ip_range = "10.101.0.0/16"
+	//							  tags = [
+	//								{
+	//								  key   = "name"
+	//								  value = "terraform-dep-vpc-volume"
+	//								}
+	//							  ]
+	//							}
 	//
-	//	resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
-	//		require.NotEmpty(t, v)
-	//		resourceId = v
-	//		return nil
-	//	}),
-	//)
-	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
-	//updatePlanValues := StepDataVolume{
-	//	volumeType: volumeTypeUpdated,
-	//	volumeSize: volumeSizeUpdated,
-	//	az:         volumeAZUpdated,
-	//	tagKey:     tagKey,
-	//	tagValue:   tagValueUpdated,
-	//	deviceName: deviceNameUpdated,
-	//}
-	//updateChecks := append(
-	//	getFieldMatchChecksVolume(updatePlanValues),
+	//							resource "numspot_subnet" "terraform-dep-subnet-volume" {
+	//							  vpc_id                 = numspot_vpc.terraform-dep-vpc-volume.id
+	//							  ip_range               = "10.101.1.0/24"
+	//							  availability_zone_name = "cloudgouv-eu-west-1a"
+	//							  tags = [
+	//								{
+	//								  key   = "name"
+	//								  value = "terraform-dep-subnet-volume"
+	//								}
+	//							  ]
+	//							}
 	//
-	//	resource.TestCheckResourceAttrWith("numspot_volume.test", "id", func(v string) error {
-	//		require.NotEmpty(t, v)
-	//		require.Equal(t, v, resourceId)
-	//		return nil
-	//	}),
-	//)
-	/////////////////////////////////////////////////////////////////////////////////////
+	//							resource "numspot_vm" "terraform-dep-vm-volume" {
+	//							  image_id  = "ami-0b7df82c"
+	//							  type      = "ns-cus6-2c4r"
+	//							  subnet_id = numspot_subnet.terraform-dep-subnet-volume.id
+	//							  tags = [
+	//								{
+	//								  key   = "name"
+	//								  value = "terraform-dep-vm-volume"
+	//								}
+	//							  ]
+	//							}
+	//
+	//							resource "numspot_vm" "terraform-dep-vm-volume-target-update-link" {
+	//							  image_id  = "ami-0b7df82c"
+	//							  type      = "ns-cus6-2c4r"
+	//							  subnet_id = numspot_subnet.terraform-dep-subnet-volume.id
+	//							  tags = [
+	//								{
+	//								  key   = "name"
+	//								  value = "terraform-dep-vm-volume-target-update-link"
+	//								}
+	//							  ]
+	//							}
+	//	`
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
+			// Step 1 - Create unlinked volume
 			{
 				Config: `
-resource "numspot_vpc" "terraform-dep-vpc-volume" {
-  ip_range = "10.101.0.0/16"
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-dep-vpc-volume"
-    }
-  ]
-}
-
-resource "numspot_subnet" "terraform-dep-subnet-volume" {
-  vpc_id                 = numspot_vpc.terraform-dep-vpc-volume.id
-  ip_range               = "10.101.1.0/24"
-  availability_zone_name = "cloudgouv-eu-west-1a"
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-dep-subnet-volume"
-    }
-  ]
-}
-
-resource "numspot_vm" "terraform-dep-vm-volume" {
-  image_id  = "ami-0b7df82c"
-  type      = "ns-cus6-2c4r"
-  subnet_id = numspot_subnet.terraform-dep-subnet-volume.id
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-dep-vm-volume"
-    }
-  ]
-}
-
-resource "numspot_volume" "terraform-volume-acctest" {
-  type                   = "standard"
-  size                   = "10"
-  availability_zone_name = "cloudgouv-eu-west-1a"
-  link_vm = {
-    vm_id       = numspot_vm.terraform-dep-vm-volume.id
-    device_name = "/dev/sdb"
-  }
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-volume-acctest"
-    }
-  ]
-}
+						resource "numspot_volume" "terraform-volume-acctest" {
+						  type                   = "standard"
+						  size                   = 10
+						  availability_zone_name = "cloudgouv-eu-west-1a"
+						  tags = [
+							{
+							  key   = "name"
+							  value = "terraform-volume-acctest"
+							}
+						  ]
+						}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "type", "standard"),
 					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "size", "10"),
 					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "availability_zone_name", "cloudgouv-eu-west-1a"),
 					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "tags.#", "1"),
-					// resource.TestCheckResourceAttr("numspot_volume.terraform-volume", "link_vm.device_name", "/dev/sdb"),
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "terraform-volume-acctest",
 					}),
 				),
-				// ExpectNonEmptyPlan: true,
 			},
-			// ImportState testing
+			// Step 2 - Update attributes from unlinked volume
+			{
+				Config: `
+						resource "numspot_volume" "terraform-volume-acctest" {
+						  type                   = "gp2"
+						  size                   = 15
+						  availability_zone_name = "cloudgouv-eu-west-1a"
+						  tags = [
+							{
+							  key   = "name"
+							  value = "terraform-volume-acctest-update"
+							}
+						  ]
+						}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "type", "gp2"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "size", "15"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-volume-acctest-update",
+					}),
+				),
+			},
+			// Step 3 - Recreate unlinked volume
+			{
+				Config: `
+						resource "numspot_volume" "terraform-volume-acctest-recreate" {
+						  type                   = "standard"
+						  size                   = 10
+						  availability_zone_name = "cloudgouv-eu-west-1a"
+						  tags = [
+							{
+							  key   = "name"
+							  value = "terraform-volume-acctest-recreate"
+							}
+						  ]
+						}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "type", "standard"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "size", "10"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest-recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-volume-acctest-recreate",
+					}),
+				),
+			},
+			// Step 4 - Link unlinked volume
+			{
+				Config: volumeDependencies + `
+						resource "numspot_volume" "terraform-volume-acctest-recreate" {
+						  type                   = "standard"
+						  size                   = 10
+						  availability_zone_name = "cloudgouv-eu-west-1a"
+						  link_vm = {
+								vm_id       = numspot_vm.terraform-dep-vm-volume.id
+								device_name = "/dev/sdb"
+							}
+						  tags = [
+							{
+							  key   = "name"
+							  value = "terraform-volume-acctest-recreate"
+							}
+						  ]
+						}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "type", "standard"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "size", "10"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "tags.#", "1"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "link_vm.device_name", "/dev/sdb"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest-recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-volume-acctest-recreate",
+					}),
+				),
+			},
+			// Step 5 - Reset plan
+			{
+				Config: volumeDependencies,
+				Check:  resource.ComposeAggregateTestCheckFunc(),
+			},
+			// Step 6 - Create linked volume
+			{
+				Config: volumeDependencies + `
+						resource "numspot_volume" "terraform-volume-acctest" {
+						  type                   = "standard"
+						  size                   = 10
+						  availability_zone_name = "cloudgouv-eu-west-1a"
+						  link_vm = {
+								vm_id       = numspot_vm.terraform-dep-vm-volume.id
+								device_name = "/dev/sdb"
+							}
+						  tags = [
+							{
+							  key   = "name"
+							  value = "terraform-volume-acctest"
+							}
+						  ]
+						}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "type", "standard"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "size", "10"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "tags.#", "1"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "link_vm.device_name", "/dev/sdb"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-volume-acctest",
+					}),
+				),
+			},
+			// Step 7 - Update attributes from linked volume
+			{
+				Config: volumeDependencies + `
+						resource "numspot_volume" "terraform-volume-acctest" {
+						  type                   = "gp2"
+						  size                   = 15
+						  availability_zone_name = "cloudgouv-eu-west-1a"
+						  link_vm = {
+								vm_id       = numspot_vm.terraform-dep-vm-volume.id
+								device_name = "/dev/sdc"
+							}
+						  tags = [
+							{
+							  key   = "name"
+							  value = "terraform-volume-acctest-update"
+							}
+						  ]
+						}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "type", "gp2"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "size", "15"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "tags.#", "1"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest", "link_vm.device_name", "/dev/sdc"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-volume-acctest-update",
+					}),
+				),
+			},
+			//Step 8 - Recreate linked volume
+			{
+				Config: volumeDependencies + `
+						resource "numspot_volume" "terraform-volume-acctest-recreate" {
+						  type                   = "standard"
+						  size                   = 20
+						  availability_zone_name = "cloudgouv-eu-west-1a"
+						  link_vm = {
+								vm_id       = numspot_vm.terraform-dep-vm-volume.id
+								device_name = "/dev/sdc"
+							}
+						  tags = [
+							{
+							  key   = "name"
+							  value = "terraform-volume-acctest-recreate"
+							}
+						  ]
+						}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "type", "standard"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "size", "20"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "tags.#", "1"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "link_vm.device_name", "/dev/sdc"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest-recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-volume-acctest-recreate",
+					}),
+				),
+			},
+			// Step 9 - Unlink linked volume
+			{
+				Config: volumeDependencies + `
+						resource "numspot_volume" "terraform-volume-acctest-recreate" {
+						  type                   = "standard"
+						  size                   = 20
+						  availability_zone_name = "cloudgouv-eu-west-1a"
+						  tags = [
+							{
+							  key   = "name"
+							  value = "terraform-volume-acctest-recreate"
+							}
+						  ]
+						}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "type", "standard"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "size", "20"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest-recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-volume-acctest-recreate",
+					}),
+				),
+			},
+			// Step 10 - Import
 			//{
-			//	ResourceName:            "numspot_volume.terraform-volume",
+			//	ResourceName:            "numspot_volume.terraform-volume-acctest",
 			//	ImportState:             true,
 			//	ImportStateVerify:       true,
 			//	ImportStateVerifyIgnore: []string{"id"},
 			//},
-			// Update testing Without Replace (if needed)
+			// Step 11 - Unlink volume and link to a new VM
 			//{
-			//	Config: `
-			//				resource "numspot_volume" "terraform-volume" {
-			//				  type                   = "gp2"
-			//				  size                   = "15"
-			//				  availability_zone_name = "cloudgouv-eu-west-1a"
-			//				 link_vm = {
-			//				 	device_name = "/dev/sdc"
-			//				 }
-			//				  tags = [
-			//					{
-			//					  key   = "name"
-			//					  value = "terraform-volume-update-acctest"
-			//					}
-			//				  ]
+			//	Config: volumeDependencies + `
+			//			resource "numspot_volume" "terraform-volume-acctest-replace" {
+			//			  type                   = "standard"
+			//			  size                   = "10"
+			//			  availability_zone_name = "cloudgouv-eu-west-1a"
+			//			  link_vm = {
+			//					vm_id       = numspot_vm.terraform-dep-vm-volume.id
+			//					device_name = "/dev/sdb"
 			//				}
+			//			  tags = [
+			//				{
+			//				  key   = "name"
+			//				  value = "terraform-volume-acctest-replace"
+			//				}
+			//			  ]
+			//			}
 			//	`,
 			//	Check: resource.ComposeAggregateTestCheckFunc(
-			//		resource.TestCheckResourceAttr("numspot_volume.terraform-volume", "type", "gp2"),
-			//		resource.TestCheckResourceAttr("numspot_volume.terraform-volume", "size", "15"),
-			//		resource.TestCheckResourceAttr("numspot_volume.terraform-volume", "availability_zone_name", "cloudgouv-eu-west-1a"),
-			//		resource.TestCheckResourceAttr("numspot_volume.terraform-volume", "tags.#", "1"),
-			//		//resource.TestCheckResourceAttr("numspot_volume.terraform-volume", "link_vm.device_name", "/dev/sdc"),
-			//		resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume", "tags.*", map[string]string{
+			//		resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "type", "standard"),
+			//		resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "size", "10"),
+			//		resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "availability_zone_name", "cloudgouv-eu-west-1a"),
+			//		resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "tags.#", "1"),
+			//		resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "link_vm.device_name", "/dev/sdb"),
+			//		resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest-replace", "tags.*", map[string]string{
 			//			"key":   "name",
-			//			"value": "terraform-volume-update-acctest",
+			//			"value": "terraform-volume-acctest-replace",
 			//		}),
 			//	),
-			//	//ExpectNonEmptyPlan: true,
-			//},
-			// Update testing With Replace of dependency resource and without Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			//{
-			//	Config: `
-			//				resource "numspot_volume" "terraform-volume-replace" {
-			//				  type                   = "gp2"
-			//				  size                   = "5"
-			//				  tags = [
-			//					{
-			//					  key   = "name"
-			//					  value = "terraform-volume-replace-acctest"
-			//					}
-			//				  ]
-			//				  link_vm = {
-			//
-			//					device_name = "/dev/sdc"
-			//				  }
-			//				}
-			//	`,
-			//	Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-			//		updateChecks,
-			//		getDependencyChecksVolume(acctest.NEW_SUFFIX),
-			//	)...),
-			//	ExpectNonEmptyPlan: true,
-			//},
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-			// Note : due to Numspot APIs architecture, this use case will not work in most cases. Nothing can be done on provider side to fix this
-			//{
-			//	Config: testVolumeConfig_DeletedDependencies(updatePlanValues),
-			//	Check:  resource.ComposeAggregateTestCheckFunc(updateChecks...),
 			//},
 		},
 	})
 }
-
-//func testVolumeConfig(subresourceSuffix string, data StepDataVolume) string {
-//	volumeSize, _ := strconv.Atoi(data.volumeSize)
-//	return fmt.Sprintf(`
-//resource "numspot_vpc" "test" {
-//  ip_range = "10.101.0.0/16"
-//  tags = [
-//    {
-//      key   = "name"
-//      value = "terraform-volume-acctest"
-//    }
-//  ]
-//}
-//
-//resource "numspot_subnet" "test" {
-//  vpc_id                 = numspot_vpc.test.id
-//  ip_range               = "10.101.1.0/24"
-//  availability_zone_name = "cloudgouv-eu-west-1a"
-//}
-//
-//resource "numspot_vm" "test%[7]s" {
-//  image_id  = "ami-0b7df82c"
-//  type      = "ns-cus6-2c4r"
-//  subnet_id = numspot_subnet.test.id
-//  tags = [
-//    {
-//      key   = "name"
-//      value = "terraform-volume-acctest"
-//    }
-//  ]
-//}
-//
-//resource "numspot_volume" "test" {
-//  type                   = %[1]q
-//  size                   = %[2]d
-//  availability_zone_name = %[3]q
-//  tags = [
-//    {
-//      key   = %[4]q
-//      value = %[5]q
-//    }
-//  ]
-//  link_vm = {
-//    vm_id       = numspot_vm.test%[7]s.id
-//    device_name = %[6]q
-//  }
-//}`, data.volumeType, volumeSize, data.az, data.tagKey, data.tagValue, data.deviceName, subresourceSuffix)
-//}
-//
-//func testVolumeConfig_DeletedDependencies(data StepDataVolume) string {
-//	volumeSize, _ := strconv.Atoi(data.volumeSize)
-//	return fmt.Sprintf(`
-//resource "numspot_volume" "test" {
-//  type                   = %[1]q
-//  size                   = %[2]d
-//  availability_zone_name = %[3]q
-//  tags = [
-//    {
-//      key   = %[4]q
-//      value = %[5]q
-//    }
-//  ]
-//}`, data.volumeType, volumeSize, data.az, data.tagKey, data.tagValue)
-//}
