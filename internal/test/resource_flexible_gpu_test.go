@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -13,9 +12,9 @@ import (
 )
 
 func TestAccFlexibleGpuResource(t *testing.T) {
-	if os.Getenv("CI") != "" {
-		t.Skipf("skipping %s test in CI", t.Name())
-	}
+	// Due to Insufficient Capacity issues we can't run this test in a deterministic way
+	// We skip this test in the CI until this problem is resolved
+	t.Skip()
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
 		err := acct.Cleanup()

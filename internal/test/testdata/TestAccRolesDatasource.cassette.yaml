@@ -41,8 +41,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:28 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -54,7 +52,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 665.798033ms
+        duration: 5ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -91,8 +89,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:28 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -104,7 +100,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 203.252537ms
+        duration: 5ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -141,8 +137,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:29 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -154,7 +148,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 205.10774ms
+        duration: 5ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -195,8 +189,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:29 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -208,7 +200,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 577.793699ms
+        duration: 5ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -245,8 +237,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:30 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -258,7 +248,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 110.256727ms
+        duration: 5ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -295,8 +285,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:30 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -308,7 +296,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 188.673977ms
+        duration: 5ms
     - id: 6
       request:
         proto: HTTP/1.1
@@ -349,8 +337,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:31 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -362,7 +348,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 649.412019ms
+        duration: 5ms
     - id: 7
       request:
         proto: HTTP/1.1
@@ -399,8 +385,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:31 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -412,7 +396,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 110.509953ms
+        duration: 5ms
     - id: 8
       request:
         proto: HTTP/1.1
@@ -449,8 +433,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:31 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -462,7 +444,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 191.014663ms
+        duration: 5ms
     - id: 9
       request:
         proto: HTTP/1.1
@@ -503,8 +485,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 14:59:32 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -516,4 +496,4 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 734.065458ms
+        duration: 5ms
