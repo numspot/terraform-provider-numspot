@@ -14,7 +14,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func CreateVolume(ctx context.Context, provider services.IProvider, input numspot.CreateVolumeJSONRequestBody, vmID, deviceName string) (numSpotVolume *numspot.Volume, err error) {
+func CreateVolume(ctx context.Context, provider services.IProvider, input numspot.CreateVolumeJSONRequestBody, vmID, deviceName string, tags []numspot.ResourceTag) (numSpotVolume *numspot.Volume, err error) {
 	spaceID := provider.GetSpaceID()
 
 	var retryCreate *numspot.CreateVolumeResponse
@@ -32,23 +32,23 @@ func CreateVolume(ctx context.Context, provider services.IProvider, input numspo
 		}
 	}
 
-	var read any
-	if read, err = utils.RetryReadUntilStateValid(ctx, volumeID, spaceID, pendingState{creating, updating}, targetState{available, inUse},
-		provider.GetNumspotClient().ReadVolumesByIdWithResponse); err != nil {
-		return nil, err
+	if len(tags) > 0 {
+		err := CreateTags(
+			ctx,
+			provider.GetNumspotClient(),
+			provider.GetSpaceID(),
+			volumeID,
+			tags,
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	var assert bool
-	if numSpotVolume, assert = read.(*numspot.Volume); !assert {
-		return nil, errors.New("invalid create volume assertion")
-	}
-
-	return numSpotVolume, err
+	return getVolumeState(ctx, provider, volumeID)
 }
 
 func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, vmID string, volumeID string, numSpotVolumeUpdate numspot.UpdateVolumeJSONRequestBody) (numSpotVolume *numspot.Volume, err error) {
-	var assert bool
-
 	// If this volume is attached to a VM, we need to change it from hot to cold volume to update its attributes
 	// To make it a cold volume we need to stop the VM it's attached to
 	if vmID != "" {
@@ -68,22 +68,35 @@ func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, vm
 		}
 	}
 
-	var retryRead any
-	if retryRead, err = utils.RetryReadUntilStateValid(ctx, volumeID, provider.GetSpaceID(), pendingState{creating, updating}, targetState{available, inUse},
-		provider.GetNumspotClient().ReadVolumesByIdWithResponse); err != nil {
+	return getVolumeState(ctx, provider, volumeID)
+}
+
+func getVolumeState(ctx context.Context, provider services.IProvider, resourceID string) (*numspot.Volume, error) {
+	read, err := utils.RetryReadUntilStateValid(
+		ctx,
+		resourceID,
+		provider.GetSpaceID(),
+		pendingState{creating, updating},
+		targetState{available, inUse},
+		provider.GetNumspotClient().ReadVolumesByIdWithResponse,
+	)
+	if err != nil {
 		return nil, err
 	}
 
-	if numSpotVolume, assert = retryRead.(*numspot.Volume); !assert {
-		return nil, errors.New("invalid update volume attributes assertion")
+	numSpotVolume, assert := read.(*numspot.Volume)
+	if !assert {
+		return nil, errors.New("invalid volume assertion")
 	}
 
-	return numSpotVolume, nil
+	return numSpotVolume, err
+}
+
+func UpdateVolumeTags(ctx context.Context, provider services.IProvider, resourceID string, currentTags []numspot.ResourceTag, newTags []numspot.ResourceTag) (*numspot.Volume, error) {
+	return UpdateResourceTags(ctx, provider, resourceID, currentTags, newTags, getVolumeState)
 }
 
 func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID, stateVMID, planVMID, planDeviceName string) (numSpotVolume *numspot.Volume, err error) {
-	var assert bool
-
 	if stateVMID == "" {
 		if planVMID != "" {
 			// Nothing in the state and VM in the plan
@@ -113,17 +126,7 @@ func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID
 		}
 	}
 
-	var retryRead any
-	if retryRead, err = utils.RetryReadUntilStateValid(ctx, volumeID, provider.GetSpaceID(), pendingState{creating, updating}, targetState{available, inUse},
-		provider.GetNumspotClient().ReadVolumesByIdWithResponse); err != nil {
-		return nil, err
-	}
-
-	if numSpotVolume, assert = retryRead.(*numspot.Volume); !assert {
-		return nil, errors.New("invalid update link assertion")
-	}
-
-	return numSpotVolume, nil
+	return getVolumeState(ctx, provider, volumeID)
 }
 
 func DeleteVolume(ctx context.Context, provider services.IProvider, volumeID, vmID string) (err error) {
@@ -175,14 +178,11 @@ func linkVolume(ctx context.Context, provider services.IProvider, volumeID strin
 		Pending: []string{attaching},
 		Target:  []string{attached},
 		Refresh: func() (interface{}, string, error) {
-			var readRes *numspot.ReadVolumesByIdResponse
-			if readRes, err = provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, spaceID, volumeID); err != nil {
-				return nil, "", err
-			}
+			volume, err := getVolumeState(ctx, provider, volumeID)
 
-			if len(*readRes.JSON200.LinkedVolumes) > 0 {
-				linkState := (*readRes.JSON200.LinkedVolumes)[0].State
-				return readRes.JSON200, *linkState, nil
+			if len(*volume.LinkedVolumes) > 0 {
+				linkState := (*volume.LinkedVolumes)[0].State
+				return volume, *linkState, nil
 			}
 			return nil, "", fmt.Errorf("volume not linked to any VM : %v", err)
 		},

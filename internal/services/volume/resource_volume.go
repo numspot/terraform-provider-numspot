@@ -62,16 +62,17 @@ func (r *VolumeResource) Schema(ctx context.Context, request resource.SchemaRequ
 }
 
 func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var initialPlan VolumeModel
-	response.Diagnostics.Append(request.Plan.Get(ctx, &initialPlan)...)
+	var plan VolumeModel
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	vmID := initialPlan.LinkVM.VmID.ValueString()
-	deviceName := initialPlan.LinkVM.DeviceName.ValueString()
+	vmID := plan.LinkVM.VmID.ValueString()
+	deviceName := plan.LinkVM.DeviceName.ValueString()
+	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
 
-	numSpotVolume, err := core.CreateVolume(ctx, r.provider, deserializeNumspotVolume(initialPlan), vmID, deviceName)
+	numSpotVolume, err := core.CreateVolume(ctx, r.provider, deserializeNumspotVolume(plan), vmID, deviceName, tagsValue)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create volume", err.Error())
 		return
@@ -83,20 +84,6 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	newPlan.Tags = initialPlan.Tags
-	if len(initialPlan.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(
-			ctx,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
-			&response.Diagnostics,
-			newPlan.Id.ValueString(),
-			initialPlan.Tags,
-		)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
 	response.Diagnostics.Append(response.State.Set(ctx, &newPlan)...)
 }
 
@@ -147,6 +134,8 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 
 	volumeID := state.Id.ValueString()
 	vmID := state.LinkVM.VmID.ValueString()
+	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
 
 	if (!utils.IsTfValueNull(plan.Size) && !plan.Size.Equal(state.Size)) ||
 		(!utils.IsTfValueNull(plan.Type) && !plan.Type.Equal(state.Type)) ||
@@ -177,21 +166,13 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	}
 
 	if !state.Tags.Equal(plan.Tags) {
-		tags.UpdateTags(
-			ctx,
-			state.Tags,
-			plan.Tags,
-			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
-			state.Id.ValueString(),
-		)
-		if response.Diagnostics.HasError() {
+		numSpotVolume, err = core.UpdateVolumeTags(ctx, r.provider, volumeID, planTags, stateTags)
+		if err != nil {
+			response.Diagnostics.AddError("unable to update volume tags", err.Error())
 			return
 		}
 	}
 
-	newState.Tags = plan.Tags
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 

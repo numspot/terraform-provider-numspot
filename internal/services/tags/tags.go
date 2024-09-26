@@ -439,14 +439,7 @@ func Diff(current, desired []TagsValue) (toCreate, toDelete, toUpdate []TagsValu
 	return toCreate, toDelete, toUpdate
 }
 
-func CreateTagsFromTf(
-	ctx context.Context,
-	apiClient *numspot.ClientWithResponses,
-	spaceId numspot.SpaceId,
-	diagnostics *diag.Diagnostics,
-	resourceId string,
-	tags types.List,
-) {
+func TfTagsToApiTags(ctx context.Context, tags types.List) []numspot.ResourceTag {
 	tfTags := make([]TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 
@@ -458,6 +451,18 @@ func CreateTagsFromTf(
 		})
 	}
 
+	return apiTags
+}
+
+func CreateTagsFromTf(
+	ctx context.Context,
+	apiClient *numspot.ClientWithResponses,
+	spaceId numspot.SpaceId,
+	diagnostics *diag.Diagnostics,
+	resourceId string,
+	tags types.List,
+) {
+	apiTags := TfTagsToApiTags(ctx, tags)
 	CreateTags(ctx, apiClient, spaceId, diagnostics, resourceId, apiTags)
 }
 
