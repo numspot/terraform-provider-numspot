@@ -95,11 +95,11 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 
 	res, err := r.provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	if err != nil {
-		response.Diagnostics.AddError("", "")
+		response.Diagnostics.AddError("unable to read volume", err.Error())
 		return
 	}
 	if res.JSON200 == nil {
-		response.Diagnostics.AddError("", "")
+		response.Diagnostics.AddError("unable to read volume", "empty response")
 		return
 	}
 
@@ -130,7 +130,8 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	}
 
 	if plan.Size.ValueInt64() < state.Size.ValueInt64() {
-		// TODO you can't downscale a volume
+		response.Diagnostics.AddError("volume downscale", "you can't downscale a volume")
+		return
 	}
 
 	volumeID := state.Id.ValueString()
@@ -187,27 +188,6 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	}
 }
 
-func deserializeCreateNumSpotVolume(tf VolumeModel) numspot.CreateVolumeJSONRequestBody {
-	var (
-		httpIOPS   *int
-		snapshotId *string
-	)
-	if !tf.Iops.IsUnknown() && !tf.Iops.IsNull() {
-		httpIOPS = utils.FromTfInt64ToIntPtr(tf.Iops)
-	}
-	if !tf.SnapshotId.IsUnknown() {
-		snapshotId = tf.SnapshotId.ValueStringPointer()
-	}
-
-	return numspot.CreateVolumeJSONRequestBody{
-		Iops:                 httpIOPS,
-		Size:                 utils.FromTfInt64ToIntPtr(tf.Size),
-		SnapshotId:           snapshotId,
-		AvailabilityZoneName: tf.AvailabilityZoneName.ValueString(),
-		Type:                 tf.Type.ValueStringPointer(),
-	}
-}
-
 func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume) (VolumeModel, diag.Diagnostics) {
 	var (
 		volumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
@@ -228,7 +208,7 @@ func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume) (VolumeMo
 			return VolumeModel{}, diags
 		}
 
-		nbLinkedVolumes := len((*http.LinkedVolumes))
+		nbLinkedVolumes := len(*http.LinkedVolumes)
 		if nbLinkedVolumes > 0 {
 			linkVm, diags = NewLinkVMValue(LinkVMValue{}.AttributeTypes(ctx),
 				map[string]attr.Value{
@@ -280,14 +260,35 @@ func serializeLinkedVolumes(ctx context.Context, http numspot.LinkedVolume) (Lin
 		})
 }
 
-func deserializeUpdateNumspotVolume(tf VolumeModel) numspot.UpdateVolumeJSONRequestBody {
-	var httpIops *int
+func deserializeCreateNumSpotVolume(tf VolumeModel) numspot.CreateVolumeJSONRequestBody {
+	var (
+		httpIOPS   *int
+		snapshotId *string
+	)
 	if !tf.Iops.IsUnknown() && !tf.Iops.IsNull() {
-		httpIops = utils.FromTfInt64ToIntPtr(tf.Iops)
+		httpIOPS = utils.FromTfInt64ToIntPtr(tf.Iops)
+	}
+	if !tf.SnapshotId.IsUnknown() {
+		snapshotId = tf.SnapshotId.ValueStringPointer()
+	}
+
+	return numspot.CreateVolumeJSONRequestBody{
+		Iops:                 httpIOPS,
+		Size:                 utils.FromTfInt64ToIntPtr(tf.Size),
+		SnapshotId:           snapshotId,
+		AvailabilityZoneName: tf.AvailabilityZoneName.ValueString(),
+		Type:                 tf.Type.ValueStringPointer(),
+	}
+}
+
+func deserializeUpdateNumspotVolume(tf VolumeModel) numspot.UpdateVolumeJSONRequestBody {
+	var httpIOPS *int
+	if !tf.Iops.IsUnknown() && !tf.Iops.IsNull() {
+		httpIOPS = utils.FromTfInt64ToIntPtr(tf.Iops)
 	}
 
 	return numspot.UpdateVolumeJSONRequestBody{
-		Iops:       httpIops,
+		Iops:       httpIOPS,
 		Size:       utils.FromTfInt64ToIntPtr(tf.Size),
 		VolumeType: tf.Type.ValueStringPointer(),
 	}
