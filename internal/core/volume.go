@@ -46,6 +46,9 @@ func CreateVolume(ctx context.Context, provider services.IProvider, numSpotVolum
 }
 
 func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, numSpotVolumeUpdate numspot.UpdateVolumeJSONRequestBody, volumeID, stateVM, planVM string) (numSpotVolume *numspot.Volume, err error) {
+	pendingStates := pendingState{creating, updating}
+	targetStates := targetState{available, inUse}
+
 	// If this volume is attached to a VM, we need to change it from hot to cold volume to update its attributes
 	// To make it a cold volume we need to stop the VM it's attached to
 	if err = vm.StopVmNoDiag(ctx, provider, stateVM); err != nil {
@@ -67,12 +70,18 @@ func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, nu
 		return nil, err
 	}
 
+	numSpotVolume, err = ReadVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID)
+	if err != nil {
+		return nil, err
+	}
+
 	return numSpotVolume, nil
 }
 
 func UpdateVolumeTags(ctx context.Context, provider services.IProvider, volumeID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (numSpotVolume *numspot.Volume, err error) {
 	pendingStates := pendingState{creating, updating}
 	targetStates := targetState{available, inUse}
+
 	if err = UpdateResourceTags(ctx, provider, stateTags, planTags, volumeID); err != nil {
 		return nil, err
 	}
