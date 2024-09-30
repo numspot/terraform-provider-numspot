@@ -102,11 +102,11 @@ func VolumesFromHttpToTfDatasource(ctx context.Context, http *numspot.Volume) (*
 		CreationDate:         types.StringValue(http.CreationDate.String()),
 		Id:                   types.StringPointerValue(http.Id),
 		Iops:                 utils.FromIntPtrToTfInt64(http.Iops),
-		//LinkedVolumes:        linkedVolumes,
+		// LinkedVolumes:        linkedVolumes,
 		Size:       utils.FromIntPtrToTfInt64(http.Size),
 		SnapshotId: types.StringPointerValue(http.SnapshotId),
 		State:      types.StringPointerValue(http.State),
 		Type:       types.StringPointerValue(http.Type),
-		//Tags:                 tagsList,
+		// Tags:                 tagsList,
 	}, nil
 }
