@@ -19,7 +19,10 @@ type TfRequestResp interface {
 	StatusCode() int
 }
 
-const TfRequestRetryTimeout = 5 * time.Minute
+const (
+	TfRequestRetryTimeout = 5 * time.Minute
+	TfRequestRetryDelay   = 5 * time.Second
+)
 
 var (
 	StatusCodeRetryOnDelete     = []int{http.StatusConflict, http.StatusFailedDependency}
