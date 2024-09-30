@@ -41,6 +41,11 @@ type AccTest struct {
 func NewAccTest(t *testing.T, vcrEnabled bool, vcrMode string) AccTest {
 	t.Helper()
 
+	runParallel := os.Getenv("PARALLEL_TEST")
+	if runParallel == "true" {
+		t.Parallel()
+	}
+
 	// Determine mode based on the environment variable or passed parameters
 	mode := os.Getenv("VCR_MODE")
 

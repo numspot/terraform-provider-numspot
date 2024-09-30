@@ -249,7 +249,6 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

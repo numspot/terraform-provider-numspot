@@ -66,7 +66,6 @@ func DhcpOptionsResourceSchema(ctx context.Context) schema.Schema {
 			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

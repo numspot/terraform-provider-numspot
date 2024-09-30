@@ -21,20 +21,7 @@ func TestAccRouteTablesDatasource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchRouteTableConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_route_tables.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_route_tables.testdata", "items.*", map[string]string{
-						"id": acctest.PAIR_PREFIX + "numspot_route_table.test.id",
-					}),
-				),
-			},
-		},
-	})
-}
-
-func fetchRouteTableConfig() string {
-	return `
+				Config: `
 resource "numspot_vpc" "net" {
   ip_range = "10.101.0.0/16"
 }
@@ -60,7 +47,15 @@ resource "numspot_route_table" "test" {
 }
 
 data "numspot_route_tables" "testdata" {
-  ids        = [numspot_route_table.test.id]
-  depends_on = [numspot_route_table.test]
-}`
+  ids = [numspot_route_table.test.id]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_route_tables.testdata", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_route_tables.testdata", "items.*", map[string]string{
+						"id": acctest.PAIR_PREFIX + "numspot_route_table.test.id",
+					}),
+				),
+			},
+		},
+	})
 }

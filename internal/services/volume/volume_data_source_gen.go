@@ -118,6 +118,31 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The type of the volume (`standard` \\| `gp2` \\| `io1`).",
 							MarkdownDescription: "The type of the volume (`standard` \\| `gp2` \\| `io1`).",
 						},
+						"link_vm": schema.SingleNestedAttribute{ // MANUALLY EDITED : Add link_vm attribute
+							Attributes: map[string]schema.Attribute{
+								"device_name": schema.StringAttribute{
+									Optional:            true,
+									Computed:            true,
+									Description:         "The name of the device. For a root device, you must use /dev/sda1. For other volumes, you must use /dev/sdX, /dev/sdXX, /dev/xvdX, or /dev/xvdXX (where the first X is a letter between b and z, and the second X is a letter between a and z).",
+									MarkdownDescription: "The name of the device. For a root device, you must use /dev/sda1. For other volumes, you must use /dev/sdX, /dev/sdXX, /dev/xvdX, or /dev/xvdXX (where the first X is a letter between b and z, and the second X is a letter between a and z).",
+								},
+								"vm_id": schema.StringAttribute{
+									Optional:            true,
+									Computed:            true,
+									Description:         "The ID of the VM you want to attach the volume to.",
+									MarkdownDescription: "The ID of the VM you want to attach the volume to.",
+								},
+							},
+							CustomType: LinkVMType{
+								ObjectType: types.ObjectType{
+									AttrTypes: LinkVMValue{}.AttributeTypes(ctx),
+								},
+							},
+							Optional:            true,
+							Computed:            true,
+							Description:         "VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded.",
+							MarkdownDescription: "VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded.",
+						}, // MANUALLY EDITED : add link_vm attribute
 					},
 				}, // MANUALLY EDITED : Removed CustomType block
 				Computed:            true,
@@ -209,7 +234,6 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 			},
 			// MANUALLY EDITED : spaceId removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

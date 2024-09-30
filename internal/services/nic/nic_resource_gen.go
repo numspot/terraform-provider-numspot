@@ -72,7 +72,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 						Optional: true,
 						PlanModifiers: []planmodifier.String{ // MANUALLY EDITED : Add plan modifier
 							stringplanmodifier.UseStateForUnknown(),
-							stringplanmodifier.RequiresReplace(),
+							stringplanmodifier.RequiresReplaceIfConfigured(),
 						},
 						Description:         "The ID of the VM.",
 						MarkdownDescription: "The ID of the VM.",
@@ -205,7 +205,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "One or more IDs of security groups for the NIC.",
 				MarkdownDescription: "One or more IDs of security groups for the NIC.",
 				PlanModifiers: []planmodifier.List{ // MANUALLY EDITED : Add requires replace
-					listplanmodifier.RequiresReplace(),
+					listplanmodifier.RequiresReplaceIfConfigured(),
 				},
 			},
 			"security_groups": schema.ListNestedAttribute{
@@ -261,7 +261,6 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Vpc for the NIC.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

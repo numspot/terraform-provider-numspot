@@ -21,21 +21,7 @@ func TestAccNicsDatasource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchNicConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_nics.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_nics.testdata", "items.*", map[string]string{
-						"id":        acctest.PAIR_PREFIX + "numspot_nic.test.id",
-						"subnet_id": acctest.PAIR_PREFIX + "numspot_subnet.subnet.id",
-					}),
-				),
-			},
-		},
-	})
-}
-
-func fetchNicConfig() string {
-	return `
+				Config: `
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
@@ -52,6 +38,15 @@ resource "numspot_nic" "test" {
 
 data "numspot_nics" "testdata" {
   ids = [numspot_nic.test.id]
-}
-`
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_nics.testdata", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_nics.testdata", "items.*", map[string]string{
+						"id":        acctest.PAIR_PREFIX + "numspot_nic.test.id",
+						"subnet_id": acctest.PAIR_PREFIX + "numspot_subnet.subnet.id",
+					}),
+				),
+			},
+		},
+	})
 }

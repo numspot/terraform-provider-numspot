@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"gopkg.in/dnaeon/go-vcr.v3/cassette"
@@ -66,6 +67,12 @@ func newRecorder(vcrMode, testName, pkgPath string) (*recorder.Recorder, *http.C
 }
 
 func cassetteSanitizer(i *cassette.Interaction) error {
+	// In order to avoid unnecessary diff after each cassette update:
+	// We set request duration to fixed  5ms for all requests in all cassettes
+	// we don't save date response header on cassettes
+	i.Response.Duration = 5 * time.Millisecond
+	delete(i.Response.Headers, "Date")
+
 	delete(i.Request.Headers, "Authorization")
 	delete(i.Request.Form, "client_id")
 	delete(i.Request.Form, "client_secret")

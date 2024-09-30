@@ -12,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -42,6 +44,9 @@ func VirtualGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Optional:            true,
 				Description:         "The ID of the Vpc to which the virtual gateway is attached.",
 				MarkdownDescription: "The ID of the Vpc to which the virtual gateway is attached.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"vpc_to_virtual_gateway_links": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -69,7 +74,6 @@ func VirtualGatewayResourceSchema(ctx context.Context) schema.Schema {
 			},
 			// MANUALLY EDITED : SpaceId Removed
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

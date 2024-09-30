@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -11,6 +10,12 @@ import (
 )
 
 func TestAccLoadBalancerDatasource(t *testing.T) {
+	// We spotted a bug on Outscale side:
+	// When a load balancer is created, deleted and the recreated with the same name, the API returns 409 Resource conflict
+	// Bug reported to Outscale: https://support.outscale.com/hc/fr-fr/requests/378437
+	// Setting random name is not compliant with recorded test cassettes
+	// For instance We skip this test in the CI pipeline until Outscale fixes the bug or we foind a better solution
+	t.Skip()
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
 		err := acct.Cleanup()
@@ -18,33 +23,11 @@ func TestAccLoadBalancerDatasource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
-	name := "elb-test"
-	backend_port := "80"
-	load_balancer_port := "80"
-	load_balancer_protocol := "TCP"
-	lb_type := "internal"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchLoadBalancersConfig(name, backend_port, load_balancer_port, load_balancer_protocol, lb_type),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_load_balancers.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_load_balancers.testdata", "items.*", map[string]string{
-						"subnets.0":                          acctest.PAIR_PREFIX + "numspot_subnet.subnet.id",
-						"name":                               name,
-						"listeners.0.backend_port":           backend_port,
-						"listeners.0.load_balancer_port":     load_balancer_port,
-						"listeners.0.load_balancer_protocol": load_balancer_protocol,
-					}),
-				),
-			},
-		},
-	})
-}
-
-func fetchLoadBalancersConfig(name, backend_port, load_balancer_port, load_balancer_protocol, lb_type string) string {
-	return fmt.Sprintf(`
+				Config: `
 resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
@@ -55,19 +38,32 @@ resource "numspot_subnet" "subnet" {
 }
 
 resource "numspot_load_balancer" "test" {
-  name = %[1]q
+  name = "elb-test"
   listeners = [
     {
-      backend_port           = %[2]s
-      load_balancer_port     = %[3]s
-      load_balancer_protocol = %[4]q
+      backend_port           = "80"
+      load_balancer_port     = "80"
+      load_balancer_protocol = "TCP"
 
     }
   ]
   subnets = [numspot_subnet.subnet.id]
-  type    = %[5]q
+  type    = "internal"
 }
 data "numspot_load_balancers" "testdata" {
   load_balancer_names = [numspot_load_balancer.test.name]
-}`, name, backend_port, load_balancer_port, load_balancer_protocol, lb_type)
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_load_balancers.testdata", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_load_balancers.testdata", "items.*", map[string]string{
+						"subnets.0":                          acctest.PAIR_PREFIX + "numspot_subnet.subnet.id",
+						"name":                               "elb-test",
+						"listeners.0.backend_port":           "80",
+						"listeners.0.load_balancer_port":     "80",
+						"listeners.0.load_balancer_protocol": "TCP",
+					}),
+				),
+			},
+		},
+	})
 }

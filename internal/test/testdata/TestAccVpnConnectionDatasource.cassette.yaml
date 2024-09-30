@@ -41,8 +41,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 17:04:25 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -54,7 +52,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 844.702556ms
+        duration: 5ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -95,8 +93,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 17:04:26 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -108,7 +104,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 548.225384ms
+        duration: 5ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -137,7 +133,7 @@ interactions:
         trailer: {}
         content_length: 116
         uncompressed: false
-        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-0d03ae00","publicIp":"192.0.2.0","state":"available","tags":[]}'
+        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-823b3c97","publicIp":"192.0.2.0","state":"available","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -149,8 +145,6 @@ interactions:
                 - "116"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:26 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -165,7 +159,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 216.021966ms
+        duration: 5ms
     - id: 3
       request:
         proto: HTTP/1.1
@@ -194,7 +188,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-295e5ca0","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-5ce7f4c2","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -206,8 +200,6 @@ interactions:
                 - "132"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:26 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -222,7 +214,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 639.047827ms
+        duration: 5ms
     - id: 4
       request:
         proto: HTTP/1.1
@@ -239,7 +231,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-295e5ca0
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-823b3c97
         method: GET
       response:
         proto: HTTP/1.1
@@ -247,9 +239,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 132
+        content_length: 116
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-295e5ca0","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-823b3c97","publicIp":"192.0.2.0","state":"available","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -258,11 +250,9 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "132"
+                - "116"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:32 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -277,7 +267,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 216.774398ms
+        duration: 5ms
     - id: 5
       request:
         proto: HTTP/1.1
@@ -294,7 +284,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-0d03ae00
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-5ce7f4c2
         method: GET
       response:
         proto: HTTP/1.1
@@ -302,9 +292,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 116
+        content_length: 132
         uncompressed: false
-        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-0d03ae00","publicIp":"192.0.2.0","state":"available","tags":[]}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-5ce7f4c2","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -313,11 +303,9 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "116"
+                - "132"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:32 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -332,7 +320,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 1.131986895s
+        duration: 5ms
     - id: 6
       request:
         proto: HTTP/1.1
@@ -361,7 +349,7 @@ interactions:
         trailer: {}
         content_length: 108
         uncompressed: false
-        body: '{"connectionType":"ipsec.1","id":"vgw-744fc147","state":"available","tags":[],"vpcToVirtualGatewayLinks":[]}'
+        body: '{"connectionType":"ipsec.1","id":"vgw-0ce9d799","state":"available","tags":[],"vpcToVirtualGatewayLinks":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -373,8 +361,6 @@ interactions:
                 - "108"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:32 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -389,7 +375,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 768.782888ms
+        duration: 5ms
     - id: 7
       request:
         proto: HTTP/1.1
@@ -401,14 +387,14 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"vpcId":"vpc-295e5ca0"}'
+        body: '{"vpcId":"vpc-5ce7f4c2"}'
         form: {}
         headers:
             Content-Type:
                 - application/json
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-744fc147/vpcs/link
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-0ce9d799/vpcs/link
         method: PUT
       response:
         proto: HTTP/1.1
@@ -418,7 +404,7 @@ interactions:
         trailer: {}
         content_length: 71
         uncompressed: false
-        body: '{"vpcToVirtualGatewayLink":{"state":"attached","vpcId":"vpc-295e5ca0"}}'
+        body: '{"vpcToVirtualGatewayLink":{"state":"attached","vpcId":"vpc-5ce7f4c2"}}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -430,8 +416,6 @@ interactions:
                 - "71"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:33 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -446,7 +430,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 414.783426ms
+        duration: 5ms
     - id: 8
       request:
         proto: HTTP/1.1
@@ -463,7 +447,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-744fc147
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-0ce9d799
         method: GET
       response:
         proto: HTTP/1.1
@@ -473,7 +457,7 @@ interactions:
         trailer: {}
         content_length: 151
         uncompressed: false
-        body: '{"connectionType":"ipsec.1","id":"vgw-744fc147","state":"available","tags":[],"vpcToVirtualGatewayLinks":[{"state":"attached","vpcId":"vpc-295e5ca0"}]}'
+        body: '{"connectionType":"ipsec.1","id":"vgw-0ce9d799","state":"available","tags":[],"vpcToVirtualGatewayLinks":[{"state":"attached","vpcId":"vpc-5ce7f4c2"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -485,8 +469,6 @@ interactions:
                 - "151"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:38 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -501,7 +483,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 435.702515ms
+        duration: 5ms
     - id: 9
       request:
         proto: HTTP/1.1
@@ -513,7 +495,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","staticRoutesOnly":false,"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","staticRoutesOnly":false,"virtualGatewayId":"vgw-0ce9d799"}'
         form: {}
         headers:
             Content-Type:
@@ -530,7 +512,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -542,8 +524,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:41 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -558,7 +538,7 @@ interactions:
                 - "true"
         status: 201 Created
         code: 201
-        duration: 2.257258191s
+        duration: 5ms
     - id: 10
       request:
         proto: HTTP/1.1
@@ -577,7 +557,7 @@ interactions:
                 - application/json
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: PUT
       response:
         proto: HTTP/1.1
@@ -587,7 +567,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -599,8 +579,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:41 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -615,7 +593,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 137.922774ms
+        duration: 5ms
     - id: 11
       request:
         proto: HTTP/1.1
@@ -632,7 +610,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -642,7 +620,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -654,8 +632,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:46 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -670,7 +646,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 149.882389ms
+        duration: 5ms
     - id: 12
       request:
         proto: HTTP/1.1
@@ -687,7 +663,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -697,7 +673,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -709,8 +685,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:46 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -725,7 +699,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 131.746352ms
+        duration: 5ms
     - id: 13
       request:
         proto: HTTP/1.1
@@ -742,7 +716,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -752,7 +726,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -764,8 +738,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:47 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -780,7 +752,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 218.352658ms
+        duration: 5ms
     - id: 14
       request:
         proto: HTTP/1.1
@@ -797,7 +769,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -807,7 +779,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -819,8 +791,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:48 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -835,7 +805,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 245.71011ms
+        duration: 5ms
     - id: 15
       request:
         proto: HTTP/1.1
@@ -852,7 +822,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -862,7 +832,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -874,8 +844,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:50 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -890,7 +858,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 447.094321ms
+        duration: 5ms
     - id: 16
       request:
         proto: HTTP/1.1
@@ -907,7 +875,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -917,7 +885,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -929,8 +897,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:04:53 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -945,7 +911,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 186.061539ms
+        duration: 5ms
     - id: 17
       request:
         proto: HTTP/1.1
@@ -962,7 +928,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -972,7 +938,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -984,8 +950,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:00 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1000,7 +964,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 154.034257ms
+        duration: 5ms
     - id: 18
       request:
         proto: HTTP/1.1
@@ -1017,7 +981,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1027,7 +991,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1039,8 +1003,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:10 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1055,7 +1017,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 423.603695ms
+        duration: 5ms
     - id: 19
       request:
         proto: HTTP/1.1
@@ -1072,7 +1034,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1082,7 +1044,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1094,8 +1056,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:21 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1110,7 +1070,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 274.862513ms
+        duration: 5ms
     - id: 20
       request:
         proto: HTTP/1.1
@@ -1127,7 +1087,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1137,7 +1097,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1149,8 +1109,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:31 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1165,7 +1123,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 173.365969ms
+        duration: 5ms
     - id: 21
       request:
         proto: HTTP/1.1
@@ -1182,7 +1140,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1192,7 +1150,7 @@ interactions:
         trailer: {}
         content_length: 1396
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"pending","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1204,8 +1162,6 @@ interactions:
                 - "1396"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:41 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1220,7 +1176,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 456.798092ms
+        duration: 5ms
     - id: 22
       request:
         proto: HTTP/1.1
@@ -1237,7 +1193,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1247,7 +1203,7 @@ interactions:
         trailer: {}
         content_length: 1398
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1259,8 +1215,6 @@ interactions:
                 - "1398"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:51 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1275,7 +1229,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 284.751673ms
+        duration: 5ms
     - id: 23
       request:
         proto: HTTP/1.1
@@ -1292,7 +1246,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections?ids=vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections?ids=vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1302,7 +1256,7 @@ interactions:
         trailer: {}
         content_length: 1410
         uncompressed: false
-        body: '{"items":[{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}]}'
+        body: '{"items":[{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1314,8 +1268,6 @@ interactions:
                 - "1410"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:52 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1330,7 +1282,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 282.143537ms
+        duration: 5ms
     - id: 24
       request:
         proto: HTTP/1.1
@@ -1371,8 +1323,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 17:05:53 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1384,7 +1334,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 589.057102ms
+        duration: 5ms
     - id: 25
       request:
         proto: HTTP/1.1
@@ -1401,7 +1351,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections?ids=vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections?ids=vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1411,7 +1361,7 @@ interactions:
         trailer: {}
         content_length: 1410
         uncompressed: false
-        body: '{"items":[{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}]}'
+        body: '{"items":[{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1423,8 +1373,6 @@ interactions:
                 - "1410"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:53 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1439,7 +1387,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 159.036377ms
+        duration: 5ms
     - id: 26
       request:
         proto: HTTP/1.1
@@ -1480,8 +1428,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 17:05:53 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1493,7 +1439,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 578.606552ms
+        duration: 5ms
     - id: 27
       request:
         proto: HTTP/1.1
@@ -1510,7 +1456,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-0d03ae00
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-5ce7f4c2
         method: GET
       response:
         proto: HTTP/1.1
@@ -1518,9 +1464,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 116
+        content_length: 132
         uncompressed: false
-        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-0d03ae00","publicIp":"192.0.2.0","state":"available","tags":[]}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-5ce7f4c2","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1529,11 +1475,9 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "116"
+                - "132"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:54 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1548,7 +1492,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 120.553027ms
+        duration: 5ms
     - id: 28
       request:
         proto: HTTP/1.1
@@ -1565,7 +1509,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-295e5ca0
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-0ce9d799
         method: GET
       response:
         proto: HTTP/1.1
@@ -1573,9 +1517,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 132
+        content_length: 151
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-295e5ca0","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"connectionType":"ipsec.1","id":"vgw-0ce9d799","state":"available","tags":[],"vpcToVirtualGatewayLinks":[{"state":"attached","vpcId":"vpc-5ce7f4c2"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1584,11 +1528,9 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "132"
+                - "151"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:54 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1603,7 +1545,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 243.615674ms
+        duration: 5ms
     - id: 29
       request:
         proto: HTTP/1.1
@@ -1620,7 +1562,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-744fc147
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-823b3c97
         method: GET
       response:
         proto: HTTP/1.1
@@ -1628,9 +1570,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 151
+        content_length: 116
         uncompressed: false
-        body: '{"connectionType":"ipsec.1","id":"vgw-744fc147","state":"available","tags":[],"vpcToVirtualGatewayLinks":[{"state":"attached","vpcId":"vpc-295e5ca0"}]}'
+        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-823b3c97","publicIp":"192.0.2.0","state":"available","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1639,11 +1581,9 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "151"
+                - "116"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:54 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1658,7 +1598,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 191.021546ms
+        duration: 5ms
     - id: 30
       request:
         proto: HTTP/1.1
@@ -1675,7 +1615,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1685,7 +1625,7 @@ interactions:
         trailer: {}
         content_length: 1398
         uncompressed: false
-        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}'
+        body: '{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1697,8 +1637,6 @@ interactions:
                 - "1398"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:59 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1713,7 +1651,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 216.684984ms
+        duration: 5ms
     - id: 31
       request:
         proto: HTTP/1.1
@@ -1730,7 +1668,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections?ids=vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections?ids=vpn-bbe6210c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1740,7 +1678,7 @@ interactions:
         trailer: {}
         content_length: 1410
         uncompressed: false
-        body: '{"items":[{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-0d03ae00\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"uYuuVLkFPQF9nmoMwhvtj8nC6X\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.241\"}}}],\"VirtualGatewayId\":\"vgw-744fc147\"}","clientGatewayId":"cgw-0d03ae00","connectionType":"ipsec.1","id":"vpn-7b5f38f9","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-10T17:04:39.214Z","outsideIpAddress":"142.44.58.241","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-744fc147"}]}'
+        body: '{"items":[{"clientGatewayConfiguration":"{\"ClientGatewayId\":\"cgw-823b3c97\",\"ConnectionType\":\"ipsec.1\",\"Tunnels\":[{\"ClientGateway\":{\"Bgp\":{\"Asn\":65000,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.2/30\"},\"TunnelOutside\":{\"IpAddress\":\"192.0.2.0\"}},\"Ike\":{\"AuthenticationProtocole\":\"SHA2_256_128 HMAC\",\"EncryptionProtocol\":\"256-bit AES-CBC\",\"Lifetime\":28800,\"Mode\":\"main\",\"PerfectForwardSecrecyGroup\":16,\"PreSharedKey\":\"TCDlR3fciC4wS6a964uIv5sefb\"},\"Ipsec\":{\"AuthenticationProtocol\":\"SHA2_256_128 HMAC\",\"ClearDfBit\":true,\"DeadPeerDetection\":{\"Interval\":30,\"Retries\":3},\"EncryptionProtocol\":\"256-bit AES-CBC\",\"FragmentationBeforeEncryption\":true,\"Lifetime\":3600,\"Mode\":\"tunnel\",\"PerfectForwardSecercyGroup\":16,\"Protocol\":\"esp\",\"TcpMssAdjustment\":1387},\"VirtualGateway\":{\"Bgp\":{\"Asn\":50624,\"HoldTime\":30},\"TunnelInside\":{\"IpRange\":\"169.254.254.1/30\"},\"TunnelOutside\":{\"IpAddress\":\"142.44.58.233\"}}}],\"VirtualGatewayId\":\"vgw-0ce9d799\"}","clientGatewayId":"cgw-823b3c97","connectionType":"ipsec.1","id":"vpn-bbe6210c","routes":[],"state":"available","staticRoutesOnly":false,"tags":[],"vgwTelemetries":[{"acceptedRouteCount":0,"lastStateChangeDate":"2024-09-25T09:40:31.337Z","outsideIpAddress":"142.44.58.233","state":"DOWN","stateDescription":"IPSEC IS DOWN"}],"virtualGatewayId":"vgw-0ce9d799"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1752,8 +1690,6 @@ interactions:
                 - "1410"
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:05:59 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1768,7 +1704,7 @@ interactions:
                 - "true"
         status: 200 OK
         code: 200
-        duration: 214.874352ms
+        duration: 5ms
     - id: 32
       request:
         proto: HTTP/1.1
@@ -1809,8 +1745,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 17:06:00 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1822,7 +1756,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 646.280403ms
+        duration: 5ms
     - id: 33
       request:
         proto: HTTP/1.1
@@ -1863,8 +1797,6 @@ interactions:
                 - "1229"
             Content-Type:
                 - application/json
-            Date:
-                - Tue, 10 Sep 2024 17:06:01 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -1876,7 +1808,7 @@ interactions:
                 - "false"
         status: 200 OK
         code: 200
-        duration: 654.61288ms
+        duration: 5ms
     - id: 34
       request:
         proto: HTTP/1.1
@@ -1893,7 +1825,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-7b5f38f9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpnConnections/vpn-bbe6210c
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1911,15 +1843,13 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:06:01 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
                 - Origin
             X-Id:
-                - vpn-7b5f38f9
+                - vpn-bbe6210c
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -1929,7 +1859,7 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 499.919871ms
+        duration: 5ms
     - id: 35
       request:
         proto: HTTP/1.1
@@ -1946,7 +1876,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-0d03ae00
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-823b3c97
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1964,15 +1894,13 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:06:02 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
                 - Origin
             X-Id:
-                - cgw-0d03ae00
+                - cgw-823b3c97
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -1982,7 +1910,7 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 209.888549ms
+        duration: 5ms
     - id: 36
       request:
         proto: HTTP/1.1
@@ -1994,14 +1922,14 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"vpcId":"vpc-295e5ca0"}'
+        body: '{"vpcId":"vpc-5ce7f4c2"}'
         form: {}
         headers:
             Content-Type:
                 - application/json
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-744fc147/vpcs/unlink
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-0ce9d799/vpcs/unlink
         method: PUT
       response:
         proto: HTTP/1.1
@@ -2019,8 +1947,6 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:06:02 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
@@ -2035,7 +1961,7 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 413.888761ms
+        duration: 5ms
     - id: 37
       request:
         proto: HTTP/1.1
@@ -2052,7 +1978,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-744fc147
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/virtualGateways/vgw-0ce9d799
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2070,15 +1996,13 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:06:02 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
                 - Origin
             X-Id:
-                - vgw-744fc147
+                - vgw-0ce9d799
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -2088,7 +2012,7 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 362.887438ms
+        duration: 5ms
     - id: 38
       request:
         proto: HTTP/1.1
@@ -2105,7 +2029,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-295e5ca0
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-5ce7f4c2
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2123,15 +2047,13 @@ interactions:
                 - keep-alive
             Content-Type:
                 - application/json; charset=utf-8
-            Date:
-                - Tue, 10 Sep 2024 17:06:02 GMT
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
                 - Origin
             X-Id:
-                - vpc-295e5ca0
+                - vpc-5ce7f4c2
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -2141,4 +2063,4 @@ interactions:
                 - "false"
         status: 204 No Content
         code: 204
-        duration: 199.003917ms
+        duration: 5ms

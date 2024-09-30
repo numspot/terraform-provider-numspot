@@ -2,43 +2,14 @@ package test
 
 import (
 	"fmt"
-	"slices"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 )
-
-// This struct will store the input data that will be used in your tests (all fields as string)
-type StepDataRouteTable struct {
-	tagKey,
-	tagValue string
-}
-
-// Generate checks to validate that resource 'numspot_route_table.test' has input data values
-func getFieldMatchChecksRouteTable(data StepDataRouteTable) []resource.TestCheckFunc {
-	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttr("numspot_route_table.test", "tags.#", "1"),
-		resource.TestCheckTypeSetElemNestedAttrs("numspot_route_table.test", "tags.*", map[string]string{
-			"key":   data.tagKey,
-			"value": data.tagValue,
-		}),
-	}
-}
-
-// Generate checks to validate that resource 'numspot_route_table.test' is properly linked to given subresources
-// If resource has no dependencies, return empty array
-func getDependencyChecksRouteTable(dependenciesSuffix string) []resource.TestCheckFunc {
-	return []resource.TestCheckFunc{
-		resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test"+dependenciesSuffix, "id"),
-		resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test"+dependenciesSuffix, "id"),
-		acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test", "routes.*", map[string]string{ // If field is a list of objects (containing id and/or other fields)
-			"gateway_id": fmt.Sprintf(acctest.PAIR_PREFIX+"numspot_internet_gateway.test%[1]s.id", dependenciesSuffix),
-		}),
-	}
-}
 
 func TestAccRouteTableResource(t *testing.T) {
 	acct := acctest.NewAccTest(t, false, "")
@@ -50,126 +21,172 @@ func TestAccRouteTableResource(t *testing.T) {
 
 	var resourceId string
 
-	////////////// Define input data that will be used in the test sequence //////////////
-	// resource fields that can be updated in-place
-	tagKey := "name"
-	tagValue := "Terraform-Test-Volume"
-	tagValueUpdate := "Terraform-Test-Volume-Update"
-
-	// resource fields that cannot be updated in-place (requires replace)
-	// None
-
-	/////////////////////////////////////////////////////////////////////////////////////
-
-	////////////// Define plan values and generate associated attribute checks  //////////////
-	// The base plan (used in first create and to reset resource state before some tests)
-	basePlanValues := StepDataRouteTable{
-		tagKey:   tagKey,
-		tagValue: tagValue,
-	}
-	createChecks := append(
-		getFieldMatchChecksRouteTable(basePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
-			require.NotEmpty(t, v)
-			resourceId = v
-			return nil
-		}),
-	)
-
-	// The plan that should trigger Update function (based on basePlanValues). Update the value for as much updatable fields as possible here.
-	updatePlanValues := StepDataRouteTable{
-		tagKey:   tagKey,
-		tagValue: tagValueUpdate,
-	}
-	updateChecks := append(
-		getFieldMatchChecksRouteTable(updatePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
-			require.NotEmpty(t, v)
-			require.Equal(t, v, resourceId)
-			return nil
-		}),
-	)
-
-	replaceChecks := append(
-		getFieldMatchChecksRouteTable(updatePlanValues),
-
-		resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
-			require.NotEmpty(t, v)
-			require.NotEqual(t, v, resourceId)
-			return nil
-		}),
-	)
-	/////////////////////////////////////////////////////////////////////////////////////
-
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{ // Create testing
-				Config: testRouteTableConfig(acctest.BASE_SUFFIX, basePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					createChecks,
-					getDependencyChecksRouteTable(acctest.BASE_SUFFIX),
-				)...),
+			{ // 1 - Create testing
+				Config: `
+resource "numspot_vpc" "test" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "test" {
+  vpc_id   = numspot_vpc.test.id
+  ip_range = "10.101.1.0/24"
+}
+
+resource "numspot_internet_gateway" "test" {
+  vpc_id = numspot_vpc.test.id
+}
+
+resource "numspot_route_table" "test" {
+  vpc_id    = numspot_vpc.test.id
+  subnet_id = numspot_subnet.test.id
+  routes = [
+    {
+      destination_ip_range = "0.0.0.0/0"
+      gateway_id           = numspot_internet_gateway.test.id
+    }
+  ]
+  tags = [{
+    key   = "name"
+    value = "Terraform-Test-Volume"
+  }]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_route_table.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_route_table.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Volume",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test", "id"),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test", "id"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test", "routes.*", map[string]string{
+						"gateway_id": acctest.PAIR_PREFIX + "numspot_internet_gateway.test.id",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
 			},
-			// ImportState testing
+			// 2 - ImportState testing
 			{
 				ResourceName:            "numspot_route_table.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"id"},
 			},
-			// Update testing Without Replace (if needed)
+			// 3 - Update testing Without Replace (if needed)
 			{
-				Config: testRouteTableConfig(acctest.BASE_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					updateChecks,
-					getDependencyChecksRouteTable(acctest.BASE_SUFFIX),
-				)...),
-			},
-
-			// <== If resource has optional dependencies ==>
-			// Update testing With Replace of dependency resource and without Replacing the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-			{
-				Config: testRouteTableConfig(acctest.NEW_SUFFIX, updatePlanValues),
-				Check: resource.ComposeAggregateTestCheckFunc(slices.Concat(
-					replaceChecks,
-					getDependencyChecksRouteTable(acctest.NEW_SUFFIX),
-				)...),
-			},
-		},
-	})
-}
-
-func testRouteTableConfig(subresourceSuffix string, data StepDataRouteTable) string {
-	return fmt.Sprintf(`
-resource "numspot_vpc" "test%[1]s" {
+				Config: `
+resource "numspot_vpc" "test" {
   ip_range = "10.101.0.0/16"
 }
 
-resource "numspot_subnet" "test%[1]s" {
-  vpc_id   = numspot_vpc.test%[1]s.id
+resource "numspot_subnet" "test" {
+  vpc_id   = numspot_vpc.test.id
   ip_range = "10.101.1.0/24"
 }
 
-resource "numspot_internet_gateway" "test%[1]s" {
-  vpc_id = numspot_vpc.test%[1]s.id
+resource "numspot_internet_gateway" "test" {
+  vpc_id = numspot_vpc.test.id
 }
 
 resource "numspot_route_table" "test" {
-  vpc_id    = numspot_vpc.test%[1]s.id
-  subnet_id = numspot_subnet.test%[1]s.id
+  vpc_id    = numspot_vpc.test.id
+  subnet_id = numspot_subnet.test.id
   routes = [
     {
       destination_ip_range = "0.0.0.0/0"
-      gateway_id           = numspot_internet_gateway.test%[1]s.id
+      gateway_id           = numspot_internet_gateway.test.id
     }
   ]
   tags = [{
-    key   = %[2]q
-    value = %[3]q
+    key   = "name"
+    value = "Terraform-Test-Volume-Updated"
   }]
-}`, subresourceSuffix, data.tagKey, data.tagValue)
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_route_table.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_route_table.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Volume-Updated",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test", "id"),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test", "id"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test", "routes.*", map[string]string{
+						"gateway_id": acctest.PAIR_PREFIX + "numspot_internet_gateway.test.id",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.Equal(t, resourceId, v) {
+							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
+						}
+						return nil
+					}),
+				),
+			},
+
+			// <== If resource has optional dependencies ==>
+			// 4 - Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
+			{
+				Config: `
+resource "numspot_vpc" "test_new" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "test_new" {
+  vpc_id   = numspot_vpc.test_new.id
+  ip_range = "10.101.1.0/24"
+}
+
+resource "numspot_internet_gateway" "test_new" {
+  vpc_id = numspot_vpc.test_new.id
+}
+
+resource "numspot_route_table" "test" {
+  vpc_id    = numspot_vpc.test_new.id
+  subnet_id = numspot_subnet.test_new.id
+  routes = [
+    {
+      destination_ip_range = "0.0.0.0/0"
+      gateway_id           = numspot_internet_gateway.test_new.id
+    }
+  ]
+  tags = [{
+    key   = "name"
+    value = "Terraform-Test-Volume-Updated"
+  }]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_route_table.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_route_table.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Volume-Updated",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test_new", "id"),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test_new", "id"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test", "routes.*", map[string]string{
+						"gateway_id": acctest.PAIR_PREFIX + "numspot_internet_gateway.test_new.id",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.NotEqual(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						return nil
+					}),
+				),
+			},
+		},
+	})
 }

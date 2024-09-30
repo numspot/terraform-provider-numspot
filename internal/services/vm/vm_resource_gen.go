@@ -513,7 +513,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the Vpc in which the VM is running.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

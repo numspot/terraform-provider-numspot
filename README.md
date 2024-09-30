@@ -99,3 +99,48 @@ In order to run a single test, use:
 ```shell
 $ make testacc TESTARGS="-run TestAccKeypairDatasource"
 ```
+
+### HTTP Call Mocking
+We use the [go-vcr](https://github.com/dnaeon/go-vcr) library to mock HTTP calls. This allows us to record real HTTP interactions and replay them during subsequent test runs, making tests faster and more reliable by avoiding real API calls every time.
+
+The recorded HTTP interactions, called "cassettes," are stored in the `test/testdata` directory. If you modify or add new resources or data sources in the provider, you'll need to update the corresponding cassette by rerunning the tests with the `VCR_MODE` environment variable set to `"record"`. This re-records the interactions for the updated resource or data source.
+
+### Running Tests Using Cassettes
+If you want to run tests or the full test suite without making actual API calls and using the pre-recorded cassettes, set the `VCR_MODE` environment variable to "replay". This mode will replay the previously recorded interactions stored in the cassettes.
+
+To run the full test suite or a specific test using the generated cassettes:
+```shell
+$ VCR_MODE=replay make testacc
+```
+
+Or to run a specific test:
+```shell
+$ VCR_MODE=replay make testacc TESTARGS="-run TestAccKeypairDatasource"
+```
+
+This is useful when you want to test without incurring additional charges or waiting for real API responses.
+
+### Running Tests Concurrently
+If you want to speed up the test execution by running tests concurrently, you can set the `PARALLEL_TEST` environment variable to "true". This will enable parallel test execution across multiple resources or data sources.
+
+To run tests in parallel:
+```shell
+$ PARALLEL_TEST=true make testacc
+```
+Or to run a specific test in parallel:
+```shell
+$ PARALLEL_TEST=true make testacc TESTARGS="-run TestAccKeypairDatasource"
+```
+
+### Updating Cassettes
+If you update a resource or data source, follow these steps to regenerate the relevant cassette:
+
+1. Set the `VCR_MODE` environment variable to "record" to create new cassettes.
+2. Run the test for the specific resource or data source that was modified.
+
+Example:
+```shell
+$ VCR_MODE=record make testacc TESTARGS="-run TestAccKeypairDatasource"
+```
+This will re-record the HTTP interactions for `TestAccKeypairDatasource` and save the updated cassette to the `test/testdata` directory.
+

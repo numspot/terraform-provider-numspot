@@ -104,7 +104,6 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The size of the volume used to create the snapshot, in gibibytes (GiB).",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 

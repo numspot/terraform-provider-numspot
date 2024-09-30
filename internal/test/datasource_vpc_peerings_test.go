@@ -21,20 +21,7 @@ func TestAccVpcPeeringsDatasource(t *testing.T) {
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
 			{
-				Config: fetchVpcPeeringConfig(),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_vpc_peerings.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vpc_peerings.testdata", "items.*", map[string]string{
-						"id": acctest.PAIR_PREFIX + "numspot_vpc_peering.test.id",
-					}),
-				),
-			},
-		},
-	})
-}
-
-func fetchVpcPeeringConfig() string {
-	return `
+				Config: `
 resource "numspot_vpc" "source" {
   ip_range = "10.101.1.0/24"
 }
@@ -50,6 +37,14 @@ resource "numspot_vpc_peering" "test" {
 
 data "numspot_vpc_peerings" "testdata" {
   ids = [numspot_vpc_peering.test.id]
-}
-`
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.numspot_vpc_peerings.testdata", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vpc_peerings.testdata", "items.*", map[string]string{
+						"id": acctest.PAIR_PREFIX + "numspot_vpc_peering.test.id",
+					}),
+				),
+			},
+		},
+	})
 }

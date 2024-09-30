@@ -201,7 +201,6 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				},
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
