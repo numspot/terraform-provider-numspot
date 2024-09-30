@@ -9,28 +9,39 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func UpdateResourceTags[ResourceType any](
-	ctx context.Context,
-	provider services.IProvider,
-	resourceID string,
-	currentTags []numspot.ResourceTag,
-	newTags []numspot.ResourceTag,
-	readFunc func(context.Context, services.IProvider, string) (*ResourceType, error),
-) (*ResourceType, error) {
+func UpdateResourceTags(ctx context.Context, provider services.IProvider, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, resourceID string) error {
 	spaceID := provider.GetSpaceID()
-	err := updateTags(
-		ctx,
-		currentTags, newTags,
-		provider.GetNumspotClient(),
-		spaceID,
-		resourceID,
-	)
-	if err != nil {
-		return nil, err
+	if err := updateTags(ctx, stateTags, planTags, provider.GetNumspotClient(), spaceID, resourceID); err != nil {
+		return err
 	}
-
-	return readFunc(ctx, provider, resourceID)
+	return nil
 }
+
+//func UpdateResourceTags[ResourceType any](
+//	ctx context.Context,
+//	provider services.IProvider,
+//	readFunc func(context.Context, services.IProvider, pendingState, targetState, string, string) (*ResourceType, error),
+//	pendingStates pendingState,
+//	targetStates targetState,
+//	currentTags []numspot.ResourceTag,
+//	newTags []numspot.ResourceTag,
+//	op string,
+//	resourceID string,
+//) (*ResourceType, error) {
+//	spaceID := provider.GetSpaceID()
+//	err := updateTags(
+//		ctx,
+//		currentTags, newTags,
+//		provider.GetNumspotClient(),
+//		spaceID,
+//		resourceID,
+//	)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return readFunc(ctx, provider, pendingStates, targetStates, op, resourceID)
+//}
 
 // Same as CreateTags but without using Diagnostics. Remove CreateTags when other function are reworked
 func CreateTags(
@@ -62,7 +73,7 @@ func updateTags(
 	apiClient *numspot.ClientWithResponses,
 	spaceId numspot.SpaceId,
 	resourceId string,
-) error {
+) (err error) {
 	toCreate, toDelete, toUpdate := Diff(stateTags, planTags)
 
 	toDeleteApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toDelete))
@@ -96,23 +107,27 @@ func updateTags(
 	}
 
 	if len(toDeleteApiTags) > 0 {
-		DeleteTags(
+		if err = DeleteTags(
 			ctx,
 			apiClient,
 			spaceId,
 			resourceId,
 			toDeleteApiTags,
-		)
+		); err != nil {
+			return err
+		}
 	}
 
 	if len(toCreateApiTags) > 0 {
-		CreateTags(
+		if err = CreateTags(
 			ctx,
 			apiClient,
 			spaceId,
 			resourceId,
 			toCreateApiTags,
-		)
+		); err != nil {
+			return err
+		}
 	}
 
 	return nil

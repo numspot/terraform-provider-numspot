@@ -20,10 +20,12 @@ import (
 // Create linked volume
 // Update attributes from linked volume
 // Replace attributes // no replace
-// Recreate linked volume
 // Unlink linked volume
+// Recreate linked volume
 //
 // Unlink and link volume to a new VM
+// Delete VM and link volume to a new VM
+
 func TestAccVolumeResource(t *testing.T) {
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
@@ -90,19 +92,19 @@ func TestAccVolumeResource(t *testing.T) {
 									}
 								  ]
 								}
-	
+								
 								resource "numspot_vm" "terraform-dep-vm-volume" {
-								  image_id  = "ami-0b7df82c"
-								  type      = "ns-cus6-2c4r"
-								  subnet_id = numspot_subnet.terraform-dep-subnet-volume.id
-								  tags = [
+								image_id  = "ami-0b7df82c"
+								type      = "ns-cus6-2c4r"
+								subnet_id = numspot_subnet.terraform-dep-subnet-volume.id
+								tags = [
 									{
 									  key   = "name"
 									  value = "terraform-dep-vm-volume"
 									}
 								  ]
 								}
-	
+
 								resource "numspot_vm" "terraform-dep-vm-volume-dest-link" {
 								  image_id  = "ami-0b7df82c"
 								  type      = "ns-cus6-2c4r"
@@ -114,6 +116,8 @@ func TestAccVolumeResource(t *testing.T) {
 									}
 								  ]
 								}
+
+
 		`
 
 	resource.Test(t, resource.TestCase{
@@ -235,12 +239,38 @@ func TestAccVolumeResource(t *testing.T) {
 					}),
 				),
 			},
-			// Step 6 - Reset plan
+			// Step 6 - Unlink linked volume
+			{
+				Config: volumeDependencies + `
+						resource "numspot_volume" "terraform-volume-acctest-recreate" {
+						  type                   = "standard"
+						  size                   = 10
+						  availability_zone_name = "cloudgouv-eu-west-1a"
+						  tags = [
+							{
+							  key   = "name"
+							  value = "terraform-volume-acctest-recreate"
+							}
+						  ]
+						}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "type", "standard"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "size", "10"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest-recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-volume-acctest-recreate",
+					}),
+				),
+			},
+			// Step 7 - Delete unlinked volume
 			{
 				Config: volumeDependencies,
 				Check:  resource.ComposeAggregateTestCheckFunc(),
 			},
-			// Step 7 - Create linked volume
+			// Step 8 - Create linked volume
 			{
 				Config: volumeDependencies + `
 						resource "numspot_volume" "terraform-volume-acctest" {
@@ -271,7 +301,7 @@ func TestAccVolumeResource(t *testing.T) {
 					}),
 				),
 			},
-			// Step 8 - Update attributes from linked volume
+			// Step 9 - Update attributes from linked volume
 			{
 				Config: volumeDependencies + `
 						resource "numspot_volume" "terraform-volume-acctest" {
@@ -302,7 +332,7 @@ func TestAccVolumeResource(t *testing.T) {
 					}),
 				),
 			},
-			// Step 9 - Recreate linked volume
+			// Step 10 - Recreate linked volume
 			{
 				Config: volumeDependencies + `
 						resource "numspot_volume" "terraform-volume-acctest-recreate" {
@@ -333,7 +363,7 @@ func TestAccVolumeResource(t *testing.T) {
 					}),
 				),
 			},
-			// Step 10 - Unlink volume and link to a new VM
+			// Step 11 - Unlink volume and link to a new VM
 			{
 				Config: volumeUpdateLinkDependencies + `
 						resource "numspot_volume" "terraform-volume-acctest-recreate" {
@@ -353,23 +383,23 @@ func TestAccVolumeResource(t *testing.T) {
 						}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "type", "standard"),
-					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "size", "20"),
-					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "availability_zone_name", "cloudgouv-eu-west-1a"),
-					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "tags.#", "1"),
-					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-replace", "link_vm.device_name", "/dev/sdc"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "type", "standard"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "size", "20"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "tags.#", "1"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "link_vm.device_name", "/dev/sdc"),
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest-recreate", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "terraform-volume-acctest-recreate",
 					}),
 				),
 			},
-			// Step 11 - Unlink linked volume
+			// Step 12 - Unlink by removing VM
 			{
-				Config: volumeDependencies + `
+				Config: `
 						resource "numspot_volume" "terraform-volume-acctest-recreate" {
 						  type                   = "standard"
-						  size                   = 20
+						  size                   = 25
 						  availability_zone_name = "cloudgouv-eu-west-1a"
 						  tags = [
 							{
@@ -381,7 +411,7 @@ func TestAccVolumeResource(t *testing.T) {
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "type", "standard"),
-					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "size", "20"),
+					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "size", "25"),
 					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "availability_zone_name", "cloudgouv-eu-west-1a"),
 					resource.TestCheckResourceAttr("numspot_volume.terraform-volume-acctest-recreate", "tags.#", "1"),
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_volume.terraform-volume-acctest-recreate", "tags.*", map[string]string{

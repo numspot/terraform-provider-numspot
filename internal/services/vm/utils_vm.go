@@ -15,36 +15,76 @@ import (
 	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func StopVmNoDiag(ctx context.Context, provider services.IProvider, id string) (err error) {
+func StopVmNoDiag(ctx context.Context, provider services.IProvider, vm string) (err error) {
 	// Already stopped
+	if vm == "" {
+		return nil
+	}
+
 	var vmStatus *numspot.ReadVmsByIdResponse
-	if vmStatus, err = provider.GetNumspotClient().ReadVmsByIdWithResponse(
-		ctx,
-		provider.GetSpaceID(),
-		id,
-	); err != nil {
+	if vmStatus, err = provider.GetNumspotClient().ReadVmsByIdWithResponse(ctx, provider.GetSpaceID(), vm); err != nil {
 		return err
+	}
+
+	// VM does not exist
+	if vmStatus == nil || vmStatus.JSON200 == nil {
+		return nil
 	}
 	if *vmStatus.JSON200.State == "stopped" || *vmStatus.JSON200.State == "terminated" {
 		return nil
 	}
+
 	//////////////////
-	//forceStop := true
+	forceStop := true
 	// Stop the VM
-	if _, err = provider.GetNumspotClient().StopVmWithResponse(ctx, provider.GetSpaceID(), id,
-		numspot.StopVm{
-			//ForceStop: &forceStop,
-		},
+	if _, err = provider.GetNumspotClient().StopVmWithResponse(ctx, provider.GetSpaceID(), vm, numspot.StopVm{ForceStop: &forceStop}); err != nil {
+		return err
+	}
+
+	if _, err = utils2.RetryReadUntilStateValid(ctx, vm, provider.GetSpaceID(), []string{"stopping"}, []string{"stopped", "terminated"},
+		provider.GetNumspotClient().ReadVmsByIdWithResponse); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func StartVmNoDiag(ctx context.Context, provider services.IProvider, vm string) (err error) {
+	// Already running
+	if vm == "" {
+		return nil
+	}
+
+	var vmStatus *numspot.ReadVmsByIdResponse
+	if vmStatus, err = provider.GetNumspotClient().ReadVmsByIdWithResponse(
+		ctx,
+		provider.GetSpaceID(),
+		vm,
 	); err != nil {
+		return err
+	}
+
+	// VM does not exist
+	if vmStatus == nil || vmStatus.JSON200 == nil {
+		return nil
+	}
+
+	if *vmStatus.JSON200.State == "running" || *vmStatus.JSON200.State == "terminated" {
+		return nil
+	}
+
+	//////////////////
+	// Start the VM
+	if _, err = provider.GetNumspotClient().StartVmWithResponse(ctx, provider.GetSpaceID(), vm); err != nil {
 		return err
 	}
 
 	_, err = utils2.RetryReadUntilStateValid(
 		ctx,
-		id,
+		vm,
 		provider.GetSpaceID(),
-		[]string{"stopping"},
-		[]string{"stopped", "terminated"},
+		[]string{"pending"},
+		[]string{"running"},
 		provider.GetNumspotClient().ReadVmsByIdWithResponse,
 	)
 	if err != nil {
@@ -85,40 +125,6 @@ func StopVm(ctx context.Context, provider services.IProvider, id string) diag.Di
 	}
 
 	return diags
-}
-
-func StartVmNoDiag(ctx context.Context, provider services.IProvider, id string) (err error) {
-	// Already running
-	var vmStatus *numspot.ReadVmsByIdResponse
-	if vmStatus, err = provider.GetNumspotClient().ReadVmsByIdWithResponse(
-		ctx,
-		provider.GetSpaceID(),
-		id,
-	); err != nil {
-		return err
-	}
-	if *vmStatus.JSON200.State == "running" {
-		return nil
-	}
-	//////////////////
-	// Start the VM
-	if _, err = provider.GetNumspotClient().StartVmWithResponse(ctx, provider.GetSpaceID(), id); err != nil {
-		return err
-	}
-
-	_, err = utils2.RetryReadUntilStateValid(
-		ctx,
-		id,
-		provider.GetSpaceID(),
-		[]string{"pending"},
-		[]string{"running"},
-		provider.GetNumspotClient().ReadVmsByIdWithResponse,
-	)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func StartVm(ctx context.Context, provider services.IProvider, id string) diag.Diagnostics {

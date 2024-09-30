@@ -15,19 +15,6 @@ func VolumeFromTfToHttp(tf *VolumeModel) *numspot.Volume {
 	return &numspot.Volume{}
 }
 
-func ValueFromTfToUpdaterequest(tf *VolumeModel) numspot.UpdateVolumeJSONRequestBody {
-	var httpIops *int
-	if !tf.Iops.IsUnknown() && !tf.Iops.IsNull() {
-		httpIops = utils.FromTfInt64ToIntPtr(tf.Iops)
-	}
-
-	return numspot.UpdateVolumeJSONRequestBody{
-		Iops:       httpIops,
-		Size:       utils.FromTfInt64ToIntPtr(tf.Size),
-		VolumeType: tf.Type.ValueStringPointer(),
-	}
-}
-
 func VolumeFromTfToLinkRequest(tf *VolumeModel) numspot.LinkVolumeJSONRequestBody {
 	var (
 		deviceName string

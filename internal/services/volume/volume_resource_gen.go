@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -37,7 +39,6 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "The ID of the volume.",
 			},
 			"iops": schema.Int64Attribute{
-				//Default:             int64default.StaticInt64(150),
 				Optional:            true,
 				Computed:            true,
 				Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
@@ -83,7 +84,7 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Information about your volume attachment.",
 			},
 			"size": schema.Int64Attribute{
-				//Default:             int64default.StaticInt64(10),
+				Default:             int64default.StaticInt64(10),
 				Optional:            true,
 				Computed:            true,
 				Description:         "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
@@ -102,7 +103,7 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"type": schema.StringAttribute{
-				//Default:             stringdefault.StaticString("standard"),
+				Default:             stringdefault.StaticString("standard"),
 				Optional:            true,
 				Computed:            true,
 				Description:         "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />",
@@ -137,7 +138,6 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded.",
 			},
 		},
-		DeprecationMessage: "Managing IAAS services with Terraform is deprecated", // MANUALLY EDITED : Add Deprecation message
 	}
 }
 
@@ -154,7 +154,6 @@ type VolumeModel struct {
 	Type                 types.String `tfsdk:"type"`
 	LinkVM               LinkVMValue  `tfsdk:"link_vm"` // MANUALLY EDITED : Add link_vm attribute
 	// MANUALLY EDITED : spaceId removed
-
 }
 
 // MANUALLY EDITED : add LinkVMType/LinkVMValue functions
