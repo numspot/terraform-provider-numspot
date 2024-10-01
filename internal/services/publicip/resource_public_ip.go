@@ -136,11 +136,7 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 }
 
 func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var (
-		plan, state  PublicIpModel
-		linkPublicIP *string
-		err          error
-	)
+	var plan, state PublicIpModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -161,24 +157,7 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 		if response.Diagnostics.HasError() {
 			return
 		}
-	}
 
-	data, diags := refreshState(ctx, r.provider, state.Id.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
-		return
-	}
-
-	chgSet := ComputePublicIPChangeSet(&plan, data)
-
-	if chgSet.Err != nil {
-		response.Diagnostics.AddError("Failed to update public IP", chgSet.Err.Error())
-		return
-	}
-
-	if chgSet.Unlink {
-		_ = invokeUnlinkPublicIP(ctx, r.provider, &state) // We still want to try delete resource even if the unlink didn't work (ressource has been unlinked before for example)
-		state.LinkPublicIP = types.StringNull()
 		data, diags := refreshState(ctx, r.provider, state.Id.ValueString())
 		if diags.HasError() {
 			response.Diagnostics.Append(diags...)
@@ -187,22 +166,6 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 
 		response.Diagnostics.Append(response.State.Set(ctx, *data)...)
 	}
-	if chgSet.Link {
-		plan.Id = state.Id
-		linkPublicIP, err = invokeLinkPublicIP(ctx, r.provider, &plan)
-		if err != nil {
-			response.Diagnostics.AddError("Failed to link public IP", err.Error())
-			return
-		}
-		state.LinkPublicIP = types.StringPointerValue(linkPublicIP)
-	}
-	data, diags = refreshState(ctx, r.provider, state.Id.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
-		return
-	}
-
-	response.Diagnostics.Append(response.State.Set(ctx, *data)...)
 }
 
 func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

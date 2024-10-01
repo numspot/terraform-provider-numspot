@@ -49,17 +49,11 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "The ID of the Subnet.",
 							MarkdownDescription: "The ID of the Subnet.",
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-							},
 						},
 						"vpc_id": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The ID of the Vpc.",
 							MarkdownDescription: "The ID of the Vpc.",
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-							},
 						},
 					},
 					CustomType: LinkRouteTablesType{
@@ -175,6 +169,9 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 				Optional:            true,
 				Description:         "The ID of the SubNet for which you want to link the route table.",
 				MarkdownDescription: "The ID of the SubNet for which you want to link the route table.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"local_route": schema.SingleNestedAttribute{ // MANUALLY EDITED : Add local_route attribute (used as buffer value in provider)
 				Attributes: map[string]schema.Attribute{

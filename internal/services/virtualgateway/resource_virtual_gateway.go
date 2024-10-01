@@ -173,46 +173,6 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 		modifications = true
 	}
 
-	// Link/Unlink virtual gateway to VPCs
-	if state.VpcId.ValueString() != plan.VpcId.ValueString() {
-
-		// Unlink
-		if !(state.VpcId.IsNull() || state.VpcId.IsUnknown()) {
-			_ = utils2.ExecuteRequest(func() (*numspot.UnlinkVirtualGatewayToVpcResponse, error) {
-				return r.provider.GetNumspotClient().UnlinkVirtualGatewayToVpcWithResponse(
-					ctx,
-					r.provider.GetSpaceID(),
-					state.Id.ValueString(),
-					numspot.UnlinkVirtualGatewayToVpcJSONRequestBody{
-						VpcId: state.VpcId.ValueString(),
-					},
-				)
-			}, http.StatusNoContent, &response.Diagnostics)
-			if response.Diagnostics.HasError() {
-				return
-			}
-		}
-
-		// Link
-		if !(plan.VpcId.IsNull() || plan.VpcId.IsUnknown()) {
-			_ = utils2.ExecuteRequest(func() (*numspot.LinkVirtualGatewayToVpcResponse, error) {
-				return r.provider.GetNumspotClient().LinkVirtualGatewayToVpcWithResponse(
-					ctx,
-					r.provider.GetSpaceID(),
-					state.Id.ValueString(),
-					numspot.LinkVirtualGatewayToVpcJSONRequestBody{
-						VpcId: plan.VpcId.ValueString(),
-					},
-				)
-			}, http.StatusOK, &response.Diagnostics)
-			if response.Diagnostics.HasError() {
-				return
-			}
-		}
-
-		modifications = true
-	}
-
 	if !modifications {
 		return
 	}

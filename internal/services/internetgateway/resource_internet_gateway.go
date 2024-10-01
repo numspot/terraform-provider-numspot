@@ -177,42 +177,6 @@ func (r *InternetGatewayResource) Update(ctx context.Context, request resource.U
 		modifications = true
 	}
 
-	if !state.VpcId.Equal(plan.VpcId) {
-		if !utils.IsTfValueNull(state.VpcId) {
-			err := utils.RetryUnlinkUntilSuccess(
-				ctx,
-				r.provider.GetSpaceID(),
-				state.Id.ValueString(),
-				numspot.UnlinkInternetGatewayJSONRequestBody{
-					VpcId: state.VpcId.ValueString(),
-				},
-				r.provider.GetNumspotClient().UnlinkInternetGatewayWithResponse,
-			)
-			if err != nil {
-				response.Diagnostics.AddError("Failed to unlink Internet Gateway to VPC", err.Error())
-				return
-			}
-		}
-
-		if !utils.IsTfValueNull(plan.VpcId) {
-			linRes := utils.ExecuteRequest(func() (*numspot.LinkInternetGatewayResponse, error) {
-				return r.provider.GetNumspotClient().LinkInternetGatewayWithResponse(
-					ctx,
-					r.provider.GetSpaceID(),
-					state.Id.ValueString(),
-					numspot.LinkInternetGatewayJSONRequestBody{
-						VpcId: plan.VpcId.ValueString(),
-					},
-				)
-			}, http.StatusNoContent, &response.Diagnostics)
-			if linRes == nil {
-				return
-			}
-		}
-
-		modifications = true
-	}
-
 	if !modifications {
 		return
 	}
