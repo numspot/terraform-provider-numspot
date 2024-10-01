@@ -2,7 +2,6 @@ package publicip
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -13,32 +12,6 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
-
-var errNicVmConflict = fmt.Errorf("couldn't have nicID and vmID at the same time")
-
-type PublicIPChangeSet struct {
-	Unlink bool
-	Link   bool
-	Err    error
-}
-
-func ComputePublicIPChangeSet(plan, state *PublicIpModel) PublicIPChangeSet {
-	c := PublicIPChangeSet{Err: nil}
-	c.Unlink = plan.VmId.IsNull() && !state.VmId.IsNull() ||
-		plan.NicId.IsUnknown() && !state.NicId.IsNull()
-
-	switch {
-	case plan.NicId.IsUnknown() && plan.VmId.IsNull():
-		c.Link = false
-	case !plan.NicId.IsUnknown() && !plan.VmId.IsNull():
-		c.Err = errNicVmConflict
-	case !plan.NicId.IsUnknown():
-		c.Link = true
-	case !plan.VmId.IsNull():
-		c.Link = true
-	}
-	return c
-}
 
 func PublicIpFromHttpToTf(ctx context.Context, elt *numspot.PublicIp) (*PublicIpModel, diag.Diagnostics) {
 	var (

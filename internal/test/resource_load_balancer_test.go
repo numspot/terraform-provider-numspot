@@ -115,6 +115,11 @@ resource "numspot_load_balancer" "test" {
 						"backend_port":       "80",
 						"load_balancer_port": "80",
 					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "health_check", map[string]string{
+						"healthy_threshold": "10",
+						"check_interval":    "30",
+						"port":              "8080",
+					}),
 					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test", "id"),
 					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test", "id"),
 					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "backend_vm_ids.*", "numspot_vm.test", "id"),
@@ -202,10 +207,10 @@ resource "numspot_load_balancer" "test" {
   type = "internal"
 
   health_check = {
-    healthy_threshold   = 10
-    check_interval      = 30
+    healthy_threshold   = 15
+    check_interval      = 35
     path                = "/index.html"
-    port                = 8080
+    port                = 8081
     protocol            = "HTTPS"
     timeout             = 5
     unhealthy_threshold = 5
@@ -233,6 +238,11 @@ resource "numspot_load_balancer" "test" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
 						"backend_port":       "8080",
 						"load_balancer_port": "8080",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "health_check", map[string]string{
+						"healthy_threshold": "15",
+						"check_interval":    "35",
+						"port":              "8081",
 					}),
 					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test", "id"),
 					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test", "id"),
@@ -347,6 +357,11 @@ resource "numspot_load_balancer" "test" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
 						"backend_port":       "8080",
 						"load_balancer_port": "8080",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "health_check", map[string]string{
+						"healthy_threshold": "10",
+						"check_interval":    "30",
+						"port":              "8080",
 					}),
 					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test", "id"),
 					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test", "id"),

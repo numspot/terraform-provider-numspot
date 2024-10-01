@@ -240,18 +240,25 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 		modifs = true
 	}
 
-	if (!plan.BackendIps.IsUnknown() && !plan.BackendIps.Equal(state.BackendIps)) ||
-		(!plan.BackendVmIds.IsUnknown() && !plan.BackendVmIds.Equal(state.BackendVmIds)) {
-		diags := r.updateBackendMachines(ctx, plan, state)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
-		}
-	}
-
-	if r.shouldUpdate(state, plan) {
-		r.UpdateLoadBalancer(ctx, request, response)
-		if response.Diagnostics.HasError() {
-			return
+	if !plan.HealthCheck.IsUnknown() && !state.HealthCheck.Equal(plan.HealthCheck) {
+		// HealthCheck:
+		if !plan.HealthCheck.IsUnknown() && !state.HealthCheck.Equal(plan.HealthCheck) {
+			res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
+				return r.provider.GetNumspotClient().UpdateLoadBalancerWithResponse(ctx, r.provider.GetSpaceID(), plan.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
+					HealthCheck: &numspot.HealthCheck{
+						CheckInterval:      utils.FromTfInt64ToInt(plan.HealthCheck.CheckInterval),
+						HealthyThreshold:   utils.FromTfInt64ToInt(plan.HealthCheck.HealthyThreshold),
+						Path:               plan.HealthCheck.Path.ValueStringPointer(),
+						Port:               utils.FromTfInt64ToInt(plan.HealthCheck.Port),
+						Protocol:           plan.HealthCheck.Protocol.ValueString(),
+						Timeout:            utils.FromTfInt64ToInt(plan.HealthCheck.Timeout),
+						UnhealthyThreshold: utils.FromTfInt64ToInt(plan.HealthCheck.UnhealthyThreshold),
+					},
+				})
+			}, http.StatusOK, &response.Diagnostics)
+			if res == nil {
+				return
+			}
 		}
 
 		modifs = true
@@ -313,112 +320,6 @@ func (r *LoadBalancerResource) deleteListeners(ctx context.Context, loadBalancer
 		)
 	}, http.StatusNoContent, &diags)
 
-	return diags
-}
-
-func (r *LoadBalancerResource) shouldUpdate(state, plan LoadBalancerModel) bool {
-	shouldUpdate := false
-
-	shouldUpdate = shouldUpdate || (!plan.HealthCheck.IsUnknown() && !state.HealthCheck.Equal(plan.HealthCheck))
-	shouldUpdate = shouldUpdate || (!plan.SecurityGroups.IsUnknown() && !state.SecurityGroups.Equal(plan.SecurityGroups))
-	shouldUpdate = shouldUpdate || (!plan.SecuredCookies.IsUnknown() && !state.SecuredCookies.Equal(plan.SecuredCookies))
-
-	return shouldUpdate
-}
-
-// Outscale only allows one update at a time for loadbalancer (don't ask why), so we call the update function multiple time
-func (r *LoadBalancerResource) UpdateLoadBalancer(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var plan, state LoadBalancerModel
-
-	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	// HealthCheck:
-	if !plan.HealthCheck.IsUnknown() && !state.HealthCheck.Equal(plan.HealthCheck) {
-		res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
-			return r.provider.GetNumspotClient().UpdateLoadBalancerWithResponse(ctx, r.provider.GetSpaceID(), plan.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
-				HealthCheck: &numspot.HealthCheck{
-					CheckInterval:      utils.FromTfInt64ToInt(plan.HealthCheck.CheckInterval),
-					HealthyThreshold:   utils.FromTfInt64ToInt(plan.HealthCheck.HealthyThreshold),
-					Path:               plan.HealthCheck.Path.ValueStringPointer(),
-					Port:               utils.FromTfInt64ToInt(plan.HealthCheck.Port),
-					Protocol:           plan.HealthCheck.Protocol.ValueString(),
-					Timeout:            utils.FromTfInt64ToInt(plan.HealthCheck.Timeout),
-					UnhealthyThreshold: utils.FromTfInt64ToInt(plan.HealthCheck.UnhealthyThreshold),
-				},
-			})
-		}, http.StatusOK, &response.Diagnostics)
-		if res == nil {
-			return
-		}
-	}
-
-	// Security Groups
-	if !plan.SecurityGroups.IsUnknown() && !state.SecurityGroups.Equal(plan.SecurityGroups) {
-		res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
-			securityGroups := utils.FromTfStringListToStringList(ctx, plan.SecurityGroups)
-			return r.provider.GetNumspotClient().UpdateLoadBalancerWithResponse(ctx, r.provider.GetSpaceID(), plan.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
-				SecurityGroups: &securityGroups,
-			})
-		}, http.StatusOK, &response.Diagnostics)
-		if res == nil {
-			return
-		}
-	}
-}
-
-func (r *LoadBalancerResource) updateBackendMachines(ctx context.Context, plan, state LoadBalancerModel) diag.Diagnostics {
-	var diags diag.Diagnostics
-	var backendIpstoLink, backendIpstoUnlink, backendVmIdstoLink, backendVmIdstoUnlink []string
-
-	stateBackendIps := utils.TfStringSetToStringPtrSet(ctx, state.BackendIps)
-	planBackendIps := utils.TfStringSetToStringPtrSet(ctx, plan.BackendIps)
-	stateBackendVmIds := utils.TfStringSetToStringPtrSet(ctx, state.BackendVmIds)
-	planBackendVmIds := utils.TfStringSetToStringPtrSet(ctx, plan.BackendVmIds)
-
-	if planBackendIps != nil && stateBackendIps != nil {
-		backendIpstoLink, backendIpstoUnlink = utils.DiffComparable(*planBackendIps, *stateBackendIps)
-	}
-	if planBackendIps != nil && stateBackendIps != nil {
-		backendVmIdstoLink, backendVmIdstoUnlink = utils.DiffComparable(*planBackendVmIds, *stateBackendVmIds)
-	}
-
-	diags = r.unlinkBackendMachines(ctx, state.Name.ValueString(), &backendIpstoUnlink, &backendVmIdstoUnlink)
-	if diags.HasError() {
-		return diags
-	}
-
-	diags = r.linkBackendMachines(ctx, state.Name.ValueString(), &backendIpstoLink, &backendVmIdstoLink)
-	if diags.HasError() {
-		return diags
-	}
-
-	return nil
-}
-
-func (r *LoadBalancerResource) unlinkBackendMachines(ctx context.Context, lbName string, backendIps, backendVmIds *[]string) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	payload := numspot.UnlinkLoadBalancerBackendMachinesJSONRequestBody{}
-
-	if backendIps != nil && len(*backendIps) > 0 {
-		payload.BackendIps = backendIps
-	}
-
-	if backendVmIds != nil && len(*backendVmIds) > 0 {
-		payload.BackendVmIds = backendVmIds
-	}
-
-	utils.ExecuteRequest(func() (*numspot.UnlinkLoadBalancerBackendMachinesResponse, error) {
-		return r.provider.GetNumspotClient().UnlinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.GetSpaceID(), lbName, payload)
-	}, http.StatusNoContent, &diags)
 	return diags
 }
 

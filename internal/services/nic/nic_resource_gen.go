@@ -15,6 +15,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -56,6 +57,9 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 						Optional:            true,
 						Description:         "The device index for the NIC attachment (between `1` and `7`, both included).",
 						MarkdownDescription: "The device index for the NIC attachment (between `1` and `7`, both included).",
+						PlanModifiers: []planmodifier.Int64{ // MANUALLY EDITED : Add plan modifier
+							int64planmodifier.RequiresReplaceIfConfigured(),
+						},
 					},
 					"id": schema.StringAttribute{
 						Computed:            true,

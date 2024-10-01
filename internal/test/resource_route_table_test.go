@@ -62,7 +62,8 @@ resource "numspot_route_table" "test" {
 					resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test", "id"),
 					resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test", "id"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test", "routes.*", map[string]string{
-						"gateway_id": acctest.PAIR_PREFIX + "numspot_internet_gateway.test.id",
+						"gateway_id":           acctest.PAIR_PREFIX + "numspot_internet_gateway.test.id",
+						"destination_ip_range": "0.0.0.0/0",
 					}),
 					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
 						if !assert.NotEmpty(t, v) {
@@ -101,7 +102,7 @@ resource "numspot_route_table" "test" {
   subnet_id = numspot_subnet.test.id
   routes = [
     {
-      destination_ip_range = "0.0.0.0/0"
+      destination_ip_range = "10.0.0.0/16"
       gateway_id           = numspot_internet_gateway.test.id
     }
   ]
@@ -119,7 +120,8 @@ resource "numspot_route_table" "test" {
 					resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test", "id"),
 					resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test", "id"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test", "routes.*", map[string]string{
-						"gateway_id": acctest.PAIR_PREFIX + "numspot_internet_gateway.test.id",
+						"gateway_id":           acctest.PAIR_PREFIX + "numspot_internet_gateway.test.id",
+						"destination_ip_range": "10.0.0.0/16",
 					}),
 					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
 						if !assert.NotEmpty(t, v) {
@@ -134,7 +136,7 @@ resource "numspot_route_table" "test" {
 			},
 
 			// <== If resource has optional dependencies ==>
-			// 4 - Update testing With Replace of dependency resource and without Replacing the resource (if needed)
+			// 4 - Update testing With Replace of dependency resource and with Replace of the resource
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
 			{
 				Config: `
@@ -174,7 +176,8 @@ resource "numspot_route_table" "test" {
 					resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test_new", "id"),
 					resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test_new", "id"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test", "routes.*", map[string]string{
-						"gateway_id": acctest.PAIR_PREFIX + "numspot_internet_gateway.test_new.id",
+						"gateway_id":           acctest.PAIR_PREFIX + "numspot_internet_gateway.test_new.id",
+						"destination_ip_range": "0.0.0.0/0",
 					}),
 					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
 						if !assert.NotEmpty(t, v) {

@@ -191,41 +191,6 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 		modifs = true
 	}
 
-	if !state.SubnetId.Equal(plan.SubnetId) {
-		currentSubnetId := state.SubnetId.ValueStringPointer()
-		desiredSubnetId := plan.SubnetId.ValueStringPointer()
-
-		switch {
-		case currentSubnetId != nil && desiredSubnetId == nil:
-			// Nothing to do, the subnet is deleted first, and the route table assoc is deleted
-			diags = r.unlinkSubnet(ctx, state, *currentSubnetId)
-			response.Diagnostics.Append(diags...)
-			if response.Diagnostics.HasError() {
-				return
-			}
-		case currentSubnetId == nil && desiredSubnetId != nil:
-			// Attach create subnet
-			diags = r.linkRouteTable(ctx, state.Id.ValueString(), *desiredSubnetId)
-			response.Diagnostics.Append(diags...)
-			if response.Diagnostics.HasError() {
-				return
-			}
-		default:
-			// Detach current and attach desired
-			diags = r.unlinkSubnet(ctx, state, *currentSubnetId)
-			response.Diagnostics.Append(diags...)
-			if response.Diagnostics.HasError() {
-				return
-			}
-
-			diags = r.linkRouteTable(ctx, state.Id.ValueString(), *desiredSubnetId)
-			response.Diagnostics.Append(diags...)
-			if response.Diagnostics.HasError() {
-				return
-			}
-		}
-	}
-
 	stateRoutes := make([]RoutesValue, 0, len(state.Routes.Elements()))
 	diags = state.Routes.ElementsAs(ctx, &stateRoutes, false)
 	response.Diagnostics.Append(diags...)
@@ -373,59 +338,6 @@ func (r *RouteTableResource) deleteRoutes(ctx context.Context, routeTableId stri
 	}
 
 	return
-}
-
-func (r *RouteTableResource) unlinkSubnet(ctx context.Context, state RouteTableModel, subnetId string) diag.Diagnostics {
-	// This function attempts to unlink a subnet from a route table.
-	// It first retrieves all linked route tables, then identifies the specific association by subnet ID.
-	// If found, it proceeds to unlink the route table using the association ID.
-	// Any errors encountered during the process are added to the diagnostics and returned.
-
-	var diags diag.Diagnostics
-	rtbAssocsTf := make([]LinkRouteTablesValue, 0, len(state.LinkRouteTables.Elements()))
-	diags = state.LinkRouteTables.ElementsAs(ctx, &rtbAssocsTf, false)
-	if diags.HasError() {
-		return diags
-	}
-
-	var rtbAssocId *string
-	for _, rtbAssocTf := range rtbAssocsTf {
-		if strings.EqualFold(rtbAssocTf.SubnetId.ValueString(), subnetId) {
-			rtbAssocId = rtbAssocTf.Id.ValueStringPointer()
-			break
-		}
-	}
-
-	if rtbAssocId == nil {
-		diags.AddError("Failed to retrieve route table associated with subnet Id", "Failed to retrieve route table associated with subnet Id")
-		return diags
-	}
-
-	unlinkDiags := r.unlinkRouteTable(ctx, state.Id.ValueString(), *rtbAssocId)
-
-	// This check is necessary to ensure the operation is successful in scenarios where the subnet was created prior to this action.
-	// In such cases, the association link might be deleted before the route table resource has been updated, leading to potential inconsistencies.
-	if unlinkDiags.HasError() {
-		readRes := r.readRouteTable(ctx, state.Id.ValueString(), diags)
-		if readRes == nil {
-			return diags
-		}
-
-		found := false
-		for _, rtb := range *readRes.JSON200.LinkRouteTables {
-			if rtb.Id == rtbAssocId {
-				found = true
-				break
-			}
-		}
-
-		if found {
-			diags.Append(unlinkDiags...)
-			return diags
-		}
-	}
-
-	return diags
 }
 
 func (r *RouteTableResource) linkRouteTable(ctx context.Context, routeTableId, subnetId string) diag.Diagnostics {

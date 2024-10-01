@@ -252,7 +252,7 @@ func isUpdateNeeded(plan numspot.UpdateVmJSONRequestBody, state numspot.UpdateVm
 		compareSimpleFieldPtr(plan.KeypairName, state.KeypairName) &&
 		compareSimpleFieldPtr(plan.NestedVirtualization, state.NestedVirtualization) &&
 		(utils2.GetPtrValue(plan.Performance) == "" || compareSimpleFieldPtr(plan.Performance, state.Performance)) && // if performance is not provided by user,
-		(len(utils2.GetPtrValue(plan.BlockDeviceMappings)) == 0 || compareSlicePtr(plan.SecurityGroupIds, state.SecurityGroupIds)) &&
+		(len(utils2.GetPtrValue(plan.BlockDeviceMappings)) == 0) &&
 		compareSimpleFieldPtr(plan.UserData, state.UserData) &&
 		compareSimpleFieldPtr(plan.VmInitiatedShutdownBehavior, state.VmInitiatedShutdownBehavior) &&
 		compareSimpleFieldPtr(plan.Type, state.Type) &&
