@@ -89,28 +89,26 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 
 func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state VolumeModel
+
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res, err := r.provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
+	volumeID := state.Id.ValueString()
+
+	numSpotVolume, err := core.ReadVolume(ctx, r.provider, volumeID)
 	if err != nil {
 		response.Diagnostics.AddError("unable to read volume", err.Error())
 		return
 	}
 
-	if res.JSON200 == nil {
-		response.Diagnostics.AddError("unable to read volume", "empty response")
-		return
-	}
-
-	newState, diags := serializeNumSpotVolume(ctx, res.JSON200)
+	state, diags := serializeNumSpotVolume(ctx, numSpotVolume)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
 	}
-	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
 func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
