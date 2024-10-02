@@ -4,47 +4,14 @@ import (
 	"context"
 	"net/http"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func UpdateResourceTags(ctx context.Context, provider services.IProvider, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, resourceID string) error {
-	spaceID := provider.GetSpaceID()
-	if err := updateTags(ctx, stateTags, planTags, provider.GetNumspotClient(), spaceID, resourceID); err != nil {
-		return err
-	}
-	return nil
-}
-
-//func UpdateResourceTags[ResourceType any](
-//	ctx context.Context,
-//	provider services.IProvider,
-//	readFunc func(context.Context, services.IProvider, pendingState, targetState, string, string) (*ResourceType, error),
-//	pendingStates pendingState,
-//	targetStates targetState,
-//	currentTags []numspot.ResourceTag,
-//	newTags []numspot.ResourceTag,
-//	op string,
-//	resourceID string,
-//) (*ResourceType, error) {
-//	spaceID := provider.GetSpaceID()
-//	err := updateTags(
-//		ctx,
-//		currentTags, newTags,
-//		provider.GetNumspotClient(),
-//		spaceID,
-//		resourceID,
-//	)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return readFunc(ctx, provider, pendingStates, targetStates, op, resourceID)
-//}
-
-// Same as CreateTags but without using Diagnostics. Remove CreateTags when other function are reworked
+// CreateTags Same as CreateTags but without using Diagnostics. Remove CreateTags when other function are reworked
 func CreateTags(
 	ctx context.Context,
 	apiClient *numspot.ClientWithResponses,
@@ -68,13 +35,10 @@ func CreateTags(
 	return nil
 }
 
-func updateTags(
-	ctx context.Context,
-	stateTags, planTags []numspot.ResourceTag,
-	apiClient *numspot.ClientWithResponses,
-	spaceId numspot.SpaceId,
-	resourceId string,
-) (err error) {
+func UpdateResourceTags(ctx context.Context, provider services.IProvider, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, resourceID string) (err error) {
+	numSpotClient := provider.GetNumspotClient()
+	spaceID := provider.GetSpaceID()
+
 	toCreate, toDelete, toUpdate := Diff(stateTags, planTags)
 
 	toDeleteApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toDelete))
@@ -110,9 +74,9 @@ func updateTags(
 	if len(toDeleteApiTags) > 0 {
 		if err = DeleteTags(
 			ctx,
-			apiClient,
-			spaceId,
-			resourceId,
+			numSpotClient,
+			spaceID,
+			resourceID,
 			toDeleteApiTags,
 		); err != nil {
 			return err
@@ -122,9 +86,9 @@ func updateTags(
 	if len(toCreateApiTags) > 0 {
 		if err = CreateTags(
 			ctx,
-			apiClient,
-			spaceId,
-			resourceId,
+			numSpotClient,
+			spaceID,
+			resourceID,
 			toCreateApiTags,
 		); err != nil {
 			return err
