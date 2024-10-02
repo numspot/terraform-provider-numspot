@@ -79,18 +79,44 @@ func UpdateVolumeTags(ctx context.Context, provider services.IProvider, volumeID
 func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID, stateVM, planVM, planDeviceName string) (*numspot.Volume, error) {
 	var err error
 
-	if stateVM != planVM {
-		switch {
-		case stateVM != "":
-			if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
-				return nil, err
-			}
-		case planVM != "":
-			if err = linkVolume(ctx, provider, updateOp, volumeID, planVM, planDeviceName); err != nil {
-				return nil, err
-			}
+	switch {
+	// Nothing in the state and VM in the plan
+	// We link the volume to the VM in the plan
+	case stateVM == "" && planVM != "":
+		if err = linkVolume(ctx, provider, updateOp, volumeID, planVM, planDeviceName); err != nil {
+			return nil, err
+		}
+
+	// Nothing in the plan and VM in the state
+	// We need to unlink the volume to the VM in state
+	case stateVM != "" && planVM == "":
+		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
+			return nil, err
+		}
+
+	// VM in the state, VM in the plan
+	// We need to unlink the volume from the previous VM (in state) and link it to the new VM (in plan) with the device name in the plan
+	case stateVM != "":
+		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
+			return nil, err
+		}
+		if err = linkVolume(ctx, provider, updateOp, volumeID, planVM, planDeviceName); err != nil {
+			return nil, err
 		}
 	}
+
+	//if stateVM != planVM {
+	//	switch {
+	//	case stateVM != "":
+	//		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
+	//			return nil, err
+	//		}
+	//	case planVM != "":
+	//		if err = linkVolume(ctx, provider, updateOp, volumeID, planVM, planDeviceName); err != nil {
+	//			return nil, err
+	//		}
+	//	}
+	//}
 
 	return RetryReadVolume(ctx, provider, updateOp, volumeID)
 }
