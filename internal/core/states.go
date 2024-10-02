@@ -18,8 +18,3 @@ const (
 	available = "available"
 	inUse     = "in-use"
 )
-
-type (
-	targetState  []string
-	pendingState []string
-)
