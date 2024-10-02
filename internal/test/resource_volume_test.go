@@ -116,10 +116,6 @@ resource "numspot_vm" "terraform-dep-vm-volume-dest-link" {
     }
   ]
 }
-
-
-
-
 		`
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,

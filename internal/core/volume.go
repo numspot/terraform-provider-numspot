@@ -31,20 +31,16 @@ func CreateVolume(ctx context.Context, provider services.IProvider, numSpotVolum
 	}
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider.GetNumspotClient(), provider.GetSpaceID(), volumeID, tags); err != nil {
+		if err = CreateTags(ctx, provider.GetNumspotClient(), spaceID, volumeID, tags); err != nil {
 			return nil, err
 		}
 	}
 
-	numSpotVolume, err = ReadVolume(ctx, provider, pendingState{creating, updating}, targetState{available, inUse}, createOp, volumeID)
-	if err != nil {
-		return nil, err
-	}
-
-	return numSpotVolume, nil
+	return ReadVolume(ctx, provider, pendingState{creating, updating}, targetState{available, inUse}, createOp, volumeID)
 }
 
-func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, numSpotVolumeUpdate numspot.UpdateVolumeJSONRequestBody, volumeID, stateVM, planVM string) (numSpotVolume *numspot.Volume, err error) {
+func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, numSpotVolumeUpdate numspot.UpdateVolumeJSONRequestBody, volumeID, stateVM, planVM string) (*numspot.Volume, error) {
+	var err error
 	pendingStates := pendingState{creating, updating}
 	targetStates := targetState{available, inUse}
 
@@ -69,30 +65,21 @@ func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, nu
 		return nil, err
 	}
 
-	numSpotVolume, err = ReadVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID)
-	if err != nil {
-		return nil, err
-	}
-
-	return numSpotVolume, nil
+	return ReadVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID)
 }
 
-func UpdateVolumeTags(ctx context.Context, provider services.IProvider, volumeID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (numSpotVolume *numspot.Volume, err error) {
+func UpdateVolumeTags(ctx context.Context, provider services.IProvider, volumeID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Volume, error) {
 	pendingStates := pendingState{creating, updating}
 	targetStates := targetState{available, inUse}
 
-	if err = UpdateResourceTags(ctx, provider, stateTags, planTags, volumeID); err != nil {
+	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, volumeID); err != nil {
 		return nil, err
 	}
-	numSpotVolume, err = ReadVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID)
-	if err != nil {
-		return nil, err
-	}
-
-	return numSpotVolume, nil
+	return ReadVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID)
 }
 
-func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID, stateVM, planVM, planDeviceName string) (numSpotVolume *numspot.Volume, err error) {
+func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID, stateVM, planVM, planDeviceName string) (*numspot.Volume, error) {
+	var err error
 	pendingStates := pendingState{creating, updating}
 	targetStates := targetState{available, inUse}
 
@@ -123,12 +110,7 @@ func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID
 		}
 	}
 
-	numSpotVolume, err = ReadVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID)
-	if err != nil {
-		return nil, err
-	}
-
-	return numSpotVolume, nil
+	return ReadVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID)
 }
 
 func DeleteVolume(ctx context.Context, provider services.IProvider, volumeID, stateVM, planVM string) (err error) {

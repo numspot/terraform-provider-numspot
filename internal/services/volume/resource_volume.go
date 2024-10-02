@@ -99,6 +99,7 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 		response.Diagnostics.AddError("unable to read volume", err.Error())
 		return
 	}
+
 	if res.JSON200 == nil {
 		response.Diagnostics.AddError("unable to read volume", "empty response")
 		return
@@ -158,7 +159,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		}
 	}
 
-	if !state.Tags.Equal(plan.Tags) {
+	if !plan.Tags.Equal(state.Tags) {
 		numSpotVolume, err = core.UpdateVolumeTags(ctx, r.provider, volumeID, stateTags, planTags)
 		if err != nil {
 			response.Diagnostics.AddError("unable to update volume tags", err.Error())
@@ -182,8 +183,7 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 		return
 	}
 
-	err := core.DeleteVolume(ctx, r.provider, state.Id.ValueString(), state.LinkVM.VmID.ValueString(), "")
-	if err != nil {
+	if err := core.DeleteVolume(ctx, r.provider, state.Id.ValueString(), state.LinkVM.VmID.ValueString(), ""); err != nil {
 		response.Diagnostics.AddError("failed to delete volume", err.Error())
 		return
 	}
