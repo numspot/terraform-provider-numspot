@@ -98,14 +98,14 @@ func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID
 	// Nothing in the plan and VM in the state
 	// We need to unlink the volume to the VM in state
 	case stateVM != "" && planVM == "":
-		if err = unlinkVolume(ctx, provider, volumeID, stateVM, planVM); err != nil {
+		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
 			return nil, err
 		}
 
 	// VM in the state, VM in the plan
 	// We need to unlink the volume from the previous VM (in state) and link it to the new VM (in plan) with the device name in the plan
 	case stateVM != "":
-		if err = unlinkVolume(ctx, provider, volumeID, stateVM, planVM); err != nil {
+		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
 			return nil, err
 		}
 		if err = linkVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID, planVM, planDeviceName); err != nil {
@@ -116,9 +116,9 @@ func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID
 	return RetryReadVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID)
 }
 
-func DeleteVolume(ctx context.Context, provider services.IProvider, volumeID, stateVM, planVM string) (err error) {
+func DeleteVolume(ctx context.Context, provider services.IProvider, volumeID, stateVM string) (err error) {
 	if stateVM != "" {
-		if err = unlinkVolume(ctx, provider, volumeID, stateVM, planVM); err != nil {
+		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
 			return err
 		}
 	}
@@ -157,7 +157,7 @@ func ReadVolume(ctx context.Context, provider services.IProvider, volumeID strin
 	return numSpotReadVolume.JSON200, err
 }
 
-func unlinkVolume(ctx context.Context, provider services.IProvider, volumeID, stateVM, planVM string) (err error) {
+func unlinkVolume(ctx context.Context, provider services.IProvider, volumeID, stateVM string) (err error) {
 	volume, err := ReadVolume(ctx, provider, volumeID)
 	if err != nil {
 		return err
