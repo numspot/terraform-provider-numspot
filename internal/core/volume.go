@@ -49,9 +49,6 @@ func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, nu
 	if err = vm.StopVmNoDiag(ctx, provider, stateVM); err != nil {
 		return nil, err
 	}
-	if err = vm.StopVmNoDiag(ctx, provider, planVM); err != nil {
-		return nil, err
-	}
 
 	var updateVolumeResponse *numspot.UpdateVolumeResponse
 	if updateVolumeResponse, err = provider.GetNumspotClient().UpdateVolumeWithResponse(ctx, provider.GetSpaceID(), volumeID, numSpotVolumeUpdate); err != nil {
@@ -63,9 +60,6 @@ func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, nu
 
 	// Starting back up the VM making it a hot volume
 	if err = vm.StartVmNoDiag(ctx, provider, stateVM); err != nil {
-		return nil, err
-	}
-	if err = vm.StartVmNoDiag(ctx, provider, planVM); err != nil {
 		return nil, err
 	}
 
@@ -87,29 +81,16 @@ func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID
 	pendingStates := pendingState{creating, updating}
 	targetStates := targetState{available, inUse}
 
-	switch {
-	// Nothing in the state and VM in the plan
-	// We link the volume to the VM in the plan
-	case stateVM == "" && planVM != "":
-		if err = linkVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID, planVM, planDeviceName); err != nil {
-			return nil, err
-		}
-
-	// Nothing in the plan and VM in the state
-	// We need to unlink the volume to the VM in state
-	case stateVM != "" && planVM == "":
-		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
-			return nil, err
-		}
-
-	// VM in the state, VM in the plan
-	// We need to unlink the volume from the previous VM (in state) and link it to the new VM (in plan) with the device name in the plan
-	case stateVM != "":
-		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
-			return nil, err
-		}
-		if err = linkVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID, planVM, planDeviceName); err != nil {
-			return nil, err
+	if stateVM != planVM {
+		switch {
+		case stateVM != "":
+			if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
+				return nil, err
+			}
+		case planVM != "":
+			if err = linkVolume(ctx, provider, pendingStates, targetStates, updateOp, volumeID, planVM, planDeviceName); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -202,7 +183,10 @@ func linkVolume(ctx context.Context, provider services.IProvider, pendingStates 
 		Delay:   utils.TfRequestRetryDelay,
 		Refresh: func() (interface{}, string, error) {
 			var volume *numspot.Volume
-			volume, err = RetryReadVolume(ctx, provider, pendingStates, targetStates, op, volumeID)
+			if volume, err = RetryReadVolume(ctx, provider, pendingStates, targetStates, op, volumeID); err != nil {
+				return nil, "", err
+			}
+
 			if len(*volume.LinkedVolumes) > 0 {
 				linkState := (*volume.LinkedVolumes)[0].State
 				return volume, *linkState, nil
