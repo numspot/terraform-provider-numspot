@@ -91,7 +91,6 @@ resource "numspot_vm" "vm" {
 
 ### Optional
 
-- `block_device_mappings` (Attributes List) One or more block device mappings. (see [below for nested schema](#nestedatt--block_device_mappings))
 - `client_token` (String) A unique identifier which enables you to manage the idempotency.
 - `deletion_protection` (Boolean) If true, you cannot delete the VM unless you change this parameter back to false.
 - `keypair_name` (String) The name of the keypair.
@@ -110,6 +109,7 @@ resource "numspot_vm" "vm" {
 ### Read-Only
 
 - `architecture` (String) The architecture of the VM (`i386` \| `x86_64`).
+- `block_device_mappings` (Attributes List) One or more block device mappings. (see [below for nested schema](#nestedatt--block_device_mappings))
 - `creation_date` (String) The date and time of creation of the VM.
 - `hypervisor` (String) The hypervisor type of the VMs (`ovm` \| `xen`).
 - `id` (String) The ID of the VM.
@@ -130,37 +130,6 @@ resource "numspot_vm" "vm" {
 - `state_reason` (String) The reason explaining the current state of the VM.
 - `vpc_id` (String) The ID of the Vpc in which the VM is running.
 
-<a id="nestedatt--block_device_mappings"></a>
-### Nested Schema for `block_device_mappings`
-
-Optional:
-
-- `bsu` (Attributes) Information about the BSU volume to create. (see [below for nested schema](#nestedatt--block_device_mappings--bsu))
-- `device_name` (String) The device name for the volume. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`).
-- `no_device` (String) Removes the device which is included in the block device mapping of the OMI.
-- `virtual_device_name` (String) The name of the virtual device (`ephemeralN`).
-
-<a id="nestedatt--block_device_mappings--bsu"></a>
-### Nested Schema for `block_device_mappings.bsu`
-
-Optional:
-
-- `delete_on_vm_deletion` (Boolean) By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.
-- `iops` (Number) The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
-- `snapshot_id` (String) The ID of the snapshot used to create the volume.
-- `volume_size` (Number) The size of the volume, in gibibytes (GiB).<br />
-If you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />
-If you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.
-- `volume_type` (String) The type of the volume (`standard` \| `io1` \| `gp2`). If not specified in the request, a `standard` volume is created.<br />
-
-Read-Only:
-
-- `link_date` (String) The date and time of attachment of the volume to the VM, in ISO 8601 date-time format.
-- `state` (String) The state of the volume.
-- `volume_id` (String) The ID of the volume.
-
-
-
 <a id="nestedatt--placement"></a>
 ### Nested Schema for `placement`
 
@@ -177,6 +146,34 @@ Required:
 
 - `key` (String) The key of the tag, with a minimum of 1 character.
 - `value` (String) The value of the tag, between 0 and 255 characters.
+
+
+<a id="nestedatt--block_device_mappings"></a>
+### Nested Schema for `block_device_mappings`
+
+Read-Only:
+
+- `bsu` (Attributes) Information about the BSU volume to create. (see [below for nested schema](#nestedatt--block_device_mappings--bsu))
+- `device_name` (String) The device name for the volume. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`).
+- `no_device` (String) Removes the device which is included in the block device mapping of the OMI.
+- `virtual_device_name` (String) The name of the virtual device (`ephemeralN`).
+
+<a id="nestedatt--block_device_mappings--bsu"></a>
+### Nested Schema for `block_device_mappings.bsu`
+
+Read-Only:
+
+- `delete_on_vm_deletion` (Boolean) By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.
+- `iops` (Number) The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
+- `link_date` (String) The date and time of attachment of the volume to the VM, in ISO 8601 date-time format.
+- `snapshot_id` (String) The ID of the snapshot used to create the volume.
+- `state` (String) The state of the volume.
+- `volume_id` (String) The ID of the volume.
+- `volume_size` (Number) The size of the volume, in gibibytes (GiB).<br />
+If you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />
+If you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.
+- `volume_type` (String) The type of the volume (`standard` \| `io1` \| `gp2`). If not specified in the request, a `standard` volume is created.<br />
+
 
 
 <a id="nestedatt--nics"></a>

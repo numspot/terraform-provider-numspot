@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -81,6 +84,7 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Information about your volume attachment.",
 			},
 			"size": schema.Int64Attribute{
+				Default:             int64default.StaticInt64(10),
 				Optional:            true,
 				Computed:            true,
 				Description:         "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
@@ -99,6 +103,7 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"type": schema.StringAttribute{
+				Default:             stringdefault.StaticString("standard"),
 				Optional:            true,
 				Computed:            true,
 				Description:         "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.<br />",
@@ -108,12 +113,14 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 			"link_vm": schema.SingleNestedAttribute{ // MANUALLY EDITED : Add link_vm attribute
 				Attributes: map[string]schema.Attribute{
 					"device_name": schema.StringAttribute{
+						Default:             stringdefault.StaticString(""),
 						Optional:            true,
 						Computed:            true,
 						Description:         "The name of the device. For a root device, you must use /dev/sda1. For other volumes, you must use /dev/sdX, /dev/sdXX, /dev/xvdX, or /dev/xvdXX (where the first X is a letter between b and z, and the second X is a letter between a and z).",
 						MarkdownDescription: "The name of the device. For a root device, you must use /dev/sda1. For other volumes, you must use /dev/sdX, /dev/sdXX, /dev/xvdX, or /dev/xvdXX (where the first X is a letter between b and z, and the second X is a letter between a and z).",
 					},
 					"vm_id": schema.StringAttribute{
+						Default:             stringdefault.StaticString(""),
 						Optional:            true,
 						Computed:            true,
 						Description:         "The ID of the VM you want to attach the volume to.",
@@ -147,7 +154,6 @@ type VolumeModel struct {
 	Type                 types.String `tfsdk:"type"`
 	LinkVM               LinkVMValue  `tfsdk:"link_vm"` // MANUALLY EDITED : Add link_vm attribute
 	// MANUALLY EDITED : spaceId removed
-
 }
 
 // MANUALLY EDITED : add LinkVMType/LinkVMValue functions

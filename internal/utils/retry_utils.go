@@ -19,7 +19,10 @@ type TfRequestResp interface {
 	StatusCode() int
 }
 
-const TfRequestRetryTimeout = 5 * time.Minute
+const (
+	TfRequestRetryTimeout = 5 * time.Minute
+	TfRequestRetryDelay   = 5 * time.Second
+)
 
 var (
 	StatusCodeRetryOnDelete     = []int{http.StatusConflict, http.StatusFailedDependency}
@@ -156,6 +159,24 @@ func RetryCreateUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
 	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID, body)
+
+		return checkRetryCondition(res, err, StatusCodeStopRetryOnCreate, StatusCodeRetryOnCreate)
+	})
+
+	return res, retryError
+}
+
+func RetryLinkUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
+	ctx context.Context,
+	spaceID numspot.SpaceId,
+	volumeID string,
+	body BodyType,
+	fun func(context.Context, numspot.SpaceId, string, BodyType, ...numspot.RequestEditorFn) (R, error),
+) (R, error) {
+	var res R
+	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+		var err error
+		res, err = fun(ctx, spaceID, volumeID, body)
 
 		return checkRetryCondition(res, err, StatusCodeStopRetryOnCreate, StatusCodeRetryOnCreate)
 	})
