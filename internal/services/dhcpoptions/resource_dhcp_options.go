@@ -81,13 +81,13 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 
 	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
 
-	numSpotDHCPOptions, err := core.CreateDHCPOptions(ctx, r.provider, deserializeDHCPOptions(ctx, plan), tagsValue)
+	numSpotDHCPOptions, err := core.CreateDHCPOptions(ctx, r.provider, deserializeDHCPOption(ctx, plan), tagsValue)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create DHCP options", err.Error())
 		return
 	}
 
-	state, diags := serializeNumSpotDHCPOptions(ctx, numSpotDHCPOptions)
+	state, diags := serializeNumSpotDHCPOption(ctx, numSpotDHCPOptions)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -105,13 +105,13 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 
 	dhcpOptionsID := state.Id.ValueString()
 
-	dhcpOptions, err := core.ReadDHCPOptions(ctx, r.provider, dhcpOptionsID)
+	dhcpOptions, err := core.ReadDHCPOption(ctx, r.provider, dhcpOptionsID)
 	if err != nil {
-		response.Diagnostics.AddError("", "")
+		response.Diagnostics.AddError("unable to read DHCP option", err.Error())
 		return
 	}
 
-	newState, diagnostics := serializeNumSpotDHCPOptions(ctx, dhcpOptions)
+	newState, diagnostics := serializeNumSpotDHCPOption(ctx, dhcpOptions)
 	if diagnostics.HasError() {
 		response.Diagnostics.Append(diagnostics...)
 		return
@@ -150,7 +150,7 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 		}
 	}
 
-	newState, diags := serializeNumSpotDHCPOptions(ctx, numSpotDHCPOptions)
+	newState, diags := serializeNumSpotDHCPOption(ctx, numSpotDHCPOptions)
 	if diags.HasError() {
 		return
 	}
@@ -168,12 +168,12 @@ func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.Delet
 	dhcpOptionsID := state.Id.ValueString()
 
 	if err := core.DeleteDHCPOptions(ctx, r.provider, dhcpOptionsID); err != nil {
-		response.Diagnostics.AddError("failed to delete DHCP Options", err.Error())
+		response.Diagnostics.AddError("unable to delete DHCP Options", err.Error())
 		return
 	}
 }
 
-func deserializeDHCPOptions(ctx context.Context, tf DhcpOptionsModel) numspot.CreateDhcpOptionsJSONRequestBody {
+func deserializeDHCPOption(ctx context.Context, tf DhcpOptionsModel) numspot.CreateDhcpOptionsJSONRequestBody {
 	var domainNameServers, logServers, ntpServers []string
 
 	domainNameServers = make([]string, 0, len(tf.DomainNameServers.Elements()))
@@ -193,7 +193,7 @@ func deserializeDHCPOptions(ctx context.Context, tf DhcpOptionsModel) numspot.Cr
 	}
 }
 
-func serializeNumSpotDHCPOptions(ctx context.Context, http *numspot.DhcpOptionsSet) (DhcpOptionsModel, diag.Diagnostics) {
+func serializeNumSpotDHCPOption(ctx context.Context, http *numspot.DhcpOptionsSet) (DhcpOptionsModel, diag.Diagnostics) {
 	var diagnostics diag.Diagnostics
 	var domainNameServersTf, logServersTf, ntpServersTf, tagsTf types.List
 

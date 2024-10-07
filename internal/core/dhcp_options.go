@@ -25,14 +25,14 @@ func CreateDHCPOptions(ctx context.Context, provider services.IProvider, numSpot
 		}
 	}
 
-	return ReadDHCPOptions(ctx, provider, dhcpOptionsID)
+	return ReadDHCPOption(ctx, provider, dhcpOptionsID)
 }
 
 func UpdateDHCPOptionsTags(ctx context.Context, provider services.IProvider, dhcpOptionsID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.DhcpOptionsSet, error) {
 	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, dhcpOptionsID); err != nil {
 		return nil, err
 	}
-	return ReadDHCPOptions(ctx, provider, dhcpOptionsID)
+	return ReadDHCPOption(ctx, provider, dhcpOptionsID)
 }
 
 func DeleteDHCPOptions(ctx context.Context, provider services.IProvider, dhcpOptionsID string) error {
@@ -46,9 +46,26 @@ func DeleteDHCPOptions(ctx context.Context, provider services.IProvider, dhcpOpt
 	return nil
 }
 
-func ReadDHCPOptions(ctx context.Context, provider services.IProvider, dhcpOptionsID string) (*numspot.DhcpOptionsSet, error) {
-	read, err := provider.GetNumspotClient().ReadDhcpOptionsByIdWithResponse(ctx, provider.GetSpaceID(), dhcpOptionsID)
+func ReadDHCPOptions(ctx context.Context, provider services.IProvider, dhcpOptions numspot.ReadDhcpOptionsParams) (*numspot.ReadDhcpOptionsResponseSchema, error) {
+	read, err := provider.GetNumspotClient().ReadDhcpOptionsWithResponse(ctx, provider.GetSpaceID(), &dhcpOptions)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = utils.ParseHTTPError(read.Body, read.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	return read.JSON200, nil
+}
+
+func ReadDHCPOption(ctx context.Context, provider services.IProvider, dhcpOptionID string) (*numspot.DhcpOptionsSet, error) {
+	read, err := provider.GetNumspotClient().ReadDhcpOptionsByIdWithResponse(ctx, provider.GetSpaceID(), dhcpOptionID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = utils.ParseHTTPError(read.Body, read.StatusCode()); err != nil {
 		return nil, err
 	}
 
