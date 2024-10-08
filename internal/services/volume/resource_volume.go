@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
@@ -78,7 +79,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	state, diags := serializeNumSpotVolume(ctx, numSpotVolume)
+	state, diags := serializeNumSpotVolume(ctx, numSpotVolume, plan.ReplaceVolumeOnDownsize)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -103,7 +104,7 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 		return
 	}
 
-	state, diags := serializeNumSpotVolume(ctx, numSpotVolume)
+	state, diags := serializeNumSpotVolume(ctx, numSpotVolume, state.ReplaceVolumeOnDownsize)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -130,7 +131,8 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	}
 
 	if plan.Size.ValueInt64() < state.Size.ValueInt64() {
-		response.Diagnostics.AddError("volume downscale", "you can't downscale a volume")
+		response.Diagnostics.AddError("volume downsize", fmt.Sprintf("Trying to update volume size from %v to %v. It is not possible to downsize a volume in an update. "+
+			"To force the replace of volume, set attribute 'replace_volume_on_downsize' to true. Note : All data on volume will be lost.", state.Size.ValueInt64(), plan.Size.ValueInt64()))
 		return
 	}
 
@@ -165,7 +167,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		}
 	}
 
-	newState, diags := serializeNumSpotVolume(ctx, numSpotVolume)
+	newState, diags := serializeNumSpotVolume(ctx, numSpotVolume, plan.ReplaceVolumeOnDownsize)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
@@ -187,7 +189,7 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	}
 }
 
-func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume) (VolumeModel, diag.Diagnostics) {
+func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, ReplaceVolumeOnDownsize basetypes.BoolValue) (VolumeModel, diag.Diagnostics) {
 	var (
 		volumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
 		tagsTf  types.List
@@ -233,17 +235,18 @@ func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume) (VolumeMo
 	}
 
 	return VolumeModel{
-		CreationDate:         types.StringValue(http.CreationDate.String()),
-		Id:                   types.StringPointerValue(http.Id),
-		Iops:                 utils.FromIntPtrToTfInt64(http.Iops),
-		Size:                 utils.FromIntPtrToTfInt64(http.Size),
-		SnapshotId:           types.StringPointerValue(http.SnapshotId),
-		State:                types.StringPointerValue(http.State),
-		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
-		Type:                 types.StringPointerValue(http.Type),
-		LinkedVolumes:        volumes,
-		Tags:                 tagsTf,
-		LinkVM:               linkVm,
+		CreationDate:            types.StringValue(http.CreationDate.String()),
+		Id:                      types.StringPointerValue(http.Id),
+		Iops:                    utils.FromIntPtrToTfInt64(http.Iops),
+		Size:                    utils.FromIntPtrToTfInt64(http.Size),
+		SnapshotId:              types.StringPointerValue(http.SnapshotId),
+		State:                   types.StringPointerValue(http.State),
+		AvailabilityZoneName:    types.StringPointerValue(http.AvailabilityZoneName),
+		Type:                    types.StringPointerValue(http.Type),
+		LinkedVolumes:           volumes,
+		Tags:                    tagsTf,
+		LinkVM:                  linkVm,
+		ReplaceVolumeOnDownsize: ReplaceVolumeOnDownsize,
 	}, diags
 }
 

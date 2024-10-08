@@ -17,22 +17,22 @@ import (
 )
 
 type VolumesDataSourceModel struct {
-	Items                        []VolumeModel `tfsdk:"items"`
-	AvailabilityZoneNames        types.List    `tfsdk:"availability_zone_names"`
-	CreationDates                types.List    `tfsdk:"creation_dates"`
-	Ids                          types.List    `tfsdk:"ids"`
-	LinkVolumeDeleteOnVmDeletion types.Bool    `tfsdk:"link_volume_delete_on_vm_deletion"`
-	LinkVolumeDeviceNames        types.List    `tfsdk:"link_volume_device_names"`
-	LinkVolumeLinkDates          types.List    `tfsdk:"link_volume_link_dates"`
-	LinkVolumeLinkStates         types.List    `tfsdk:"link_volume_link_states"`
-	LinkVolumeVmIds              types.List    `tfsdk:"link_volume_vm_ids"`
-	SnapshotIds                  types.List    `tfsdk:"snapshot_ids"`
-	TagKeys                      types.List    `tfsdk:"tag_keys"`
-	TagValues                    types.List    `tfsdk:"tag_values"`
-	Tags                         types.List    `tfsdk:"tags"`
-	VolumeSizes                  types.List    `tfsdk:"volume_sizes"`
-	VolumeStates                 types.List    `tfsdk:"volume_states"`
-	VolumeTypes                  types.List    `tfsdk:"volume_types"`
+	Items                        []DatasourceVolumeModel `tfsdk:"items"`
+	AvailabilityZoneNames        types.List              `tfsdk:"availability_zone_names"`
+	CreationDates                types.List              `tfsdk:"creation_dates"`
+	Ids                          types.List              `tfsdk:"ids"`
+	LinkVolumeDeleteOnVmDeletion types.Bool              `tfsdk:"link_volume_delete_on_vm_deletion"`
+	LinkVolumeDeviceNames        types.List              `tfsdk:"link_volume_device_names"`
+	LinkVolumeLinkDates          types.List              `tfsdk:"link_volume_link_dates"`
+	LinkVolumeLinkStates         types.List              `tfsdk:"link_volume_link_states"`
+	LinkVolumeVmIds              types.List              `tfsdk:"link_volume_vm_ids"`
+	SnapshotIds                  types.List              `tfsdk:"snapshot_ids"`
+	TagKeys                      types.List              `tfsdk:"tag_keys"`
+	TagValues                    types.List              `tfsdk:"tag_values"`
+	Tags                         types.List              `tfsdk:"tags"`
+	VolumeSizes                  types.List              `tfsdk:"volume_sizes"`
+	VolumeStates                 types.List              `tfsdk:"volume_states"`
+	VolumeTypes                  types.List              `tfsdk:"volume_types"`
 }
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -138,7 +138,7 @@ func deserializeNumSpotVolumeDataSource(ctx context.Context, tf VolumesDataSourc
 	}
 }
 
-func serializeNumSpotDataSource(ctx context.Context, http *numspot.Volume) (*VolumeModel, diag.Diagnostics) {
+func serializeNumSpotDataSource(ctx context.Context, http *numspot.Volume) (*DatasourceVolumeModel, diag.Diagnostics) {
 	var (
 		linkedVolumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
 		diags         diag.Diagnostics
@@ -164,7 +164,7 @@ func serializeNumSpotDataSource(ctx context.Context, http *numspot.Volume) (*Vol
 		}
 	}
 
-	return &VolumeModel{
+	return &DatasourceVolumeModel{
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		CreationDate:         types.StringValue(http.CreationDate.String()),
 		Id:                   types.StringPointerValue(http.Id),

@@ -237,6 +237,21 @@ func VolumeDataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
+type DatasourceVolumeModel struct {
+	AvailabilityZoneName types.String `tfsdk:"availability_zone_name"`
+	CreationDate         types.String `tfsdk:"creation_date"`
+	Id                   types.String `tfsdk:"id"`
+	Iops                 types.Int64  `tfsdk:"iops"`
+	LinkedVolumes        types.List   `tfsdk:"linked_volumes"`
+	Size                 types.Int64  `tfsdk:"size"`
+	SnapshotId           types.String `tfsdk:"snapshot_id"`
+	State                types.String `tfsdk:"state"`
+	Tags                 types.List   `tfsdk:"tags"`
+	Type                 types.String `tfsdk:"type"`
+	LinkVM               LinkVMValue  `tfsdk:"link_vm"` // MANUALLY EDITED : Add link_vm attribute
+	// MANUALLY EDITED : spaceId removed
+}
+
 // MANUALLY EDITED : Model declaration removed
 
 // MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

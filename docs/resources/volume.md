@@ -63,6 +63,7 @@ resource "numspot_volume" "volume" {
 
 - `iops` (Number) The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.
 - `link_vm` (Attributes) VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded. (see [below for nested schema](#nestedatt--link_vm))
+- `replace_volume_on_downsize` (Boolean) If replace_volume_on_downsize is set to 'true' and volume size is reduced, the volume will be deleted and recreated.  WARNING : All data on the volume will be lost. Default is false
 - `size` (Number) The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified).
 - `snapshot_id` (String) The ID of the snapshot from which you want to create the volume.
 - `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))

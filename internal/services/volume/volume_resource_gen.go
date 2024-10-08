@@ -7,7 +7,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -89,6 +92,37 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
 				MarkdownDescription: "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified). ",
+				PlanModifiers: []planmodifier.Int64{ // MANUALLY EDITED : Adds RequireReplaceIf
+					int64planmodifier.RequiresReplaceIf(
+						func(ctx context.Context, req planmodifier.Int64Request, resp *int64planmodifier.RequiresReplaceIfFuncResponse) {
+							resp.RequiresReplace = false
+
+							var state, plan VolumeModel
+							resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+							resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+							if resp.Diagnostics.HasError() {
+								return
+							}
+
+							stateSize := state.Size.ValueInt64()
+							planSize := plan.Size.ValueInt64()
+							ReplaceVolumeOnDownsize := plan.ReplaceVolumeOnDownsize.ValueBool()
+
+							if planSize < stateSize && ReplaceVolumeOnDownsize {
+								resp.RequiresReplace = true
+							}
+						},
+						"If planned volume size is smaller than current size and 'replace_volume_on_downsize' is set to true, the volume will be replaced.",
+						"If planned volume size is smaller than current size and 'replace_volume_on_downsize' is set to true, the volume will be replaced.",
+					),
+				},
+			},
+			"replace_volume_on_downsize": schema.BoolAttribute{ // MANUALLY EDITED : Adds replace_volume_on_downsize attribute
+				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(false),
+				Description:         "If replace_volume_on_downsize is set to 'true' and volume size is reduced, the volume will be deleted and recreated.  WARNING : All data on the volume will be lost. Default is false",
+				MarkdownDescription: "If replace_volume_on_downsize is set to 'true' and volume size is reduced, the volume will be deleted and recreated.  WARNING : All data on the volume will be lost. Default is false",
 			},
 			"snapshot_id": schema.StringAttribute{
 				Optional:            true,
@@ -142,17 +176,18 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type VolumeModel struct {
-	AvailabilityZoneName types.String `tfsdk:"availability_zone_name"`
-	CreationDate         types.String `tfsdk:"creation_date"`
-	Id                   types.String `tfsdk:"id"`
-	Iops                 types.Int64  `tfsdk:"iops"`
-	LinkedVolumes        types.List   `tfsdk:"linked_volumes"`
-	Size                 types.Int64  `tfsdk:"size"`
-	SnapshotId           types.String `tfsdk:"snapshot_id"`
-	State                types.String `tfsdk:"state"`
-	Tags                 types.List   `tfsdk:"tags"`
-	Type                 types.String `tfsdk:"type"`
-	LinkVM               LinkVMValue  `tfsdk:"link_vm"` // MANUALLY EDITED : Add link_vm attribute
+	AvailabilityZoneName    types.String `tfsdk:"availability_zone_name"`
+	CreationDate            types.String `tfsdk:"creation_date"`
+	Id                      types.String `tfsdk:"id"`
+	Iops                    types.Int64  `tfsdk:"iops"`
+	LinkedVolumes           types.List   `tfsdk:"linked_volumes"`
+	Size                    types.Int64  `tfsdk:"size"`
+	SnapshotId              types.String `tfsdk:"snapshot_id"`
+	State                   types.String `tfsdk:"state"`
+	Tags                    types.List   `tfsdk:"tags"`
+	Type                    types.String `tfsdk:"type"`
+	LinkVM                  LinkVMValue  `tfsdk:"link_vm"`                    // MANUALLY EDITED : Add link_vm attribute
+	ReplaceVolumeOnDownsize types.Bool   `tfsdk:"replace_volume_on_downsize"` // MANUALLY EDITED : Add replace_volume_on_downsize attribute
 	// MANUALLY EDITED : spaceId removed
 }
 
@@ -857,14 +892,12 @@ func (t LinkedVolumesType) ValueFromTerraform(ctx context.Context, in tftypes.Va
 	val := map[string]tftypes.Value{}
 
 	err := in.As(&val)
-
 	if err != nil {
 		return nil, err
 	}
 
 	for k, v := range val {
 		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
 		if err != nil {
 			return nil, err
 		}
@@ -909,7 +942,6 @@ func (v LinkedVolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		vals := make(map[string]tftypes.Value, 5)
 
 		val, err = v.DeleteOnVmDeletion.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -917,7 +949,6 @@ func (v LinkedVolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		vals["delete_on_vm_deletion"] = val
 
 		val, err = v.DeviceName.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -925,7 +956,6 @@ func (v LinkedVolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		vals["device_name"] = val
 
 		val, err = v.Id.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -933,7 +963,6 @@ func (v LinkedVolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		vals["id"] = val
 
 		val, err = v.State.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
@@ -941,7 +970,6 @@ func (v LinkedVolumesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		vals["state"] = val
 
 		val, err = v.VmId.ToTerraformValue(ctx)
-
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
