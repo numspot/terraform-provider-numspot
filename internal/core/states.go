@@ -12,6 +12,7 @@ const (
 	attached  = "attached"
 	creating  = "creating"
 	updating  = "updating"
+	pending   = "pending"
 	running   = "running"
 	stopped   = "stopped"
 	created   = "created"

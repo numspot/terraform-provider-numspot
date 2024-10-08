@@ -3,12 +3,13 @@ package clientgateway
 import (
 	"context"
 	"fmt"
-	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
-
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -59,132 +60,133 @@ func (r *ClientGatewayResource) Schema(ctx context.Context, request resource.Sch
 }
 
 func (r *ClientGatewayResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data ClientGatewayModel
-	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	// Retries create until request response is OK
-	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
-		ctx,
-		r.provider.GetSpaceID(),
-		ClientGatewayFromTfToCreateRequest(&data),
-		r.provider.GetNumspotClient().CreateClientGatewayWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Client Gateway", err.Error())
-		return
-	}
-
-	createdId := *res.JSON201.Id
-	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, createdId, data.Tags)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
-
-	// Retries read on resource until state is OK
-	read, err := utils.RetryReadUntilStateValid(
-		ctx,
-		createdId,
-		r.provider.GetSpaceID(),
-		[]string{"pending"},
-		[]string{"available"},
-		r.provider.GetNumspotClient().ReadClientGatewaysByIdWithResponse,
-	)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Client Gateways", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
-		return
-	}
-
-	rr, ok := read.(*numspot.ClientGateway)
-	if !ok {
-		response.Diagnostics.AddError("Failed to create client-gateway", "object conversion error")
-		return
-	}
-
-	tf := ClientGatewayFromHttpToTf(ctx, rr, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
-}
-
-func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var data ClientGatewayModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
-
-	res := utils.ExecuteRequest(func() (*numspot.ReadClientGatewaysByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadClientGatewaysByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	tf := ClientGatewayFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
-}
-
-func (r *ClientGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var state, plan ClientGatewayModel
-	modifications := false
-
-	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	var plan ClientGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if !state.Tags.Equal(plan.Tags) {
-		tags.UpdateTags(
-			ctx,
-			state.Tags,
-			plan.Tags,
-			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
-			state.Id.ValueString(),
-		)
-		if response.Diagnostics.HasError() {
-			return
-		}
-		modifications = true
-	}
+	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
 
-	if !modifications {
+	clientGateway, err := core.CreateClientGateway(ctx, r.provider, deserializeCreateClientGateway(plan), tagsValue)
+	if err != nil {
+		response.Diagnostics.AddError("", err.Error())
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadClientGatewaysByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadClientGatewaysByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	state, diags := serializeClientGateway(ctx, clientGateway)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 		return
 	}
 
-	tf := ClientGatewayFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+	var state ClientGatewayModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+
+	clientGatewayID := state.Id.ValueString()
+
+	numSpotClientGateway, err := core.ReadClientGateway(ctx, r.provider, clientGatewayID)
+	if err != nil {
+		response.Diagnostics.AddError("", err.Error())
+		return
+	}
+
+	state, diags := serializeClientGateway(ctx, numSpotClientGateway)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func (r *ClientGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+	var (
+		err                  error
+		numSpotClientGateway *numspot.ClientGateway
+		state, plan          ClientGatewayModel
+		diags                diag.Diagnostics
+	)
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
-}
-
-func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data ClientGatewayModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
-
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteClientGatewayWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete Client Gateway", err.Error())
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.State.RemoveResource(ctx)
+	clientGatewayID := state.Id.ValueString()
+	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+
+	if !state.Tags.Equal(plan.Tags) {
+		numSpotClientGateway, err = core.UpdateClientGatewayTags(ctx, r.provider, stateTags, planTags, clientGatewayID)
+		if err != nil {
+			response.Diagnostics.AddError("", err.Error())
+			return
+		}
+	}
+
+	state, diags = serializeClientGateway(ctx, numSpotClientGateway)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+	var state ClientGatewayModel
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	clientGatewayID := state.Id.ValueString()
+
+	err := core.DeleteClientGateway(ctx, r.provider, clientGatewayID)
+	if err != nil {
+		response.Diagnostics.AddError("", err.Error())
+		return
+	}
+}
+
+func deserializeCreateClientGateway(tf ClientGatewayModel) numspot.CreateClientGatewayJSONRequestBody {
+	return numspot.CreateClientGatewayJSONRequestBody{
+		BgpAsn:         utils.FromTfInt64ToInt(tf.BgpAsn),
+		ConnectionType: tf.ConnectionType.ValueString(),
+		PublicIp:       tf.PublicIp.ValueString(),
+	}
+}
+
+func serializeClientGateway(ctx context.Context, http *numspot.ClientGateway) (ClientGatewayModel, diag.Diagnostics) {
+	var (
+		tagsTf types.List
+		diags  diag.Diagnostics
+	)
+
+	if http.Tags != nil {
+		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		if diags.HasError() {
+			return ClientGatewayModel{}, diags
+		}
+	}
+
+	return ClientGatewayModel{
+		BgpAsn:         utils.FromIntPtrToTfInt64(http.BgpAsn),
+		ConnectionType: types.StringPointerValue(http.ConnectionType),
+		Id:             types.StringPointerValue(http.Id),
+		PublicIp:       types.StringPointerValue(http.PublicIp),
+		State:          types.StringPointerValue(http.State),
+		Tags:           tagsTf,
+	}, diags
 }
