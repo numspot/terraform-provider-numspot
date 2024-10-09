@@ -3,13 +3,15 @@ package dhcpoptions
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -70,28 +72,22 @@ func (d *dhcpOptionsDataSource) Schema(ctx context.Context, _ datasource.SchemaR
 // Read refreshes the Terraform state with the latest data.
 func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan DHCPOptionsDataSourceModel
+	var diags diag.Diagnostics
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	params := DhcpOptionsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
+	params := dhcpOptionsFromTfToAPIReadParams(ctx, plan, &diags)
+
+	dhcpOptions, err := core.ReadDHCPOptions(ctx, d.provider, params)
+	if err != nil {
 		return
 	}
-	res := utils.ExecuteRequest(func() (*numspot.ReadDhcpOptionsResponse, error) {
-		return d.provider.GetNumspotClient().ReadDhcpOptionsWithResponse(ctx, d.provider.GetSpaceID(), &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty DHCP options list")
-	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, DHCPOptionsFromHttpToTfDatasource, &response.Diagnostics)
-
-	if response.Diagnostics.HasError() {
+	objectItems := utils.FromHttpGenericListToTfList(ctx, dhcpOptions.Items, dhcpOptionsFromHttpToTfDatasource, &diags)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
 		return
 	}
 
@@ -99,4 +95,58 @@ func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.Rea
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func dhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSourceModel, diags *diag.Diagnostics) numspot.ReadDhcpOptionsParams {
+	ids := utils.TfStringListToStringPtrList(ctx, tf.IDs, diags)
+	domainNames := utils.TfStringListToStringPtrList(ctx, tf.DomainNames, diags)
+	dnsServers := utils.TfStringListToStringPtrList(ctx, tf.DomainNameServers, diags)
+	logServers := utils.TfStringListToStringPtrList(ctx, tf.LogServers, diags)
+	ntpServers := utils.TfStringListToStringPtrList(ctx, tf.NTPServers, diags)
+	tagKeys := utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags)
+	tagValues := utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags)
+	tags := utils.TfStringListToStringPtrList(ctx, tf.Tags, diags)
+
+	return numspot.ReadDhcpOptionsParams{
+		Default:           tf.Default.ValueBoolPointer(),
+		DomainNameServers: dnsServers,
+		DomainNames:       domainNames,
+		LogServers:        logServers,
+		NtpServers:        ntpServers,
+		TagKeys:           tagKeys,
+		TagValues:         tagValues,
+		Tags:              tags,
+		Ids:               ids,
+	}
+}
+
+func dhcpOptionsFromHttpToTfDatasource(ctx context.Context, http *numspot.DhcpOptionsSet, diags *diag.Diagnostics) *DhcpOptionsModel {
+	var tagsList types.List
+	dnsServers := utils.FromStringListPointerToTfStringList(ctx, http.DomainNameServers, diags)
+	if diags.HasError() {
+		return nil
+	}
+	logServers := utils.FromStringListPointerToTfStringList(ctx, http.LogServers, diags)
+	if diags.HasError() {
+		return nil
+	}
+	ntpServers := utils.FromStringListPointerToTfStringList(ctx, http.NtpServers, diags)
+	if diags.HasError() {
+		return nil
+	}
+	if http.Tags != nil {
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		if diags.HasError() {
+			return nil
+		}
+	}
+	return &DhcpOptionsModel{
+		Default:           types.BoolPointerValue(http.Default),
+		DomainName:        types.StringPointerValue(http.DomainName),
+		DomainNameServers: dnsServers,
+		Id:                types.StringPointerValue(http.Id),
+		LogServers:        logServers,
+		NtpServers:        ntpServers,
+		Tags:              tagsList,
+	}
 }

@@ -5,18 +5,22 @@ package dhcpoptions
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
 func DhcpOptionsResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The ID of the DHCP options set.",
+				MarkdownDescription: "The ID of the DHCP options set.",
+			},
 			"default": schema.BoolAttribute{
 				Computed:            true,
 				Description:         "If true, the DHCP options set is a default one. If false, it is not.",
@@ -37,11 +41,9 @@ func DhcpOptionsResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The IPs of domain name servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
 				MarkdownDescription: "The IPs of domain name servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
-			},
-			"id": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The ID of the DHCP options set.",
-				MarkdownDescription: "The ID of the DHCP options set.",
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"log_servers": schema.ListAttribute{
 				ElementType:         types.StringType,
