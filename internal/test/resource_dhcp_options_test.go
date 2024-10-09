@@ -23,15 +23,15 @@ func TestAccDHCPOptionsResource(t *testing.T) {
 			// Step 1 - Create DHCP Options with domain name
 			{
 				Config: `
-						resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
-						  domain_name = "domain.name"
-						  tags = [
-							{
-							  key   = "name"
-							  value = "terraform-dhcp-options-acctest"
-							}
-						  ]
-						}
+resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
+  domain_name = "domain.name"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-dhcp-options-acctest"
+    }
+  ]
+}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "domain_name", "domain.name"),
@@ -52,15 +52,15 @@ func TestAccDHCPOptionsResource(t *testing.T) {
 			// Step 3 - Replace DHCP Options domain name
 			{
 				Config: `
-						resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
-						  domain_name = "domain.name.replaced"
-						  tags = [
-							{
-							  key   = "name"
-							  value = "terraform-dhcp-options-acctest"
-							}
-						  ]
-						}
+resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
+  domain_name = "domain.name.replaced"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-dhcp-options-acctest"
+    }
+  ]
+}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "domain_name", "domain.name.replaced"),
@@ -74,15 +74,15 @@ func TestAccDHCPOptionsResource(t *testing.T) {
 			// Step 4 - Update DHCP Options tags
 			{
 				Config: `
-						resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
-						  domain_name = "domain.name.replaced"
-						  tags = [
-							{
-							  key   = "name"
-							  value = "terraform-dhcp-options-acctest-update"
-							}
-						  ]
-						}
+resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
+  domain_name = "domain.name.replaced"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-dhcp-options-acctest-update"
+    }
+  ]
+}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "domain_name", "domain.name.replaced"),
@@ -101,18 +101,18 @@ func TestAccDHCPOptionsResource(t *testing.T) {
 			// Step 6 - Create DHCP Options with domain name servers
 			{
 				Config: `
-						resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
-						  domain_name_servers = ["192.0.0.1", "192.0.0.2"]
-						  tags = [
-							{
-							  key   = "name"
-							  value = "terraform-dhcp-options-acctest"
-							}
-						  ]
-						}
+resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
+  domain_name_servers = ["192.0.0.1", "192.0.0.2"]
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-dhcp-options-acctest"
+    }
+  ]
+}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					//resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "domain_name", "domain.name"),
+					// resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "domain_name", "domain.name"),
 					resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.#", "1"),
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.*", map[string]string{
 						"key":   "name",
@@ -123,18 +123,18 @@ func TestAccDHCPOptionsResource(t *testing.T) {
 			// Step 7 - Replace DHCP Options with domain name servers
 			{
 				Config: `
-						resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
-						  domain_name_servers = ["192.0.0.3", "192.0.0.4"]
-						  tags = [
-							{
-							  key   = "name"
-							  value = "terraform-dhcp-options-acctest"
-							}
-						  ]
-						}
+resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
+  domain_name_servers = ["192.0.0.3", "192.0.0.4"]
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-dhcp-options-acctest"
+    }
+  ]
+}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					//resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest-replaced", "domain_name_servers", "domain.name"),
+					// resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest-replaced", "domain_name_servers", "domain.name"),
 					resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.#", "1"),
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.*", map[string]string{
 						"key":   "name",
@@ -150,18 +150,18 @@ func TestAccDHCPOptionsResource(t *testing.T) {
 			// Step 9 - Create DHCP Options with log servers
 			{
 				Config: `
-						resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
-						  log_servers = ["192.0.0.1", "192.0.0.2"]
-						  tags = [
-							{
-							  key   = "name"
-							  value = "terraform-dhcp-options-acctest"
-							}
-						  ]
-						}
+resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
+  log_servers = ["192.0.0.1", "192.0.0.2"]
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-dhcp-options-acctest"
+    }
+  ]
+}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					//resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "log_servers", "domain.name"),
+					// resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "log_servers", "domain.name"),
 					resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.#", "1"),
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.*", map[string]string{
 						"key":   "name",
@@ -172,18 +172,18 @@ func TestAccDHCPOptionsResource(t *testing.T) {
 			// Step 10 - Replace DHCP Options with log servers
 			{
 				Config: `
-						resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
-						  log_servers = ["192.0.0.3", "192.0.0.4"]
-						  tags = [
-							{
-							  key   = "name"
-							  value = "terraform-dhcp-options-acctest"
-							}
-						  ]
-						}
+resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
+  log_servers = ["192.0.0.3", "192.0.0.4"]
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-dhcp-options-acctest"
+    }
+  ]
+}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					//resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest-replaced", "domain_name", "domain.name"),
+					// resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest-replaced", "domain_name", "domain.name"),
 					resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.#", "1"),
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.*", map[string]string{
 						"key":   "name",
@@ -199,18 +199,18 @@ func TestAccDHCPOptionsResource(t *testing.T) {
 			// Step 12 - Create DHCP Options with NTP servers
 			{
 				Config: `
-						resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
-						  ntp_servers = ["192.0.0.1", "192.0.0.2"]
-						  tags = [
-							{
-							  key   = "name"
-							  value = "terraform-dhcp-options-acctest"
-							}
-						  ]
-						}
+resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
+  ntp_servers = ["192.0.0.1", "192.0.0.2"]
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-dhcp-options-acctest"
+    }
+  ]
+}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					//resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "domain_name", "domain.name"),
+					// resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "domain_name", "domain.name"),
 					resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.#", "1"),
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.*", map[string]string{
 						"key":   "name",
@@ -221,18 +221,18 @@ func TestAccDHCPOptionsResource(t *testing.T) {
 			// Step 13 - Replace DHCP Options with NTP servers
 			{
 				Config: `
-						resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
-						  ntp_servers = ["192.0.0.3", "192.0.0.4"]
-						  tags = [
-							{
-							  key   = "name"
-							  value = "terraform-dhcp-options-acctest"
-							}
-						  ]
-						}
+resource "numspot_dhcp_options" "terraform-dhcp-options-acctest" {
+  ntp_servers = ["192.0.0.3", "192.0.0.4"]
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-dhcp-options-acctest"
+    }
+  ]
+}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					//resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest-replaced", "domain_name", "domain.name"),
+					// resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest-replaced", "domain_name", "domain.name"),
 					resource.TestCheckResourceAttr("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.#", "1"),
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_dhcp_options.terraform-dhcp-options-acctest", "tags.*", map[string]string{
 						"key":   "name",

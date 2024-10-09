@@ -4,16 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
-
-	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/types"
-
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -98,15 +96,6 @@ func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.Rea
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
-func dhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSourceModel) numspot.ReadDhcpOptionsParams {
-	ids := utils.TfStringListToStringPtrList(ctx, tf.IDs)
-	domainNames := utils.TfStringListToStringPtrList(ctx, tf.DomainNames)
-	dnsServers := utils.TfStringListToStringPtrList(ctx, tf.DomainNameServers)
-	logServers := utils.TfStringListToStringPtrList(ctx, tf.LogServers)
-	ntpServers := utils.TfStringListToStringPtrList(ctx, tf.NTPServers)
-	tagKeys := utils.TfStringListToStringPtrList(ctx, tf.TagKeys)
-	tagValues := utils.TfStringListToStringPtrList(ctx, tf.TagValues)
-	tags := utils.TfStringListToStringPtrList(ctx, tf.Tags)
 
 func dhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSourceModel, diags *diag.Diagnostics) numspot.ReadDhcpOptionsParams {
 	ids := utils.TfStringListToStringPtrList(ctx, tf.IDs, diags)
