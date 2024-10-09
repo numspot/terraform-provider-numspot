@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type FlexibleGpuDataSourceModel struct {
@@ -73,8 +73,8 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 		return
 	}
 
-	params := FlexibleGpusFromTfToAPIReadParams(ctx, plan)
-	res := utils2.ExecuteRequest(func() (*numspot.ReadFlexibleGpusResponse, error) {
+	params := FlexibleGpusFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	res := utils.ExecuteRequest(func() (*numspot.ReadFlexibleGpusResponse, error) {
 		return d.provider.GetNumspotClient().ReadFlexibleGpusWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -84,10 +84,9 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 		response.Diagnostics.AddError("HTTP call failed", "got empty FlexibleGpus list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, FlexibleGpusFromHttpToTfDatasource)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, FlexibleGpusFromHttpToTfDatasource, &response.Diagnostics)
 
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

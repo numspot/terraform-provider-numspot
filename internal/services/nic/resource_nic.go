@@ -70,7 +70,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
-		NicFromTfToCreateRequest(ctx, &plan),
+		NicFromTfToCreateRequest(ctx, &plan, &response.Diagnostics),
 		r.provider.GetNumspotClient().CreateNicWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create NIC", err.Error())
@@ -85,16 +85,14 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		}
 	}
 
-	tf, diags := r.refreshNICState(ctx, createdId, []string{"attaching"}, []string{"available", "in-use"})
-	response.Diagnostics.Append(diags...)
+	tf := r.refreshNICState(ctx, createdId, []string{"attaching"}, []string{"available", "in-use"}, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	if !utils.IsTfValueNull(plan.LinkNic.VmId) && !utils.IsTfValueNull(plan.LinkNic.DeviceNumber) {
-		tf, diags = r.linkNIC(ctx, &plan, tf)
+		tf = r.linkNIC(ctx, &plan, tf, &response.Diagnostics)
 
-		response.Diagnostics.Append(diags...)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -114,9 +112,8 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 		return
 	}
 
-	tf, diagnostics := NicFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	tf := NicFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -153,16 +150,15 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 	if !utils.IsTfValueNull(plan.LinkNic) &&
 		!utils.IsTfValueNull(plan.LinkNic.VmId) && !state.LinkNic.VmId.Equal(plan.LinkNic.VmId) ||
 		!utils.IsTfValueNull(plan.LinkNic.DeviceNumber) && !state.LinkNic.DeviceNumber.Equal(plan.LinkNic.DeviceNumber) {
-		_, diags := r.updateLinkNIC(ctx, &plan, &state)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		_ = r.updateLinkNIC(ctx, &plan, &state, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
 	// Update Nic
 	if r.shouldUpdate(plan, state) {
-		body := NicFromTfToUpdaterequest(ctx, &plan)
+		body := NicFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
 		res, err := r.provider.GetNumspotClient().UpdateNicWithResponse(ctx, r.provider.GetSpaceID(), nicId, body)
 		if err != nil {
 			response.Diagnostics.AddError("failed to update nic", err.Error())
@@ -182,9 +178,8 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 		return
 	}
 
-	tf, diagnostics := NicFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	tf := NicFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -199,8 +194,8 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	}
 
 	if !utils.IsTfValueNull(data.LinkNic) {
-		tf, diags := r.unlinkNIC(ctx, &data)
-		if diags.HasError() {
+		tf := r.unlinkNIC(ctx, &data, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 		response.Diagnostics.Append(request.State.Set(ctx, tf)...)
@@ -213,68 +208,64 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	}
 }
 
-func (r *NicResource) updateLinkNIC(ctx context.Context, plan, state *NicModel) (*NicModel, diag.Diagnostics) {
+func (r *NicResource) updateLinkNIC(ctx context.Context, plan, state *NicModel, diags *diag.Diagnostics) *NicModel {
 	var tf *NicModel
-	diags := diag.Diagnostics{}
 	if state.LinkNic.VmId.Equal(plan.LinkNic.VmId) &&
 		state.LinkNic.DeviceNumber.Equal(plan.LinkNic.DeviceNumber) {
-		return state, diags
+		return state
 	}
 
 	if !utils.IsTfValueNull(state.LinkNic) {
-		tf, diags = r.unlinkNIC(ctx, state)
+		tf = r.unlinkNIC(ctx, state, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
 	if !utils.IsTfValueNull(plan.LinkNic) {
-		tf, diags = r.linkNIC(ctx, plan, tf)
+		tf = r.linkNIC(ctx, plan, tf, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
-	return tf, diags
+	return tf
 }
 
-func (r *NicResource) linkNIC(ctx context.Context, plan, state *NicModel) (*NicModel, diag.Diagnostics) {
-	diags := diag.Diagnostics{}
+func (r *NicResource) linkNIC(ctx context.Context, plan, state *NicModel, diags *diag.Diagnostics) *NicModel {
 	resLink := utils.ExecuteRequest(func() (*numspot.LinkNicResponse, error) {
 		return r.provider.GetNumspotClient().LinkNicWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString(), NicFromTfToLinkNICRequest(plan))
-	}, http.StatusOK, &diags)
+	}, http.StatusOK, diags)
 	if resLink == nil {
-		return nil, diags
+		return nil
 	}
 
-	tf, diags := r.refreshNICState(ctx, state.Id.ValueString(), []string{"available"}, []string{"in-use"})
+	tf := r.refreshNICState(ctx, state.Id.ValueString(), []string{"available"}, []string{"in-use"}, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	return tf, nil
+	return tf
 }
 
-func (r *NicResource) unlinkNIC(ctx context.Context, state *NicModel) (*NicModel, diag.Diagnostics) {
-	diags := diag.Diagnostics{}
+func (r *NicResource) unlinkNIC(ctx context.Context, state *NicModel, diags *diag.Diagnostics) *NicModel {
 	payload := numspot.UnlinkNicJSONRequestBody{LinkNicId: state.LinkNic.Id.ValueString()}
 	resLink := utils.ExecuteRequest(func() (*numspot.UnlinkNicResponse, error) {
 		return r.provider.GetNumspotClient().UnlinkNicWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString(), payload)
-	}, http.StatusNoContent, &diags)
+	}, http.StatusNoContent, diags)
 	if resLink == nil {
-		return nil, diags
+		return nil
 	}
 
-	tf, diags := r.refreshNICState(ctx, state.Id.ValueString(), []string{"in-use"}, []string{"available"})
+	tf := r.refreshNICState(ctx, state.Id.ValueString(), []string{"in-use"}, []string{"available"}, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	return tf, nil
+	return tf
 }
 
-func (r *NicResource) refreshNICState(ctx context.Context, id string, startState, targetState []string) (*NicModel, diag.Diagnostics) {
-	diags := diag.Diagnostics{}
+func (r *NicResource) refreshNICState(ctx context.Context, id string, startState, targetState []string, diags *diag.Diagnostics) *NicModel {
 	// Retries read on resource until state is OK
 	readRes, err := utils.RetryReadUntilStateValid(
 		ctx,
@@ -286,21 +277,21 @@ func (r *NicResource) refreshNICState(ctx context.Context, id string, startState
 	)
 	if err != nil {
 		diags.AddError("Failed to read NIC", fmt.Sprintf("Error waiting for instance (%s) to be created/updated: %s", id, err))
-		return nil, diags
+		return nil
 	}
 
 	read, ok := readRes.(*numspot.Nic)
 	if !ok {
 		diags.AddError("Failed to read NIC", "object conversion error")
-		return nil, diags
+		return nil
 	}
 
-	tf, diags := NicFromHttpToTf(ctx, read)
+	tf := NicFromHttpToTf(ctx, read, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	return tf, diags
+	return tf
 }
 
 func (r *NicResource) shouldUpdate(plan, state NicModel) bool {

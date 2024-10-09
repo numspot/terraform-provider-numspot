@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type NicsDataSourceModel struct {
@@ -91,8 +91,12 @@ func (d *nicsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		return
 	}
 
-	params := NicsFromTfToAPIReadParams(ctx, plan)
-	res := utils2.ExecuteRequest(func() (*numspot.ReadNicsResponse, error) {
+	params := NicsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	res := utils.ExecuteRequest(func() (*numspot.ReadNicsResponse, error) {
 		return d.provider.GetNumspotClient().ReadNicsWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -102,10 +106,9 @@ func (d *nicsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		response.Diagnostics.AddError("HTTP call failed", "got empty Nic list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, NicsFromHttpToTfDatasource)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, NicsFromHttpToTfDatasource, &response.Diagnostics)
 
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	state = plan

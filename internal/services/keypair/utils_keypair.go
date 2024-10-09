@@ -56,18 +56,18 @@ func KeyPairFromTfToCreateRequest(tf *KeyPairModel) numspot.CreateKeypairJSONReq
 	}
 }
 
-func KeypairsFromTfToAPIReadParams(ctx context.Context, tf KeypairsDataSourceModel) numspot.ReadKeypairsParams {
+func KeypairsFromTfToAPIReadParams(ctx context.Context, tf KeypairsDataSourceModel, diags *diag.Diagnostics) numspot.ReadKeypairsParams {
 	return numspot.ReadKeypairsParams{
-		KeypairFingerprints: utils.TfStringListToStringPtrList(ctx, tf.KeypairFingerprints),
-		KeypairNames:        utils.TfStringListToStringPtrList(ctx, tf.KeypairNames),
-		KeypairTypes:        utils.TfStringListToStringPtrList(ctx, tf.KeypairTypes),
+		KeypairFingerprints: utils.TfStringListToStringPtrList(ctx, tf.KeypairFingerprints, diags),
+		KeypairNames:        utils.TfStringListToStringPtrList(ctx, tf.KeypairNames, diags),
+		KeypairTypes:        utils.TfStringListToStringPtrList(ctx, tf.KeypairTypes, diags),
 	}
 }
 
-func KeypairsFromHttpToTfDatasource(ctx context.Context, http *numspot.Keypair) (*KeyPairDatasourceItemModel, diag.Diagnostics) {
+func KeypairsFromHttpToTfDatasource(ctx context.Context, http *numspot.Keypair, diags *diag.Diagnostics) *KeyPairDatasourceItemModel {
 	return &KeyPairDatasourceItemModel{
 		Fingerprint: types.StringPointerValue(http.Fingerprint),
 		Name:        types.StringPointerValue(http.Name),
 		Type:        types.StringPointerValue(http.Type),
-	}, nil
+	}
 }

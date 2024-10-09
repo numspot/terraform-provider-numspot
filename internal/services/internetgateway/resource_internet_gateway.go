@@ -121,9 +121,8 @@ func (r *InternetGatewayResource) Create(ctx context.Context, request resource.C
 		return
 	}
 
-	tf, diags := InternetServiceFromHttpToTf(ctx, rr)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := InternetServiceFromHttpToTf(ctx, rr, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -142,9 +141,8 @@ func (r *InternetGatewayResource) Read(ctx context.Context, request resource.Rea
 		return
 	}
 
-	tf, diags := InternetServiceFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := InternetServiceFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -188,9 +186,8 @@ func (r *InternetGatewayResource) Update(ctx context.Context, request resource.U
 		return
 	}
 
-	tf, diags := InternetServiceFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := InternetServiceFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

@@ -21,16 +21,13 @@ func ClientGatewayFromTfToHttp(tf *ClientGatewayModel) *numspot.ClientGateway {
 	}
 }
 
-func ClientGatewayFromHttpToTf(ctx context.Context, http *numspot.ClientGateway) (*ClientGatewayModel, diag.Diagnostics) {
-	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
-	)
+func ClientGatewayFromHttpToTf(ctx context.Context, http *numspot.ClientGateway, diags *diag.Diagnostics) *ClientGatewayModel {
+	var tagsTf types.List
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -41,7 +38,7 @@ func ClientGatewayFromHttpToTf(ctx context.Context, http *numspot.ClientGateway)
 		PublicIp:       types.StringPointerValue(http.PublicIp),
 		State:          types.StringPointerValue(http.State),
 		Tags:           tagsTf,
-	}, diags
+	}
 }
 
 func ClientGatewayFromTfToCreateRequest(tf *ClientGatewayModel) numspot.CreateClientGatewayJSONRequestBody {
@@ -52,30 +49,29 @@ func ClientGatewayFromTfToCreateRequest(tf *ClientGatewayModel) numspot.CreateCl
 	}
 }
 
-func ClientGatewaysFromTfToAPIReadParams(ctx context.Context, tf ClientGatewaysDataSourceModel) numspot.ReadClientGatewaysParams {
+func ClientGatewaysFromTfToAPIReadParams(ctx context.Context, tf ClientGatewaysDataSourceModel, diags *diag.Diagnostics) numspot.ReadClientGatewaysParams {
 	return numspot.ReadClientGatewaysParams{
-		States:          utils.TfStringListToStringPtrList(ctx, tf.States),
-		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:            utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:             utils.TfStringListToStringPtrList(ctx, tf.IDs),
-		ConnectionTypes: utils.TfStringListToStringPtrList(ctx, tf.ConnectionTypes),
-		BgpAsns:         utils.TFInt64ListToIntListPointer(ctx, tf.BgpAsns),
-		PublicIps:       utils.TfStringListToStringPtrList(ctx, tf.PublicIps),
+		States:          utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:            utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:             utils.TfStringListToStringPtrList(ctx, tf.IDs, diags),
+		ConnectionTypes: utils.TfStringListToStringPtrList(ctx, tf.ConnectionTypes, diags),
+		BgpAsns:         utils.TFInt64ListToIntListPointer(ctx, tf.BgpAsns, diags),
+		PublicIps:       utils.TfStringListToStringPtrList(ctx, tf.PublicIps, diags),
 	}
 }
 
-func ClientGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.ClientGateway) (*ClientGatewayModel, diag.Diagnostics) {
+func ClientGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.ClientGateway, diags *diag.Diagnostics) *ClientGatewayModel {
 	var (
-		diags    diag.Diagnostics
 		tagsList types.List
 		bgpAsnTf types.Int64
 	)
 
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -91,5 +87,5 @@ func ClientGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.Cli
 		Tags:           tagsList,
 		BgpAsn:         bgpAsnTf,
 		PublicIp:       types.StringPointerValue(http.PublicIp),
-	}, nil
+	}
 }

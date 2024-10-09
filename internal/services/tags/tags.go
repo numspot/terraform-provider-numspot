@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 func TagsSchema(ctx context.Context) schema.ListNestedAttribute {
@@ -483,30 +483,34 @@ func CreateTags(
 	}
 
 	if res.StatusCode() != http.StatusNoContent {
-		apiError := utils2.HandleError(res.Body)
+		apiError := utils.HandleError(res.Body)
 		diagnostics.AddError("Failed to create Tags", apiError.Error())
 		return
 	}
 }
 
-func tagFromAPI(ctx context.Context, tag numspot.Tag) (TagsValue, diag.Diagnostics) {
-	return NewTagsValue(
+func tagFromAPI(ctx context.Context, tag numspot.Tag, diags *diag.Diagnostics) TagsValue {
+	tagValue, diagnostics := NewTagsValue(
 		TagsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"key":   types.StringPointerValue(tag.Key),
 			"value": types.StringPointerValue(tag.Value),
 		},
 	)
+	diags.Append(diagnostics...)
+	return tagValue
 }
 
-func ResourceTagFromAPI(ctx context.Context, tag numspot.ResourceTag) (TagsValue, diag.Diagnostics) {
-	return NewTagsValue(
+func ResourceTagFromAPI(ctx context.Context, tag numspot.ResourceTag, diags *diag.Diagnostics) TagsValue {
+	resourceTagValue, diagnostics := NewTagsValue(
 		TagsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"key":   types.StringValue(tag.Key),
 			"value": types.StringValue(tag.Value),
 		},
 	)
+	diags.Append(diagnostics...)
+	return resourceTagValue
 }
 
 func ReadTags(
@@ -526,7 +530,7 @@ func ReadTags(
 	}
 
 	if res.StatusCode() != http.StatusOK {
-		apiError := utils2.HandleError(res.Body)
+		apiError := utils.HandleError(res.Body)
 		diagnostics.AddError("Failed to read Tags", apiError.Error())
 		return types.List{}
 	}
@@ -536,16 +540,13 @@ func ReadTags(
 		return types.List{}
 	}
 
-	tfTags, resDiagnostics := utils2.GenericListToTfListValue(
+	tfTags := utils.GenericListToTfListValue(
 		ctx,
 		TagsValue{},
 		tagFromAPI,
 		*res.JSON200.Items,
+		&diagnostics,
 	)
-	if resDiagnostics.HasError() {
-		diagnostics.Append(resDiagnostics...)
-		return types.List{}
-	}
 
 	return tfTags
 }
@@ -568,7 +569,7 @@ func DeleteTags(
 	}
 
 	if res.StatusCode() != http.StatusNoContent {
-		apiError := utils2.HandleError(res.Body)
+		apiError := utils.HandleError(res.Body)
 		diagnostics.AddError("Failed to delete Tags", apiError.Error())
 		return
 	}

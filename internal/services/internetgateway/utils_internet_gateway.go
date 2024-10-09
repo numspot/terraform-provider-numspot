@@ -19,16 +19,13 @@ func InternetServiceFromTfToHttp(tf InternetGatewayModel) *numspot.InternetGatew
 	}
 }
 
-func InternetServiceFromHttpToTf(ctx context.Context, http *numspot.InternetGateway) (*InternetGatewayModel, diag.Diagnostics) {
-	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
-	)
+func InternetServiceFromHttpToTf(ctx context.Context, http *numspot.InternetGateway, diags *diag.Diagnostics) *InternetGatewayModel {
+	var tagsTf types.List
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -37,31 +34,25 @@ func InternetServiceFromHttpToTf(ctx context.Context, http *numspot.InternetGate
 		VpcId: types.StringPointerValue(http.VpcId),
 		State: types.StringPointerValue(http.State),
 		Tags:  tagsTf,
-	}, diags
-}
-
-func InternetGatewaysFromTfToAPIReadParams(ctx context.Context, tf InternetGatewaysDataSourceModel) numspot.ReadInternetGatewaysParams {
-	return numspot.ReadInternetGatewaysParams{
-		TagKeys:    utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:  utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:       utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:        utils.TfStringListToStringPtrList(ctx, tf.IDs),
-		LinkStates: utils.TfStringListToStringPtrList(ctx, tf.LinkStates),
-		LinkVpcIds: utils.TfStringListToStringPtrList(ctx, tf.LinkVpcIds),
 	}
 }
 
-func InternetGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.InternetGateway) (*InternetGatewayModel, diag.Diagnostics) {
-	var (
-		diags    diag.Diagnostics
-		tagsList types.List
-	)
+func InternetGatewaysFromTfToAPIReadParams(ctx context.Context, tf InternetGatewaysDataSourceModel, diags *diag.Diagnostics) numspot.ReadInternetGatewaysParams {
+	return numspot.ReadInternetGatewaysParams{
+		TagKeys:    utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:  utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:       utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:        utils.TfStringListToStringPtrList(ctx, tf.IDs, diags),
+		LinkStates: utils.TfStringListToStringPtrList(ctx, tf.LinkStates, diags),
+		LinkVpcIds: utils.TfStringListToStringPtrList(ctx, tf.LinkVpcIds, diags),
+	}
+}
+
+func InternetGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.InternetGateway, diags *diag.Diagnostics) *InternetGatewayModel {
+	var tagsList types.List
 
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return &InternetGatewayModel{
@@ -69,5 +60,5 @@ func InternetGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.I
 		State: types.StringPointerValue(http.State),
 		VpcId: types.StringPointerValue(http.VpcId),
 		Tags:  tagsList,
-	}, nil
+	}
 }

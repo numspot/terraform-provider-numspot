@@ -11,7 +11,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -66,7 +66,7 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		NatGatewayFromTfToCreateRequest(data),
@@ -85,7 +85,7 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 	}
 
 	// Retries read on resource until state is OK
-	read, err := utils2.RetryReadUntilStateValid(
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -104,8 +104,8 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf, diagnostics := NatGatewayFromHttpToTf(ctx, rr)
-	if diagnostics.HasError() {
+	tf := NatGatewayFromHttpToTf(ctx, rr, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -116,15 +116,15 @@ func (r *NatGatewayResource) Read(ctx context.Context, request resource.ReadRequ
 	var data NatGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadNatGatewayByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadNatGatewayByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadNatGatewayByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diagnostics := NatGatewayFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
+	tf := NatGatewayFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -161,15 +161,15 @@ func (r *NatGatewayResource) Update(ctx context.Context, request resource.Update
 		return
 	}
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadNatGatewayByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadNatGatewayByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadNatGatewayByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diagnostics := NatGatewayFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
+	tf := NatGatewayFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -180,7 +180,7 @@ func (r *NatGatewayResource) Delete(ctx context.Context, request resource.Delete
 	var data NatGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteNatGatewayWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteNatGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete NAT Gateway", err.Error())
 		return

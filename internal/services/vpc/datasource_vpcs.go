@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type VPCsDataSourceModel struct {
@@ -74,8 +74,11 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		return
 	}
 
-	params := VPCsFromTfToAPIReadParams(ctx, plan)
-	res := utils2.ExecuteRequest(func() (*numspot.ReadVpcsResponse, error) {
+	params := VPCsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	res := utils.ExecuteRequest(func() (*numspot.ReadVpcsResponse, error) {
 		return d.provider.GetNumspotClient().ReadVpcsWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -85,10 +88,9 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		response.Diagnostics.AddError("HTTP call failed", "got empty VPCs list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VPCsFromHttpToTfDatasource)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VPCsFromHttpToTfDatasource, &response.Diagnostics)
 
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

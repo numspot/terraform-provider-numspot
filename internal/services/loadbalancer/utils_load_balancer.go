@@ -11,118 +11,121 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt numspot.ApplicationStickyCookiePolicy) (ApplicationStickyCookiePoliciesValue, diag.Diagnostics) {
-	return NewApplicationStickyCookiePoliciesValue(
+func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt numspot.ApplicationStickyCookiePolicy, diags *diag.Diagnostics) ApplicationStickyCookiePoliciesValue {
+	value, diagnostics := NewApplicationStickyCookiePoliciesValue(
 		ApplicationStickyCookiePoliciesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"cookie_name": types.StringPointerValue(elt.CookieName),
 			"policy_name": types.StringPointerValue(elt.PolicyName),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func listenersFromHTTP(ctx context.Context, elt numspot.Listener) (ListenersValue, diag.Diagnostics) {
-	tfPolicyNames, diags := utils2.FromStringListPointerToTfStringList(ctx, elt.PolicyNames)
+func listenersFromHTTP(ctx context.Context, elt numspot.Listener, diags *diag.Diagnostics) ListenersValue {
+	tfPolicyNames := utils.FromStringListPointerToTfStringList(ctx, elt.PolicyNames, diags)
 	if diags.HasError() {
-		return ListenersValue{}, diags
+		return ListenersValue{}
 	}
-	return NewListenersValue(
+	value, diagnostics := NewListenersValue(
 		ListenersValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"backend_port":           utils2.FromIntPtrToTfInt64(elt.BackendPort),
+			"backend_port":           utils.FromIntPtrToTfInt64(elt.BackendPort),
 			"backend_protocol":       types.StringPointerValue(elt.BackendProtocol),
-			"load_balancer_port":     utils2.FromIntPtrToTfInt64(elt.LoadBalancerPort),
+			"load_balancer_port":     utils.FromIntPtrToTfInt64(elt.LoadBalancerPort),
 			"load_balancer_protocol": types.StringPointerValue(elt.BackendProtocol),
 			"policy_names":           tfPolicyNames,
 			"server_certificate_id":  types.StringPointerValue(elt.BackendProtocol),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func stickyCookiePoliciesFromHTTP(ctx context.Context, elt numspot.LoadBalancerStickyCookiePolicy) (StickyCookiePoliciesValue, diag.Diagnostics) {
-	return NewStickyCookiePoliciesValue(
+func stickyCookiePoliciesFromHTTP(ctx context.Context, elt numspot.LoadBalancerStickyCookiePolicy, diags *diag.Diagnostics) StickyCookiePoliciesValue {
+	value, diagnostics := NewStickyCookiePoliciesValue(
 		StickyCookiePoliciesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"cookie_expiration_period": utils2.FromIntPtrToTfInt64(elt.CookieExpirationPeriod),
+			"cookie_expiration_period": utils.FromIntPtrToTfInt64(elt.CookieExpirationPeriod),
 			"policy_name":              types.StringPointerValue(elt.PolicyName),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
 func LoadBalancerFromTfToHttp(tf *LoadBalancerModel) *numspot.LoadBalancer {
 	return &numspot.LoadBalancer{}
 }
 
-func LoadBalancerFromHttpToTf(ctx context.Context, http *numspot.LoadBalancer) (*LoadBalancerModel, diag.Diagnostics) {
-	var (
-		diags  diag.Diagnostics
-		tagsTf types.List
-	)
+func LoadBalancerFromHttpToTf(ctx context.Context, http *numspot.LoadBalancer, diags *diag.Diagnostics) *LoadBalancerModel {
+	var tagsTf types.List
 
-	applicationStickyCookiePoliciestypes, diags := utils2.GenericListToTfListValue(ctx, ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
+	applicationStickyCookiePoliciestypes := utils.GenericListToTfListValue(ctx, ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	listeners, diags := utils2.GenericSetToTfSetValue(ctx, ListenersValue{}, listenersFromHTTP, *http.Listeners)
+	listeners := utils.GenericSetToTfSetValue(ctx, ListenersValue{}, listenersFromHTTP, *http.Listeners, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	stickyCookiePolicies, diags := utils2.GenericListToTfListValue(ctx, StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies)
+	stickyCookiePolicies := utils.GenericListToTfListValue(ctx, StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	backendIps, diags := utils2.FromStringListPointerToTfStringSet(ctx, http.BackendIps)
+	backendIps := utils.FromStringListPointerToTfStringSet(ctx, http.BackendIps, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	backendVmIds, diags := utils2.FromStringListPointerToTfStringSet(ctx, http.BackendVmIds)
+	backendVmIds := utils.FromStringListPointerToTfStringSet(ctx, http.BackendVmIds, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	if http.Tags != nil {
-		tagsTf, diags = utils2.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
-	healthCheck, diags := NewHealthCheckValue(HealthCheckValue{}.AttributeTypes(ctx),
+	healthCheck, diagnostics := NewHealthCheckValue(HealthCheckValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"check_interval":      utils2.FromIntToTfInt64(http.HealthCheck.CheckInterval),
-			"healthy_threshold":   utils2.FromIntToTfInt64(http.HealthCheck.HealthyThreshold),
+			"check_interval":      utils.FromIntToTfInt64(http.HealthCheck.CheckInterval),
+			"healthy_threshold":   utils.FromIntToTfInt64(http.HealthCheck.HealthyThreshold),
 			"path":                types.StringPointerValue(http.HealthCheck.Path),
-			"port":                utils2.FromIntToTfInt64(http.HealthCheck.Port),
+			"port":                utils.FromIntToTfInt64(http.HealthCheck.Port),
 			"protocol":            types.StringValue(http.HealthCheck.Protocol),
-			"timeout":             utils2.FromIntToTfInt64(http.HealthCheck.Timeout),
-			"unhealthy_threshold": utils2.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
+			"timeout":             utils.FromIntToTfInt64(http.HealthCheck.Timeout),
+			"unhealthy_threshold": utils.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
 		})
 
+	diags.Append(diagnostics...)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	securityGroups, diags := utils2.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
+	securityGroups := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	sourceSecurityGroup := SourceSecurityGroupValue{
 		SecurityGroupName: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
 	}
 
-	subnets, diags := utils2.FromStringListPointerToTfStringList(ctx, http.Subnets)
+	subnets := utils.FromStringListPointerToTfStringList(ctx, http.Subnets, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	azNames, diags := utils2.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames)
+	azNames := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	return &LoadBalancerModel{
@@ -144,58 +147,54 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *numspot.LoadBalancer) (
 		AvailabilityZoneNames:           azNames,
 		Type:                            types.StringPointerValue(http.Type),
 		Tags:                            tagsTf,
-	}, diags
+	}
 }
 
-func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadBalancer) (*LoadBalancerModelDatasource, diag.Diagnostics) {
-	var (
-		tagsList types.List
-		diags    diag.Diagnostics
-	)
+func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadBalancer, diags *diag.Diagnostics) *LoadBalancerModelDatasource {
+	var tagsList types.List
 
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
-	applicationStickyCookiePoliciestypes, diags := utils2.GenericListToTfListValue(ctx, ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies)
+	applicationStickyCookiePoliciestypes := utils.GenericListToTfListValue(ctx, ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	listeners, diags := utils2.GenericSetToTfSetValue(ctx, ListenersValue{}, listenersFromHTTP, *http.Listeners)
+	listeners := utils.GenericSetToTfSetValue(ctx, ListenersValue{}, listenersFromHTTP, *http.Listeners, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	stickyCookiePolicies, diags := utils2.GenericListToTfListValue(ctx, StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies)
+	stickyCookiePolicies := utils.GenericListToTfListValue(ctx, StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	backendIps, _ := utils2.FromStringListPointerToTfStringSet(ctx, http.BackendIps)
-	backendVmIds, _ := utils2.FromStringListPointerToTfStringSet(ctx, http.BackendVmIds)
-	healthCheck, err := NewHealthCheckValue(HealthCheckValue{}.AttributeTypes(ctx),
+	backendIps := utils.FromStringListPointerToTfStringSet(ctx, http.BackendIps, diags)
+	backendVmIds := utils.FromStringListPointerToTfStringSet(ctx, http.BackendVmIds, diags)
+	healthCheck, diagnostics := NewHealthCheckValue(HealthCheckValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"check_interval":      utils2.FromIntToTfInt64(http.HealthCheck.CheckInterval),
-			"healthy_threshold":   utils2.FromIntToTfInt64(http.HealthCheck.HealthyThreshold),
+			"check_interval":      utils.FromIntToTfInt64(http.HealthCheck.CheckInterval),
+			"healthy_threshold":   utils.FromIntToTfInt64(http.HealthCheck.HealthyThreshold),
 			"path":                types.StringPointerValue(http.HealthCheck.Path),
-			"port":                utils2.FromIntToTfInt64(http.HealthCheck.Port),
+			"port":                utils.FromIntToTfInt64(http.HealthCheck.Port),
 			"protocol":            types.StringValue(http.HealthCheck.Protocol),
-			"timeout":             utils2.FromIntToTfInt64(http.HealthCheck.Timeout),
-			"unhealthy_threshold": utils2.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
+			"timeout":             utils.FromIntToTfInt64(http.HealthCheck.Timeout),
+			"unhealthy_threshold": utils.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
 		})
-	if err != nil {
-		return nil, diags
-	}
-	securityGroups, _ := utils2.FromStringListPointerToTfStringList(ctx, http.SecurityGroups)
+
+	diags.Append(diagnostics...)
+	securityGroups := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups, diags)
 	sourceSecurityGroup := SourceSecurityGroupValue{
 		SecurityGroupName: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
 	}
-	subnets, _ := utils2.FromStringListPointerToTfStringList(ctx, http.Subnets)
-	azNames, _ := utils2.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames)
+	subnets := utils.FromStringListPointerToTfStringList(ctx, http.Subnets, diags)
+	azNames := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames, diags)
 
 	return &LoadBalancerModelDatasource{
 		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciestypes,
@@ -215,24 +214,24 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadB
 		AvailabilityZoneNames:           azNames,
 		ItemsType:                       types.StringPointerValue(http.Type),
 		Tags:                            tagsList,
-	}, nil
+	}
 }
 
-func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *LoadBalancerModel) numspot.CreateLoadBalancerJSONRequestBody {
+func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *LoadBalancerModel, diags *diag.Diagnostics) numspot.CreateLoadBalancerJSONRequestBody {
 	var securityGroupsPtr *[]string
 	if !(tf.SecurityGroups.IsNull() || tf.SecurityGroups.IsUnknown()) {
-		securityGroups := utils2.TfStringListToStringList(ctx, tf.SecurityGroups)
+		securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups, diags)
 		securityGroupsPtr = &securityGroups
 	}
-	subnets := utils2.TfStringListToStringList(ctx, tf.Subnets)
-	listeners := utils2.TfSetToGenericList(func(a ListenersValue) numspot.ListenerForCreation {
+	subnets := utils.TfStringListToStringList(ctx, tf.Subnets, diags)
+	listeners := utils.TfSetToGenericList(func(a ListenersValue) numspot.ListenerForCreation {
 		return numspot.ListenerForCreation{
-			BackendPort:          utils2.FromTfInt64ToInt(a.BackendPort),
+			BackendPort:          utils.FromTfInt64ToInt(a.BackendPort),
 			BackendProtocol:      a.BackendProtocol.ValueStringPointer(),
-			LoadBalancerPort:     utils2.FromTfInt64ToInt(a.LoadBalancerPort),
+			LoadBalancerPort:     utils.FromTfInt64ToInt(a.LoadBalancerPort),
 			LoadBalancerProtocol: a.LoadBalancerProtocol.ValueString(),
 		}
-	}, ctx, tf.Listeners)
+	}, ctx, tf.Listeners, diags)
 
 	return numspot.CreateLoadBalancerJSONRequestBody{
 		Listeners:      listeners,
@@ -244,7 +243,7 @@ func LoadBalancerFromTfToCreateRequest(ctx context.Context, tf *LoadBalancerMode
 	}
 }
 
-func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *LoadBalancerModel) numspot.UpdateLoadBalancerJSONRequestBody {
+func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *LoadBalancerModel, diags *diag.Diagnostics) numspot.UpdateLoadBalancerJSONRequestBody {
 	var (
 		loadBalancerPort *int                 = nil
 		policyNames      *[]string            = nil
@@ -255,13 +254,13 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *LoadBalancerMode
 
 	if !tf.HealthCheck.IsUnknown() {
 		hc = &numspot.HealthCheck{
-			CheckInterval:      utils2.FromTfInt64ToInt(tf.HealthCheck.CheckInterval),
-			HealthyThreshold:   utils2.FromTfInt64ToInt(tf.HealthCheck.HealthyThreshold),
+			CheckInterval:      utils.FromTfInt64ToInt(tf.HealthCheck.CheckInterval),
+			HealthyThreshold:   utils.FromTfInt64ToInt(tf.HealthCheck.HealthyThreshold),
 			Path:               tf.HealthCheck.Path.ValueStringPointer(),
-			Port:               utils2.FromTfInt64ToInt(tf.HealthCheck.Port),
+			Port:               utils.FromTfInt64ToInt(tf.HealthCheck.Port),
 			Protocol:           tf.HealthCheck.Protocol.ValueString(),
-			Timeout:            utils2.FromTfInt64ToInt(tf.HealthCheck.Timeout),
-			UnhealthyThreshold: utils2.FromTfInt64ToInt(tf.HealthCheck.UnhealthyThreshold),
+			Timeout:            utils.FromTfInt64ToInt(tf.HealthCheck.Timeout),
+			UnhealthyThreshold: utils.FromTfInt64ToInt(tf.HealthCheck.UnhealthyThreshold),
 		}
 	}
 	if !tf.PublicIp.IsUnknown() {
@@ -270,18 +269,18 @@ func LoadBalancerFromTfToUpdateRequest(ctx context.Context, tf *LoadBalancerMode
 	if !tf.SecuredCookies.IsUnknown() {
 		securedCookies = tf.SecuredCookies.ValueBoolPointer()
 	}
-	securityGroups := utils2.TfStringListToStringList(ctx, tf.SecurityGroups)
-	listeners := utils2.TfSetToGenericSet(func(elt ListenersValue) numspot.Listener {
-		policyNames := utils2.TfStringListToStringList(ctx, elt.PolicyNames)
+	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups, diags)
+	listeners := utils.TfSetToGenericSet(func(elt ListenersValue) numspot.Listener {
+		policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames, diags)
 		return numspot.Listener{
-			BackendPort:          utils2.FromTfInt64ToIntPtr(elt.BackendPort),
+			BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
 			BackendProtocol:      elt.BackendProtocol.ValueStringPointer(),
-			LoadBalancerPort:     utils2.FromTfInt64ToIntPtr(elt.LoadBalancerPort),
+			LoadBalancerPort:     utils.FromTfInt64ToIntPtr(elt.LoadBalancerPort),
 			LoadBalancerProtocol: elt.BackendProtocol.ValueStringPointer(),
 			PolicyNames:          &policyNames,
 			ServerCertificateId:  elt.ServerCertificateId.ValueStringPointer(),
 		}
-	}, ctx, tf.Listeners)
+	}, ctx, tf.Listeners, diags)
 
 	if len(listeners) == 1 {
 		loadBalancerPort = listeners[0].LoadBalancerPort
@@ -317,7 +316,7 @@ func CreateLoadBalancerTags(
 		})
 	}
 
-	_ = utils2.ExecuteRequest(func() (*numspot.CreateLoadBalancerTagsResponse, error) {
+	_ = utils.ExecuteRequest(func() (*numspot.CreateLoadBalancerTagsResponse, error) {
 		return iaasClient.CreateLoadBalancerTagsWithResponse(ctx, spaceId, numspot.CreateLoadBalancerTagsRequest{
 			Names: []string{loadBalancerName},
 			Tags:  apiTags,
@@ -343,7 +342,7 @@ func DeleteLoadBalancerTags(
 		})
 	}
 
-	_ = utils2.ExecuteRequest(func() (*numspot.DeleteLoadBalancerTagsResponse, error) {
+	_ = utils.ExecuteRequest(func() (*numspot.DeleteLoadBalancerTagsResponse, error) {
 		return iaasClient.DeleteLoadBalancerTagsWithResponse(ctx, spaceId, numspot.DeleteLoadBalancerTagsJSONRequestBody{
 			Names: []string{loadBalancerName},
 			Tags:  apiTags,

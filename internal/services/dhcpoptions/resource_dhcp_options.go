@@ -11,7 +11,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -66,7 +66,7 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		DhcpOptionsFromTfToCreateRequest(ctx, data),
@@ -84,10 +84,9 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 		}
 	}
 
-	tf, diagnostics := DhcpOptionsFromHttpToTf(ctx, res.JSON201)
+	tf := DhcpOptionsFromHttpToTf(ctx, res.JSON201, &response.Diagnostics)
 	tf.Tags = tags.ReadTags(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), response.Diagnostics, createdId)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -98,16 +97,15 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 	var data DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadDhcpOptionsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadDhcpOptionsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadDhcpOptionsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diagnostics := DhcpOptionsFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	tf := DhcpOptionsFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -137,17 +135,14 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 		}
 	}
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadDhcpOptionsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadDhcpOptionsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadDhcpOptionsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diags := DhcpOptionsFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
-		return
-	}
+	tf := DhcpOptionsFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -159,7 +154,7 @@ func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.Delet
 	var data DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteDhcpOptionsWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteDhcpOptionsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete DHCP Options", err.Error())
 		return

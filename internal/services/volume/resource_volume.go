@@ -79,9 +79,8 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	state, diags := serializeNumSpotVolume(ctx, numSpotVolume, plan.ReplaceVolumeOnDownsize)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	state := serializeNumSpotVolume(ctx, numSpotVolume, &response.Diagnostics, plan.ReplaceVolumeOnDownsize)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -104,12 +103,11 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 		return
 	}
 
-	state, diags := serializeNumSpotVolume(ctx, numSpotVolume, state.ReplaceVolumeOnDownsize)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := serializeNumSpotVolume(ctx, numSpotVolume, &response.Diagnostics, state.ReplaceVolumeOnDownsize)
+	if response.Diagnostics.HasError() {
 		return
 	}
-	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
@@ -117,7 +115,6 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		err           error
 		numSpotVolume *numspot.Volume
 		state, plan   VolumeModel
-		diags         diag.Diagnostics
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -167,9 +164,8 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 		}
 	}
 
-	newState, diags := serializeNumSpotVolume(ctx, numSpotVolume, plan.ReplaceVolumeOnDownsize)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	newState := serializeNumSpotVolume(ctx, numSpotVolume, &response.Diagnostics, plan.ReplaceVolumeOnDownsize)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
@@ -189,49 +185,36 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	}
 }
 
-func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, ReplaceVolumeOnDownsize basetypes.BoolValue) (VolumeModel, diag.Diagnostics) {
+func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, diags *diag.Diagnostics, ReplaceVolumeOnDownsize basetypes.BoolValue) VolumeModel {
 	var (
 		volumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
 		tagsTf  types.List
-		diags   diag.Diagnostics
 		linkVm  LinkVMValue
 	)
 
 	if http.LinkedVolumes != nil {
-		volumes, diags = utils.GenericListToTfListValue(
+		volumes = utils.GenericListToTfListValue(
 			ctx,
 			LinkedVolumesValue{},
 			serializeLinkedVolumes,
 			*http.LinkedVolumes,
+			diags,
 		)
-
-		if diags.HasError() {
-			return VolumeModel{}, diags
-		}
 
 		nbLinkedVolumes := len(*http.LinkedVolumes)
 		if nbLinkedVolumes > 0 {
-			linkVm, diags = NewLinkVMValue(LinkVMValue{}.AttributeTypes(ctx),
+			var diagnostics diag.Diagnostics
+			linkVm, diagnostics = NewLinkVMValue(LinkVMValue{}.AttributeTypes(ctx),
 				map[string]attr.Value{
 					"device_name": types.StringPointerValue((*http.LinkedVolumes)[0].DeviceName),
 					"vm_id":       types.StringPointerValue((*http.LinkedVolumes)[0].VmId),
 				})
-			if diags.HasError() {
-				return VolumeModel{}, diags
-			}
-
-		}
-
-		if diags.HasError() {
-			return VolumeModel{}, diags
+			diags.Append(diagnostics...)
 		}
 	}
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return VolumeModel{}, diags
-		}
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return VolumeModel{
@@ -247,11 +230,11 @@ func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, ReplaceVo
 		Tags:                    tagsTf,
 		LinkVM:                  linkVm,
 		ReplaceVolumeOnDownsize: ReplaceVolumeOnDownsize,
-	}, diags
+	}
 }
 
-func serializeLinkedVolumes(ctx context.Context, http numspot.LinkedVolume) (LinkedVolumesValue, diag.Diagnostics) {
-	return NewLinkedVolumesValue(
+func serializeLinkedVolumes(ctx context.Context, http numspot.LinkedVolume, diags *diag.Diagnostics) LinkedVolumesValue {
+	value, diagnostics := NewLinkedVolumesValue(
 		LinkedVolumesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(http.DeleteOnVmDeletion),
@@ -260,6 +243,8 @@ func serializeLinkedVolumes(ctx context.Context, http numspot.LinkedVolume) (Lin
 			"vm_id":                 types.StringPointerValue(http.VmId),
 			"id":                    types.StringPointerValue(http.Id),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
 func deserializeCreateNumSpotVolume(tf VolumeModel) numspot.CreateVolumeJSONRequestBody {

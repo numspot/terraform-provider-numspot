@@ -37,19 +37,19 @@ func FlexibleGpuFromTfToUpdateRequest(tf *FlexibleGpuModel) numspot.UpdateFlexib
 	}
 }
 
-func FlexibleGpusFromTfToAPIReadParams(ctx context.Context, tf FlexibleGpuDataSourceModel) numspot.ReadFlexibleGpusParams {
+func FlexibleGpusFromTfToAPIReadParams(ctx context.Context, tf FlexibleGpuDataSourceModel, diags *diag.Diagnostics) numspot.ReadFlexibleGpusParams {
 	return numspot.ReadFlexibleGpusParams{
-		States:                utils.TfStringListToStringPtrList(ctx, tf.States),
-		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.Ids),
-		AvailabilityZoneNames: utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames),
+		States:                utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		AvailabilityZoneNames: utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames, diags),
 		DeleteOnVmDeletion:    utils.FromTfBoolToBoolPtr(tf.DeleteOnVmDeletion),
-		Generations:           utils.TfStringListToStringPtrList(ctx, tf.Generations),
-		ModelNames:            utils.TfStringListToStringPtrList(ctx, tf.ModelNames),
-		VmIds:                 utils.TfStringListToStringPtrList(ctx, tf.VmIds),
+		Generations:           utils.TfStringListToStringPtrList(ctx, tf.Generations, diags),
+		ModelNames:            utils.TfStringListToStringPtrList(ctx, tf.ModelNames, diags),
+		VmIds:                 utils.TfStringListToStringPtrList(ctx, tf.VmIds, diags),
 	}
 }
 
-func FlexibleGpusFromHttpToTfDatasource(ctx context.Context, http *numspot.FlexibleGpu) (*FlexibleGpuModelItemDataSource, diag.Diagnostics) {
+func FlexibleGpusFromHttpToTfDatasource(ctx context.Context, http *numspot.FlexibleGpu, diags *diag.Diagnostics) *FlexibleGpuModelItemDataSource {
 	return &FlexibleGpuModelItemDataSource{
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		Id:                   types.StringPointerValue(http.Id),
@@ -58,7 +58,7 @@ func FlexibleGpusFromHttpToTfDatasource(ctx context.Context, http *numspot.Flexi
 		Generation:           types.StringPointerValue(http.Generation),
 		ModelName:            types.StringPointerValue(http.ModelName),
 		VmId:                 types.StringPointerValue(http.VmId),
-	}, nil
+	}
 }
 
 func LinkFlexibleGpuFromTfToCreateRequest(tf *FlexibleGpuModel) numspot.LinkFlexibleGpuJSONRequestBody {

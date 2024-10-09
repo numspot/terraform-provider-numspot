@@ -19,35 +19,37 @@ func VpnConnectionFromTfToHttp(tf *VpnConnectionModel) *numspot.VpnConnection {
 	return &numspot.VpnConnection{}
 }
 
-func routeFromHTTP(ctx context.Context, elt numspot.RouteLight) (RoutesValue, diag.Diagnostics) {
-	return NewRoutesValue(
+func routeFromHTTP(ctx context.Context, elt numspot.RouteLight, diags *diag.Diagnostics) RoutesValue {
+	value, diagnostics := NewRoutesValue(
 		RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"destination_ip_range": types.StringPointerValue(elt.DestinationIpRange),
 			"route_type":           types.StringPointerValue(elt.RouteType),
 			"state":                types.StringPointerValue(elt.State),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func phase1OptionsFromHTTP(ctx context.Context, elt *numspot.Phase1Options) (Phase1optionsValue, diag.Diagnostics) {
-	phase1IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms)
+func phase1OptionsFromHTTP(ctx context.Context, elt *numspot.Phase1Options, diags *diag.Diagnostics) Phase1optionsValue {
+	phase1IntegrityAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms, diags)
 	if diags.HasError() {
-		return Phase1optionsValue{}, diags
+		return Phase1optionsValue{}
 	}
-	phase1EncryptionAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1EncryptionAlgorithms)
+	phase1EncryptionAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1EncryptionAlgorithms, diags)
 	if diags.HasError() {
-		return Phase1optionsValue{}, diags
+		return Phase1optionsValue{}
 	}
-	phase1DHGroupNumbers, diags := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase1DhGroupNumbers)
+	phase1DHGroupNumbers := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase1DhGroupNumbers, diags)
 	if diags.HasError() {
-		return Phase1optionsValue{}, diags
+		return Phase1optionsValue{}
 	}
-	ikeVersions, diags := utils.FromStringListPointerToTfStringList(ctx, elt.IkeVersions)
+	ikeVersions := utils.FromStringListPointerToTfStringList(ctx, elt.IkeVersions, diags)
 	if diags.HasError() {
-		return Phase1optionsValue{}, diags
+		return Phase1optionsValue{}
 	}
 
-	return NewPhase1optionsValue(
+	value, diagnostics := NewPhase1optionsValue(
 		Phase1optionsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"dpd_timeout_action":          types.StringPointerValue(elt.DpdTimeoutAction),
@@ -60,23 +62,25 @@ func phase1OptionsFromHTTP(ctx context.Context, elt *numspot.Phase1Options) (Pha
 			"replay_window_size":          utils.FromIntPtrToTfInt64(elt.ReplayWindowSize),
 			"startup_action":              types.StringPointerValue(elt.StartupAction),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func phase2OptionsFromHTTP(ctx context.Context, elt *numspot.Phase2Options) (Phase2optionsValue, diag.Diagnostics) {
-	phase2IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms)
+func phase2OptionsFromHTTP(ctx context.Context, elt *numspot.Phase2Options, diags *diag.Diagnostics) Phase2optionsValue {
+	phase2IntegrityAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms, diags)
 	if diags.HasError() {
-		return Phase2optionsValue{}, diags
+		return Phase2optionsValue{}
 	}
-	phase2EncryptionAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2EncryptionAlgorithms)
+	phase2EncryptionAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2EncryptionAlgorithms, diags)
 	if diags.HasError() {
-		return Phase2optionsValue{}, diags
+		return Phase2optionsValue{}
 	}
-	phase2DHGroupNumbers, diags := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase2DhGroupNumbers)
+	phase2DHGroupNumbers := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase2DhGroupNumbers, diags)
 	if diags.HasError() {
-		return Phase2optionsValue{}, diags
+		return Phase2optionsValue{}
 	}
 
-	return NewPhase2optionsValue(
+	value, diagnostics := NewPhase2optionsValue(
 		Phase2optionsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"phase2dh_group_numbers":      phase2DHGroupNumbers,
@@ -85,65 +89,60 @@ func phase2OptionsFromHTTP(ctx context.Context, elt *numspot.Phase2Options) (Pha
 			"phase2lifetime_seconds":      utils.FromIntPtrToTfInt64(elt.Phase2LifetimeSeconds),
 			"pre_shared_key":              types.StringPointerValue(elt.PreSharedKey),
 		})
+
+	diags.Append(diagnostics...)
+	return value
 }
 
-func vpnOptionsFromHTTP(ctx context.Context, elt *numspot.VpnOptions) (VpnOptionsValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
+func vpnOptionsFromHTTP(ctx context.Context, elt *numspot.VpnOptions, diags *diag.Diagnostics) VpnOptionsValue {
 	if elt == nil {
-		return VpnOptionsValue{}, diag.Diagnostics{}
+		return VpnOptionsValue{}
 	}
 
-	phase1OptionsNull, diags := NewPhase1optionsValueUnknown().ToObjectValue(ctx)
-	if diags.HasError() {
-		return VpnOptionsValue{}, diags
-	}
-	phase2OptionsNull, diags := NewPhase2optionsValueUnknown().ToObjectValue(ctx)
-	if diags.HasError() {
-		return VpnOptionsValue{}, diags
-	}
-	vpnOptions, diags := NewVpnOptionsValue(
+	phase1OptionsNull, diagnostics := NewPhase1optionsValueUnknown().ToObjectValue(ctx)
+	diags.Append(diagnostics...)
+	phase2OptionsNull, diagnostics := NewPhase2optionsValueUnknown().ToObjectValue(ctx)
+	diags.Append(diagnostics...)
+
+	vpnOptions, diagnostics := NewVpnOptionsValue(
 		VpnOptionsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"phase1options":          phase1OptionsNull,
 			"phase2options":          phase2OptionsNull,
 			"tunnel_inside_ip_range": types.StringPointerValue(elt.TunnelInsideIpRange),
 		})
+	diags.Append(diagnostics...)
 
 	if elt.Phase1Options != nil {
-		phase1Options, diags := phase1OptionsFromHTTP(ctx, elt.Phase1Options)
+		phase1Options := phase1OptionsFromHTTP(ctx, elt.Phase1Options, diags)
 		if diags.HasError() {
-			return VpnOptionsValue{}, diags
+			return VpnOptionsValue{}
 		}
-		ph1OptsObj, diags := phase1Options.ToObjectValue(ctx)
-		if diags.HasError() {
-			return VpnOptionsValue{}, diags
-		}
+		ph1OptsObj, diagnostics := phase1Options.ToObjectValue(ctx)
+		diags.Append(diagnostics...)
+
 		vpnOptions.Phase1options = ph1OptsObj
 	}
 
 	if elt.Phase2Options != nil {
-		phase2Options, diags := phase2OptionsFromHTTP(ctx, elt.Phase2Options)
-		if diags.HasError() {
-			return VpnOptionsValue{}, diags
-		}
-		ph2OptsObj, diags := phase2Options.ToObjectValue(ctx)
-		if diags.HasError() {
-			return VpnOptionsValue{}, diags
-		}
+		phase2Options := phase2OptionsFromHTTP(ctx, elt.Phase2Options, diags)
+		ph2OptsObj, diagnostics := phase2Options.ToObjectValue(ctx)
+		diags.Append(diagnostics...)
+
 		vpnOptions.Phase2options = ph2OptsObj
 	}
 
-	return vpnOptions, diags
+	return vpnOptions
 }
 
-func VGWTelemetryFromHTTPToTF(ctx context.Context, http numspot.VgwTelemetry) (VgwTelemetriesValue, diag.Diagnostics) {
+func VGWTelemetryFromHTTPToTF(ctx context.Context, http numspot.VgwTelemetry, diags *diag.Diagnostics) VgwTelemetriesValue {
 	var lastStateChangeDate string
 	if http.LastStateChangeDate != nil {
 		lastStateChangeDate = http.LastStateChangeDate.String()
 	} else {
 		lastStateChangeDate = ""
 	}
-	return NewVgwTelemetriesValue(
+	value, diagnostics := NewVgwTelemetriesValue(
 		VgwTelemetriesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"accepted_route_count":   utils.FromIntPtrToTfInt64(http.AcceptedRouteCount),
@@ -152,24 +151,15 @@ func VGWTelemetryFromHTTPToTF(ctx context.Context, http numspot.VgwTelemetry) (V
 			"state":                  types.StringPointerValue(http.State),
 			"state_description":      types.StringPointerValue(http.StateDescription),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection) (*VpnConnectionModel, diag.Diagnostics) {
-	var (
-		diags  diag.Diagnostics
-		tagsTf types.List
-	)
-
-	vpnOptions, diags := vpnOptionsFromHTTP(ctx, http.VpnOptions)
-	if diags.HasError() {
-		return nil, diags
-	}
+func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection, diags *diag.Diagnostics) *VpnConnectionModel {
+	var tagsTf types.List
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	vpnConnectionModel := VpnConnectionModel{
@@ -180,7 +170,7 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection)
 		State:                      types.StringPointerValue(http.State),
 		StaticRoutesOnly:           types.BoolPointerValue(http.StaticRoutesOnly),
 		VirtualGatewayId:           types.StringPointerValue(http.VirtualGatewayId),
-		VpnOptions:                 vpnOptions,
+		VpnOptions:                 vpnOptionsFromHTTP(ctx, http.VpnOptions, diags),
 		Tags:                       tagsTf,
 	}
 
@@ -189,22 +179,16 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection)
 		httpRoutes := slices.DeleteFunc(*http.Routes, func(r numspot.RouteLight) bool {
 			return *r.State == VPNConnectionRouteStateDeleted
 		})
-		routes, diags := utils.GenericSetToTfSetValue(ctx, RoutesValue{}, routeFromHTTP, httpRoutes)
-		if diags.HasError() {
-			return nil, diags
-		}
+		routes := utils.GenericSetToTfSetValue(ctx, RoutesValue{}, routeFromHTTP, httpRoutes, diags)
 		vpnConnectionModel.Routes = routes
 	}
 
 	if http.VgwTelemetries != nil {
-		vgwTelemetries, diags := utils.GenericListToTfListValue(ctx, VgwTelemetriesValue{}, VGWTelemetryFromHTTPToTF, *http.VgwTelemetries)
-		if diags.HasError() {
-			return nil, diags
-		}
+		vgwTelemetries := utils.GenericListToTfListValue(ctx, VgwTelemetriesValue{}, VGWTelemetryFromHTTPToTF, *http.VgwTelemetries, diags)
 		vpnConnectionModel.VgwTelemetries = vgwTelemetries
 	}
 
-	return &vpnConnectionModel, nil
+	return &vpnConnectionModel
 }
 
 func VpnConnectionFromTfToCreateRequest(tf *VpnConnectionModel) numspot.CreateVpnConnectionJSONRequestBody {
@@ -216,10 +200,10 @@ func VpnConnectionFromTfToCreateRequest(tf *VpnConnectionModel) numspot.CreateVp
 	}
 }
 
-func VpnConnectionFromTfToUpdateRequest(ctx context.Context, tf *VpnConnectionModel) numspot.UpdateVpnConnectionJSONRequestBody {
+func VpnConnectionFromTfToUpdateRequest(ctx context.Context, tf *VpnConnectionModel, diags *diag.Diagnostics) numspot.UpdateVpnConnectionJSONRequestBody {
 	var vpnOptions *numspot.VpnOptionsToUpdate
 
-	phase2Options := phase2OptionsToUpdateFromTFToHTTP(ctx, tf.VpnOptions)
+	phase2Options := phase2OptionsToUpdateFromTFToHTTP(ctx, tf.VpnOptions, diags)
 	if phase2Options != nil || tf.VpnOptions.TunnelInsideIpRange.ValueStringPointer() != nil {
 		vpnOptions = &numspot.VpnOptionsToUpdate{}
 	}
@@ -233,74 +217,62 @@ func VpnConnectionFromTfToUpdateRequest(ctx context.Context, tf *VpnConnectionMo
 	}
 }
 
-func phase2OptionsToUpdateFromTFToHTTP(ctx context.Context, vpnOptions VpnOptionsValue) *numspot.Phase2OptionsToUpdate {
-	vpnOptionsValue, diags := NewPhase2optionsValue(vpnOptions.Phase2options.AttributeTypes(ctx), vpnOptions.Phase2options.Attributes())
-	if diags.HasError() {
-		return nil
-	}
+func phase2OptionsToUpdateFromTFToHTTP(ctx context.Context, vpnOptions VpnOptionsValue, diags *diag.Diagnostics) *numspot.Phase2OptionsToUpdate {
+	vpnOptionsValue, diagnostics := NewPhase2optionsValue(vpnOptions.Phase2options.AttributeTypes(ctx), vpnOptions.Phase2options.Attributes())
+	diags.Append(diagnostics...)
+
 	if vpnOptionsValue.PreSharedKey.ValueStringPointer() == nil {
 		return nil
 	}
 	return &numspot.Phase2OptionsToUpdate{PreSharedKey: vpnOptionsValue.PreSharedKey.ValueStringPointer()}
 }
 
-func VpnConnectionsFromTfToAPIReadParams(ctx context.Context, tf VpnConnectionsDataSourceModel) numspot.ReadVpnConnectionsParams {
+func VpnConnectionsFromTfToAPIReadParams(ctx context.Context, tf VpnConnectionsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVpnConnectionsParams {
 	return numspot.ReadVpnConnectionsParams{
-		States:                   utils.TfStringListToStringPtrList(ctx, tf.States),
-		TagKeys:                  utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:                utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:                     utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:                      utils.TfStringListToStringPtrList(ctx, tf.Ids),
-		ConnectionTypes:          utils.TfStringListToStringPtrList(ctx, tf.ConnectionTypes),
-		ClientGatewayIds:         utils.TfStringListToStringPtrList(ctx, tf.ClientGatewayIds),
-		RouteDestinationIpRanges: utils.TfStringListToStringPtrList(ctx, tf.RouteDestinationIpRanges),
+		States:                   utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		TagKeys:                  utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:                utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:                     utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:                      utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		ConnectionTypes:          utils.TfStringListToStringPtrList(ctx, tf.ConnectionTypes, diags),
+		ClientGatewayIds:         utils.TfStringListToStringPtrList(ctx, tf.ClientGatewayIds, diags),
+		RouteDestinationIpRanges: utils.TfStringListToStringPtrList(ctx, tf.RouteDestinationIpRanges, diags),
 		StaticRoutesOnly:         utils.FromTfBoolToBoolPtr(tf.StaticRouteOnly),
-		BgpAsns:                  utils.TFInt64ListToIntListPointer(ctx, tf.BgpAsns),
-		VirtualGatewayIds:        utils.TfStringListToStringPtrList(ctx, tf.VirtualGatewayIds),
+		BgpAsns:                  utils.TFInt64ListToIntListPointer(ctx, tf.BgpAsns, diags),
+		VirtualGatewayIds:        utils.TfStringListToStringPtrList(ctx, tf.VirtualGatewayIds, diags),
 	}
 }
 
-func VpnConnectionsFromHttpToTfDatasource(ctx context.Context, http *numspot.VpnConnection) (*VpnConnectionModel, diag.Diagnostics) {
+func VpnConnectionsFromHttpToTfDatasource(ctx context.Context, http *numspot.VpnConnection, diags *diag.Diagnostics) *VpnConnectionModel {
 	var (
 		routes              = types.SetNull(RoutesValue{}.Type(ctx))
 		vgwTelemetriesValue = types.ListNull(VgwTelemetriesValue{}.Type(ctx))
-		diags               diag.Diagnostics
 		tagsList            types.List
 	)
 	if http.Routes != nil {
-		routes, diags = utils.GenericSetToTfSetValue(
+		routes = utils.GenericSetToTfSetValue(
 			ctx,
 			RoutesValue{},
 			routeFromHTTPDatasource,
 			*http.Routes,
+			diags,
 		)
-		if diags.HasError() {
-			return nil, diags
-		}
 	}
 	if http.VgwTelemetries != nil {
-		vgwTelemetriesValue, diags = utils.GenericListToTfListValue(
+		vgwTelemetriesValue = utils.GenericListToTfListValue(
 			ctx,
 			VgwTelemetriesValue{},
 			VGWTelemetryFromHTTPDatasource,
 			*http.VgwTelemetries,
+			diags,
 		)
-		if diags.HasError() {
-			return nil, diags
-		}
 	}
 
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
-	vpnOptions, diags := vpnOptionsFromHTTPDatasource(ctx, http.VpnOptions)
-	if diags.HasError() {
-		return nil, diags
-	}
+	vpnOptions := vpnOptionsFromHTTPDatasource(ctx, http.VpnOptions, diags)
 
 	return &VpnConnectionModel{
 		ClientGatewayConfiguration: types.StringPointerValue(http.ClientGatewayConfiguration),
@@ -314,38 +286,28 @@ func VpnConnectionsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpn
 		VirtualGatewayId:           types.StringPointerValue(http.VirtualGatewayId),
 		VpnOptions:                 vpnOptions,
 		Tags:                       tagsList,
-	}, nil
+	}
 }
 
-func routeFromHTTPDatasource(ctx context.Context, elt numspot.RouteLight) (RoutesValue, diag.Diagnostics) {
-	return NewRoutesValue(
+func routeFromHTTPDatasource(ctx context.Context, elt numspot.RouteLight, diags *diag.Diagnostics) RoutesValue {
+	value, diagnostics := NewRoutesValue(
 		RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"destination_ip_range": types.StringPointerValue(elt.DestinationIpRange),
 			"route_type":           types.StringPointerValue(elt.RouteType),
 			"state":                types.StringPointerValue(elt.State),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func phase1OptionsFromHTTPDatasource(ctx context.Context, elt *numspot.Phase1Options) (Phase1optionsValue, diag.Diagnostics) {
-	phase1IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms)
-	if diags.HasError() {
-		return Phase1optionsValue{}, diags
-	}
-	phase1EncryptionAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1EncryptionAlgorithms)
-	if diags.HasError() {
-		return Phase1optionsValue{}, diags
-	}
-	phase1DHGroupNumbers, diags := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase1DhGroupNumbers)
-	if diags.HasError() {
-		return Phase1optionsValue{}, diags
-	}
-	ikeVersions, diags := utils.FromStringListPointerToTfStringList(ctx, elt.IkeVersions)
-	if diags.HasError() {
-		return Phase1optionsValue{}, diags
-	}
+func phase1OptionsFromHTTPDatasource(ctx context.Context, elt *numspot.Phase1Options, diags *diag.Diagnostics) Phase1optionsValue {
+	phase1IntegrityAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms, diags)
+	phase1EncryptionAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1EncryptionAlgorithms, diags)
+	phase1DHGroupNumbers := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase1DhGroupNumbers, diags)
+	ikeVersions := utils.FromStringListPointerToTfStringList(ctx, elt.IkeVersions, diags)
 
-	return NewPhase1optionsValue(
+	value, diagnostics := NewPhase1optionsValue(
 		Phase1optionsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"dpd_timeout_action":          types.StringPointerValue(elt.DpdTimeoutAction),
@@ -358,23 +320,17 @@ func phase1OptionsFromHTTPDatasource(ctx context.Context, elt *numspot.Phase1Opt
 			"replay_window_size":          utils.FromIntPtrToTfInt64(elt.ReplayWindowSize),
 			"startup_action":              types.StringPointerValue(elt.StartupAction),
 		})
+
+	diags.Append(diagnostics...)
+	return value
 }
 
-func phase2OptionsFromHTTPDatasource(ctx context.Context, elt *numspot.Phase2Options) (Phase2optionsValue, diag.Diagnostics) {
-	phase2IntegrityAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms)
-	if diags.HasError() {
-		return Phase2optionsValue{}, diags
-	}
-	phase2EncryptionAlgorithms, diags := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2EncryptionAlgorithms)
-	if diags.HasError() {
-		return Phase2optionsValue{}, diags
-	}
-	phase2DHGroupNumbers, diags := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase2DhGroupNumbers)
-	if diags.HasError() {
-		return Phase2optionsValue{}, diags
-	}
+func phase2OptionsFromHTTPDatasource(ctx context.Context, elt *numspot.Phase2Options, diags *diag.Diagnostics) Phase2optionsValue {
+	phase2IntegrityAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms, diags)
+	phase2EncryptionAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2EncryptionAlgorithms, diags)
+	phase2DHGroupNumbers := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase2DhGroupNumbers, diags)
 
-	return NewPhase2optionsValue(
+	value, diagnostics := NewPhase2optionsValue(
 		Phase2optionsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"phase2dh_group_numbers":      phase2DHGroupNumbers,
@@ -383,45 +339,42 @@ func phase2OptionsFromHTTPDatasource(ctx context.Context, elt *numspot.Phase2Opt
 			"phase2lifetime_seconds":      utils.FromIntPtrToTfInt64(elt.Phase2LifetimeSeconds),
 			"pre_shared_key":              types.StringPointerValue(elt.PreSharedKey),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func vpnOptionsFromHTTPDatasource(ctx context.Context, elt *numspot.VpnOptions) (VpnOptionsValue, diag.Diagnostics) {
+func vpnOptionsFromHTTPDatasource(ctx context.Context, elt *numspot.VpnOptions, diags *diag.Diagnostics) VpnOptionsValue {
 	if elt == nil {
-		return VpnOptionsValue{}, diag.Diagnostics{}
+		return VpnOptionsValue{}
 	}
-	vpnOptions, diags := NewVpnOptionsValue(
+	vpnOptions, diagnostics := NewVpnOptionsValue(
 		VpnOptionsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"phase1options":          NewPhase1optionsValueNull(),
 			"phase2options":          NewPhase2optionsValueNull(),
 			"tunnel_inside_ip_range": types.StringPointerValue(elt.TunnelInsideIpRange),
 		})
+	diags.Append(diagnostics...)
 
 	if elt.Phase1Options != nil {
-		phase1Options, diags := phase1OptionsFromHTTPDatasource(ctx, elt.Phase1Options)
-		if diags.HasError() {
-			return VpnOptionsValue{}, diags
-		}
+		phase1Options := phase1OptionsFromHTTPDatasource(ctx, elt.Phase1Options, diags)
 		vpnOptions.Phase1options.Attributes()["phase1options"] = phase1Options
 	}
 
 	if elt.Phase2Options != nil {
-		phase2Options, diags := phase2OptionsFromHTTPDatasource(ctx, elt.Phase2Options)
-		if diags.HasError() {
-			return VpnOptionsValue{}, diags
-		}
-		vpnOptions.Phase1options.Attributes()["phase2options"] = phase2Options
+		phase2Options := phase2OptionsFromHTTPDatasource(ctx, elt.Phase2Options, diags)
+		vpnOptions.Phase2options.Attributes()["phase2options"] = phase2Options
 	}
 
-	return vpnOptions, diags
+	return vpnOptions
 }
 
-func VGWTelemetryFromHTTPDatasource(ctx context.Context, http numspot.VgwTelemetry) (VgwTelemetriesValue, diag.Diagnostics) {
+func VGWTelemetryFromHTTPDatasource(ctx context.Context, http numspot.VgwTelemetry, diags *diag.Diagnostics) VgwTelemetriesValue {
 	var lastStateChangeDate string
 	if http.LastStateChangeDate != nil {
 		lastStateChangeDate = http.LastStateChangeDate.String()
 	}
-	return NewVgwTelemetriesValue(
+	value, diagnostics := NewVgwTelemetriesValue(
 		VgwTelemetriesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"accepted_route_count":   utils.FromIntPtrToTfInt64(http.AcceptedRouteCount),
@@ -430,4 +383,6 @@ func VGWTelemetryFromHTTPDatasource(ctx context.Context, http numspot.VgwTelemet
 			"state":                  types.StringPointerValue(http.State),
 			"state_description":      types.StringPointerValue(http.StateDescription),
 		})
+	diags.Append(diagnostics...)
+	return value
 }

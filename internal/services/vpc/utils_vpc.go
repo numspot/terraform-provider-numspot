@@ -11,16 +11,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func NetFromHttpToTf(ctx context.Context, http *numspot.Vpc) (*VpcModel, diag.Diagnostics) {
-	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
-	)
+func NetFromHttpToTf(ctx context.Context, http *numspot.Vpc, diags *diag.Diagnostics) *VpcModel {
+	var tagsTf types.List
+
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return &VpcModel{
@@ -30,7 +25,7 @@ func NetFromHttpToTf(ctx context.Context, http *numspot.Vpc) (*VpcModel, diag.Di
 		State:            types.StringPointerValue(http.State),
 		Tenancy:          types.StringPointerValue(http.Tenancy),
 		Tags:             tagsTf,
-	}, nil
+	}
 }
 
 func NetFromTfToCreateRequest(tf *VpcModel) numspot.CreateVpcJSONRequestBody {
@@ -40,30 +35,26 @@ func NetFromTfToCreateRequest(tf *VpcModel) numspot.CreateVpcJSONRequestBody {
 	}
 }
 
-func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel) numspot.ReadVpcsParams {
+func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVpcsParams {
 	return numspot.ReadVpcsParams{
-		DhcpOptionsSetIds: utils.TfStringListToStringPtrList(ctx, tf.DHCPOptionsSetIds),
-		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges),
+		DhcpOptionsSetIds: utils.TfStringListToStringPtrList(ctx, tf.DHCPOptionsSetIds, diags),
+		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges, diags),
 		IsDefault:         tf.IsDefault.ValueBoolPointer(),
-		States:            utils.TfStringListToStringPtrList(ctx, tf.States),
-		TagKeys:           utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:         utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:              utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:               utils.TfStringListToStringPtrList(ctx, tf.IDs),
+		States:            utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		TagKeys:           utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:         utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:              utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:               utils.TfStringListToStringPtrList(ctx, tf.IDs, diags),
 	}
 }
 
-func VPCsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpc) (*VpcModel, diag.Diagnostics) {
-	var (
-		tagsList types.List
-		diags    diag.Diagnostics
-	)
+func VPCsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpc, diags *diag.Diagnostics) *VpcModel {
+	var tagsList types.List
+
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
+
 	return &VpcModel{
 		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
 		Id:               types.StringPointerValue(http.Id),
@@ -71,10 +62,10 @@ func VPCsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpc) (*VpcMod
 		State:            types.StringPointerValue(http.State),
 		Tenancy:          types.StringPointerValue(http.Tenancy),
 		Tags:             tagsList,
-	}, nil
+	}
 }
 
-func VpcFromTfToUpdaterequest(ctx context.Context, tf *VpcModel, diagnostics *diag.Diagnostics) numspot.UpdateVpcJSONRequestBody {
+func VpcFromTfToUpdaterequest(ctx context.Context, tf *VpcModel) numspot.UpdateVpcJSONRequestBody {
 	return numspot.UpdateVpcJSONRequestBody{
 		DhcpOptionsSetId: tf.DhcpOptionsSetId.ValueString(),
 	}

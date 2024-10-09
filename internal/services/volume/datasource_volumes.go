@@ -84,7 +84,7 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 		return
 	}
 
-	res, err := d.provider.GetNumspotClient().ReadVolumesWithResponse(ctx, d.provider.GetSpaceID(), deserializeNumSpotVolumeDataSource(ctx, plan))
+	res, err := d.provider.GetNumspotClient().ReadVolumesWithResponse(ctx, d.provider.GetSpaceID(), deserializeNumSpotVolumeDataSource(ctx, plan, &response.Diagnostics))
 	if err != nil {
 		return
 	}
@@ -92,9 +92,8 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 		response.Diagnostics.AddError("HTTP call failed", "got empty volumes list")
 	}
 
-	objectItems, diags := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, serializeNumSpotDataSource)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, serializeNumSpotDataSource, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -103,65 +102,59 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func deserializeNumSpotVolumeDataSource(ctx context.Context, tf VolumesDataSourceModel) *numspot.ReadVolumesParams {
+func deserializeNumSpotVolumeDataSource(ctx context.Context, tf VolumesDataSourceModel, diags *diag.Diagnostics) *numspot.ReadVolumesParams {
 	var creationDatesPtr *[]time.Time
 	var linkVolumeLinkDatesPtr *[]time.Time
 	var volumeSizesPtr *[]int
 
 	if !(tf.CreationDates.IsNull() || tf.CreationDates.IsUnknown()) {
-		creationDates := utils.TfStringListToTimeList(ctx, tf.CreationDates, "2020-06-30T00:00:00.000Z")
+		creationDates := utils.TfStringListToTimeList(ctx, tf.CreationDates, "2020-06-30T00:00:00.000Z", diags)
 		creationDatesPtr = &creationDates
 	}
 
 	if !(tf.LinkVolumeLinkDates.IsNull() || tf.LinkVolumeLinkDates.IsUnknown()) {
-		linkVolumeLinkDates := utils.TfStringListToTimeList(ctx, tf.LinkVolumeLinkDates, "2020-06-30T00:00:00.000Z")
+		linkVolumeLinkDates := utils.TfStringListToTimeList(ctx, tf.LinkVolumeLinkDates, "2020-06-30T00:00:00.000Z", diags)
 		linkVolumeLinkDatesPtr = &linkVolumeLinkDates
 	}
 
 	if !(tf.VolumeSizes.IsNull() || tf.VolumeSizes.IsUnknown()) {
-		volumeSizes := utils.TFInt64ListToIntList(ctx, tf.VolumeSizes)
+		volumeSizes := utils.TFInt64ListToIntList(ctx, tf.VolumeSizes, diags)
 		volumeSizesPtr = &volumeSizes
 	}
 	return &numspot.ReadVolumesParams{
 		CreationDates:                creationDatesPtr,
 		LinkVolumeDeleteOnVmDeletion: tf.LinkVolumeDeleteOnVmDeletion.ValueBoolPointer(),
-		LinkVolumeDeviceNames:        utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeDeviceNames),
+		LinkVolumeDeviceNames:        utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeDeviceNames, diags),
 		LinkVolumeLinkDates:          linkVolumeLinkDatesPtr,
-		LinkVolumeLinkStates:         utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeLinkStates),
-		LinkVolumeVmIds:              utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeVmIds),
-		SnapshotIds:                  utils.TfStringListToStringPtrList(ctx, tf.SnapshotIds),
+		LinkVolumeLinkStates:         utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeLinkStates, diags),
+		LinkVolumeVmIds:              utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeVmIds, diags),
+		SnapshotIds:                  utils.TfStringListToStringPtrList(ctx, tf.SnapshotIds, diags),
 		VolumeSizes:                  volumeSizesPtr,
-		VolumeStates:                 utils.TfStringListToStringPtrList(ctx, tf.VolumeStates),
-		VolumeTypes:                  utils.TfStringListToStringPtrList(ctx, tf.VolumeTypes),
-		AvailabilityZoneNames:        utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames),
-		Ids:                          utils.TfStringListToStringPtrList(ctx, tf.Ids),
+		VolumeStates:                 utils.TfStringListToStringPtrList(ctx, tf.VolumeStates, diags),
+		VolumeTypes:                  utils.TfStringListToStringPtrList(ctx, tf.VolumeTypes, diags),
+		AvailabilityZoneNames:        utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames, diags),
+		Ids:                          utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
 	}
 }
 
-func serializeNumSpotDataSource(ctx context.Context, http *numspot.Volume) (*DatasourceVolumeModel, diag.Diagnostics) {
+func serializeNumSpotDataSource(ctx context.Context, http *numspot.Volume, diags *diag.Diagnostics) *DatasourceVolumeModel {
 	var (
 		linkedVolumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
-		diags         diag.Diagnostics
 		tagsList      types.List
 	)
 
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	if http.LinkedVolumes != nil {
-		linkedVolumes, diags = utils.GenericListToTfListValue(
+		linkedVolumes = utils.GenericListToTfListValue(
 			ctx,
 			LinkedVolumesValue{},
 			fromLinkedVolumeSchemaToTFVolumesList,
 			*http.LinkedVolumes,
+			diags,
 		)
-		if diags.HasError() {
-			return nil, diags
-		}
 	}
 
 	return &DatasourceVolumeModel{
@@ -175,11 +168,11 @@ func serializeNumSpotDataSource(ctx context.Context, http *numspot.Volume) (*Dat
 		State:                types.StringPointerValue(http.State),
 		Type:                 types.StringPointerValue(http.Type),
 		Tags:                 tagsList,
-	}, nil
+	}
 }
 
-func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http numspot.LinkedVolume) (LinkedVolumesValue, diag.Diagnostics) {
-	return NewLinkedVolumesValue(
+func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http numspot.LinkedVolume, diags *diag.Diagnostics) LinkedVolumesValue {
+	value, diagnostics := NewLinkedVolumesValue(
 		LinkedVolumesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(http.DeleteOnVmDeletion),
@@ -188,4 +181,6 @@ func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http numspot.Lin
 			"vm_id":                 types.StringPointerValue(http.VmId),
 			"id":                    types.StringPointerValue(http.Id),
 		})
+	diags.Append(diagnostics...)
+	return value
 }

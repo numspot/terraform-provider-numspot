@@ -23,25 +23,25 @@ func SecurityGroupFromTfToHttp(tf *SecurityGroupModel) *numspot.SecurityGroup {
 	}
 }
 
-func InboundRuleFromHttpToTf(ctx context.Context, rules numspot.SecurityGroupRule) (InboundRulesValue, diag.Diagnostics) {
+func InboundRuleFromHttpToTf(ctx context.Context, rules numspot.SecurityGroupRule) InboundRulesValue {
 	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
 	if diags.HasError() {
-		return InboundRulesValue{}, diags
+		return InboundRulesValue{}
 	}
 
 	serviceIds, diags := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
 	if diags.HasError() {
-		return InboundRulesValue{}, diags
+		return InboundRulesValue{}
 	}
 
 	if rules.ServiceIds == nil {
 		serviceIds, diags = types.ListValueFrom(ctx, types.StringType, []string{})
 		if diags.HasError() {
-			return InboundRulesValue{}, diags
+			return InboundRulesValue{}
 		}
 	}
 
-	return NewInboundRulesValue(
+	value, diagnostics := NewInboundRulesValue(
 		InboundRulesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"from_port_range":         utils.FromIntPtrToTfInt64(rules.FromPortRange),
@@ -52,27 +52,29 @@ func InboundRuleFromHttpToTf(ctx context.Context, rules numspot.SecurityGroupRul
 			"service_ids":             serviceIds,
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func OutboundRuleFromHttpToTf(ctx context.Context, rules numspot.SecurityGroupRule) (OutboundRulesValue, diag.Diagnostics) {
+func OutboundRuleFromHttpToTf(ctx context.Context, rules numspot.SecurityGroupRule) OutboundRulesValue {
 	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
 	if diags.HasError() {
-		return OutboundRulesValue{}, diags
+		return OutboundRulesValue{}
 	}
 
 	serviceIds, diags := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
 	if diags.HasError() {
-		return OutboundRulesValue{}, diags
+		return OutboundRulesValue{}
 	}
 
 	if rules.ServiceIds == nil {
 		serviceIds, diags = types.ListValueFrom(ctx, types.StringType, []string{})
 		if diags.HasError() {
-			return OutboundRulesValue{}, diags
+			return OutboundRulesValue{}
 		}
 	}
 
-	return NewOutboundRulesValue(
+	value, diagnostics := NewOutboundRulesValue(
 		OutboundRulesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"from_port_range":         utils.FromIntPtrToTfInt64(rules.FromPortRange),
@@ -83,54 +85,55 @@ func OutboundRuleFromHttpToTf(ctx context.Context, rules numspot.SecurityGroupRu
 			"service_ids":             serviceIds,
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func SecurityGroupFromHttpToTf(ctx context.Context, http *numspot.SecurityGroup) (*SecurityGroupModel, diag.Diagnostics) {
-	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
-	)
+func SecurityGroupFromHttpToTf(ctx context.Context, http *numspot.SecurityGroup, diags *diag.Diagnostics) *SecurityGroupModel {
+	var tagsTf types.List
 
 	if http.InboundRules == nil {
-		return nil, diags
+		return nil
 	}
 	ibd := make([]InboundRulesValue, 0, len(*http.InboundRules))
 	for _, e := range *http.InboundRules {
-		value, diags := InboundRuleFromHttpToTf(ctx, e)
+		value := InboundRuleFromHttpToTf(ctx, e)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 
 		ibd = append(ibd, value)
 	}
 
 	if http.OutboundRules == nil {
-		return nil, diags
+		return nil
 	}
 	obd := make([]OutboundRulesValue, 0, len(*http.OutboundRules))
 	for _, e := range *http.OutboundRules {
-		value, diags := OutboundRuleFromHttpToTf(ctx, e)
+		value := OutboundRuleFromHttpToTf(ctx, e)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 
 		obd = append(obd, value)
 	}
 
-	ibdsTf, diags := types.SetValueFrom(ctx, InboundRulesValue{}.Type(ctx), ibd)
+	ibdsTf, diagnostics := types.SetValueFrom(ctx, InboundRulesValue{}.Type(ctx), ibd)
+	diags.Append(diagnostics...)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	obdsTf, diags := types.SetValueFrom(ctx, OutboundRulesValue{}.Type(ctx), obd)
+	obdsTf, diagnostics := types.SetValueFrom(ctx, OutboundRulesValue{}.Type(ctx), obd)
+	diags.Append(diagnostics...)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -144,7 +147,7 @@ func SecurityGroupFromHttpToTf(ctx context.Context, http *numspot.SecurityGroup)
 		Tags:          tagsTf,
 	}
 
-	return &res, diags
+	return &res
 }
 
 func SecurityGroupFromTfToCreateRequest(tf *SecurityGroupModel) numspot.CreateSecurityGroupJSONRequestBody {
@@ -218,64 +221,65 @@ func CreateOutboundRulesRequest(ctx context.Context, sgId string, data []Outboun
 	return outboundRulesCreationBody
 }
 
-func SecurityGroupsFromTfToAPIReadParams(ctx context.Context, tf SecurityGroupsDataSourceModel) numspot.ReadSecurityGroupsParams {
+func SecurityGroupsFromTfToAPIReadParams(ctx context.Context, tf SecurityGroupsDataSourceModel, diags *diag.Diagnostics) numspot.ReadSecurityGroupsParams {
 	return numspot.ReadSecurityGroupsParams{
-		Descriptions:                 utils.TfStringListToStringPtrList(ctx, tf.Descriptions),
-		InboundRuleFromPortRanges:    utils.TFInt64ListToIntListPointer(ctx, tf.InboundRuleFromPortRanges),
-		InboundRuleProtocols:         utils.TfStringListToStringPtrList(ctx, tf.InboundRuleProtocols),
-		InboundRuleIpRanges:          utils.TfStringListToStringPtrList(ctx, tf.InboundRuleIpRanges),
-		InboundRuleSecurityGroupIds:  utils.TfStringListToStringPtrList(ctx, tf.InboundRuleSecurityGroupIds),
-		InboundRuleToPortRanges:      utils.TFInt64ListToIntListPointer(ctx, tf.InboundRuleToPortRanges),
-		SecurityGroupIds:             utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
-		SecurityGroupNames:           utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupNames),
-		OutboundRuleFromPortRanges:   utils.TFInt64ListToIntListPointer(ctx, tf.OutboundRuleFromPortRanges),
-		OutboundRuleProtocols:        utils.TfStringListToStringPtrList(ctx, tf.OutboundRuleProtocols),
-		OutboundRuleIpRanges:         utils.TfStringListToStringPtrList(ctx, tf.OutboundRuleIpRanges),
-		OutboundRuleSecurityGroupIds: utils.TfStringListToStringPtrList(ctx, tf.OutboundRuleSecurityGroupIds),
-		OutboundRuleToPortRanges:     utils.TFInt64ListToIntListPointer(ctx, tf.OutboundRuleToPortRanges),
-		VpcIds:                       utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
-		TagKeys:                      utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:                    utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:                         utils.TfStringListToStringPtrList(ctx, tf.Tags),
+		Descriptions:                 utils.TfStringListToStringPtrList(ctx, tf.Descriptions, diags),
+		InboundRuleFromPortRanges:    utils.TFInt64ListToIntListPointer(ctx, tf.InboundRuleFromPortRanges, diags),
+		InboundRuleProtocols:         utils.TfStringListToStringPtrList(ctx, tf.InboundRuleProtocols, diags),
+		InboundRuleIpRanges:          utils.TfStringListToStringPtrList(ctx, tf.InboundRuleIpRanges, diags),
+		InboundRuleSecurityGroupIds:  utils.TfStringListToStringPtrList(ctx, tf.InboundRuleSecurityGroupIds, diags),
+		InboundRuleToPortRanges:      utils.TFInt64ListToIntListPointer(ctx, tf.InboundRuleToPortRanges, diags),
+		SecurityGroupIds:             utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
+		SecurityGroupNames:           utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupNames, diags),
+		OutboundRuleFromPortRanges:   utils.TFInt64ListToIntListPointer(ctx, tf.OutboundRuleFromPortRanges, diags),
+		OutboundRuleProtocols:        utils.TfStringListToStringPtrList(ctx, tf.OutboundRuleProtocols, diags),
+		OutboundRuleIpRanges:         utils.TfStringListToStringPtrList(ctx, tf.OutboundRuleIpRanges, diags),
+		OutboundRuleSecurityGroupIds: utils.TfStringListToStringPtrList(ctx, tf.OutboundRuleSecurityGroupIds, diags),
+		OutboundRuleToPortRanges:     utils.TFInt64ListToIntListPointer(ctx, tf.OutboundRuleToPortRanges, diags),
+		VpcIds:                       utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
+		TagKeys:                      utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:                    utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:                         utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
 	}
 }
 
-func SecurityGroupsFromHttpToTfDatasource(ctx context.Context, http *numspot.SecurityGroup) (*SecurityGroupModel, diag.Diagnostics) {
+func SecurityGroupsFromHttpToTfDatasource(ctx context.Context, http *numspot.SecurityGroup, diags *diag.Diagnostics) *SecurityGroupModel {
 	var (
 		inboundRules  = types.SetNull(InboundRulesValue{}.Type(ctx))
 		outboundRules = types.SetNull(OutboundRulesValue{}.Type(ctx))
-		diags         diag.Diagnostics
 		tagsList      types.List
 	)
 
 	if http.InboundRules != nil {
-		inboundRules, diags = utils.GenericSetToTfSetValue(
+		inboundRules = utils.GenericSetToTfSetValue(
 			ctx,
 			InboundRulesValue{},
 			inboundRuleFromHttpToTfDatasource,
 			*http.InboundRules,
+			diags,
 		)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
 	if http.OutboundRules != nil {
-		outboundRules, diags = utils.GenericSetToTfSetValue(
+		outboundRules = utils.GenericSetToTfSetValue(
 			ctx,
 			OutboundRulesValue{},
 			outboundRuleFromHttpToTfDatasource,
 			*http.OutboundRules,
+			diags,
 		)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -287,28 +291,20 @@ func SecurityGroupsFromHttpToTfDatasource(ctx context.Context, http *numspot.Sec
 		Name:          types.StringPointerValue(http.Name),
 		OutboundRules: outboundRules,
 		VpcId:         types.StringPointerValue(http.VpcId),
-	}, nil
+	}
 }
 
-func inboundRuleFromHttpToTfDatasource(ctx context.Context, rules numspot.SecurityGroupRule) (InboundRulesValue, diag.Diagnostics) {
-	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
-	if diags.HasError() {
-		return InboundRulesValue{}, diags
-	}
-
-	serviceIds, diags := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
-	if diags.HasError() {
-		return InboundRulesValue{}, diags
-	}
-
+func inboundRuleFromHttpToTfDatasource(ctx context.Context, rules numspot.SecurityGroupRule, diags *diag.Diagnostics) InboundRulesValue {
+	ipRanges, diagnostics := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
+	diags.Append(diagnostics...)
+	serviceIds, diagnostics := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
+	diags.Append(diagnostics...)
 	if rules.ServiceIds == nil {
-		serviceIds, diags = types.ListValueFrom(ctx, types.StringType, []string{})
-		if diags.HasError() {
-			return InboundRulesValue{}, diags
-		}
+		serviceIds, diagnostics = types.ListValueFrom(ctx, types.StringType, []string{})
+		diags.Append(diagnostics...)
 	}
 
-	return NewInboundRulesValue(
+	value, diagnostics := NewInboundRulesValue(
 		InboundRulesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"from_port_range":         utils.FromIntPtrToTfInt64(rules.FromPortRange),
@@ -319,29 +315,23 @@ func inboundRuleFromHttpToTfDatasource(ctx context.Context, rules numspot.Securi
 			"service_ids":             serviceIds,
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func outboundRuleFromHttpToTfDatasource(ctx context.Context, rules numspot.SecurityGroupRule) (OutboundRulesValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
+func outboundRuleFromHttpToTfDatasource(ctx context.Context, rules numspot.SecurityGroupRule, diags *diag.Diagnostics) OutboundRulesValue {
+	ipRanges, diagnostics := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
+	diags.Append(diagnostics...)
 
-	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
-	if diags.HasError() {
-		return OutboundRulesValue{}, diags
-	}
-
-	serviceIds, diags := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
-	if diags.HasError() {
-		return OutboundRulesValue{}, diags
-	}
+	serviceIds, diagnostics := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
+	diags.Append(diagnostics...)
 
 	if rules.ServiceIds == nil {
-		serviceIds, diags = types.ListValueFrom(ctx, types.StringType, []string{})
-		if diags.HasError() {
-			return OutboundRulesValue{}, diags
-		}
+		serviceIds, diagnostics = types.ListValueFrom(ctx, types.StringType, []string{})
+		diags.Append(diagnostics...)
 	}
 
-	return NewOutboundRulesValue(
+	value, diagnostics := NewOutboundRulesValue(
 		OutboundRulesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"from_port_range":         utils.FromIntPtrToTfInt64(rules.FromPortRange),
@@ -352,4 +342,6 @@ func outboundRuleFromHttpToTfDatasource(ctx context.Context, rules numspot.Secur
 			"service_ids":             serviceIds,
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }

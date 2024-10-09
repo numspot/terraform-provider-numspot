@@ -11,7 +11,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -66,7 +66,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		VirtualGatewayFromTfToCreateRequest(data),
@@ -86,7 +86,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 
 	// Link virtual gateway to VPCs
 	if !data.VpcId.IsNull() {
-		_ = utils2.ExecuteRequest(func() (*numspot.LinkVirtualGatewayToVpcResponse, error) {
+		_ = utils.ExecuteRequest(func() (*numspot.LinkVirtualGatewayToVpcResponse, error) {
 			return r.provider.GetNumspotClient().LinkVirtualGatewayToVpcWithResponse(
 				ctx,
 				r.provider.GetSpaceID(),
@@ -102,7 +102,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 	}
 
 	// Retries read on resource until state is OK
-	read, err := utils2.RetryReadUntilStateValid(
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -121,8 +121,8 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	tf, diagnostics := VirtualGatewayFromHttpToTf(ctx, rr)
-	if diagnostics.HasError() {
+	tf := VirtualGatewayFromHttpToTf(ctx, rr, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -133,15 +133,15 @@ func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.Read
 	var data VirtualGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadVirtualGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadVirtualGatewaysByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diagnostics := VirtualGatewayFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
+	tf := VirtualGatewayFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -176,15 +176,15 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 	if !modifications {
 		return
 	}
-	res := utils2.ExecuteRequest(func() (*numspot.ReadVirtualGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadVirtualGatewaysByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadVirtualGatewaysByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diagnostics := VirtualGatewayFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
+	tf := VirtualGatewayFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -196,7 +196,7 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 
 	// Unlink
 	if !(data.VpcId.IsNull() || data.VpcId.IsUnknown()) {
-		_ = utils2.ExecuteRequest(func() (*numspot.UnlinkVirtualGatewayToVpcResponse, error) {
+		_ = utils.ExecuteRequest(func() (*numspot.UnlinkVirtualGatewayToVpcResponse, error) {
 			return r.provider.GetNumspotClient().UnlinkVirtualGatewayToVpcWithResponse(
 				ctx,
 				r.provider.GetSpaceID(),
@@ -210,7 +210,7 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 		// Note : don't return in case of error, we want to try to delete the resource anyway
 	}
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVirtualGatewayWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVirtualGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Virtual Gateway", err.Error())
 		return

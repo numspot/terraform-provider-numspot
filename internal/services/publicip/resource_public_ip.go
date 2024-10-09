@@ -12,7 +12,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -67,7 +67,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	}
 
 	// Retries create until request response is OK
-	createRes, err := utils2.RetryCreateUntilResourceAvailable(
+	createRes, err := utils.RetryCreateUntilResourceAvailable(
 		ctx,
 		r.provider.GetSpaceID(),
 		r.provider.GetNumspotClient().CreatePublicIpWithResponse)
@@ -76,9 +76,8 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	publicIp, diags := PublicIpFromHttpToTf(ctx, createRes.JSON201)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	publicIp := PublicIpFromHttpToTf(ctx, createRes.JSON201, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -106,9 +105,8 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 	}
 
 	// Refresh state
-	data, diags := refreshState(ctx, r.provider, publicIp.Id.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	data := refreshState(ctx, r.provider, publicIp.Id.ValueString(), &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -119,16 +117,15 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 	var data PublicIpModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	readRes := utils2.ExecuteRequest(func() (*numspot.ReadPublicIpsByIdResponse, error) {
+	readRes := utils.ExecuteRequest(func() (*numspot.ReadPublicIpsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadPublicIpsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
 		return
 	}
 
-	tf, diags := PublicIpFromHttpToTf(ctx, readRes.JSON200)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := PublicIpFromHttpToTf(ctx, readRes.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -158,9 +155,8 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 			return
 		}
 
-		data, diags := refreshState(ctx, r.provider, state.Id.ValueString())
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		data := refreshState(ctx, r.provider, state.Id.ValueString(), &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
@@ -176,7 +172,7 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 		_ = invokeUnlinkPublicIP(ctx, r.provider, &state) // We still want to try delete resource even if the unlink didn't work (ressource has been unlinked before for example)
 	}
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), state.Id.ValueString(), r.provider.GetNumspotClient().DeletePublicIpWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), state.Id.ValueString(), r.provider.GetNumspotClient().DeletePublicIpWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Public IP", err.Error())
 		return
