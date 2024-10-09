@@ -379,7 +379,6 @@ resource "numspot_volume" "terraform-volume-acctest" {
 					}),
 				),
 			},
-
 			// Edge case on linked volume recreation, since Terraform triggers concurrently Create and Delete when recreating a resource,  i.e. when a resource name changes
 			// Create can be called before Delete, and we will try to link a different volume to the same VM and device (which returns a conflict)
 			// Step 12 - Recreate linked volume
