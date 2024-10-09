@@ -11,7 +11,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -66,7 +66,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		ClientGatewayFromTfToCreateRequest(&data),
@@ -85,7 +85,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 	}
 
 	// Retries read on resource until state is OK
-	read, err := utils2.RetryReadUntilStateValid(
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -104,9 +104,8 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	tf, diags := ClientGatewayFromHttpToTf(ctx, rr)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := ClientGatewayFromHttpToTf(ctx, rr, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -117,16 +116,15 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 	var data ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadClientGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadClientGatewaysByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadClientGatewaysByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diags := ClientGatewayFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := ClientGatewayFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -163,16 +161,15 @@ func (r *ClientGatewayResource) Update(ctx context.Context, request resource.Upd
 		return
 	}
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadClientGatewaysByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadClientGatewaysByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadClientGatewaysByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diags := ClientGatewayFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := ClientGatewayFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -183,7 +180,7 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 	var data ClientGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteClientGatewayWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteClientGatewayWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Client Gateway", err.Error())
 		return

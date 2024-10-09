@@ -81,10 +81,7 @@ func (d *spaceDataSource) Read(ctx context.Context, request datasource.ReadReque
 		return
 	}
 
-	tf, diags := SpaceFromHttpToTfDatasource(ctx, res.JSON200)
-	if diags != nil {
-		response.Diagnostics.AddError("Error while converting Space HTTP object to Terraform object", diags.Errors()[0].Detail())
-	}
+	tf := SpaceFromHttpToTfDatasource(ctx, res.JSON200)
 	state = *tf
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)

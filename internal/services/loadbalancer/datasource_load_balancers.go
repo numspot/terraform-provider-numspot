@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type loadBalancersDataSourceModel struct {
@@ -69,10 +69,10 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 
 	params := numspot.ReadLoadBalancersParams{}
 	if !plan.LoadBalancerNames.IsNull() {
-		lbNames := utils2.TfStringListToStringList(ctx, plan.LoadBalancerNames)
+		lbNames := utils.TfStringListToStringList(ctx, plan.LoadBalancerNames, &response.Diagnostics)
 		params.LoadBalancerNames = &lbNames
 	}
-	res := utils2.ExecuteRequest(func() (*numspot.ReadLoadBalancersResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadLoadBalancersResponse, error) {
 		return d.provider.GetNumspotClient().ReadLoadBalancersWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -82,10 +82,9 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 		response.Diagnostics.AddError("HTTP call failed", "got empty load balancers list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, LoadBalancerFromHttpToTfDatasource)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, LoadBalancerFromHttpToTfDatasource, &response.Diagnostics)
 
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

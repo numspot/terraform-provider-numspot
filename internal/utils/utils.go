@@ -85,7 +85,7 @@ func IsTfValueNull(val attr.Value) bool {
 	return val.IsNull() || val.IsUnknown()
 }
 
-func FromUUIDListToTfStringSet(ctx context.Context, arr []uuid.UUID) (types.Set, diag.Diagnostics) {
+func FromUUIDListToTfStringSet(ctx context.Context, arr []uuid.UUID, diags *diag.Diagnostics) types.Set {
 	if arr == nil {
 		arr = make([]uuid.UUID, 0)
 	}
@@ -95,55 +95,73 @@ func FromUUIDListToTfStringSet(ctx context.Context, arr []uuid.UUID) (types.Set,
 		nArr = append(nArr, id.String())
 	}
 
-	return types.SetValueFrom(ctx, types.StringType, nArr)
+	setValue, diagnostics := types.SetValueFrom(ctx, types.StringType, nArr)
+
+	diags.Append(diagnostics...)
+	return setValue
 }
 
-func FromStringListToTfStringList(ctx context.Context, arr []string) (types.List, diag.Diagnostics) {
+func FromStringListToTfStringList(ctx context.Context, arr []string, diags *diag.Diagnostics) types.List {
 	if arr == nil {
 		arr = make([]string, 0)
 	}
-	return types.ListValueFrom(ctx, types.StringType, arr)
+	listValue, diagnostics := types.ListValueFrom(ctx, types.StringType, arr)
+	diags.Append(diagnostics...)
+
+	return listValue
 }
 
-func FromStringListPointerToTfStringSet(ctx context.Context, arr *[]string) (types.Set, diag.Diagnostics) {
+func FromStringListPointerToTfStringSet(ctx context.Context, arr *[]string, diags *diag.Diagnostics) types.Set {
 	if arr == nil {
-		return types.SetValueFrom(ctx, types.StringType, []string{})
+		setValue, diagnostics := types.SetValueFrom(ctx, types.StringType, []string{})
+		diags.Append(diagnostics...)
+		return setValue
 	}
-	return types.SetValueFrom(ctx, types.StringType, *arr)
+	setValue, diagnostics := types.SetValueFrom(ctx, types.StringType, *arr)
+	diags.Append(diagnostics...)
+	return setValue
 }
 
-func FromStringListPointerToTfStringList(ctx context.Context, arr *[]string) (types.List, diag.Diagnostics) {
+func FromStringListPointerToTfStringList(ctx context.Context, arr *[]string, diags *diag.Diagnostics) types.List {
 	if arr == nil {
-		return types.ListValueFrom(ctx, types.StringType, []string{})
+		listValue, diagnostics := types.ListValueFrom(ctx, types.StringType, []string{})
+		diags.Append(diagnostics...)
+		return listValue
 	}
-	return types.ListValueFrom(ctx, types.StringType, *arr)
+	listValue, diagnostics := types.ListValueFrom(ctx, types.StringType, *arr)
+	diags.Append(diagnostics...)
+	return listValue
 }
 
-func FromIntListPointerToTfInt64List(ctx context.Context, arr *[]int) (types.List, diag.Diagnostics) {
+func FromIntListPointerToTfInt64List(ctx context.Context, arr *[]int, diags *diag.Diagnostics) types.List {
 	if arr == nil {
-		return types.ListValueFrom(ctx, types.Int64Type, []int{})
+		listValue, diagnostics := types.ListValueFrom(ctx, types.Int64Type, []int{})
+		diags.Append(diagnostics...)
+		return listValue
 	}
-	return types.ListValueFrom(ctx, types.Int64Type, *arr)
+	listValue, diagnostics := types.ListValueFrom(ctx, types.Int64Type, *arr)
+	diags.Append(diagnostics...)
+	return listValue
 }
 
-func TFInt64ListToIntList(ctx context.Context, list types.List) []int {
+func TFInt64ListToIntList(ctx context.Context, list types.List, diags *diag.Diagnostics) []int {
 	return TfListToGenericList(func(a types.Int64) int {
 		return int(a.ValueInt64())
-	}, ctx, list)
+	}, ctx, list, diags)
 }
 
-func TFInt64ListToIntListPointer(ctx context.Context, list types.List) *[]int {
+func TFInt64ListToIntListPointer(ctx context.Context, list types.List, diags *diag.Diagnostics) *[]int {
 	if list.IsNull() {
 		return nil
 	}
 	arr := TfListToGenericList(func(a types.Int64) int {
 		return int(a.ValueInt64())
-	}, ctx, list)
+	}, ctx, list, diags)
 
 	return &arr
 }
 
-func TfSetToGenericSet[A, B any](fun func(A) B, ctx context.Context, set types.Set) []B {
+func TfSetToGenericSet[A, B any](fun func(A) B, ctx context.Context, set types.Set, diags *diag.Diagnostics) []B {
 	if len(set.Elements()) == 0 {
 		return nil
 	}
@@ -151,7 +169,8 @@ func TfSetToGenericSet[A, B any](fun func(A) B, ctx context.Context, set types.S
 	tfList := make([]A, 0, len(set.Elements()))
 	res := make([]B, 0, len(set.Elements()))
 
-	set.ElementsAs(ctx, &tfList, false)
+	diags.Append(set.ElementsAs(ctx, &tfList, false)...)
+
 	for _, e := range tfList {
 		res = append(res, fun(e))
 	}
@@ -159,7 +178,7 @@ func TfSetToGenericSet[A, B any](fun func(A) B, ctx context.Context, set types.S
 	return res
 }
 
-func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list types.List) []B {
+func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list types.List, diags *diag.Diagnostics) []B {
 	if len(list.Elements()) == 0 {
 		return nil
 	}
@@ -167,7 +186,7 @@ func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list type
 	tfList := make([]A, 0, len(list.Elements()))
 	res := make([]B, 0, len(list.Elements()))
 
-	list.ElementsAs(ctx, &tfList, false)
+	diags.Append(list.ElementsAs(ctx, &tfList, false)...)
 	for _, e := range tfList {
 		res = append(res, fun(e))
 	}
@@ -175,7 +194,7 @@ func TfListToGenericList[A, B any](fun func(A) B, ctx context.Context, list type
 	return res
 }
 
-func TfSetToGenericList[A, B any](fun func(A) B, ctx context.Context, set types.Set) []B {
+func TfSetToGenericList[A, B any](fun func(A) B, ctx context.Context, set types.Set, diags *diag.Diagnostics) []B {
 	if len(set.Elements()) == 0 {
 		return nil
 	}
@@ -183,7 +202,10 @@ func TfSetToGenericList[A, B any](fun func(A) B, ctx context.Context, set types.
 	tfList := make([]A, 0, len(set.Elements()))
 	res := make([]B, 0, len(set.Elements()))
 
-	set.ElementsAs(ctx, &tfList, false)
+	diags.Append(set.ElementsAs(ctx, &tfList, false)...)
+	if diags.HasError() {
+		return nil
+	}
 	for _, e := range tfList {
 		res = append(res, fun(e))
 	}
@@ -191,97 +213,102 @@ func TfSetToGenericList[A, B any](fun func(A) B, ctx context.Context, set types.
 	return res
 }
 
-func TfStringListToStringList(ctx context.Context, list types.List) []string {
+func TfStringListToStringList(ctx context.Context, list types.List, diags *diag.Diagnostics) []string {
 	return TfListToGenericList(func(a types.String) string {
 		return a.ValueString()
-	}, ctx, list)
+	}, ctx, list, diags)
 }
 
-func TfStringSetToStringPtrSet(ctx context.Context, set types.Set) *[]string {
+func TfStringSetToStringPtrSet(ctx context.Context, set types.Set, diags *diag.Diagnostics) *[]string {
 	if set.IsNull() {
 		return nil
 	}
 	slice := TfSetToGenericSet(func(a types.String) string {
 		return a.ValueString()
-	}, ctx, set)
+	}, ctx, set, diags)
 	return &slice
 }
 
-func TfStringListToStringPtrList(ctx context.Context, list types.List) *[]string {
+func TfStringListToStringPtrList(ctx context.Context, list types.List, diags *diag.Diagnostics) *[]string {
 	if list.IsNull() || list.IsUnknown() {
 		return nil
 	}
 	slice := TfListToGenericList(func(a types.String) string {
 		return a.ValueString()
-	}, ctx, list)
+	}, ctx, list, diags)
 	return &slice
 }
 
-func TfStringListToTimeList(ctx context.Context, list types.List, format string) []time.Time {
+func TfStringListToTimeList(ctx context.Context, list types.List, format string, diags *diag.Diagnostics) []time.Time {
 	if list.IsNull() {
 		return nil
 	}
-	slice := TfListToGenericList(func(a types.String) time.Time {
+	return TfListToGenericList(func(a types.String) time.Time {
 		t, err := time.Parse(format, a.ValueString())
 		if err != nil {
 			return time.Time{}
 		}
 		return t
-	}, ctx, list)
-	return slice
+	}, ctx, list, diags)
 }
 
-func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, tfListInnerObjType A, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.ListValue, diag.Diagnostics) {
+func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, tfListInnerObjType A, fn func(ctx context.Context, from B, diags *diag.Diagnostics) A, from []B, diags *diag.Diagnostics) basetypes.ListValue {
 	var emptyA A
 
 	to := make([]A, 0, len(from))
 	for i := range from {
-		res, diags := fn(ctx, from[i])
+		res := fn(ctx, from[i], diags)
 		if diags.HasError() {
-			return types.List{}, diags
+			return types.List{}
 		}
 
 		to = append(to, res)
 	}
 
-	return types.ListValueFrom(ctx, emptyA.Type(ctx), to)
+	listValue, diagnostics := types.ListValueFrom(ctx, emptyA.Type(ctx), to)
+	diags.Append(diagnostics...)
+	return listValue
 }
 
-func GenericSetToTfSetValue[A ITFValue, B any](ctx context.Context, tfListInnerObjType A, fn func(ctx context.Context, from B) (A, diag.Diagnostics), from []B) (basetypes.SetValue, diag.Diagnostics) {
+func GenericSetToTfSetValue[A ITFValue, B any](ctx context.Context, tfListInnerObjType A, fn func(ctx context.Context, from B, diags *diag.Diagnostics) A, from []B, diags *diag.Diagnostics) basetypes.SetValue {
 	var emptyA A
 
 	to := make([]A, 0, len(from))
 	for i := range from {
-		res, diags := fn(ctx, from[i])
+		res := fn(ctx, from[i], diags)
 		if diags.HasError() {
-			return types.Set{}, diags
+			return types.Set{}
 		}
 
 		to = append(to, res)
 	}
 
-	return types.SetValueFrom(ctx, emptyA.Type(ctx), to)
+	setValue, diagnostics := types.SetValueFrom(ctx, emptyA.Type(ctx), to)
+	diags.Append(diagnostics...)
+	return setValue
 }
 
-func StringSetToTfSetValue(ctx context.Context, from []string) (types.Set, diag.Diagnostics) {
+func StringSetToTfSetValue(ctx context.Context, from []string, diags *diag.Diagnostics) types.Set {
 	return GenericSetToTfSetValue(
 		ctx,
 		basetypes.StringValue{},
-		func(_ context.Context, from string) (types.String, diag.Diagnostics) {
-			return types.StringValue(from), nil
+		func(_ context.Context, from string, diags *diag.Diagnostics) types.String {
+			return types.StringValue(from)
 		},
 		from,
+		diags,
 	)
 }
 
-func StringListToTfListValue(ctx context.Context, from []string) (types.List, diag.Diagnostics) {
+func StringListToTfListValue(ctx context.Context, from []string, diags *diag.Diagnostics) types.List {
 	return GenericListToTfListValue(
 		ctx,
 		basetypes.StringValue{},
-		func(_ context.Context, from string) (types.String, diag.Diagnostics) {
-			return types.StringValue(from), nil
+		func(_ context.Context, from string, diags *diag.Diagnostics) types.String {
+			return types.StringValue(from)
 		},
 		from,
+		diags,
 	)
 }
 
@@ -301,44 +328,44 @@ func FromTfBoolValueToTfOrNull(element basetypes.BoolValue) basetypes.BoolValue 
 	return element
 }
 
-func FromTfStringListToStringList(ctx context.Context, list types.List) []string {
+func FromTfStringListToStringList(ctx context.Context, list types.List, diags *diag.Diagnostics) []string {
 	return TfListToGenericList(func(a types.String) string {
 		return a.ValueString()
-	}, ctx, list)
+	}, ctx, list, diags)
 }
 
-func FromTfStringSetToStringList(ctx context.Context, set types.Set) []string {
+func FromTfStringSetToStringList(ctx context.Context, set types.Set, diags *diag.Diagnostics) []string {
 	return TfSetToGenericList(func(a types.String) string {
 		return a.ValueString()
-	}, ctx, set)
+	}, ctx, set, diags)
 }
 
-func ParseUUID(id string) (uuid.UUID, diag.Diagnostics) {
-	var diags diag.Diagnostics
+func ParseUUID(id string, diags *diag.Diagnostics) uuid.UUID {
 	parsedUUID, err := uuid.Parse(id)
 	if err != nil {
 		diags.AddError("Failed to parse id", err.Error())
 	}
-	return parsedUUID, diags
+	return parsedUUID
 }
 
 func FromHttpGenericListToTfList[httpType any, tfType any](
 	ctx context.Context,
 	http_items *[]httpType,
-	httpToTfParser func(context.Context, *httpType) (*tfType, diag.Diagnostics),
-) ([]tfType, diag.Diagnostics) {
+	httpToTfParser func(context.Context, *httpType, *diag.Diagnostics) *tfType,
+	diags *diag.Diagnostics,
+) []tfType {
 	itemList := make([]tfType, 0, len(*http_items))
 
 	for _, item := range *http_items {
-		tf, diags := httpToTfParser(ctx, &item)
+		tf := httpToTfParser(ctx, &item, diags)
 		if diags.HasError() {
-			return itemList, diags
+			return nil
 		}
 
 		itemList = append(itemList, *tf)
 	}
 
-	return itemList, nil
+	return itemList
 }
 
 func Diff[A basetypes.ObjectValuable](current, desired []A) (toCreate, toDelete []A) {

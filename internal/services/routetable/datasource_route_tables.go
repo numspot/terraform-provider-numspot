@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type RouteTablesDataSourceModel struct {
@@ -83,8 +83,12 @@ func (d *routeTablesDataSource) Read(ctx context.Context, request datasource.Rea
 		return
 	}
 
-	params := RouteTablesFromTfToAPIReadParams(ctx, plan)
-	res := utils2.ExecuteRequest(func() (*numspot.ReadRouteTablesResponse, error) {
+	params := RouteTablesFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	res := utils.ExecuteRequest(func() (*numspot.ReadRouteTablesResponse, error) {
 		return d.provider.GetNumspotClient().ReadRouteTablesWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -94,10 +98,8 @@ func (d *routeTablesDataSource) Read(ctx context.Context, request datasource.Rea
 		response.Diagnostics.AddError("HTTP call failed", "got empty Route Table list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, RouteTablesFromHttpToTfDatasource)
-
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, RouteTablesFromHttpToTfDatasource, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

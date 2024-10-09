@@ -122,6 +122,5 @@ func reflectHttpResponse(res openapi3filter.StatusCoder) (statusCode *int, bodyB
 			}
 		}
 	}
-
 	return
 }

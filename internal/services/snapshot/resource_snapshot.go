@@ -12,7 +12,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -67,7 +67,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		SnapshotFromTfToCreateRequest(&data),
@@ -86,7 +86,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	}
 
 	// Retries read on resource until state is OK
-	readRes, err := utils2.RetryReadUntilStateValid(
+	readRes, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -105,9 +105,8 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	tf, diags := SnapshotFromHttpToTf(ctx, rr)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := SnapshotFromHttpToTf(ctx, rr, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -130,16 +129,15 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	var data SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadSnapshotsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diags := SnapshotFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := SnapshotFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -189,16 +187,15 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 		return
 	}
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadSnapshotsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diags := SnapshotFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	tf := SnapshotFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -221,7 +218,7 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	var data SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteSnapshotWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteSnapshotWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Snapshot", err.Error())
 		return

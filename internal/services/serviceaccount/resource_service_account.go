@@ -14,7 +14,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -96,13 +96,12 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
-	spaceId, diags := utils2.ParseUUID(plan.SpaceId.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	spaceId := utils.ParseUUID(plan.SpaceId.ValueString(), &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res := utils2.ExecuteRequest(func() (*numspot.CreateServiceAccountSpaceResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.CreateServiceAccountSpaceResponse, error) {
 		return r.provider.GetNumspotClient().CreateServiceAccountSpaceWithResponse(
 			ctx,
 			spaceId,
@@ -126,10 +125,9 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 
 	// Attach permissions
 	if len(plan.GlobalPermissions.Elements()) > 0 {
-		globalPermissions := utils2.FromTfStringSetToStringList(ctx, plan.GlobalPermissions)
-		diags := r.modifyServiceAccountIAMPolicy(ctx, AddAction, EntityTypePermission, spaceId, res.JSON201.Id, globalPermissions)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		globalPermissions := utils.FromTfStringSetToStringList(ctx, plan.GlobalPermissions, &response.Diagnostics)
+		r.modifyServiceAccountIAMPolicy(ctx, AddAction, EntityTypePermission, spaceId, res.JSON201.Id, globalPermissions, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
@@ -138,10 +136,9 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 
 	// Attach Roles
 	if len(plan.Roles.Elements()) > 0 {
-		roles := utils2.FromTfStringSetToStringList(ctx, plan.Roles)
-		diags := r.modifyServiceAccountIAMPolicy(ctx, AddAction, EntityTypeRole, spaceId, res.JSON201.Id, roles)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		roles := utils.FromTfStringSetToStringList(ctx, plan.Roles, &response.Diagnostics)
+		r.modifyServiceAccountIAMPolicy(ctx, AddAction, EntityTypeRole, spaceId, res.JSON201.Id, roles, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
@@ -149,25 +146,22 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 	}
 
 	if verifyRolesAndPermissions {
-		roles, permissions, diags := r.getRolesAndGlobalPermissions(ctx, res.JSON201.Id)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		roles, permissions := r.getRolesAndGlobalPermissions(ctx, res.JSON201.Id, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
 		if roles != nil && len(*roles) > 0 {
-			rolesTf, diags := utils2.FromUUIDListToTfStringSet(ctx, *roles)
-			if diags.HasError() {
-				response.Diagnostics.Append(diags...)
+			rolesTf := utils.FromUUIDListToTfStringSet(ctx, *roles, &response.Diagnostics)
+			if response.Diagnostics.HasError() {
 				return
 			}
 			tf.Roles = rolesTf
 		}
 
 		if permissions != nil && len(*permissions) > 0 {
-			permissionsTf, diags := utils2.FromUUIDListToTfStringSet(ctx, *permissions)
-			if diags.HasError() {
-				response.Diagnostics.Append(diags...)
+			permissionsTf := utils.FromUUIDListToTfStringSet(ctx, *permissions, &response.Diagnostics)
+			if response.Diagnostics.HasError() {
 				return
 			}
 			tf.GlobalPermissions = permissionsTf
@@ -187,19 +181,13 @@ func (r *ServiceAccountResource) Read(ctx context.Context, request resource.Read
 	var state ServiceAccountModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
-	spaceId, diags := utils2.ParseUUID(state.SpaceId.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	spaceId := utils.ParseUUID(state.SpaceId.ValueString(), &response.Diagnostics)
+	serviceAccountID := utils.ParseUUID(state.ServiceAccountId.ValueString(), &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	serviceAccountID, diags := utils2.ParseUUID(state.ServiceAccountId.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
-		return
-	}
-
-	res := utils2.ExecuteRequest(func() (*numspot.GetServiceAccountSpaceResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.GetServiceAccountSpaceResponse, error) {
 		return r.provider.GetNumspotClient().GetServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -211,27 +199,18 @@ func (r *ServiceAccountResource) Read(ctx context.Context, request resource.Read
 		return
 	}
 
-	roles, permissions, diags := r.getRolesAndGlobalPermissions(ctx, state.ServiceAccountId.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	roles, permissions := r.getRolesAndGlobalPermissions(ctx, state.ServiceAccountId.ValueString(), &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
 	if roles != nil && len(*roles) > 0 {
-		rolesTf, diags := utils2.FromUUIDListToTfStringSet(ctx, *roles)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
-			return
-		}
+		rolesTf := utils.FromUUIDListToTfStringSet(ctx, *roles, &response.Diagnostics)
 		state.Roles = rolesTf
 	}
 
 	if permissions != nil && len(*permissions) > 0 {
-		permissionsTf, diags := utils2.FromUUIDListToTfStringSet(ctx, *permissions)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
-			return
-		}
+		permissionsTf := utils.FromUUIDListToTfStringSet(ctx, *permissions, &response.Diagnostics)
 		state.GlobalPermissions = permissionsTf
 	}
 
@@ -240,6 +219,10 @@ func (r *ServiceAccountResource) Read(ctx context.Context, request resource.Read
 	state.Name = tf.Name
 
 	state.Id = types.StringValue(fmt.Sprintf("%s,%s", state.SpaceId.ValueString(), state.ServiceAccountId.ValueString()))
+
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
@@ -252,15 +235,9 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 		return
 	}
 
-	spaceId, diags := utils2.ParseUUID(plan.SpaceId.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
-		return
-	}
-
-	serviceAccountID, diags := utils2.ParseUUID(state.ServiceAccountId.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	spaceId := utils.ParseUUID(plan.SpaceId.ValueString(), &response.Diagnostics)
+	serviceAccountID := utils.ParseUUID(state.ServiceAccountId.ValueString(), &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -288,12 +265,14 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 	// Roles & Permissions
 	verifyRolesAndPermissions := false
 	if !plan.GlobalPermissions.Equal(state.GlobalPermissions) {
-		statePermissions := utils2.FromTfStringSetToStringList(ctx, state.GlobalPermissions)
-		planPermissions := utils2.FromTfStringSetToStringList(ctx, plan.GlobalPermissions)
+		statePermissions := utils.FromTfStringSetToStringList(ctx, state.GlobalPermissions, &response.Diagnostics)
+		planPermissions := utils.FromTfStringSetToStringList(ctx, plan.GlobalPermissions, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
+			return
+		}
 
-		diags := r.updateRolesOrPermission(ctx, spaceId, state.ServiceAccountId.ValueString(), EntityTypePermission, statePermissions, planPermissions)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		r.updateRolesOrPermission(ctx, spaceId, state.ServiceAccountId.ValueString(), EntityTypePermission, statePermissions, planPermissions, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
@@ -301,12 +280,14 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 	}
 
 	if !plan.Roles.Equal(state.Roles) {
-		stateRoles := utils2.FromTfStringSetToStringList(ctx, state.Roles)
-		planRoles := utils2.FromTfStringSetToStringList(ctx, plan.Roles)
+		stateRoles := utils.FromTfStringSetToStringList(ctx, state.Roles, &response.Diagnostics)
+		planRoles := utils.FromTfStringSetToStringList(ctx, plan.Roles, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
+			return
+		}
 
-		diags := r.updateRolesOrPermission(ctx, spaceId, state.ServiceAccountId.ValueString(), EntityTypeRole, stateRoles, planRoles)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		r.updateRolesOrPermission(ctx, spaceId, state.ServiceAccountId.ValueString(), EntityTypeRole, stateRoles, planRoles, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
@@ -314,16 +295,14 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 	}
 
 	if verifyRolesAndPermissions {
-		roles, permissions, diags := r.getRolesAndGlobalPermissions(ctx, state.ServiceAccountId.ValueString())
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		roles, permissions := r.getRolesAndGlobalPermissions(ctx, state.ServiceAccountId.ValueString(), &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
 		if roles != nil && len(*roles) > 0 {
-			rolesTf, diags := utils2.FromUUIDListToTfStringSet(ctx, *roles)
-			if diags.HasError() {
-				response.Diagnostics.Append(diags...)
+			rolesTf := utils.FromUUIDListToTfStringSet(ctx, *roles, &response.Diagnostics)
+			if response.Diagnostics.HasError() {
 				return
 			}
 			state.Roles = rolesTf
@@ -332,9 +311,8 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 		}
 
 		if permissions != nil && len(*permissions) > 0 {
-			permissionsTf, diags := utils2.FromUUIDListToTfStringSet(ctx, *permissions)
-			if diags.HasError() {
-				response.Diagnostics.Append(diags...)
+			permissionsTf := utils.FromUUIDListToTfStringSet(ctx, *permissions, &response.Diagnostics)
+			if response.Diagnostics.HasError() {
 				return
 			}
 			state.GlobalPermissions = permissionsTf
@@ -354,7 +332,7 @@ func (r *ServiceAccountResource) updateServiceAccount(
 ) (*ServiceAccountModel, error) {
 	payload := numspot.ServiceAccount{Name: serviceAccountName}
 
-	res := utils2.ExecuteRequest(func() (*numspot.UpdateServiceAccountSpaceResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.UpdateServiceAccountSpaceResponse, error) {
 		return r.provider.GetNumspotClient().UpdateServiceAccountSpaceWithResponse(ctx, spaceID, servicAccountID, payload)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -374,7 +352,7 @@ func (r *ServiceAccountResource) assignServiceAccountToSpace(
 	spaceID, servicAccountID uuid.UUID,
 	response *resource.UpdateResponse,
 ) error {
-	res := utils2.ExecuteRequest(func() (*numspot.AssignServiceAccountToSpaceResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.AssignServiceAccountToSpaceResponse, error) {
 		return r.provider.GetNumspotClient().AssignServiceAccountToSpaceWithResponse(ctx, spaceID, servicAccountID)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -388,19 +366,13 @@ func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.De
 	var state ServiceAccountModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
-	spaceId, diags := utils2.ParseUUID(state.SpaceId.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	spaceId := utils.ParseUUID(state.SpaceId.ValueString(), &response.Diagnostics)
+	serviceAccountID := utils.ParseUUID(state.ServiceAccountId.ValueString(), &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	serviceAccountID, diags := utils2.ParseUUID(state.ServiceAccountId.ValueString())
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
-		return
-	}
-
-	res := utils2.ExecuteRequest(func() (*numspot.DeleteServiceAccountSpaceResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.DeleteServiceAccountSpaceResponse, error) {
 		return r.provider.GetNumspotClient().DeleteServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
@@ -410,18 +382,14 @@ func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.De
 	response.State.RemoveResource(ctx)
 }
 
-func parseStringListAsUUIDs(strList []string) ([]uuid.UUID, diag.Diagnostics) {
+func parseStringListAsUUIDs(strList []string, diags *diag.Diagnostics) []uuid.UUID {
 	uuidBulk := make([]uuid.UUID, 0, len(strList))
 	for _, str := range strList {
-		currentUuid, diags := utils2.ParseUUID(str)
-		if diags.HasError() {
-			return nil, diags
-		}
-
+		currentUuid := utils.ParseUUID(str, diags)
 		uuidBulk = append(uuidBulk, currentUuid)
 	}
 
-	return uuidBulk, nil
+	return uuidBulk
 }
 
 // Global Permissions & Roles
@@ -432,20 +400,13 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 	spaceId uuid.UUID,
 	serviceAccountID string,
 	uuids []string,
-) diag.Diagnostics {
-	var diags diag.Diagnostics
-
+	diags *diag.Diagnostics,
+) {
 	// Parse Service Account ID
-	serviceAccountUUID, diags := utils2.ParseUUID(serviceAccountID)
-	if diags.HasError() {
-		return diags
-	}
+	serviceAccountUUID := utils.ParseUUID(serviceAccountID, diags)
 
 	// Parse UUIDs
-	uuidList, diags := parseStringListAsUUIDs(uuids)
-	if diags.HasError() {
-		return diags
-	}
+	uuidList := parseStringListAsUUIDs(uuids, diags)
 
 	// Create Body
 	var policies *numspot.IAMPolicy
@@ -466,8 +427,12 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 		}
 	}
 
+	if diags.HasError() {
+		return
+	}
+
 	// Execute
-	utils2.ExecuteRequest(func() (*numspot.SetIAMPolicySpaceResponse, error) {
+	utils.ExecuteRequest(func() (*numspot.SetIAMPolicySpaceResponse, error) {
 		return r.provider.GetNumspotClient().SetIAMPolicySpaceWithResponse(
 			ctx,
 			spaceId,
@@ -475,9 +440,7 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 			serviceAccountUUID,
 			body,
 		)
-	}, http.StatusNoContent, &diags)
-
-	return diags
+	}, http.StatusNoContent, diags)
 }
 
 func (r *ServiceAccountResource) updateRolesOrPermission(
@@ -486,54 +449,50 @@ func (r *ServiceAccountResource) updateRolesOrPermission(
 	serviceAccountID string,
 	entityType EntityType,
 	stateValues, planValues []string,
-) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	toAdd, toRemove := utils2.DiffComparable(stateValues, planValues)
+	diags *diag.Diagnostics,
+) {
+	toAdd, toRemove := utils.DiffComparable(stateValues, planValues)
 
 	if len(toRemove) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, DeleteAction, entityType, spaceId, serviceAccountID, toRemove)
+		r.modifyServiceAccountIAMPolicy(ctx, DeleteAction, entityType, spaceId, serviceAccountID, toRemove, diags)
 		if diags.HasError() {
-			return diags
+			return
 		}
 	}
 
 	if len(toAdd) > 0 {
-		diags = r.modifyServiceAccountIAMPolicy(ctx, AddAction, entityType, spaceId, serviceAccountID, toAdd)
+		r.modifyServiceAccountIAMPolicy(ctx, AddAction, entityType, spaceId, serviceAccountID, toAdd, diags)
 		if diags.HasError() {
-			return diags
+			return
 		}
 	}
-
-	return diags
 }
 
 func (r *ServiceAccountResource) getRolesAndGlobalPermissions(
 	ctx context.Context,
 	serviceAccountID string,
-) (*[]uuid.UUID, *[]uuid.UUID, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	serviceAccountUUID, diags := utils2.ParseUUID(serviceAccountID)
+	diags *diag.Diagnostics,
+) (*[]uuid.UUID, *[]uuid.UUID) {
+	serviceAccountUUID := utils.ParseUUID(serviceAccountID, diags)
 	if diags.HasError() {
-		return nil, nil, diags
+		return nil, nil
 	}
 
-	res := utils2.ExecuteRequest(func() (*numspot.GetIAMPolicySpaceResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.GetIAMPolicySpaceResponse, error) {
 		return r.provider.GetNumspotClient().GetIAMPolicySpaceWithResponse(
 			ctx, r.provider.GetSpaceID(), numspot.ServiceAccounts, serviceAccountUUID)
-	}, http.StatusOK, &diags)
+	}, http.StatusOK, diags)
 	if res == nil {
-		return nil, nil, diags
+		return nil, nil
 	}
 
 	if res.JSON200 == nil {
 		diags.AddError("Failed to get IAM policy space response", res.Status())
-		return nil, nil, diags
+		return nil, nil
 	}
 
 	roles := res.JSON200.Roles
 	permissions := res.JSON200.Permissions
 
-	return roles, permissions, nil
+	return roles, permissions
 }

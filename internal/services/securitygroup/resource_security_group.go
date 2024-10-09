@@ -13,7 +13,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -60,11 +60,9 @@ func (r *SecurityGroupResource) Schema(ctx context.Context, request resource.Sch
 	response.Schema = SecurityGroupResourceSchema(ctx)
 }
 
-func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, existingRules *[]numspot.SecurityGroupRule, flow string) diag.Diagnostics {
-	var diags diag.Diagnostics
-
+func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, existingRules *[]numspot.SecurityGroupRule, flow string, diags *diag.Diagnostics) {
 	if existingRules == nil {
-		return nil
+		return
 	}
 
 	rules := make([]numspot.SecurityGroupRule, 0, len(*existingRules))
@@ -79,15 +77,13 @@ func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, exis
 		})
 	}
 
-	utils2.ExecuteRequest(func() (*numspot.DeleteSecurityGroupRuleResponse, error) {
+	utils.ExecuteRequest(func() (*numspot.DeleteSecurityGroupRuleResponse, error) {
 		body := numspot.DeleteSecurityGroupRuleJSONRequestBody{
 			Flow:  flow,
 			Rules: &rules,
 		}
 		return r.provider.GetNumspotClient().DeleteSecurityGroupRuleWithResponse(ctx, r.provider.GetSpaceID(), id, body)
-	}, http.StatusNoContent, &diags)
-
-	return diags
+	}, http.StatusNoContent, diags)
 }
 
 // Note : this is not a method of SecurityGroupResource because method do not handle generic types
@@ -97,61 +93,54 @@ func createRules[RulesType any](
 	id string,
 	rulesToCreate basetypes.SetValue,
 	fun func(ctx context.Context, sgId string, data []RulesType) numspot.CreateSecurityGroupRuleJSONRequestBody,
-) diag.Diagnostics {
-	var diags diag.Diagnostics
-
+	diags *diag.Diagnostics,
+) {
 	rules := make([]RulesType, 0, len(rulesToCreate.Elements()))
 	rulesToCreate.ElementsAs(ctx, &rules, false)
 
-	_ = utils2.ExecuteRequest(func() (*numspot.CreateSecurityGroupRuleResponse, error) {
+	_ = utils.ExecuteRequest(func() (*numspot.CreateSecurityGroupRuleResponse, error) {
 		body := fun(ctx, id, rules)
 		return r.provider.GetNumspotClient().CreateSecurityGroupRuleWithResponse(ctx, r.provider.GetSpaceID(), id, body)
-	}, http.StatusCreated, &diags)
-
-	return diags
+	}, http.StatusCreated, diags)
 }
 
-func (r *SecurityGroupResource) updateAllRules(ctx context.Context, data SecurityGroupModel, id string) diag.Diagnostics {
-	var diags diag.Diagnostics
-
+func (r *SecurityGroupResource) updateAllRules(ctx context.Context, data SecurityGroupModel, id string, diags *diag.Diagnostics) {
 	// Read security group to retrieve the existing rules
 	read := r.readSecurityGroup(ctx, id, diags)
 	if diags.HasError() {
-		return diags
+		return
 	}
 
 	// Delete existing inbound rules
 	if len(*read.JSON200.InboundRules) > 0 {
-		diags = r.deleteRules(ctx, id, read.JSON200.InboundRules, "Inbound")
+		r.deleteRules(ctx, id, read.JSON200.InboundRules, "Inbound", diags)
 		if diags.HasError() {
-			return diags
+			return
 		}
 	}
 
 	// Create wanted inbound rules
 	if len(data.InboundRules.Elements()) > 0 {
-		diags = createRules(r, ctx, id, data.InboundRules, CreateInboundRulesRequest)
+		createRules(r, ctx, id, data.InboundRules, CreateInboundRulesRequest, diags)
 		if diags.HasError() {
-			return diags
+			return
 		}
 	}
 
 	// Delete existing Outbound rules
 	if len(*read.JSON200.OutboundRules) > 0 {
-		diags = r.deleteRules(ctx, id, read.JSON200.OutboundRules, "Outbound")
+		r.deleteRules(ctx, id, read.JSON200.OutboundRules, "Outbound", diags)
 		if diags.HasError() {
-			return diags
+			return
 		}
 	}
 	// Create wanted Outbound rules
 	if len(data.OutboundRules.Elements()) > 0 {
-		diags = createRules(r, ctx, id, data.OutboundRules, CreateOutboundRulesRequest)
+		createRules(r, ctx, id, data.OutboundRules, CreateOutboundRulesRequest, diags)
 		if diags.HasError() {
-			return diags
+			return
 		}
 	}
-
-	return nil
 }
 
 func (r *SecurityGroupResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
@@ -162,7 +151,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		SecurityGroupFromTfToCreateRequest(&data),
@@ -172,7 +161,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	id := utils2.GetPtrValue(res.JSON201.Id)
+	id := utils.GetPtrValue(res.JSON201.Id)
 	if id == "" {
 		return
 	}
@@ -185,21 +174,20 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		}
 	}
 
-	diags := r.updateAllRules(ctx, data, id)
+	r.updateAllRules(ctx, data, id, &response.Diagnostics)
 
-	if diags.HasError() {
-		return
-	}
-
-	// Read before store
-	read := r.readSecurityGroup(ctx, id, response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, read.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	// Read before store
+	read := r.readSecurityGroup(ctx, id, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	tf := SecurityGroupFromHttpToTf(ctx, read.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -210,14 +198,13 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 	var data SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := r.readSecurityGroup(ctx, data.Id.ValueString(), response.Diagnostics)
+	res := r.readSecurityGroup(ctx, data.Id.ValueString(), &response.Diagnostics)
 	if response.Diagnostics.HasError() || res == nil {
 		return
 	}
 
-	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	tf := SecurityGroupFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -226,7 +213,7 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 func (r *SecurityGroupResource) readSecurityGroup(
 	ctx context.Context,
 	id string,
-	diagnostics diag.Diagnostics,
+	diagnostics *diag.Diagnostics,
 ) *numspot.ReadSecurityGroupsByIdResponse {
 	res, err := r.provider.GetNumspotClient().ReadSecurityGroupsByIdWithResponse(ctx, r.provider.GetSpaceID(), id)
 	if err != nil {
@@ -235,7 +222,7 @@ func (r *SecurityGroupResource) readSecurityGroup(
 	}
 
 	if res.StatusCode() != http.StatusOK {
-		apiError := utils2.HandleError(res.Body)
+		apiError := utils.HandleError(res.Body)
 		diagnostics.AddError("Failed to read SecurityGroup", apiError.Error())
 		return nil
 	}
@@ -270,24 +257,19 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 	}
 
 	// update rules
-	diags := r.updateAllRules(ctx, plan, securityGroupId)
-	if diags.HasError() {
+	r.updateAllRules(ctx, plan, securityGroupId, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res := r.readSecurityGroup(ctx, securityGroupId, response.Diagnostics)
+	res := r.readSecurityGroup(ctx, securityGroupId, &response.Diagnostics)
 	if response.Diagnostics.HasError() || res == nil {
 		return
 	}
 
-	tf, diagnostics := SecurityGroupFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	tf := SecurityGroupFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
-	}
-
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -297,7 +279,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 	var data SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteSecurityGroupWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteSecurityGroupWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Security Group", err.Error())
 		return

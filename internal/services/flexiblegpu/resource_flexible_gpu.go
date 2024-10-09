@@ -12,7 +12,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vm"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -59,53 +59,45 @@ func (r *FlexibleGpuResource) Schema(ctx context.Context, request resource.Schem
 	response.Schema = FlexibleGpuResourceSchema(ctx)
 }
 
-func (r *FlexibleGpuResource) linkVm(ctx context.Context, gpuId string, data FlexibleGpuModel) diag.Diagnostics {
-	var diags diag.Diagnostics
-
+func (r *FlexibleGpuResource) linkVm(ctx context.Context, gpuId string, data FlexibleGpuModel, diags *diag.Diagnostics) {
 	// Link GPU to VM
 	body := LinkFlexibleGpuFromTfToCreateRequest(&data)
-	_ = utils2.ExecuteRequest(func() (*numspot.LinkFlexibleGpuResponse, error) {
+	_ = utils.ExecuteRequest(func() (*numspot.LinkFlexibleGpuResponse, error) {
 		return r.provider.GetNumspotClient().LinkFlexibleGpuWithResponse(ctx, r.provider.GetSpaceID(), gpuId, body)
-	}, http.StatusNoContent, &diags)
+	}, http.StatusNoContent, diags)
 	if diags.HasError() {
-		return diags
+		return
 	}
 
 	// Restart VM needed when linking a GPU
-	diags = vm.StopVm(ctx, r.provider, data.VmId.ValueString())
+	vm.StopVm(ctx, r.provider, data.VmId.ValueString(), diags)
 	if diags.HasError() {
-		return diags
+		return
 	}
-	diags = vm.StartVm(ctx, r.provider, data.VmId.ValueString())
+	vm.StartVm(ctx, r.provider, data.VmId.ValueString(), diags)
 	if diags.HasError() {
-		return diags
+		return
 	}
-
-	return diags
 }
 
-func (r *FlexibleGpuResource) unlinkVm(ctx context.Context, gpuId string, data FlexibleGpuModel) diag.Diagnostics {
-	var diags diag.Diagnostics
-
+func (r *FlexibleGpuResource) unlinkVm(ctx context.Context, gpuId string, data FlexibleGpuModel, diags *diag.Diagnostics) {
 	// Unlink GPU from any VM
-	_ = utils2.ExecuteRequest(func() (*numspot.UnlinkFlexibleGpuResponse, error) {
+	_ = utils.ExecuteRequest(func() (*numspot.UnlinkFlexibleGpuResponse, error) {
 		return r.provider.GetNumspotClient().UnlinkFlexibleGpuWithResponse(ctx, r.provider.GetSpaceID(), gpuId)
-	}, http.StatusNoContent, &diags)
+	}, http.StatusNoContent, diags)
 	if diags.HasError() {
-		return diags
+		return
 	}
 
 	// Restart VM needed when unlinking a GPU
-	diags = vm.StopVm(ctx, r.provider, data.VmId.ValueString())
+	vm.StopVm(ctx, r.provider, data.VmId.ValueString(), diags)
 	if diags.HasError() {
-		return diags
+		return
 	}
-	diags = vm.StartVm(ctx, r.provider, data.VmId.ValueString())
+	vm.StartVm(ctx, r.provider, data.VmId.ValueString(), diags)
 	if diags.HasError() {
-		return diags
+		return
 	}
-
-	return diags
 }
 
 func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
@@ -116,7 +108,7 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		FlexibleGpuFromTfToCreateRequest(&data),
@@ -130,13 +122,13 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 
 	// Link GPU to VM
 	if !(data.VmId.IsNull() || data.VmId.IsUnknown()) {
-		response.Diagnostics.Append(r.linkVm(ctx, createdId, data)...)
+		r.linkVm(ctx, createdId, data, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
-	read, err := utils2.RetryReadUntilStateValid(
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -159,16 +151,16 @@ func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.Creat
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *FlexibleGpuResource) read(ctx context.Context, id string, diagnostics diag.Diagnostics) *numspot.FlexibleGpu {
+func (r *FlexibleGpuResource) read(ctx context.Context, id string, diags *diag.Diagnostics) *numspot.FlexibleGpu {
 	res, err := r.provider.GetNumspotClient().ReadFlexibleGpusByIdWithResponse(ctx, r.provider.GetSpaceID(), id)
 	if err != nil {
-		diagnostics.AddError("Failed to read RouteTable", err.Error())
+		diags.AddError("Failed to read RouteTable", err.Error())
 		return nil
 	}
 
 	if res.StatusCode() != http.StatusOK {
-		apiError := utils2.HandleError(res.Body)
-		diagnostics.AddError("Failed to read FlexibleGpu", apiError.Error())
+		apiError := utils.HandleError(res.Body)
+		diags.AddError("Failed to read FlexibleGpu", apiError.Error())
 		return nil
 	}
 
@@ -179,7 +171,7 @@ func (r *FlexibleGpuResource) Read(ctx context.Context, request resource.ReadReq
 	var data FlexibleGpuModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	gpu := r.read(ctx, data.Id.ValueString(), response.Diagnostics)
+	gpu := r.read(ctx, data.Id.ValueString(), &response.Diagnostics)
 	if gpu == nil {
 		return
 	}
@@ -198,15 +190,16 @@ func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.Updat
 
 	if plan.VmId.ValueString() != state.VmId.ValueString() {
 		if state.VmId.IsNull() || state.VmId.IsUnknown() { // If GPU is not linked to any VM and we want to link it
-			response.Diagnostics.Append(r.linkVm(ctx, state.Id.ValueString(), plan)...)
+			r.linkVm(ctx, state.Id.ValueString(), plan, &response.Diagnostics)
 			if response.Diagnostics.HasError() {
 				return
 			}
 
 		} else if plan.VmId.IsNull() || plan.VmId.IsUnknown() { // If GPU is linked to a VM and we want to unlink it
-			diags := r.unlinkVm(ctx, state.Id.ValueString(), state)
-			if diags.HasError() {
-				_, err := utils2.RetryReadUntilStateValid(
+			var diagnostics diag.Diagnostics // Use a temporary diag because some errors might be ok here
+			r.unlinkVm(ctx, state.Id.ValueString(), state, &diagnostics)
+			if diagnostics.HasError() {
+				_, err := utils.RetryReadUntilStateValid(
 					ctx,
 					state.Id.ValueString(),
 					r.provider.GetSpaceID(),
@@ -215,14 +208,15 @@ func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.Updat
 					r.provider.GetNumspotClient().ReadFlexibleGpusByIdWithResponse,
 				)
 				if err != nil {
-					response.Diagnostics.Append(diags...)
+					response.Diagnostics.Append(diagnostics...)
 					response.Diagnostics.AddError("Failed while waiting for GPU to get unlinked", err.Error())
 				}
 			}
 		} else { // Gpu is linked to a VM and we want to link it to another
-			diags := r.unlinkVm(ctx, state.Id.ValueString(), state)
-			if diags.HasError() {
-				_, err := utils2.RetryReadUntilStateValid(
+			var diagnostics diag.Diagnostics // Use a temporary diag because some errors might be ok here
+			r.unlinkVm(ctx, state.Id.ValueString(), state, &diagnostics)
+			if diagnostics.HasError() {
+				_, err := utils.RetryReadUntilStateValid(
 					ctx,
 					state.Id.ValueString(),
 					r.provider.GetSpaceID(),
@@ -231,11 +225,11 @@ func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.Updat
 					r.provider.GetNumspotClient().ReadFlexibleGpusByIdWithResponse,
 				)
 				if err != nil {
-					response.Diagnostics.Append(diags...)
+					response.Diagnostics.Append(diagnostics...)
 					response.Diagnostics.AddError("Failed while waiting for GPU to get unlinked", err.Error())
 				}
 			}
-			response.Diagnostics.Append(r.linkVm(ctx, state.Id.ValueString(), plan)...)
+			r.linkVm(ctx, state.Id.ValueString(), plan, &response.Diagnostics)
 			if response.Diagnostics.HasError() {
 				return
 			}
@@ -244,7 +238,7 @@ func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.Updat
 
 	if plan.DeleteOnVmDeletion != state.DeleteOnVmDeletion {
 		body := FlexibleGpuFromTfToUpdateRequest(&plan)
-		res := utils2.ExecuteRequest(func() (*numspot.UpdateFlexibleGpuResponse, error) {
+		res := utils.ExecuteRequest(func() (*numspot.UpdateFlexibleGpuResponse, error) {
 			return r.provider.GetNumspotClient().UpdateFlexibleGpuWithResponse(
 				ctx,
 				r.provider.GetSpaceID(),
@@ -257,7 +251,7 @@ func (r *FlexibleGpuResource) Update(ctx context.Context, request resource.Updat
 
 	}
 
-	gpu := r.read(ctx, state.Id.ValueString(), response.Diagnostics)
+	gpu := r.read(ctx, state.Id.ValueString(), &response.Diagnostics)
 	if gpu == nil {
 		return
 	}
@@ -271,9 +265,10 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
 	if !(data.VmId.IsNull() || data.VmId.IsUnknown()) {
-		diags := r.unlinkVm(ctx, data.Id.ValueString(), data)
-		if diags.HasError() {
-			_, err := utils2.RetryReadUntilStateValid(
+		var diagnostics diag.Diagnostics // Use a temporary diag because some errors might be ok here
+		r.unlinkVm(ctx, data.Id.ValueString(), data, &diagnostics)
+		if diagnostics.HasError() {
+			_, err := utils.RetryReadUntilStateValid(
 				ctx,
 				data.Id.ValueString(),
 				r.provider.GetSpaceID(),
@@ -282,14 +277,14 @@ func (r *FlexibleGpuResource) Delete(ctx context.Context, request resource.Delet
 				r.provider.GetNumspotClient().ReadFlexibleGpusByIdWithResponse,
 			)
 			if err != nil {
-				response.Diagnostics.Append(diags...)
+				response.Diagnostics.Append(diagnostics...)
 				response.Diagnostics.AddError("Failed while waiting for GPU to get unlinked", err.Error())
 				return
 			}
 		}
 	}
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteFlexibleGpuWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteFlexibleGpuWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Flexible GPU", err.Error())
 		return

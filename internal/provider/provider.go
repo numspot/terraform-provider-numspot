@@ -11,6 +11,7 @@ import (
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
@@ -97,7 +98,8 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 }
 
 func (p *numspotProvider) authenticateUser(ctx context.Context, NumspotClient *numspot.ClientWithResponses, data *NumspotProviderModel) (*string, error) {
-	clientUuid, diags := utils.ParseUUID(data.ClientId.ValueString())
+	var diags diag.Diagnostics
+	clientUuid := utils.ParseUUID(data.ClientId.ValueString(), &diags)
 	if diags.HasError() {
 		return nil, fmt.Errorf("Error while parsing %s as UUID", data.ClientId.ValueString())
 	}

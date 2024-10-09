@@ -12,22 +12,21 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func RouteTableFromHttpToTf(ctx context.Context, http *numspot.RouteTable) (*RouteTableModel, diag.Diagnostics) {
+func RouteTableFromHttpToTf(ctx context.Context, http *numspot.RouteTable, diags *diag.Diagnostics) *RouteTableModel {
 	var (
-		tagsTf     types.List
-		diags      diag.Diagnostics
 		localRoute RoutesValue
 		routes     []numspot.Route
+		tagsTf     types.List
 	)
 
 	if http.Routes == nil {
-		return nil, diags
+		return nil
 	}
 	for _, route := range *http.Routes {
 		if route.GatewayId != nil && *route.GatewayId == "local" {
-			localRoute, diags = routeTableRouteFromAPI(ctx, route)
+			localRoute = routeTableRouteFromAPI(ctx, route, diags)
 			if diags.HasError() {
-				return nil, diags
+				return nil
 			}
 		} else {
 			routes = append(routes, route)
@@ -35,15 +34,15 @@ func RouteTableFromHttpToTf(ctx context.Context, http *numspot.RouteTable) (*Rou
 	}
 
 	// Routes
-	tfRoutes, diags := utils.GenericSetToTfSetValue(ctx, RoutesValue{}, routeTableRouteFromAPI, routes)
+	tfRoutes := utils.GenericSetToTfSetValue(ctx, RoutesValue{}, routeTableRouteFromAPI, routes, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	// Links
-	tfLinks, diags := utils.GenericListToTfListValue(ctx, LinkRouteTablesValue{}, routeTableLinkFromAPI, *http.LinkRouteTables)
+	tfLinks := utils.GenericListToTfListValue(ctx, LinkRouteTablesValue{}, routeTableLinkFromAPI, *http.LinkRouteTables, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	// Retrieve Subnet Id:
@@ -56,9 +55,9 @@ func RouteTableFromHttpToTf(ctx context.Context, http *numspot.RouteTable) (*Rou
 	}
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -73,11 +72,11 @@ func RouteTableFromHttpToTf(ctx context.Context, http *numspot.RouteTable) (*Rou
 		LocalRoute:                      localRoute,
 	}
 
-	return &res, diags
+	return &res
 }
 
-func routeTableLinkFromAPI(ctx context.Context, link numspot.LinkRouteTable) (LinkRouteTablesValue, diag.Diagnostics) {
-	return NewLinkRouteTablesValue(
+func routeTableLinkFromAPI(ctx context.Context, link numspot.LinkRouteTable, diags *diag.Diagnostics) LinkRouteTablesValue {
+	value, diagnostics := NewLinkRouteTablesValue(
 		LinkRouteTablesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"id":             types.StringPointerValue(link.Id),
@@ -87,10 +86,12 @@ func routeTableLinkFromAPI(ctx context.Context, link numspot.LinkRouteTable) (Li
 			"vpc_id":         types.StringPointerValue(link.VpcId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func routeTableRouteFromAPI(ctx context.Context, route numspot.Route) (RoutesValue, diag.Diagnostics) {
-	return NewRoutesValue(
+func routeTableRouteFromAPI(ctx context.Context, route numspot.Route, diags *diag.Diagnostics) RoutesValue {
+	value, diagnostics := NewRoutesValue(
 		RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"creation_method":        types.StringPointerValue(route.CreationMethod),
@@ -104,6 +105,8 @@ func routeTableRouteFromAPI(ctx context.Context, route numspot.Route) (RoutesVal
 			"vm_id":                  types.StringPointerValue(route.VmId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
 func RouteTableFromTfToCreateRequest(tf *RouteTableModel) numspot.CreateRouteTableJSONRequestBody {
@@ -129,31 +132,30 @@ func RouteTableFromTfToDeleteRoutesRequest(route RoutesValue) numspot.DeleteRout
 	}
 }
 
-func RouteTablesFromTfToAPIReadParams(ctx context.Context, tf RouteTablesDataSourceModel) numspot.ReadRouteTablesParams {
+func RouteTablesFromTfToAPIReadParams(ctx context.Context, tf RouteTablesDataSourceModel, diags *diag.Diagnostics) numspot.ReadRouteTablesParams {
 	return numspot.ReadRouteTablesParams{
-		TagKeys:                         utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:                       utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:                            utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:                             utils.TfStringListToStringPtrList(ctx, tf.Ids),
-		RouteVpcPeeringIds:              utils.TfStringListToStringPtrList(ctx, tf.RouteVpcPeeringIds),
-		RouteNatGatewayIds:              utils.TfStringListToStringPtrList(ctx, tf.RouteNatGatewayIds),
-		RouteVmIds:                      utils.TfStringListToStringPtrList(ctx, tf.RouteVmIds),
-		RouteCreationMethods:            utils.TfStringListToStringPtrList(ctx, tf.RouteCreationMethods),
-		RouteDestinationIpRanges:        utils.TfStringListToStringPtrList(ctx, tf.RouteDestinationIpRanges),
-		RouteDestinationServiceIds:      utils.TfStringListToStringPtrList(ctx, tf.RouteDestinationServiceIds),
-		RouteGatewayIds:                 utils.TfStringListToStringPtrList(ctx, tf.RouteGatewayIds),
-		RouteStates:                     utils.TfStringListToStringPtrList(ctx, tf.RouteStates),
-		VpcIds:                          utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
-		LinkRouteTableIds:               utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableIds),
+		TagKeys:                         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:                       utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:                            utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:                             utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		RouteVpcPeeringIds:              utils.TfStringListToStringPtrList(ctx, tf.RouteVpcPeeringIds, diags),
+		RouteNatGatewayIds:              utils.TfStringListToStringPtrList(ctx, tf.RouteNatGatewayIds, diags),
+		RouteVmIds:                      utils.TfStringListToStringPtrList(ctx, tf.RouteVmIds, diags),
+		RouteCreationMethods:            utils.TfStringListToStringPtrList(ctx, tf.RouteCreationMethods, diags),
+		RouteDestinationIpRanges:        utils.TfStringListToStringPtrList(ctx, tf.RouteDestinationIpRanges, diags),
+		RouteDestinationServiceIds:      utils.TfStringListToStringPtrList(ctx, tf.RouteDestinationServiceIds, diags),
+		RouteGatewayIds:                 utils.TfStringListToStringPtrList(ctx, tf.RouteGatewayIds, diags),
+		RouteStates:                     utils.TfStringListToStringPtrList(ctx, tf.RouteStates, diags),
+		VpcIds:                          utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
+		LinkRouteTableIds:               utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableIds, diags),
 		LinkRouteTableMain:              utils.FromTfBoolToBoolPtr(tf.LinkRouteTableMain),
-		LinkRouteTableLinkRouteTableIds: utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableLinkRouteTableIds),
-		LinkSubnetIds:                   utils.TfStringListToStringPtrList(ctx, tf.LinkSubnetIds),
+		LinkRouteTableLinkRouteTableIds: utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableLinkRouteTableIds, diags),
+		LinkSubnetIds:                   utils.TfStringListToStringPtrList(ctx, tf.LinkSubnetIds, diags),
 	}
 }
 
-func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *numspot.RouteTable) (*RouteTableModelDatasource, diag.Diagnostics) {
+func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *numspot.RouteTable, diags *diag.Diagnostics) *RouteTableModelDatasource {
 	var (
-		diags                               diag.Diagnostics
 		tagsList                            = types.ListNull(tags.TagsValue{}.Type(ctx))
 		linkRouteTablesList                 = types.ListNull(LinkRouteTablesValue{}.Type(ctx))
 		routes                              = types.ListNull(RoutesValue{}.Type(ctx))
@@ -161,33 +163,33 @@ func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *numspot.RouteT
 	)
 
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
 	if http.LinkRouteTables != nil {
-		linkRouteTablesList, diags = utils.GenericListToTfListValue(ctx, LinkRouteTablesValue{}, routeTableLinkFromAPIDatasource, *http.LinkRouteTables)
+		linkRouteTablesList = utils.GenericListToTfListValue(ctx, LinkRouteTablesValue{}, routeTableLinkFromAPIDatasource, *http.LinkRouteTables, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
 	if http.RoutePropagatingVirtualGateways != nil {
-		routePropagatingVirtualGatewaysList, diags = utils.GenericListToTfListValue(
+		routePropagatingVirtualGatewaysList = utils.GenericListToTfListValue(
 			ctx, RoutePropagatingVirtualGatewaysValue{},
 			routeTableRoutePropagatingVirtualGatewaysFromAPIDatasource,
-			*http.RoutePropagatingVirtualGateways)
+			*http.RoutePropagatingVirtualGateways, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
 	if http.Routes != nil {
-		routes, diags = utils.GenericListToTfListValue(ctx, RoutesValue{}, routeFromAPIDatasource, *http.Routes)
+		routes = utils.GenericListToTfListValue(ctx, RoutesValue{}, routeFromAPIDatasource, *http.Routes, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -198,11 +200,11 @@ func RouteTablesFromHttpToTfDatasource(ctx context.Context, http *numspot.RouteT
 		RoutePropagatingVirtualGateways: routePropagatingVirtualGatewaysList,
 		VpcId:                           types.StringPointerValue(http.VpcId),
 		Routes:                          routes,
-	}, nil
+	}
 }
 
-func routeFromAPIDatasource(ctx context.Context, route numspot.Route) (RoutesValue, diag.Diagnostics) {
-	return NewRoutesValue(
+func routeFromAPIDatasource(ctx context.Context, route numspot.Route, diags *diag.Diagnostics) RoutesValue {
+	value, diagnostics := NewRoutesValue(
 		RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"creation_method":        types.StringPointerValue(route.CreationMethod),
@@ -216,10 +218,12 @@ func routeFromAPIDatasource(ctx context.Context, route numspot.Route) (RoutesVal
 			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func routeTableLinkFromAPIDatasource(ctx context.Context, link numspot.LinkRouteTable) (LinkRouteTablesValue, diag.Diagnostics) {
-	return NewLinkRouteTablesValue(
+func routeTableLinkFromAPIDatasource(ctx context.Context, link numspot.LinkRouteTable, diags *diag.Diagnostics) LinkRouteTablesValue {
+	value, diagnostics := NewLinkRouteTablesValue(
 		LinkRouteTablesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"id":             types.StringPointerValue(link.Id),
@@ -229,13 +233,17 @@ func routeTableLinkFromAPIDatasource(ctx context.Context, link numspot.LinkRoute
 			"vpc_id":         types.StringPointerValue(link.VpcId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func routeTableRoutePropagatingVirtualGatewaysFromAPIDatasource(ctx context.Context, route numspot.RoutePropagatingVirtualGateway) (RoutePropagatingVirtualGatewaysValue, diag.Diagnostics) {
-	return NewRoutePropagatingVirtualGatewaysValue(
+func routeTableRoutePropagatingVirtualGatewaysFromAPIDatasource(ctx context.Context, route numspot.RoutePropagatingVirtualGateway, diags *diag.Diagnostics) RoutePropagatingVirtualGatewaysValue {
+	value, diagnostics := NewRoutePropagatingVirtualGatewaysValue(
 		RoutePropagatingVirtualGatewaysValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"virtual_gateway_id": types.StringPointerValue(route.VirtualGatewayId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }

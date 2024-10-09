@@ -12,7 +12,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 func StopVmNoDiag(ctx context.Context, provider services.IProvider, vm string) (err error) {
@@ -41,7 +41,7 @@ func StopVmNoDiag(ctx context.Context, provider services.IProvider, vm string) (
 		return err
 	}
 
-	if _, err = utils2.RetryReadUntilStateValid(ctx, vm, provider.GetSpaceID(), []string{"stopping"}, []string{"stopped", "terminated"},
+	if _, err = utils.RetryReadUntilStateValid(ctx, vm, provider.GetSpaceID(), []string{"stopping"}, []string{"stopped", "terminated"},
 		provider.GetNumspotClient().ReadVmsByIdWithResponse); err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func StartVmNoDiag(ctx context.Context, provider services.IProvider, vm string) 
 		return err
 	}
 
-	_, err = utils2.RetryReadUntilStateValid(
+	_, err = utils.RetryReadUntilStateValid(
 		ctx,
 		vm,
 		provider.GetSpaceID(),
@@ -94,24 +94,22 @@ func StartVmNoDiag(ctx context.Context, provider services.IProvider, vm string) 
 	return nil
 }
 
-func StopVm(ctx context.Context, provider services.IProvider, id string) diag.Diagnostics {
-	var diags diag.Diagnostics
-
+func StopVm(ctx context.Context, provider services.IProvider, id string, diags *diag.Diagnostics) {
 	forceStop := true
 	body := numspot.StopVm{
 		ForceStop: &forceStop,
 	}
 
 	// Stop the VM
-	_ = utils2.ExecuteRequest(func() (*numspot.StopVmResponse, error) {
+	_ = utils.ExecuteRequest(func() (*numspot.StopVmResponse, error) {
 		return provider.GetNumspotClient().StopVmWithResponse(ctx, provider.GetSpaceID(), id, body)
-	}, http.StatusOK, &diags)
+	}, http.StatusOK, diags)
 
 	if diags.HasError() {
-		return diags
+		return
 	}
 
-	_, err := utils2.RetryReadUntilStateValid(
+	_, err := utils.RetryReadUntilStateValid(
 		ctx,
 		id,
 		provider.GetSpaceID(),
@@ -121,25 +119,21 @@ func StopVm(ctx context.Context, provider services.IProvider, id string) diag.Di
 	)
 	if err != nil {
 		diags.AddError("error while waiting for VM to stop", err.Error())
-		return diags
+		return
 	}
-
-	return diags
 }
 
-func StartVm(ctx context.Context, provider services.IProvider, id string) diag.Diagnostics {
-	var diags diag.Diagnostics
-
+func StartVm(ctx context.Context, provider services.IProvider, id string, diags *diag.Diagnostics) {
 	// Start the VM
-	_ = utils2.ExecuteRequest(func() (*numspot.StartVmResponse, error) {
+	_ = utils.ExecuteRequest(func() (*numspot.StartVmResponse, error) {
 		return provider.GetNumspotClient().StartVmWithResponse(ctx, provider.GetSpaceID(), id)
-	}, http.StatusOK, &diags)
+	}, http.StatusOK, diags)
 
 	if diags.HasError() {
-		return diags
+		return
 	}
 
-	_, err := utils2.RetryReadUntilStateValid(
+	_, err := utils.RetryReadUntilStateValid(
 		ctx,
 		id,
 		provider.GetSpaceID(),
@@ -149,10 +143,8 @@ func StartVm(ctx context.Context, provider services.IProvider, id string) diag.D
 	)
 	if err != nil {
 		diags.AddError("error while waiting for VM to start", err.Error())
-		return diags
+		return
 	}
-
-	return diags
 }
 
 func VmIsDeleted(id string) bool {
@@ -160,59 +152,58 @@ func VmIsDeleted(id string) bool {
 	return true
 }
 
-func vmBsuFromApi(ctx context.Context, elt numspot.BsuCreated) (basetypes.ObjectValue, diag.Diagnostics) {
-	obj, diags := NewBsuValue(
+func vmBsuFromApi(ctx context.Context, elt numspot.BsuCreated, diags *diag.Diagnostics) basetypes.ObjectValue {
+	obj, diagnostics := NewBsuValue(
 		BsuValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(elt.DeleteOnVmDeletion),
 			"link_date":             types.StringValue(elt.LinkDate.String()),
 			"state":                 types.StringPointerValue(elt.State),
 			"volume_id":             types.StringPointerValue(elt.VolumeId),
-
-			"iops":        types.Int64Null(),
-			"snapshot_id": types.StringNull(),
-			"volume_size": types.Int64Null(),
-			"volume_type": types.StringNull(),
+			"iops":                  types.Int64Null(),
+			"snapshot_id":           types.StringNull(),
+			"volume_size":           types.Int64Null(),
+			"volume_type":           types.StringNull(),
 		},
 	)
-	if diags != nil {
-		return basetypes.ObjectValue{}, diags
+	diags.Append(diagnostics...)
+	if diags.HasError() {
+		return basetypes.ObjectValue{}
 	}
-	return obj.ToObjectValue(ctx)
+	objectValue, diagnostics := obj.ToObjectValue(ctx)
+	diags.Append(diagnostics...)
+	return objectValue
 }
 
-func vmBlockDeviceMappingFromApi(ctx context.Context, elt numspot.BlockDeviceMappingCreated) (BlockDeviceMappingsValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
+func vmBlockDeviceMappingFromApi(ctx context.Context, elt numspot.BlockDeviceMappingCreated, diags *diag.Diagnostics) BlockDeviceMappingsValue {
 	if elt.Bsu == nil {
-		return BlockDeviceMappingsValue{}, diags
+		return BlockDeviceMappingsValue{}
 	}
 	// Bsu
-	bsuTf, diagnostics := vmBsuFromApi(ctx, *elt.Bsu)
-	if diagnostics.HasError() {
-		return BlockDeviceMappingsValue{}, diagnostics
+	bsuTf := vmBsuFromApi(ctx, *elt.Bsu, diags)
+	if diags.HasError() {
+		return BlockDeviceMappingsValue{}
 	}
 
-	return NewBlockDeviceMappingsValue(
+	value, diagnostics := NewBlockDeviceMappingsValue(
 		BlockDeviceMappingsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"bsu":         bsuTf,
-			"device_name": types.StringPointerValue(elt.DeviceName),
-
+			"bsu":                 bsuTf,
+			"device_name":         types.StringPointerValue(elt.DeviceName),
 			"no_device":           types.StringNull(),
 			"virtual_device_name": types.StringNull(),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func linkNicsFromApi(ctx context.Context, linkNic numspot.LinkNicLight) (LinkNicValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
+func linkNicsFromApi(ctx context.Context, linkNic numspot.LinkNicLight, diags *diag.Diagnostics) LinkNicValue {
 	if linkNic.DeviceNumber == nil {
-		return LinkNicValue{}, diags
+		return LinkNicValue{}
 	}
 	deviceNumber := int64(*linkNic.DeviceNumber)
-	return NewLinkNicValue(
+	value, diagnostics := NewLinkNicValue(
 		LinkNicValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(linkNic.DeleteOnVmDeletion),
@@ -221,40 +212,34 @@ func linkNicsFromApi(ctx context.Context, linkNic numspot.LinkNicLight) (LinkNic
 			"state":                 types.StringPointerValue(linkNic.State),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func linkPublicIpVmFromApi(ctx context.Context, linkPublicIp numspot.LinkPublicIpLightForVm) (LinkPublicIpValue, diag.Diagnostics) {
-	return NewLinkPublicIpValue(
+func linkPublicIpVmFromApi(ctx context.Context, linkPublicIp numspot.LinkPublicIpLightForVm, diags *diag.Diagnostics) LinkPublicIpValue {
+	value, diagnostics := NewLinkPublicIpValue(
 		LinkPublicIpValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"public_dns_name": types.StringPointerValue(linkPublicIp.PublicDnsName),
 			"public_ip":       types.StringPointerValue(linkPublicIp.PublicIp),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-//func linkNicFromApi(ctx context.Context, nic numspot.Nic) (LinkNicValue, diag.Diagnostics) {
-//	return NewLinkNicValue(
-//		LinkNicValue{}.AttributeTypes(ctx),
-//		map[string]attr.Value{
-//			"public_dns_name": types.StringPointerValue(nic.LinkNic.PublicDnsName),
-//			"public_ip":       types.StringPointerValue(linkPublicIp.PublicIp),
-//		},
-//	)
-//}
-
-func privateIpsFromApi(ctx context.Context, privateIp numspot.PrivateIpLightForVm) (PrivateIpsValue, diag.Diagnostics) {
-	linkPublicIp, diags := linkPublicIpVmFromApi(ctx, utils2.GetPtrValue(privateIp.LinkPublicIp))
+func privateIpsFromApi(ctx context.Context, privateIp numspot.PrivateIpLightForVm, diags *diag.Diagnostics) PrivateIpsValue {
+	linkPublicIp := linkPublicIpVmFromApi(ctx, utils.GetPtrValue(privateIp.LinkPublicIp), diags)
 	if diags.HasError() {
-		return PrivateIpsValue{}, diags
+		return PrivateIpsValue{}
 	}
 
 	linkPublicIpObjectValue, diagnostics := linkPublicIp.ToObjectValue(ctx)
 	if diagnostics.HasError() {
-		return PrivateIpsValue{}, diags
+		return PrivateIpsValue{}
 	}
 
-	return NewPrivateIpsValue(
+	value, diagnostics := NewPrivateIpsValue(
 		PrivateIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"is_primary":       types.BoolPointerValue(privateIp.IsPrimary),
@@ -263,86 +248,70 @@ func privateIpsFromApi(ctx context.Context, privateIp numspot.PrivateIpLightForV
 			"private_ip":       types.StringPointerValue(privateIp.PrivateIp),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func securityGroupsFromApi(ctx context.Context, privateIp numspot.SecurityGroupLight) (SecurityGroupsValue, diag.Diagnostics) {
-	return NewSecurityGroupsValue(
+func securityGroupsFromApi(ctx context.Context, privateIp numspot.SecurityGroupLight, diags *diag.Diagnostics) SecurityGroupsValue {
+	value, diagnostics := NewSecurityGroupsValue(
 		SecurityGroupsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"security_group_id":   types.StringPointerValue(privateIp.SecurityGroupId),
 			"security_group_name": types.StringPointerValue(privateIp.SecurityGroupName),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func nicsFromApi(ctx context.Context, nic numspot.NicLight) (NicsValue, diag.Diagnostics) {
+func nicsFromApi(ctx context.Context, nic numspot.NicLight, diags *diag.Diagnostics) NicsValue {
 	var (
-		diagnosticsToReturn diag.Diagnostics
-		diags               diag.Diagnostics
-		linkNics            LinkNicValue
-		linkPublicIp        LinkPublicIpValue
-		privateIpsTf        basetypes.ListValue
-		securityGroupsTf    basetypes.ListValue
-		// deviceNumber        int64
+		linkNics         LinkNicValue
+		linkPublicIp     LinkPublicIpValue
+		privateIpsTf     basetypes.ListValue
+		securityGroupsTf basetypes.ListValue
 	)
 
 	if nic.LinkNic != nil {
-		//if nic.LinkNic.DeviceNumber == nil {
-		//	return NicsValue{}, diags
-		//}
-		//deviceNumber = int64(*nic.LinkNic.DeviceNumber)
-
-		linkNics, diags = linkNicsFromApi(ctx, *nic.LinkNic)
-		diagnosticsToReturn.Append(diags...)
+		linkNics = linkNicsFromApi(ctx, *nic.LinkNic, diags)
 	}
 	linkNicsObjectValue, diagnostics := linkNics.ToObjectValue(ctx)
-	if diagnostics.HasError() {
-		return NicsValue{}, diagnosticsToReturn
-	}
+	diags.Append(diagnostics...)
 
 	if nic.LinkPublicIp != nil {
-		linkPublicIp, diags = linkPublicIpVmFromApi(ctx, *nic.LinkPublicIp)
-		diagnosticsToReturn.Append(diags...)
+		linkPublicIp = linkPublicIpVmFromApi(ctx, *nic.LinkPublicIp, diags)
 	}
 	linkPublicIpObjectValue, diagnostics := linkPublicIp.ToObjectValue(ctx)
-	if diagnostics.HasError() {
-		return NicsValue{}, diagnosticsToReturn
-	}
+	diags.Append(diagnostics...)
 
 	var privateIps []numspot.PrivateIpLightForVm
 	if nic.PrivateIps != nil {
 		privateIps = *nic.PrivateIps
 	}
-	privateIpsTf, diags = utils2.GenericListToTfListValue(
+	privateIpsTf = utils.GenericListToTfListValue(
 		ctx,
 		PrivateIpsValue{},
 		privateIpsFromApi,
 		privateIps,
+		diags,
 	)
-	diagnosticsToReturn.Append(diags...)
 
 	var securityGroups []numspot.SecurityGroupLight
 	if nic.SecurityGroups != nil {
 		securityGroups = *nic.SecurityGroups
 	}
-	securityGroupsTf, diags = utils2.GenericListToTfListValue(
+	securityGroupsTf = utils.GenericListToTfListValue(
 		ctx,
 		SecurityGroupsValue{},
 		securityGroupsFromApi,
 		securityGroups,
+		diags,
 	)
-	diagnosticsToReturn.Append(diags...)
 
-	if diagnosticsToReturn.HasError() {
-		return NicsValue{}, diagnosticsToReturn
-	}
-
-	return NewNicsValue(
+	value, diagnostics := NewNicsValue(
 		NicsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			//"delete_on_vm_deletion":  types.BoolPointerValue(nic.LinkNic.DeleteOnVmDeletion),
-			"description": types.StringPointerValue(nic.Description),
-			//"device_number":          types.Int64PointerValue(&deviceNumber),
+			"description":            types.StringPointerValue(nic.Description),
 			"is_source_dest_checked": types.BoolPointerValue(nic.IsSourceDestChecked),
 			"link_nic":               linkNicsObjectValue,
 			"link_public_ip":         linkPublicIpObjectValue,
@@ -354,29 +323,29 @@ func nicsFromApi(ctx context.Context, nic numspot.NicLight) (NicsValue, diag.Dia
 			"security_groups":        securityGroupsTf,
 			"state":                  types.StringPointerValue(nic.State),
 			"subnet_id":              types.StringPointerValue(nic.SubnetId),
-
-			//"security_group_ids":         types.ListNull(types.StringType),
-			//"secondary_private_ip_count": types.Int64Null(),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func placementFromHTTP(ctx context.Context, elt *numspot.Placement) (PlacementValue, diag.Diagnostics) {
+func placementFromHTTP(ctx context.Context, elt *numspot.Placement, diags *diag.Diagnostics) PlacementValue {
 	if elt == nil {
-		return PlacementValue{}, diag.Diagnostics{}
+		return PlacementValue{}
 	}
-	return NewPlacementValue(
+	value, diagnostics := NewPlacementValue(
 		PlacementValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"availability_zone_name": types.StringPointerValue(elt.AvailabilityZoneName),
 			"tenancy":                types.StringPointerValue(elt.Tenancy),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func VmFromHttpToTf(ctx context.Context, http *numspot.Vm) (*VmModel, diag.Diagnostics) {
+func VmFromHttpToTf(ctx context.Context, http *numspot.Vm, diags *diag.Diagnostics) *VmModel {
 	var (
 		tagsTf types.List
-		diags  diag.Diagnostics
 		nics   = types.ListNull(NicsValue{}.Type(ctx))
 	)
 
@@ -385,19 +354,11 @@ func VmFromHttpToTf(ctx context.Context, http *numspot.Vm) (*VmModel, diag.Diagn
 	if http.PrivateIp != nil {
 		privateIps = []string{*http.PrivateIp}
 	}
-	privateIpsTf, diags := utils2.StringListToTfListValue(ctx, privateIps)
-	if diags.HasError() {
-		return nil, diags
-	}
 
 	// Product Code
 	var productCodes []string
 	if http.ProductCodes != nil {
 		productCodes = *http.ProductCodes
-	}
-	productCodesTf, diags := utils2.StringListToTfListValue(ctx, productCodes)
-	if diags.HasError() {
-		return nil, diags
 	}
 
 	// Security Group Ids & names
@@ -415,32 +376,18 @@ func VmFromHttpToTf(ctx context.Context, http *numspot.Vm) (*VmModel, diag.Diagn
 		}
 	}
 
-	// Security Group Ids
-	securityGroupIdsTf, diags := utils2.StringListToTfListValue(ctx, securityGroupIds)
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	// Security Groups names
-	securityGroupsTf, diags := utils2.StringListToTfListValue(ctx, securityGroupNames)
-	if diags.HasError() {
-		return nil, diags
-	}
-
 	// Block Device Mapping
 	var blockDeviceMappings []numspot.BlockDeviceMappingCreated
 	blockDeviceMappingTf := types.ListNull(BlockDeviceMappingsValue{}.Type(ctx))
 	if http.BlockDeviceMappings != nil {
 		blockDeviceMappings = *http.BlockDeviceMappings
-		blockDeviceMappingTf, diags = utils2.GenericListToTfListValue(
+		blockDeviceMappingTf = utils.GenericListToTfListValue(
 			ctx,
 			BlockDeviceMappingsValue{},
 			vmBlockDeviceMappingFromApi,
 			blockDeviceMappings,
+			diags,
 		)
-		if diags.HasError() {
-			return nil, diags
-		}
 	}
 
 	// Creation Date
@@ -451,27 +398,16 @@ func VmFromHttpToTf(ctx context.Context, http *numspot.Vm) (*VmModel, diag.Diagn
 
 	// Tags
 	if http.Tags != nil {
-		tagsTf, diags = utils2.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	if http.Nics != nil {
-		nics, diags = utils2.GenericListToTfListValue(ctx, NicsValue{}, nicsFromApi, *http.Nics)
-		if diags.HasError() {
-			return nil, diags
-		}
-	}
-
-	placement, diags := placementFromHTTP(ctx, http.Placement)
-	if diags.HasError() {
-		return nil, diags
+		nics = utils.GenericListToTfListValue(ctx, NicsValue{}, nicsFromApi, *http.Nics, diags)
 	}
 
 	var launchNumber basetypes.Int64Value
 	if http.LaunchNumber != nil {
-		launchNumber = utils2.FromIntPtrToTfInt64(http.LaunchNumber)
+		launchNumber = utils.FromIntPtrToTfInt64(http.LaunchNumber)
 	}
 
 	r := VmModel{
@@ -493,19 +429,19 @@ func VmFromHttpToTf(ctx context.Context, http *numspot.Vm) (*VmModel, diag.Diagn
 		VpcId:                types.StringPointerValue(http.VpcId),
 		Nics:                 nics,
 		OsFamily:             types.StringPointerValue(http.OsFamily),
-		Placement:            placement,
+		Placement:            placementFromHTTP(ctx, http.Placement, diags),
 		PrivateDnsName:       types.StringPointerValue(http.PrivateDnsName),
 		PrivateIp:            types.StringPointerValue(http.PrivateIp),
 		//
-		PrivateIps:                  privateIpsTf,
-		ProductCodes:                productCodesTf,
+		PrivateIps:                  utils.StringListToTfListValue(ctx, privateIps, diags),
+		ProductCodes:                utils.StringListToTfListValue(ctx, productCodes, diags),
 		PublicDnsName:               types.StringPointerValue(http.PublicDnsName),
 		PublicIp:                    types.StringPointerValue(http.PublicIp),
 		ReservationId:               types.StringPointerValue(http.ReservationId),
 		RootDeviceName:              types.StringPointerValue(http.RootDeviceName),
 		RootDeviceType:              types.StringPointerValue(http.RootDeviceType),
-		SecurityGroupIds:            securityGroupIdsTf,
-		SecurityGroups:              securityGroupsTf,
+		SecurityGroupIds:            utils.StringListToTfListValue(ctx, securityGroupIds, diags),
+		SecurityGroups:              utils.StringListToTfListValue(ctx, securityGroupNames, diags),
 		State:                       types.StringPointerValue(http.State),
 		StateReason:                 types.StringPointerValue(http.StateReason),
 		SubnetId:                    types.StringPointerValue(http.SubnetId),
@@ -530,7 +466,7 @@ func VmFromHttpToTf(ctx context.Context, http *numspot.Vm) (*VmModel, diag.Diagn
 		r.SecurityGroupIds = listValue
 	}
 
-	return &r, diags
+	return &r
 }
 
 func VmFromTfToCreateRequest(ctx context.Context, tf *VmModel, diags *diag.Diagnostics) numspot.CreateVmsJSONRequestBody {
@@ -551,31 +487,31 @@ func VmFromTfToCreateRequest(ctx context.Context, tf *VmModel, diags *diag.Diagn
 
 	if !(tf.Placement.IsNull() || tf.Placement.IsUnknown()) {
 		placement = &numspot.Placement{
-			AvailabilityZoneName: utils2.FromTfStringToStringPtr(tf.Placement.AvailabilityZoneName),
-			Tenancy:              utils2.FromTfStringToStringPtr(tf.Placement.Tenancy),
+			AvailabilityZoneName: utils.FromTfStringToStringPtr(tf.Placement.AvailabilityZoneName),
+			Tenancy:              utils.FromTfStringToStringPtr(tf.Placement.Tenancy),
 		}
 	}
 
 	bootOnCreation := true
 	return numspot.CreateVmsJSONRequestBody{
 		BootOnCreation:              &bootOnCreation,
-		ClientToken:                 utils2.FromTfStringToStringPtr(tf.ClientToken),
-		DeletionProtection:          utils2.FromTfBoolToBoolPtr(tf.DeletionProtection),
+		ClientToken:                 utils.FromTfStringToStringPtr(tf.ClientToken),
+		DeletionProtection:          utils.FromTfBoolToBoolPtr(tf.DeletionProtection),
 		ImageId:                     tf.ImageId.ValueString(),
-		KeypairName:                 utils2.FromTfStringToStringPtr(tf.KeypairName),
-		NestedVirtualization:        utils2.FromTfBoolToBoolPtr(tf.NestedVirtualization),
+		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
+		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
 		Nics:                        nicsPtr,
 		Placement:                   placement,
-		PrivateIps:                  utils2.TfStringListToStringPtrList(ctx, tf.PrivateIps),
-		SecurityGroupIds:            utils2.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
-		SecurityGroups:              utils2.TfStringListToStringPtrList(ctx, tf.SecurityGroups),
+		PrivateIps:                  utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags),
+		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
+		SecurityGroups:              utils.TfStringListToStringPtrList(ctx, tf.SecurityGroups, diags),
 		SubnetId:                    tf.SubnetId.ValueString(),
-		UserData:                    utils2.FromTfStringToStringPtr(tf.UserData),
-		VmInitiatedShutdownBehavior: utils2.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
-		Type:                        utils2.FromTfStringToStringPtr(tf.Type),
+		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
+		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
+		Type:                        utils.FromTfStringToStringPtr(tf.Type),
 		BlockDeviceMappings:         blockDeviceMappingPtr,
-		MaxVmsCount:                 utils2.FromTfInt64ToIntPtr(tf.MaxVmsCount),
-		MinVmsCount:                 utils2.FromTfInt64ToIntPtr(tf.MinVmsCount),
+		MaxVmsCount:                 utils.FromTfInt64ToIntPtr(tf.MaxVmsCount),
+		MinVmsCount:                 utils.FromTfInt64ToIntPtr(tf.MinVmsCount),
 	}
 }
 
@@ -606,15 +542,13 @@ func blockDeviceMappingFromTf(bdm BlockDeviceMappingsValue) numspot.BlockDeviceM
 	}
 }
 
-func VmFromTfToUpdaterequest(ctx context.Context, tf *VmModel, diagnostics *diag.Diagnostics) numspot.UpdateVmJSONRequestBody {
+func VmFromTfToUpdaterequest(ctx context.Context, tf *VmModel, diags *diag.Diagnostics) numspot.UpdateVmJSONRequestBody {
 	blockDeviceMapping := make([]numspot.BlockDeviceMappingVmUpdate, 0, len(tf.BlockDeviceMappings.Elements()))
 
-	// if !(tf.BlockDeviceMappings.IsNull() || tf.BlockDeviceMappings.IsUnknown()) {
-	// blockDeviceMapping := make([]numspot.BlockDeviceMappingVmUpdate, 0, len(tf.BlockDeviceMappings.Elements()))
 	for _, bdmTf := range tf.BlockDeviceMappings.Elements() {
 		bdmTfRes, ok := bdmTf.(BlockDeviceMappingsValue)
 		if !ok {
-			diagnostics.AddError("Failed to cast block device mapping resource", "")
+			diags.AddError("Failed to cast block device mapping resource", "")
 			return numspot.UpdateVmJSONRequestBody{}
 		}
 
@@ -622,86 +556,74 @@ func VmFromTfToUpdaterequest(ctx context.Context, tf *VmModel, diagnostics *diag
 		blockDeviceMapping = append(blockDeviceMapping, bdmApi)
 	}
 
-	//diagnostics.Append(tf.BlockDeviceMappings.ElementsAs(ctx, &blockDeviceMapping, true)...)
-	//blockDeviceMappingPtr = &blockDeviceMapping
-	//}
-
 	return numspot.UpdateVmJSONRequestBody{
-		DeletionProtection:          utils2.FromTfBoolToBoolPtr(tf.DeletionProtection),
-		KeypairName:                 utils2.FromTfStringToStringPtr(tf.KeypairName),
-		NestedVirtualization:        utils2.FromTfBoolToBoolPtr(tf.NestedVirtualization),
-		SecurityGroupIds:            utils2.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
-		UserData:                    utils2.FromTfStringToStringPtr(tf.UserData),
-		VmInitiatedShutdownBehavior: utils2.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
-		Type:                        utils2.FromTfStringToStringPtr(tf.Type),
+		DeletionProtection:          utils.FromTfBoolToBoolPtr(tf.DeletionProtection),
+		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
+		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
+		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
+		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
+		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
+		Type:                        utils.FromTfStringToStringPtr(tf.Type),
 		BlockDeviceMappings:         &blockDeviceMapping,
-		IsSourceDestChecked:         utils2.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
+		IsSourceDestChecked:         utils.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
 	}
 }
 
-func VmsFromTfToAPIReadParams(ctx context.Context, tf VmsDataSourceModel) numspot.ReadVmsParams {
-	// blockDeviceMappingsLinkDates := make([]numspot.ReadVmsParams_BlockDeviceMappingLinkDates_Item, 0, len(tf.BlockDeviceMappingsLinkDates.Elements()))
-	// tf.BlockDeviceMappingsLinkDates.ElementsAs(ctx, &blockDeviceMappingsLinkDates, false)
-
-	// creationDates := make([]numspot.ReadVmsParams_CreationDates_Item, 0, len(tf.D.Elements()))
-	// tf.CreationDates.ElementsAs(ctx, &creationDates, false)
-
+func VmsFromTfToAPIReadParams(ctx context.Context, tf VmsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVmsParams {
 	return numspot.ReadVmsParams{
-		TagKeys:                              utils2.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:                            utils2.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:                                 utils2.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:                                  utils2.TfStringListToStringPtrList(ctx, tf.Ids),
-		Architectures:                        utils2.TfStringListToStringPtrList(ctx, tf.Architectures),
-		BlockDeviceMappingDeleteOnVmDeletion: utils2.FromTfBoolToBoolPtr(tf.BlockDeviceMappingDeleteOnVmDeletion),
-		BlockDeviceMappingDeviceNames:        utils2.TfStringListToStringPtrList(ctx, tf.BlockDeviceMappingDeviceNames),
-		// BlockDeviceMappingLinkDates:          &blockDeviceMappingsLinkDates,
-		BlockDeviceMappingStates:    utils2.TfStringListToStringPtrList(ctx, tf.BlockDeviceMappingsDataSourcetates),
-		BlockDeviceMappingVolumeIds: utils2.TfStringListToStringPtrList(ctx, tf.BlockDeviceMappingVolumeIds),
-		ClientTokens:                utils2.TfStringListToStringPtrList(ctx, tf.ClientTokens),
-		// CreationDates:                        &creationDates,
-		ImageIds:                     utils2.TfStringListToStringPtrList(ctx, tf.ImageIds),
-		IsSourceDestChecked:          utils2.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
-		KeypairNames:                 utils2.TfStringListToStringPtrList(ctx, tf.KeypairNames),
-		LaunchNumbers:                utils2.TFInt64ListToIntListPointer(ctx, tf.LaunchNumbers),
-		NicDescriptions:              utils2.TfStringListToStringPtrList(ctx, tf.NicDescriptions),
-		NicIsSourceDestChecked:       utils2.FromTfBoolToBoolPtr(tf.NicIsSourceDestChecked),
-		NicLinkNicDeleteOnVmDeletion: utils2.FromTfBoolToBoolPtr(tf.NicLinkNicDeleteOnVmDeletion),
-		NicLinkNicDeviceNumbers:      utils2.TFInt64ListToIntListPointer(ctx, tf.NicLinkNicDeviceNumbers),
-		NicLinkNicLinkNicIds:         utils2.TfStringListToStringPtrList(ctx, tf.NicLinkNicLinkNicIds),
-		NicLinkNicStates:             utils2.TfStringListToStringPtrList(ctx, tf.NicLinkNicStates),
-		NicLinkPublicIpPublicIps:     utils2.TfStringListToStringPtrList(ctx, tf.NicLinkPublicIpPublicIpIds),
-		NicMacAddresses:              utils2.TfStringListToStringPtrList(ctx, tf.NicMacAddresses),
-		NicNicIds:                    utils2.TfStringListToStringPtrList(ctx, tf.NicNicIds),
-		NicPrivateIpsLinkPublicIpIds: utils2.TfStringListToStringPtrList(ctx, tf.NicPrivateIpsLinkPublicIpIds),
-		NicPrivateIpsPrimaryIp:       utils2.FromTfBoolToBoolPtr(tf.NicPrivateIpsPrimaryIp),
-		NicPrivateIpsPrivateIps:      utils2.TfStringListToStringPtrList(ctx, tf.NicPrivateIpsPrivateIps),
-		NicSecurityGroupIds:          utils2.TfStringListToStringPtrList(ctx, tf.NicSecurityGroupIds),
-		NicSecurityGroupNames:        utils2.TfStringListToStringPtrList(ctx, tf.NicSecurityGroupNames),
-		NicStates:                    utils2.TfStringListToStringPtrList(ctx, tf.NicStates),
-		NicSubnetIds:                 utils2.TfStringListToStringPtrList(ctx, tf.NicSubnetIds),
-		Platforms:                    utils2.TfStringListToStringPtrList(ctx, tf.Platforms),
-		PrivateIps:                   utils2.TfStringListToStringPtrList(ctx, tf.PrivateIps),
-		ProductCodes:                 utils2.TfStringListToStringPtrList(ctx, tf.ProductCodes),
-		PublicIps:                    utils2.TfStringListToStringPtrList(ctx, tf.PublicIps),
-		ReservationIds:               utils2.TfStringListToStringPtrList(ctx, tf.ReservationIds),
-		RootDeviceNames:              utils2.TfStringListToStringPtrList(ctx, tf.RootDeviceNames),
-		RootDeviceTypes:              utils2.TfStringListToStringPtrList(ctx, tf.RootDeviceTypes),
-		SecurityGroupIds:             utils2.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
-		SecurityGroupNames:           utils2.TfStringListToStringPtrList(ctx, tf.SecurityGroupNames),
-		StateReasonMessages:          utils2.TfStringListToStringPtrList(ctx, tf.StateReasonMessages),
-		SubnetIds:                    utils2.TfStringListToStringPtrList(ctx, tf.SubnetIds),
-		Tenancies:                    utils2.TfStringListToStringPtrList(ctx, tf.Tenancies),
-		VmStateNames:                 utils2.TfStringListToStringPtrList(ctx, tf.VmStateNames),
-		Types:                        utils2.TfStringListToStringPtrList(ctx, tf.Types),
-		VpcIds:                       utils2.TfStringListToStringPtrList(ctx, tf.VpcIds),
-		NicVpcIds:                    utils2.TfStringListToStringPtrList(ctx, tf.NicVpcIds),
-		AvailabilityZoneNames:        utils2.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames),
+		TagKeys:                              utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:                            utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:                                 utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:                                  utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		Architectures:                        utils.TfStringListToStringPtrList(ctx, tf.Architectures, diags),
+		BlockDeviceMappingDeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(tf.BlockDeviceMappingDeleteOnVmDeletion),
+		BlockDeviceMappingDeviceNames:        utils.TfStringListToStringPtrList(ctx, tf.BlockDeviceMappingDeviceNames, diags),
+		BlockDeviceMappingStates:             utils.TfStringListToStringPtrList(ctx, tf.BlockDeviceMappingsDataSourcetates, diags),
+		BlockDeviceMappingVolumeIds:          utils.TfStringListToStringPtrList(ctx, tf.BlockDeviceMappingVolumeIds, diags),
+		ClientTokens:                         utils.TfStringListToStringPtrList(ctx, tf.ClientTokens, diags),
+		ImageIds:                             utils.TfStringListToStringPtrList(ctx, tf.ImageIds, diags),
+		IsSourceDestChecked:                  utils.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
+		KeypairNames:                         utils.TfStringListToStringPtrList(ctx, tf.KeypairNames, diags),
+		LaunchNumbers:                        utils.TFInt64ListToIntListPointer(ctx, tf.LaunchNumbers, diags),
+		NicDescriptions:                      utils.TfStringListToStringPtrList(ctx, tf.NicDescriptions, diags),
+		NicIsSourceDestChecked:               utils.FromTfBoolToBoolPtr(tf.NicIsSourceDestChecked),
+		NicLinkNicDeleteOnVmDeletion:         utils.FromTfBoolToBoolPtr(tf.NicLinkNicDeleteOnVmDeletion),
+		NicLinkNicDeviceNumbers:              utils.TFInt64ListToIntListPointer(ctx, tf.NicLinkNicDeviceNumbers, diags),
+		NicLinkNicLinkNicIds:                 utils.TfStringListToStringPtrList(ctx, tf.NicLinkNicLinkNicIds, diags),
+		NicLinkNicStates:                     utils.TfStringListToStringPtrList(ctx, tf.NicLinkNicStates, diags),
+		NicLinkPublicIpPublicIps:             utils.TfStringListToStringPtrList(ctx, tf.NicLinkPublicIpPublicIpIds, diags),
+		NicMacAddresses:                      utils.TfStringListToStringPtrList(ctx, tf.NicMacAddresses, diags),
+		NicNicIds:                            utils.TfStringListToStringPtrList(ctx, tf.NicNicIds, diags),
+		NicPrivateIpsLinkPublicIpIds:         utils.TfStringListToStringPtrList(ctx, tf.NicPrivateIpsLinkPublicIpIds, diags),
+		NicPrivateIpsPrimaryIp:               utils.FromTfBoolToBoolPtr(tf.NicPrivateIpsPrimaryIp),
+		NicPrivateIpsPrivateIps:              utils.TfStringListToStringPtrList(ctx, tf.NicPrivateIpsPrivateIps, diags),
+		NicSecurityGroupIds:                  utils.TfStringListToStringPtrList(ctx, tf.NicSecurityGroupIds, diags),
+		NicSecurityGroupNames:                utils.TfStringListToStringPtrList(ctx, tf.NicSecurityGroupNames, diags),
+		NicStates:                            utils.TfStringListToStringPtrList(ctx, tf.NicStates, diags),
+		NicSubnetIds:                         utils.TfStringListToStringPtrList(ctx, tf.NicSubnetIds, diags),
+		Platforms:                            utils.TfStringListToStringPtrList(ctx, tf.Platforms, diags),
+		PrivateIps:                           utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags),
+		ProductCodes:                         utils.TfStringListToStringPtrList(ctx, tf.ProductCodes, diags),
+		PublicIps:                            utils.TfStringListToStringPtrList(ctx, tf.PublicIps, diags),
+		ReservationIds:                       utils.TfStringListToStringPtrList(ctx, tf.ReservationIds, diags),
+		RootDeviceNames:                      utils.TfStringListToStringPtrList(ctx, tf.RootDeviceNames, diags),
+		RootDeviceTypes:                      utils.TfStringListToStringPtrList(ctx, tf.RootDeviceTypes, diags),
+		SecurityGroupIds:                     utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
+		SecurityGroupNames:                   utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupNames, diags),
+		StateReasonMessages:                  utils.TfStringListToStringPtrList(ctx, tf.StateReasonMessages, diags),
+		SubnetIds:                            utils.TfStringListToStringPtrList(ctx, tf.SubnetIds, diags),
+		Tenancies:                            utils.TfStringListToStringPtrList(ctx, tf.Tenancies, diags),
+		VmStateNames:                         utils.TfStringListToStringPtrList(ctx, tf.VmStateNames, diags),
+		Types:                                utils.TfStringListToStringPtrList(ctx, tf.Types, diags),
+		VpcIds:                               utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
+		NicVpcIds:                            utils.TfStringListToStringPtrList(ctx, tf.NicVpcIds, diags),
+		AvailabilityZoneNames:                utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames, diags),
 	}
 }
 
-func fromBsuToTFBsu(ctx context.Context, http *numspot.BsuCreated) (BsuDataSourceValue, diag.Diagnostics) {
+func fromBsuToTFBsu(ctx context.Context, http *numspot.BsuCreated, diags *diag.Diagnostics) BsuDataSourceValue {
 	if http == nil {
-		return BsuDataSourceValue{}, diag.Diagnostics{}
+		return BsuDataSourceValue{}
 	}
 
 	var linkDateTf types.String
@@ -711,7 +633,7 @@ func fromBsuToTFBsu(ctx context.Context, http *numspot.BsuCreated) (BsuDataSourc
 		linkDateTf = types.StringPointerValue(&linkDate)
 	}
 
-	return NewBsuDataSourceValue(
+	value, diagnostics := NewBsuDataSourceValue(
 		BsuDataSourceValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(http.DeleteOnVmDeletion),
@@ -720,30 +642,34 @@ func fromBsuToTFBsu(ctx context.Context, http *numspot.BsuCreated) (BsuDataSourc
 			"volume_id":             types.StringPointerValue(http.VolumeId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func fromBlockDeviceMappingsToBlockDeviceMappingsList(ctx context.Context, http numspot.BlockDeviceMappingCreated) (BlockDeviceMappingsDataSourceValue, diag.Diagnostics) {
-	bsu, diags := fromBsuToTFBsu(ctx, http.Bsu)
+func fromBlockDeviceMappingsToBlockDeviceMappingsList(ctx context.Context, http numspot.BlockDeviceMappingCreated, diags *diag.Diagnostics) BlockDeviceMappingsDataSourceValue {
+	bsu := fromBsuToTFBsu(ctx, http.Bsu, diags)
 	if diags.HasError() {
-		return BlockDeviceMappingsDataSourceValue{}, diags
+		return BlockDeviceMappingsDataSourceValue{}
 	}
 	bsuObjectValue, diagnostics := bsu.ToObjectValue(ctx)
 	if diagnostics.HasError() {
-		return BlockDeviceMappingsDataSourceValue{}, diags
+		return BlockDeviceMappingsDataSourceValue{}
 	}
 
-	return NewBlockDeviceMappingsDataSourceValue(
+	value, diagnostics := NewBlockDeviceMappingsDataSourceValue(
 		BlockDeviceMappingsDataSourceValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"bsu":         bsuObjectValue,
 			"device_name": types.StringPointerValue(http.DeviceName),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func fromLinkNicToTFLinkNic(ctx context.Context, http *numspot.LinkNicLight) (LinkNicValue, diag.Diagnostics) {
+func fromLinkNicToTFLinkNic(ctx context.Context, http *numspot.LinkNicLight, diags *diag.Diagnostics) LinkNicValue {
 	if http == nil {
-		return LinkNicValue{}, diag.Diagnostics{}
+		return LinkNicValue{}
 	}
 	var deviceNumberTf types.Int64
 
@@ -754,7 +680,7 @@ func fromLinkNicToTFLinkNic(ctx context.Context, http *numspot.LinkNicLight) (Li
 		deviceNumberTf = types.Int64Value(0)
 	}
 
-	return NewLinkNicValue(
+	value, diagnostics := NewLinkNicValue(
 		LinkNicValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(http.DeleteOnVmDeletion),
@@ -763,61 +689,49 @@ func fromLinkNicToTFLinkNic(ctx context.Context, http *numspot.LinkNicLight) (Li
 			"state":                 types.StringPointerValue(http.State),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func linkPublicIpForVmFromHTTPDatasource(ctx context.Context, http *numspot.LinkPublicIpLightForVm) (LinkPublicIpValue, diag.Diagnostics) {
+func linkPublicIpForVmFromHTTPDatasource(ctx context.Context, http *numspot.LinkPublicIpLightForVm, diags *diag.Diagnostics) LinkPublicIpValue {
 	if http == nil {
-		return LinkPublicIpValue{}, diag.Diagnostics{}
+		return LinkPublicIpValue{}
 	}
 
-	return NewLinkPublicIpValue(
+	value, diagnostics := NewLinkPublicIpValue(
 		LinkPublicIpValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"public_dns_name": types.StringPointerValue(http.PublicDnsName),
 			"public_ip":       types.StringPointerValue(http.PublicIp),
-			//"public_ip_account_id": types.StringPointerValue(utils2.EmptyStrPointer()),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func securityGroupsForVmFromHTTP(ctx context.Context, elt numspot.SecurityGroupLight) (SecurityGroupsValue, diag.Diagnostics) {
-	return NewSecurityGroupsValue(
+func securityGroupsForVmFromHTTP(ctx context.Context, elt numspot.SecurityGroupLight, diags *diag.Diagnostics) SecurityGroupsValue {
+	value, diagnostics := NewSecurityGroupsValue(
 		SecurityGroupsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"security_group_id":   types.StringPointerValue(elt.SecurityGroupId),
 			"security_group_name": types.StringPointerValue(elt.SecurityGroupName),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func fromNicsToNicsList(ctx context.Context, http numspot.NicLight) (NicsValue, diag.Diagnostics) {
-	linkNic, diags := fromLinkNicToTFLinkNic(ctx, http.LinkNic)
-	if diags.HasError() {
-		return NicsValue{}, diags
-	}
-	linkNICObject, diags := linkNic.ToObjectValue(ctx)
-	if diags.HasError() {
-		return NicsValue{}, diags
-	}
+func fromNicsToNicsList(ctx context.Context, http numspot.NicLight, diags *diag.Diagnostics) NicsValue {
+	linkNic := fromLinkNicToTFLinkNic(ctx, http.LinkNic, diags)
+	linkNICObject, diagnostics := linkNic.ToObjectValue(ctx)
+	diags.Append(diagnostics...)
 
-	linkPublicIP, diags := linkPublicIpForVmFromHTTPDatasource(ctx, http.LinkPublicIp)
-	if diags.HasError() {
-		return NicsValue{}, diags
-	}
-	linkPublicIPObject, diags := linkPublicIP.ToObjectValue(ctx)
-	if diags.HasError() {
-		return NicsValue{}, diags
-	}
+	linkPublicIP := linkPublicIpForVmFromHTTPDatasource(ctx, http.LinkPublicIp, diags)
+	linkPublicIPObject, diagnostics := linkPublicIP.ToObjectValue(ctx)
+	diags.Append(diagnostics...)
 
-	privateIps, diags := utils2.GenericListToTfListValue(ctx, PrivateIpsValue{}, privateIpsFromApi, utils2.GetPtrValue(http.PrivateIps))
-	if diags.HasError() {
-		return NicsValue{}, diags
-	}
+	privateIps := utils.GenericListToTfListValue(ctx, PrivateIpsValue{}, privateIpsFromApi, utils.GetPtrValue(http.PrivateIps), diags)
+	securityGroups := utils.GenericListToTfListValue(ctx, SecurityGroupsValue{}, securityGroupsForVmFromHTTP, utils.GetPtrValue(http.SecurityGroups), diags)
 
-	securityGroups, diags := utils2.GenericListToTfListValue(ctx, SecurityGroupsValue{}, securityGroupsForVmFromHTTP, utils2.GetPtrValue(http.SecurityGroups))
-	if diags.HasError() {
-		return NicsValue{}, diags
-	}
-
-	return NewNicsValue(
+	value, diagnostics := NewNicsValue(
 		NicsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"description":            types.StringPointerValue(http.Description),
@@ -834,91 +748,84 @@ func fromNicsToNicsList(ctx context.Context, http numspot.NicLight) (NicsValue, 
 			"vpc_id":                 types.StringPointerValue(http.VpcId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func fromSecurityGroupToTFSecurityGroupList(ctx context.Context, http numspot.SecurityGroupLight) (SecurityGroupsValue, diag.Diagnostics) {
-	return NewSecurityGroupsValue(
+func fromSecurityGroupToTFSecurityGroupList(ctx context.Context, http numspot.SecurityGroupLight, diags *diag.Diagnostics) SecurityGroupsValue {
+	value, diagnostics := NewSecurityGroupsValue(
 		SecurityGroupsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"security_group_id":   types.StringPointerValue(http.SecurityGroupId),
 			"security_group_name": types.StringPointerValue(http.SecurityGroupName),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm) (*VmModelItemDataSource, diag.Diagnostics) {
+func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm, diags *diag.Diagnostics) *VmModelItemDataSource {
 	var (
 		blockDeviceMappings = types.ListNull(BlockDeviceMappingsValue{}.Type(ctx))
 		nics                = types.ListNull(NicsValue{}.Type(ctx))
 		securityGroups      = types.ListNull(SecurityGroupsValue{}.Type(ctx))
 		productCodes        types.List
 		placement           PlacementValue
-		diags               diag.Diagnostics
 		tagsList            types.List
 		launchNumberTf      types.Int64
 		creationDateTf      types.String
 	)
 
 	if http.BlockDeviceMappings != nil {
-		blockDeviceMappings, diags = utils2.GenericListToTfListValue(
+		blockDeviceMappings = utils.GenericListToTfListValue(
 			ctx,
 			BlockDeviceMappingsDataSourceValue{},
 			fromBlockDeviceMappingsToBlockDeviceMappingsList,
 			*http.BlockDeviceMappings,
+			diags,
 		)
-		if diags.HasError() {
-			return nil, diags
-		}
 	}
 
 	if http.Nics != nil {
-		nics, diags = utils2.GenericListToTfListValue(
+		nics = utils.GenericListToTfListValue(
 			ctx,
 			NicsValue{},
 			fromNicsToNicsList,
 			*http.Nics,
+			diags,
 		)
-		if diags.HasError() {
-			return nil, diags
-		}
 	}
 
 	if http.SecurityGroups != nil {
-		securityGroups, diags = utils2.GenericListToTfListValue(
+		securityGroups = utils.GenericListToTfListValue(
 			ctx,
 			SecurityGroupsValue{},
 			fromSecurityGroupToTFSecurityGroupList,
 			*http.SecurityGroups,
+			diags,
 		)
-		if diags.HasError() {
-			return nil, diags
-		}
 	}
 
 	if http.Placement != nil {
-		placement, diags = NewPlacementValue(
+		var diagnostics diag.Diagnostics
+		placement, diagnostics = NewPlacementValue(
 			PlacementValue{}.AttributeTypes(ctx),
 			map[string]attr.Value{
 				"availability_zone_name": types.StringPointerValue(http.Placement.AvailabilityZoneName),
 				"tenancy":                types.StringPointerValue(http.Placement.Tenancy),
 			},
 		)
-		if diags.HasError() {
-			return nil, diags
-		}
+		diags.Append(diagnostics...)
 	}
 
 	if http.ProductCodes != nil {
-		productCodes, diags = utils2.StringListToTfListValue(ctx, *http.ProductCodes)
-		if diags.HasError() {
-			return nil, diags
-		}
+		productCodes = utils.StringListToTfListValue(ctx, *http.ProductCodes, diags)
 	}
 
 	if http.Tags != nil {
-		tagsList, diags = utils2.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -967,5 +874,5 @@ func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm) (*VmModelI
 		Type:                          types.StringPointerValue(http.Type),
 		UserData:                      types.StringPointerValue(http.UserData),
 		VpcId:                         types.StringPointerValue(http.VpcId),
-	}, nil
+	}
 }

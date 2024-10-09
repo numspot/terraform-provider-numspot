@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type ClientGatewaysDataSourceModel struct {
@@ -74,8 +74,8 @@ func (d *clientGatewaysDataSource) Read(ctx context.Context, request datasource.
 		return
 	}
 
-	params := ClientGatewaysFromTfToAPIReadParams(ctx, plan)
-	res := utils2.ExecuteRequest(func() (*numspot.ReadClientGatewaysResponse, error) {
+	params := ClientGatewaysFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	res := utils.ExecuteRequest(func() (*numspot.ReadClientGatewaysResponse, error) {
 		return d.provider.GetNumspotClient().ReadClientGatewaysWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -85,10 +85,14 @@ func (d *clientGatewaysDataSource) Read(ctx context.Context, request datasource.
 		response.Diagnostics.AddError("HTTP call failed", "got empty Client Gateways list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, ClientGatewaysFromHttpToTfDatasource)
+	objectItems := utils.FromHttpGenericListToTfList(
+		ctx,
+		res.JSON200.Items,
+		ClientGatewaysFromHttpToTfDatasource,
+		&response.Diagnostics,
+	)
 
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

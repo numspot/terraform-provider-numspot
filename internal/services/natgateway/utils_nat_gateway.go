@@ -12,35 +12,35 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func publicIpFromApi(ctx context.Context, elt numspot.PublicIpLight) (PublicIpsValue, diag.Diagnostics) {
-	return NewPublicIpsValue(
+func publicIpFromApi(ctx context.Context, elt numspot.PublicIpLight, diags *diag.Diagnostics) PublicIpsValue {
+	value, diagnostics := NewPublicIpsValue(
 		PublicIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"public_ip":    types.StringPointerValue(elt.PublicIp),
 			"public_ip_id": types.StringPointerValue(elt.PublicIpId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func NatGatewayFromHttpToTf(ctx context.Context, http *numspot.NatGateway) (*NatGatewayModel, diag.Diagnostics) {
-	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
-	)
+func NatGatewayFromHttpToTf(ctx context.Context, http *numspot.NatGateway, diags *diag.Diagnostics) *NatGatewayModel {
+	var tagsTf types.List
 
 	var publicIp []numspot.PublicIpLight
 	if http.PublicIps != nil {
 		publicIp = *http.PublicIps
 	}
 	// Public Ips
-	publicIpsTf, diags := utils.GenericListToTfListValue(
+	publicIpsTf := utils.GenericListToTfListValue(
 		ctx,
 		PublicIpsValue{},
 		publicIpFromApi,
 		publicIp,
+		diags,
 	)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	// PublicIpId must be the id of the first public io
@@ -52,9 +52,9 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *numspot.NatGateway) (*Nat
 	}
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -66,34 +66,32 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *numspot.NatGateway) (*Nat
 		VpcId:      types.StringPointerValue(http.VpcId),
 		Tags:       tagsTf,
 		PublicIpId: types.StringPointerValue(publicIpId),
-	}, diags
+	}
 }
 
-func NatGatewayFromHttpToTfDatasource(ctx context.Context, http *numspot.NatGateway) (*NatGatewayModelDatasource, diag.Diagnostics) {
-	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
-	)
+func NatGatewayFromHttpToTfDatasource(ctx context.Context, http *numspot.NatGateway, diags *diag.Diagnostics) *NatGatewayModelDatasource {
+	var tagsTf types.List
 
 	var publicIp []numspot.PublicIpLight
 	if http.PublicIps != nil {
 		publicIp = *http.PublicIps
 	}
 	// Public Ips
-	publicIpsTf, diags := utils.GenericListToTfListValue(
+	publicIpsTf := utils.GenericListToTfListValue(
 		ctx,
 		PublicIpsValue{},
 		publicIpFromApi,
 		publicIp,
+		diags,
 	)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -104,7 +102,7 @@ func NatGatewayFromHttpToTfDatasource(ctx context.Context, http *numspot.NatGate
 		SubnetId:  types.StringPointerValue(http.SubnetId),
 		VpcId:     types.StringPointerValue(http.VpcId),
 		Tags:      tagsTf,
-	}, diags
+	}
 }
 
 func NatGatewayFromTfToCreateRequest(tf NatGatewayModel) numspot.CreateNatGatewayJSONRequestBody {
@@ -114,14 +112,14 @@ func NatGatewayFromTfToCreateRequest(tf NatGatewayModel) numspot.CreateNatGatewa
 	}
 }
 
-func NatGatewaysFromTfToAPIReadParams(ctx context.Context, tf NatGatewaysDataSourceModel) numspot.ReadNatGatewayParams {
+func NatGatewaysFromTfToAPIReadParams(ctx context.Context, tf NatGatewaysDataSourceModel, diags *diag.Diagnostics) numspot.ReadNatGatewayParams {
 	return numspot.ReadNatGatewayParams{
-		SubnetIds: utils.TfStringListToStringPtrList(ctx, tf.SubnetIds),
-		VpcIds:    utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
-		States:    utils.TfStringListToStringPtrList(ctx, tf.States),
-		TagKeys:   utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues: utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:      utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:       utils.TfStringListToStringPtrList(ctx, tf.Ids),
+		SubnetIds: utils.TfStringListToStringPtrList(ctx, tf.SubnetIds, diags),
+		VpcIds:    utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
+		States:    utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		TagKeys:   utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues: utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:      utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:       utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
 	}
 }

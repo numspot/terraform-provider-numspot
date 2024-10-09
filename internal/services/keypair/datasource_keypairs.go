@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type KeypairsDataSourceModel struct {
@@ -69,8 +69,8 @@ func (d *keypairsDataSource) Read(ctx context.Context, request datasource.ReadRe
 		return
 	}
 
-	params := KeypairsFromTfToAPIReadParams(ctx, plan)
-	res := utils2.ExecuteRequest(func() (*numspot.ReadKeypairsResponse, error) {
+	params := KeypairsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	res := utils.ExecuteRequest(func() (*numspot.ReadKeypairsResponse, error) {
 		return d.provider.GetNumspotClient().ReadKeypairsWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -80,10 +80,9 @@ func (d *keypairsDataSource) Read(ctx context.Context, request datasource.ReadRe
 		response.Diagnostics.AddError("HTTP call failed", "got empty Keypair list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, KeypairsFromHttpToTfDatasource)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, KeypairsFromHttpToTfDatasource, &response.Diagnostics)
 
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

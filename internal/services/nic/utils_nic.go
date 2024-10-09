@@ -14,32 +14,35 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func privatesIpFromApi(ctx context.Context, elt numspot.PrivateIp) (PrivateIpsValue, diag.Diagnostics) {
+func privatesIpFromApi(ctx context.Context, elt numspot.PrivateIp, diags *diag.Diagnostics) PrivateIpsValue {
 	var (
 		linkPublicIpTf  LinkPublicIpValue
 		linkPublicIpObj basetypes.ObjectValue
-		diagnostics     diag.Diagnostics
 	)
 
 	if elt.LinkPublicIp != nil {
-		linkPublicIpTf, diagnostics = linkPublicIpFromApi(ctx, *elt.LinkPublicIp)
-		if diagnostics.HasError() {
-			return PrivateIpsValue{}, diagnostics
+		linkPublicIpTf = linkPublicIpFromApi(ctx, *elt.LinkPublicIp, diags)
+		if diags.HasError() {
+			return PrivateIpsValue{}
 		}
 
+		var diagnostics diag.Diagnostics
 		linkPublicIpObj, diagnostics = linkPublicIpTf.ToObjectValue(ctx)
-		if diagnostics.HasError() {
-			return PrivateIpsValue{}, diagnostics
+		diags.Append(diagnostics...)
+		if diags.HasError() {
+			return PrivateIpsValue{}
 		}
 	} else {
 		linkPublicIpTf = NewLinkPublicIpValueNull()
+		var diagnostics diag.Diagnostics
 		linkPublicIpObj, diagnostics = linkPublicIpTf.ToObjectValue(ctx)
+		diags.Append(diagnostics...)
 		if diagnostics.HasError() {
-			return PrivateIpsValue{}, diagnostics
+			return PrivateIpsValue{}
 		}
 	}
 
-	return NewPrivateIpsValue(
+	value, diagnostics := NewPrivateIpsValue(
 		PrivateIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"is_primary":       types.BoolPointerValue(elt.IsPrimary),
@@ -48,20 +51,24 @@ func privatesIpFromApi(ctx context.Context, elt numspot.PrivateIp) (PrivateIpsVa
 			"private_ip":       types.StringPointerValue(elt.PrivateIp),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func securityGroupLightFromApi(ctx context.Context, elt numspot.SecurityGroupLight) (SecurityGroupsValue, diag.Diagnostics) {
-	return NewSecurityGroupsValue(
+func securityGroupLightFromApi(ctx context.Context, elt numspot.SecurityGroupLight, diags *diag.Diagnostics) SecurityGroupsValue {
+	value, diagnostics := NewSecurityGroupsValue(
 		SecurityGroupsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"security_group_id":   types.StringPointerValue(elt.SecurityGroupId),
 			"security_group_name": types.StringPointerValue(elt.SecurityGroupName),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func linkPublicIpFromApi(ctx context.Context, elt numspot.LinkPublicIp) (LinkPublicIpValue, diag.Diagnostics) {
-	return NewLinkPublicIpValue(
+func linkPublicIpFromApi(ctx context.Context, elt numspot.LinkPublicIp, diags *diag.Diagnostics) LinkPublicIpValue {
+	value, diagnostics := NewLinkPublicIpValue(
 		LinkPublicIpValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"id":              types.StringPointerValue(elt.Id),
@@ -70,23 +77,24 @@ func linkPublicIpFromApi(ctx context.Context, elt numspot.LinkPublicIp) (LinkPub
 			"public_ip_id":    types.StringPointerValue(elt.PublicIpId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func NicFromHttpToTf(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Diagnostics) {
+func NicFromHttpToTf(ctx context.Context, http *numspot.Nic, diags *diag.Diagnostics) *NicModel {
 	var (
 		linkPublicIpTf LinkPublicIpValue
 		linkNicTf      LinkNicValue
 		tagsTf         types.List
-		diags          diag.Diagnostics
 	)
 	// Private IPs
-	privateIps, diags := utils.GenericListToTfListValue(ctx, PrivateIpsValue{}, privatesIpFromApi, utils.GetPtrValue(http.PrivateIps))
+	privateIps := utils.GenericListToTfListValue(ctx, PrivateIpsValue{}, privatesIpFromApi, utils.GetPtrValue(http.PrivateIps), diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	if http.SecurityGroups == nil {
-		return nil, diags
+		return nil
 	}
 	// Retrieve security groups id
 	securityGroupIds := make([]string, 0, len(*http.SecurityGroups))
@@ -97,22 +105,22 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Di
 	}
 
 	// Security Group Ids
-	securityGroupsIdTf, diags := utils.StringListToTfListValue(ctx, securityGroupIds)
+	securityGroupsIdTf := utils.StringListToTfListValue(ctx, securityGroupIds, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	// Security Groups
-	securityGroupsTf, diags := utils.GenericListToTfListValue(ctx, SecurityGroupsValue{}, securityGroupLightFromApi, utils.GetPtrValue(http.SecurityGroups))
+	securityGroupsTf := utils.GenericListToTfListValue(ctx, SecurityGroupsValue{}, securityGroupLightFromApi, utils.GetPtrValue(http.SecurityGroups), diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	// Link Public Ip
 	if http.LinkPublicIp != nil {
-		linkPublicIpTf, diags = linkPublicIpFromApi(ctx, *http.LinkPublicIp)
+		linkPublicIpTf = linkPublicIpFromApi(ctx, *http.LinkPublicIp, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	} else {
 		linkPublicIpTf = NewLinkPublicIpValueNull()
@@ -120,9 +128,9 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Di
 
 	// Link NIC
 	if http.LinkNic != nil {
-		linkNicTf, diags = linkNICFromHTTP(ctx, *http.LinkNic)
+		linkNicTf = linkNICFromHTTP(ctx, *http.LinkNic, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	} else {
 		linkNicTf = NewLinkNicValueNull()
@@ -135,9 +143,9 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Di
 	}
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -157,10 +165,10 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic) (*NicModel, diag.Di
 		SubnetId:             types.StringPointerValue(http.SubnetId),
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		Tags:                 tagsTf,
-	}, diags
+	}
 }
 
-func NicFromTfToCreateRequest(ctx context.Context, tf *NicModel) numspot.CreateNicJSONRequestBody {
+func NicFromTfToCreateRequest(ctx context.Context, tf *NicModel, diags *diag.Diagnostics) numspot.CreateNicJSONRequestBody {
 	var privateIpsPtr *[]numspot.PrivateIpLight
 	var securityGroupIdsPtr *[]string
 
@@ -170,12 +178,12 @@ func NicFromTfToCreateRequest(ctx context.Context, tf *NicModel) numspot.CreateN
 				IsPrimary: a.IsPrimary.ValueBoolPointer(),
 				PrivateIp: a.PrivateIp.ValueStringPointer(),
 			}
-		}, ctx, tf.PrivateIps)
+		}, ctx, tf.PrivateIps, diags)
 		privateIpsPtr = &privateIps
 	}
 
 	if !(tf.SecurityGroupIds.IsNull() || tf.SecurityGroupIds.IsUnknown()) {
-		securityGroupIds := utils.TfStringListToStringList(ctx, tf.SecurityGroupIds)
+		securityGroupIds := utils.TfStringListToStringList(ctx, tf.SecurityGroupIds, diags)
 		securityGroupIdsPtr = &securityGroupIds
 	}
 	return numspot.CreateNicJSONRequestBody{
@@ -186,39 +194,38 @@ func NicFromTfToCreateRequest(ctx context.Context, tf *NicModel) numspot.CreateN
 	}
 }
 
-func NicsFromTfToAPIReadParams(ctx context.Context, tf NicsDataSourceModel) numspot.ReadNicsParams {
+func NicsFromTfToAPIReadParams(ctx context.Context, tf NicsDataSourceModel, diags *diag.Diagnostics) numspot.ReadNicsParams {
 	return numspot.ReadNicsParams{
-		Descriptions: utils.TfStringListToStringPtrList(ctx, tf.Descriptions),
-
+		Descriptions:                    utils.TfStringListToStringPtrList(ctx, tf.Descriptions, diags),
 		IsSourceDestCheck:               utils.FromTfBoolToBoolPtr(tf.IsSourceDestCheck),
 		LinkNicDeleteOnVmDeletion:       utils.FromTfBoolToBoolPtr(tf.LinkNicDeleteOnVmDeletion),
-		LinkNicDeviceNumbers:            utils.TFInt64ListToIntListPointer(ctx, tf.LinkNicDeviceNumbers),
-		LinkNicLinkNicIds:               utils.TfStringListToStringPtrList(ctx, tf.LinkNicLinkNicIds),
-		LinkNicStates:                   utils.TfStringListToStringPtrList(ctx, tf.LinkNicStates),
-		LinkNicVmIds:                    utils.TfStringListToStringPtrList(ctx, tf.LinkNicVmIds),
-		MacAddresses:                    utils.TfStringListToStringPtrList(ctx, tf.MacAddresses),
-		LinkPublicIpLinkPublicIpIds:     utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpLinkPublicIpIds),
-		LinkPublicIpPublicIpIds:         utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpPublicIpIds),
-		LinkPublicIpPublicIps:           utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpPublicIps),
-		PrivateDnsNames:                 utils.TfStringListToStringPtrList(ctx, tf.PrivateDnsNames),
+		LinkNicDeviceNumbers:            utils.TFInt64ListToIntListPointer(ctx, tf.LinkNicDeviceNumbers, diags),
+		LinkNicLinkNicIds:               utils.TfStringListToStringPtrList(ctx, tf.LinkNicLinkNicIds, diags),
+		LinkNicStates:                   utils.TfStringListToStringPtrList(ctx, tf.LinkNicStates, diags),
+		LinkNicVmIds:                    utils.TfStringListToStringPtrList(ctx, tf.LinkNicVmIds, diags),
+		MacAddresses:                    utils.TfStringListToStringPtrList(ctx, tf.MacAddresses, diags),
+		LinkPublicIpLinkPublicIpIds:     utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpLinkPublicIpIds, diags),
+		LinkPublicIpPublicIpIds:         utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpPublicIpIds, diags),
+		LinkPublicIpPublicIps:           utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpPublicIps, diags),
+		PrivateDnsNames:                 utils.TfStringListToStringPtrList(ctx, tf.PrivateDnsNames, diags),
 		PrivateIpsPrimaryIp:             utils.FromTfBoolToBoolPtr(tf.PrivateIpsPrimaryIp),
-		PrivateIpsLinkPublicIpPublicIps: utils.TfStringListToStringPtrList(ctx, tf.PrivateIpsLinkPublicIpPublicIps),
-		PrivateIpsPrivateIps:            utils.TfStringListToStringPtrList(ctx, tf.PrivateIpsPrivateIps),
-		SecurityGroupIds:                utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
-		SecurityGroupNames:              utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupNames),
-		States:                          utils.TfStringListToStringPtrList(ctx, tf.States),
-		SubnetIds:                       utils.TfStringListToStringPtrList(ctx, tf.SubnetIds),
-		VpcIds:                          utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
-		Ids:                             utils.TfStringListToStringPtrList(ctx, tf.Ids),
-		AvailabilityZoneNames:           utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames),
-		Tags:                            utils.TfStringListToStringPtrList(ctx, tf.Tags),
-		TagKeys:                         utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:                       utils.TfStringListToStringPtrList(ctx, tf.TagValues),
+		PrivateIpsLinkPublicIpPublicIps: utils.TfStringListToStringPtrList(ctx, tf.PrivateIpsLinkPublicIpPublicIps, diags),
+		PrivateIpsPrivateIps:            utils.TfStringListToStringPtrList(ctx, tf.PrivateIpsPrivateIps, diags),
+		SecurityGroupIds:                utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
+		SecurityGroupNames:              utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupNames, diags),
+		States:                          utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		SubnetIds:                       utils.TfStringListToStringPtrList(ctx, tf.SubnetIds, diags),
+		VpcIds:                          utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
+		Ids:                             utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		AvailabilityZoneNames:           utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames, diags),
+		Tags:                            utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		TagKeys:                         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:                       utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
 	}
 }
 
-func linkPublicIpFromHTTP(ctx context.Context, http numspot.LinkPublicIp) (LinkPublicIpValue, diag.Diagnostics) {
-	return NewLinkPublicIpValue(
+func linkPublicIpFromHTTP(ctx context.Context, http numspot.LinkPublicIp, diags *diag.Diagnostics) LinkPublicIpValue {
+	value, diagnostics := NewLinkPublicIpValue(
 		LinkPublicIpValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"id":              types.StringPointerValue(http.Id),
@@ -226,10 +233,12 @@ func linkPublicIpFromHTTP(ctx context.Context, http numspot.LinkPublicIp) (LinkP
 			"public_ip":       types.StringPointerValue(http.PublicIp),
 			"public_ip_id":    types.StringPointerValue(http.PublicIpId),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func linkNICFromHTTP(ctx context.Context, http numspot.LinkNic) (LinkNicValue, diag.Diagnostics) {
-	return NewLinkNicValue(
+func linkNICFromHTTP(ctx context.Context, http numspot.LinkNic, diags *diag.Diagnostics) LinkNicValue {
+	value, diagnostics := NewLinkNicValue(
 		LinkNicValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"id":                    types.StringPointerValue(http.Id),
@@ -238,20 +247,23 @@ func linkNICFromHTTP(ctx context.Context, http numspot.LinkNic) (LinkNicValue, d
 			"state":                 types.StringPointerValue(http.State),
 			"vm_id":                 types.StringPointerValue(http.VmId),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func privateIpsFromHTTP(ctx context.Context, http numspot.PrivateIp) (PrivateIpsValue, diag.Diagnostics) {
-	linkPublicIp, diags := linkPublicIpFromHTTP(ctx, utils.GetPtrValue(http.LinkPublicIp))
+func privateIpsFromHTTP(ctx context.Context, http numspot.PrivateIp, diags *diag.Diagnostics) PrivateIpsValue {
+	linkPublicIp := linkPublicIpFromHTTP(ctx, utils.GetPtrValue(http.LinkPublicIp), diags)
 	if diags.HasError() {
-		return PrivateIpsValue{}, diags
+		return PrivateIpsValue{}
 	}
 
-	linkPublicIpObjectValue, diags := linkPublicIp.ToObjectValue(ctx)
+	linkPublicIpObjectValue, diagnostics := linkPublicIp.ToObjectValue(ctx)
+	diags.Append(diagnostics...)
 	if diags.HasError() {
-		return PrivateIpsValue{}, diags
+		return PrivateIpsValue{}
 	}
 
-	return NewPrivateIpsValue(
+	value, diagnostics := NewPrivateIpsValue(
 		PrivateIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"is_primary":       types.BoolPointerValue(http.IsPrimary),
@@ -259,38 +271,39 @@ func privateIpsFromHTTP(ctx context.Context, http numspot.PrivateIp) (PrivateIps
 			"private_dns_name": types.StringPointerValue(http.PrivateDnsName),
 			"private_ip":       types.StringPointerValue(http.PrivateIp),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func securityGroupsFromHTTP(ctx context.Context, http numspot.SecurityGroupLight) (SecurityGroupsValue, diag.Diagnostics) {
-	return NewSecurityGroupsValue(
+func securityGroupsFromHTTP(ctx context.Context, http numspot.SecurityGroupLight, diags *diag.Diagnostics) SecurityGroupsValue {
+	value, diagnostics := NewSecurityGroupsValue(
 		SecurityGroupsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"security_group_id":   types.StringPointerValue(http.SecurityGroupId),
 			"security_group_name": types.StringPointerValue(http.SecurityGroupName),
 		})
+	diags.Append(diagnostics...)
+	return value
 }
 
-func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic) (*NicModelDatasource, diag.Diagnostics) {
+func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic, diags *diag.Diagnostics) *NicModelDatasource {
 	if http == nil {
-		return nil, nil
+		return nil
 	}
 
 	var (
 		tagsList     types.List
 		linkNic      LinkNicValue
 		linkPublicIp LinkPublicIpValue
-		diag         diag.Diagnostics
 	)
 
 	if http.Tags != nil {
-		tagsList, diag = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diag.HasError() {
-			return nil, diag
-		}
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	if http.LinkNic != nil {
-		linkNic, diag = NewLinkNicValue(LinkNicValue{}.AttributeTypes(ctx),
+		var diagnostics diag.Diagnostics
+		linkNic, diagnostics = NewLinkNicValue(LinkNicValue{}.AttributeTypes(ctx),
 			map[string]attr.Value{
 				"delete_on_vm_deletion": types.BoolPointerValue(http.LinkNic.DeleteOnVmDeletion),
 				"device_number":         utils.FromIntPtrToTfInt64(http.LinkNic.DeviceNumber),
@@ -298,32 +311,35 @@ func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic) (*NicMod
 				"state":                 types.StringPointerValue(http.LinkNic.State),
 				"vm_id":                 types.StringPointerValue(http.LinkNic.VmId),
 			})
-		if diag.HasError() {
-			return nil, diag
+		diags.Append(diagnostics...)
+		if diags.HasError() {
+			return nil
 		}
 	}
 
 	if http.LinkPublicIp != nil {
-		linkPublicIp, diag = NewLinkPublicIpValue(LinkPublicIpValue{}.AttributeTypes(ctx),
+		var diagnostics diag.Diagnostics
+		linkPublicIp, diagnostics = NewLinkPublicIpValue(LinkPublicIpValue{}.AttributeTypes(ctx),
 			map[string]attr.Value{
 				"id":              types.StringPointerValue(http.LinkPublicIp.Id),
 				"public_dns_name": types.StringPointerValue(http.LinkPublicIp.PublicDnsName),
 				"public_ip":       types.StringPointerValue(http.LinkPublicIp.PublicIp),
 				"public_ip_id":    types.StringPointerValue(http.LinkPublicIp.PublicIpId),
 			})
-		if diag.HasError() {
-			return nil, diag
+		diags.Append(diagnostics...)
+		if diags.HasError() {
+			return nil
 		}
 	}
 
-	privateIps, diags := utils.GenericListToTfListValue(ctx, PrivateIpsValue{}, privateIpsFromHTTP, utils.GetPtrValue(http.PrivateIps))
+	privateIps := utils.GenericListToTfListValue(ctx, PrivateIpsValue{}, privateIpsFromHTTP, utils.GetPtrValue(http.PrivateIps), diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	securityGroups, diags := utils.GenericListToTfListValue(ctx, SecurityGroupsValue{}, securityGroupsFromHTTP, utils.GetPtrValue(http.SecurityGroups))
+	securityGroups := utils.GenericListToTfListValue(ctx, SecurityGroupsValue{}, securityGroupsFromHTTP, utils.GetPtrValue(http.SecurityGroups), diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
 	return &NicModelDatasource{
@@ -341,17 +357,17 @@ func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic) (*NicMod
 		SubnetId:             types.StringPointerValue(http.SubnetId),
 		VpcId:                types.StringPointerValue(http.VpcId),
 		Tags:                 tagsList,
-	}, nil
+	}
 }
 
-func NicFromTfToUpdaterequest(ctx context.Context, tf *NicModel) numspot.UpdateNicJSONRequestBody {
+func NicFromTfToUpdaterequest(ctx context.Context, tf *NicModel, diags *diag.Diagnostics) numspot.UpdateNicJSONRequestBody {
 	linkNic := numspot.LinkNicToUpdate{
 		DeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(tf.LinkNic.DeleteOnVmDeletion),
 		LinkNicId:          utils.FromTfStringToStringPtr(tf.LinkNic.Id),
 	}
 
 	return numspot.UpdateNicJSONRequestBody{
-		SecurityGroupIds: utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds),
+		SecurityGroupIds: utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
 		Description:      utils.FromTfStringToStringPtr(tf.Description),
 		LinkNic:          &linkNic,
 	}

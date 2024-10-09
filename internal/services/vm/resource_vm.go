@@ -13,7 +13,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -67,7 +67,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		VmFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
@@ -90,7 +90,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		}
 	}
 
-	read, err := utils2.RetryReadUntilStateValid(
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -110,14 +110,13 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	}
 
 	// In some cases, when there is insufficient capacity the VM is created with state = stopped
-	if utils2.GetPtrValue(vmSchema.State) == "stopped" {
-		response.Diagnostics.AddError("Issue while creating VM", fmt.Sprintf("VM was created in 'stopped' state. Reason : %s", utils2.GetPtrValue(vmSchema.StateReason)))
+	if utils.GetPtrValue(vmSchema.State) == "stopped" {
+		response.Diagnostics.AddError("Issue while creating VM", fmt.Sprintf("VM was created in 'stopped' state. Reason : %s", utils.GetPtrValue(vmSchema.StateReason)))
 		return
 	}
 
-	tf, diagnostics := VmFromHttpToTf(ctx, vmSchema)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	tf := VmFromHttpToTf(ctx, vmSchema, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -128,8 +127,8 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	var data VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadVmsByIdResponse, error) {
-		id := utils2.FromTfStringToStringPtr(data.Id)
+	res := utils.ExecuteRequest(func() (*numspot.ReadVmsByIdResponse, error) {
+		id := utils.FromTfStringToStringPtr(data.Id)
 		if id == nil {
 			return nil, errors.New("Found invalid id")
 		}
@@ -139,9 +138,8 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 		return
 	}
 
-	tf, diagnostics := VmFromHttpToTf(ctx, res.JSON200)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	tf := VmFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -187,14 +185,13 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 
 	if isUpdateNeeded(body, bodyFromState) {
 		// Stop VM before doing update
-		diags := StopVm(ctx, r.provider, vmId)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		StopVm(ctx, r.provider, vmId, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
 		// Update VM
-		updatedRes := utils2.ExecuteRequest(func() (*numspot.UpdateVmResponse, error) {
+		updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVmResponse, error) {
 			return r.provider.GetNumspotClient().UpdateVmWithResponse(ctx, r.provider.GetSpaceID(), vmId, body)
 		}, http.StatusOK, &response.Diagnostics)
 
@@ -203,15 +200,14 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		}
 
 		// Restart VM
-		diags = StartVm(ctx, r.provider, vmId)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		StartVm(ctx, r.provider, vmId, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
 	// Retries read on VM until state is OK
-	read, err := utils2.RetryReadUntilStateValid(
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		vmId,
 		r.provider.GetSpaceID(),
@@ -229,21 +225,17 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		return
 	}
 
-	tf, diags := VmFromHttpToTf(ctx, vmObject)
-
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
-	}
+	tf := VmFromHttpToTf(ctx, vmObject, &response.Diagnostics)
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func compareSimpleFieldPtr[R comparable](val1 *R, val2 *R) bool {
-	return utils2.GetPtrValue(val1) == utils2.GetPtrValue(val2)
+	return utils.GetPtrValue(val1) == utils.GetPtrValue(val2)
 }
 
 func compareSlicePtr[R comparable](val1 *[]R, val2 *[]R) bool {
-	return slices.Equal(utils2.GetPtrValue(val1), utils2.GetPtrValue(val2))
+	return slices.Equal(utils.GetPtrValue(val1), utils.GetPtrValue(val2))
 }
 
 func isUpdateNeeded(plan numspot.UpdateVmJSONRequestBody, state numspot.UpdateVmJSONRequestBody) bool {
@@ -251,12 +243,12 @@ func isUpdateNeeded(plan numspot.UpdateVmJSONRequestBody, state numspot.UpdateVm
 		compareSimpleFieldPtr(plan.DeletionProtection, state.DeletionProtection) &&
 		compareSimpleFieldPtr(plan.KeypairName, state.KeypairName) &&
 		compareSimpleFieldPtr(plan.NestedVirtualization, state.NestedVirtualization) &&
-		(utils2.GetPtrValue(plan.Performance) == "" || compareSimpleFieldPtr(plan.Performance, state.Performance)) && // if performance is not provided by user,
-		(len(utils2.GetPtrValue(plan.BlockDeviceMappings)) == 0) &&
+		(utils.GetPtrValue(plan.Performance) == "" || compareSimpleFieldPtr(plan.Performance, state.Performance)) && // if performance is not provided by user,
+		(len(utils.GetPtrValue(plan.BlockDeviceMappings)) == 0) &&
 		compareSimpleFieldPtr(plan.UserData, state.UserData) &&
 		compareSimpleFieldPtr(plan.VmInitiatedShutdownBehavior, state.VmInitiatedShutdownBehavior) &&
 		compareSimpleFieldPtr(plan.Type, state.Type) &&
-		(len(utils2.GetPtrValue(plan.BlockDeviceMappings)) == 0 || (compareSlicePtr(plan.BlockDeviceMappings, state.BlockDeviceMappings))) &&
+		(len(utils.GetPtrValue(plan.BlockDeviceMappings)) == 0 || (compareSlicePtr(plan.BlockDeviceMappings, state.BlockDeviceMappings))) &&
 		compareSimpleFieldPtr(plan.IsSourceDestChecked, state.IsSourceDestChecked))
 }
 
@@ -264,7 +256,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	var data VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVmsWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVmsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VM", err.Error())
 		return

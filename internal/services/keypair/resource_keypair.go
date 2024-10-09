@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -65,7 +65,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		KeyPairFromTfToCreateRequest(&data),
@@ -90,7 +90,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	var data KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadKeypairsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadKeypairsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadKeypairsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -101,11 +101,11 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 		res.JSON200,
 	)
 
-	if !utils2.IsTfValueNull(data.PublicKey) {
+	if !utils.IsTfValueNull(data.PublicKey) {
 		tf.PublicKey = data.PublicKey
 	}
 
-	if !utils2.IsTfValueNull(data.PrivateKey) {
+	if !utils.IsTfValueNull(data.PrivateKey) {
 		tf.PrivateKey = data.PrivateKey
 	}
 
@@ -120,7 +120,7 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 	var data KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteKeypairWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteKeypairWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete KeyPair", err.Error())
 		return

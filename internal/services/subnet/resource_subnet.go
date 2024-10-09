@@ -11,7 +11,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -66,7 +66,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		SubnetFromTfToCreateRequest(&data),
@@ -77,7 +77,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	}
 
 	createdId := *res.JSON201.Id
-	_, err = utils2.RetryReadUntilStateValid(
+	_, err = utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -91,7 +91,7 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	}
 
 	if data.MapPublicIpOnLaunch.ValueBool() {
-		updateRes := utils2.ExecuteRequest(func() (*numspot.UpdateSubnetResponse, error) {
+		updateRes := utils.ExecuteRequest(func() (*numspot.UpdateSubnetResponse, error) {
 			return r.provider.GetNumspotClient().UpdateSubnetWithResponse(ctx, r.provider.GetSpaceID(), createdId, numspot.UpdateSubnetJSONRequestBody{
 				MapPublicIpOnLaunch: true,
 			})
@@ -108,15 +108,15 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		}
 	}
 
-	readRes := utils2.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
+	readRes := utils.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadSubnetsByIdWithResponse(ctx, r.provider.GetSpaceID(), createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if readRes == nil {
 		return
 	}
 
-	tf, diags := SubnetFromHttpToTf(ctx, readRes.JSON200)
-	if diags.HasError() {
+	tf := SubnetFromHttpToTf(ctx, readRes.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -126,15 +126,15 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadSubnetsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diags := SubnetFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
+	tf := SubnetFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -165,7 +165,7 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 	}
 
 	if !state.MapPublicIpOnLaunch.Equal(plan.MapPublicIpOnLaunch) {
-		res := utils2.ExecuteRequest(func() (*numspot.UpdateSubnetResponse, error) {
+		res := utils.ExecuteRequest(func() (*numspot.UpdateSubnetResponse, error) {
 			return r.provider.GetNumspotClient().UpdateSubnetWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString(),
 				numspot.UpdateSubnet{
 					MapPublicIpOnLaunch: plan.MapPublicIpOnLaunch.ValueBool(),
@@ -176,15 +176,15 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 		}
 	}
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadSubnetsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diags := SubnetFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
+	tf := SubnetFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	if response.Diagnostics.HasError() {
@@ -198,7 +198,7 @@ func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequ
 	var data SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteSubnetWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteSubnetWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete subnet", err.Error())
 		return

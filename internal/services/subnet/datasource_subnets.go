@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type SubnetsDataSourceModel struct {
@@ -75,8 +75,8 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 		return
 	}
 
-	params := SubnetsFromTfToAPIReadParams(ctx, plan)
-	res := utils2.ExecuteRequest(func() (*numspot.ReadSubnetsResponse, error) {
+	params := SubnetsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	res := utils.ExecuteRequest(func() (*numspot.ReadSubnetsResponse, error) {
 		return d.provider.GetNumspotClient().ReadSubnetsWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -86,10 +86,9 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 		response.Diagnostics.AddError("HTTP call failed", "got empty Subnets list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SubnetsFromHttpToTfDatasource)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SubnetsFromHttpToTfDatasource, &response.Diagnostics)
 
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

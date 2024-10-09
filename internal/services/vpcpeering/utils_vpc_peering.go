@@ -13,56 +13,60 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func accepterVpcFromApi(ctx context.Context, http *numspot.AccepterVpc) (AccepterVpcValue, diag.Diagnostics) {
+func accepterVpcFromApi(ctx context.Context, http *numspot.AccepterVpc, diags *diag.Diagnostics) AccepterVpcValue {
 	if http == nil {
-		return NewAccepterVpcValueNull(), nil
+		return NewAccepterVpcValueNull()
 	}
 
-	return NewAccepterVpcValue(
+	value, diagnostics := NewAccepterVpcValue(
 		AccepterVpcValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"ip_range": types.StringPointerValue(http.IpRange),
 			"vpc_id":   types.StringPointerValue(http.VpcId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func sourceVpcFromApi(ctx context.Context, http *numspot.SourceVpc) (SourceVpcValue, diag.Diagnostics) {
+func sourceVpcFromApi(ctx context.Context, http *numspot.SourceVpc, diags *diag.Diagnostics) SourceVpcValue {
 	if http == nil {
-		return NewSourceVpcValueNull(), nil
+		return NewSourceVpcValueNull()
 	}
 
-	return NewSourceVpcValue(
+	value, diagnostics := NewSourceVpcValue(
 		SourceVpcValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"ip_range": types.StringPointerValue(http.IpRange),
 			"vpc_id":   types.StringPointerValue(http.VpcId),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func vpcPeeringStateFromApi(ctx context.Context, http *numspot.VpcPeeringState) (StateValue, diag.Diagnostics) {
+func vpcPeeringStateFromApi(ctx context.Context, http *numspot.VpcPeeringState, diags *diag.Diagnostics) StateValue {
 	if http == nil {
-		return NewStateValueNull(), nil
+		return NewStateValueNull()
 	}
 
-	return NewStateValue(
+	value, diagnostics := NewStateValue(
 		StateValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"message": types.StringPointerValue(http.Message),
 			"name":    types.StringPointerValue(http.Name),
 		},
 	)
+	diags.Append(diagnostics...)
+	return value
 }
 
-func VpcPeeringFromHttpToTf(ctx context.Context, http *numspot.VpcPeering) (*VpcPeeringModel, diag.Diagnostics) {
+func VpcPeeringFromHttpToTf(ctx context.Context, http *numspot.VpcPeering, diags *diag.Diagnostics) *VpcPeeringModel {
 	// In the event that the creation of VPC peering fails, the error message might be found in
 	// the "state" field. If the state's name is "failed", then the error message will be contained
 	// in the state's message. We must address this particular scenario.
-	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
-	)
+	var tagsTf types.List
+
 	vpcPeeringStateHttp := http.State
 
 	if vpcPeeringStateHttp != nil {
@@ -75,24 +79,13 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *numspot.VpcPeering) (*Vpc
 				errorMessage = *message
 			}
 			diags.AddError("Failed to create vpc peering", errorMessage)
-			return nil, diags
+			return nil
 		}
 	}
 
-	vpcPeeringState, diags := vpcPeeringStateFromApi(ctx, vpcPeeringStateHttp)
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	accepterVpcTf, diags := accepterVpcFromApi(ctx, http.AccepterVpc)
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	sourceVpcTf, diags := sourceVpcFromApi(ctx, http.SourceVpc)
-	if diags.HasError() {
-		return nil, diags
-	}
+	vpcPeeringState := vpcPeeringStateFromApi(ctx, vpcPeeringStateHttp, diags)
+	accepterVpcTf := accepterVpcFromApi(ctx, http.AccepterVpc, diags)
+	sourceVpcTf := sourceVpcFromApi(ctx, http.SourceVpc, diags)
 
 	var httpExpirationDate, accepterVpcId, sourceVpcId *string
 	if http.ExpirationDate != nil {
@@ -110,9 +103,9 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *numspot.VpcPeering) (*Vpc
 	}
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -125,7 +118,7 @@ func VpcPeeringFromHttpToTf(ctx context.Context, http *numspot.VpcPeering) (*Vpc
 		SourceVpcId:    types.StringPointerValue(sourceVpcId),
 		State:          vpcPeeringState,
 		Tags:           tagsTf,
-	}, diags
+	}
 }
 
 func VpcPeeringFromTfToCreateRequest(tf VpcPeeringModel) numspot.CreateVpcPeeringJSONRequestBody {
@@ -135,27 +128,26 @@ func VpcPeeringFromTfToCreateRequest(tf VpcPeeringModel) numspot.CreateVpcPeerin
 	}
 }
 
-func VpcPeeringsFromTfToAPIReadParams(ctx context.Context, tf VpcPeeringsDataSourceModel) numspot.ReadVpcPeeringsParams {
-	expirationDates := utils.TfStringListToTimeList(ctx, tf.ExpirationDates, "2020-06-30T00:00:00.000Z")
+func VpcPeeringsFromTfToAPIReadParams(ctx context.Context, tf VpcPeeringsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVpcPeeringsParams {
+	expirationDates := utils.TfStringListToTimeList(ctx, tf.ExpirationDates, "2020-06-30T00:00:00.000Z", diags)
 
 	return numspot.ReadVpcPeeringsParams{
 		ExpirationDates:     &expirationDates,
-		StateMessages:       utils.TfStringListToStringPtrList(ctx, tf.StateMessages),
-		StateNames:          utils.TfStringListToStringPtrList(ctx, tf.StateNames),
-		AccepterVpcIpRanges: utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcIpRanges),
-		AccepterVpcVpcIds:   utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcVpcIds),
-		Ids:                 utils.TfStringListToStringPtrList(ctx, tf.Ids),
-		SourceVpcIpRanges:   utils.TfStringListToStringPtrList(ctx, tf.SourceVpcIpRanges),
-		SourceVpcVpcIds:     utils.TfStringListToStringPtrList(ctx, tf.SourceVpcVpcIds),
-		TagKeys:             utils.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:           utils.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:                utils.TfStringListToStringPtrList(ctx, tf.Tags),
+		StateMessages:       utils.TfStringListToStringPtrList(ctx, tf.StateMessages, diags),
+		StateNames:          utils.TfStringListToStringPtrList(ctx, tf.StateNames, diags),
+		AccepterVpcIpRanges: utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcIpRanges, diags),
+		AccepterVpcVpcIds:   utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcVpcIds, diags),
+		Ids:                 utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		SourceVpcIpRanges:   utils.TfStringListToStringPtrList(ctx, tf.SourceVpcIpRanges, diags),
+		SourceVpcVpcIds:     utils.TfStringListToStringPtrList(ctx, tf.SourceVpcVpcIds, diags),
+		TagKeys:             utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:           utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:                utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
 	}
 }
 
-func VpcPeeringsFromHttpToTfDatasource(ctx context.Context, http *numspot.VpcPeering) (*VpcPeeringDatasourceItemModel, diag.Diagnostics) {
+func VpcPeeringsFromHttpToTfDatasource(ctx context.Context, http *numspot.VpcPeering, diags *diag.Diagnostics) *VpcPeeringDatasourceItemModel {
 	var (
-		diags            diag.Diagnostics
 		tagsList         types.List
 		accepterVpc      AccepterVpcValue
 		sourceVpc        SourceVpcValue
@@ -164,9 +156,9 @@ func VpcPeeringsFromHttpToTfDatasource(ctx context.Context, http *numspot.VpcPee
 	)
 
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -176,36 +168,33 @@ func VpcPeeringsFromHttpToTfDatasource(ctx context.Context, http *numspot.VpcPee
 	}
 
 	if http.AccepterVpc != nil {
-		accepterVpc, diags = NewAccepterVpcValue(AccepterVpcValue{}.AttributeTypes(ctx),
+		var diagnostics diag.Diagnostics
+		accepterVpc, diagnostics = NewAccepterVpcValue(AccepterVpcValue{}.AttributeTypes(ctx),
 			map[string]attr.Value{
 				"ip_range": types.StringPointerValue(http.AccepterVpc.IpRange),
 				"vpc_id":   types.StringPointerValue(http.AccepterVpc.VpcId),
 			})
-		if diags.HasError() {
-			return nil, diags
-		}
+		diags.Append(diagnostics...)
 	}
 
 	if http.SourceVpc != nil {
-		sourceVpc, diags = NewSourceVpcValue(SourceVpcValue{}.AttributeTypes(ctx),
+		var diagnostics diag.Diagnostics
+		sourceVpc, diagnostics = NewSourceVpcValue(SourceVpcValue{}.AttributeTypes(ctx),
 			map[string]attr.Value{
 				"ip_range": types.StringPointerValue(http.SourceVpc.IpRange),
 				"vpc_id":   types.StringPointerValue(http.SourceVpc.VpcId),
 			})
-		if diags.HasError() {
-			return nil, diags
-		}
+		diags.Append(diagnostics...)
 	}
 
 	if http.State != nil {
-		state, diags = NewStateValue(StateValue{}.AttributeTypes(ctx),
+		var diagnostics diag.Diagnostics
+		state, diagnostics = NewStateValue(StateValue{}.AttributeTypes(ctx),
 			map[string]attr.Value{
 				"message": types.StringPointerValue(http.State.Message),
 				"name":    types.StringPointerValue(http.State.Name),
 			})
-		if diags.HasError() {
-			return nil, diags
-		}
+		diags.Append(diagnostics...)
 	}
 
 	return &VpcPeeringDatasourceItemModel{
@@ -215,5 +204,5 @@ func VpcPeeringsFromHttpToTfDatasource(ctx context.Context, http *numspot.VpcPee
 		ExpirationDate: expirationDateTf,
 		SourceVpc:      sourceVpc,
 		State:          state,
-	}, nil
+	}
 }

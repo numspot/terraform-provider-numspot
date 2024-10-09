@@ -10,7 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type SnapshotsDataSourceModel struct {
@@ -78,8 +78,11 @@ func (d *snapshotsDataSource) Read(ctx context.Context, request datasource.ReadR
 		return
 	}
 
-	params := SnapshotsFromTfToAPIReadParams(ctx, plan)
-	res := utils2.ExecuteRequest(func() (*numspot.ReadSnapshotsResponse, error) {
+	params := SnapshotsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsResponse, error) {
 		return d.provider.GetNumspotClient().ReadSnapshotsWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -89,10 +92,9 @@ func (d *snapshotsDataSource) Read(ctx context.Context, request datasource.ReadR
 		response.Diagnostics.AddError("HTTP call failed", "got empty Snapshot list")
 	}
 
-	objectItems, diags := utils2.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SnapshotsFromHttpToTfDatasource)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SnapshotsFromHttpToTfDatasource, &response.Diagnostics)
 
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

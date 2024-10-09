@@ -11,7 +11,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -66,7 +66,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	}
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		NetFromTfToCreateRequest(&data),
@@ -87,8 +87,8 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 
 	// if dhcp_options_set_id is set, we need to update the Vpc as this attribute can be set on Update only and not on Create
 	if !data.DhcpOptionsSetId.IsNull() && !data.DhcpOptionsSetId.IsUnknown() {
-		updatedRes := utils2.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
-			body := VpcFromTfToUpdaterequest(ctx, &data, &response.Diagnostics)
+		updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
+			body := VpcFromTfToUpdaterequest(ctx, &data)
 			return r.provider.GetNumspotClient().UpdateVpcWithResponse(ctx, r.provider.GetSpaceID(), createdId, body)
 		}, http.StatusOK, &response.Diagnostics)
 
@@ -96,7 +96,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 			return
 		}
 	}
-	readRes, err := utils2.RetryReadUntilStateValid(
+	readRes, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
 		r.provider.GetSpaceID(),
@@ -115,8 +115,8 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	tf, diags := NetFromHttpToTf(ctx, vpc)
-	if diags.HasError() {
+	tf := NetFromHttpToTf(ctx, vpc, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -127,7 +127,7 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils2.ExecuteRequest(func() (*numspot.ReadVpcsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadVpcsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadVpcsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
@@ -135,8 +135,8 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 	}
 
 	// TODO: read Nets returns tags in response, do not need to relist tags
-	tf, diags := NetFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
+	tf := NetFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -177,8 +177,8 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 	}
 
 	// Update Vpc
-	updatedRes := utils2.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
-		body := VpcFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
+	updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
+		body := VpcFromTfToUpdaterequest(ctx, &plan)
 		return r.provider.GetNumspotClient().UpdateVpcWithResponse(ctx, r.provider.GetSpaceID(), vpcId, body)
 	}, http.StatusOK, &response.Diagnostics)
 
@@ -187,15 +187,15 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 	}
 
 	// Read resource
-	res := utils2.ExecuteRequest(func() (*numspot.ReadVpcsByIdResponse, error) {
+	res := utils.ExecuteRequest(func() (*numspot.ReadVpcsByIdResponse, error) {
 		return r.provider.GetNumspotClient().ReadVpcsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
 	}
 
-	tf, diags := NetFromHttpToTf(ctx, res.JSON200)
-	if diags.HasError() {
+	tf := NetFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	if response.Diagnostics.HasError() {
@@ -209,7 +209,7 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVpcWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVpcWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPC", err.Error())
 		return

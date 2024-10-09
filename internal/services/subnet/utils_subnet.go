@@ -11,16 +11,10 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func SubnetFromHttpToTf(ctx context.Context, http *numspot.Subnet) (*SubnetModel, diag.Diagnostics) {
-	var (
-		tagsList types.List
-		diags    diag.Diagnostics
-	)
+func SubnetFromHttpToTf(ctx context.Context, http *numspot.Subnet, diags *diag.Diagnostics) *SubnetModel {
+	var tagsList types.List
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return &SubnetModel{
@@ -32,7 +26,7 @@ func SubnetFromHttpToTf(ctx context.Context, http *numspot.Subnet) (*SubnetModel
 		State:                types.StringPointerValue(http.State),
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		Tags:                 tagsList,
-	}, nil
+	}
 }
 
 func SubnetFromTfToCreateRequest(tf *SubnetModel) numspot.CreateSubnetJSONRequestBody {
@@ -43,28 +37,22 @@ func SubnetFromTfToCreateRequest(tf *SubnetModel) numspot.CreateSubnetJSONReques
 	}
 }
 
-func SubnetsFromTfToAPIReadParams(ctx context.Context, tf SubnetsDataSourceModel) numspot.ReadSubnetsParams {
+func SubnetsFromTfToAPIReadParams(ctx context.Context, tf SubnetsDataSourceModel, diags *diag.Diagnostics) numspot.ReadSubnetsParams {
 	return numspot.ReadSubnetsParams{
-		AvailableIpsCounts:    utils.TFInt64ListToIntListPointer(ctx, tf.AvailableIpsCounts),
-		IpRanges:              utils.TfStringListToStringPtrList(ctx, tf.IpRanges),
-		States:                utils.TfStringListToStringPtrList(ctx, tf.States),
-		VpcIds:                utils.TfStringListToStringPtrList(ctx, tf.VpcIds),
-		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.Ids),
-		AvailabilityZoneNames: utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames),
+		AvailableIpsCounts:    utils.TFInt64ListToIntListPointer(ctx, tf.AvailableIpsCounts, diags),
+		IpRanges:              utils.TfStringListToStringPtrList(ctx, tf.IpRanges, diags),
+		States:                utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		VpcIds:                utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
+		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		AvailabilityZoneNames: utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames, diags),
 	}
 }
 
-func SubnetsFromHttpToTfDatasource(ctx context.Context, http *numspot.Subnet) (*SubnetModel, diag.Diagnostics) {
-	var (
-		diags    diag.Diagnostics
-		tagsList types.List
-	)
+func SubnetsFromHttpToTfDatasource(ctx context.Context, http *numspot.Subnet, diags *diag.Diagnostics) *SubnetModel {
+	var tagsList types.List
 
 	if http.Tags != nil {
-		tagsList, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diags.HasError() {
-			return nil, diags
-		}
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return &SubnetModel{
@@ -76,5 +64,5 @@ func SubnetsFromHttpToTfDatasource(ctx context.Context, http *numspot.Subnet) (*
 		State:                types.StringPointerValue(http.State),
 		VpcId:                types.StringPointerValue(http.VpcId),
 		Tags:                 tagsList,
-	}, nil
+	}
 }

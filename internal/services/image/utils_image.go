@@ -43,12 +43,12 @@ func blockDeviceMappingFromTf(bdm BlockDeviceMappingsValue) numspot.BlockDeviceM
 	}
 }
 
-func bsuFromApi(ctx context.Context, bsu *numspot.BsuToCreate) (BsuValue, diag.Diagnostics) {
+func bsuFromApi(ctx context.Context, bsu *numspot.BsuToCreate, diags *diag.Diagnostics) BsuValue {
 	if bsu == nil {
-		return NewBsuValueNull(), nil
+		return NewBsuValueNull()
 	}
 
-	return NewBsuValue(
+	bsuValue, diagnostics := NewBsuValue(
 		BsuValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(bsu.DeleteOnVmDeletion),
@@ -58,20 +58,22 @@ func bsuFromApi(ctx context.Context, bsu *numspot.BsuToCreate) (BsuValue, diag.D
 			"volume_type":           types.StringPointerValue(bsu.VolumeType),
 		},
 	)
+	diags.Append(diagnostics...)
+	return bsuValue
 }
 
-func blockDeviceMappingFromApi(ctx context.Context, bdm numspot.BlockDeviceMappingImage) (BlockDeviceMappingsValue, diag.Diagnostics) {
-	bsu, diagnostics := bsuFromApi(ctx, bdm.Bsu)
-	if diagnostics.HasError() {
-		return NewBlockDeviceMappingsValueNull(), diagnostics
+func blockDeviceMappingFromApi(ctx context.Context, bdm numspot.BlockDeviceMappingImage, diags *diag.Diagnostics) BlockDeviceMappingsValue {
+	bsu := bsuFromApi(ctx, bdm.Bsu, diags)
+	if diags.HasError() {
+		return NewBlockDeviceMappingsValueNull()
 	}
 
 	bsuObjectValue, diagnostics := bsu.ToObjectValue(ctx)
 	if diagnostics.HasError() {
-		return NewBlockDeviceMappingsValueNull(), diagnostics
+		return NewBlockDeviceMappingsValueNull()
 	}
 
-	return NewBlockDeviceMappingsValue(
+	blockDeviceMappingValue, diagnostics := NewBlockDeviceMappingsValue(
 		BlockDeviceMappingsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"bsu":                 bsuObjectValue,
@@ -79,24 +81,27 @@ func blockDeviceMappingFromApi(ctx context.Context, bdm numspot.BlockDeviceMappi
 			"virtual_device_name": types.StringPointerValue(bdm.VirtualDeviceName),
 		},
 	)
+	diags.Append(diagnostics...)
+	return blockDeviceMappingValue
 }
 
-func stateCommentFromApi(ctx context.Context, state numspot.StateComment) (StateCommentValue, diag.Diagnostics) {
-	return NewStateCommentValue(
+func stateCommentFromApi(ctx context.Context, state numspot.StateComment, diags *diag.Diagnostics) StateCommentValue {
+	stateCommentValue, diagnostics := NewStateCommentValue(
 		StateCommentValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"state_code":    types.StringPointerValue(state.StateCode),
 			"state_message": types.StringPointerValue(state.StateMessage),
 		},
 	)
+	diags.Append(diagnostics...)
+	return stateCommentValue
 }
 
-func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, diag.Diagnostics) {
+func ImageFromHttpToTf(ctx context.Context, http *numspot.Image, diags *diag.Diagnostics) *ImageModel {
 	var (
 		creationDateTf        types.String
 		blockDeviceMappingsTf types.List
 		productCodesTf        types.List
-		diags                 diag.Diagnostics
 		stateCommentTf        StateCommentValue
 		tagsTf                types.List
 	)
@@ -109,14 +114,15 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, d
 
 	// Block Device Mapping
 	if http.BlockDeviceMappings != nil {
-		blockDeviceMappingsTf, diags = utils.GenericListToTfListValue(
+		blockDeviceMappingsTf = utils.GenericListToTfListValue(
 			ctx,
 			BlockDeviceMappingsValue{},
 			blockDeviceMappingFromApi,
 			*http.BlockDeviceMappings,
+			diags,
 		)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	} else {
 		blockDeviceMappingsTf = types.ListNull(BlockDeviceMappingsValue{}.Type(ctx))
@@ -124,9 +130,9 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, d
 
 	// Product Codes
 	if http.ProductCodes != nil {
-		productCodesTf, diags = utils.StringListToTfListValue(ctx, *http.ProductCodes)
+		productCodesTf = utils.StringListToTfListValue(ctx, *http.ProductCodes, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	} else {
 		productCodesTf = types.ListNull(types.StringType)
@@ -134,9 +140,9 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, d
 
 	// State Comment
 	if http.StateComment != nil {
-		stateCommentTf, diags = stateCommentFromApi(ctx, *http.StateComment)
+		stateCommentTf = stateCommentFromApi(ctx, *http.StateComment, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	} else {
 		stateCommentTf = NewStateCommentValueNull()
@@ -144,17 +150,19 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, d
 
 	// Tags
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
-	access, diags := NewAccessValue(AccessValue{}.AttributeTypes(ctx),
+	access, diagnostics := NewAccessValue(AccessValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"is_public": types.BoolPointerValue(http.Access.IsPublic),
 		},
 	)
+
+	diags.Append(diagnostics...)
 
 	return &ImageModel{
 		Architecture:   types.StringPointerValue(http.Architecture),
@@ -173,13 +181,12 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image) (*ImageModel, d
 		// VmId:  types.StringPointerValue(http.),
 		// NoReboot:       types.BoolPointerValue(http.),
 		//
-		StateComment: stateCommentTf,
-		//
+		StateComment:        stateCommentTf,
 		ProductCodes:        productCodesTf,
 		BlockDeviceMappings: blockDeviceMappingsTf,
 		Tags:                tagsTf,
 		Access:              access,
-	}, diags
+	}
 }
 
 func ImageFromTfToCreateRequest(ctx context.Context, tf *ImageModel, diag *diag.Diagnostics) *numspot.CreateImageJSONRequestBody {

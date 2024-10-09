@@ -10,19 +10,16 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func PublicIpFromHttpToTf(ctx context.Context, elt *numspot.PublicIp) (*PublicIpModel, diag.Diagnostics) {
-	var (
-		diags    diag.Diagnostics
-		tagsList types.List
-	)
+func PublicIpFromHttpToTf(ctx context.Context, elt *numspot.PublicIp, diags *diag.Diagnostics) *PublicIpModel {
+	var tagsList types.List
 
 	if elt.Tags != nil {
-		tagsList, diags = utils2.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *elt.Tags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *elt.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -34,7 +31,7 @@ func PublicIpFromHttpToTf(ctx context.Context, elt *numspot.PublicIp) (*PublicIp
 		VmId:         types.StringPointerValue(elt.VmId),
 		LinkPublicIP: types.StringPointerValue(elt.LinkPublicIpId),
 		Tags:         tagsList,
-	}, nil
+	}
 }
 
 func invokeLinkPublicIP(ctx context.Context, provider services.IProvider, data *PublicIpModel) (*string, error) {
@@ -52,7 +49,7 @@ func invokeLinkPublicIP(ctx context.Context, provider services.IProvider, data *
 		return nil, err
 	}
 	if res.StatusCode() != http.StatusOK {
-		return nil, utils2.HandleError(res.Body)
+		return nil, utils.HandleError(res.Body)
 	}
 
 	return res.JSON200.LinkPublicIpId, nil
@@ -67,59 +64,54 @@ func invokeUnlinkPublicIP(ctx context.Context, provider services.IProvider, data
 		return err
 	}
 	if res.StatusCode() != http.StatusOK {
-		return utils2.HandleError(res.Body)
+		return utils.HandleError(res.Body)
 	}
 
 	return nil
 }
 
-func refreshState(ctx context.Context, provider services.IProvider, id string) (*PublicIpModel, diag.Diagnostics) {
+func refreshState(ctx context.Context, provider services.IProvider, id string, diags *diag.Diagnostics) *PublicIpModel {
 	// Refresh state
-	var diags diag.Diagnostics
-
 	res, err := provider.GetNumspotClient().ReadPublicIpsByIdWithResponse(ctx, provider.GetSpaceID(), id)
 	if err != nil {
 		diags.AddError("Failed to read public ip", err.Error())
-		return nil, diags
+		return nil
 	}
 
 	if res.StatusCode() != http.StatusOK {
-		apiError := utils2.HandleError(res.Body)
+		apiError := utils.HandleError(res.Body)
 		diags.AddError("Failed to read public ip", apiError.Error())
-		return nil, diags
+		return nil
 	}
 
-	tf, diags := PublicIpFromHttpToTf(ctx, res.JSON200)
+	tf := PublicIpFromHttpToTf(ctx, res.JSON200, diags)
 	if diags.HasError() {
-		return nil, diags
+		return nil
 	}
 
-	return tf, diags
+	return tf
 }
 
-func PublicIpsFromTfToAPIReadParams(ctx context.Context, tf PublicIpsDataSourceModel) numspot.ReadPublicIpsParams {
+func PublicIpsFromTfToAPIReadParams(ctx context.Context, tf PublicIpsDataSourceModel, diags *diag.Diagnostics) numspot.ReadPublicIpsParams {
 	return numspot.ReadPublicIpsParams{
-		LinkPublicIpIds: utils2.TfStringListToStringPtrList(ctx, tf.LinkPublicIpIds),
-		NicIds:          utils2.TfStringListToStringPtrList(ctx, tf.NicIds),
-		PrivateIps:      utils2.TfStringListToStringPtrList(ctx, tf.PrivateIps),
-		TagKeys:         utils2.TfStringListToStringPtrList(ctx, tf.TagKeys),
-		TagValues:       utils2.TfStringListToStringPtrList(ctx, tf.TagValues),
-		Tags:            utils2.TfStringListToStringPtrList(ctx, tf.Tags),
-		Ids:             utils2.TfStringListToStringPtrList(ctx, tf.IDs),
-		VmIds:           utils2.TfStringListToStringPtrList(ctx, tf.VmIds),
+		LinkPublicIpIds: utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpIds, diags),
+		NicIds:          utils.TfStringListToStringPtrList(ctx, tf.NicIds, diags),
+		PrivateIps:      utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags),
+		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:            utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:             utils.TfStringListToStringPtrList(ctx, tf.IDs, diags),
+		VmIds:           utils.TfStringListToStringPtrList(ctx, tf.VmIds, diags),
 	}
 }
 
-func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *numspot.PublicIp) (*PublicIpModelDatasource, diag.Diagnostics) {
-	var (
-		tagsList types.List
-		diag     diag.Diagnostics
-	)
+func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *numspot.PublicIp, diags *diag.Diagnostics) *PublicIpModelDatasource {
+	var tagsList types.List
 
 	if http.Tags != nil {
-		tagsList, diag = utils2.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
-		if diag.HasError() {
-			return nil, diag
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		if diags.HasError() {
+			return nil
 		}
 	}
 
@@ -131,5 +123,5 @@ func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *numspot.PublicIp
 		VmId:           types.StringPointerValue(http.VmId),
 		LinkPublicIpId: types.StringPointerValue(http.LinkPublicIpId),
 		Tags:           tagsList,
-	}, nil
+	}
 }

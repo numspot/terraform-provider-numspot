@@ -11,19 +11,19 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func CreateAclListFromTf(ctx context.Context, tf ACLsModel) ([]numspot.ACL, diag.Diagnostics) {
+func CreateAclListFromTf(ctx context.Context, tf ACLsModel, diags *diag.Diagnostics) []numspot.ACL {
 	if tf.ACLs.IsNull() || tf.ACLs.IsUnknown() {
-		return nil, nil
+		return nil
 	}
 	acls := make([]ACLValue, 0, len(tf.ACLs.Elements()))
-	diags := tf.ACLs.ElementsAs(ctx, &acls, false)
+	diags.Append(tf.ACLs.ElementsAs(ctx, &acls, false)...)
 
 	aclsHttp := make([]numspot.ACL, 0, len(tf.ACLs.Elements()))
 
 	for _, acl := range acls {
-		permissionIdUuid, diags := utils.ParseUUID(acl.PermissionId.ValueString())
+		permissionIdUuid := utils.ParseUUID(acl.PermissionId.ValueString(), diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 
 		aclsHttp = append(aclsHttp, numspot.ACL{
@@ -34,15 +34,17 @@ func CreateAclListFromTf(ctx context.Context, tf ACLsModel) ([]numspot.ACL, diag
 			Subresource:  utils.FromTfStringToStringPtr(tf.Subresource),
 		})
 	}
-	return aclsHttp, diags
+	return aclsHttp
 }
 
-func CreateTfAclFromHttp(ctx context.Context, http numspot.ACL) (ACLValue, diag.Diagnostics) {
-	return NewACLValue(
+func CreateTfAclFromHttp(ctx context.Context, http numspot.ACL, diags *diag.Diagnostics) ACLValue {
+	aclValue, diagnostics := NewACLValue(
 		ACLValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"resource_id":   types.StringValue(http.ResourceId),
 			"permission_id": types.StringValue(http.PermissionId.String()),
 		},
 	)
+	diags.Append(diagnostics...)
+	return aclValue
 }

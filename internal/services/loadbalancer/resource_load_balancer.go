@@ -69,7 +69,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	_, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
-		LoadBalancerFromTfToCreateRequest(ctx, &data),
+		LoadBalancerFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
 		r.provider.GetNumspotClient().CreateLoadBalancerWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Load Balancer", err.Error())
@@ -78,22 +78,21 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 
 	// Backends
 	if len(data.BackendVmIds.Elements()) > 0 || len(data.BackendIps.Elements()) > 0 {
-		diags := r.linkBackendMachines(ctx,
+		r.linkBackendMachines(ctx,
 			data.Name.ValueString(),
-			utils.TfStringSetToStringPtrSet(ctx, data.BackendIps),
-			utils.TfStringSetToStringPtrSet(ctx, data.BackendVmIds),
+			utils.TfStringSetToStringPtrSet(ctx, data.BackendIps, &response.Diagnostics),
+			utils.TfStringSetToStringPtrSet(ctx, data.BackendVmIds, &response.Diagnostics),
+			&response.Diagnostics,
 		)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
 	// Health Check
 	if !data.HealthCheck.IsUnknown() {
-		_, diags := r.AttachHealthCheck(ctx, data.Name.ValueString(), data.HealthCheck)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		_ = r.AttachHealthCheck(ctx, data.Name.ValueString(), data.HealthCheck, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 	}
@@ -124,8 +123,7 @@ func (r *LoadBalancerResource) readLoadBalancer(ctx context.Context, id string, 
 		return nil
 	}
 
-	tf, diags := LoadBalancerFromHttpToTf(ctx, res.JSON200)
-	diagnostic.Append(diags...)
+	tf := LoadBalancerFromHttpToTf(ctx, res.JSON200, &diagnostic)
 	if diagnostic.HasError() {
 		return nil
 	}
@@ -323,9 +321,7 @@ func (r *LoadBalancerResource) deleteListeners(ctx context.Context, loadBalancer
 	return diags
 }
 
-func (r *LoadBalancerResource) linkBackendMachines(ctx context.Context, lbName string, backendIps, backendVmIds *[]string) diag.Diagnostics {
-	var diags diag.Diagnostics
-
+func (r *LoadBalancerResource) linkBackendMachines(ctx context.Context, lbName string, backendIps, backendVmIds *[]string, diags *diag.Diagnostics) {
 	payload := numspot.LinkLoadBalancerBackendMachinesJSONRequestBody{}
 
 	if backendIps != nil && len(*backendIps) > 0 {
@@ -338,13 +334,10 @@ func (r *LoadBalancerResource) linkBackendMachines(ctx context.Context, lbName s
 
 	utils.ExecuteRequest(func() (*numspot.LinkLoadBalancerBackendMachinesResponse, error) {
 		return r.provider.GetNumspotClient().LinkLoadBalancerBackendMachinesWithResponse(ctx, r.provider.GetSpaceID(), lbName, payload)
-	}, http.StatusNoContent, &diags)
-	return diags
+	}, http.StatusNoContent, diags)
 }
 
-func (r *LoadBalancerResource) AttachHealthCheck(ctx context.Context, lbName string, healthCheck HealthCheckValue) (*numspot.UpdateLoadBalancerResponse, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
+func (r *LoadBalancerResource) AttachHealthCheck(ctx context.Context, lbName string, healthCheck HealthCheckValue, diags *diag.Diagnostics) *numspot.UpdateLoadBalancerResponse {
 	payload := numspot.UpdateLoadBalancerJSONRequestBody{
 		HealthCheck: &numspot.HealthCheck{
 			CheckInterval:      utils.FromTfInt64ToInt(healthCheck.CheckInterval),
@@ -359,9 +352,9 @@ func (r *LoadBalancerResource) AttachHealthCheck(ctx context.Context, lbName str
 
 	updatedLoadBalancer := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
 		return r.provider.GetNumspotClient().UpdateLoadBalancerWithResponse(ctx, r.provider.GetSpaceID(), lbName, payload)
-	}, http.StatusOK, &diags)
+	}, http.StatusOK, diags)
 
-	return updatedLoadBalancer, diags
+	return updatedLoadBalancer
 }
 
 func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {

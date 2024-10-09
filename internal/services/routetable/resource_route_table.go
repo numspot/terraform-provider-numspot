@@ -13,7 +13,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -65,7 +65,7 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 
 	// Retries create until request response is OK
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.GetSpaceID(),
 		RouteTableFromTfToCreateRequest(&data),
@@ -88,15 +88,13 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 
 	routes := make([]RoutesValue, 0, len(data.Routes.Elements()))
 	data.Routes.ElementsAs(ctx, &routes, false)
-	diags := r.createRoutes(ctx, createdId, routes)
-	response.Diagnostics.Append(diags...)
+	r.createRoutes(ctx, createdId, routes, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	if !data.SubnetId.IsNull() {
-		diags = r.linkRouteTable(ctx, createdId, data.SubnetId.ValueString())
-		response.Diagnostics.Append(diags...)
+		r.linkRouteTable(ctx, createdId, data.SubnetId.ValueString(), &response.Diagnostics)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -107,11 +105,11 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
-	tf, diags := RouteTableFromHttpToTf(
+	tf := RouteTableFromHttpToTf(
 		ctx,
 		read.JSON200,
+		&response.Diagnostics,
 	)
-	response.Diagnostics.Append(diags...)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -128,11 +126,11 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 		return
 	}
 
-	tf, diags := RouteTableFromHttpToTf(
+	tf := RouteTableFromHttpToTf(
 		ctx,
 		res.JSON200,
+		&response.Diagnostics,
 	)
-	response.Diagnostics.Append(diags...)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -148,7 +146,7 @@ func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diag
 	}
 
 	if res.StatusCode() != http.StatusOK {
-		apiError := utils2.HandleError(res.Body)
+		apiError := utils.HandleError(res.Body)
 		diag.AddError("Failed to read RouteTable", apiError.Error())
 		return nil
 	}
@@ -208,7 +206,7 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 				return
 			}
 
-			diags = r.createRoutes(ctx, state.Id.ValueString(), planRoutes)
+			r.createRoutes(ctx, state.Id.ValueString(), planRoutes, &response.Diagnostics)
 			response.Diagnostics.Append(diags...)
 			if response.Diagnostics.HasError() {
 				return
@@ -216,7 +214,7 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 
 			modifs = true
 		case len(stateRoutesWithoutLocal) > 0 && len(plan.Routes.Elements()) == 0:
-			diags = r.deleteRoutes(ctx, state.Id.ValueString(), stateRoutesWithoutLocal)
+			r.deleteRoutes(ctx, state.Id.ValueString(), stateRoutesWithoutLocal, &response.Diagnostics)
 			response.Diagnostics.Append(diags...)
 			if response.Diagnostics.HasError() {
 				return
@@ -231,14 +229,13 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 				return
 			}
 
-			toCreate, toDelete := utils2.Diff(stateRoutesWithoutLocal, planRoutes)
-			diags = r.createRoutes(ctx, state.Id.ValueString(), toCreate)
-			response.Diagnostics.Append(diags...)
+			toCreate, toDelete := utils.Diff(stateRoutesWithoutLocal, planRoutes)
+			r.createRoutes(ctx, state.Id.ValueString(), toCreate, &response.Diagnostics)
 			if response.Diagnostics.HasError() {
 				return
 			}
 
-			diags = r.deleteRoutes(ctx, state.Id.ValueString(), toDelete)
+			r.deleteRoutes(ctx, state.Id.ValueString(), toDelete, &response.Diagnostics)
 			response.Diagnostics.Append(diags...)
 			if response.Diagnostics.HasError() {
 				return
@@ -255,9 +252,10 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 			return
 		}
 
-		tf, diags := RouteTableFromHttpToTf(
+		tf := RouteTableFromHttpToTf(
 			ctx,
 			res.JSON200,
+			&response.Diagnostics,
 		)
 		response.Diagnostics.Append(diags...)
 		if response.Diagnostics.HasError() {
@@ -298,62 +296,54 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 		}
 	}
 
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteRouteTableWithResponse)
+	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteRouteTableWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Route Table", err.Error())
 		return
 	}
 }
 
-func (r *RouteTableResource) createRoutes(ctx context.Context, routeTableId string, routes []RoutesValue) (diags diag.Diagnostics) {
+func (r *RouteTableResource) createRoutes(ctx context.Context, routeTableId string, routes []RoutesValue, diags *diag.Diagnostics) {
 	for i := range routes {
 		route := &routes[i]
 		if route != nil {
 			// prevent creating the one added in the plan modify function
 			if !route.IsUnknown() && !route.IsNull() && !strings.EqualFold(route.GatewayId.ValueString(), "local") {
-				createdRoute := utils2.ExecuteRequest(func() (*numspot.CreateRouteResponse, error) {
+				createdRoute := utils.ExecuteRequest(func() (*numspot.CreateRouteResponse, error) {
 					return r.provider.GetNumspotClient().CreateRouteWithResponse(ctx, r.provider.GetSpaceID(), routeTableId, RouteTableFromTfToCreateRoutesRequest(*route))
-				}, http.StatusCreated, &diags)
+				}, http.StatusCreated, diags)
 				if createdRoute == nil {
 					return
 				}
 			}
 		}
 	}
-
-	return
 }
 
-func (r *RouteTableResource) deleteRoutes(ctx context.Context, routeTableId string, routes []RoutesValue) (diags diag.Diagnostics) {
+func (r *RouteTableResource) deleteRoutes(ctx context.Context, routeTableId string, routes []RoutesValue, diags *diag.Diagnostics) {
 	for i := range routes {
 		route := &routes[i]
 		if route != nil {
-			deletedRoute := utils2.ExecuteRequest(func() (*numspot.DeleteRouteResponse, error) {
+			deletedRoute := utils.ExecuteRequest(func() (*numspot.DeleteRouteResponse, error) {
 				return r.provider.GetNumspotClient().DeleteRouteWithResponse(ctx, r.provider.GetSpaceID(), routeTableId, RouteTableFromTfToDeleteRoutesRequest(*route))
-			}, http.StatusNoContent, &diags)
+			}, http.StatusNoContent, diags)
 			if deletedRoute == nil {
 				return
 			}
 		}
 	}
-
-	return
 }
 
-func (r *RouteTableResource) linkRouteTable(ctx context.Context, routeTableId, subnetId string) diag.Diagnostics {
-	var diags diag.Diagnostics
-
-	utils2.ExecuteRequest(func() (*numspot.LinkRouteTableResponse, error) {
+func (r *RouteTableResource) linkRouteTable(ctx context.Context, routeTableId, subnetId string, diags *diag.Diagnostics) {
+	utils.ExecuteRequest(func() (*numspot.LinkRouteTableResponse, error) {
 		return r.provider.GetNumspotClient().LinkRouteTableWithResponse(ctx, r.provider.GetSpaceID(), routeTableId, numspot.LinkRouteTableJSONRequestBody{SubnetId: subnetId})
-	}, http.StatusOK, &diags)
-
-	return diags
+	}, http.StatusOK, diags)
 }
 
 func (r *RouteTableResource) unlinkRouteTable(ctx context.Context, routeTableId, linkRouteTableId string) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	utils2.ExecuteRequest(func() (*numspot.UnlinkRouteTableResponse, error) {
+	utils.ExecuteRequest(func() (*numspot.UnlinkRouteTableResponse, error) {
 		return r.provider.GetNumspotClient().UnlinkRouteTableWithResponse(ctx, r.provider.GetSpaceID(), routeTableId, numspot.UnlinkRouteTableJSONRequestBody{LinkRouteTableId: linkRouteTableId})
 	}, http.StatusNoContent, &diags)
 
