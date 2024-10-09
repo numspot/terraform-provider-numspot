@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
@@ -175,7 +176,7 @@ func serializeClientGateway(ctx context.Context, http *numspot.ClientGateway) (C
 	)
 
 	if http.Tags != nil {
-		tagsTf, diags = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, &diags)
 		if diags.HasError() {
 			return ClientGatewayModel{}, diags
 		}
