@@ -27,7 +27,7 @@ func CreateClientGateway(ctx context.Context, provider services.IProvider, numSp
 	createdId := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider.GetNumspotClient(), spaceID, createdId, tags); err != nil {
+		if err = CreateTags(ctx, provider, createdId, tags); err != nil {
 			return nil, err
 		}
 	}

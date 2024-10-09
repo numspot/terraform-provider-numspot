@@ -36,7 +36,7 @@ func CreateVolume(ctx context.Context, provider services.IProvider, numSpotVolum
 	}
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider.GetNumspotClient(), spaceID, volumeID, tags); err != nil {
+		if err = CreateTags(ctx, provider, volumeID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -204,7 +204,7 @@ func linkVolume(ctx context.Context, provider services.IProvider, op, volumeID, 
 		Pending: []string{attaching},
 		Target:  []string{attached},
 		Timeout: utils.TfRequestRetryTimeout,
-		Delay:   utils.TfRequestRetryDelay,
+		Delay:   utils.ParseRetryBackoff(),
 		Refresh: func() (interface{}, string, error) {
 			var volume *numspot.Volume
 			if volume, err = RetryReadVolume(ctx, provider, op, volumeID); err != nil {

@@ -21,7 +21,7 @@ func CreateDHCPOptions(ctx context.Context, provider services.IProvider, numSpot
 	dhcpOptionsID := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider.GetNumspotClient(), spaceID, dhcpOptionsID, tags); err != nil {
+		if err = CreateTags(ctx, provider, dhcpOptionsID, tags); err != nil {
 			return nil, err
 		}
 	}

@@ -3,12 +3,14 @@ package subnet
 import (
 	"context"
 	"fmt"
-	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -59,64 +61,22 @@ func (r *SubnetResource) Schema(ctx context.Context, request resource.SchemaRequ
 }
 
 func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data SubnetModel
-	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	var plan SubnetModel
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	// Retries create until request response is OK
-	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
-		ctx,
-		r.provider.GetSpaceID(),
-		SubnetFromTfToCreateRequest(&data),
-		r.provider.GetNumspotClient().CreateSubnetWithResponse)
+	createSubnetPayload := deserializeCreateSubnet(plan)
+	tags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	res, err := core.CreateSubnet(ctx, r.provider, createSubnetPayload, plan.MapPublicIpOnLaunch.ValueBool(), tags)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Subnet", err.Error())
+		response.Diagnostics.AddError("Failed to create subnet", err.Error())
 		return
 	}
 
-	createdId := *res.JSON201.Id
-	_, err = utils.RetryReadUntilStateValid(
-		ctx,
-		createdId,
-		r.provider.GetSpaceID(),
-		[]string{"pending"},
-		[]string{"available"},
-		r.provider.GetNumspotClient().ReadSubnetsByIdWithResponse,
-	)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", *res.JSON201.Id, err))
-		return
-	}
-
-	if data.MapPublicIpOnLaunch.ValueBool() {
-		updateRes := utils.ExecuteRequest(func() (*numspot.UpdateSubnetResponse, error) {
-			return r.provider.GetNumspotClient().UpdateSubnetWithResponse(ctx, r.provider.GetSpaceID(), createdId, numspot.UpdateSubnetJSONRequestBody{
-				MapPublicIpOnLaunch: true,
-			})
-		}, http.StatusOK, &response.Diagnostics)
-		if updateRes == nil {
-			return
-		}
-	}
-
-	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, createdId, data.Tags)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
-
-	readRes := utils.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadSubnetsByIdWithResponse(ctx, r.provider.GetSpaceID(), createdId)
-	}, http.StatusOK, &response.Diagnostics)
-	if readRes == nil {
-		return
-	}
-
-	tf := SubnetFromHttpToTf(ctx, readRes.JSON200, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
+	tf, diags := serializeSubnet(ctx, res)
+	if diags.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -126,83 +86,106 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 	var data SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadSubnetsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	res, err := core.ReadSubnet(ctx, r.provider, data.Id.ValueString())
+	if err != nil {
+		response.Diagnostics.AddError("Failed to read subnet", err.Error())
 		return
 	}
 
-	tf := SubnetFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
+	tf, diags := serializeSubnet(ctx, res)
+	if diags.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var plan, state SubnetModel
+	var (
+		plan, state SubnetModel
+		res         *numspot.Subnet
+		err         error
+		updated     bool
+	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	if !state.Tags.Equal(plan.Tags) {
-		tags.UpdateTags(
+		updated = true
+		planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+		stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+		if res, err = core.UpdateSubnetTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags); err != nil {
+			response.Diagnostics.AddError("Failed to update subnet", fmt.Sprintf("failed to update tags: %s", err.Error()))
+		}
+	}
+
+	if !utils.IsTfValueNull(plan.MapPublicIpOnLaunch) {
+		updated = true
+		if res, err = core.UpdateSubnetAttributes(
 			ctx,
-			state.Tags,
-			plan.Tags,
-			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
+			r.provider,
 			state.Id.ValueString(),
-		)
-		if response.Diagnostics.HasError() {
+			plan.MapPublicIpOnLaunch.ValueBool(),
+		); err != nil {
+			response.Diagnostics.AddError("Failed to update subnet", fmt.Sprintf("failed to update MapPublicIPOnLaunch: %s", err.Error()))
 			return
 		}
 	}
 
-	if !state.MapPublicIpOnLaunch.Equal(plan.MapPublicIpOnLaunch) {
-		res := utils.ExecuteRequest(func() (*numspot.UpdateSubnetResponse, error) {
-			return r.provider.GetNumspotClient().UpdateSubnetWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString(),
-				numspot.UpdateSubnet{
-					MapPublicIpOnLaunch: plan.MapPublicIpOnLaunch.ValueBool(),
-				})
-		}, http.StatusOK, &response.Diagnostics)
-		if res == nil {
+	if updated {
+		tf, diags := serializeSubnet(ctx, res)
+		if diags.HasError() {
+			response.Diagnostics.Append(diags...)
 			return
 		}
-	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadSubnetsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadSubnetsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
+		response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 	}
-
-	tf := SubnetFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteSubnetWithResponse)
-	if err != nil {
+	if err := core.DeleteSubnet(ctx, r.provider, data.Id.ValueString()); err != nil {
 		response.Diagnostics.AddError("Failed to delete subnet", err.Error())
-		return
+	}
+}
+
+func deserializeCreateSubnet(tf SubnetModel) numspot.CreateSubnetJSONRequestBody {
+	return numspot.CreateSubnetJSONRequestBody{
+		IpRange:              tf.IpRange.ValueString(),
+		VpcId:                tf.VpcId.ValueString(),
+		AvailabilityZoneName: tf.AvailabilityZoneName.ValueStringPointer(),
+	}
+}
+
+func serializeSubnet(ctx context.Context, http *numspot.Subnet) (*SubnetModel, diag.Diagnostics) {
+	var (
+		tagsList types.List
+		diags    diag.Diagnostics
+	)
+	if http.Tags != nil {
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, &diags)
+		if diags.HasError() {
+			return nil, diags
+		}
 	}
 
-	response.State.RemoveResource(ctx)
+	return &SubnetModel{
+		AvailableIpsCount:    utils.FromIntPtrToTfInt64(http.AvailableIpsCount),
+		Id:                   types.StringPointerValue(http.Id),
+		IpRange:              types.StringPointerValue(http.IpRange),
+		MapPublicIpOnLaunch:  types.BoolPointerValue(http.MapPublicIpOnLaunch),
+		VpcId:                types.StringPointerValue(http.VpcId),
+		State:                types.StringPointerValue(http.State),
+		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
+		Tags:                 tagsList,
+	}, nil
 }
