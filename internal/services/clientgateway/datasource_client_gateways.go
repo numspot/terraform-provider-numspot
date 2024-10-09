@@ -6,10 +6,12 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -74,7 +76,12 @@ func (d *clientGatewaysDataSource) Read(ctx context.Context, request datasource.
 		return
 	}
 
-	params := ClientGatewaysFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params, diags := ClientGatewaysFromTfToAPIReadParams(ctx, plan)
+	if diags.HasError() {
+		response.Diagnostics.Append(diags...)
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.ReadClientGatewaysResponse, error) {
 		return d.provider.GetNumspotClient().ReadClientGatewaysWithResponse(ctx, d.provider.GetSpaceID(), &params)
 	}, http.StatusOK, &response.Diagnostics)
@@ -85,12 +92,7 @@ func (d *clientGatewaysDataSource) Read(ctx context.Context, request datasource.
 		response.Diagnostics.AddError("HTTP call failed", "got empty Client Gateways list")
 	}
 
-	objectItems := utils.FromHttpGenericListToTfList(
-		ctx,
-		res.JSON200.Items,
-		ClientGatewaysFromHttpToTfDatasource,
-		&response.Diagnostics,
-	)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, clientGatewaysFromHttpToTfDatasource, &diags)
 
 	if response.Diagnostics.HasError() {
 		return
@@ -100,4 +102,46 @@ func (d *clientGatewaysDataSource) Read(ctx context.Context, request datasource.
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func ClientGatewaysFromTfToAPIReadParams(ctx context.Context, tf ClientGatewaysDataSourceModel) (numspot.ReadClientGatewaysParams, diag.Diagnostics) {
+	var diags diag.Diagnostics
+	return numspot.ReadClientGatewaysParams{
+		States:          utils.TfStringListToStringPtrList(ctx, tf.States, &diags),
+		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, &diags),
+		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues, &diags),
+		Tags:            utils.TfStringListToStringPtrList(ctx, tf.Tags, &diags),
+		Ids:             utils.TfStringListToStringPtrList(ctx, tf.IDs, &diags),
+		ConnectionTypes: utils.TfStringListToStringPtrList(ctx, tf.ConnectionTypes, &diags),
+		BgpAsns:         utils.TFInt64ListToIntListPointer(ctx, tf.BgpAsns, &diags),
+		PublicIps:       utils.TfStringListToStringPtrList(ctx, tf.PublicIps, &diags),
+	}, diags
+}
+
+func clientGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.ClientGateway, diags *diag.Diagnostics) *ClientGatewayModel {
+	var (
+		tagsList types.List
+		bgpAsnTf types.Int64
+	)
+
+	if http.Tags != nil {
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	if http.BgpAsn != nil {
+		bgpAsn := int64(*http.BgpAsn)
+		bgpAsnTf = types.Int64PointerValue(&bgpAsn)
+	}
+
+	return &ClientGatewayModel{
+		Id:             types.StringPointerValue(http.Id),
+		State:          types.StringPointerValue(http.State),
+		ConnectionType: types.StringPointerValue(http.ConnectionType),
+		Tags:           tagsList,
+		BgpAsn:         bgpAsnTf,
+		PublicIp:       types.StringPointerValue(http.PublicIp),
+	}
 }
