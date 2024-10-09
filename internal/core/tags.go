@@ -13,12 +13,11 @@ import (
 // CreateTags Same as CreateTags but without using Diagnostics. Remove CreateTags when other function are reworked
 func CreateTags(
 	ctx context.Context,
-	apiClient *numspot.ClientWithResponses,
-	spaceId numspot.SpaceId,
+	provider services.IProvider,
 	resourceId string,
 	tags []numspot.ResourceTag,
 ) error {
-	res, err := apiClient.CreateTagsWithResponse(ctx, spaceId, numspot.CreateTagsJSONRequestBody{
+	res, err := provider.GetNumspotClient().CreateTagsWithResponse(ctx, provider.GetSpaceID(), numspot.CreateTagsJSONRequestBody{
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})
@@ -35,9 +34,6 @@ func CreateTags(
 }
 
 func UpdateResourceTags(ctx context.Context, provider services.IProvider, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, resourceID string) (err error) {
-	numSpotClient := provider.GetNumspotClient()
-	spaceID := provider.GetSpaceID()
-
 	toCreate, toDelete, toUpdate := Diff(stateTags, planTags)
 
 	toDeleteApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toDelete))
@@ -73,8 +69,7 @@ func UpdateResourceTags(ctx context.Context, provider services.IProvider, stateT
 	if len(toDeleteApiTags) > 0 {
 		if err = DeleteTags(
 			ctx,
-			numSpotClient,
-			spaceID,
+			provider,
 			resourceID,
 			toDeleteApiTags,
 		); err != nil {
@@ -85,8 +80,7 @@ func UpdateResourceTags(ctx context.Context, provider services.IProvider, stateT
 	if len(toCreateApiTags) > 0 {
 		if err = CreateTags(
 			ctx,
-			numSpotClient,
-			spaceID,
+			provider,
 			resourceID,
 			toCreateApiTags,
 		); err != nil {
@@ -99,12 +93,11 @@ func UpdateResourceTags(ctx context.Context, provider services.IProvider, stateT
 
 func DeleteTags(
 	ctx context.Context,
-	apiClient *numspot.ClientWithResponses,
-	spaceId numspot.SpaceId,
+	provider services.IProvider,
 	resourceId string,
 	tags []numspot.ResourceTag,
 ) error {
-	res, err := apiClient.DeleteTagsWithResponse(ctx, spaceId, numspot.DeleteTagsJSONRequestBody{
+	res, err := provider.GetNumspotClient().DeleteTagsWithResponse(ctx, provider.GetSpaceID(), numspot.DeleteTagsJSONRequestBody{
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})

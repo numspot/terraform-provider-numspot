@@ -3,16 +3,12 @@ package space
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
-)
 
-const (
-	TfRequestRetryTimeout = 5 * time.Minute
-	TfRequestRetryDelay   = 2 * time.Second
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 func SpaceFromTfToCreateRequest(tf *SpaceModel) numspot.CreateSpaceRequest {
@@ -48,8 +44,8 @@ func RetryReadSpaceUntilReady(ctx context.Context, client *numspot.ClientWithRes
 			}
 			return res.JSON200, string(res.JSON200.Status), nil
 		},
-		Timeout: TfRequestRetryTimeout,
-		Delay:   TfRequestRetryDelay,
+		Timeout: utils.TfRequestRetryTimeout,
+		Delay:   utils.ParseRetryBackoff(),
 	}
 
 	return createStateConf.WaitForStateContext(ctx)

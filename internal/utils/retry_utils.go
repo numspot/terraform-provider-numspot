@@ -54,7 +54,7 @@ var (
 // env variable parsing should be done provider bootstrapping phase.
 func ParseRetryBackoff() time.Duration {
 	// Default retry backoff set to 5s
-	retryBackoff := 5 * time.Second
+	retryBackoff := TfRequestRetryDelay
 
 	retryBackoffStr := os.Getenv("RETRY_BACKOFF")
 	// Parse the string into time.Duration
