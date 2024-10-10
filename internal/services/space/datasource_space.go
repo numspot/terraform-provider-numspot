@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -23,7 +23,7 @@ func (d *spaceDataSource) Configure(_ context.Context, request datasource.Config
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -40,7 +40,7 @@ func NewSpaceDataSource() datasource.DataSource {
 }
 
 type spaceDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -62,6 +62,12 @@ func (d *spaceDataSource) Read(ctx context.Context, request datasource.ReadReque
 		return
 	}
 
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	spaceId, err := uuid.Parse(plan.SpaceId.ValueString())
 	if err != nil {
 		response.Diagnostics.AddError("Invalid space id", fmt.Sprintf("space id should be in UUID format but was '%s'", plan.SpaceId))
@@ -75,7 +81,7 @@ func (d *spaceDataSource) Read(ctx context.Context, request datasource.ReadReque
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.GetSpaceByIdResponse, error) {
-		return d.provider.GetNumspotClient().GetSpaceByIdWithResponse(ctx, organisationId, spaceId)
+		return numspotClient.GetSpaceByIdWithResponse(ctx, organisationId, spaceId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

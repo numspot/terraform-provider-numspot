@@ -10,8 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -23,7 +23,7 @@ var (
 )
 
 type SubnetResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewSubnetResource() resource.Resource {
@@ -35,7 +35,7 @@ func (r *SubnetResource) Configure(ctx context.Context, request resource.Configu
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -85,6 +85,9 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	res, err := core.ReadSubnet(ctx, r.provider, data.Id.ValueString())
 	if err != nil {
@@ -152,6 +155,9 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	if err := core.DeleteSubnet(ctx, r.provider, data.Id.ValueString()); err != nil {
 		response.Diagnostics.AddError("Failed to delete subnet", err.Error())

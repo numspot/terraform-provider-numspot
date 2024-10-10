@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -30,7 +30,7 @@ func (d *rolesDataSource) Configure(_ context.Context, request datasource.Config
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -48,7 +48,7 @@ func NewRolesDatasource() datasource.DataSource {
 }
 
 type rolesDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -93,8 +93,14 @@ func (d *rolesDataSource) fetchPaginatedRoles(
 	response *datasource.ReadResponse,
 ) {
 	var pageSize int32 = 50
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.ListRolesSpaceResponse, error) {
-		return d.provider.GetNumspotClient().ListRolesSpaceWithResponse(ctx, spaceID, requestParams)
+		return numspotClient.ListRolesSpaceWithResponse(ctx, spaceID, requestParams)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

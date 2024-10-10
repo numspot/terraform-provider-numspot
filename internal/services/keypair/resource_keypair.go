@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -20,7 +20,7 @@ var (
 )
 
 type KeyPairResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewKeyPairResource() resource.Resource {
@@ -32,7 +32,7 @@ func (r *KeyPairResource) Configure(ctx context.Context, request resource.Config
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -64,12 +64,18 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		KeyPairFromTfToCreateRequest(&data),
-		r.provider.GetNumspotClient().CreateKeypairWithResponse)
+		numspotClient.CreateKeypairWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create KeyPair", err.Error())
 		return
@@ -89,9 +95,18 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadKeypairsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadKeypairsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString()) // Use faker to inject token_200 status code
+		return numspotClient.ReadKeypairsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString()) // Use faker to inject token_200 status code
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -119,8 +134,17 @@ func (r *KeyPairResource) Update(ctx context.Context, request resource.UpdateReq
 func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteKeypairWithResponse)
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteKeypairWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete KeyPair", err.Error())
 		return

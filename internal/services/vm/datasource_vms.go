@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -22,7 +22,7 @@ func (d *vmsDataSource) Configure(_ context.Context, request datasource.Configur
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -40,7 +40,7 @@ func NewVmsDataSource() datasource.DataSource {
 }
 
 type vmsDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -66,8 +66,14 @@ func (d *vmsDataSource) Read(ctx context.Context, request datasource.ReadRequest
 		return
 	}
 
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.ReadVmsResponse, error) {
-		return d.provider.GetNumspotClient().ReadVmsWithResponse(ctx, d.provider.GetSpaceID(), &params)
+		return numspotClient.ReadVmsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

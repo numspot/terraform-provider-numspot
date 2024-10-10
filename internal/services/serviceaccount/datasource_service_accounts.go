@@ -11,7 +11,7 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -31,7 +31,7 @@ func (d *serviceAccountsDataSource) Configure(_ context.Context, request datasou
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -49,7 +49,7 @@ func NewServiceAccountsDataSource() datasource.DataSource {
 }
 
 type serviceAccountsDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -107,6 +107,12 @@ func (d *serviceAccountsDataSource) fetchPaginatedServiceAccounts(
 	svcAccountsHolder *[]ServiceAccountDataSourceModel,
 	response *datasource.ReadResponse,
 ) {
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	svcAccountIDs, err := getServiceAccountIDs(ctx, plan.ServiceAccountIDs)
 	if err != nil {
 		response.Diagnostics.AddError("failed to deserialize service accounts IDs", err.Error())
@@ -116,7 +122,7 @@ func (d *serviceAccountsDataSource) fetchPaginatedServiceAccounts(
 	params := ServiceAccountsFromTfToAPIReadParams(*plan)
 
 	res := utils.ExecuteRequest(func() (*numspot.ListServiceAccountSpaceResponse, error) {
-		return d.provider.GetNumspotClient().ListServiceAccountSpaceWithResponse(ctx, spaceID, &params, body)
+		return numspotClient.ListServiceAccountSpaceWithResponse(ctx, spaceID, &params, body)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

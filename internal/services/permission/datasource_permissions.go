@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -33,7 +33,7 @@ func (d *permissionsDataSource) Configure(_ context.Context, request datasource.
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -51,7 +51,7 @@ func NewPermissionsDataSource() datasource.DataSource {
 }
 
 type permissionsDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -95,8 +95,13 @@ func (d *permissionsDataSource) fetchPaginatedPermissions(
 	permissionsHolder *[]PermissionModel,
 	response *datasource.ReadResponse,
 ) {
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 	res := utils.ExecuteRequest(func() (*numspot.ListPermissionsSpaceResponse, error) {
-		return d.provider.GetNumspotClient().ListPermissionsSpaceWithResponse(ctx, spaceID, requestParams)
+		return numspotClient.ListPermissionsSpaceWithResponse(ctx, spaceID, requestParams)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

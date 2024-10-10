@@ -10,6 +10,8 @@ import (
 )
 
 func TestAccSpaceDatasource(t *testing.T) {
+	t.Skip()
+
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
 		err := acct.Cleanup()

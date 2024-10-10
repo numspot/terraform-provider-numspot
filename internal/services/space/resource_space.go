@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -23,7 +23,7 @@ var (
 )
 
 type SpaceResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewSpaceResource() resource.Resource {
@@ -35,7 +35,7 @@ func (r *SpaceResource) Configure(ctx context.Context, request resource.Configur
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -79,6 +79,12 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	organisationId, err := uuid.Parse(plan.OrganisationId.ValueString())
 	if err != nil {
@@ -86,7 +92,7 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 	res := utils.ExecuteRequest(func() (*numspot.CreateSpaceResponse, error) {
-		return r.provider.GetNumspotClient().CreateSpaceWithResponse(
+		return numspotClient.CreateSpaceWithResponse(
 			ctx,
 			organisationId,
 			SpaceFromTfToCreateRequest(&plan),
@@ -95,7 +101,7 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 	if res == nil {
 		return
 	}
-	readRes, err := RetryReadSpaceUntilReady(ctx, r.provider.GetNumspotClient(), organisationId, res.JSON200.Id)
+	readRes, err := RetryReadSpaceUntilReady(ctx, numspotClient, organisationId, res.JSON200.Id)
 	if err != nil {
 		response.Diagnostics.AddError("failed to read space", err.Error())
 		return
@@ -122,6 +128,15 @@ func (r *SpaceResource) Create(ctx context.Context, request resource.CreateReque
 func (r *SpaceResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data SpaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	spaceId, err := uuid.Parse(data.SpaceId.ValueString())
 	if err != nil {
@@ -136,7 +151,7 @@ func (r *SpaceResource) Read(ctx context.Context, request resource.ReadRequest, 
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.GetSpaceByIdResponse, error) {
-		return r.provider.GetNumspotClient().GetSpaceByIdWithResponse(ctx, organisationId, spaceId)
+		return numspotClient.GetSpaceByIdWithResponse(ctx, organisationId, spaceId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -154,6 +169,15 @@ func (r *SpaceResource) Update(ctx context.Context, request resource.UpdateReque
 func (r *SpaceResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data SpaceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	spaceId, err := uuid.Parse(data.SpaceId.ValueString())
 	if err != nil {
@@ -168,7 +192,7 @@ func (r *SpaceResource) Delete(ctx context.Context, request resource.DeleteReque
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.DeleteSpaceResponse, error) {
-		return r.provider.GetNumspotClient().DeleteSpaceWithResponse(ctx, organisationId, spaceId)
+		return numspotClient.DeleteSpaceWithResponse(ctx, organisationId, spaceId)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return

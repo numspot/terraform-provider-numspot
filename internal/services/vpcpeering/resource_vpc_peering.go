@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -19,7 +19,7 @@ var (
 )
 
 type VpcPeeringResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewVpcPeeringResource() resource.Resource {
@@ -31,7 +31,7 @@ func (r *VpcPeeringResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -59,12 +59,18 @@ func (r *VpcPeeringResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		VpcPeeringFromTfToCreateRequest(data),
-		r.provider.GetNumspotClient().CreateVpcPeeringWithResponse)
+		numspotClient.CreateVpcPeeringWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPC Peering", err.Error())
 		return
@@ -76,14 +82,14 @@ func (r *VpcPeeringResource) Create(ctx context.Context, request resource.Create
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
 	readRes := utils.ExecuteRequest(func() (*numspot.ReadVpcPeeringsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadVpcPeeringsByIdWithResponse(ctx, r.provider.GetSpaceID(), createdId)
+		return numspotClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -108,9 +114,18 @@ func (r *VpcPeeringResource) Create(ctx context.Context, request resource.Create
 func (r *VpcPeeringResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data VpcPeeringModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadVpcPeeringsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadVpcPeeringsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
+		return numspotClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -141,6 +156,11 @@ func (r *VpcPeeringResource) Update(ctx context.Context, request resource.Update
 	if response.Diagnostics.HasError() {
 		return
 	}
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
@@ -148,8 +168,8 @@ func (r *VpcPeeringResource) Update(ctx context.Context, request resource.Update
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
+			numspotClient,
+			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
 		if response.Diagnostics.HasError() {
@@ -163,7 +183,7 @@ func (r *VpcPeeringResource) Update(ctx context.Context, request resource.Update
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadVpcPeeringsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadVpcPeeringsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
+		return numspotClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -188,8 +208,17 @@ func (r *VpcPeeringResource) Update(ctx context.Context, request resource.Update
 func (r *VpcPeeringResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data VpcPeeringModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVpcPeeringWithResponse)
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteVpcPeeringWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPC Peering", err.Error())
 		return

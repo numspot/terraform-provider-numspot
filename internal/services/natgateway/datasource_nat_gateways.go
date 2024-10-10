@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -34,7 +34,7 @@ func (d *natGatewaysDataSource) Configure(_ context.Context, request datasource.
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -52,7 +52,7 @@ func NewNatGatewaysDataSource() datasource.DataSource {
 }
 
 type natGatewaysDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -73,13 +73,19 @@ func (d *natGatewaysDataSource) Read(ctx context.Context, request datasource.Rea
 		return
 	}
 
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	params := NatGatewaysFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadNatGatewayResponse, error) {
-		return d.provider.GetNumspotClient().ReadNatGatewayWithResponse(ctx, d.provider.GetSpaceID(), &params)
+		return numspotClient.ReadNatGatewayWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

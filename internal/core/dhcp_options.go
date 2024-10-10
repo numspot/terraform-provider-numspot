@@ -5,16 +5,20 @@ import (
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func CreateDHCPOptions(ctx context.Context, provider services.IProvider, numSpotDHCPOptionsCreate numspot.CreateDhcpOptionsJSONRequestBody, tags []numspot.ResourceTag) (numSpotDHCPOptions *numspot.DhcpOptionsSet, err error) {
-	spaceID := provider.GetSpaceID()
+func CreateDHCPOptions(ctx context.Context, provider *client.NumSpotSDK, numSpotDHCPOptionsCreate numspot.CreateDhcpOptionsJSONRequestBody, tags []numspot.ResourceTag) (numSpotDHCPOptions *numspot.DhcpOptionsSet, err error) {
+	spaceID := provider.SpaceID
 
 	var retryCreate *numspot.CreateDhcpOptionsResponse
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotDHCPOptionsCreate,
-		provider.GetNumspotClient().CreateDhcpOptionsWithResponse); err != nil {
+		numspotClient.CreateDhcpOptionsWithResponse); err != nil {
 		return nil, err
 	}
 
@@ -29,26 +33,34 @@ func CreateDHCPOptions(ctx context.Context, provider services.IProvider, numSpot
 	return ReadDHCPOption(ctx, provider, dhcpOptionsID)
 }
 
-func UpdateDHCPOptionsTags(ctx context.Context, provider services.IProvider, dhcpOptionsID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.DhcpOptionsSet, error) {
+func UpdateDHCPOptionsTags(ctx context.Context, provider *client.NumSpotSDK, dhcpOptionsID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.DhcpOptionsSet, error) {
 	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, dhcpOptionsID); err != nil {
 		return nil, err
 	}
 	return ReadDHCPOption(ctx, provider, dhcpOptionsID)
 }
 
-func DeleteDHCPOptions(ctx context.Context, provider services.IProvider, dhcpOptionsID string) error {
-	spaceID := provider.GetSpaceID()
+func DeleteDHCPOptions(ctx context.Context, provider *client.NumSpotSDK, dhcpOptionsID string) error {
+	spaceID := provider.SpaceID
 
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
 	if err := utils.RetryDeleteUntilResourceAvailable(ctx, spaceID, dhcpOptionsID,
-		provider.GetNumspotClient().DeleteDhcpOptionsWithResponse); err != nil {
+		numspotClient.DeleteDhcpOptionsWithResponse); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func ReadDHCPOptions(ctx context.Context, provider services.IProvider, dhcpOptions numspot.ReadDhcpOptionsParams) (*numspot.ReadDhcpOptionsResponseSchema, error) {
-	read, err := provider.GetNumspotClient().ReadDhcpOptionsWithResponse(ctx, provider.GetSpaceID(), &dhcpOptions)
+func ReadDHCPOptions(ctx context.Context, provider *client.NumSpotSDK, dhcpOptions numspot.ReadDhcpOptionsParams) (*numspot.ReadDhcpOptionsResponseSchema, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	read, err := numspotClient.ReadDhcpOptionsWithResponse(ctx, provider.SpaceID, &dhcpOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -60,8 +72,12 @@ func ReadDHCPOptions(ctx context.Context, provider services.IProvider, dhcpOptio
 	return read.JSON200, nil
 }
 
-func ReadDHCPOption(ctx context.Context, provider services.IProvider, dhcpOptionID string) (*numspot.DhcpOptionsSet, error) {
-	read, err := provider.GetNumspotClient().ReadDhcpOptionsByIdWithResponse(ctx, provider.GetSpaceID(), dhcpOptionID)
+func ReadDHCPOption(ctx context.Context, provider *client.NumSpotSDK, dhcpOptionID string) (*numspot.DhcpOptionsSet, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	read, err := numspotClient.ReadDhcpOptionsByIdWithResponse(ctx, provider.SpaceID, dhcpOptionID)
 	if err != nil {
 		return nil, err
 	}

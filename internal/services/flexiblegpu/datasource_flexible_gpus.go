@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -34,7 +34,7 @@ func (d *flexibleGpusDataSource) Configure(_ context.Context, request datasource
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -52,7 +52,7 @@ func NewFlexibleGpusDataSource() datasource.DataSource {
 }
 
 type flexibleGpusDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -73,9 +73,14 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 		return
 	}
 
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 	params := FlexibleGpusFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
 	res := utils.ExecuteRequest(func() (*numspot.ReadFlexibleGpusResponse, error) {
-		return d.provider.GetNumspotClient().ReadFlexibleGpusWithResponse(ctx, d.provider.GetSpaceID(), &params)
+		return numspotClient.ReadFlexibleGpusWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -44,7 +44,7 @@ func (d *routeTablesDataSource) Configure(_ context.Context, request datasource.
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -62,7 +62,7 @@ func NewRouteTablesDataSource() datasource.DataSource {
 }
 
 type routeTablesDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -88,8 +88,14 @@ func (d *routeTablesDataSource) Read(ctx context.Context, request datasource.Rea
 		return
 	}
 
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.ReadRouteTablesResponse, error) {
-		return d.provider.GetNumspotClient().ReadRouteTablesWithResponse(ctx, d.provider.GetSpaceID(), &params)
+		return numspotClient.ReadRouteTablesWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

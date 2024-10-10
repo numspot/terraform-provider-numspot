@@ -10,19 +10,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func StopVmNoDiag(ctx context.Context, provider services.IProvider, vm string) (err error) {
+func StopVmNoDiag(ctx context.Context, provider *client.NumSpotSDK, vm string) (err error) {
 	// Already stopped
 	if vm == "" {
 		return nil
 	}
 
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+
 	var vmStatus *numspot.ReadVmsByIdResponse
-	if vmStatus, err = provider.GetNumspotClient().ReadVmsByIdWithResponse(ctx, provider.GetSpaceID(), vm); err != nil {
+	if vmStatus, err = numspotClient.ReadVmsByIdWithResponse(ctx, provider.SpaceID, vm); err != nil {
 		return err
 	}
 
@@ -37,28 +42,33 @@ func StopVmNoDiag(ctx context.Context, provider services.IProvider, vm string) (
 	//////////////////
 	forceStop := true
 	// Stop the VM
-	if _, err = provider.GetNumspotClient().StopVmWithResponse(ctx, provider.GetSpaceID(), vm, numspot.StopVm{ForceStop: &forceStop}); err != nil {
+	if _, err = numspotClient.StopVmWithResponse(ctx, provider.SpaceID, vm, numspot.StopVm{ForceStop: &forceStop}); err != nil {
 		return err
 	}
 
-	if _, err = utils.RetryReadUntilStateValid(ctx, vm, provider.GetSpaceID(), []string{"stopping"}, []string{"stopped", "terminated"},
-		provider.GetNumspotClient().ReadVmsByIdWithResponse); err != nil {
+	if _, err = utils.RetryReadUntilStateValid(ctx, vm, provider.SpaceID, []string{"stopping"}, []string{"stopped", "terminated"},
+		numspotClient.ReadVmsByIdWithResponse); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func StartVmNoDiag(ctx context.Context, provider services.IProvider, vm string) (err error) {
+func StartVmNoDiag(ctx context.Context, provider *client.NumSpotSDK, vm string) (err error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+
 	// Already running
 	if vm == "" {
 		return nil
 	}
 
 	var vmStatus *numspot.ReadVmsByIdResponse
-	if vmStatus, err = provider.GetNumspotClient().ReadVmsByIdWithResponse(
+	if vmStatus, err = numspotClient.ReadVmsByIdWithResponse(
 		ctx,
-		provider.GetSpaceID(),
+		provider.SpaceID,
 		vm,
 	); err != nil {
 		return err
@@ -75,17 +85,17 @@ func StartVmNoDiag(ctx context.Context, provider services.IProvider, vm string) 
 
 	//////////////////
 	// Start the VM
-	if _, err = provider.GetNumspotClient().StartVmWithResponse(ctx, provider.GetSpaceID(), vm); err != nil {
+	if _, err = numspotClient.StartVmWithResponse(ctx, provider.SpaceID, vm); err != nil {
 		return err
 	}
 
 	_, err = utils.RetryReadUntilStateValid(
 		ctx,
 		vm,
-		provider.GetSpaceID(),
+		provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running"},
-		provider.GetNumspotClient().ReadVmsByIdWithResponse,
+		numspotClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		return err
@@ -94,7 +104,13 @@ func StartVmNoDiag(ctx context.Context, provider services.IProvider, vm string) 
 	return nil
 }
 
-func StopVm(ctx context.Context, provider services.IProvider, id string, diags *diag.Diagnostics) {
+func StopVm(ctx context.Context, provider *client.NumSpotSDK, id string, diags *diag.Diagnostics) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	forceStop := true
 	body := numspot.StopVm{
 		ForceStop: &forceStop,
@@ -102,20 +118,20 @@ func StopVm(ctx context.Context, provider services.IProvider, id string, diags *
 
 	// Stop the VM
 	_ = utils.ExecuteRequest(func() (*numspot.StopVmResponse, error) {
-		return provider.GetNumspotClient().StopVmWithResponse(ctx, provider.GetSpaceID(), id, body)
+		return numspotClient.StopVmWithResponse(ctx, provider.SpaceID, id, body)
 	}, http.StatusOK, diags)
 
 	if diags.HasError() {
 		return
 	}
 
-	_, err := utils.RetryReadUntilStateValid(
+	_, err = utils.RetryReadUntilStateValid(
 		ctx,
 		id,
-		provider.GetSpaceID(),
+		provider.SpaceID,
 		[]string{"stopping"},
 		[]string{"stopped", "terminated"},
-		provider.GetNumspotClient().ReadVmsByIdWithResponse,
+		numspotClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		diags.AddError("error while waiting for VM to stop", err.Error())
@@ -123,23 +139,29 @@ func StopVm(ctx context.Context, provider services.IProvider, id string, diags *
 	}
 }
 
-func StartVm(ctx context.Context, provider services.IProvider, id string, diags *diag.Diagnostics) {
+func StartVm(ctx context.Context, provider *client.NumSpotSDK, id string, diags *diag.Diagnostics) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Start the VM
 	_ = utils.ExecuteRequest(func() (*numspot.StartVmResponse, error) {
-		return provider.GetNumspotClient().StartVmWithResponse(ctx, provider.GetSpaceID(), id)
+		return numspotClient.StartVmWithResponse(ctx, provider.SpaceID, id)
 	}, http.StatusOK, diags)
 
 	if diags.HasError() {
 		return
 	}
 
-	_, err := utils.RetryReadUntilStateValid(
+	_, err = utils.RetryReadUntilStateValid(
 		ctx,
 		id,
-		provider.GetSpaceID(),
+		provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running"},
-		provider.GetNumspotClient().ReadVmsByIdWithResponse,
+		numspotClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		diags.AddError("error while waiting for VM to start", err.Error())

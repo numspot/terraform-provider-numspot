@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -23,7 +23,7 @@ var (
 )
 
 type VpnConnectionResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewVpnConnectionResource() resource.Resource {
@@ -35,7 +35,7 @@ func (r *VpnConnectionResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	client, ok := request.ProviderData.(services.IProvider)
+	client, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -67,12 +67,18 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		VpnConnectionFromTfToCreateRequest(&plan),
-		r.provider.GetNumspotClient().CreateVpnConnectionWithResponse)
+		numspotClient.CreateVpnConnectionWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPN Connection", err.Error())
 		return
@@ -80,7 +86,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 
 	createdId := *res.JSON201.Id
 	if len(plan.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, createdId, plan.Tags)
+		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -136,14 +142,20 @@ func (r *VpnConnectionResource) Update(ctx context.Context, request resource.Upd
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
 			ctx,
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
+			numspotClient,
+			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
 		if response.Diagnostics.HasError() {
@@ -206,7 +218,13 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 		return
 	}
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVpnConnectionWithResponse)
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteVpnConnectionWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPN Connection", err.Error())
 		return
@@ -214,6 +232,11 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 }
 
 func (r *VpnConnectionResource) addRoutes(ctx context.Context, vpnID string, tfRoutes []RoutesValue, diags *diag.Diagnostics) {
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 	routes := make([]numspot.CreateVpnConnectionRoute, len(tfRoutes))
 	for i := range tfRoutes {
 		routes[i] = numspot.CreateVpnConnectionRoute{
@@ -223,12 +246,17 @@ func (r *VpnConnectionResource) addRoutes(ctx context.Context, vpnID string, tfR
 
 	for _, route := range routes {
 		_ = utils.ExecuteRequest(func() (*numspot.CreateVpnConnectionRouteResponse, error) {
-			return r.provider.GetNumspotClient().CreateVpnConnectionRouteWithResponse(ctx, r.provider.GetSpaceID(), vpnID, route)
+			return numspotClient.CreateVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
 		}, http.StatusOK, diags)
 	}
 }
 
 func (r *VpnConnectionResource) deleteRoutes(ctx context.Context, vpnID string, tfRoutes []RoutesValue, diags *diag.Diagnostics) {
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 	routes := make([]numspot.DeleteVpnConnectionRoute, len(tfRoutes))
 	for i := range tfRoutes {
 		routes[i] = numspot.DeleteVpnConnectionRoute{
@@ -238,7 +266,7 @@ func (r *VpnConnectionResource) deleteRoutes(ctx context.Context, vpnID string, 
 
 	for _, route := range routes {
 		_ = utils.ExecuteRequest(func() (*numspot.DeleteVpnConnectionRouteResponse, error) {
-			return r.provider.GetNumspotClient().DeleteVpnConnectionRouteWithResponse(ctx, r.provider.GetSpaceID(), vpnID, route)
+			return numspotClient.DeleteVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
 		}, http.StatusNoContent, diags)
 	}
 }
@@ -256,14 +284,20 @@ func (r *VpnConnectionResource) readVPNConnection(
 	id string,
 	diags *diag.Diagnostics,
 ) *VpnConnectionModel {
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return nil
+	}
+
 	// Retries read on resource until state is OK
 	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		id,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.GetNumspotClient().ReadVpnConnectionsByIdWithResponse,
+		numspotClient.ReadVpnConnectionsByIdWithResponse,
 	)
 	if err != nil {
 		diags.AddError("Failed to read VpnConnection", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", id, err))
@@ -287,10 +321,15 @@ func (r *VpnConnectionResource) updateVPNOptions(
 	plan VpnConnectionModel,
 	diags *diag.Diagnostics,
 ) *VpnConnectionModel {
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return nil
+	}
 	res := utils.ExecuteRequest(func() (*numspot.UpdateVpnConnectionResponse, error) {
-		return r.provider.GetNumspotClient().UpdateVpnConnectionWithResponse(
+		return numspotClient.UpdateVpnConnectionWithResponse(
 			ctx,
-			r.provider.GetSpaceID(),
+			r.provider.SpaceID,
 			id,
 			VpnConnectionFromTfToUpdateRequest(ctx, &plan, diags))
 	}, http.StatusOK, diags)

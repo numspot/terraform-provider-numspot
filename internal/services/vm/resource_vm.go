@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -23,7 +23,7 @@ var (
 )
 
 type VmResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewVmResource() resource.Resource {
@@ -35,7 +35,7 @@ func (r *VmResource) Configure(ctx context.Context, request resource.ConfigureRe
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -66,12 +66,18 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		VmFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
-		r.provider.GetNumspotClient().CreateVmsWithResponse)
+		numspotClient.CreateVmsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VM", err.Error())
 	}
@@ -84,7 +90,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 
 	// Create tags
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -93,10 +99,10 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running", "stopped"}, // In some cases, when there is insufficient capacity the VM is created with state = stopped
-		r.provider.GetNumspotClient().ReadVmsByIdWithResponse,
+		numspotClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", createdId, err))
@@ -126,13 +132,22 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadVmsByIdResponse, error) {
 		id := utils.FromTfStringToStringPtr(data.Id)
 		if id == nil {
 			return nil, errors.New("Found invalid id")
 		}
-		return r.provider.GetNumspotClient().ReadVmsByIdWithResponse(ctx, r.provider.GetSpaceID(), *id)
+		return numspotClient.ReadVmsByIdWithResponse(ctx, r.provider.SpaceID, *id)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -155,6 +170,11 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 	vmId := state.Id.ValueString()
 
 	// Update tags
@@ -164,8 +184,8 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
+			numspotClient,
+			r.provider.SpaceID,
 			vmId,
 		)
 		if response.Diagnostics.HasError() {
@@ -192,7 +212,7 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 
 		// Update VM
 		updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVmResponse, error) {
-			return r.provider.GetNumspotClient().UpdateVmWithResponse(ctx, r.provider.GetSpaceID(), vmId, body)
+			return numspotClient.UpdateVmWithResponse(ctx, r.provider.SpaceID, vmId, body)
 		}, http.StatusOK, &response.Diagnostics)
 
 		if updatedRes == nil || response.Diagnostics.HasError() {
@@ -210,10 +230,10 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		vmId,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"running"},
-		r.provider.GetNumspotClient().ReadVmsByIdWithResponse,
+		numspotClient.ReadVmsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to update VM", fmt.Sprintf("Error waiting for VM to be created: %s", err))
@@ -255,8 +275,16 @@ func isUpdateNeeded(plan numspot.UpdateVmJSONRequestBody, state numspot.UpdateVm
 func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVmsWithResponse)
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteVmsWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VM", err.Error())
 		return

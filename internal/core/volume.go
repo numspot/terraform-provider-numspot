@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vm"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -17,12 +17,17 @@ var (
 	volumeTargetStates  = []string{available, inUse}
 )
 
-func CreateVolume(ctx context.Context, provider services.IProvider, numSpotVolumeCreate numspot.CreateVolumeJSONRequestBody, tags []numspot.ResourceTag, vmID, deviceName string) (numSpotVolume *numspot.Volume, err error) {
-	spaceID := provider.GetSpaceID()
+func CreateVolume(ctx context.Context, provider *client.NumSpotSDK, numSpotVolumeCreate numspot.CreateVolumeJSONRequestBody, tags []numspot.ResourceTag, vmID, deviceName string) (numSpotVolume *numspot.Volume, err error) {
+	spaceID := provider.SpaceID
+
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	var retryCreate *numspot.CreateVolumeResponse
 	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotVolumeCreate,
-		provider.GetNumspotClient().CreateVolumeWithResponse); err != nil {
+		numspotClient.CreateVolumeWithResponse); err != nil {
 		return nil, err
 	}
 
@@ -44,7 +49,7 @@ func CreateVolume(ctx context.Context, provider services.IProvider, numSpotVolum
 	return RetryReadVolume(ctx, provider, createOp, volumeID)
 }
 
-func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, numSpotVolumeUpdate numspot.UpdateVolumeJSONRequestBody, volumeID, stateVM, planVM string) (*numspot.Volume, error) {
+func UpdateVolumeAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpotVolumeUpdate numspot.UpdateVolumeJSONRequestBody, volumeID, stateVM, planVM string) (*numspot.Volume, error) {
 	var err error
 
 	// If this volume is attached to a VM, we need to change it from hot to cold volume to update its attributes
@@ -53,8 +58,12 @@ func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, nu
 		return nil, err
 	}
 
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 	var updateVolumeResponse *numspot.UpdateVolumeResponse
-	if updateVolumeResponse, err = provider.GetNumspotClient().UpdateVolumeWithResponse(ctx, provider.GetSpaceID(), volumeID, numSpotVolumeUpdate); err != nil {
+	if updateVolumeResponse, err = numspotClient.UpdateVolumeWithResponse(ctx, provider.SpaceID, volumeID, numSpotVolumeUpdate); err != nil {
 		return nil, err
 	}
 	if err = utils.ParseHTTPError(updateVolumeResponse.Body, updateVolumeResponse.StatusCode()); err != nil {
@@ -69,14 +78,14 @@ func UpdateVolumeAttributes(ctx context.Context, provider services.IProvider, nu
 	return RetryReadVolume(ctx, provider, updateOp, volumeID)
 }
 
-func UpdateVolumeTags(ctx context.Context, provider services.IProvider, volumeID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Volume, error) {
+func UpdateVolumeTags(ctx context.Context, provider *client.NumSpotSDK, volumeID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Volume, error) {
 	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, volumeID); err != nil {
 		return nil, err
 	}
 	return RetryReadVolume(ctx, provider, updateOp, volumeID)
 }
 
-func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID, stateVM, planVM, planDeviceName string) (*numspot.Volume, error) {
+func UpdateVolumeLink(ctx context.Context, provider *client.NumSpotSDK, volumeID, stateVM, planVM, planDeviceName string) (*numspot.Volume, error) {
 	var err error
 
 	switch {
@@ -121,14 +130,19 @@ func UpdateVolumeLink(ctx context.Context, provider services.IProvider, volumeID
 	return RetryReadVolume(ctx, provider, updateOp, volumeID)
 }
 
-func DeleteVolume(ctx context.Context, provider services.IProvider, volumeID, stateVM string) (err error) {
+func DeleteVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID, stateVM string) (err error) {
 	if stateVM != "" {
 		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
 			return err
 		}
 	}
 
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.GetSpaceID(), volumeID, provider.GetNumspotClient().DeleteVolumeWithResponse)
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, volumeID, numspotClient.DeleteVolumeWithResponse)
 	if err != nil {
 		return err
 	}
@@ -136,8 +150,12 @@ func DeleteVolume(ctx context.Context, provider services.IProvider, volumeID, st
 	return nil
 }
 
-func RetryReadVolume(ctx context.Context, provider services.IProvider, op string, volumeID string) (*numspot.Volume, error) {
-	read, err := utils.RetryReadUntilStateValid(ctx, volumeID, provider.GetSpaceID(), volumePendingStates, volumeTargetStates, provider.GetNumspotClient().ReadVolumesByIdWithResponse)
+func RetryReadVolume(ctx context.Context, provider *client.NumSpotSDK, op string, volumeID string) (*numspot.Volume, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	read, err := utils.RetryReadUntilStateValid(ctx, volumeID, provider.SpaceID, volumePendingStates, volumeTargetStates, numspotClient.ReadVolumesByIdWithResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -149,9 +167,13 @@ func RetryReadVolume(ctx context.Context, provider services.IProvider, op string
 	return numSpotVolume, err
 }
 
-func ReadVolume(ctx context.Context, provider services.IProvider, volumeID string) (numSpotVolume *numspot.Volume, err error) {
+func ReadVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID string) (numSpotVolume *numspot.Volume, err error) {
 	var numSpotReadVolume *numspot.ReadVolumesByIdResponse
-	numSpotReadVolume, err = provider.GetNumspotClient().ReadVolumesByIdWithResponse(ctx, provider.GetSpaceID(), volumeID)
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotReadVolume, err = numspotClient.ReadVolumesByIdWithResponse(ctx, provider.SpaceID, volumeID)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +184,7 @@ func ReadVolume(ctx context.Context, provider services.IProvider, volumeID strin
 	return numSpotReadVolume.JSON200, err
 }
 
-func unlinkVolume(ctx context.Context, provider services.IProvider, volumeID, stateVM string) (err error) {
+func unlinkVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID, stateVM string) (err error) {
 	volume, err := ReadVolume(ctx, provider, volumeID)
 	if err != nil {
 		return err
@@ -173,8 +195,12 @@ func unlinkVolume(ctx context.Context, provider services.IProvider, volumeID, st
 			return err
 		}
 
+		numspotClient, err := provider.GetClient(ctx)
+		if err != nil {
+			return err
+		}
 		var unlinkVolumeResponse *numspot.UnlinkVolumeResponse
-		if unlinkVolumeResponse, err = provider.GetNumspotClient().UnlinkVolumeWithResponse(ctx, provider.GetSpaceID(), volumeID, numspot.UnlinkVolumeJSONRequestBody{}); err != nil {
+		if unlinkVolumeResponse, err = numspotClient.UnlinkVolumeWithResponse(ctx, provider.SpaceID, volumeID, numspot.UnlinkVolumeJSONRequestBody{}); err != nil {
 			return err
 		}
 		if err = utils.ParseHTTPError(unlinkVolumeResponse.Body, unlinkVolumeResponse.StatusCode()); err != nil {
@@ -189,14 +215,18 @@ func unlinkVolume(ctx context.Context, provider services.IProvider, volumeID, st
 	return nil
 }
 
-func linkVolume(ctx context.Context, provider services.IProvider, op, volumeID, vmID, deviceName string) (err error) {
-	spaceID := provider.GetSpaceID()
+func linkVolume(ctx context.Context, provider *client.NumSpotSDK, op, volumeID, vmID, deviceName string) (err error) {
+	spaceID := provider.SpaceID
 	linkBody := numspot.LinkVolumeJSONRequestBody{
 		DeviceName: deviceName,
 		VmId:       vmID,
 	}
 
-	if _, err = utils.RetryLinkUntilResourceAvailableWithBody(ctx, spaceID, volumeID, linkBody, provider.GetNumspotClient().LinkVolumeWithResponse); err != nil {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+	if _, err = utils.RetryLinkUntilResourceAvailableWithBody(ctx, spaceID, volumeID, linkBody, numspotClient.LinkVolumeWithResponse); err != nil {
 		return err
 	}
 

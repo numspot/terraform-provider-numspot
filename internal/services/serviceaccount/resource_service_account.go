@@ -13,7 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -41,7 +41,7 @@ const (
 )
 
 type ServiceAccountResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewServiceAccountResource() resource.Resource {
@@ -53,7 +53,7 @@ func (r *ServiceAccountResource) Configure(ctx context.Context, request resource
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -101,8 +101,14 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.CreateServiceAccountSpaceResponse, error) {
-		return r.provider.GetNumspotClient().CreateServiceAccountSpaceWithResponse(
+		return numspotClient.CreateServiceAccountSpaceWithResponse(
 			ctx,
 			spaceId,
 			ServiceAccountFromTFToCreateRequest(plan),
@@ -180,15 +186,22 @@ func (r *ServiceAccountResource) Create(ctx context.Context, request resource.Cr
 func (r *ServiceAccountResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state ServiceAccountModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
-
+	if response.Diagnostics.HasError() {
+		return
+	}
 	spaceId := utils.ParseUUID(state.SpaceId.ValueString(), &response.Diagnostics)
 	serviceAccountID := utils.ParseUUID(state.ServiceAccountId.ValueString(), &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	res := utils.ExecuteRequest(func() (*numspot.GetServiceAccountSpaceResponse, error) {
-		return r.provider.GetNumspotClient().GetServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
+		return numspotClient.GetServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -242,9 +255,9 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 	}
 
 	if !plan.Name.Equal(state.Name) {
-		tf, err := r.updateServiceAccount(ctx, spaceId, serviceAccountID, plan.Name.ValueString(), response)
-		if err != nil {
-			response.Diagnostics.AddError(err.Error(), "")
+		tf := r.updateServiceAccount(ctx, spaceId, serviceAccountID, plan.Name.ValueString(), response)
+		if response.Diagnostics.HasError() {
+			return
 		}
 
 		state.ServiceAccountId = tf.ServiceAccountId
@@ -253,9 +266,8 @@ func (r *ServiceAccountResource) Update(ctx context.Context, request resource.Up
 	}
 
 	if !plan.SpaceId.Equal(state.SpaceId) {
-		err := r.assignServiceAccountToSpace(ctx, spaceId, serviceAccountID, response)
-		if err != nil {
-			response.Diagnostics.AddError(err.Error(), "")
+		r.assignServiceAccountToSpace(ctx, spaceId, serviceAccountID, response)
+		if response.Diagnostics.HasError() {
 			return
 		}
 		state.SpaceId = plan.SpaceId
@@ -329,42 +341,62 @@ func (r *ServiceAccountResource) updateServiceAccount(
 	spaceID, servicAccountID uuid.UUID,
 	serviceAccountName string,
 	response *resource.UpdateResponse,
-) (*ServiceAccountModel, error) {
+) *ServiceAccountModel {
 	payload := numspot.ServiceAccount{Name: serviceAccountName}
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return nil
+	}
 
 	res := utils.ExecuteRequest(func() (*numspot.UpdateServiceAccountSpaceResponse, error) {
-		return r.provider.GetNumspotClient().UpdateServiceAccountSpaceWithResponse(ctx, spaceID, servicAccountID, payload)
+		return numspotClient.UpdateServiceAccountSpaceWithResponse(ctx, spaceID, servicAccountID, payload)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
-		return nil, fmt.Errorf("failed to update service account: %v", "empty response")
+		response.Diagnostics.AddError("failed to update service account", "empty response")
+		return nil
 	}
 
 	if res.JSON200 == nil {
-		return nil, fmt.Errorf("failed to update service account: %v", "empty response")
+		response.Diagnostics.AddError("failed to update service account", "empty response")
 	}
 
 	tf := ServiceAccountEditedResponseFromHTTPToTF(ctx, *res.JSON200)
-	return &tf, nil
+	return &tf
 }
 
 func (r *ServiceAccountResource) assignServiceAccountToSpace(
 	ctx context.Context,
 	spaceID, servicAccountID uuid.UUID,
 	response *resource.UpdateResponse,
-) error {
+) {
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 	res := utils.ExecuteRequest(func() (*numspot.AssignServiceAccountToSpaceResponse, error) {
-		return r.provider.GetNumspotClient().AssignServiceAccountToSpaceWithResponse(ctx, spaceID, servicAccountID)
+		return numspotClient.AssignServiceAccountToSpaceWithResponse(ctx, spaceID, servicAccountID)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
-		return fmt.Errorf("failed to assign service account to space: %v", "empty response")
+		response.Diagnostics.AddError("failed to update service account", "empty response")
+		return
 	}
-
-	return nil
 }
 
 func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state ServiceAccountModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	spaceId := utils.ParseUUID(state.SpaceId.ValueString(), &response.Diagnostics)
 	serviceAccountID := utils.ParseUUID(state.ServiceAccountId.ValueString(), &response.Diagnostics)
@@ -373,7 +405,7 @@ func (r *ServiceAccountResource) Delete(ctx context.Context, request resource.De
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.DeleteServiceAccountSpaceResponse, error) {
-		return r.provider.GetNumspotClient().DeleteServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
+		return numspotClient.DeleteServiceAccountSpaceWithResponse(ctx, spaceId, serviceAccountID)
 	}, http.StatusNoContent, &response.Diagnostics)
 	if res == nil {
 		return
@@ -402,6 +434,12 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 	uuids []string,
 	diags *diag.Diagnostics,
 ) {
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Parse Service Account ID
 	serviceAccountUUID := utils.ParseUUID(serviceAccountID, diags)
 
@@ -433,7 +471,7 @@ func (r *ServiceAccountResource) modifyServiceAccountIAMPolicy(
 
 	// Execute
 	utils.ExecuteRequest(func() (*numspot.SetIAMPolicySpaceResponse, error) {
-		return r.provider.GetNumspotClient().SetIAMPolicySpaceWithResponse(
+		return numspotClient.SetIAMPolicySpaceWithResponse(
 			ctx,
 			spaceId,
 			numspot.ServiceAccounts,
@@ -477,10 +515,14 @@ func (r *ServiceAccountResource) getRolesAndGlobalPermissions(
 	if diags.HasError() {
 		return nil, nil
 	}
-
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return nil, nil
+	}
 	res := utils.ExecuteRequest(func() (*numspot.GetIAMPolicySpaceResponse, error) {
-		return r.provider.GetNumspotClient().GetIAMPolicySpaceWithResponse(
-			ctx, r.provider.GetSpaceID(), numspot.ServiceAccounts, serviceAccountUUID)
+		return numspotClient.GetIAMPolicySpaceWithResponse(
+			ctx, r.provider.SpaceID, numspot.ServiceAccounts, serviceAccountUUID)
 	}, http.StatusOK, diags)
 	if res == nil {
 		return nil, nil

@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/serviceaccount"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -21,7 +21,7 @@ var (
 )
 
 type AclsResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewAclsResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *AclsResource) Configure(ctx context.Context, request resource.Configure
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -85,6 +85,9 @@ func (r *AclsResource) Create(ctx context.Context, request resource.CreateReques
 func (r *AclsResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state ACLsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	tf := r.readAcls(ctx, state, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
@@ -142,10 +145,15 @@ func (r *AclsResource) updateAcls(
 		Items: acls,
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 	// Execute
 	if action == serviceaccount.AddAction {
 		utils.ExecuteRequest(func() (*numspot.CreateACLServiceAccountSpaceBulkResponse, error) {
-			return r.provider.GetNumspotClient().CreateACLServiceAccountSpaceBulkWithResponse(
+			return numspotClient.CreateACLServiceAccountSpaceBulkWithResponse(
 				ctx,
 				spaceUUID,
 				serviceAccountUUID,
@@ -154,7 +162,7 @@ func (r *AclsResource) updateAcls(
 		}, http.StatusCreated, diags)
 	} else if action == serviceaccount.DeleteAction {
 		utils.ExecuteRequest(func() (*numspot.DeleteACLServiceAccountSpaceBulkResponse, error) {
-			return r.provider.GetNumspotClient().DeleteACLServiceAccountSpaceBulkWithResponse(
+			return numspotClient.DeleteACLServiceAccountSpaceBulkWithResponse(
 				ctx,
 				spaceUUID,
 				serviceAccountUUID,
@@ -170,7 +178,7 @@ func (r *AclsResource) readAcls(
 	diags *diag.Diagnostics,
 ) *ACLsModel {
 	readResult := ACLsModel{
-		SpaceId:          types.StringValue(r.provider.GetSpaceID().String()),
+		SpaceId:          types.StringValue(r.provider.SpaceID.String()),
 		ServiceAccountId: tf.ServiceAccountId,
 		Service:          tf.Service,
 		Resource:         tf.Resource,
@@ -188,9 +196,15 @@ func (r *AclsResource) readAcls(
 		Subresource: tf.Subresource.ValueStringPointer(),
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return nil
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.GetACLServiceAccountSpaceResponse, error) {
-		return r.provider.GetNumspotClient().GetACLServiceAccountSpaceWithResponse(
-			ctx, r.provider.GetSpaceID(), serviceAccountUUID, &body)
+		return numspotClient.GetACLServiceAccountSpaceWithResponse(
+			ctx, r.provider.SpaceID, serviceAccountUUID, &body)
 	}, http.StatusOK, diags)
 	if res == nil {
 		return nil
