@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -22,7 +22,7 @@ var (
 )
 
 type ImageResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewImageResource() resource.Resource {
@@ -34,7 +34,7 @@ func (r *ImageResource) Configure(ctx context.Context, request resource.Configur
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -66,12 +66,18 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		*ImageFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
-		r.provider.GetNumspotClient().CreateImageWithResponse)
+		numspotClient.CreateImageWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Image", err.Error())
 		return
@@ -79,7 +85,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -96,10 +102,10 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 	waitedImage, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.GetNumspotClient().ReadImagesByIdWithResponse,
+		numspotClient.ReadImagesByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Image", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -142,9 +148,17 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 	var data ImageModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 	res := utils.ExecuteRequest(func() (*numspot.ReadImagesByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadImagesByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
+		return numspotClient.ReadImagesByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
 	if response.Diagnostics.HasError() {
@@ -182,9 +196,14 @@ func (r *ImageResource) updateImageAccess(ctx context.Context, id string, data I
 		}
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 	_ = utils.ExecuteRequest(func() (*numspot.UpdateImageResponse, error) {
-		return r.provider.GetNumspotClient().UpdateImageWithResponse(ctx,
-			r.provider.GetSpaceID(),
+		return numspotClient.UpdateImageWithResponse(ctx,
+			r.provider.SpaceID,
 			id,
 			body,
 		)
@@ -201,14 +220,21 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	if !state.Tags.Equal(plan.Tags) {
+
 		tags.UpdateTags(
 			ctx,
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
+			numspotClient,
+			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
 		if response.Diagnostics.HasError() {
@@ -230,7 +256,7 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadImagesByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadImagesByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
+		return numspotClient.ReadImagesByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 
 	if response.Diagnostics.HasError() {
@@ -249,8 +275,16 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteImageWithResponse)
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteImageWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Image", err.Error())
 		return

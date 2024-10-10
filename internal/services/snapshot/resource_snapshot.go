@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -22,7 +22,7 @@ var (
 )
 
 type SnapshotResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewSnapshotResource() resource.Resource {
@@ -34,7 +34,7 @@ func (r *SnapshotResource) Configure(ctx context.Context, request resource.Confi
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -66,12 +66,18 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		SnapshotFromTfToCreateRequest(&data),
-		r.provider.GetNumspotClient().CreateSnapshotWithResponse)
+		numspotClient.CreateSnapshotWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Snapshot", err.Error())
 		return
@@ -79,7 +85,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -89,10 +95,10 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	readRes, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		[]string{"pending/queued", "in-queue", "pending"},
 		[]string{"completed"},
-		r.provider.GetNumspotClient().ReadSnapshotsByIdWithResponse,
+		numspotClient.ReadSnapshotsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Snapshot", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -129,8 +135,18 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	var data SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadSnapshotsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
+		return numspotClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -166,14 +182,20 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	if !state.Tags.Equal(plan.Tags) {
 		tags.UpdateTags(
 			ctx,
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
+			numspotClient,
+			r.provider.SpaceID,
 			state.Id.ValueString(),
 		)
 		if response.Diagnostics.HasError() {
@@ -188,7 +210,7 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadSnapshotsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
+		return numspotClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -217,8 +239,17 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteSnapshotWithResponse)
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteSnapshotWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Snapshot", err.Error())
 		return

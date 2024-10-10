@@ -7,16 +7,21 @@ import (
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
-	utils2 "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func CreateSubnet(ctx context.Context, provider services.IProvider, payload numspot.CreateSubnet, mapPublicIPOnLaunch bool, tags []numspot.ResourceTag) (*numspot.Subnet, error) {
-	res, err := utils2.RetryCreateUntilResourceAvailableWithBody(
+func CreateSubnet(ctx context.Context, provider *client.NumSpotSDK, payload numspot.CreateSubnet, mapPublicIPOnLaunch bool, tags []numspot.ResourceTag) (*numspot.Subnet, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		provider.GetSpaceID(),
+		provider.SpaceID,
 		payload,
-		provider.GetNumspotClient().CreateSubnetWithResponse)
+		numspotClient.CreateSubnetWithResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -43,14 +48,19 @@ func CreateSubnet(ctx context.Context, provider services.IProvider, payload nums
 	return resRead, nil
 }
 
-func RetryReadSubnet(ctx context.Context, provider services.IProvider, id string) (*numspot.Subnet, error) {
-	read, err := utils2.RetryReadUntilStateValid(
+func RetryReadSubnet(ctx context.Context, provider *client.NumSpotSDK, id string) (*numspot.Subnet, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	read, err := utils.RetryReadUntilStateValid(
 		ctx,
 		id,
-		provider.GetSpaceID(),
+		provider.SpaceID,
 		[]string{pending},
 		[]string{available},
-		provider.GetNumspotClient().ReadSubnetsByIdWithResponse,
+		numspotClient.ReadSubnetsByIdWithResponse,
 	)
 	if err != nil {
 		return nil, err
@@ -64,8 +74,13 @@ func RetryReadSubnet(ctx context.Context, provider services.IProvider, id string
 	return res, nil
 }
 
-func ReadSubnet(ctx context.Context, provider services.IProvider, id string) (*numspot.Subnet, error) {
-	res, err := provider.GetNumspotClient().ReadSubnetsByIdWithResponse(ctx, provider.GetSpaceID(), id)
+func ReadSubnet(ctx context.Context, provider *client.NumSpotSDK, id string) (*numspot.Subnet, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := numspotClient.ReadSubnetsByIdWithResponse(ctx, provider.SpaceID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +92,13 @@ func ReadSubnet(ctx context.Context, provider services.IProvider, id string) (*n
 	return res.JSON200, nil
 }
 
-func UpdateSubnetAttributes(ctx context.Context, provider services.IProvider, id string, mapPublicIpOnLaunch bool) (*numspot.Subnet, error) {
-	res, err := provider.GetNumspotClient().UpdateSubnetWithResponse(ctx, provider.GetSpaceID(), id, numspot.UpdateSubnetJSONRequestBody{
+func UpdateSubnetAttributes(ctx context.Context, provider *client.NumSpotSDK, id string, mapPublicIpOnLaunch bool) (*numspot.Subnet, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := numspotClient.UpdateSubnetWithResponse(ctx, provider.SpaceID, id, numspot.UpdateSubnetJSONRequestBody{
 		MapPublicIpOnLaunch: mapPublicIpOnLaunch,
 	})
 	if err != nil {
@@ -96,15 +116,20 @@ func UpdateSubnetAttributes(ctx context.Context, provider services.IProvider, id
 	return resRead, nil
 }
 
-func UpdateSubnetTags(ctx context.Context, provider services.IProvider, id string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Subnet, error) {
+func UpdateSubnetTags(ctx context.Context, provider *client.NumSpotSDK, id string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Subnet, error) {
 	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, id); err != nil {
 		return nil, err
 	}
 	return ReadSubnet(ctx, provider, id)
 }
 
-func DeleteSubnet(ctx context.Context, provider services.IProvider, id string) error {
-	err := utils2.RetryDeleteUntilResourceAvailable(ctx, provider.GetSpaceID(), id, provider.GetNumspotClient().DeleteSubnetWithResponse)
+func DeleteSubnet(ctx context.Context, provider *client.NumSpotSDK, id string) error {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, id, numspotClient.DeleteSubnetWithResponse)
 	if err != nil {
 		return err
 	}

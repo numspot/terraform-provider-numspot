@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -28,7 +28,7 @@ func (d *loadBalancersDataSource) Configure(_ context.Context, request datasourc
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -46,7 +46,7 @@ func NewLoadBalancersDataSource() datasource.DataSource {
 }
 
 type loadBalancersDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -67,13 +67,19 @@ func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.R
 		return
 	}
 
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	params := numspot.ReadLoadBalancersParams{}
 	if !plan.LoadBalancerNames.IsNull() {
 		lbNames := utils.TfStringListToStringList(ctx, plan.LoadBalancerNames, &response.Diagnostics)
 		params.LoadBalancerNames = &lbNames
 	}
 	res := utils.ExecuteRequest(func() (*numspot.ReadLoadBalancersResponse, error) {
-		return d.provider.GetNumspotClient().ReadLoadBalancersWithResponse(ctx, d.provider.GetSpaceID(), &params)
+		return numspotClient.ReadLoadBalancersWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -6,7 +6,7 @@ import (
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -15,12 +15,16 @@ var (
 	clientGatewayTargetStates  = []string{available}
 )
 
-func CreateClientGateway(ctx context.Context, provider services.IProvider, numSpotClientGatewayCreate numspot.CreateClientGatewayJSONRequestBody, tags []numspot.ResourceTag) (numSpotClientGateway *numspot.ClientGateway, err error) {
-	spaceID := provider.GetSpaceID()
+func CreateClientGateway(ctx context.Context, provider *client.NumSpotSDK, numSpotClientGatewayCreate numspot.CreateClientGatewayJSONRequestBody, tags []numspot.ResourceTag) (numSpotClientGateway *numspot.ClientGateway, err error) {
+	spaceID := provider.SpaceID
+
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	var retryCreate *numspot.CreateClientGatewayResponse
-	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotClientGatewayCreate,
-		provider.GetNumspotClient().CreateClientGatewayWithResponse); err != nil {
+	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotClientGatewayCreate, numspotClient.CreateClientGatewayWithResponse); err != nil {
 		return nil, err
 	}
 
@@ -35,23 +39,32 @@ func CreateClientGateway(ctx context.Context, provider services.IProvider, numSp
 	return RetryReadClientGateway(ctx, provider, createOp, createdId)
 }
 
-func UpdateClientGatewayTags(ctx context.Context, provider services.IProvider, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, clientGatewayID string) (*numspot.ClientGateway, error) {
+func UpdateClientGatewayTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, clientGatewayID string) (*numspot.ClientGateway, error) {
 	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, clientGatewayID); err != nil {
 		return nil, err
 	}
 	return RetryReadClientGateway(ctx, provider, updateOp, clientGatewayID)
 }
 
-func DeleteClientGateway(ctx context.Context, provider services.IProvider, clientGatewayID string) error {
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, provider.GetSpaceID(), clientGatewayID, provider.GetNumspotClient().DeleteClientGatewayWithResponse)
+func DeleteClientGateway(ctx context.Context, provider *client.NumSpotSDK, clientGatewayID string) error {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, clientGatewayID, numspotClient.DeleteClientGatewayWithResponse)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func ReadClientGateway(ctx context.Context, provider services.IProvider, clientGatewayID string) (*numspot.ClientGateway, error) {
-	numSpotClientGateway, err := provider.GetNumspotClient().ReadClientGatewaysByIdWithResponse(ctx, provider.GetSpaceID(), clientGatewayID)
+func ReadClientGateway(ctx context.Context, provider *client.NumSpotSDK, clientGatewayID string) (*numspot.ClientGateway, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotClientGateway, err := numspotClient.ReadClientGatewaysByIdWithResponse(ctx, provider.SpaceID, clientGatewayID)
 	if err != nil {
 		return nil, err
 	}
@@ -63,9 +76,13 @@ func ReadClientGateway(ctx context.Context, provider services.IProvider, clientG
 	return numSpotClientGateway.JSON200, nil
 }
 
-func RetryReadClientGateway(ctx context.Context, provider services.IProvider, op string, clientGatewayID string) (*numspot.ClientGateway, error) {
-	read, err := utils.RetryReadUntilStateValid(ctx, clientGatewayID, provider.GetSpaceID(), clientGatewayPendingStates, clientGatewayTargetStates,
-		provider.GetNumspotClient().ReadClientGatewaysByIdWithResponse)
+func RetryReadClientGateway(ctx context.Context, provider *client.NumSpotSDK, op string, clientGatewayID string) (*numspot.ClientGateway, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	read, err := utils.RetryReadUntilStateValid(ctx, clientGatewayID, provider.SpaceID, clientGatewayPendingStates, clientGatewayTargetStates,
+		numspotClient.ReadClientGatewaysByIdWithResponse)
 	if err != nil {
 		return nil, err
 	}

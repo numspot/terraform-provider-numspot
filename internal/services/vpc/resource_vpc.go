@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -21,7 +21,7 @@ var (
 )
 
 type VpcResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewNetResource() resource.Resource {
@@ -33,7 +33,7 @@ func (r *VpcResource) Configure(ctx context.Context, request resource.ConfigureR
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -65,12 +65,18 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		NetFromTfToCreateRequest(&data),
-		r.provider.GetNumspotClient().CreateVpcWithResponse)
+		numspotClient.CreateVpcWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPC", err.Error())
 		return
@@ -79,7 +85,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	// Handle tags
 	createdId := *res.JSON201.Id
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, createdId, data.Tags)
+		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -89,7 +95,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	if !data.DhcpOptionsSetId.IsNull() && !data.DhcpOptionsSetId.IsUnknown() {
 		updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
 			body := VpcFromTfToUpdaterequest(ctx, &data)
-			return r.provider.GetNumspotClient().UpdateVpcWithResponse(ctx, r.provider.GetSpaceID(), createdId, body)
+			return numspotClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, createdId, body)
 		}, http.StatusOK, &response.Diagnostics)
 
 		if updatedRes == nil || response.Diagnostics.HasError() {
@@ -99,10 +105,10 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	readRes, err := utils.RetryReadUntilStateValid(
 		ctx,
 		createdId,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		[]string{"pending"},
 		[]string{"available"},
-		r.provider.GetNumspotClient().ReadVpcsByIdWithResponse,
+		numspotClient.ReadVpcsByIdWithResponse,
 	)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Net", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
@@ -126,9 +132,18 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadVpcsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadVpcsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
+		return numspotClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -159,6 +174,12 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	vpcId := state.Id.ValueString()
 
 	if !state.Tags.Equal(plan.Tags) {
@@ -167,8 +188,8 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
+			numspotClient,
+			r.provider.SpaceID,
 			vpcId,
 		)
 		if response.Diagnostics.HasError() {
@@ -179,7 +200,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 	// Update Vpc
 	updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
 		body := VpcFromTfToUpdaterequest(ctx, &plan)
-		return r.provider.GetNumspotClient().UpdateVpcWithResponse(ctx, r.provider.GetSpaceID(), vpcId, body)
+		return numspotClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, vpcId, body)
 	}, http.StatusOK, &response.Diagnostics)
 
 	if updatedRes == nil || response.Diagnostics.HasError() {
@@ -188,7 +209,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 
 	// Read resource
 	res := utils.ExecuteRequest(func() (*numspot.ReadVpcsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadVpcsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
+		return numspotClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -209,7 +230,17 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 	var data VpcModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteVpcWithResponse)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteVpcWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete VPC", err.Error())
 		return

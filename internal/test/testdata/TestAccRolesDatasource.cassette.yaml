@@ -31,7 +31,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -47,9 +47,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -66,9 +63,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles
         method: GET
       response:
@@ -95,9 +90,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -114,9 +106,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles?page%5BnextToken%5D=dfe44385-7232-456e-9d13-a37e5f6ec1cc&page%5Bsize%5D=50
         method: GET
       response:
@@ -143,9 +133,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -179,7 +166,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -195,9 +182,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -214,9 +198,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles
         method: GET
       response:
@@ -243,9 +225,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -262,9 +241,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles?page%5BnextToken%5D=dfe44385-7232-456e-9d13-a37e5f6ec1cc&page%5Bsize%5D=50
         method: GET
       response:
@@ -291,9 +268,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -327,7 +301,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -343,9 +317,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -362,9 +333,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles
         method: GET
       response:
@@ -391,9 +360,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -410,9 +376,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles?page%5BnextToken%5D=dfe44385-7232-456e-9d13-a37e5f6ec1cc&page%5Bsize%5D=50
         method: GET
       response:
@@ -439,9 +403,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -475,7 +436,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -491,9 +452,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms

@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -46,7 +46,7 @@ func (d *securityGroupsDataSource) Configure(_ context.Context, request datasour
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -64,7 +64,7 @@ func NewSecurityGroupsDataSource() datasource.DataSource {
 }
 
 type securityGroupsDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -85,13 +85,19 @@ func (d *securityGroupsDataSource) Read(ctx context.Context, request datasource.
 		return
 	}
 
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	params := SecurityGroupsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadSecurityGroupsResponse, error) {
-		return d.provider.GetNumspotClient().ReadSecurityGroupsWithResponse(ctx, d.provider.GetSpaceID(), &params)
+		return numspotClient.ReadSecurityGroupsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -35,7 +35,7 @@ func (d *publicIpsDataSource) Configure(_ context.Context, request datasource.Co
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -53,7 +53,7 @@ func NewPublicIpsDataSource() datasource.DataSource {
 }
 
 type publicIpsDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -74,13 +74,19 @@ func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadR
 		return
 	}
 
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	params := PublicIpsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadPublicIpsResponse, error) {
-		return d.provider.GetNumspotClient().ReadPublicIpsWithResponse(ctx, d.provider.GetSpaceID(), &params)
+		return numspotClient.ReadPublicIpsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

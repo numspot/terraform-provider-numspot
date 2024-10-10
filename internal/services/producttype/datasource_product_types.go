@@ -32,7 +32,7 @@ func (d *productTypesDataSource) Configure(_ context.Context, request datasource
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -50,7 +50,7 @@ func NewProductTypesDataSource() datasource.DataSource {
 }
 
 type productTypesDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -72,13 +72,8 @@ func (d *productTypesDataSource) Read(ctx context.Context, request datasource.Re
 	}
 
 	params := ProductTypesFromTfToAPIReadParams(ctx, plan)
-<<<<<<< HEAD
 	res := utils.ExecuteRequest(func() (*numspot.ReadProductTypesResponse, error) {
-		return d.provider.IaasClient.ReadProductTypesWithResponse(ctx, d.provider.GetSpaceID(), &params)
-=======
-	res := utils.ExecuteRequest(func() (*numspot.ReadProductTypesResponse, error) {
-		return d.provider.GetNumspotClient().ReadProductTypesWithResponse(ctx, d.provider.GetSpaceID(), &params)
->>>>>>> refactor: fix import cycle and remove unused code
+		return numspotClient.ReadProductTypesWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -34,8 +34,13 @@ func PublicIpFromHttpToTf(ctx context.Context, elt *numspot.PublicIp, diags *dia
 	}
 }
 
-func invokeLinkPublicIP(ctx context.Context, provider services.IProvider, data *PublicIpModel) (*string, error) {
+func invokeLinkPublicIP(ctx context.Context, provider *client.NumSpotSDK, data *PublicIpModel) (*string, error) {
 	var payload numspot.LinkPublicIpJSONRequestBody
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	if !data.VmId.IsNull() {
 		payload = numspot.LinkPublicIpJSONRequestBody{VmId: data.VmId.ValueStringPointer()}
 	} else {
@@ -44,7 +49,7 @@ func invokeLinkPublicIP(ctx context.Context, provider services.IProvider, data *
 			PrivateIp: data.PrivateIp.ValueStringPointer(),
 		}
 	}
-	res, err := provider.GetNumspotClient().LinkPublicIpWithResponse(ctx, provider.GetSpaceID(), data.Id.ValueString(), payload)
+	res, err := numspotClient.LinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -55,11 +60,16 @@ func invokeLinkPublicIP(ctx context.Context, provider services.IProvider, data *
 	return res.JSON200.LinkPublicIpId, nil
 }
 
-func invokeUnlinkPublicIP(ctx context.Context, provider services.IProvider, data *PublicIpModel) error {
+func invokeUnlinkPublicIP(ctx context.Context, provider *client.NumSpotSDK, data *PublicIpModel) error {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+
 	payload := numspot.UnlinkPublicIpJSONRequestBody{
 		LinkPublicIpId: data.LinkPublicIP.ValueStringPointer(),
 	}
-	res, err := provider.GetNumspotClient().UnlinkPublicIpWithResponse(ctx, provider.GetSpaceID(), data.Id.ValueString(), payload)
+	res, err := numspotClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, data.Id.ValueString(), payload)
 	if err != nil {
 		return err
 	}
@@ -70,9 +80,15 @@ func invokeUnlinkPublicIP(ctx context.Context, provider services.IProvider, data
 	return nil
 }
 
-func refreshState(ctx context.Context, provider services.IProvider, id string, diags *diag.Diagnostics) *PublicIpModel {
+func refreshState(ctx context.Context, provider *client.NumSpotSDK, id string, diags *diag.Diagnostics) *PublicIpModel {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return nil
+	}
+
 	// Refresh state
-	res, err := provider.GetNumspotClient().ReadPublicIpsByIdWithResponse(ctx, provider.GetSpaceID(), id)
+	res, err := numspotClient.ReadPublicIpsByIdWithResponse(ctx, provider.SpaceID, id)
 	if err != nil {
 		diags.AddError("Failed to read public ip", err.Error())
 		return nil

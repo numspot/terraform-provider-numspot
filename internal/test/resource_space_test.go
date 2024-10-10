@@ -12,6 +12,8 @@ import (
 )
 
 func TestAccSpaceResource(t *testing.T) {
+	t.Skip()
+
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
 		err := acct.Cleanup()

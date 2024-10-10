@@ -62,8 +62,8 @@ go_generate:
     - apt update
     - apt install terraform -y
   script:
-    - go generate ./...
-    - git diff --compact-summary --exit-code || (echo; echo "Unexpected difference in directories after code generation. Run 'go generate ./...' command and commit."; exit 1)
+    - go generate
+    - git diff --compact-summary --exit-code || (echo; echo "Unexpected difference in directories after code generation. Run 'go generate' command and commit."; exit 1)
 
 acc-tests:
   image: golang:1.21.0

@@ -54,7 +54,7 @@ func NewAccTest(t *testing.T, vcrEnabled bool, vcrMode string) AccTest {
 		if !vcrEnabled {
 			return AccTest{
 				TestProvider: ProtoV6ProviderFactoriesType{
-					"numspot": providerserver.NewProtocol6WithError(provider.New("0.1", false, nil)()),
+					"numspot": providerserver.NewProtocol6WithError(provider.ProvideNumSpotProvider()()),
 				},
 				Cleanup: func() error {
 					return nil
@@ -70,7 +70,7 @@ func NewAccTest(t *testing.T, vcrEnabled bool, vcrMode string) AccTest {
 
 	rec, client, err := newRecorder(mode, t.Name(), fixturesPath)
 	require.NoError(t, err)
-	pr := provider.New("0.1", false, client)()
+	pr := provider.ProvideNumSpotProviderWithHTTPClient(client)()
 
 	return AccTest{
 		TestProvider: ProtoV6ProviderFactoriesType{

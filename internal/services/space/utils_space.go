@@ -42,6 +42,7 @@ func RetryReadSpaceUntilReady(ctx context.Context, client *numspot.ClientWithRes
 			if err != nil {
 				return nil, "", fmt.Errorf("failed to read space : %v", err.Error())
 			}
+			// TODO : check that response is a status 200
 			return res.JSON200, string(res.JSON200.Status), nil
 		},
 		Timeout: utils.TfRequestRetryTimeout,

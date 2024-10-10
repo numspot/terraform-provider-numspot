@@ -31,7 +31,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -80,7 +80,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -115,8 +115,6 @@ interactions:
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions
         method: POST
       response:
@@ -127,7 +125,7 @@ interactions:
         trailer: {}
         content_length: 151
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-4e35af90","logServers":[],"ntpServers":[],"tags":[]}'
+        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-3e4df201","logServers":[],"ntpServers":[],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -165,13 +163,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-4e35af90"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"resourceIds":["dopt-3e4df201"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: PATCH
       response:
@@ -218,10 +214,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-4e35af90
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-3e4df201
         method: GET
       response:
         proto: HTTP/1.1
@@ -231,7 +225,7 @@ interactions:
         trailer: {}
         content_length: 206
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-4e35af90","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-3e4df201","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -288,7 +282,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -337,7 +331,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -369,10 +363,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-4e35af90
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-3e4df201
         method: GET
       response:
         proto: HTTP/1.1
@@ -382,7 +374,7 @@ interactions:
         trailer: {}
         content_length: 206
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-4e35af90","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-3e4df201","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -439,7 +431,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -471,10 +463,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-4e35af90
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-3e4df201
         method: GET
       response:
         proto: HTTP/1.1
@@ -484,7 +474,7 @@ interactions:
         trailer: {}
         content_length: 206
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-4e35af90","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-3e4df201","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -541,7 +531,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -573,10 +563,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-4e35af90
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-3e4df201
         method: GET
       response:
         proto: HTTP/1.1
@@ -586,7 +574,7 @@ interactions:
         trailer: {}
         content_length: 206
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-4e35af90","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"domain.name","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-3e4df201","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -643,7 +631,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -675,10 +663,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-4e35af90
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-3e4df201
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -702,7 +688,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - dopt-4e35af90
+                - dopt-3e4df201
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -729,8 +715,6 @@ interactions:
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions
         method: POST
       response:
@@ -741,7 +725,7 @@ interactions:
         trailer: {}
         content_length: 160
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-28caea28","logServers":[],"ntpServers":[],"tags":[]}'
+        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-893de5e9","logServers":[],"ntpServers":[],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -779,13 +763,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-28caea28"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"resourceIds":["dopt-893de5e9"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: PATCH
       response:
@@ -832,10 +814,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-28caea28
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-893de5e9
         method: GET
       response:
         proto: HTTP/1.1
@@ -845,7 +825,7 @@ interactions:
         trailer: {}
         content_length: 215
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-28caea28","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-893de5e9","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -902,7 +882,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -951,7 +931,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -983,10 +963,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-28caea28
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-893de5e9
         method: GET
       response:
         proto: HTTP/1.1
@@ -996,7 +974,7 @@ interactions:
         trailer: {}
         content_length: 215
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-28caea28","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-893de5e9","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1053,7 +1031,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1085,10 +1063,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-28caea28
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-893de5e9
         method: GET
       response:
         proto: HTTP/1.1
@@ -1098,7 +1074,7 @@ interactions:
         trailer: {}
         content_length: 215
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-28caea28","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-893de5e9","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1155,7 +1131,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1185,13 +1161,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-28caea28"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
+        body: '{"resourceIds":["dopt-893de5e9"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: DELETE
       response:
@@ -1238,13 +1212,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-28caea28"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
+        body: '{"resourceIds":["dopt-893de5e9"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: PATCH
       response:
@@ -1291,10 +1263,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-28caea28
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-893de5e9
         method: GET
       response:
         proto: HTTP/1.1
@@ -1304,7 +1274,7 @@ interactions:
         trailer: {}
         content_length: 222
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-28caea28","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
+        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-893de5e9","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1361,7 +1331,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1410,7 +1380,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1442,10 +1412,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-28caea28
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-893de5e9
         method: GET
       response:
         proto: HTTP/1.1
@@ -1455,7 +1423,7 @@ interactions:
         trailer: {}
         content_length: 222
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-28caea28","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
+        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-893de5e9","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1512,7 +1480,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1544,10 +1512,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-28caea28
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-893de5e9
         method: GET
       response:
         proto: HTTP/1.1
@@ -1557,7 +1523,7 @@ interactions:
         trailer: {}
         content_length: 222
         uncompressed: false
-        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-28caea28","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
+        body: '{"default":false,"domainName":"domain.name.replaced","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-893de5e9","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest-update"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1614,7 +1580,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1646,10 +1612,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-28caea28
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-893de5e9
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1673,7 +1637,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - dopt-28caea28
+                - dopt-893de5e9
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -1714,7 +1678,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1763,7 +1727,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1798,8 +1762,6 @@ interactions:
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions
         method: POST
       response:
@@ -1810,7 +1772,7 @@ interactions:
         trailer: {}
         content_length: 178
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.1","192.0.0.2"],"id":"dopt-dce90b42","logServers":[],"ntpServers":[],"tags":[]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.1","192.0.0.2"],"id":"dopt-9a5be153","logServers":[],"ntpServers":[],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1848,13 +1810,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-dce90b42"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"resourceIds":["dopt-9a5be153"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: PATCH
       response:
@@ -1901,10 +1861,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-dce90b42
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-9a5be153
         method: GET
       response:
         proto: HTTP/1.1
@@ -1914,7 +1872,7 @@ interactions:
         trailer: {}
         content_length: 233
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.1","192.0.0.2"],"id":"dopt-dce90b42","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.1","192.0.0.2"],"id":"dopt-9a5be153","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1971,7 +1929,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2020,7 +1978,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2052,10 +2010,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-dce90b42
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-9a5be153
         method: GET
       response:
         proto: HTTP/1.1
@@ -2065,7 +2021,7 @@ interactions:
         trailer: {}
         content_length: 233
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.1","192.0.0.2"],"id":"dopt-dce90b42","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.1","192.0.0.2"],"id":"dopt-9a5be153","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2122,7 +2078,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2154,10 +2110,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-dce90b42
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-9a5be153
         method: GET
       response:
         proto: HTTP/1.1
@@ -2167,7 +2121,7 @@ interactions:
         trailer: {}
         content_length: 233
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.1","192.0.0.2"],"id":"dopt-dce90b42","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.1","192.0.0.2"],"id":"dopt-9a5be153","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2224,7 +2178,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2256,10 +2210,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-dce90b42
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-9a5be153
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2283,7 +2235,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - dopt-dce90b42
+                - dopt-9a5be153
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -2310,8 +2262,6 @@ interactions:
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions
         method: POST
       response:
@@ -2322,7 +2272,7 @@ interactions:
         trailer: {}
         content_length: 178
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.3","192.0.0.4"],"id":"dopt-c4526a5d","logServers":[],"ntpServers":[],"tags":[]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.3","192.0.0.4"],"id":"dopt-8fb4d4d8","logServers":[],"ntpServers":[],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2360,13 +2310,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-c4526a5d"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"resourceIds":["dopt-8fb4d4d8"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: PATCH
       response:
@@ -2413,10 +2361,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-c4526a5d
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-8fb4d4d8
         method: GET
       response:
         proto: HTTP/1.1
@@ -2426,7 +2372,7 @@ interactions:
         trailer: {}
         content_length: 233
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.3","192.0.0.4"],"id":"dopt-c4526a5d","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.3","192.0.0.4"],"id":"dopt-8fb4d4d8","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2483,7 +2429,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2532,7 +2478,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2564,10 +2510,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-c4526a5d
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-8fb4d4d8
         method: GET
       response:
         proto: HTTP/1.1
@@ -2577,7 +2521,7 @@ interactions:
         trailer: {}
         content_length: 233
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.3","192.0.0.4"],"id":"dopt-c4526a5d","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.3","192.0.0.4"],"id":"dopt-8fb4d4d8","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2634,7 +2578,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2666,10 +2610,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-c4526a5d
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-8fb4d4d8
         method: GET
       response:
         proto: HTTP/1.1
@@ -2679,7 +2621,7 @@ interactions:
         trailer: {}
         content_length: 233
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.3","192.0.0.4"],"id":"dopt-c4526a5d","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["192.0.0.3","192.0.0.4"],"id":"dopt-8fb4d4d8","logServers":[],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2736,7 +2678,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2768,10 +2710,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-c4526a5d
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-8fb4d4d8
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2795,7 +2735,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - dopt-c4526a5d
+                - dopt-8fb4d4d8
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -2836,7 +2776,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2885,7 +2825,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2920,8 +2860,6 @@ interactions:
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions
         method: POST
       response:
@@ -2932,7 +2870,7 @@ interactions:
         trailer: {}
         content_length: 199
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-9069f633","logServers":["192.0.0.1","192.0.0.2"],"ntpServers":[],"tags":[]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-b76f4e74","logServers":["192.0.0.1","192.0.0.2"],"ntpServers":[],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2970,13 +2908,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-9069f633"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"resourceIds":["dopt-b76f4e74"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: PATCH
       response:
@@ -3023,10 +2959,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-9069f633
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-b76f4e74
         method: GET
       response:
         proto: HTTP/1.1
@@ -3036,7 +2970,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-9069f633","logServers":["192.0.0.1","192.0.0.2"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-b76f4e74","logServers":["192.0.0.1","192.0.0.2"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3093,7 +3027,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3142,7 +3076,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3174,10 +3108,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-9069f633
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-b76f4e74
         method: GET
       response:
         proto: HTTP/1.1
@@ -3187,7 +3119,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-9069f633","logServers":["192.0.0.1","192.0.0.2"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-b76f4e74","logServers":["192.0.0.1","192.0.0.2"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3244,7 +3176,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3276,10 +3208,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-9069f633
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-b76f4e74
         method: GET
       response:
         proto: HTTP/1.1
@@ -3289,7 +3219,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-9069f633","logServers":["192.0.0.1","192.0.0.2"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-b76f4e74","logServers":["192.0.0.1","192.0.0.2"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3346,7 +3276,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3378,10 +3308,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-9069f633
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-b76f4e74
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -3405,7 +3333,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - dopt-9069f633
+                - dopt-b76f4e74
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -3432,8 +3360,6 @@ interactions:
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions
         method: POST
       response:
@@ -3444,7 +3370,7 @@ interactions:
         trailer: {}
         content_length: 199
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-77df683e","logServers":["192.0.0.3","192.0.0.4"],"ntpServers":[],"tags":[]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-60d2b132","logServers":["192.0.0.3","192.0.0.4"],"ntpServers":[],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3482,13 +3408,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-77df683e"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"resourceIds":["dopt-60d2b132"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: PATCH
       response:
@@ -3535,10 +3459,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-77df683e
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-60d2b132
         method: GET
       response:
         proto: HTTP/1.1
@@ -3548,7 +3470,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-77df683e","logServers":["192.0.0.3","192.0.0.4"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-60d2b132","logServers":["192.0.0.3","192.0.0.4"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3605,7 +3527,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3654,7 +3576,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3686,10 +3608,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-77df683e
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-60d2b132
         method: GET
       response:
         proto: HTTP/1.1
@@ -3699,7 +3619,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-77df683e","logServers":["192.0.0.3","192.0.0.4"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-60d2b132","logServers":["192.0.0.3","192.0.0.4"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3756,7 +3676,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3788,10 +3708,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-77df683e
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-60d2b132
         method: GET
       response:
         proto: HTTP/1.1
@@ -3801,7 +3719,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-77df683e","logServers":["192.0.0.3","192.0.0.4"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-60d2b132","logServers":["192.0.0.3","192.0.0.4"],"ntpServers":[],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3858,7 +3776,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3890,10 +3808,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-77df683e
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-60d2b132
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -3917,7 +3833,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - dopt-77df683e
+                - dopt-60d2b132
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -3958,7 +3874,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4007,7 +3923,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4042,8 +3958,6 @@ interactions:
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions
         method: POST
       response:
@@ -4054,7 +3968,7 @@ interactions:
         trailer: {}
         content_length: 199
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-1da0e916","logServers":[],"ntpServers":["192.0.0.1","192.0.0.2"],"tags":[]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-663e25d4","logServers":[],"ntpServers":["192.0.0.1","192.0.0.2"],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4092,13 +4006,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-1da0e916"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"resourceIds":["dopt-663e25d4"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: PATCH
       response:
@@ -4145,10 +4057,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-1da0e916
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-663e25d4
         method: GET
       response:
         proto: HTTP/1.1
@@ -4158,7 +4068,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-1da0e916","logServers":[],"ntpServers":["192.0.0.1","192.0.0.2"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-663e25d4","logServers":[],"ntpServers":["192.0.0.1","192.0.0.2"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4215,7 +4125,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4264,7 +4174,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4296,10 +4206,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-1da0e916
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-663e25d4
         method: GET
       response:
         proto: HTTP/1.1
@@ -4309,7 +4217,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-1da0e916","logServers":[],"ntpServers":["192.0.0.1","192.0.0.2"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-663e25d4","logServers":[],"ntpServers":["192.0.0.1","192.0.0.2"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4366,7 +4274,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4398,10 +4306,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-1da0e916
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-663e25d4
         method: GET
       response:
         proto: HTTP/1.1
@@ -4411,7 +4317,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-1da0e916","logServers":[],"ntpServers":["192.0.0.1","192.0.0.2"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-663e25d4","logServers":[],"ntpServers":["192.0.0.1","192.0.0.2"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4468,7 +4374,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4500,10 +4406,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-1da0e916
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-663e25d4
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -4527,7 +4431,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - dopt-1da0e916
+                - dopt-663e25d4
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -4554,8 +4458,6 @@ interactions:
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions
         method: POST
       response:
@@ -4566,7 +4468,7 @@ interactions:
         trailer: {}
         content_length: 199
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-7d684acf","logServers":[],"ntpServers":["192.0.0.3","192.0.0.4"],"tags":[]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-75e86bf9","logServers":[],"ntpServers":["192.0.0.3","192.0.0.4"],"tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4604,13 +4506,11 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["dopt-7d684acf"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"resourceIds":["dopt-75e86bf9"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
         method: PATCH
       response:
@@ -4657,10 +4557,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-7d684acf
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-75e86bf9
         method: GET
       response:
         proto: HTTP/1.1
@@ -4670,7 +4568,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-7d684acf","logServers":[],"ntpServers":["192.0.0.3","192.0.0.4"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-75e86bf9","logServers":[],"ntpServers":["192.0.0.3","192.0.0.4"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4727,7 +4625,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4776,7 +4674,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4808,10 +4706,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-7d684acf
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-75e86bf9
         method: GET
       response:
         proto: HTTP/1.1
@@ -4821,7 +4717,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-7d684acf","logServers":[],"ntpServers":["192.0.0.3","192.0.0.4"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-75e86bf9","logServers":[],"ntpServers":["192.0.0.3","192.0.0.4"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4878,7 +4774,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4910,10 +4806,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-7d684acf
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-75e86bf9
         method: GET
       response:
         proto: HTTP/1.1
@@ -4923,7 +4817,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-7d684acf","logServers":[],"ntpServers":["192.0.0.3","192.0.0.4"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
+        body: '{"default":false,"domainName":"cloudgouv-eu-west-1.compute.internal","domainNameServers":["OutscaleProvidedDNS"],"id":"dopt-75e86bf9","logServers":[],"ntpServers":["192.0.0.3","192.0.0.4"],"tags":[{"key":"name","value":"terraform-dhcp-options-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -4980,7 +4874,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -5012,10 +4906,8 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-7d684acf
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/dhcpOptions/dopt-75e86bf9
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -5039,7 +4931,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - dopt-7d684acf
+                - dopt-75e86bf9
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0

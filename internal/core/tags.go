@@ -6,18 +6,23 @@ import (
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 // CreateTags Same as CreateTags but without using Diagnostics. Remove CreateTags when other function are reworked
 func CreateTags(
 	ctx context.Context,
-	provider services.IProvider,
+	provider *client.NumSpotSDK,
 	resourceId string,
 	tags []numspot.ResourceTag,
 ) error {
-	res, err := provider.GetNumspotClient().CreateTagsWithResponse(ctx, provider.GetSpaceID(), numspot.CreateTagsJSONRequestBody{
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+
+	res, err := numspotClient.CreateTagsWithResponse(ctx, provider.SpaceID, numspot.CreateTagsJSONRequestBody{
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})
@@ -33,7 +38,7 @@ func CreateTags(
 	return nil
 }
 
-func UpdateResourceTags(ctx context.Context, provider services.IProvider, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, resourceID string) (err error) {
+func UpdateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, resourceID string) (err error) {
 	toCreate, toDelete, toUpdate := Diff(stateTags, planTags)
 
 	toDeleteApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toDelete))
@@ -93,11 +98,15 @@ func UpdateResourceTags(ctx context.Context, provider services.IProvider, stateT
 
 func DeleteTags(
 	ctx context.Context,
-	provider services.IProvider,
+	provider *client.NumSpotSDK,
 	resourceId string,
 	tags []numspot.ResourceTag,
 ) error {
-	res, err := provider.GetNumspotClient().DeleteTagsWithResponse(ctx, provider.GetSpaceID(), numspot.DeleteTagsJSONRequestBody{
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return err
+	}
+	res, err := numspotClient.DeleteTagsWithResponse(ctx, provider.SpaceID, numspot.DeleteTagsJSONRequestBody{
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})

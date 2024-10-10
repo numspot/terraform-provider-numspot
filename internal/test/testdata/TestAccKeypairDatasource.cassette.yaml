@@ -31,7 +31,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -47,9 +47,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -83,7 +80,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -99,9 +96,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -121,8 +115,6 @@ interactions:
         headers:
             Content-Type:
                 - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs
         method: POST
       response:
@@ -131,9 +123,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 1828
+        content_length: 1832
         uncompressed: false
-        body: '{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","privateKey":"-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEApuj3BZzREt92VsBaH7822c6OYPA01deRdJR2hr5AI/n4Y5xRQ6UjW4Dk9Nyy\nPMg4GmN/xYyixkdLXH1qkvfq4cHrUBUpBQWQG8f5kFYCrm+aJ6PWcqXQV/gMi9W3VkOHT6DuycnP\nnve0sUTuh68bbUYGwEG11bV09WHaowbRggH2wTFLRPfqzzt1hacwEXvVQMvOV5/MvFJPjy7t40lZ\n3g7jQDfkPABo9P7Jymklo9cvm5qZsBnhjU0cD2Eu3MmZV2TtTyvK6nvmEeUeQZw5wxPyNYfTQO1c\nJVL2+NixfLpEFKxoLx80f6Id/3DH56wUWo0OTdm+XF6wWSj9mBLBGwIDAQABAoIBAH0Ww2q1aAtY\n5fuGFQUN7TG3GAWWgEJzWFOioGHDW5aa1IjysgScUq9VHkJU1E+xTjqYrz2CdMtcyyH57FFQ8/tV\nteFCuodE8AeiC2scys2oXkOvChzKICaNg/mYpdpEqbgHyG36jVt6ETV5j7qohUmT3aNgm8IaSBlO\nyOi9R27Ci3pTrA51LQU3kSLdzaEPsn6O+enOGTssBz1VptWSvlthdd9onk2jk/YOmCoxrJsx2QFM\ntyj3K8RIXxQxiOdCYE+uwFRHHDSoz9OAYBC2USnSOSyp+7N1wAdOVQmStATARkSrz15bbbFGSoav\nVtUiw/lqs1N80wJysyR8lujOuAECgYEA3Ts0gKxejIMKQh1ezUe+4nNT5WuqK8ewRhO4SD4nCCQs\n7lcS3if7Zos0Hgy2/qBq/MGyWWa5mz7o54ceB6yRhsZN5/CTLS0AtGGNb4SKxpRaLtlDqGKze5SQ\npXc7HnHouoKyV6EUaa/ltki0Yz1mmxey2H7SJjvkaKxWnOKu+hsCgYEAwSRA7tyPImhwYXMBJMT0\n8zqKZm0d1HHtLwYExWbJ2+ZKhtiunZgV7h55JCiOZz5Ool/0bJ9yo3CVGTe4kRMDjqBFyMndegHB\nTi/vVmsO5YlQ5l77IgVPRUI7HQfnGV9mVscxRYUVYhB95u1Jd8KNOpGFZOpHK2JkXBxnqCuXxQEC\ngYASfDPy3HQ6AWkGBTY6qNgGS+SistBRQCo2cMdhIfBY+czXTWdCMM0M0GzWZfGUbQsDe5vPZIn1\nstf7IIsd0QmH3WH9E1j42V3JtK0AuG5wEU1HxNemZjjhBpTfforuDE6J5wnH0KnH+u6SwJhyAltk\nciJ7fH1KvI5lQKEsErTUKQKBgAe7q93kdtap19YPBLy0JhqW/XOcatVWumhnlUlSFEL5tYIwqs0k\nibw+/Bq2hP0dQYi+zsqKl8xzdYTM9lbYrAvJ3wFrE7MO3u6CfNK49p+6H8MZinSSQdpEDJnc9yPM\n7gwLba2a5oBGqMPWPFrPL1ho+y5PMwpJpjsJ6ByTokABAoGAe10lNqZh2emr3NLZlrIptC0zOc/g\nOCV1DyFJyMYRrVULtkvRe/p5HMfoIcJNFEoEzz+AXk1y6cnT3sDKxJF+5PRBsKtXGjv3qvdBRy99\n2eI8JOcX6m/q3ylDrjyxsC6Ys29Isq93JHzSqyK5isBLMeah1a6SUAlj/5xqQYbv5kE=\n-----END RSA PRIVATE KEY-----","type":"ssh-rsa"}'
+        body: '{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","privateKey":"-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAw6nJM4kh1rPKEpNDAMMJBfeupZrhJnG7B+0BgZUJnbRRT5ZGwciPusAKjhg9\nckecuAel6FW8fCawTM6LnsJFldjo+OKEMrb6K3ccdaBUYLtwKa2zOZcP775Cyg9aNXJYzqeMZvhG\ndmxu+awQSIBw3q1jNPEpOIGekVhuuhLjjLbirn0xgDLknMp46qUTpcrMJJ5jrjHOQQVB7Magtawf\nn0sksAZXu0GutwLj43AzG24v1GE2gechfXOpALHIwdZSu9Tef/6IYoTBQEEL6gn6LhjtnjrhZ9f2\n3p0I5dhuEC6nRzxtHEhVmztP40p8WmB0hayPCqSVNuaWoNwEnh6uPwIDAQABAoIBAHyQzDoWFMf2\ngDBhNmf2wvjcnYBq4Oozv6mlFq9jrdKL6LQtbPCT+gUfm9ioz/3AX6K9o78NTkkP7G+Jk1PIRLrI\ndFF3DEipOw2O8DxmjTFkQ10Va6O/a3LrAuRW78xU9vrhqj4n09wy3lfvVhKCStlJM36SBfcmdkf8\nL8ogmmOLMNv2bBRETC+B+ATAz4TFzC2P/I5YQ26dBkWQPp2IyuLHqdkgyGIE85mVjMp0zOx7O2oL\nc2zEL3aUjLbQSlwUPXIEnEWB/zoDeB2oubeMTB/y2PUZwfGfcUkaAcqsFMXcmOq6PxgAmrvEJaPf\n0C6czWnZG7BCMY8jF8uAJ4IZBkkCgYEA9wDkoE8OGYZKycqn7xhx1gOxdnHoxXFcrX2nkKYQviIo\nhL2TfHZgz8KBALPVjAHhWUndJZbzf9c/jrrKX17KazKheDbXyWbCe5QKhDWqYt154N1HENYIL08L\nU95kX6iYcNF6PLUTnWHzsUNUXPx+6wSaItLgB+sNK4G5nqTng/0CgYEAysovxnOomQWQMrs8SJ0+\nQMX8ubSv9MKsLRGBd1BfebDOiYjckMCMMDHWxcotYsIziJRBCvu0XWKDrL4MEknOgeJXBx7IXLOf\njjhyDN24ya5xSL+7r13wIjf5W7awmcV5GaUNMvwYx3yzGjdZ26mpxpMzJCIiTn7NZJPK9ujZKesC\ngYEAtQVkiNAnRzGSUf1BwgqqMuyV/HZS35DLGSLD0VDDaHTkORQuqMKhBOJJZNhnIqqmGqf1ePz+\nC60WmWXvtqFju9hpWg7namTzF1pRsr8Z1kb2cYP59y7E5NcLODX+XdTTk6sR6LfUXj1ROZJcm6E4\n6sh+phLhuSvchQwXm1rDiYkCgYAZiX6csiHwKzgue0+rIUoepBAgXrWtz/oYrtSr7s4nJ/HKdha4\nj9bXlt8iB0TR4/zTXUAXnvzmqapFTaV9hBfiWVt2RRUcP25/XXJXVnCXzUTs0WBURDMiTAQ13Xq9\n0pVeel+AJSkFrhlr2r6RH/uGSzEsgrPpSKSa3tW3ZDk8wwKBgQDT+eJguWUjXYcQ02bmICuw35Pp\nzGfdNrupcCPfZthL+a8zWlzpLpNKcPXZWGtmPkLOjIDA1/BYrh6kUxo2kjXVuwyJ031JIONR/CFT\nkSCe3JZKxNhpWapjveSzc8o0v4WG6DpE007PpY0u6PRPHjRrh4DLn/jc60wtxh98nSJTSA==\n-----END RSA PRIVATE KEY-----","type":"ssh-rsa"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -142,7 +134,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "1828"
+                - "1832"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -173,9 +165,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs?keypairNames=key-pair-name-test-terraform
         method: GET
       response:
@@ -186,7 +176,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"items":[{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
+        body: '{"items":[{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -243,7 +233,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -259,9 +249,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -278,9 +265,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs?keypairNames=key-pair-name-test-terraform
         method: GET
       response:
@@ -291,7 +276,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"items":[{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
+        body: '{"items":[{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -348,7 +333,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -364,9 +349,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -383,9 +365,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs/key-pair-name-test-terraform
         method: GET
       response:
@@ -396,7 +376,7 @@ interactions:
         trailer: {}
         content_length: 120
         uncompressed: false
-        body: '{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","type":"ssh-rsa"}'
+        body: '{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","type":"ssh-rsa"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -436,9 +416,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs?keypairNames=key-pair-name-test-terraform
         method: GET
       response:
@@ -449,7 +427,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"items":[{"fingerprint":"75:39:b6:33:1f:c0:f1:df:33:3b:6b:b7:f2:ea:35:48","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
+        body: '{"items":[{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -506,7 +484,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -522,9 +500,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -558,7 +533,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -574,9 +549,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-            X-Krakend-Completed:
-                - "false"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -593,9 +565,7 @@ interactions:
         request_uri: ""
         body: ""
         form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
+        headers: {}
         url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs/key-pair-name-test-terraform
         method: DELETE
       response:

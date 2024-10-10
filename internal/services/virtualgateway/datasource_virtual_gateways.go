@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -35,7 +35,7 @@ func (d *virtualGatewaysDataSource) Configure(_ context.Context, request datasou
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -53,7 +53,7 @@ func NewVirtualGatewaysDataSource() datasource.DataSource {
 }
 
 type virtualGatewaysDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -74,13 +74,19 @@ func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource
 		return
 	}
 
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	params := VirtualGatewaysFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadVirtualGatewaysResponse, error) {
-		return d.provider.GetNumspotClient().ReadVirtualGatewaysWithResponse(ctx, d.provider.GetSpaceID(), &params)
+		return numspotClient.ReadVirtualGatewaysWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

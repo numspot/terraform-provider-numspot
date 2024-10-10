@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -38,7 +38,7 @@ func (d *vpnConnectionsDataSource) Configure(_ context.Context, request datasour
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -56,7 +56,7 @@ func NewVpnConnectionsDataSource() datasource.DataSource {
 }
 
 type vpnConnectionsDataSource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 // Metadata returns the data source type name.
@@ -76,6 +76,11 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 	if response.Diagnostics.HasError() {
 		return
 	}
+	numspotClient, err := d.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	params := VpnConnectionsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
@@ -83,7 +88,7 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 	}
 
 	res := utils.ExecuteRequest(func() (*numspot.ReadVpnConnectionsResponse, error) {
-		return d.provider.GetNumspotClient().ReadVpnConnectionsWithResponse(ctx, d.provider.GetSpaceID(), &params)
+		return numspotClient.ReadVpnConnectionsWithResponse(ctx, d.provider.SpaceID, &params)
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return

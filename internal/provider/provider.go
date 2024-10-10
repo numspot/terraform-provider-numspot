@@ -2,23 +2,17 @@ package provider
 
 import (
 	"context"
-	"crypto/tls"
-	"encoding/base64"
-	"fmt"
 	"net/http"
 	"os"
 
-	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
-	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/acl"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/clientgateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/dhcpoptions"
@@ -44,34 +38,32 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vpc"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vpcpeering"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vpnconnection"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
-
-var _ provider.Provider = (*numspotProvider)(nil)
-
-type Key string
-
-func New(version string, development bool, client *http.Client) func() provider.Provider {
-	return func() provider.Provider {
-		return &numspotProvider{
-			version:     version,
-			development: development,
-			client:      client,
-		}
-	}
-}
-
-type numspotProvider struct {
-	version     string
-	development bool
-	client      *http.Client
-}
 
 type NumspotProviderModel struct {
 	NumSpotHost  types.String `tfsdk:"numspot_host"`
 	ClientId     types.String `tfsdk:"client_id"`
 	ClientSecret types.String `tfsdk:"client_secret"`
 	SpaceId      types.String `tfsdk:"space_id"`
+}
+
+var _ provider.Provider = (*numspotProvider)(nil)
+
+type numspotProvider struct {
+	version    string
+	httpClient *http.Client
+}
+
+func ProvideNumSpotProvider() func() provider.Provider {
+	return func() provider.Provider {
+		return &numspotProvider{}
+	}
+}
+
+func ProvideNumSpotProviderWithHTTPClient(client *http.Client) func() provider.Provider {
+	return func() provider.Provider {
+		return &numspotProvider{httpClient: client}
+	}
 }
 
 func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
@@ -95,47 +87,6 @@ func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest
 			},
 		},
 	}
-}
-
-func (p *numspotProvider) authenticateUser(ctx context.Context, NumspotClient *numspot.ClientWithResponses, data *NumspotProviderModel) (*string, error) {
-	var diags diag.Diagnostics
-	clientUuid := utils.ParseUUID(data.ClientId.ValueString(), &diags)
-	if diags.HasError() {
-		return nil, fmt.Errorf("Error while parsing %s as UUID", data.ClientId.ValueString())
-	}
-	body := numspot.TokenReq{
-		GrantType:    "client_credentials",
-		ClientId:     &clientUuid,
-		ClientSecret: data.ClientSecret.ValueStringPointer(),
-	}
-
-	basicAuth := buildBasicAuth(data.ClientId.ValueString(), data.ClientSecret.ValueString())
-	response, err := NumspotClient.TokenWithFormdataBodyWithResponse(ctx, &numspot.TokenParams{
-		Authorization: &basicAuth,
-	}, body)
-	if err != nil {
-		return nil, err
-	}
-
-	return &response.JSON200.AccessToken, nil
-}
-
-func buildBasicAuth(username, password string) string {
-	auth := username + ":" + password
-	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
-}
-
-type Provider struct {
-	SpaceID       numspot.SpaceId
-	NumspotClient *numspot.ClientWithResponses
-}
-
-func (p Provider) GetSpaceID() numspot.SpaceId {
-	return p.SpaceID
-}
-
-func (p Provider) GetNumspotClient() *numspot.ClientWithResponses {
-	return p.NumspotClient
 }
 
 func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -244,84 +195,24 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	config.ClientId = types.StringValue(clientID)
 	config.ClientSecret = types.StringValue(clientSecret)
 
-	// Create a new Numspot provider using the configuration values
-	var (
-		numspotClient     *numspot.ClientWithResponses
-		defaulthttpclient *http.Client
-	)
-
-	if p.client != nil {
-		defaulthttpclient = p.client
-	} else {
-		defaulthttpclient = &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			},
-		}
-	}
-	httpClient := func(c *numspot.Client) error {
-		c.Client = defaulthttpclient
-		return nil
+	options := []client.Option{
+		client.WithHost(config.NumSpotHost.ValueString()),
+		client.WithSpaceID(spaceId),
+		client.WithClientID(config.ClientId.ValueString()),
+		client.WithClientSecret(config.ClientSecret.ValueString()),
 	}
 
-	requestEditor := numspot.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
-		req.Header.Add("User-Agent", "TERRAFORM-NUMSPOT")
-		return nil
-	})
-
-	numspotClient, err := numspot.NewClientWithResponses(config.NumSpotHost.ValueString(), httpClient, requestEditor)
+	if p.httpClient != nil {
+		options = append(options, client.WithHTTPClient(p.httpClient))
+	}
+	numSpotSDK, err := client.NewNumSpotSDK(ctx, options...)
 	if err != nil {
-		resp.Diagnostics.AddError("Auth error", "failed to get access token")
+		resp.Diagnostics.AddError("Error initializing Numspot SDK", err.Error())
 		return
 	}
 
-	accessToken, err := p.authenticateUser(ctx, numspotClient, &config)
-	if err != nil {
-		resp.Diagnostics.AddError("Auth error", "failed to get access token")
-		return
-	}
-
-	if accessToken == nil {
-		resp.Diagnostics.AddError("Failed to retrieve access token", "returned access token is nil")
-		return
-	}
-
-	if *accessToken == "" {
-		resp.Diagnostics.AddError("Failed to retrieve access token", "returned access token is nil")
-		return
-	}
-
-	bearerProvider, err := securityprovider.NewSecurityProviderBearerToken(*accessToken)
-	if err != nil {
-		resp.Diagnostics.AddError("Failed to create bearer provider token", err.Error())
-		return
-	}
-
-	numspotClient, err = numspot.NewClientWithResponses(config.NumSpotHost.ValueString(), httpClient, requestEditor, numspot.WithRequestEditorFn(bearerProvider.Intercept))
-	if err != nil {
-		resp.Diagnostics.AddError("Failed to create bearer provider token", err.Error())
-		return
-	}
-
-	// Make the Numspot provider available during DataSource and Resource
-	// type Configure methods.
-	spaceUuid, err := uuid.Parse(spaceId)
-	if err != nil {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("space_id"),
-			"Missing Numspot Client ID",
-			"Failed to parse Space ID, please provide a valid Space ID.",
-		)
-		return
-	}
-
-	providerData := Provider{
-		SpaceID:       spaceUuid,
-		NumspotClient: numspotClient,
-	}
-
-	resp.DataSourceData = providerData
-	resp.ResourceData = providerData
+	resp.DataSourceData = numSpotSDK
+	resp.ResourceData = numSpotSDK
 }
 
 func (p *numspotProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {

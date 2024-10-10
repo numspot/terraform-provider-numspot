@@ -79,7 +79,7 @@ func cassetteSanitizer(i *cassette.Interaction) error {
 	// remove plain body containing client_id and client_secret for iam/token endpoint
 	if strings.HasSuffix(i.Request.URL, "iam/token") {
 		i.Request.Body = ""
-		i.Response.Body = `{"access_token": "just a fake token"}`
+		i.Response.Body = `{"access_token": "just a fake token","expires_in": 3600}`
 	}
 	return nil
 }

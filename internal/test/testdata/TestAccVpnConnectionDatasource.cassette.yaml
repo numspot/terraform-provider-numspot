@@ -31,7 +31,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: ''
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -83,7 +83,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: ''
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1313,7 +1313,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: ''
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1418,7 +1418,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: ''
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1735,7 +1735,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: ''
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1787,7 +1787,7 @@ interactions:
         trailer: {}
         content_length: 1229
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: ''
         headers:
             Api-Gateway-Completed:
                 - "false"

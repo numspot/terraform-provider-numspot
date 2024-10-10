@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -23,7 +23,7 @@ var (
 )
 
 type SecurityGroupResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewSecurityGroupResource() resource.Resource {
@@ -35,7 +35,7 @@ func (r *SecurityGroupResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -65,6 +65,12 @@ func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, exis
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	rules := make([]numspot.SecurityGroupRule, 0, len(*existingRules))
 	for _, e := range *existingRules {
 		rules = append(rules, numspot.SecurityGroupRule{
@@ -82,7 +88,7 @@ func (r *SecurityGroupResource) deleteRules(ctx context.Context, id string, exis
 			Flow:  flow,
 			Rules: &rules,
 		}
-		return r.provider.GetNumspotClient().DeleteSecurityGroupRuleWithResponse(ctx, r.provider.GetSpaceID(), id, body)
+		return numspotClient.DeleteSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
 	}, http.StatusNoContent, diags)
 }
 
@@ -97,10 +103,15 @@ func createRules[RulesType any](
 ) {
 	rules := make([]RulesType, 0, len(rulesToCreate.Elements()))
 	rulesToCreate.ElementsAs(ctx, &rules, false)
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
 
 	_ = utils.ExecuteRequest(func() (*numspot.CreateSecurityGroupRuleResponse, error) {
 		body := fun(ctx, id, rules)
-		return r.provider.GetNumspotClient().CreateSecurityGroupRuleWithResponse(ctx, r.provider.GetSpaceID(), id, body)
+		return numspotClient.CreateSecurityGroupRuleWithResponse(ctx, r.provider.SpaceID, id, body)
 	}, http.StatusCreated, diags)
 }
 
@@ -150,12 +161,18 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		SecurityGroupFromTfToCreateRequest(&data),
-		r.provider.GetNumspotClient().CreateSecurityGroupWithResponse)
+		numspotClient.CreateSecurityGroupWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Security Group", err.Error())
 		return
@@ -168,7 +185,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 	// Create tags
 	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, id, data.Tags)
+		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, id, data.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -197,6 +214,9 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	res := r.readSecurityGroup(ctx, data.Id.ValueString(), &response.Diagnostics)
 	if response.Diagnostics.HasError() || res == nil {
@@ -215,7 +235,13 @@ func (r *SecurityGroupResource) readSecurityGroup(
 	id string,
 	diagnostics *diag.Diagnostics,
 ) *numspot.ReadSecurityGroupsByIdResponse {
-	res, err := r.provider.GetNumspotClient().ReadSecurityGroupsByIdWithResponse(ctx, r.provider.GetSpaceID(), id)
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return nil
+	}
+
+	res, err := numspotClient.ReadSecurityGroupsByIdWithResponse(ctx, r.provider.SpaceID, id)
 	if err != nil {
 		diagnostics.AddError("Failed to read RouteTable", err.Error())
 		return nil
@@ -238,6 +264,12 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	securityGroupId := state.Id.ValueString()
 
 	// update tags
@@ -247,8 +279,8 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
+			numspotClient,
+			r.provider.SpaceID,
 			securityGroupId,
 		)
 		if response.Diagnostics.HasError() {
@@ -278,8 +310,17 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteSecurityGroupWithResponse)
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteSecurityGroupWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Security Group", err.Error())
 		return

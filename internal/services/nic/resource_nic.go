@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -22,7 +22,7 @@ var (
 )
 
 type NicResource struct {
-	provider services.IProvider
+	provider *client.NumSpotSDK
 }
 
 func NewNicResource() resource.Resource {
@@ -34,7 +34,7 @@ func (r *NicResource) Configure(ctx context.Context, request resource.ConfigureR
 		return
 	}
 
-	provider, ok := request.ProviderData.(services.IProvider)
+	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -66,12 +66,18 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		NicFromTfToCreateRequest(ctx, &plan, &response.Diagnostics),
-		r.provider.GetNumspotClient().CreateNicWithResponse)
+		numspotClient.CreateNicWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create NIC", err.Error())
 		return
@@ -79,7 +85,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 
 	createdId := *res.JSON201.Id
 	if len(plan.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, r.provider.GetNumspotClient(), r.provider.GetSpaceID(), &response.Diagnostics, createdId, plan.Tags)
+		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
@@ -105,8 +111,18 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 	var data NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	res := utils.ExecuteRequest(func() (*numspot.ReadNicsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadNicsByIdWithResponse(ctx, r.provider.GetSpaceID(), data.Id.ValueString())
+		return numspotClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -129,6 +145,12 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	nicId := state.Id.ValueString()
 
 	// Update tags
@@ -138,8 +160,8 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 			state.Tags,
 			plan.Tags,
 			&response.Diagnostics,
-			r.provider.GetNumspotClient(),
-			r.provider.GetSpaceID(),
+			numspotClient,
+			r.provider.SpaceID,
 			nicId,
 		)
 		if response.Diagnostics.HasError() {
@@ -159,7 +181,7 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 	// Update Nic
 	if r.shouldUpdate(plan, state) {
 		body := NicFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
-		res, err := r.provider.GetNumspotClient().UpdateNicWithResponse(ctx, r.provider.GetSpaceID(), nicId, body)
+		res, err := numspotClient.UpdateNicWithResponse(ctx, r.provider.SpaceID, nicId, body)
 		if err != nil {
 			response.Diagnostics.AddError("failed to update nic", err.Error())
 			return
@@ -172,7 +194,7 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 
 	// Read resource
 	res := utils.ExecuteRequest(func() (*numspot.ReadNicsByIdResponse, error) {
-		return r.provider.GetNumspotClient().ReadNicsByIdWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString())
+		return numspotClient.ReadNicsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
 	}, http.StatusOK, &response.Diagnostics)
 	if res == nil {
 		return
@@ -193,6 +215,12 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 		return
 	}
 
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+
 	if !utils.IsTfValueNull(data.LinkNic) {
 		tf := r.unlinkNIC(ctx, &data, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
@@ -201,7 +229,7 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 		response.Diagnostics.Append(request.State.Set(ctx, tf)...)
 	}
 
-	err := utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.GetSpaceID(), data.Id.ValueString(), r.provider.GetNumspotClient().DeleteNicWithResponse)
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteNicWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to delete Nic", err.Error())
 		return
@@ -233,8 +261,14 @@ func (r *NicResource) updateLinkNIC(ctx context.Context, plan, state *NicModel, 
 }
 
 func (r *NicResource) linkNIC(ctx context.Context, plan, state *NicModel, diags *diag.Diagnostics) *NicModel {
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return nil
+	}
+
 	resLink := utils.ExecuteRequest(func() (*numspot.LinkNicResponse, error) {
-		return r.provider.GetNumspotClient().LinkNicWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString(), NicFromTfToLinkNICRequest(plan))
+		return numspotClient.LinkNicWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString(), NicFromTfToLinkNICRequest(plan))
 	}, http.StatusOK, diags)
 	if resLink == nil {
 		return nil
@@ -250,8 +284,13 @@ func (r *NicResource) linkNIC(ctx context.Context, plan, state *NicModel, diags 
 
 func (r *NicResource) unlinkNIC(ctx context.Context, state *NicModel, diags *diag.Diagnostics) *NicModel {
 	payload := numspot.UnlinkNicJSONRequestBody{LinkNicId: state.LinkNic.Id.ValueString()}
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return nil
+	}
 	resLink := utils.ExecuteRequest(func() (*numspot.UnlinkNicResponse, error) {
-		return r.provider.GetNumspotClient().UnlinkNicWithResponse(ctx, r.provider.GetSpaceID(), state.Id.ValueString(), payload)
+		return numspotClient.UnlinkNicWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString(), payload)
 	}, http.StatusNoContent, diags)
 	if resLink == nil {
 		return nil
@@ -266,14 +305,20 @@ func (r *NicResource) unlinkNIC(ctx context.Context, state *NicModel, diags *dia
 }
 
 func (r *NicResource) refreshNICState(ctx context.Context, id string, startState, targetState []string, diags *diag.Diagnostics) *NicModel {
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		diags.AddError("Error while initiating numspotClient", err.Error())
+		return nil
+	}
+
 	// Retries read on resource until state is OK
 	readRes, err := utils.RetryReadUntilStateValid(
 		ctx,
 		id,
-		r.provider.GetSpaceID(),
+		r.provider.SpaceID,
 		startState,
 		targetState,
-		r.provider.GetNumspotClient().ReadNicsByIdWithResponse,
+		numspotClient.ReadNicsByIdWithResponse,
 	)
 	if err != nil {
 		diags.AddError("Failed to read NIC", fmt.Sprintf("Error waiting for instance (%s) to be created/updated: %s", id, err))
