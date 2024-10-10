@@ -127,7 +127,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -170,7 +170,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
         method: GET
       response:
         proto: HTTP/1.1
@@ -180,7 +180,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -218,7 +218,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-235cacf5"}'
         form: {}
         headers:
             Content-Type:
@@ -235,7 +235,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -267,28 +267,30 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 28
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: ""
+        body: '{"mapPublicIpOnLaunch":true}'
         form: {}
         headers:
+            Content-Type:
+                - application/json
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
-        method: GET
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
+        method: PUT
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 201
+        content_length: 200
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -297,7 +299,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "201"
+                - "200"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -320,21 +322,19 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 28
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"mapPublicIpOnLaunch":true}'
+        body: ""
         form: {}
         headers:
-            Content-Type:
-                - application/json
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
-        method: PUT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
+        method: GET
       response:
         proto: HTTP/1.1
         proto_major: 1
@@ -343,7 +343,7 @@ interactions:
         trailer: {}
         content_length: 200
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -375,66 +375,13 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 200
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "200"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 8
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
         content_length: 91
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["subnet-94212c4f"],"tags":[{"key":"name","value":"Terraform-Test-Subnet"}]}'
+        body: '{"resourceIds":["subnet-1c1c4eaa"],"tags":[{"key":"name","value":"Terraform-Test-Subnet"}]}'
         form: {}
         headers:
             Content-Type:
@@ -474,7 +421,7 @@ interactions:
         status: 204 No Content
         code: 204
         duration: 5ms
-    - id: 9
+    - id: 8
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -490,7 +437,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
         method: GET
       response:
         proto: HTTP/1.1
@@ -500,7 +447,7 @@ interactions:
         trailer: {}
         content_length: 246
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -524,6 +471,55 @@ interactions:
             X-Krakend-Completed:
                 - "false"
                 - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 9
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
         status: 200 OK
         code: 200
         duration: 5ms
@@ -581,47 +577,51 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 117
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
         body: ""
-        form:
-            grant_type:
-                - client_credentials
+        form: {}
         headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
+        method: GET
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 1229
+        content_length: 132
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
+            Cache-Control:
+                - public, max-age=300
             Connection:
                 - keep-alive
             Content-Length:
-                - "1229"
+                - "132"
             Content-Type:
-                - application/json
+                - application/json; charset=utf-8
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
+                - Origin
             X-Krakend:
                 - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -641,7 +641,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
         method: GET
       response:
         proto: HTTP/1.1
@@ -649,9 +649,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 132
+        content_length: 246
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -660,7 +660,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "132"
+                - "246"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -683,51 +683,47 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 117
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
         body: ""
-        form: {}
+        form:
+            grant_type:
+                - client_credentials
         headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
-        method: GET
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 246
+        content_length: 1229
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"access_token": "just a fake token"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
-            Cache-Control:
-                - public, max-age=300
             Connection:
                 - keep-alive
             Content-Length:
-                - "246"
+                - "1229"
             Content-Type:
-                - application/json; charset=utf-8
+                - application/json
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
-                - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -736,55 +732,6 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 15
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
         content_length: 0
         transfer_encoding: []
         trailer: {}
@@ -796,7 +743,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
         method: GET
       response:
         proto: HTTP/1.1
@@ -806,7 +753,7 @@ interactions:
         trailer: {}
         content_length: 246
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -833,7 +780,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 16
+    - id: 15
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -882,7 +829,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 17
+    - id: 16
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -898,7 +845,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
         method: GET
       response:
         proto: HTTP/1.1
@@ -908,7 +855,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -935,7 +882,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 18
+    - id: 17
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -951,7 +898,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
         method: GET
       response:
         proto: HTTP/1.1
@@ -961,7 +908,7 @@ interactions:
         trailer: {}
         content_length: 246
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -988,7 +935,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 19
+    - id: 18
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1037,7 +984,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 20
+    - id: 19
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1048,7 +995,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["subnet-94212c4f"],"tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}]}'
+        body: '{"resourceIds":["subnet-1c1c4eaa"],"tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}]}'
         form: {}
         headers:
             Content-Type:
@@ -1090,7 +1037,7 @@ interactions:
         status: 204 No Content
         code: 204
         duration: 5ms
-    - id: 21
+    - id: 20
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1101,7 +1048,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["subnet-94212c4f"],"tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}]}'
+        body: '{"resourceIds":["subnet-1c1c4eaa"],"tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}]}'
         form: {}
         headers:
             Content-Type:
@@ -1141,7 +1088,7 @@ interactions:
         status: 204 No Content
         code: 204
         duration: 5ms
-    - id: 22
+    - id: 21
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1157,7 +1104,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
         method: GET
       response:
         proto: HTTP/1.1
@@ -1167,7 +1114,7 @@ interactions:
         trailer: {}
         content_length: 254
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1194,7 +1141,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 23
+    - id: 22
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1212,7 +1159,7 @@ interactions:
                 - application/json
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
         method: PUT
       response:
         proto: HTTP/1.1
@@ -1222,7 +1169,60 @@ interactions:
         trailer: {}
         content_length: 255
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-235cacf5"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "255"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 23
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 255
+        uncompressed: false
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1254,51 +1254,47 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 117
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
         body: ""
-        form: {}
+        form:
+            grant_type:
+                - client_credentials
         headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
-        method: GET
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 255
+        content_length: 1229
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"access_token": "just a fake token"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
-            Cache-Control:
-                - public, max-age=300
             Connection:
                 - keep-alive
             Content-Length:
-                - "255"
+                - "1229"
             Content-Type:
-                - application/json; charset=utf-8
+                - application/json
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
-                - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -1356,47 +1352,51 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 117
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
         body: ""
-        form:
-            grant_type:
-                - client_credentials
+        form: {}
         headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
+        method: GET
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 1229
+        content_length: 132
         uncompressed: false
-        body: '{"access_token": "just a fake token"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
+            Cache-Control:
+                - public, max-age=300
             Connection:
                 - keep-alive
             Content-Length:
-                - "1229"
+                - "132"
             Content-Type:
-                - application/json
+                - application/json; charset=utf-8
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
+                - Origin
             X-Krakend:
                 - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -1416,7 +1416,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
         method: GET
       response:
         proto: HTTP/1.1
@@ -1424,9 +1424,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 132
+        content_length: 255
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1435,7 +1435,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "132"
+                - "255"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -1458,59 +1458,6 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 255
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-4e4c6da9"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "255"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 29
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
         content_length: 117
         transfer_encoding: []
         trailer: {}
@@ -1555,6 +1502,59 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
+    - id: 29
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 132
+        uncompressed: false
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "132"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
     - id: 30
       request:
         proto: HTTP/1.1
@@ -1571,7 +1571,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
         method: GET
       response:
         proto: HTTP/1.1
@@ -1579,9 +1579,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 132
+        content_length: 255
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-1c1c4eaa","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1590,7 +1590,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "132"
+                - "255"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -1613,59 +1613,6 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 255
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-94212c4f","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-4e4c6da9"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "255"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 32
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
         content_length: 117
         transfer_encoding: []
         trailer: {}
@@ -1710,7 +1657,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 33
+    - id: 32
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1726,7 +1673,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-94212c4f
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-1c1c4eaa
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1750,7 +1697,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - subnet-94212c4f
+                - subnet-1c1c4eaa
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -1761,7 +1708,7 @@ interactions:
         status: 204 No Content
         code: 204
         duration: 5ms
-    - id: 34
+    - id: 33
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1772,7 +1719,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"availabilityZoneName":"","ipRange":"10.101.2.0/24","vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"","ipRange":"10.101.2.0/24","vpcId":"vpc-235cacf5"}'
         form: {}
         headers:
             Content-Type:
@@ -1789,7 +1736,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-9869bbc7","ipRange":"10.101.2.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-a5bd4aaf","ipRange":"10.101.2.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1816,6 +1763,57 @@ interactions:
         status: 201 Created
         code: 201
         duration: 5ms
+    - id: 34
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 99
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"resourceIds":["subnet-a5bd4aaf"],"tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}]}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
+        method: PATCH
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "false"
+        status: 204 No Content
+        code: 204
+        duration: 5ms
     - id: 35
       request:
         proto: HTTP/1.1
@@ -1832,7 +1830,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-9869bbc7
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-a5bd4aaf
         method: GET
       response:
         proto: HTTP/1.1
@@ -1840,9 +1838,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 201
+        content_length: 255
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-9869bbc7","ipRange":"10.101.2.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-a5bd4aaf","ipRange":"10.101.2.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1851,7 +1849,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "201"
+                - "255"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -1874,102 +1872,96 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 99
+        content_length: 117
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["subnet-9869bbc7"],"tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}]}'
-        form: {}
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
         headers:
             Content-Type:
-                - application/json
+                - application/x-www-form-urlencoded
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
-        method: PATCH
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 0
+        content_length: 1229
         uncompressed: false
-        body: ""
+        body: '{"access_token": "just a fake token"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
+            Content-Length:
+                - "1229"
             Content-Type:
-                - application/json; charset=utf-8
+                - application/json
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
-                - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "false"
-        status: 204 No Content
-        code: 204
+        status: 200 OK
+        code: 200
         duration: 5ms
     - id: 37
       request:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 117
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
         body: ""
-        form: {}
+        form:
+            grant_type:
+                - client_credentials
         headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-9869bbc7
-        method: GET
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 255
+        content_length: 1229
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-9869bbc7","ipRange":"10.101.2.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"access_token": "just a fake token"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
-            Cache-Control:
-                - public, max-age=300
             Connection:
                 - keep-alive
             Content-Length:
-                - "255"
+                - "1229"
             Content-Type:
-                - application/json; charset=utf-8
+                - application/json
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
-                - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -1978,104 +1970,6 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 39
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 40
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
         content_length: 0
         transfer_encoding: []
         trailer: {}
@@ -2087,7 +1981,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
         method: GET
       response:
         proto: HTTP/1.1
@@ -2097,7 +1991,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2124,6 +2018,108 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
+    - id: 39
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-a5bd4aaf
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 255
+        uncompressed: false
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-a5bd4aaf","ipRange":"10.101.2.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-235cacf5"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "255"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 40
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
     - id: 41
       request:
         proto: HTTP/1.1
@@ -2140,7 +2136,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-9869bbc7
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
         method: GET
       response:
         proto: HTTP/1.1
@@ -2148,9 +2144,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 255
+        content_length: 132
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-9869bbc7","ipRange":"10.101.2.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2159,7 +2155,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "255"
+                - "132"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -2182,55 +2178,6 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 43
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
         content_length: 0
         transfer_encoding: []
         trailer: {}
@@ -2242,60 +2189,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 132
-        uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "132"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 44
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-9869bbc7
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-a5bd4aaf
         method: GET
       response:
         proto: HTTP/1.1
@@ -2305,7 +2199,7 @@ interactions:
         trailer: {}
         content_length: 255
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-9869bbc7","ipRange":"10.101.2.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-a5bd4aaf","ipRange":"10.101.2.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet-Updated"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2332,7 +2226,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 45
+    - id: 43
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -2381,7 +2275,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 46
+    - id: 44
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -2397,7 +2291,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-9869bbc7
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-a5bd4aaf
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2421,7 +2315,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - subnet-9869bbc7
+                - subnet-a5bd4aaf
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -2432,7 +2326,7 @@ interactions:
         status: 204 No Content
         code: 204
         duration: 5ms
-    - id: 47
+    - id: 45
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -2443,7 +2337,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-235cacf5"}'
         form: {}
         headers:
             Content-Type:
@@ -2460,7 +2354,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-71ff29b8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-76da35f8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2487,60 +2381,7 @@ interactions:
         status: 201 Created
         code: 201
         duration: 5ms
-    - id: 48
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-71ff29b8
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 201
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-71ff29b8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "201"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 49
+    - id: 46
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -2558,7 +2399,7 @@ interactions:
                 - application/json
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-71ff29b8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-76da35f8
         method: PUT
       response:
         proto: HTTP/1.1
@@ -2568,7 +2409,7 @@ interactions:
         trailer: {}
         content_length: 200
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-71ff29b8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-76da35f8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2595,7 +2436,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 50
+    - id: 47
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -2611,7 +2452,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-71ff29b8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-76da35f8
         method: GET
       response:
         proto: HTTP/1.1
@@ -2621,7 +2462,7 @@ interactions:
         trailer: {}
         content_length: 200
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-71ff29b8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-76da35f8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2648,7 +2489,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 51
+    - id: 48
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -2659,7 +2500,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["subnet-71ff29b8"],"tags":[{"key":"name","value":"Terraform-Test-Subnet"}]}'
+        body: '{"resourceIds":["subnet-76da35f8"],"tags":[{"key":"name","value":"Terraform-Test-Subnet"}]}'
         form: {}
         headers:
             Content-Type:
@@ -2699,7 +2540,7 @@ interactions:
         status: 204 No Content
         code: 204
         duration: 5ms
-    - id: 52
+    - id: 49
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -2715,7 +2556,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-71ff29b8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-76da35f8
         method: GET
       response:
         proto: HTTP/1.1
@@ -2725,7 +2566,7 @@ interactions:
         trailer: {}
         content_length: 246
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-71ff29b8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-76da35f8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2752,7 +2593,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 53
+    - id: 50
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -2798,6 +2639,161 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 51
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 52
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 132
+        uncompressed: false
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "132"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 53
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-76da35f8
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 246
+        uncompressed: false
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-76da35f8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-235cacf5"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "246"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -2866,7 +2862,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
         method: GET
       response:
         proto: HTTP/1.1
@@ -2876,7 +2872,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-235cacf5","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2919,7 +2915,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-71ff29b8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-76da35f8
         method: GET
       response:
         proto: HTTP/1.1
@@ -2929,7 +2925,7 @@ interactions:
         trailer: {}
         content_length: 246
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-71ff29b8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-76da35f8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-235cacf5"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3021,7 +3017,164 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-76da35f8
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Id:
+                - subnet-76da35f8
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "false"
+        status: 204 No Content
+        code: 204
+        duration: 5ms
+    - id: 59
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-235cacf5
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Id:
+                - vpc-235cacf5
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "false"
+        status: 204 No Content
+        code: 204
+        duration: 5ms
+    - id: 60
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 40
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"ipRange":"10.101.0.0/16","tenancy":""}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 132
+        uncompressed: false
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4fceae6c","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "132"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 201 Created
+        code: 201
+        duration: 5ms
+    - id: 61
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4fceae6c
         method: GET
       response:
         proto: HTTP/1.1
@@ -3031,7 +3184,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4e4c6da9","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4fceae6c","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3058,7 +3211,117 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 59
+    - id: 62
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 76
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-4fceae6c"}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 201
+        uncompressed: false
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-039dac6d","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-4fceae6c"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "201"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 201 Created
+        code: 201
+        duration: 5ms
+    - id: 63
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 28
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"mapPublicIpOnLaunch":true}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-039dac6d
+        method: PUT
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-039dac6d","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-4fceae6c"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 64
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -3074,7 +3337,111 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-71ff29b8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-039dac6d
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 200
+        uncompressed: false
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-039dac6d","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-4fceae6c"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "200"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 65
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 91
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"resourceIds":["subnet-039dac6d"],"tags":[{"key":"name","value":"Terraform-Test-Subnet"}]}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
+        method: PATCH
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "false"
+        status: 204 No Content
+        code: 204
+        duration: 5ms
+    - id: 66
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers:
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-039dac6d
         method: GET
       response:
         proto: HTTP/1.1
@@ -3084,7 +3451,7 @@ interactions:
         trailer: {}
         content_length: 246
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-71ff29b8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-4e4c6da9"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-039dac6d","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-4fceae6c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3111,7 +3478,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 60
+    - id: 67
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -3160,429 +3527,52 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 61
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-71ff29b8
-        method: DELETE
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 0
-        uncompressed: false
-        body: ""
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Id:
-                - subnet-71ff29b8
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "false"
-        status: 204 No Content
-        code: 204
-        duration: 5ms
-    - id: 62
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4e4c6da9
-        method: DELETE
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 0
-        uncompressed: false
-        body: ""
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Id:
-                - vpc-4e4c6da9
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "false"
-        status: 204 No Content
-        code: 204
-        duration: 5ms
-    - id: 63
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 40
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: '{"ipRange":"10.101.0.0/16","tenancy":""}'
-        form: {}
-        headers:
-            Content-Type:
-                - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 132
-        uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-358cf850","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "132"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 201 Created
-        code: 201
-        duration: 5ms
-    - id: 64
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-358cf850
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 132
-        uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-358cf850","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "132"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 65
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 76
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-358cf850"}'
-        form: {}
-        headers:
-            Content-Type:
-                - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 201
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-ad6e74f2","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-358cf850"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "201"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 201 Created
-        code: 201
-        duration: 5ms
-    - id: 66
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-ad6e74f2
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 201
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-ad6e74f2","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-358cf850"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "201"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 67
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 28
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: '{"mapPublicIpOnLaunch":true}'
-        form: {}
-        headers:
-            Content-Type:
-                - application/json
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-ad6e74f2
-        method: PUT
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 200
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-ad6e74f2","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-358cf850"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "200"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
     - id: 68
       request:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 117
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
         body: ""
-        form: {}
+        form:
+            grant_type:
+                - client_credentials
         headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-ad6e74f2
-        method: GET
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 200
+        content_length: 1229
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-ad6e74f2","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-358cf850"}'
+        body: '{"access_token": "just a fake token"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
-            Cache-Control:
-                - public, max-age=300
             Connection:
                 - keep-alive
             Content-Length:
-                - "200"
+                - "1229"
             Content-Type:
-                - application/json; charset=utf-8
+                - application/json
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
-                - Origin
             X-Krakend:
                 - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -3591,35 +3581,37 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 91
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"resourceIds":["subnet-ad6e74f2"],"tags":[{"key":"name","value":"Terraform-Test-Subnet"}]}'
+        body: ""
         form: {}
         headers:
-            Content-Type:
-                - application/json
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
-        method: PATCH
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4fceae6c
+        method: GET
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 0
+        content_length: 132
         uncompressed: false
-        body: ""
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-4fceae6c","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
+            Cache-Control:
+                - public, max-age=300
             Connection:
                 - keep-alive
+            Content-Length:
+                - "132"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -3633,9 +3625,9 @@ interactions:
                 - Version 2.6.3
             X-Krakend-Completed:
                 - "false"
-                - "false"
-        status: 204 No Content
-        code: 204
+                - "true"
+        status: 200 OK
+        code: 200
         duration: 5ms
     - id: 70
       request:
@@ -3653,7 +3645,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-ad6e74f2
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-039dac6d
         method: GET
       response:
         proto: HTTP/1.1
@@ -3663,7 +3655,7 @@ interactions:
         trailer: {}
         content_length: 246
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-ad6e74f2","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-358cf850"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-039dac6d","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-4fceae6c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -3804,26 +3796,22 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-358cf850
-        method: GET
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-039dac6d
+        method: DELETE
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 132
+        content_length: 0
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-358cf850","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: ""
         headers:
             Api-Gateway-Completed:
                 - "false"
-            Cache-Control:
-                - public, max-age=300
             Connection:
                 - keep-alive
-            Content-Length:
-                - "132"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -3831,15 +3819,17 @@ interactions:
             Vary:
                 - Origin
                 - Origin
+            X-Id:
+                - subnet-039dac6d
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
                 - Version 2.6.3
             X-Krakend-Completed:
                 - "false"
-                - "true"
-        status: 200 OK
-        code: 200
+                - "false"
+        status: 204 No Content
+        code: 204
         duration: 5ms
     - id: 74
       request:
@@ -3857,158 +3847,7 @@ interactions:
         headers:
             User-Agent:
                 - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-ad6e74f2
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 246
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-ad6e74f2","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[{"key":"name","value":"Terraform-Test-Subnet"}],"vpcId":"vpc-358cf850"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "246"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 75
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 76
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 77
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-ad6e74f2
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-4fceae6c
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -4032,58 +3871,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - subnet-ad6e74f2
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "false"
-        status: 204 No Content
-        code: 204
-        duration: 5ms
-    - id: 78
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-358cf850
-        method: DELETE
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 0
-        uncompressed: false
-        body: ""
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Id:
-                - vpc-358cf850
+                - vpc-4fceae6c
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
