@@ -22,13 +22,9 @@ func CreateSubnet(ctx context.Context, provider services.IProvider, payload nums
 	}
 
 	createdID := *res.JSON201.Id
-	_, err = RetryReadSubnet(ctx, provider, createdID)
-	if err != nil {
-		return nil, fmt.Errorf("Error waiting for instance (%s) to be created: %s", *res.JSON201.Id, err)
-	}
 
 	if mapPublicIPOnLaunch {
-		if _, err = UpdateSubnetAttributes(ctx, provider, createdID, true); err != nil {
+		if _, err = UpdateSubnetAttributes(ctx, provider, createdID, mapPublicIPOnLaunch); err != nil {
 			return nil, fmt.Errorf("failed to update MapPublicIPOnLaunch: %w", err)
 		}
 	}
@@ -39,7 +35,7 @@ func CreateSubnet(ctx context.Context, provider services.IProvider, payload nums
 		}
 	}
 
-	resRead, err := ReadSubnet(ctx, provider, createdID)
+	resRead, err := RetryReadSubnet(ctx, provider, createdID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read subnet: %w", err)
 	}
