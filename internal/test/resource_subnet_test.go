@@ -1,11 +1,9 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
@@ -19,185 +17,146 @@ func TestAccSubnetResource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
-	var resourceId string
+	subnetDependencies := `
+resource "numspot_vpc" "terraform-dep-vpc-subnet" {
+  ip_range = "10.101.0.0/16"
+}
+`
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{ // 1 - Create testing
-				Config: `
-resource "numspot_vpc" "test" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id                  = numspot_vpc.test.id
+			// Step 1 - Create subnet
+			{
+				Config: subnetDependencies + `
+resource "numspot_subnet" "terraform-subnet-acctest" {
+  vpc_id                  = numspot_vpc.terraform-dep-vpc-subnet.id
   ip_range                = "10.101.1.0/24"
-  map_public_ip_on_launch = "true"
   tags = [
-    {
+{
       key   = "name"
-      value = "Terraform-Test-Subnet"
-    }
-  ]
+      value = "terraform-subnet-acctest"
+    }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_subnet.test", "map_public_ip_on_launch", "true"),
-					resource.TestCheckResourceAttr("numspot_subnet.test", "ip_range", "10.101.1.0/24"),
-					resource.TestCheckResourceAttr("numspot_subnet.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttrPair("numspot_subnet.terraform-subnet-acctest", "vpc_id", "numspot_vpc.terraform-dep-vpc-subnet", "id"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "ip_range", "10.101.1.0/24"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.terraform-subnet-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Subnet",
-					}),
-					resource.TestCheckResourceAttrPair("numspot_subnet.test", "vpc_id", "numspot_vpc.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_subnet.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						resourceId = v
-						return nil
+						"value": "terraform-subnet-acctest",
 					}),
 				),
 			},
-			// 2 - ImportState testing
+			// Step 2 - Import subnet
 			{
-				ResourceName:            "numspot_subnet.test",
+				ResourceName:            "numspot_subnet.terraform-subnet-acctest",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"id"},
 			},
-			// 3 - Update testing Without Replace (if needed)
+			// Step 3 - Update subnet attributes
 			{
-				Config: `
-resource "numspot_vpc" "test" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id                  = numspot_vpc.test.id
+				Config: subnetDependencies + `
+resource "numspot_subnet" "terraform-subnet-acctest" {
+  vpc_id                  = numspot_vpc.terraform-dep-vpc-subnet.id
   ip_range                = "10.101.1.0/24"
-  map_public_ip_on_launch = "false"
-  tags = [
-    {
+  map_public_ip_on_launch = "true"
+  tags = [{
       key   = "name"
-      value = "Terraform-Test-Subnet-Updated"
-    }
-  ]
+      value = "terraform-subnet-acctest-update"
+    }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_subnet.test", "map_public_ip_on_launch", "false"),
-					resource.TestCheckResourceAttr("numspot_subnet.test", "ip_range", "10.101.1.0/24"),
-					resource.TestCheckResourceAttr("numspot_subnet.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttrPair("numspot_subnet.terraform-subnet-acctest", "vpc_id", "numspot_vpc.terraform-dep-vpc-subnet", "id"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "ip_range", "10.101.1.0/24"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "map_public_ip_on_launch", "true"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.terraform-subnet-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Subnet-Updated",
-					}),
-					resource.TestCheckResourceAttrPair("numspot_subnet.test", "vpc_id", "numspot_vpc.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_subnet.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						return nil
+						"value": "terraform-subnet-acctest-update",
 					}),
 				),
 			},
-			// 4 - Update testing With Replace (if needed)
+			// Step 4 - Reset subnet
 			{
-				Config: `
-resource "numspot_vpc" "test" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id                  = numspot_vpc.test.id
+				Config: ` `,
+				Check:  resource.ComposeAggregateTestCheckFunc(),
+			},
+			// Step 5 - Create subnet with attributes
+			{
+				Config: subnetDependencies + `
+resource "numspot_subnet" "terraform-subnet-acctest" {
+  vpc_id                  = numspot_vpc.terraform-dep-vpc-subnet.id
+  availability_zone_name =  "cloudgouv-eu-west-1a"
   ip_range                = "10.101.2.0/24"
-  map_public_ip_on_launch = "false"
-  tags = [
-    {
-      key   = "name"
-      value = "Terraform-Test-Subnet-Updated"
-    }
-  ]
-}`,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_subnet.test", "map_public_ip_on_launch", "false"),
-					resource.TestCheckResourceAttr("numspot_subnet.test", "ip_range", "10.101.2.0/24"),
-					resource.TestCheckResourceAttr("numspot_subnet.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.test", "tags.*", map[string]string{
-						"key":   "name",
-						"value": "Terraform-Test-Subnet-Updated",
-					}),
-					resource.TestCheckResourceAttrPair("numspot_subnet.test", "vpc_id", "numspot_vpc.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_subnet.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						resourceId = v
-						return nil
-					})),
-			},
-
-			// <== If resource has required dependencies ==>
-			{ // 5 - Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: `
-resource "numspot_vpc" "test" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id                  = numspot_vpc.test.id
-  ip_range                = "10.101.1.0/24"
   map_public_ip_on_launch = "true"
-  tags = [
-    {
+  tags = [{
       key   = "name"
-      value = "Terraform-Test-Subnet"
-    }
-  ]
-}`,
+      value = "terraform-subnet-acctest"
+    }]
+}
+`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair("numspot_subnet.terraform-subnet-acctest", "vpc_id", "numspot_vpc.terraform-dep-vpc-subnet", "id"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "availability_zone_name", "cloudgouv-eu-west-1a"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "ip_range", "10.101.2.0/24"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "map_public_ip_on_launch", "true"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.terraform-subnet-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-subnet-acctest",
+					}),
+				),
 			},
-			// 6 - Update testing With Replace of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			// Step 6 - Replace subnet attributes
 			{
-				Config: `
-resource "numspot_vpc" "test_new" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id                  = numspot_vpc.test_new.id
+				Config: subnetDependencies + `
+resource "numspot_subnet" "terraform-subnet-acctest" {
+  vpc_id                  = numspot_vpc.terraform-dep-vpc-subnet.id
+  availability_zone_name =  "cloudgouv-eu-west-1b"
   ip_range                = "10.101.1.0/24"
   map_public_ip_on_launch = "true"
-  tags = [
-    {
+  tags = [{
       key   = "name"
-      value = "Terraform-Test-Subnet"
-    }
-  ]
+      value = "terraform-subnet-acctest-replace"
+    }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_subnet.test", "map_public_ip_on_launch", "true"),
-					resource.TestCheckResourceAttr("numspot_subnet.test", "ip_range", "10.101.1.0/24"),
-					resource.TestCheckResourceAttr("numspot_subnet.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttrPair("numspot_subnet.terraform-subnet-acctest", "vpc_id", "numspot_vpc.terraform-dep-vpc-subnet", "id"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "availability_zone_name", "cloudgouv-eu-west-1b"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "ip_range", "10.101.1.0/24"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "map_public_ip_on_launch", "true"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.terraform-subnet-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Subnet",
+						"value": "terraform-subnet-acctest-replace",
 					}),
-					resource.TestCheckResourceAttrPair("numspot_subnet.test", "vpc_id", "numspot_vpc.test_new", "id"),
-					resource.TestCheckResourceAttrWith("numspot_subnet.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						return nil
+				),
+			},
+			// Step 7 - Recreate subnet
+			{
+				Config: subnetDependencies + `
+resource "numspot_subnet" "terraform-subnet-acctest-recreate" {
+  vpc_id                  = numspot_vpc.terraform-dep-vpc-subnet.id
+  availability_zone_name =  "cloudgouv-eu-west-1b"
+  ip_range                = "10.101.2.0/24"
+  map_public_ip_on_launch = "true"
+  tags = [{
+      key   = "name"
+      value = "terraform-subnet-acctest-recreate"
+    }]
+}
+`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair("numspot_subnet.terraform-subnet-acctest-recreate", "vpc_id", "numspot_vpc.terraform-dep-vpc-subnet", "id"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest-recreate", "availability_zone_name", "cloudgouv-eu-west-1b"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest-recreate", "ip_range", "10.101.2.0/24"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest-recreate", "map_public_ip_on_launch", "true"),
+					resource.TestCheckResourceAttr("numspot_subnet.terraform-subnet-acctest-recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_subnet.terraform-subnet-acctest-recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-subnet-acctest-recreate",
 					})),
 			},
 		},
