@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
+
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -77,54 +77,62 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	numSpotVM, err := core.CreateVM(ctx, r.provider, numSpotCreateVM, tagsValue)
+	numSpotVM, err := core.CreateVM(ctx, r.provider, deserializeCreateNumSpotVolume(plan), tagsValue, vmID, deviceName)
 	if err != nil {
-		response.Diagnostics.AddError("unable to create VM", err.Error())
+		response.Diagnostics.AddError("unable to create volume", err.Error())
 		return
 	}
 
-	state := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
+	// Retries create until request response is OK
+	//res, err := utils.RetryCreateUntilResourceAvailableWithBody(
+	//	ctx,
+	//	r.provider.SpaceID,
+	//	VmFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
+	//	numspotClient.CreateVmsWithResponse)
+	//if err != nil {
+	//	response.Diagnostics.AddError("Failed to create VM", err.Error())
+	//}
+	//if response.Diagnostics.HasError() {
+	//	return
+	//}
+	//
+	//vm := *res.JSON201
+	//createdId := *vm.Id
+	//
+	//// Create tags
+	//if len(data.Tags.Elements()) > 0 {
+	//	tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+	//	if response.Diagnostics.HasError() {
+	//		return
+	//	}
+	//}
+	//
+	//read, err := utils.RetryReadUntilStateValid(
+	//	ctx,
+	//	createdId,
+	//	r.provider.SpaceID,
+	//	[]string{"pending"},
+	//	[]string{"running", "stopped"}, // In some cases, when there is insufficient capacity the VM is created with state = stopped
+	//	numspotClient.ReadVmsByIdWithResponse,
+	//)
+	//if err != nil {
+	//	response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", createdId, err))
+	//	return
+	//}
+	//
+	//vmSchema, ok := read.(*numspot.Vm)
+	//if !ok {
+	//	response.Diagnostics.AddError("Failed to create VM", "object conversion error")
+	//	return
+	//}
+	//
+	//// In some cases, when there is insufficient capacity the VM is created with state = stopped
+	//if utils.GetPtrValue(vmSchema.State) == "stopped" {
+	//	response.Diagnostics.AddError("Issue while creating VM", fmt.Sprintf("VM was created in 'stopped' state. Reason : %s", utils.GetPtrValue(vmSchema.StateReason)))
+	//	return
+	//}
 
-	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
-}
-
-func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state VmModel
-	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	vmID := state.Id.ValueString()
-
-	numSpotVM, err := core.ReadVM(ctx, r.provider, vmID)
-	if err != nil {
-		response.Diagnostics.AddError("unable to read VM", err.Error())
-	}
-
-	newState := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
-}
-
-func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var (
-		err         error
-		state, plan VmModel
-		numSpotVM   *numspot.Vm
-	)
-
-	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	tf := VmFromHttpToTf(ctx, numSpotVM, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
