@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -105,6 +104,7 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
+
 func SubnetsFromTfToAPIReadParams(ctx context.Context, tf SubnetsDataSourceModel, diags *diag.Diagnostics) numspot.ReadSubnetsParams {
 	return numspot.ReadSubnetsParams{
 		AvailableIpsCounts:    utils.TFInt64ListToIntListPointer(ctx, tf.AvailableIpsCounts, diags),

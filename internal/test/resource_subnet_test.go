@@ -30,13 +30,13 @@ resource "numspot_vpc" "terraform-dep-vpc-subnet" {
 			{
 				Config: subnetDependencies + `
 resource "numspot_subnet" "terraform-subnet-acctest" {
-  vpc_id                  = numspot_vpc.terraform-dep-vpc-subnet.id
-  ip_range                = "10.101.1.0/24"
+  vpc_id   = numspot_vpc.terraform-dep-vpc-subnet.id
+  ip_range = "10.101.1.0/24"
   tags = [
-{
+    {
       key   = "name"
       value = "terraform-subnet-acctest"
-    }]
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair("numspot_subnet.terraform-subnet-acctest", "vpc_id", "numspot_vpc.terraform-dep-vpc-subnet", "id"),
@@ -63,9 +63,9 @@ resource "numspot_subnet" "terraform-subnet-acctest" {
   ip_range                = "10.101.1.0/24"
   map_public_ip_on_launch = "true"
   tags = [{
-      key   = "name"
-      value = "terraform-subnet-acctest-update"
-    }]
+    key   = "name"
+    value = "terraform-subnet-acctest-update"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair("numspot_subnet.terraform-subnet-acctest", "vpc_id", "numspot_vpc.terraform-dep-vpc-subnet", "id"),
@@ -88,13 +88,13 @@ resource "numspot_subnet" "terraform-subnet-acctest" {
 				Config: subnetDependencies + `
 resource "numspot_subnet" "terraform-subnet-acctest" {
   vpc_id                  = numspot_vpc.terraform-dep-vpc-subnet.id
-  availability_zone_name =  "cloudgouv-eu-west-1a"
+  availability_zone_name  = "cloudgouv-eu-west-1a"
   ip_range                = "10.101.2.0/24"
   map_public_ip_on_launch = "true"
   tags = [{
-      key   = "name"
-      value = "terraform-subnet-acctest"
-    }]
+    key   = "name"
+    value = "terraform-subnet-acctest"
+  }]
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -114,13 +114,13 @@ resource "numspot_subnet" "terraform-subnet-acctest" {
 				Config: subnetDependencies + `
 resource "numspot_subnet" "terraform-subnet-acctest" {
   vpc_id                  = numspot_vpc.terraform-dep-vpc-subnet.id
-  availability_zone_name =  "cloudgouv-eu-west-1b"
+  availability_zone_name  = "cloudgouv-eu-west-1b"
   ip_range                = "10.101.1.0/24"
   map_public_ip_on_launch = "true"
   tags = [{
-      key   = "name"
-      value = "terraform-subnet-acctest-replace"
-    }]
+    key   = "name"
+    value = "terraform-subnet-acctest-replace"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair("numspot_subnet.terraform-subnet-acctest", "vpc_id", "numspot_vpc.terraform-dep-vpc-subnet", "id"),
@@ -139,13 +139,13 @@ resource "numspot_subnet" "terraform-subnet-acctest" {
 				Config: subnetDependencies + `
 resource "numspot_subnet" "terraform-subnet-acctest-recreate" {
   vpc_id                  = numspot_vpc.terraform-dep-vpc-subnet.id
-  availability_zone_name =  "cloudgouv-eu-west-1b"
+  availability_zone_name  = "cloudgouv-eu-west-1b"
   ip_range                = "10.101.2.0/24"
   map_public_ip_on_launch = "true"
   tags = [{
-      key   = "name"
-      value = "terraform-subnet-acctest-recreate"
-    }]
+    key   = "name"
+    value = "terraform-subnet-acctest-recreate"
+  }]
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
