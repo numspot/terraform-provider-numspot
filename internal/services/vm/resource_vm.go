@@ -4,8 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -77,9 +82,9 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	numSpotVM, err := core.CreateVM(ctx, r.provider, deserializeCreateNumSpotVolume(plan), tagsValue, vmID, deviceName)
+	numSpotVM, err := core.CreateVM(ctx, r.provider, numSpotCreateVM, tagsValue)
 	if err != nil {
-		response.Diagnostics.AddError("unable to create volume", err.Error())
+		response.Diagnostics.AddError("unable to create VM", err.Error())
 		return
 	}
 
@@ -132,45 +137,156 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	//	return
 	//}
 
-	tf := VmFromHttpToTf(ctx, numSpotVM, &response.Diagnostics)
+	state := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
+}
+
+func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+	var state VmModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	vmID := state.Id.ValueString()
+
+	numSpotVM, err := core.ReadVM(ctx, r.provider, vmID)
+	if err != nil {
+		response.Diagnostics.AddError("", err.Error())
+	}
+
+	newState := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+}
+
+func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+	var (
+		err         error
+		state, plan VmModel
+		numSpotVM   *numspot.Vm
+		diags       diag.Diagnostics
+	)
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	//numspotClient, err := r.provider.GetClient(ctx)
+	//if err != nil {
+	//	response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+	//	return
+	//}
+	//vmId := state.Id.ValueString()
+	//
+	//// Update tags
+	//if !state.Tags.Equal(plan.Tags) {
+	//	tags.UpdateTags(
+	//		ctx,
+	//		state.Tags,
+	//		plan.Tags,
+	//		&response.Diagnostics,
+	//		numspotClient,
+	//		r.provider.SpaceID,
+	//		vmId,
+	//	)
+	//	if response.Diagnostics.HasError() {
+	//		return
+	//	}
+	//}
+	//
+	//body := VmFromTfToUpdaterequest(ctx, &plan, &response.Diagnostics)
+	//if response.Diagnostics.HasError() {
+	//	return
+	//}
+	//
+	//bodyFromState := VmFromTfToUpdaterequest(ctx, &state, &response.Diagnostics)
+	//if response.Diagnostics.HasError() {
+	//	return
+	//}
+	//
+	//if isUpdateNeeded(body, bodyFromState) {
+	//	// Stop VM before doing update
+	//	StopVm(ctx, r.provider, vmId, &response.Diagnostics)
+	//	if response.Diagnostics.HasError() {
+	//		return
+	//	}
+	//
+	//	// Update VM
+	//	updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVmResponse, error) {
+	//		return numspotClient.UpdateVmWithResponse(ctx, r.provider.SpaceID, vmId, body)
+	//	}, http.StatusOK, &response.Diagnostics)
+	//
+	//	if updatedRes == nil || response.Diagnostics.HasError() {
+	//		return
+	//	}
+	//
+	//	// Restart VM
+	//	StartVm(ctx, r.provider, vmId, &response.Diagnostics)
+	//	if response.Diagnostics.HasError() {
+	//		return
+	//	}
+	//}
+	//
+	//// Retries read on VM until state is OK
+	//read, err := utils.RetryReadUntilStateValid(
+	//	ctx,
+	//	vmId,
+	//	r.provider.SpaceID,
+	//	[]string{"pending"},
+	//	[]string{"running"},
+	//	numspotClient.ReadVmsByIdWithResponse,
+	//)
+	//if err != nil {
+	//	response.Diagnostics.AddError("Failed to update VM", fmt.Sprintf("Error waiting for VM to be created: %s", err))
+	//	return
+	//}
+	//vmObject, ok := read.(*numspot.Vm)
+	//if !ok {
+	//	response.Diagnostics.AddError("Failed to update VM", "object conversion error")
+	//	return
+	//}
 
 	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
 	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
 	vmID := state.Id.ValueString()
 
-	numSpotUpdateVM := deserializeUpdateNumSpotVM(ctx, plan, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
+	numSpotUpdateVM := deserializeUpdateNumSpotVM(ctx, state, &diags)
 
-	if !plan.KeypairName.Equal(state.KeypairName) {
-		numSpotVM, err = core.UpdateVMKeypair(ctx, r.provider, numSpotUpdateVM, vmID)
-		if err != nil {
-			response.Diagnostics.AddError("unable to update VM keypair", err.Error())
-			return
-		}
-	}
-
-	if !plan.DeletionProtection.Equal(state.DeletionProtection) ||
+	if !plan.ClientToken.Equal(state.ClientToken) ||
+		!plan.DeletionProtection.Equal(state.DeletionProtection) ||
+		!plan.KeypairName.Equal(state.KeypairName) ||
+		!plan.MaxVmsCount.Equal(state.MaxVmsCount) ||
+		!plan.MinVmsCount.Equal(state.MinVmsCount) ||
 		!plan.NestedVirtualization.Equal(state.NestedVirtualization) ||
-		!plan.SecurityGroupIds.Equal(state.SecurityGroupIds) ||
+		!plan.Placement.Equal(state.Placement) ||
+		!plan.PrivateIps.Equal(state.PrivateIps) ||
 		!plan.Type.Equal(state.Type) ||
 		!plan.UserData.Equal(state.UserData) ||
 		!plan.VmInitiatedShutdownBehavior.Equal(state.VmInitiatedShutdownBehavior) {
 		numSpotVM, err = core.UpdateVMAttributes(ctx, r.provider, numSpotUpdateVM, vmID)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update VM attributes", err.Error())
+			response.Diagnostics.AddError("error while updating VM attributes", err.Error())
 			return
 		}
 	}
 
 	if !plan.Tags.Equal(state.Tags) {
-		numSpotVM, err = core.UpdateVMTags(ctx, r.provider, stateTags, planTags, vmID)
+		numSpotVM, err = core.UpdateVMTags(ctx, r.provider, numSpotUpdateVM, stateTags, planTags)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update VM tags", err.Error())
+			response.Diagnostics.AddError("error while updating VM tags", err.Error())
 			return
 		}
 	}
@@ -182,15 +298,44 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+//func compareSimpleFieldPtr[R comparable](val1 *R, val2 *R) bool {
+//	return utils.GetPtrValue(val1) == utils.GetPtrValue(val2)
+//}
+//
+//func compareSlicePtr[R comparable](val1 *[]R, val2 *[]R) bool {
+//	return slices.Equal(utils.GetPtrValue(val1), utils.GetPtrValue(val2))
+//}
+//func isUpdateNeeded(plan numspot.UpdateVmJSONRequestBody, state numspot.UpdateVmJSONRequestBody) bool {
+//	return !(compareSimpleFieldPtr(plan.BsuOptimized, state.BsuOptimized) &&
+//		compareSimpleFieldPtr(plan.DeletionProtection, state.DeletionProtection) &&
+//		compareSimpleFieldPtr(plan.KeypairName, state.KeypairName) &&
+//		compareSimpleFieldPtr(plan.NestedVirtualization, state.NestedVirtualization) &&
+//		(utils.GetPtrValue(plan.Performance) == "" || compareSimpleFieldPtr(plan.Performance, state.Performance)) && // if performance is not provided by user,
+//		(len(utils.GetPtrValue(plan.BlockDeviceMappings)) == 0) &&
+//		compareSimpleFieldPtr(plan.UserData, state.UserData) &&
+//		compareSimpleFieldPtr(plan.VmInitiatedShutdownBehavior, state.VmInitiatedShutdownBehavior) &&
+//		compareSimpleFieldPtr(plan.Type, state.Type) &&
+//		(len(utils.GetPtrValue(plan.BlockDeviceMappings)) == 0 || (compareSlicePtr(plan.BlockDeviceMappings, state.BlockDeviceMappings))) &&
+//		compareSimpleFieldPtr(plan.IsSourceDestChecked, state.IsSourceDestChecked))
+//}
+
 func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state VmModel
-	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	var data VmModel
+	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
+	linkNicsObjectValue, diagnostics := linkNics.ToObjectValue(ctx)
+	diags.Append(diagnostics...)
 
-	if err := core.DeleteVM(ctx, r.provider, state.Id.ValueString()); err != nil {
-		response.Diagnostics.AddError("unable to delete VM", err.Error())
+	numspotClient, err := r.provider.GetClient(ctx)
+	if err != nil {
+		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		return
+	}
+	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteVmsWithResponse)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to delete VM", err.Error())
 		return
 	}
 }
@@ -217,6 +362,10 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf VmModel, diags *diag.Dia
 			Tenancy:              utils.FromTfStringToStringPtr(tf.Placement.Tenancy),
 		}
 	}
+	if http.SecurityGroups != nil {
+		listValue, _ := types.ListValueFrom(ctx, types.StringType, securityGroups)
+		r.SecurityGroupIds = listValue
+	}
 
 	bootOnCreation := true
 	return numspot.CreateVmsJSONRequestBody{
@@ -233,9 +382,11 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf VmModel, diags *diag.Dia
 		SecurityGroups:              utils.TfStringListToStringPtrList(ctx, tf.SecurityGroups, diags),
 		SubnetId:                    tf.SubnetId.ValueString(),
 		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
-		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.InitiatedShutdownBehavior),
+		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
 		Type:                        utils.FromTfStringToStringPtr(tf.Type),
 		BlockDeviceMappings:         blockDeviceMappingPtr,
+		MaxVmsCount:                 utils.FromTfInt64ToIntPtr(tf.MaxVmsCount),
+		MinVmsCount:                 utils.FromTfInt64ToIntPtr(tf.MinVmsCount),
 	}
 }
 
@@ -473,7 +624,6 @@ func linkNicsFromApi(ctx context.Context, linkNic numspot.LinkNicLight, diags *d
 	diags.Append(diagnostics...)
 	return value
 }
-
 func privateIpsFromApi(ctx context.Context, privateIp numspot.PrivateIpLightForVm, diags *diag.Diagnostics) PrivateIpsValue {
 	linkPublicIp := linkPublicIpVmFromApi(ctx, utils.GetPtrValue(privateIp.LinkPublicIp), diags)
 	if diags.HasError() {
@@ -532,7 +682,6 @@ func vmBlockDeviceMappingFromApi(ctx context.Context, elt numspot.BlockDeviceMap
 	diags.Append(diagnostics...)
 	return value
 }
-
 func vmBsuFromApi(ctx context.Context, elt numspot.BsuCreated, diags *diag.Diagnostics) basetypes.ObjectValue {
 	obj, diagnostics := NewBsuValue(
 		BsuValue{}.AttributeTypes(ctx),
@@ -576,13 +725,12 @@ func deserializeUpdateNumSpotVM(ctx context.Context, tf VmModel, diags *diag.Dia
 		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
 		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
 		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
-		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.InitiatedShutdownBehavior),
+		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.VmInitiatedShutdownBehavior),
 		Type:                        utils.FromTfStringToStringPtr(tf.Type),
 		BlockDeviceMappings:         &blockDeviceMapping,
 		IsSourceDestChecked:         utils.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
 	}
 }
-
 func blockDeviceMappingFromTf(bdm BlockDeviceMappingsValue) numspot.BlockDeviceMappingVmUpdate {
 	attrtypes := bdm.Bsu.AttributeTypes(context.Background())
 	attrVals := bdm.Bsu.Attributes()
@@ -598,7 +746,6 @@ func blockDeviceMappingFromTf(bdm BlockDeviceMappingsValue) numspot.BlockDeviceM
 		VirtualDeviceName: bdm.VirtualDeviceName.ValueStringPointer(),
 	}
 }
-
 func bsuFromTf(bsu BsuValue) *numspot.BsuToUpdateVm {
 	if bsu.IsNull() || bsu.IsUnknown() {
 		return nil
