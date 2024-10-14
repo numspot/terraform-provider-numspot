@@ -181,7 +181,7 @@ func ReadVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID strin
 		return nil, err
 	}
 
-	return numSpotReadVolume.JSON200, err
+	return numSpotReadVolume.JSON200, nil
 }
 
 func unlinkVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID, stateVM string) (err error) {
