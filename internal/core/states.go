@@ -22,5 +22,4 @@ const (
 	created      = "created"
 	available    = "available"
 	inUse        = "in-use"
-	detaching    = "detaching"
 )
