@@ -17,25 +17,25 @@ func TestAccVmResource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
-	//	vmDependencies := `
-	//resource "numspot_vpc" "terraform-dep-vm-vpc" {
-	//  ip_range = "10.101.0.0/16"
-	//  tags = [{
-	//    key   = "name"
-	//    value = "terraform-dep-vm-vpc"
-	//  }]
-	//}
-	//
-	//resource "numspot_subnet" "terraform-dep-vm-subnet" {
-	//  vpc_id                 = numspot_vpc.terraform-dep-vm-vpc.id
-	//  ip_range               = "10.101.1.0/24"
-	//  availability_zone_name = "cloudgouv-eu-west-1a"
-	//  tags = [{
-	//    key   = "name"
-	//    value = "terraform-dep-vm-subnet"
-	//  }]
-	//}
-	//`
+	vmDependencies := `
+	resource "numspot_vpc" "terraform-dep-vm-vpc" {
+	 ip_range = "10.101.0.0/16"
+	 tags = [{
+	   key   = "name"
+	   value = "terraform-dep-vm-vpc"
+	 }]
+	}
+	
+	resource "numspot_subnet" "terraform-dep-vm-subnet" {
+	 vpc_id                 = numspot_vpc.terraform-dep-vm-vpc.id
+	 ip_range               = "10.101.1.0/24"
+	 availability_zone_name = "cloudgouv-eu-west-1a"
+	 tags = [{
+	   key   = "name"
+	   value = "terraform-dep-vm-subnet"
+	 }]
+	}
+	`
 
 	vmUpdateDependencies := `
 resource "numspot_vpc" "terraform-dep-vm-vpc" {
@@ -80,111 +80,111 @@ resource "numspot_security_group" "terraform-dep-vm-sg" {
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			//			// Step 1 - Create VM
-			//			{
-			//				Config: vmDependencies + `
-			//resource "numspot_vm" "numspot-vm-acctest" {
-			//  subnet_id = numspot_subnet.terraform-dep-vm-subnet.id
-			//  image_id  = "ami-00669acb"
-			//  type      = "ns-cus6-2c4r"
-			//
-			//  tags = [{
-			//    key   = "name"
-			//    value = "terraform-vm-acctest"
-			//  }]
-			//}`,
-			//				Check: resource.ComposeAggregateTestCheckFunc(
-			//					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "image_id", "ami-00669acb"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "type", "ns-cus6-2c4r"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "tags.#", "1"),
-			//					resource.TestCheckTypeSetElemNestedAttrs("numspot_vm.numspot-vm-acctest", "tags.*", map[string]string{
-			//						"key":   "name",
-			//						"value": "terraform-vm-acctest",
-			//					}),
-			//				),
-			//			},
-			//			// Step 2 - Import
-			//			{
-			//				ResourceName:            "numspot_vm.numspot-vm-acctest",
-			//				ImportState:             true,
-			//				ImportStateVerify:       true,
-			//				ImportStateVerifyIgnore: []string{"id"},
-			//			},
-			//			// Step 3 - Update VM attributes
-			//			{
-			//				Config: vmUpdateDependencies + `
-			//resource "numspot_vm" "numspot-vm-acctest" {
-			//  subnet_id          = numspot_subnet.terraform-dep-vm-subnet.id
-			//  keypair_name       = numspot_keypair.terraform-dep-vm-keypair.name
-			//  security_group_ids = [numspot_security_group.terraform-dep-vm-sg.id]
-			//
-			//  image_id                    = "ami-00669acb"
-			//  type                        = "ns-eco6-2c2r"
-			//  user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
-			//  initiated_shutdown_behavior = "terminate"
-			//
-			//  tags = [{
-			//    key   = "name"
-			//    value = "terraform-vm-acctest-update"
-			//  }]
-			//}
-			//`,
-			//				Check: resource.ComposeAggregateTestCheckFunc(
-			//					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
-			//					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "keypair_name", "numspot_keypair.terraform-dep-vm-keypair", "name"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "security_group_ids.#", "1"),
-			//					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "security_group_ids.0", "numspot_security_group.terraform-dep-vm-sg", "id"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "image_id", "ami-00669acb"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "type", "ns-eco6-2c2r"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "user_data", "dXNlci1kYXRhLWVuY29kZWQ="),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "initiated_shutdown_behavior", "terminate"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "tags.#", "1"),
-			//					resource.TestCheckTypeSetElemNestedAttrs("numspot_vm.numspot-vm-acctest", "tags.*", map[string]string{
-			//						"key":   "name",
-			//						"value": "terraform-vm-acctest-update",
-			//					}),
-			//				),
-			//			},
-			//			// Step 4 - Reset VM
-			//			{
-			//				Config: vmDependencies + ` `,
-			//				Check:  resource.ComposeAggregateTestCheckFunc(),
-			//			},
-			//			// Step 5 - Create VM with attributes to update
-			//			{
-			//				Config: vmUpdateDependencies + `
-			//resource "numspot_vm" "numspot-vm-acctest" {
-			//  subnet_id          = numspot_subnet.terraform-dep-vm-subnet.id
-			//  keypair_name       = numspot_keypair.terraform-dep-vm-keypair.name
-			//  security_group_ids = [numspot_security_group.terraform-dep-vm-sg.id]
-			//
-			//  image_id                    = "ami-00669acb"
-			//  type                        = "ns-eco6-2c2r"
-			//  user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
-			//  initiated_shutdown_behavior = "terminate"
-			//
-			//  tags = [{
-			//    key   = "name"
-			//    value = "terraform-vm-acctest"
-			//  }]
-			//}`,
-			//				Check: resource.ComposeAggregateTestCheckFunc(
-			//					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
-			//					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "keypair_name", "numspot_keypair.terraform-dep-vm-keypair", "name"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "security_group_ids.#", "1"),
-			//					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "security_group_ids.0", "numspot_security_group.terraform-dep-vm-sg", "id"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "image_id", "ami-00669acb"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "type", "ns-eco6-2c2r"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "user_data", "dXNlci1kYXRhLWVuY29kZWQ="),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "initiated_shutdown_behavior", "terminate"),
-			//					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "tags.#", "1"),
-			//					resource.TestCheckTypeSetElemNestedAttrs("numspot_vm.numspot-vm-acctest", "tags.*", map[string]string{
-			//						"key":   "name",
-			//						"value": "terraform-vm-acctest",
-			//					}),
-			//				),
-			//			},
+			// Step 1 - Create VM
+			{
+				Config: vmDependencies + `
+			resource "numspot_vm" "numspot-vm-acctest" {
+			 subnet_id = numspot_subnet.terraform-dep-vm-subnet.id
+			 image_id  = "ami-00669acb"
+			 type      = "ns-cus6-2c4r"
+			
+			 tags = [{
+			   key   = "name"
+			   value = "terraform-vm-acctest"
+			 }]
+			}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "image_id", "ami-00669acb"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "type", "ns-cus6-2c4r"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_vm.numspot-vm-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-vm-acctest",
+					}),
+				),
+			},
+			// Step 2 - Import
+			{
+				ResourceName:            "numspot_vm.numspot-vm-acctest",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"id"},
+			},
+			// Step 3 - Update VM attributes
+			{
+				Config: vmUpdateDependencies + `
+			resource "numspot_vm" "numspot-vm-acctest" {
+			 subnet_id          = numspot_subnet.terraform-dep-vm-subnet.id
+			 keypair_name       = numspot_keypair.terraform-dep-vm-keypair.name
+			 security_group_ids = [numspot_security_group.terraform-dep-vm-sg.id]
+			
+			 image_id                    = "ami-00669acb"
+			 type                        = "ns-eco6-2c2r"
+			 user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
+			 initiated_shutdown_behavior = "terminate"
+			
+			 tags = [{
+			   key   = "name"
+			   value = "terraform-vm-acctest-update"
+			 }]
+			}
+			`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
+					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "keypair_name", "numspot_keypair.terraform-dep-vm-keypair", "name"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "security_group_ids.#", "1"),
+					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "security_group_ids.0", "numspot_security_group.terraform-dep-vm-sg", "id"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "image_id", "ami-00669acb"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "type", "ns-eco6-2c2r"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "user_data", "dXNlci1kYXRhLWVuY29kZWQ="),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "initiated_shutdown_behavior", "terminate"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_vm.numspot-vm-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-vm-acctest-update",
+					}),
+				),
+			},
+			// Step 4 - Reset VM
+			{
+				Config: vmDependencies + ` `,
+				Check:  resource.ComposeAggregateTestCheckFunc(),
+			},
+			// Step 5 - Create VM with attributes to update
+			{
+				Config: vmUpdateDependencies + `
+			resource "numspot_vm" "numspot-vm-acctest" {
+			 subnet_id          = numspot_subnet.terraform-dep-vm-subnet.id
+			 keypair_name       = numspot_keypair.terraform-dep-vm-keypair.name
+			 security_group_ids = [numspot_security_group.terraform-dep-vm-sg.id]
+			
+			 image_id                    = "ami-00669acb"
+			 type                        = "ns-eco6-2c2r"
+			 user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
+			 initiated_shutdown_behavior = "terminate"
+			
+			 tags = [{
+			   key   = "name"
+			   value = "terraform-vm-acctest"
+			 }]
+			}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
+					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "keypair_name", "numspot_keypair.terraform-dep-vm-keypair", "name"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "security_group_ids.#", "1"),
+					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "security_group_ids.0", "numspot_security_group.terraform-dep-vm-sg", "id"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "image_id", "ami-00669acb"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "type", "ns-eco6-2c2r"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "user_data", "dXNlci1kYXRhLWVuY29kZWQ="),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "initiated_shutdown_behavior", "terminate"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_vm.numspot-vm-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-vm-acctest",
+					}),
+				),
+			},
 			// Step 6 - Replace VM attributes
 			{
 				Config: vmUpdateDependencies + `
@@ -198,8 +198,8 @@ resource "numspot_vm" "numspot-vm-acctest" {
   user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
   initiated_shutdown_behavior = "terminate"
 
-  client_token  = "client-token"
-  private_ips   = ["10.101.10.1"]
+  client_token  = "M39Fx9Oys2"
+  private_ips   = ["10.101.1.15"]
   placement = {
     tenancy                = "default"
     availability_zone_name = "cloudgouv-eu-west-1a"
@@ -221,9 +221,9 @@ resource "numspot_vm" "numspot-vm-acctest" {
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "user_data", "dXNlci1kYXRhLWVuY29kZWQ="),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "initiated_shutdown_behavior", "terminate"),
 
-					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "client_token", "client-token"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "client_token", "M39Fx9Oys2"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "private_ips.#", "1"),
-					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "private_ips.0", "10.101.10.1"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "private_ips.0", "10.101.1.15"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "placement.tenancy", "default"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "placement.availability_zone_name", "cloudgouv-eu-west-1a"),
 
@@ -247,8 +247,8 @@ resource "numspot_vm" "numspot-vm-acctest-recreate" {
   user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
   initiated_shutdown_behavior = "stop"
 
-  client_token  = "client-token"
-  private_ips   = ["10.101.10.1"]
+  client_token  = "3s77OVJ4qU"
+  private_ips   = ["10.101.1.20"]
   placement = {
     tenancy                = "default"
     availability_zone_name = "cloudgouv-eu-west-1a"
@@ -270,9 +270,9 @@ resource "numspot_vm" "numspot-vm-acctest-recreate" {
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "user_data", "dXNlci1kYXRhLWVuY29kZWQ="),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "initiated_shutdown_behavior", "stop"),
 
-					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "client_token", "client-token"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "client_token", "3s77OVJ4qU"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "private_ips.#", "1"),
-					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "private_ips.0", "10.101.10.1"),
+					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "private_ips.0", "10.101.1.20"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "placement.tenancy", "default"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "placement.availability_zone_name", "cloudgouv-eu-west-1a"),
 
