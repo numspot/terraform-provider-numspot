@@ -52,6 +52,66 @@ func UpdateVMAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpo
 		return nil, err
 	}
 
+	numSpotVMUpdate.KeypairName = nil
+
+	var updateVMResponse *numspot.UpdateVmResponse
+	if updateVMResponse, err = numspotClient.UpdateVmWithResponse(ctx, spaceID, vmID, numSpotVMUpdate); err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(updateVMResponse.Body, updateVMResponse.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	//}, http.StatusOK, &response.Diagnostics)
+	//
+	//if updatedRes == nil || response.Diagnostics.HasError() {
+	//	return
+	//}
+
+	if err = StartVM(ctx, provider, vmID); err != nil {
+		return nil, err
+	}
+
+	// Retries read on VM until state is OK
+	//read, err := utils.RetryReadUntilStateValid(
+	//	ctx,
+	//	vmId,
+	//	r.provider.SpaceID,
+	//	[]string{"pending"},
+	//	[]string{"running"},
+	//	numspotClient.ReadVmsByIdWithResponse,
+	//)
+	//if err != nil {
+	//	response.Diagnostics.AddError("Failed to update VM", fmt.Sprintf("Error waiting for VM to be created: %s", err))
+	//	return
+	//}
+
+	return RetryReadVM(ctx, provider, createOp, vmID)
+}
+
+func UpdateVMKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotVMUpdate numspot.UpdateVmJSONRequestBody, vmID string) (numSpotVM *numspot.Vm, err error) {
+	spaceID := provider.SpaceID
+
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = StopVM(ctx, provider, vmID); err != nil {
+		return nil, err
+	}
+
+	numSpotVMUpdate.BlockDeviceMappings = nil
+	numSpotVMUpdate.BsuOptimized = nil
+	numSpotVMUpdate.IsSourceDestChecked = nil
+	numSpotVMUpdate.SecurityGroupIds = nil
+	numSpotVMUpdate.DeletionProtection = nil
+	numSpotVMUpdate.UserData = nil
+	numSpotVMUpdate.Type = nil
+	numSpotVMUpdate.SecurityGroupIds = nil
+	numSpotVMUpdate.VmInitiatedShutdownBehavior = nil
+	numSpotVMUpdate.NestedVirtualization = nil
+
 	var updateVMResponse *numspot.UpdateVmResponse
 	if updateVMResponse, err = numspotClient.UpdateVmWithResponse(ctx, spaceID, vmID, numSpotVMUpdate); err != nil {
 		return nil, err
