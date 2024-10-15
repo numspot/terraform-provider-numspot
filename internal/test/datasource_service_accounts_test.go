@@ -28,6 +28,7 @@ func TestAccServiceAccountDatasource(t *testing.T) {
 resource "numspot_service_account" "test" {
   space_id = "67d97ad4-3005-48dc-a392-60a97ab5097c"
   name     = "terraform-service-account-test-datasource"
+  service_account_id = 
 }
 
 data "numspot_service_accounts" "testdata" {
