@@ -8,7 +8,6 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vm"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -53,7 +52,7 @@ func UpdateVolumeAttributes(ctx context.Context, provider *client.NumSpotSDK, nu
 
 	// If this volume is attached to a VM, we need to change it from hot to cold volume to update its attributes
 	// To make it a cold volume we need to stop the VM it's attached to
-	if err = vm.StopVmNoDiag(ctx, provider, stateVM); err != nil {
+	if err = StopVM(ctx, provider, stateVM); err != nil {
 		return nil, err
 	}
 
@@ -70,7 +69,7 @@ func UpdateVolumeAttributes(ctx context.Context, provider *client.NumSpotSDK, nu
 	}
 
 	// Starting back up the VM making it a hot volume
-	if err = vm.StartVmNoDiag(ctx, provider, stateVM); err != nil {
+	if err = StartVM(ctx, provider, stateVM); err != nil {
 		return nil, err
 	}
 
@@ -190,23 +189,24 @@ func unlinkVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID, st
 	}
 
 	if *volume.State == inUse {
-		if err = vm.StopVmNoDiag(ctx, provider, stateVM); err != nil {
+		if err = StopVM(ctx, provider, stateVM); err != nil {
 			return err
 		}
 
-		numspotClient, err := provider.GetClient(ctx)
+		var numSpotClient *numspot.ClientWithResponses
+		numSpotClient, err = provider.GetClient(ctx)
 		if err != nil {
 			return err
 		}
 		var unlinkVolumeResponse *numspot.UnlinkVolumeResponse
-		if unlinkVolumeResponse, err = numspotClient.UnlinkVolumeWithResponse(ctx, provider.SpaceID, volumeID, numspot.UnlinkVolumeJSONRequestBody{}); err != nil {
+		if unlinkVolumeResponse, err = numSpotClient.UnlinkVolumeWithResponse(ctx, provider.SpaceID, volumeID, numspot.UnlinkVolumeJSONRequestBody{}); err != nil {
 			return err
 		}
 		if err = utils.ParseHTTPError(unlinkVolumeResponse.Body, unlinkVolumeResponse.StatusCode()); err != nil {
 			return err
 		}
 
-		if err = vm.StartVmNoDiag(ctx, provider, stateVM); err != nil {
+		if err = StartVM(ctx, provider, stateVM); err != nil {
 			return err
 		}
 	}

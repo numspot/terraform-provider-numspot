@@ -11,7 +11,6 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vm"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -75,14 +74,14 @@ func (r *FlexibleGpuResource) linkVm(ctx context.Context, gpuId string, data Fle
 	}
 
 	// Restart VM needed when linking a GPU
-	vm.StopVm(ctx, r.provider, data.VmId.ValueString(), diags)
-	if diags.HasError() {
-		return
-	}
-	vm.StartVm(ctx, r.provider, data.VmId.ValueString(), diags)
-	if diags.HasError() {
-		return
-	}
+	//StopVM(ctx, r.provider, data.VmId.ValueString(), diags)
+	//if diags.HasError() {
+	//	return
+	//}
+	//vm.StartVm(ctx, r.provider, data.VmId.ValueString(), diags)
+	//if diags.HasError() {
+	//	return
+	//}
 }
 
 func (r *FlexibleGpuResource) unlinkVm(ctx context.Context, gpuId string, data FlexibleGpuModel, diags *diag.Diagnostics) {
@@ -100,14 +99,14 @@ func (r *FlexibleGpuResource) unlinkVm(ctx context.Context, gpuId string, data F
 	}
 
 	// Restart VM needed when unlinking a GPU
-	vm.StopVm(ctx, r.provider, data.VmId.ValueString(), diags)
-	if diags.HasError() {
-		return
-	}
-	vm.StartVm(ctx, r.provider, data.VmId.ValueString(), diags)
-	if diags.HasError() {
-		return
-	}
+	//vm.StopVm(ctx, r.provider, data.VmId.ValueString(), diags)
+	//if diags.HasError() {
+	//	return
+	//}
+	//vm.StartVm(ctx, r.provider, data.VmId.ValueString(), diags)
+	//if diags.HasError() {
+	//	return
+	//}
 }
 
 func (r *FlexibleGpuResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {

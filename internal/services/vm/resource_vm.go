@@ -5,17 +5,15 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
-
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -85,55 +83,6 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
-	// Retries create until request response is OK
-	//res, err := utils.RetryCreateUntilResourceAvailableWithBody(
-	//	ctx,
-	//	r.provider.SpaceID,
-	//	VmFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
-	//	numspotClient.CreateVmsWithResponse)
-	//if err != nil {
-	//	response.Diagnostics.AddError("Failed to create VM", err.Error())
-	//}
-	//if response.Diagnostics.HasError() {
-	//	return
-	//}
-	//
-	//vm := *res.JSON201
-	//createdId := *vm.Id
-	//
-	//// Create tags
-	//if len(data.Tags.Elements()) > 0 {
-	//	tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//}
-	//
-	//read, err := utils.RetryReadUntilStateValid(
-	//	ctx,
-	//	createdId,
-	//	r.provider.SpaceID,
-	//	[]string{"pending"},
-	//	[]string{"running", "stopped"}, // In some cases, when there is insufficient capacity the VM is created with state = stopped
-	//	numspotClient.ReadVmsByIdWithResponse,
-	//)
-	//if err != nil {
-	//	response.Diagnostics.AddError("Failed to create VM", fmt.Sprintf("Error waiting for example instance (%s) to be created: %s", createdId, err))
-	//	return
-	//}
-	//
-	//vmSchema, ok := read.(*numspot.Vm)
-	//if !ok {
-	//	response.Diagnostics.AddError("Failed to create VM", "object conversion error")
-	//	return
-	//}
-	//
-	//// In some cases, when there is insufficient capacity the VM is created with state = stopped
-	//if utils.GetPtrValue(vmSchema.State) == "stopped" {
-	//	response.Diagnostics.AddError("Issue while creating VM", fmt.Sprintf("VM was created in 'stopped' state. Reason : %s", utils.GetPtrValue(vmSchema.StateReason)))
-	//	return
-	//}
-
 	state := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
@@ -153,7 +102,7 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 
 	numSpotVM, err := core.ReadVM(ctx, r.provider, vmID)
 	if err != nil {
-		response.Diagnostics.AddError("", err.Error())
+		response.Diagnostics.AddError("unable to read VM", err.Error())
 	}
 
 	newState := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
@@ -169,7 +118,6 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		err         error
 		state, plan VmModel
 		numSpotVM   *numspot.Vm
-		diags       diag.Diagnostics
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -260,7 +208,10 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
 	vmID := state.Id.ValueString()
 
-	numSpotUpdateVM := deserializeUpdateNumSpotVM(ctx, state, &diags)
+	numSpotUpdateVM := deserializeUpdateNumSpotVM(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
 
 	if !plan.ClientToken.Equal(state.ClientToken) ||
 		!plan.DeletionProtection.Equal(state.DeletionProtection) ||
@@ -275,15 +226,15 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		!plan.VmInitiatedShutdownBehavior.Equal(state.VmInitiatedShutdownBehavior) {
 		numSpotVM, err = core.UpdateVMAttributes(ctx, r.provider, numSpotUpdateVM, vmID)
 		if err != nil {
-			response.Diagnostics.AddError("error while updating VM attributes", err.Error())
+			response.Diagnostics.AddError("unable to update VM attributes", err.Error())
 			return
 		}
 	}
 
 	if !plan.Tags.Equal(state.Tags) {
-		numSpotVM, err = core.UpdateVMTags(ctx, r.provider, numSpotUpdateVM, stateTags, planTags)
+		numSpotVM, err = core.UpdateVMTags(ctx, r.provider, stateTags, planTags, vmID)
 		if err != nil {
-			response.Diagnostics.AddError("error while updating VM tags", err.Error())
+			response.Diagnostics.AddError("unable to update VM tags", err.Error())
 			return
 		}
 	}
@@ -317,20 +268,14 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 //}
 
 func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data VmModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state VmModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteVmsWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete VM", err.Error())
+	if err := core.DeleteVM(ctx, r.provider, state.Id.ValueString()); err != nil {
+		response.Diagnostics.AddError("unable to delete VM", err.Error())
 		return
 	}
 }
@@ -615,6 +560,7 @@ func linkNicsFromApi(ctx context.Context, linkNic numspot.LinkNicLight, diags *d
 	diags.Append(diagnostics...)
 	return value
 }
+
 func privateIpsFromApi(ctx context.Context, privateIp numspot.PrivateIpLightForVm, diags *diag.Diagnostics) PrivateIpsValue {
 	linkPublicIp := linkPublicIpVmFromApi(ctx, utils.GetPtrValue(privateIp.LinkPublicIp), diags)
 	if diags.HasError() {
@@ -673,6 +619,7 @@ func vmBlockDeviceMappingFromApi(ctx context.Context, elt numspot.BlockDeviceMap
 	diags.Append(diagnostics...)
 	return value
 }
+
 func vmBsuFromApi(ctx context.Context, elt numspot.BsuCreated, diags *diag.Diagnostics) basetypes.ObjectValue {
 	obj, diagnostics := NewBsuValue(
 		BsuValue{}.AttributeTypes(ctx),
@@ -722,6 +669,7 @@ func deserializeUpdateNumSpotVM(ctx context.Context, tf VmModel, diags *diag.Dia
 		IsSourceDestChecked:         utils.FromTfBoolToBoolPtr(tf.IsSourceDestChecked),
 	}
 }
+
 func blockDeviceMappingFromTf(bdm BlockDeviceMappingsValue) numspot.BlockDeviceMappingVmUpdate {
 	attrtypes := bdm.Bsu.AttributeTypes(context.Background())
 	attrVals := bdm.Bsu.Attributes()
@@ -737,6 +685,7 @@ func blockDeviceMappingFromTf(bdm BlockDeviceMappingsValue) numspot.BlockDeviceM
 		VirtualDeviceName: bdm.VirtualDeviceName.ValueStringPointer(),
 	}
 }
+
 func bsuFromTf(bsu BsuValue) *numspot.BsuToUpdateVm {
 	if bsu.IsNull() || bsu.IsUnknown() {
 		return nil

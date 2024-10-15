@@ -180,7 +180,7 @@ func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 	}
 
 	if err := core.DeleteVolume(ctx, r.provider, state.Id.ValueString(), state.LinkVM.VmID.ValueString()); err != nil {
-		response.Diagnostics.AddError("failed to delete volume", err.Error())
+		response.Diagnostics.AddError("unable to delete volume", err.Error())
 		return
 	}
 }
