@@ -18,23 +18,23 @@ func TestAccVmResource(t *testing.T) {
 	pr := acct.TestProvider
 
 	vmDependencies := `
-	resource "numspot_vpc" "terraform-dep-vm-vpc" {
-	 ip_range = "10.101.0.0/16"
-	 tags = [{
-	   key   = "name"
-	   value = "terraform-dep-vm-vpc"
-	 }]
-	}
-	
-	resource "numspot_subnet" "terraform-dep-vm-subnet" {
-	 vpc_id                 = numspot_vpc.terraform-dep-vm-vpc.id
-	 ip_range               = "10.101.1.0/24"
-	 availability_zone_name = "cloudgouv-eu-west-1a"
-	 tags = [{
-	   key   = "name"
-	   value = "terraform-dep-vm-subnet"
-	 }]
-	}
+resource "numspot_vpc" "terraform-dep-vm-vpc" {
+  ip_range = "10.101.0.0/16"
+  tags = [{
+    key   = "name"
+    value = "terraform-dep-vm-vpc"
+  }]
+}
+
+resource "numspot_subnet" "terraform-dep-vm-subnet" {
+  vpc_id                 = numspot_vpc.terraform-dep-vm-vpc.id
+  ip_range               = "10.101.1.0/24"
+  availability_zone_name = "cloudgouv-eu-west-1a"
+  tags = [{
+    key   = "name"
+    value = "terraform-dep-vm-subnet"
+  }]
+}
 	`
 
 	vmUpdateDependencies := `
@@ -83,16 +83,16 @@ resource "numspot_security_group" "terraform-dep-vm-sg" {
 			// Step 1 - Create VM
 			{
 				Config: vmDependencies + `
-			resource "numspot_vm" "numspot-vm-acctest" {
-			 subnet_id = numspot_subnet.terraform-dep-vm-subnet.id
-			 image_id  = "ami-00669acb"
-			 type      = "ns-cus6-2c4r"
-			
-			 tags = [{
-			   key   = "name"
-			   value = "terraform-vm-acctest"
-			 }]
-			}`,
+resource "numspot_vm" "numspot-vm-acctest" {
+  subnet_id = numspot_subnet.terraform-dep-vm-subnet.id
+  image_id  = "ami-00669acb"
+  type      = "ns-cus6-2c4r"
+
+  tags = [{
+    key   = "name"
+    value = "terraform-vm-acctest"
+  }]
+}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "image_id", "ami-00669acb"),
@@ -114,21 +114,21 @@ resource "numspot_security_group" "terraform-dep-vm-sg" {
 			// Step 3 - Update VM attributes
 			{
 				Config: vmUpdateDependencies + `
-			resource "numspot_vm" "numspot-vm-acctest" {
-			 subnet_id          = numspot_subnet.terraform-dep-vm-subnet.id
-			 keypair_name       = numspot_keypair.terraform-dep-vm-keypair.name
-			 security_group_ids = [numspot_security_group.terraform-dep-vm-sg.id]
-			
-			 image_id                    = "ami-00669acb"
-			 type                        = "ns-eco6-2c2r"
-			 user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
-			 initiated_shutdown_behavior = "terminate"
-			
-			 tags = [{
-			   key   = "name"
-			   value = "terraform-vm-acctest-update"
-			 }]
-			}
+resource "numspot_vm" "numspot-vm-acctest" {
+  subnet_id          = numspot_subnet.terraform-dep-vm-subnet.id
+  keypair_name       = numspot_keypair.terraform-dep-vm-keypair.name
+  security_group_ids = [numspot_security_group.terraform-dep-vm-sg.id]
+
+  image_id                    = "ami-00669acb"
+  type                        = "ns-eco6-2c2r"
+  user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
+  initiated_shutdown_behavior = "terminate"
+
+  tags = [{
+    key   = "name"
+    value = "terraform-vm-acctest-update"
+  }]
+}
 			`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
@@ -154,21 +154,21 @@ resource "numspot_security_group" "terraform-dep-vm-sg" {
 			// Step 5 - Create VM with attributes to update
 			{
 				Config: vmUpdateDependencies + `
-			resource "numspot_vm" "numspot-vm-acctest" {
-			 subnet_id          = numspot_subnet.terraform-dep-vm-subnet.id
-			 keypair_name       = numspot_keypair.terraform-dep-vm-keypair.name
-			 security_group_ids = [numspot_security_group.terraform-dep-vm-sg.id]
-			
-			 image_id                    = "ami-00669acb"
-			 type                        = "ns-eco6-2c2r"
-			 user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
-			 initiated_shutdown_behavior = "terminate"
-			
-			 tags = [{
-			   key   = "name"
-			   value = "terraform-vm-acctest"
-			 }]
-			}`,
+resource "numspot_vm" "numspot-vm-acctest" {
+  subnet_id          = numspot_subnet.terraform-dep-vm-subnet.id
+  keypair_name       = numspot_keypair.terraform-dep-vm-keypair.name
+  security_group_ids = [numspot_security_group.terraform-dep-vm-sg.id]
+
+  image_id                    = "ami-00669acb"
+  type                        = "ns-eco6-2c2r"
+  user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
+  initiated_shutdown_behavior = "terminate"
+
+  tags = [{
+    key   = "name"
+    value = "terraform-vm-acctest"
+  }]
+}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
 					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "keypair_name", "numspot_keypair.terraform-dep-vm-keypair", "name"),
@@ -198,8 +198,8 @@ resource "numspot_vm" "numspot-vm-acctest" {
   user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
   initiated_shutdown_behavior = "terminate"
 
-  client_token  = "M39Fx9Oys2"
-  private_ips   = ["10.101.1.15"]
+  client_token = "M39Fx9Oys2"
+  private_ips  = ["10.101.1.15"]
   placement = {
     tenancy                = "default"
     availability_zone_name = "cloudgouv-eu-west-1a"
@@ -247,8 +247,8 @@ resource "numspot_vm" "numspot-vm-acctest-recreate" {
   user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
   initiated_shutdown_behavior = "stop"
 
-  client_token  = "3s77OVJ4qU"
-  private_ips   = ["10.101.1.20"]
+  client_token = "3s77OVJ4qU"
+  private_ips  = ["10.101.1.20"]
   placement = {
     tenancy                = "default"
     availability_zone_name = "cloudgouv-eu-west-1a"
