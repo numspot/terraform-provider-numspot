@@ -133,7 +133,7 @@ func UpdateVolumeLink(ctx context.Context, provider *client.NumSpotSDK, volumeID
 func DeleteVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID, stateVM string) (err error) {
 	if stateVM != "" {
 		if err = unlinkVolume(ctx, provider, volumeID, stateVM); err != nil {
-			return err
+			return err // TODO : remove and try to delete volume anyway ?
 		}
 	}
 

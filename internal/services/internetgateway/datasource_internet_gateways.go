@@ -3,13 +3,15 @@ package internetgateway
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -72,24 +74,18 @@ func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasourc
 		return
 	}
 
-	params := InternetGatewaysFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
-	numspotClient, err := d.provider.GetClient(ctx)
+	params := deserializeReadNumSpotInternetGateway(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numSpotInternetGateway, err := core.ReadInternetGatewaysWithParams(ctx, d.provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("unable to read internet gateway", err.Error())
 		return
 	}
-	res := utils.ExecuteRequest(func() (*numspot.ReadInternetGatewaysResponse, error) {
-		return numspotClient.ReadInternetGatewaysWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Internet Gateways list")
-	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, InternetGatewaysFromHttpToTfDatasource, &response.Diagnostics)
-
+	objectItems := serializeNumSpotInternetGateways(ctx, numSpotInternetGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -98,4 +94,32 @@ func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasourc
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func serializeNumSpotInternetGateways(ctx context.Context, internetGateways *[]numspot.InternetGateway, diags *diag.Diagnostics) []InternetGatewayModel {
+	return utils.FromHttpGenericListToTfList(ctx, internetGateways, func(ctx context.Context, internetGateway *numspot.InternetGateway, diags *diag.Diagnostics) *InternetGatewayModel {
+		var tagsList types.List
+
+		if internetGateway.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *internetGateway.Tags, diags)
+		}
+
+		return &InternetGatewayModel{
+			Id:    types.StringPointerValue(internetGateway.Id),
+			State: types.StringPointerValue(internetGateway.State),
+			VpcId: types.StringPointerValue(internetGateway.VpcId),
+			Tags:  tagsList,
+		}
+	}, diags)
+}
+
+func deserializeReadNumSpotInternetGateway(ctx context.Context, tf InternetGatewaysDataSourceModel, diags *diag.Diagnostics) numspot.ReadInternetGatewaysParams {
+	return numspot.ReadInternetGatewaysParams{
+		TagKeys:    utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:  utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:       utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:        utils.TfStringListToStringPtrList(ctx, tf.IDs, diags),
+		LinkStates: utils.TfStringListToStringPtrList(ctx, tf.LinkStates, diags),
+		LinkVpcIds: utils.TfStringListToStringPtrList(ctx, tf.LinkVpcIds, diags),
+	}
 }
