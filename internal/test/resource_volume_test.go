@@ -68,8 +68,7 @@ resource "numspot_vm" "terraform-dep-vm-volume" {
     }
   ]
 }
-		`
-
+`
 	volumeUpdateLinkDependencies := `
 resource "numspot_vpc" "terraform-dep-vpc-volume" {
   ip_range = "10.101.0.0/16"
@@ -116,7 +115,8 @@ resource "numspot_vm" "terraform-dep-vm-volume-dest-link" {
     }
   ]
 }
-			`
+`
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
