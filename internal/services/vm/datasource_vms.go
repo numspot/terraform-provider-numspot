@@ -164,6 +164,7 @@ func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm, diags *dia
 	if http.BlockDeviceMappings != nil {
 		blockDeviceMappings = utils.GenericListToTfListValue(
 			ctx,
+			BlockDeviceMappingsDataSourceValue{},
 			fromBlockDeviceMappingsToBlockDeviceMappingsList,
 			*http.BlockDeviceMappings,
 			diags,
@@ -173,6 +174,7 @@ func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm, diags *dia
 	if http.Nics != nil {
 		nics = utils.GenericListToTfListValue(
 			ctx,
+			NicsValue{},
 			fromNicsToNicsList,
 			*http.Nics,
 			diags,
@@ -182,6 +184,7 @@ func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm, diags *dia
 	if http.SecurityGroups != nil {
 		securityGroups = utils.GenericListToTfListValue(
 			ctx,
+			SecurityGroupsValue{},
 			fromSecurityGroupToTFSecurityGroupList,
 			*http.SecurityGroups,
 			diags,
@@ -205,7 +208,7 @@ func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm, diags *dia
 	}
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -326,8 +329,8 @@ func fromNicsToNicsList(ctx context.Context, http numspot.NicLight, diags *diag.
 	linkPublicIPObject, diagnostics := linkPublicIP.ToObjectValue(ctx)
 	diags.Append(diagnostics...)
 
-	privateIps := utils.GenericListToTfListValue(ctx, privateIpsFromApi, utils.GetPtrValue(http.PrivateIps), diags)
-	securityGroups := utils.GenericListToTfListValue(ctx, securityGroupsForVmFromHTTP, utils.GetPtrValue(http.SecurityGroups), diags)
+	privateIps := utils.GenericListToTfListValue(ctx, PrivateIpsValue{}, privateIpsFromApi, utils.GetPtrValue(http.PrivateIps), diags)
+	securityGroups := utils.GenericListToTfListValue(ctx, SecurityGroupsValue{}, securityGroupsForVmFromHTTP, utils.GetPtrValue(http.SecurityGroups), diags)
 
 	value, diagnostics := NewNicsValue(
 		NicsValue{}.AttributeTypes(ctx),
