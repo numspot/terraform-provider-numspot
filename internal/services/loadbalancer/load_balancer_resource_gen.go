@@ -234,12 +234,6 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about the source security group of the load balancer, which you can use as part of your inbound rules for your registered VMs.<br />\nTo only allow traffic from load balancers, add a security group rule that specifies this source security group as the inbound source.",
 				MarkdownDescription: "Information about the source security group of the load balancer, which you can use as part of your inbound rules for your registered VMs.<br />\nTo only allow traffic from load balancers, add a security group rule that specifies this source security group as the inbound source.",
 			},
-			"space_id": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "Identifier of the Space",
-				MarkdownDescription: "Identifier of the Space",
-			},
 			"sticky_cookie_policies": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -296,14 +290,12 @@ type LoadBalancerModel struct {
 	BackendVmIds                    types.Set                `tfsdk:"backend_vm_ids"` // MANUALLY EDITED : use 'Set' type instead of 'List'
 	DnsName                         types.String             `tfsdk:"dns_name"`
 	HealthCheck                     HealthCheckValue         `tfsdk:"health_check"`
-	Id                              types.String             `tfsdk:"id"`
 	Listeners                       types.Set                `tfsdk:"listeners"` // MANUALLY EDITED : use 'Set' type instead of 'List'
 	Name                            types.String             `tfsdk:"name"`
 	PublicIp                        types.String             `tfsdk:"public_ip"`
 	SecuredCookies                  types.Bool               `tfsdk:"secured_cookies"`
 	SecurityGroups                  types.List               `tfsdk:"security_groups"`
 	SourceSecurityGroup             SourceSecurityGroupValue `tfsdk:"source_security_group"`
-	SpaceId                         types.String             `tfsdk:"space_id"`
 	StickyCookiePolicies            types.List               `tfsdk:"sticky_cookie_policies"`
 	Subnets                         types.List               `tfsdk:"subnets"`
 	Tags                            types.List               `tfsdk:"tags"`
