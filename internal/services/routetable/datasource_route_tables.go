@@ -3,13 +3,16 @@ package routetable
 import (
 	"context"
 	"fmt"
-	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -83,28 +86,18 @@ func (d *routeTablesDataSource) Read(ctx context.Context, request datasource.Rea
 		return
 	}
 
-	params := RouteTablesFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializeRouteTableDatasourceParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
+	routeTables, err := core.ReadRouteTables(ctx, d.provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("failed to read route tables", err.Error())
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadRouteTablesResponse, error) {
-		return numspotClient.ReadRouteTablesWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Route Table list")
-	}
-
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, RouteTablesFromHttpToTfDatasource, &response.Diagnostics)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, routeTables, serializeRouteTableDatasource, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -113,4 +106,86 @@ func (d *routeTablesDataSource) Read(ctx context.Context, request datasource.Rea
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func deserializeRouteTableDatasourceParams(ctx context.Context, tf RouteTablesDataSourceModel, diags *diag.Diagnostics) numspot.ReadRouteTablesParams {
+	return numspot.ReadRouteTablesParams{
+		TagKeys:                         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:                       utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:                            utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:                             utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		RouteVpcPeeringIds:              utils.TfStringListToStringPtrList(ctx, tf.RouteVpcPeeringIds, diags),
+		RouteNatGatewayIds:              utils.TfStringListToStringPtrList(ctx, tf.RouteNatGatewayIds, diags),
+		RouteVmIds:                      utils.TfStringListToStringPtrList(ctx, tf.RouteVmIds, diags),
+		RouteCreationMethods:            utils.TfStringListToStringPtrList(ctx, tf.RouteCreationMethods, diags),
+		RouteDestinationIpRanges:        utils.TfStringListToStringPtrList(ctx, tf.RouteDestinationIpRanges, diags),
+		RouteDestinationServiceIds:      utils.TfStringListToStringPtrList(ctx, tf.RouteDestinationServiceIds, diags),
+		RouteGatewayIds:                 utils.TfStringListToStringPtrList(ctx, tf.RouteGatewayIds, diags),
+		RouteStates:                     utils.TfStringListToStringPtrList(ctx, tf.RouteStates, diags),
+		VpcIds:                          utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
+		LinkRouteTableIds:               utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableIds, diags),
+		LinkRouteTableMain:              utils.FromTfBoolToBoolPtr(tf.LinkRouteTableMain),
+		LinkRouteTableLinkRouteTableIds: utils.TfStringListToStringPtrList(ctx, tf.LinkRouteTableLinkRouteTableIds, diags),
+		LinkSubnetIds:                   utils.TfStringListToStringPtrList(ctx, tf.LinkSubnetIds, diags),
+	}
+}
+
+func serializeRouteTableDatasource(ctx context.Context, http *numspot.RouteTable, diags *diag.Diagnostics) *RouteTableModelDatasource {
+	var (
+		tagsList                            = types.ListNull(tags.TagsValue{}.Type(ctx))
+		linkRouteTablesList                 = types.ListNull(LinkRouteTablesValue{}.Type(ctx))
+		routes                              = types.ListNull(RoutesValue{}.Type(ctx))
+		routePropagatingVirtualGatewaysList = types.ListNull(RoutePropagatingVirtualGatewaysValue{}.Type(ctx))
+	)
+
+	if http.Tags != nil {
+		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	if http.LinkRouteTables != nil {
+		linkRouteTablesList = utils.GenericListToTfListValue(ctx, LinkRouteTablesValue{}, serializeRouteTableLink, *http.LinkRouteTables, diags)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	if http.RoutePropagatingVirtualGateways != nil {
+		routePropagatingVirtualGatewaysList = utils.GenericListToTfListValue(
+			ctx, RoutePropagatingVirtualGatewaysValue{},
+			serializaRouteTableRoutePropagatingVirtualGateways,
+			*http.RoutePropagatingVirtualGateways, diags)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	if http.Routes != nil {
+		routes = utils.GenericListToTfListValue(ctx, RoutesValue{}, serializeRoute, *http.Routes, diags)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	return &RouteTableModelDatasource{
+		Id:                              types.StringPointerValue(http.Id),
+		Tags:                            tagsList,
+		LinkRouteTables:                 linkRouteTablesList,
+		RoutePropagatingVirtualGateways: routePropagatingVirtualGatewaysList,
+		VpcId:                           types.StringPointerValue(http.VpcId),
+		Routes:                          routes,
+	}
+}
+
+func serializaRouteTableRoutePropagatingVirtualGateways(ctx context.Context, route numspot.RoutePropagatingVirtualGateway, diags *diag.Diagnostics) RoutePropagatingVirtualGatewaysValue {
+	value, diagnostics := NewRoutePropagatingVirtualGatewaysValue(
+		RoutePropagatingVirtualGatewaysValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"virtual_gateway_id": types.StringPointerValue(route.VirtualGatewayId),
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
 }

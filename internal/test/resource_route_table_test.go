@@ -11,6 +11,15 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 )
 
+// Test cases:
+// 1 - Create route table with routes
+// 2 - ImportState testing
+// 3 - Update testing Without Replace (if needed)
+// 4 - Update testing With Replace of dependency resource and with Replace of the resource
+// 5 - recreate testing
+// 6 - reset
+// 7 - Test update: add routes and tags
+
 func TestAccRouteTableResource(t *testing.T) {
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
@@ -24,7 +33,7 @@ func TestAccRouteTableResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{ // 1 - Create testing
+			{ // 1 - Create route table with routes
 				Config: `
 resource "numspot_vpc" "test" {
   ip_range = "10.101.0.0/16"
@@ -135,7 +144,6 @@ resource "numspot_route_table" "test" {
 				),
 			},
 
-			// <== If resource has optional dependencies ==>
 			// 4 - Update testing With Replace of dependency resource and with Replace of the resource
 			// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
 			{
@@ -185,6 +193,135 @@ resource "numspot_route_table" "test" {
 						}
 						if !assert.NotEqual(t, resourceId, v) {
 							return fmt.Errorf("Id should have changed")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
+			},
+			// 5 - recreate testing
+			{
+				Config: `
+resource "numspot_vpc" "test_recreate" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "test_recreate" {
+  vpc_id   = numspot_vpc.test_recreate.id
+  ip_range = "10.101.1.0/24"
+}
+
+resource "numspot_internet_gateway" "test_recreate" {
+  vpc_id = numspot_vpc.test_recreate.id
+}
+
+resource "numspot_route_table" "test_recreate" {
+  vpc_id    = numspot_vpc.test_recreate.id
+  subnet_id = numspot_subnet.test_recreate.id
+  routes = [
+    {
+      destination_ip_range = "0.0.0.0/0"
+      gateway_id           = numspot_internet_gateway.test_recreate.id
+    }
+  ]
+  tags = [{
+    key   = "name"
+    value = "Terraform-Test-Volume-recreated"
+  }]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_route_table.test_recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_route_table.test_recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Volume-recreated",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test_recreate", "subnet_id", "numspot_subnet.test_recreate", "id"),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test_recreate", "routes.*", map[string]string{
+						"gateway_id":           acctest.PAIR_PREFIX + "numspot_internet_gateway.test_recreate.id",
+						"destination_ip_range": "0.0.0.0/0",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_route_table.test_recreate", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.NotEqual(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
+			},
+			// 6 - reset
+			{
+				Config: `
+resource "numspot_vpc" "test" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_route_table" "test" {
+  vpc_id = numspot_vpc.test.id
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test", "id"),
+					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.NotEqual(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
+			},
+			// 7 - Test update: add routes and tags
+			{
+				Config: `
+resource "numspot_vpc" "test" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_subnet" "test" {
+  vpc_id   = numspot_vpc.test.id
+  ip_range = "10.101.1.0/24"
+}
+
+resource "numspot_internet_gateway" "test" {
+  vpc_id = numspot_vpc.test.id
+}
+
+resource "numspot_route_table" "test" {
+  vpc_id    = numspot_vpc.test.id
+  subnet_id = numspot_subnet.test.id
+  routes = [
+    {
+      destination_ip_range = "0.0.0.0/0"
+      gateway_id           = numspot_internet_gateway.test.id
+    }
+  ]
+  tags = [{
+    key   = "name"
+    value = "Terraform-Test-Volume"
+  }]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_route_table.test", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_route_table.test", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-Volume",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test", "subnet_id", "numspot_subnet.test", "id"),
+					resource.TestCheckResourceAttrPair("numspot_route_table.test", "vpc_id", "numspot_vpc.test", "id"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_route_table.test", "routes.*", map[string]string{
+						"gateway_id":           acctest.PAIR_PREFIX + "numspot_internet_gateway.test.id",
+						"destination_ip_range": "0.0.0.0/0",
+					}),
+					resource.TestCheckResourceAttrWith("numspot_route_table.test", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
 						}
 						return nil
 					}),

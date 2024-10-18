@@ -104,18 +104,16 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 40
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"ipRange":"10.101.0.0/16","tenancy":""}'
+        body: ""
         form: {}
-        headers:
-            Content-Type:
-                - application/json
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/publicIps
         method: POST
       response:
         proto: HTTP/1.1
@@ -123,9 +121,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 132
+        content_length: 62
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-7bb516ea","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"id":"eipalloc-517285c2","publicIp":"142.44.52.90","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -134,7 +132,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "132"
+                - "62"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -157,16 +155,18 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 40
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: ""
+        body: '{"ipRange":"10.101.0.0/16","tenancy":""}'
         form: {}
-        headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/publicIps
+        headers:
+            Content-Type:
+                - application/json
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs
         method: POST
       response:
         proto: HTTP/1.1
@@ -174,9 +174,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 62
+        content_length: 132
         uncompressed: false
-        body: '{"id":"eipalloc-8e2c0e3f","publicIp":"80.247.14.59","tags":[]}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-9ea313f3","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -185,7 +185,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "62"
+                - "132"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -217,7 +217,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-7bb516ea
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/publicIps/eipalloc-517285c2
         method: GET
       response:
         proto: HTTP/1.1
@@ -225,9 +225,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 132
+        content_length: 62
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-7bb516ea","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"id":"eipalloc-517285c2","publicIp":"142.44.52.90","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -236,7 +236,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "132"
+                - "62"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -268,7 +268,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/publicIps/eipalloc-8e2c0e3f
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-9ea313f3
         method: GET
       response:
         proto: HTTP/1.1
@@ -276,9 +276,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 62
+        content_length: 132
         uncompressed: false
-        body: '{"id":"eipalloc-8e2c0e3f","publicIp":"80.247.14.59","tags":[]}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-9ea313f3","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -287,7 +287,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "62"
+                - "132"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -329,7 +329,7 @@ interactions:
         trailer: {}
         content_length: 31
         uncompressed: false
-        body: '{"id":"igw-336c4cd4","tags":[]}'
+        body: '{"id":"igw-1b3f8f29","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -367,7 +367,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-7bb516ea"}'
+        body: '{"availabilityZoneName":"","ipRange":"10.101.1.0/24","vpcId":"vpc-9ea313f3"}'
         form: {}
         headers:
             Content-Type:
@@ -382,7 +382,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-3c96f92c","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-e5093cda","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -420,12 +420,12 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"vpcId":"vpc-7bb516ea"}'
+        body: '{"vpcId":"vpc-9ea313f3"}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-336c4cd4/vpcs/link
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-1b3f8f29/vpcs/link
         method: PUT
       response:
         proto: HTTP/1.1
@@ -463,26 +463,28 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 28
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: ""
+        body: '{"mapPublicIpOnLaunch":true}'
         form: {}
-        headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3c96f92c
-        method: GET
+        headers:
+            Content-Type:
+                - application/json
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-e5093cda
+        method: PUT
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 201
+        content_length: 200
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-3c96f92c","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-e5093cda","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -491,7 +493,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "201"
+                - "200"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -523,7 +525,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-336c4cd4
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-1b3f8f29
         method: GET
       response:
         proto: HTTP/1.1
@@ -533,7 +535,7 @@ interactions:
         trailer: {}
         content_length: 74
         uncompressed: false
-        body: '{"id":"igw-336c4cd4","state":"available","tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"id":"igw-1b3f8f29","state":"available","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -565,19 +567,17 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 28
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"mapPublicIpOnLaunch":true}'
+        body: ""
         form: {}
-        headers:
-            Content-Type:
-                - application/json
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3c96f92c
-        method: PUT
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-e5093cda
+        method: GET
       response:
         proto: HTTP/1.1
         proto_major: 1
@@ -586,7 +586,7 @@ interactions:
         trailer: {}
         content_length: 200
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-3c96f92c","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-e5093cda","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -627,7 +627,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3c96f92c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-e5093cda
         method: GET
       response:
         proto: HTTP/1.1
@@ -637,7 +637,7 @@ interactions:
         trailer: {}
         content_length: 200
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-3c96f92c","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-e5093cda","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -669,64 +669,13 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3c96f92c
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 200
-        uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-3c96f92c","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-7bb516ea"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "200"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 14
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
         content_length: 24
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"vpcId":"vpc-7bb516ea"}'
+        body: '{"vpcId":"vpc-9ea313f3"}'
         form: {}
         headers:
             Content-Type:
@@ -741,7 +690,7 @@ interactions:
         trailer: {}
         content_length: 235
         uncompressed: false
-        body: '{"id":"rtb-0b5fb870","linkRouteTables":[],"routePropagatingVirtualGateways":[],"routes":[{"creationMethod":"CreateRouteTable","destinationIpRange":"10.101.0.0/16","gatewayId":"local","state":"active"}],"tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"id":"rtb-f4fb2382","linkRouteTables":[],"routePropagatingVirtualGateways":[],"routes":[{"creationMethod":"CreateRouteTable","destinationIpRange":"10.101.0.0/16","gatewayId":"local","state":"active"}],"tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -768,7 +717,7 @@ interactions:
         status: 201 Created
         code: 201
         duration: 5ms
-    - id: 15
+    - id: 14
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -779,12 +728,12 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"destinationIpRange":"0.0.0.0/0","gatewayId":"igw-336c4cd4","natGatewayId":"","nicId":"","vmId":"","vpcPeeringId":""}'
+        body: '{"destinationIpRange":"0.0.0.0/0","gatewayId":"igw-1b3f8f29","natGatewayId":"","nicId":"","vmId":"","vpcPeeringId":""}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-0b5fb870/routes
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-f4fb2382/routes
         method: POST
       response:
         proto: HTTP/1.1
@@ -794,7 +743,7 @@ interactions:
         trailer: {}
         content_length: 345
         uncompressed: false
-        body: '{"id":"rtb-0b5fb870","linkRouteTables":[],"routePropagatingVirtualGateways":[],"routes":[{"creationMethod":"CreateRouteTable","destinationIpRange":"10.101.0.0/16","gatewayId":"local","state":"active"},{"creationMethod":"CreateRoute","destinationIpRange":"0.0.0.0/0","gatewayId":"igw-336c4cd4","state":"active"}],"tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"id":"rtb-f4fb2382","linkRouteTables":[],"routePropagatingVirtualGateways":[],"routes":[{"creationMethod":"CreateRouteTable","destinationIpRange":"10.101.0.0/16","gatewayId":"local","state":"active"},{"creationMethod":"CreateRoute","destinationIpRange":"0.0.0.0/0","gatewayId":"igw-1b3f8f29","state":"active"}],"tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -821,7 +770,7 @@ interactions:
         status: 201 Created
         code: 201
         duration: 5ms
-    - id: 16
+    - id: 15
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -832,12 +781,12 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"subnetId":"subnet-3c96f92c"}'
+        body: '{"subnetId":"subnet-e5093cda"}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-0b5fb870/subnets/link
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-f4fb2382/subnets/link
         method: PUT
       response:
         proto: HTTP/1.1
@@ -847,7 +796,7 @@ interactions:
         trailer: {}
         content_length: 40
         uncompressed: false
-        body: '{"linkRouteTableId":"rtbassoc-f71efced"}'
+        body: '{"linkRouteTableId":"rtbassoc-18e9a2b0"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -874,7 +823,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 17
+    - id: 16
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -888,7 +837,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-0b5fb870
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-f4fb2382
         method: GET
       response:
         proto: HTTP/1.1
@@ -898,7 +847,7 @@ interactions:
         trailer: {}
         content_length: 443
         uncompressed: false
-        body: '{"id":"rtb-0b5fb870","linkRouteTables":[{"id":"rtbassoc-f71efced","main":false,"routeTableId":"rtb-0b5fb870","subnetId":"subnet-3c96f92c"}],"routePropagatingVirtualGateways":[],"routes":[{"creationMethod":"CreateRoute","destinationIpRange":"0.0.0.0/0","gatewayId":"igw-336c4cd4","state":"active"},{"creationMethod":"CreateRouteTable","destinationIpRange":"10.101.0.0/16","gatewayId":"local","state":"active"}],"tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"id":"rtb-f4fb2382","linkRouteTables":[{"id":"rtbassoc-18e9a2b0","main":false,"routeTableId":"rtb-f4fb2382","subnetId":"subnet-e5093cda"}],"routePropagatingVirtualGateways":[],"routes":[{"creationMethod":"CreateRoute","destinationIpRange":"0.0.0.0/0","gatewayId":"igw-1b3f8f29","state":"active"},{"creationMethod":"CreateRouteTable","destinationIpRange":"10.101.0.0/16","gatewayId":"local","state":"active"}],"tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -925,7 +874,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 18
+    - id: 17
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -936,7 +885,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"publicIpId":"eipalloc-8e2c0e3f","subnetId":"subnet-3c96f92c"}'
+        body: '{"publicIpId":"eipalloc-517285c2","subnetId":"subnet-e5093cda"}'
         form: {}
         headers:
             Content-Type:
@@ -951,7 +900,7 @@ interactions:
         trailer: {}
         content_length: 178
         uncompressed: false
-        body: '{"id":"nat-a42dc44a","publicIps":[{"publicIp":"80.247.14.59","publicIpId":"eipalloc-8e2c0e3f"}],"state":"available","subnetId":"subnet-3c96f92c","tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"id":"nat-4703954b","publicIps":[{"publicIp":"142.44.52.90","publicIpId":"eipalloc-517285c2"}],"state":"available","subnetId":"subnet-e5093cda","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -978,7 +927,7 @@ interactions:
         status: 201 Created
         code: 201
         duration: 5ms
-    - id: 19
+    - id: 18
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -992,7 +941,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways/nat-a42dc44a
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways/nat-4703954b
         method: GET
       response:
         proto: HTTP/1.1
@@ -1002,7 +951,7 @@ interactions:
         trailer: {}
         content_length: 178
         uncompressed: false
-        body: '{"id":"nat-a42dc44a","publicIps":[{"publicIp":"80.247.14.59","publicIpId":"eipalloc-8e2c0e3f"}],"state":"available","subnetId":"subnet-3c96f92c","tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"id":"nat-4703954b","publicIps":[{"publicIp":"142.44.52.90","publicIpId":"eipalloc-517285c2"}],"state":"available","subnetId":"subnet-e5093cda","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1029,7 +978,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 20
+    - id: 19
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1043,7 +992,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways?subnetIds=subnet-3c96f92c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways?subnetIds=subnet-e5093cda
         method: GET
       response:
         proto: HTTP/1.1
@@ -1053,7 +1002,7 @@ interactions:
         trailer: {}
         content_length: 190
         uncompressed: false
-        body: '{"items":[{"id":"nat-a42dc44a","publicIps":[{"publicIp":"80.247.14.59","publicIpId":"eipalloc-8e2c0e3f"}],"state":"available","subnetId":"subnet-3c96f92c","tags":[],"vpcId":"vpc-7bb516ea"}]}'
+        body: '{"items":[{"id":"nat-4703954b","publicIps":[{"publicIp":"142.44.52.90","publicIpId":"eipalloc-517285c2"}],"state":"available","subnetId":"subnet-e5093cda","tags":[],"vpcId":"vpc-9ea313f3"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1077,6 +1026,55 @@ interactions:
             X-Krakend-Completed:
                 - "false"
                 - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 20
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
         status: 200 OK
         code: 200
         duration: 5ms
@@ -1085,55 +1083,6 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token","expires_in": 3600}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 22
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
         content_length: 0
         transfer_encoding: []
         trailer: {}
@@ -1143,7 +1092,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways?subnetIds=subnet-3c96f92c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways?subnetIds=subnet-e5093cda
         method: GET
       response:
         proto: HTTP/1.1
@@ -1153,7 +1102,7 @@ interactions:
         trailer: {}
         content_length: 190
         uncompressed: false
-        body: '{"items":[{"id":"nat-a42dc44a","publicIps":[{"publicIp":"80.247.14.59","publicIpId":"eipalloc-8e2c0e3f"}],"state":"available","subnetId":"subnet-3c96f92c","tags":[],"vpcId":"vpc-7bb516ea"}]}'
+        body: '{"items":[{"id":"nat-4703954b","publicIps":[{"publicIp":"142.44.52.90","publicIpId":"eipalloc-517285c2"}],"state":"available","subnetId":"subnet-e5093cda","tags":[],"vpcId":"vpc-9ea313f3"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1180,7 +1129,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 23
+    - id: 22
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -1226,6 +1175,57 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 23
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/publicIps/eipalloc-517285c2
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 99
+        uncompressed: false
+        body: '{"id":"eipalloc-517285c2","linkPublicIpId":"eipassoc-2cc9d534","publicIp":"142.44.52.90","tags":[]}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "99"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -1243,7 +1243,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-7bb516ea
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-9ea313f3
         method: GET
       response:
         proto: HTTP/1.1
@@ -1253,7 +1253,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-7bb516ea","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-9ea313f3","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1294,7 +1294,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/publicIps/eipalloc-8e2c0e3f
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-1b3f8f29
         method: GET
       response:
         proto: HTTP/1.1
@@ -1302,9 +1302,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 99
+        content_length: 74
         uncompressed: false
-        body: '{"id":"eipalloc-8e2c0e3f","linkPublicIpId":"eipassoc-7fe49b75","publicIp":"80.247.14.59","tags":[]}'
+        body: '{"id":"igw-1b3f8f29","state":"available","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1313,7 +1313,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "99"
+                - "74"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -1345,7 +1345,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-336c4cd4
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-e5093cda
         method: GET
       response:
         proto: HTTP/1.1
@@ -1353,9 +1353,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 74
+        content_length: 200
         uncompressed: false
-        body: '{"id":"igw-336c4cd4","state":"available","tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-e5093cda","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1364,7 +1364,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "74"
+                - "200"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -1396,7 +1396,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3c96f92c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-f4fb2382
         method: GET
       response:
         proto: HTTP/1.1
@@ -1404,9 +1404,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 200
+        content_length: 443
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-3c96f92c","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":true,"state":"available","tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"id":"rtb-f4fb2382","linkRouteTables":[{"id":"rtbassoc-18e9a2b0","main":false,"routeTableId":"rtb-f4fb2382","subnetId":"subnet-e5093cda"}],"routePropagatingVirtualGateways":[],"routes":[{"creationMethod":"CreateRoute","destinationIpRange":"0.0.0.0/0","gatewayId":"igw-1b3f8f29","state":"active"},{"creationMethod":"CreateRouteTable","destinationIpRange":"10.101.0.0/16","gatewayId":"local","state":"active"}],"tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1415,7 +1415,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "200"
+                - "443"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -1447,7 +1447,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-0b5fb870
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways/nat-4703954b
         method: GET
       response:
         proto: HTTP/1.1
@@ -1455,9 +1455,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 443
+        content_length: 178
         uncompressed: false
-        body: '{"id":"rtb-0b5fb870","linkRouteTables":[{"id":"rtbassoc-f71efced","main":false,"routeTableId":"rtb-0b5fb870","subnetId":"subnet-3c96f92c"}],"routePropagatingVirtualGateways":[],"routes":[{"creationMethod":"CreateRoute","destinationIpRange":"0.0.0.0/0","gatewayId":"igw-336c4cd4","state":"active"},{"creationMethod":"CreateRouteTable","destinationIpRange":"10.101.0.0/16","gatewayId":"local","state":"active"}],"tags":[],"vpcId":"vpc-7bb516ea"}'
+        body: '{"id":"nat-4703954b","publicIps":[{"publicIp":"142.44.52.90","publicIpId":"eipalloc-517285c2"}],"state":"available","subnetId":"subnet-e5093cda","tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1466,7 +1466,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "443"
+                - "178"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -1498,58 +1498,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways/nat-a42dc44a
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 178
-        uncompressed: false
-        body: '{"id":"nat-a42dc44a","publicIps":[{"publicIp":"80.247.14.59","publicIpId":"eipalloc-8e2c0e3f"}],"state":"available","subnetId":"subnet-3c96f92c","tags":[],"vpcId":"vpc-7bb516ea"}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "178"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 30
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways?subnetIds=subnet-3c96f92c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways?subnetIds=subnet-e5093cda
         method: GET
       response:
         proto: HTTP/1.1
@@ -1559,7 +1508,7 @@ interactions:
         trailer: {}
         content_length: 190
         uncompressed: false
-        body: '{"items":[{"id":"nat-a42dc44a","publicIps":[{"publicIp":"80.247.14.59","publicIpId":"eipalloc-8e2c0e3f"}],"state":"available","subnetId":"subnet-3c96f92c","tags":[],"vpcId":"vpc-7bb516ea"}]}'
+        body: '{"items":[{"id":"nat-4703954b","publicIps":[{"publicIp":"142.44.52.90","publicIpId":"eipalloc-517285c2"}],"state":"available","subnetId":"subnet-e5093cda","tags":[],"vpcId":"vpc-9ea313f3"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1583,6 +1532,55 @@ interactions:
             X-Krakend-Completed:
                 - "false"
                 - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 30
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
         status: 200 OK
         code: 200
         duration: 5ms
@@ -1640,55 +1638,6 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 117
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 1229
-        uncompressed: false
-        body: '{"access_token": "just a fake token","expires_in": 3600}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "1229"
-            Content-Type:
-                - application/json
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-            X-Krakend:
-                - Version undefined
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 33
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
         content_length: 0
         transfer_encoding: []
         trailer: {}
@@ -1698,7 +1647,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways/nat-a42dc44a
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/natGateways/nat-4703954b
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1722,7 +1671,56 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - nat-a42dc44a
+                - nat-4703954b
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "false"
+        status: 204 No Content
+        code: 204
+        duration: 5ms
+    - id: 33
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/publicIps/eipalloc-517285c2
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Id:
+                - eipalloc-517285c2
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -1744,12 +1742,12 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"linkRouteTableId":"rtbassoc-f71efced"}'
+        body: '{"linkRouteTableId":"rtbassoc-18e9a2b0"}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-0b5fb870/subnets/unlink
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-f4fb2382/subnets/unlink
         method: PUT
       response:
         proto: HTTP/1.1
@@ -1796,22 +1794,26 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/publicIps/eipalloc-8e2c0e3f
-        method: DELETE
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-f4fb2382
+        method: GET
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 0
+        content_length: 345
         uncompressed: false
-        body: ""
+        body: '{"id":"rtb-f4fb2382","linkRouteTables":[],"routePropagatingVirtualGateways":[],"routes":[{"creationMethod":"CreateRoute","destinationIpRange":"0.0.0.0/0","gatewayId":"igw-1b3f8f29","state":"active"},{"creationMethod":"CreateRouteTable","destinationIpRange":"10.101.0.0/16","gatewayId":"local","state":"active"}],"tags":[],"vpcId":"vpc-9ea313f3"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
+            Cache-Control:
+                - public, max-age=300
             Connection:
                 - keep-alive
+            Content-Length:
+                - "345"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -1819,17 +1821,15 @@ interactions:
             Vary:
                 - Origin
                 - Origin
-            X-Id:
-                - eipalloc-8e2c0e3f
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
                 - Version 2.6.3
             X-Krakend-Completed:
                 - "false"
-                - "false"
-        status: 204 No Content
-        code: 204
+                - "true"
+        status: 200 OK
+        code: 200
         duration: 5ms
     - id: 36
       request:
@@ -1845,7 +1845,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-0b5fb870
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/routeTables/rtb-f4fb2382
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1869,7 +1869,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - rtb-0b5fb870
+                - rtb-f4fb2382
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -1891,12 +1891,12 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"vpcId":"vpc-7bb516ea"}'
+        body: '{"vpcId":"vpc-9ea313f3"}'
         form: {}
         headers:
             Content-Type:
                 - application/json
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-336c4cd4/vpcs/unlink
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-1b3f8f29/vpcs/unlink
         method: PUT
       response:
         proto: HTTP/1.1
@@ -1943,7 +1943,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3c96f92c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-1b3f8f29
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1967,7 +1967,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - subnet-3c96f92c
+                - igw-1b3f8f29
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -1992,7 +1992,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/internetGateways/igw-336c4cd4
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-e5093cda
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2016,7 +2016,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - igw-336c4cd4
+                - subnet-e5093cda
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -2041,7 +2041,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-7bb516ea
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-9ea313f3
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2065,7 +2065,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - vpc-7bb516ea
+                - vpc-9ea313f3
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
