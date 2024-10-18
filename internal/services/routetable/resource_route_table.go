@@ -3,15 +3,16 @@ package routetable
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -61,63 +62,20 @@ func (r *RouteTableResource) Schema(ctx context.Context, request resource.Schema
 }
 
 func (r *RouteTableResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data RouteTableModel
-	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
-
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	numspotClient, err := r.provider.GetClient(ctx)
+	var plan RouteTableModel
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+	payload := deserializeCreateRouteTable(&plan)
+	tagsList := tags.TfTagsToApiTags(ctx, plan.Tags)
+	routes := deserializeRoutes(ctx, plan.Routes)
+	res, err := core.CreateRouteTable(ctx, r.provider, payload, tagsList, routes, plan.SubnetId.ValueStringPointer())
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("failed to create route table", err.Error())
 		return
 	}
 
-	// Retries create until request response is OK
-	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
+	tf := serializeRouteTable(
 		ctx,
-		r.provider.SpaceID,
-		RouteTableFromTfToCreateRequest(&data),
-		numspotClient.CreateRouteTableWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Route Table", err.Error())
-		return
-	}
-
-	jsonRes := *res.JSON201
-	createdId := *jsonRes.Id
-
-	// Tags
-	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
-
-	routes := make([]RoutesValue, 0, len(data.Routes.Elements()))
-	data.Routes.ElementsAs(ctx, &routes, false)
-	r.createRoutes(ctx, createdId, routes, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	if !data.SubnetId.IsNull() {
-		r.linkRouteTable(ctx, createdId, data.SubnetId.ValueString(), &response.Diagnostics)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
-
-	read := r.readRouteTable(ctx, createdId, response.Diagnostics)
-	if read == nil {
-		return
-	}
-
-	tf := RouteTableFromHttpToTf(
-		ctx,
-		read.JSON200,
+		res,
 		&response.Diagnostics,
 	)
 	if response.Diagnostics.HasError() {
@@ -131,14 +89,15 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 	var data RouteTableModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	res := r.readRouteTable(ctx, data.Id.ValueString(), response.Diagnostics)
-	if res == nil {
+	res, err := core.ReadRouteTable(ctx, r.provider, data.Id.ValueString())
+	if err != nil {
+		response.Diagnostics.AddError("failed to read Route Table", err.Error())
 		return
 	}
 
-	tf := RouteTableFromHttpToTf(
+	tf := serializeRouteTable(
 		ctx,
-		res.JSON200,
+		res,
 		&response.Diagnostics,
 	)
 	if response.Diagnostics.HasError() {
@@ -148,256 +107,185 @@ func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequ
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *RouteTableResource) readRouteTable(ctx context.Context, id string, diags diag.Diagnostics) *numspot.ReadRouteTablesByIdResponse {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return nil
-	}
-
-	res, err := numspotClient.ReadRouteTablesByIdWithResponse(ctx, r.provider.SpaceID, id)
-	if err != nil {
-		diags.AddError("Failed to read RouteTable", err.Error())
-		return nil
-	}
-
-	if res.StatusCode() != http.StatusOK {
-		apiError := utils.HandleError(res.Body)
-		diags.AddError("Failed to read RouteTable", apiError.Error())
-		return nil
-	}
-
-	return res
-}
-
 func (r *RouteTableResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan RouteTableModel
-		modifs      = false
+		routeTable  *numspot.RouteTable
+		err         error
 	)
-	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
+
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	if !state.Tags.Equal(plan.Tags) {
-		tags.UpdateTags(
-			ctx,
-			state.Tags,
-			plan.Tags,
-			&response.Diagnostics,
-			numspotClient,
-			r.provider.SpaceID,
-			state.Id.ValueString(),
-		)
-		if response.Diagnostics.HasError() {
-			return
-		}
-
-		modifs = true
-	}
-
-	stateRoutes := make([]RoutesValue, 0, len(state.Routes.Elements()))
-	diags := state.Routes.ElementsAs(ctx, &stateRoutes, false)
-	response.Diagnostics.Append(diags...)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	stateRoutesWithoutLocal := r.removeLocalRouteFromRoutes(stateRoutes)
-	if !state.Routes.Equal(plan.Routes) {
-		switch {
-		case len(stateRoutesWithoutLocal) == 0 && len(plan.Routes.Elements()) > 0:
-			planRoutes := make([]RoutesValue, 0, len(plan.Routes.Elements()))
-			diags = plan.Routes.ElementsAs(ctx, &planRoutes, false)
-			response.Diagnostics.Append(diags...)
-			if response.Diagnostics.HasError() {
-				return
-			}
 
-			r.createRoutes(ctx, state.Id.ValueString(), planRoutes, &response.Diagnostics)
-			response.Diagnostics.Append(diags...)
-			if response.Diagnostics.HasError() {
-				return
-			}
-
-			modifs = true
-		case len(stateRoutesWithoutLocal) > 0 && len(plan.Routes.Elements()) == 0:
-			r.deleteRoutes(ctx, state.Id.ValueString(), stateRoutesWithoutLocal, &response.Diagnostics)
-			response.Diagnostics.Append(diags...)
-			if response.Diagnostics.HasError() {
-				return
-			}
-
-			modifs = true
-		case len(stateRoutesWithoutLocal) > 0 && len(plan.Routes.Elements()) > 0:
-			planRoutes := make([]RoutesValue, 0, len(plan.Routes.Elements()))
-			diags = plan.Routes.ElementsAs(ctx, &planRoutes, false)
-			response.Diagnostics.Append(diags...)
-			if response.Diagnostics.HasError() {
-				return
-			}
-
-			toCreate, toDelete := utils.Diff(stateRoutesWithoutLocal, planRoutes)
-			r.createRoutes(ctx, state.Id.ValueString(), toCreate, &response.Diagnostics)
-			if response.Diagnostics.HasError() {
-				return
-			}
-
-			r.deleteRoutes(ctx, state.Id.ValueString(), toDelete, &response.Diagnostics)
-			response.Diagnostics.Append(diags...)
-			if response.Diagnostics.HasError() {
-				return
-			}
-
-			modifs = true
+	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	if !state.Tags.Equal(plan.Tags) {
+		routeTable, err = core.UpdateRouteTableTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags)
+		if err != nil {
+			response.Diagnostics.AddError("failed to update route table tags", err.Error())
+			return
 		}
 	}
 
-	if modifs {
-		// Read and update the state
-		res := r.readRouteTable(ctx, state.Id.ValueString(), response.Diagnostics)
-		if response.Diagnostics.HasError() {
+	stRoutes := deserializeRoutes(ctx, state.Routes)
+	plRoutes := deserializeRoutes(ctx, plan.Routes)
+	if !state.Routes.Equal(plan.Routes) {
+		routeTable, err = core.UpdateRouteTableRoutes(ctx, r.provider, state.Id.ValueString(), stRoutes, plRoutes)
+		if err != nil {
+			response.Diagnostics.AddError("failed to update route table routes", err.Error())
 			return
 		}
-
-		tf := RouteTableFromHttpToTf(
+	}
+	if routeTable != nil {
+		tf := serializeRouteTable(
 			ctx,
-			res.JSON200,
+			routeTable,
 			&response.Diagnostics,
 		)
-		response.Diagnostics.Append(diags...)
 		if response.Diagnostics.HasError() {
 			return
 		}
-
 		response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+
 	}
 }
 
 func (r *RouteTableResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data RouteTableModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	// Unlink route tables
-	links := make([]LinkRouteTablesValue, 0, len(data.LinkRouteTables.Elements()))
-	diags := data.LinkRouteTables.ElementsAs(ctx, &links, false)
-	response.Diagnostics.Append(diags...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	unlinkDiags := diag.Diagnostics{}
-	for _, link := range links {
-		r.unlinkRouteTable(ctx, data.Id.ValueString(), link.Id.ValueString(), &unlinkDiags)
-		unlinkDiags.Append(diags...)
-	}
-
-	if unlinkDiags.HasError() {
-		readRes := r.readRouteTable(ctx, data.Id.ValueString(), response.Diagnostics)
-		if readRes == nil {
-			return
-		}
-
-		if len(*readRes.JSON200.LinkRouteTables) > 0 {
-			response.Diagnostics.Append(unlinkDiags...)
-			return
-		}
-	}
-
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteRouteTableWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete Route Table", err.Error())
-		return
+	links := utils.TfListToGenericList(func(link LinkRouteTablesValue) string {
+		return link.Id.ValueString()
+	}, ctx, data.LinkRouteTables, &response.Diagnostics)
+	if err := core.DeleteRouteTable(ctx, r.provider, data.Id.ValueString(), links); err != nil {
+		response.Diagnostics.AddError("failed to delete route table", err.Error())
 	}
 }
 
-func (r *RouteTableResource) createRoutes(ctx context.Context, routeTableId string, routes []RoutesValue, diags *diag.Diagnostics) {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
+func serializeRouteTableLink(ctx context.Context, link numspot.LinkRouteTable, diags *diag.Diagnostics) LinkRouteTablesValue {
+	value, diagnostics := NewLinkRouteTablesValue(
+		LinkRouteTablesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"id":             types.StringPointerValue(link.Id),
+			"main":           types.BoolPointerValue(link.Main),
+			"route_table_id": types.StringPointerValue(link.RouteTableId),
+			"subnet_id":      types.StringPointerValue(link.SubnetId),
+			"vpc_id":         types.StringPointerValue(link.VpcId),
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
+}
 
-	for i := range routes {
-		route := &routes[i]
-		if route != nil {
-			// prevent creating the one added in the plan modify function
-			if !route.IsUnknown() && !route.IsNull() && !strings.EqualFold(route.GatewayId.ValueString(), "local") {
-				createdRoute := utils.ExecuteRequest(func() (*numspot.CreateRouteResponse, error) {
-					return numspotClient.CreateRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToCreateRoutesRequest(*route))
-				}, http.StatusCreated, diags)
-				if createdRoute == nil {
-					return
-				}
+func serializeRoute(ctx context.Context, route numspot.Route, diags *diag.Diagnostics) RoutesValue {
+	value, diagnostics := NewRoutesValue(
+		RoutesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"creation_method":        types.StringPointerValue(route.CreationMethod),
+			"destination_ip_range":   types.StringPointerValue(route.DestinationIpRange),
+			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
+			"gateway_id":             types.StringPointerValue(route.GatewayId),
+			"nat_gateway_id":         types.StringPointerValue(route.NatGatewayId),
+			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
+			"nic_id":                 types.StringPointerValue(route.NicId),
+			"state":                  types.StringPointerValue(route.State),
+			"vm_id":                  types.StringPointerValue(route.VmId),
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
+}
+
+func serializeRouteTable(ctx context.Context, http *numspot.RouteTable, diags *diag.Diagnostics) *RouteTableModel {
+	var (
+		localRoute RoutesValue
+		routes     []numspot.Route
+		tagsTf     types.List
+	)
+
+	if http.Routes == nil {
+		return nil
+	}
+	for _, route := range *http.Routes {
+		if route.GatewayId != nil && *route.GatewayId == "local" {
+			localRoute = serializeRoute(ctx, route, diags)
+			if diags.HasError() {
+				return nil
 			}
-		}
-	}
-}
-
-func (r *RouteTableResource) deleteRoutes(ctx context.Context, routeTableId string, routes []RoutesValue, diags *diag.Diagnostics) {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-	for i := range routes {
-		route := &routes[i]
-		if route != nil {
-			deletedRoute := utils.ExecuteRequest(func() (*numspot.DeleteRouteResponse, error) {
-				return numspotClient.DeleteRouteWithResponse(ctx, r.provider.SpaceID, routeTableId, RouteTableFromTfToDeleteRoutesRequest(*route))
-			}, http.StatusNoContent, diags)
-			if deletedRoute == nil {
-				return
-			}
-		}
-	}
-}
-
-func (r *RouteTableResource) linkRouteTable(ctx context.Context, routeTableId, subnetId string, diags *diag.Diagnostics) {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-	utils.ExecuteRequest(func() (*numspot.LinkRouteTableResponse, error) {
-		return numspotClient.LinkRouteTableWithResponse(ctx, r.provider.SpaceID, routeTableId, numspot.LinkRouteTableJSONRequestBody{SubnetId: subnetId})
-	}, http.StatusOK, diags)
-}
-
-func (r *RouteTableResource) unlinkRouteTable(ctx context.Context, routeTableId, linkRouteTableId string, diags *diag.Diagnostics) {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-	utils.ExecuteRequest(func() (*numspot.UnlinkRouteTableResponse, error) {
-		return numspotClient.UnlinkRouteTableWithResponse(ctx, r.provider.SpaceID, routeTableId, numspot.UnlinkRouteTableJSONRequestBody{LinkRouteTableId: linkRouteTableId})
-	}, http.StatusNoContent, diags)
-}
-
-func (r *RouteTableResource) removeLocalRouteFromRoutes(routes []RoutesValue) []RoutesValue {
-	arr := make([]RoutesValue, 0)
-	for _, route := range routes {
-		if !strings.EqualFold(route.GatewayId.ValueString(), "local") {
-			arr = append(arr, route)
+		} else {
+			routes = append(routes, route)
 		}
 	}
 
-	return arr
+	// Routes
+	tfRoutes := utils.GenericSetToTfSetValue(ctx, RoutesValue{}, serializeRoute, routes, diags)
+	if diags.HasError() {
+		return nil
+	}
+
+	// Links
+	tfLinks := utils.GenericListToTfListValue(ctx, LinkRouteTablesValue{}, serializeRouteTableLink, *http.LinkRouteTables, diags)
+	if diags.HasError() {
+		return nil
+	}
+
+	// Retrieve Subnet Id:
+	var subnetId *string
+	for _, assoc := range *http.LinkRouteTables {
+		if assoc.SubnetId != nil {
+			subnetId = assoc.SubnetId
+			break
+		}
+	}
+
+	if http.Tags != nil {
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	res := RouteTableModel{
+		Id:                              types.StringPointerValue(http.Id),
+		LinkRouteTables:                 tfLinks,
+		VpcId:                           types.StringPointerValue(http.VpcId),
+		RoutePropagatingVirtualGateways: types.ListNull(RoutePropagatingVirtualGatewaysValue{}.Type(ctx)),
+		Routes:                          tfRoutes,
+		SubnetId:                        types.StringPointerValue(subnetId),
+		Tags:                            tagsTf,
+		LocalRoute:                      localRoute,
+	}
+
+	return &res
+}
+
+func deserializeCreateRouteTable(tf *RouteTableModel) numspot.CreateRouteTableJSONRequestBody {
+	return numspot.CreateRouteTableJSONRequestBody{
+		VpcId: tf.VpcId.ValueString(),
+	}
+}
+
+func deserializeRoutes(ctx context.Context, tfRoutes types.Set) []numspot.Route {
+	routes := make([]numspot.Route, len(tfRoutes.Elements()))
+	swap := make([]RoutesValue, len(tfRoutes.Elements()))
+	tfRoutes.ElementsAs(ctx, &swap, false)
+	for i := 0; i < len(swap); i++ {
+		obj := numspot.Route{
+			DestinationIpRange: swap[i].DestinationIpRange.ValueStringPointer(),
+			GatewayId:          swap[i].GatewayId.ValueStringPointer(),
+			NatGatewayId:       swap[i].NatGatewayId.ValueStringPointer(),
+			VpcPeeringId:       swap[i].VpcPeeringId.ValueStringPointer(),
+			NicId:              swap[i].NicId.ValueStringPointer(),
+			VmId:               swap[i].VmId.ValueStringPointer(),
+		}
+		routes[i] = obj
+	}
+	return routes
 }
