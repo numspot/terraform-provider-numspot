@@ -9,6 +9,7 @@ const (
 
 const (
 	attaching = "attaching"
+	detaching = "detaching"
 	attached  = "attached"
 	creating  = "creating"
 	updating  = "updating"

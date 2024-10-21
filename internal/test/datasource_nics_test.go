@@ -31,7 +31,6 @@ resource "numspot_subnet" "subnet" {
   ip_range = "10.101.1.0/24"
 }
 
-
 resource "numspot_nic" "test" {
   subnet_id = numspot_subnet.subnet.id
 }
