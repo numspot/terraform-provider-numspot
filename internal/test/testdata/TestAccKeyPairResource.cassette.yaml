@@ -604,13 +604,13 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 137
+        content_length: 57
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"name":"key-pair-name-terraform-updated","publicKey":"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEm78d7vfikcOXDdvT0yioYUDm3spxjVws/xnL0J5f0P"}'
+        body: '{"name":"key-pair-name-terraform-updated","publicKey":""}'
         form: {}
         headers:
             Content-Type:
@@ -623,9 +623,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 127
+        content_length: 1835
         uncompressed: false
-        body: '{"fingerprint":"87:f2:1a:87:6f:40:72:0f:b5:0e:cf:12:63:aa:eb:49","name":"key-pair-name-terraform-updated","type":"ssh-ed25519"}'
+        body: '{"fingerprint":"93:0c:1d:5d:6d:11:50:ee:69:c8:fe:52:48:80:54:95","name":"key-pair-name-terraform-updated","privateKey":"-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAyHKj5ZRfrxkBZ785H+MDSbPm1D6Eb3yR5OWhuOv7Ky8a0izr1zZQiAPhAYeu\nhmMqvCWLzM6ANEr+bpAsjx63i59S+E/b9bsFwaZZ7DdrM38d+1GvXfhtdPJ4JkczEg4heg5Aadzo\nFMZqr6z9UQgp/0LjyTrJvINbfNPsLeLa0/7wBvdTdAs5Kc0dGsvP9n/0hFYyaKzQgzcuopKTWMX0\noQNrgJy/3rPrQcG78mSzncCbRuUIE3RjFYlLaMkAd/2vnBPMRUZX+Ufsta6cfGDanYVa1raR0t2X\n8dYc9bAuISgPFE0hq+luOr1uUljmkUPHTBEUCCcKXauwGFK9/ps6BQIDAQABAoIBAEbg8r+NlcAO\nsYaEAaka1uDK8oZ+jMn3XId6A5OmLix4/ZzwMXzqQdO2u2uVFMuEaWoaRLLpGkBjfFCQPpFlJTYD\n4ozXgEoGFeUB864pcojFHE7v9XjfDaVaz82JQ6/Qu1mzjGdiq9Ycy0DPhMuQfXk7p9xSI1+7ezBK\np6saGpL3ZDfH4nycB2jSolz/sAyRq3uF3kTAYuzTH2unrzK1yyjqGT3eZkoQaxvLsIIrk7YHrDPx\nrbJr53/cQvkwBw2IvzsLQnd3sMGh37umDsDm3d+l/QjwKLMVBr/CGZ8yLZIyUWdemkvAzID+5oLm\n5o6zpy/85PiyNUAuWyGMBg/ZbAkCgYEA8/d5RY+1cVoF8m8apckPceVMys8IWntvO7U3bQqNGPN5\nOXeVnpBUdu+tgWtQOJPqRdzySILWZ+YMnidGA/ixSUQ/U96DVpBIEsPuElAGxO92/dKvqMGKOyhU\nU3Ks83jcDWC8xWRVNFmQn+F/pcbtPjEmss6wmyZ2qNZx4S4mupcCgYEA0lWpM0qI8womLb7pvDbV\nGjcXyj3m7CycWvU7Nvthu6JYtCrscGss3m82Oj3y5kN8kHPY+AkN7lRdNMNHdpHnUAI2G58v+CNl\nsDbuDGIQ4S31TS+3FvygeK7O8f7IrBrEBjCdRFN5tfXRMG29a8Re0mqEsaDILosDUzd1n7n9z8MC\ngYEA3qXBVUx7yIDh4IipBxfhMo6TcJtVAk6YCyOs+6SfdF/vCBUsxNLvYsQF0pC/W4MSUMP9kVNm\nnNeEOGmbKlCyay0Ppljx//QY8pdBFBFYvC3WqHq4uQg4QRjjLG0BjgmEuejJHlQctnPu2xqOxhov\ntYxhxtl+r3mA3UEoGNtnmO0CgYBzxqcODpb3gLynLZEnAt+mQHEd55j2o0+lWZswloqjZ6d/9KiU\n8MmP3pNw16yeRsOIF9x0GzfJ2jI72sm5YHJ8vdretW8IHSPaLUI3GrvD1zJRPFSBmKkUBNTwq5f1\n8/22kofeljxGhnqRN7auXTb8h5lm1OObivVXlw1t0Ej/VQKBgQCqmnlUE2i3VgzFb8hmffagjbvV\nLnGmL729QIV8LBGMLOezJN1OQmH2IMH9Bd1g7f/i3BBGg7+MlR2LXal1DyQeHaI3yZcNKuWgI4Fj\nFLcch1Hcj2aUh/IqefMIq7Rh5VwKsWNc5u9X/SYLupMSy7XSEP00Cnm5nH7hSbMtqEG3ng==\n-----END RSA PRIVATE KEY-----","type":"ssh-rsa"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -634,7 +634,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "127"
+                - "1835"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -772,9 +772,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 127
+        content_length: 123
         uncompressed: false
-        body: '{"fingerprint":"87:f2:1a:87:6f:40:72:0f:b5:0e:cf:12:63:aa:eb:49","name":"key-pair-name-terraform-updated","type":"ssh-ed25519"}'
+        body: '{"fingerprint":"93:0c:1d:5d:6d:11:50:ee:69:c8:fe:52:48:80:54:95","name":"key-pair-name-terraform-updated","type":"ssh-rsa"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -783,7 +783,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "127"
+                - "123"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -855,6 +855,57 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs/key-pair-name-terraform-updated
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 123
+        uncompressed: false
+        body: '{"fingerprint":"93:0c:1d:5d:6d:11:50:ee:69:c8:fe:52:48:80:54:95","name":"key-pair-name-terraform-updated","type":"ssh-rsa"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "123"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 18
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
         content_length: 117
         transfer_encoding: []
         trailer: {}
@@ -899,7 +950,356 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 18
+    - id: 19
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs/key-pair-name-terraform-updated
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Id:
+                - key-pair-name-terraform-updated
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "false"
+        status: 204 No Content
+        code: 204
+        duration: 5ms
+    - id: 20
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 57
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: '{"name":"key-pair-name-terraform-updated","publicKey":""}'
+        form: {}
+        headers:
+            Content-Type:
+                - application/json
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1831
+        uncompressed: false
+        body: '{"fingerprint":"97:f3:c4:78:9e:87:c7:a5:3f:ea:87:09:b0:2c:e9:17","name":"key-pair-name-terraform-updated","privateKey":"-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAz0iWE/1jOsZWd7Cn69KJSWf1ito+UkztJMshbZJrkr/jfUcwXgsNGFz1foLZ\n95jaN5YlRc2t3YeZZpQl51hZ4jCHQTNlurkLaXXJdBZ4P6yB1yAXEH8sdrrTXK8/PvcwsohfZwkx\n8zGFZgKtdqJ+dnoihHVJ0UaMhVVyI3ZktJ9vaHmT8MpsWGSWRVVHlUXF+VQr9Al7HBHwQrk38XZn\nZ4g4+RpQ86LDEEDd1ibNSfDGDt9Mo3Spwb73/4Af9U9oM4hZDdrJYlzmSQ2Bqa3XfVvT0ESFbZKG\nflAom5jqICFDR3zEjvV50CHNM2/s7ChJQrSmcXS2+RGJq6Iv86LrvwIDAQABAoIBAAD2JTwSgNNU\n+DG18BF3+IsOoGT0fjWDhdYV2yHW/AjCOxvpqJ/HDVh/lePwV3J+kwSO/b1FJvlQF7YSGdro3gHe\nl8IFqwMiuJrUoQqY0BX7ht6ol3LMJDioxTI43eI840zwtQCVWlX2dNf0Szmxp0SFbIOQx7bgzOYR\nb2Yatnzf/lAONdv9Ljpux2/4Oj2Ls4eRRNsKA9OROvw3tH8UN2C3rqL98RBxyBNWzDVBjWhvLNAw\nJDNLjvy7+BumIU15t6kNDjtMU7GU3Yn/QsofvDYFR41NTOzO+iSqvY+VigYdLufRRacwlb86K5Tn\nod6M8ir9R2l9Op7Jkcb8c9LNPAECgYEA9ceA6Q5NiuGBaUjW3b84CSawcxtkh++2Zo5IqwGz2Hzh\nYeizz/VqmKPGCYvO+DEZK+blnKrSj9UEPKvHFc9R9yLKG9OeG9NUnvFk1ZW3DrcR6kiEvdU9kh7d\nJVUTaOfemptA4Os3+1bY+7TyYVoIWgWFhJ6BPnZS4v7SrS6Og2ECgYEA1+dEh1kw6IbhmdRa3jzW\n7/cFDMwfKxqgIBB9bEa9HvjqwJoExbh0XAGjobgEvzaqwx0Q8HIZcUHRmfbkBxy1v5OCNjFYeWzg\nmSR1e8D+7Fk+e5Ei9PoZNKwtxK+zTvxL59SBY0Ar3PKeCCrxGpMfVFiY5jrVEBNtVV11kN8i4x8C\ngYAXM+VkmxgQ82cPNHQsbP/yRTfFNiHQf33dwrLzie6bknaIkrpe+JE+pb9taUh5v9DbhynIF4xX\nTcnfnGvoEDFxvlQMOncjs1i6xJk7XK3ycq/7SStW7ImqgMVp39U8Qx+NwvhmA26+iJ1lbdiv/hrp\nvLm1Im2bIvqCOYJUHSARIQKBgQDCpsED/ge4PJL9K5VZNCTcaCrnZMjdBb5D6loJ2qT7XZPYXYPb\n9vcBVIEAdnXhJxpBmt0Ayv3hPGQKmarwNpQtyoHk9gw8PUspBtPc5R1wXO2WXj3T+//pmyoQYBAb\nMCAHPXIB14M0SpDr8Ds7qFTgqJgBSh15xuoVwpMSL/q2JQKBgDbCKVFoYG3iBNVMqg+NCi3ke/sL\nd1TL5QjKDhdFScGTJHv4x+cIUGoLOLdgLuyPhkscIJiWYvfNSulHGxPt4cy8fjHRLZH6rHWaInaU\n42lotiPre4+bVQFoeuVVgj6Exkz0em2YECnQqUNG7bXBWQFbrn5aaAz9ut/DOMaHxyxP\n-----END RSA PRIVATE KEY-----","type":"ssh-rsa"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1831"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 201 Created
+        code: 201
+        duration: 5ms
+    - id: 21
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 22
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 23
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/keypairs/key-pair-name-terraform-updated
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 123
+        uncompressed: false
+        body: '{"fingerprint":"97:f3:c4:78:9e:87:c7:a5:3f:ea:87:09:b0:2c:e9:17","name":"key-pair-name-terraform-updated","type":"ssh-rsa"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Cache-Control:
+                - public, max-age=300
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "123"
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 24
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 25
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 26
       request:
         proto: HTTP/1.1
         proto_major: 1

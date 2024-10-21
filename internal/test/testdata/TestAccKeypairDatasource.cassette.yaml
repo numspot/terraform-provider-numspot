@@ -123,9 +123,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 1832
+        content_length: 1828
         uncompressed: false
-        body: '{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","privateKey":"-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAw6nJM4kh1rPKEpNDAMMJBfeupZrhJnG7B+0BgZUJnbRRT5ZGwciPusAKjhg9\nckecuAel6FW8fCawTM6LnsJFldjo+OKEMrb6K3ccdaBUYLtwKa2zOZcP775Cyg9aNXJYzqeMZvhG\ndmxu+awQSIBw3q1jNPEpOIGekVhuuhLjjLbirn0xgDLknMp46qUTpcrMJJ5jrjHOQQVB7Magtawf\nn0sksAZXu0GutwLj43AzG24v1GE2gechfXOpALHIwdZSu9Tef/6IYoTBQEEL6gn6LhjtnjrhZ9f2\n3p0I5dhuEC6nRzxtHEhVmztP40p8WmB0hayPCqSVNuaWoNwEnh6uPwIDAQABAoIBAHyQzDoWFMf2\ngDBhNmf2wvjcnYBq4Oozv6mlFq9jrdKL6LQtbPCT+gUfm9ioz/3AX6K9o78NTkkP7G+Jk1PIRLrI\ndFF3DEipOw2O8DxmjTFkQ10Va6O/a3LrAuRW78xU9vrhqj4n09wy3lfvVhKCStlJM36SBfcmdkf8\nL8ogmmOLMNv2bBRETC+B+ATAz4TFzC2P/I5YQ26dBkWQPp2IyuLHqdkgyGIE85mVjMp0zOx7O2oL\nc2zEL3aUjLbQSlwUPXIEnEWB/zoDeB2oubeMTB/y2PUZwfGfcUkaAcqsFMXcmOq6PxgAmrvEJaPf\n0C6czWnZG7BCMY8jF8uAJ4IZBkkCgYEA9wDkoE8OGYZKycqn7xhx1gOxdnHoxXFcrX2nkKYQviIo\nhL2TfHZgz8KBALPVjAHhWUndJZbzf9c/jrrKX17KazKheDbXyWbCe5QKhDWqYt154N1HENYIL08L\nU95kX6iYcNF6PLUTnWHzsUNUXPx+6wSaItLgB+sNK4G5nqTng/0CgYEAysovxnOomQWQMrs8SJ0+\nQMX8ubSv9MKsLRGBd1BfebDOiYjckMCMMDHWxcotYsIziJRBCvu0XWKDrL4MEknOgeJXBx7IXLOf\njjhyDN24ya5xSL+7r13wIjf5W7awmcV5GaUNMvwYx3yzGjdZ26mpxpMzJCIiTn7NZJPK9ujZKesC\ngYEAtQVkiNAnRzGSUf1BwgqqMuyV/HZS35DLGSLD0VDDaHTkORQuqMKhBOJJZNhnIqqmGqf1ePz+\nC60WmWXvtqFju9hpWg7namTzF1pRsr8Z1kb2cYP59y7E5NcLODX+XdTTk6sR6LfUXj1ROZJcm6E4\n6sh+phLhuSvchQwXm1rDiYkCgYAZiX6csiHwKzgue0+rIUoepBAgXrWtz/oYrtSr7s4nJ/HKdha4\nj9bXlt8iB0TR4/zTXUAXnvzmqapFTaV9hBfiWVt2RRUcP25/XXJXVnCXzUTs0WBURDMiTAQ13Xq9\n0pVeel+AJSkFrhlr2r6RH/uGSzEsgrPpSKSa3tW3ZDk8wwKBgQDT+eJguWUjXYcQ02bmICuw35Pp\nzGfdNrupcCPfZthL+a8zWlzpLpNKcPXZWGtmPkLOjIDA1/BYrh6kUxo2kjXVuwyJ031JIONR/CFT\nkSCe3JZKxNhpWapjveSzc8o0v4WG6DpE007PpY0u6PRPHjRrh4DLn/jc60wtxh98nSJTSA==\n-----END RSA PRIVATE KEY-----","type":"ssh-rsa"}'
+        body: '{"fingerprint":"3e:09:71:e5:b1:d9:8b:fd:6c:ce:0f:ea:49:b9:42:98","name":"key-pair-name-test-terraform","privateKey":"-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAongZRItBlrpoa43h/a3Nq0PH9AZIMxxXVQU0zpNC2SoZO9O+4L8Ju+GaXU4o\nzw/tLFr7i0I3ewZXvv707KuxO+G04NyP7o1V2vjGwhzq/rQ8fcVlbIDlCCoeAZG7LwEgQKaW2z0U\n27gqisgRK71jDh3P/GPtzSW66KUYj9O2XbjIOrqHpPYinDK2/N/gjAqDp9igihlJc0ll6AcoXEVC\n9LtVs9aEPEoFquqQZ29VfDEoaBr9d1kRV73Cbl/IEoztX2cCaHdzMXsrp8QLKrVa3JECeUGBX91G\noPIlazkOmEIE5iQ9a11IuDbpeQA3uo3psUgg69Og0i6A+WyoCEwkaQIDAQABAoIBAGF53O8a/ccJ\nIA0nmycwV+0hRZ5LBpZjsqH39a7a+4h/kZQrfqIo/BYVTSAd/K3+yDWMgM8Uc2UEcTDOlvRILpXW\n3UbsDg76DUDLcbSU1Qjr6j8rZ6apzsAPROF8JeoVqtwfFvOCujj5TczmLCcqAXw+tsKe0dX7hSB/\nrTTduNSRS/IKva5NYwmFGet+ThA+hZKyJHToldA7LUcJvZ0ngrFT++oXjVKUTpM9ynOZzfyO4kGk\nPEpwxiuWK6aE7bIs3jVKoFEiTWjZ8uW/GwU2s6DfeAOe+YI8qeC+EpaMJarUKPGxdLKGIyf6ogzL\n0TckHQIeyO5LZUa52UW1g+ijhAECgYEA0zUlReVDEGlboDNehdqOphzzTcwavjt1IZK274Z7x7R+\nNR2F1W9VJKobYGjv2wrz/fSSbcvdQ6LUXzs0qPUGNF+Jc6tpP9gX9LiJRrbeSlwF+JyCBOh12tws\nnYu+gaq927TscmXqWBbN2uNJuK41OG8i+jDKaqwKOpE8h/6N+BECgYEAxOzZ2uzjwyPWs7d7dV7Y\nsiW/aRfPE4U4wYhCY5q9qLdQkrgLQbhEnT4wjNp6rRR+v8bhRrTuIIvXDvJ5e5KmVgXm5X0GgFzu\n/M8hwun1bL+L3bnOJBHME0rXAoEOV3FVJ79ym6ZSjtOH7jD+Vcb8bAxeROg3zgQwC92mCTyU/tkC\ngYB10qAIbe0LqrrCk+WXJmWNpXjVXZdNqD2fjQkgdhV3QullGCMg/gqxeXPsRJ4JxAJ5GYbWWXQF\n10BCH/Uwi//6F5HGRUlhpFs42fk6yakYMl3iYuzlcAjPHySEfwC3tVhUyIlfCBvDKHWONl1Z+VUX\nNmh8ydshxvet1HfAJfFtAQKBgQDDae39y5lw6b2C9Y6zt/z9O2woU5IP4uGhWx/WS5XtOIviLHQv\nMTYVe8Md4yhdXLsyf57JVX4AGgS9NmzK7YnWT2EDVf//nTki8kCkdRowYhvfWSRwsqB6fIfEWmDq\n8PH50YdfYbsHNG3tNf0NDbsrVVKuumm2LH2pKLg87jtEcQKBgDQRmoTO+fs0BKzzBwcfHq4KrX3G\nEsl9zpQxJpn8b9/udTEhdJN+qhqN1AS5RQRQMz4rxzrkbbat4ZLLcAEGLXZiqTKgMTqtvpjU7rIP\nBocCKsOEVQ8jqKujWnSQNxrqtJ8abdAEoxQxbd1ouStkFGGBcGtBdEaXGdH3fvyIkOua\n-----END RSA PRIVATE KEY-----","type":"ssh-rsa"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -134,7 +134,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "1832"
+                - "1828"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -176,7 +176,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"items":[{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
+        body: '{"items":[{"fingerprint":"3e:09:71:e5:b1:d9:8b:fd:6c:ce:0f:ea:49:b9:42:98","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -276,7 +276,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"items":[{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
+        body: '{"items":[{"fingerprint":"3e:09:71:e5:b1:d9:8b:fd:6c:ce:0f:ea:49:b9:42:98","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -376,7 +376,7 @@ interactions:
         trailer: {}
         content_length: 120
         uncompressed: false
-        body: '{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","type":"ssh-rsa"}'
+        body: '{"fingerprint":"3e:09:71:e5:b1:d9:8b:fd:6c:ce:0f:ea:49:b9:42:98","name":"key-pair-name-test-terraform","type":"ssh-rsa"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -427,7 +427,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"items":[{"fingerprint":"dc:79:54:4c:4c:1a:f9:f5:ab:5b:d8:8b:b3:31:a1:79","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
+        body: '{"items":[{"fingerprint":"3e:09:71:e5:b1:d9:8b:fd:6c:ce:0f:ea:49:b9:42:98","name":"key-pair-name-test-terraform","type":"ssh-rsa"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
