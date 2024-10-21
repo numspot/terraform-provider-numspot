@@ -87,8 +87,6 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	if response.Diagnostics.HasError() {
 		return
 	}
-	linkNicsObjectValue, diagnostics := linkNics.ToObjectValue(ctx)
-	diags.Append(diagnostics...)
 
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
@@ -130,8 +128,6 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 	if response.Diagnostics.HasError() {
 		return
 	}
-	linkNicsObjectValue, diagnostics := linkNics.ToObjectValue(ctx)
-	diags.Append(diagnostics...)
 
 	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
 	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
@@ -184,8 +180,6 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	if response.Diagnostics.HasError() {
 		return
 	}
-	linkNicsObjectValue, diagnostics := linkNics.ToObjectValue(ctx)
-	diags.Append(diagnostics...)
 
 	if err := core.DeleteVM(ctx, r.provider, state.Id.ValueString()); err != nil {
 		response.Diagnostics.AddError("unable to delete VM", err.Error())
@@ -214,10 +208,6 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf VmModel, diags *diag.Dia
 			AvailabilityZoneName: utils.FromTfStringToStringPtr(tf.Placement.AvailabilityZoneName),
 			Tenancy:              utils.FromTfStringToStringPtr(tf.Placement.Tenancy),
 		}
-	}
-	if http.SecurityGroups != nil {
-		listValue, _ := types.ListValueFrom(ctx, types.StringType, securityGroups)
-		r.SecurityGroupIds = listValue
 	}
 
 	bootOnCreation := true
