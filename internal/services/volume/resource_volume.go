@@ -195,7 +195,6 @@ func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, diags *di
 	if http.LinkedVolumes != nil {
 		volumes = utils.GenericListToTfListValue(
 			ctx,
-			LinkedVolumesValue{},
 			serializeLinkedVolumes,
 			*http.LinkedVolumes,
 			diags,
@@ -214,7 +213,7 @@ func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, diags *di
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return VolumeModel{

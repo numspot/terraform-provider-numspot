@@ -88,9 +88,8 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 		return
 	}
 
-	state, diags := serializeNumSpotDHCPOption(ctx, numSpotDHCPOptions)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	state := serializeNumSpotDHCPOption(ctx, numSpotDHCPOptions, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -112,9 +111,8 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 		return
 	}
 
-	newState, diagnostics := serializeNumSpotDHCPOption(ctx, dhcpOptions)
-	if diagnostics.HasError() {
-		response.Diagnostics.Append(diagnostics...)
+	newState := serializeNumSpotDHCPOption(ctx, dhcpOptions, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -126,7 +124,6 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 		err                error
 		numSpotDHCPOptions *numspot.DhcpOptionsSet
 		state, plan        DhcpOptionsModel
-		diags              diag.Diagnostics
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -151,8 +148,8 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 		}
 	}
 
-	newState, diags := serializeNumSpotDHCPOption(ctx, numSpotDHCPOptions)
-	if diags.HasError() {
+	newState := serializeNumSpotDHCPOption(ctx, numSpotDHCPOptions, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -194,35 +191,34 @@ func deserializeDHCPOption(ctx context.Context, tf DhcpOptionsModel) numspot.Cre
 	}
 }
 
-func serializeNumSpotDHCPOption(ctx context.Context, http *numspot.DhcpOptionsSet) (DhcpOptionsModel, diag.Diagnostics) {
-	var diagnostics diag.Diagnostics
+func serializeNumSpotDHCPOption(ctx context.Context, http *numspot.DhcpOptionsSet, diags *diag.Diagnostics) DhcpOptionsModel {
 	var domainNameServersTf, logServersTf, ntpServersTf, tagsTf types.List
 
 	if http.DomainNameServers != nil {
-		domainNameServersTf = utils.StringListToTfListValue(ctx, *http.DomainNameServers, &diagnostics)
-		if diagnostics.HasError() {
-			return DhcpOptionsModel{}, diagnostics
+		domainNameServersTf = utils.StringListToTfListValue(ctx, *http.DomainNameServers, diags)
+		if diags.HasError() {
+			return DhcpOptionsModel{}
 		}
 	}
 
 	if http.LogServers != nil {
-		logServersTf = utils.StringListToTfListValue(ctx, *http.LogServers, &diagnostics)
-		if diagnostics.HasError() {
-			return DhcpOptionsModel{}, diagnostics
+		logServersTf = utils.StringListToTfListValue(ctx, *http.LogServers, diags)
+		if diags.HasError() {
+			return DhcpOptionsModel{}
 		}
 	}
 
 	if http.NtpServers != nil {
-		ntpServersTf = utils.StringListToTfListValue(ctx, *http.NtpServers, &diagnostics)
-		if diagnostics.HasError() {
-			return DhcpOptionsModel{}, diagnostics
+		ntpServersTf = utils.StringListToTfListValue(ctx, *http.NtpServers, diags)
+		if diags.HasError() {
+			return DhcpOptionsModel{}
 		}
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, &diagnostics)
-		if diagnostics.HasError() {
-			return DhcpOptionsModel{}, diagnostics
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		if diags.HasError() {
+			return DhcpOptionsModel{}
 		}
 	}
 
@@ -234,5 +230,5 @@ func serializeNumSpotDHCPOption(ctx context.Context, http *numspot.DhcpOptionsSe
 		LogServers:        logServersTf,
 		NtpServers:        ntpServersTf,
 		Tags:              tagsTf,
-	}, nil
+	}
 }

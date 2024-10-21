@@ -135,7 +135,7 @@ func dhcpOptionsFromHttpToTfDatasource(ctx context.Context, http *numspot.DhcpOp
 		return nil
 	}
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}

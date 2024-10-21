@@ -542,7 +542,6 @@ func ReadTags(
 
 	tfTags := utils.GenericListToTfListValue(
 		ctx,
-		TagsValue{},
 		tagFromAPI,
 		*res.JSON200.Items,
 		&diagnostics,

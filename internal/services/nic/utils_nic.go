@@ -88,7 +88,7 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic, diags *diag.Diagnos
 		tagsTf         types.List
 	)
 	// Private IPs
-	privateIps := utils.GenericListToTfListValue(ctx, PrivateIpsValue{}, privatesIpFromApi, utils.GetPtrValue(http.PrivateIps), diags)
+	privateIps := utils.GenericListToTfListValue(ctx, privatesIpFromApi, utils.GetPtrValue(http.PrivateIps), diags)
 	if diags.HasError() {
 		return nil
 	}
@@ -111,7 +111,7 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic, diags *diag.Diagnos
 	}
 
 	// Security Groups
-	securityGroupsTf := utils.GenericListToTfListValue(ctx, SecurityGroupsValue{}, securityGroupLightFromApi, utils.GetPtrValue(http.SecurityGroups), diags)
+	securityGroupsTf := utils.GenericListToTfListValue(ctx, securityGroupLightFromApi, utils.GetPtrValue(http.SecurityGroups), diags)
 	if diags.HasError() {
 		return nil
 	}
@@ -143,7 +143,7 @@ func NicFromHttpToTf(ctx context.Context, http *numspot.Nic, diags *diag.Diagnos
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -298,7 +298,7 @@ func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic, diags *d
 	)
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	if http.LinkNic != nil {
@@ -332,12 +332,12 @@ func NicsFromHttpToTfDatasource(ctx context.Context, http *numspot.Nic, diags *d
 		}
 	}
 
-	privateIps := utils.GenericListToTfListValue(ctx, PrivateIpsValue{}, privateIpsFromHTTP, utils.GetPtrValue(http.PrivateIps), diags)
+	privateIps := utils.GenericListToTfListValue(ctx, privateIpsFromHTTP, utils.GetPtrValue(http.PrivateIps), diags)
 	if diags.HasError() {
 		return nil
 	}
 
-	securityGroups := utils.GenericListToTfListValue(ctx, SecurityGroupsValue{}, securityGroupsFromHTTP, utils.GetPtrValue(http.SecurityGroups), diags)
+	securityGroups := utils.GenericListToTfListValue(ctx, securityGroupsFromHTTP, utils.GetPtrValue(http.SecurityGroups), diags)
 	if diags.HasError() {
 		return nil
 	}

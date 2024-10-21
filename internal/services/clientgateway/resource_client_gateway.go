@@ -75,9 +75,8 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	state, diags := serializeClientGateway(ctx, clientGateway)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	state := serializeClientGateway(ctx, clientGateway, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -99,9 +98,8 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 		return
 	}
 
-	state, diags := serializeClientGateway(ctx, numSpotClientGateway)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	state = serializeClientGateway(ctx, numSpotClientGateway, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -113,7 +111,6 @@ func (r *ClientGatewayResource) Update(ctx context.Context, request resource.Upd
 		err                  error
 		numSpotClientGateway *numspot.ClientGateway
 		state, plan          ClientGatewayModel
-		diags                diag.Diagnostics
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -138,9 +135,8 @@ func (r *ClientGatewayResource) Update(ctx context.Context, request resource.Upd
 		}
 	}
 
-	state, diags = serializeClientGateway(ctx, numSpotClientGateway)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	state = serializeClientGateway(ctx, numSpotClientGateway, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
@@ -172,16 +168,13 @@ func deserializeCreateClientGateway(tf ClientGatewayModel) numspot.CreateClientG
 	}
 }
 
-func serializeClientGateway(ctx context.Context, http *numspot.ClientGateway) (ClientGatewayModel, diag.Diagnostics) {
-	var (
-		tagsTf types.List
-		diags  diag.Diagnostics
-	)
+func serializeClientGateway(ctx context.Context, http *numspot.ClientGateway, diags *diag.Diagnostics) ClientGatewayModel {
+	var tagsTf types.List
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, &diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return ClientGatewayModel{}, diags
+			return ClientGatewayModel{}
 		}
 	}
 
@@ -192,5 +185,5 @@ func serializeClientGateway(ctx context.Context, http *numspot.ClientGateway) (C
 		PublicIp:       types.StringPointerValue(http.PublicIp),
 		State:          types.StringPointerValue(http.State),
 		Tags:           tagsTf,
-	}, diags
+	}
 }

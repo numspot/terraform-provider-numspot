@@ -75,8 +75,8 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	tf, diags := serializeSubnet(ctx, res)
-	if diags.HasError() {
+	tf := serializeSubnet(ctx, res, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -95,8 +95,8 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 		return
 	}
 
-	tf, diags := serializeSubnet(ctx, res)
-	if diags.HasError() {
+	tf := serializeSubnet(ctx, res, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -142,9 +142,8 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 	}
 
 	if updated {
-		tf, diags := serializeSubnet(ctx, res)
-		if diags.HasError() {
-			response.Diagnostics.Append(diags...)
+		tf := serializeSubnet(ctx, res, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
 			return
 		}
 
@@ -172,15 +171,12 @@ func deserializeCreateSubnet(tf SubnetModel) numspot.CreateSubnetJSONRequestBody
 	}
 }
 
-func serializeSubnet(ctx context.Context, http *numspot.Subnet) (*SubnetModel, diag.Diagnostics) {
-	var (
-		tagsList types.List
-		diags    diag.Diagnostics
-	)
+func serializeSubnet(ctx context.Context, http *numspot.Subnet, diags *diag.Diagnostics) *SubnetModel {
+	var tagsList types.List
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, &diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil, diags
+			return nil
 		}
 	}
 
@@ -193,5 +189,5 @@ func serializeSubnet(ctx context.Context, http *numspot.Subnet) (*SubnetModel, d
 		State:                types.StringPointerValue(http.State),
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		Tags:                 tagsList,
-	}, nil
+	}
 }

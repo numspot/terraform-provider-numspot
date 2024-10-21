@@ -61,17 +61,17 @@ func LoadBalancerFromTfToHttp(tf *LoadBalancerModel) *numspot.LoadBalancer {
 func LoadBalancerFromHttpToTf(ctx context.Context, http *numspot.LoadBalancer, diags *diag.Diagnostics) *LoadBalancerModel {
 	var tagsTf types.List
 
-	applicationStickyCookiePoliciestypes := utils.GenericListToTfListValue(ctx, ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
+	applicationStickyCookiePoliciestypes := utils.GenericListToTfListValue(ctx, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
 	if diags.HasError() {
 		return nil
 	}
 
-	listeners := utils.GenericSetToTfSetValue(ctx, ListenersValue{}, listenersFromHTTP, *http.Listeners, diags)
+	listeners := utils.GenericSetToTfSetValue(ctx, listenersFromHTTP, *http.Listeners, diags)
 	if diags.HasError() {
 		return nil
 	}
 
-	stickyCookiePolicies := utils.GenericListToTfListValue(ctx, StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies, diags)
+	stickyCookiePolicies := utils.GenericListToTfListValue(ctx, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies, diags)
 	if diags.HasError() {
 		return nil
 	}
@@ -87,7 +87,7 @@ func LoadBalancerFromHttpToTf(ctx context.Context, http *numspot.LoadBalancer, d
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -154,23 +154,23 @@ func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadB
 	var tagsList types.List
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
 	}
 
-	applicationStickyCookiePoliciestypes := utils.GenericListToTfListValue(ctx, ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
+	applicationStickyCookiePoliciestypes := utils.GenericListToTfListValue(ctx, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
 	if diags.HasError() {
 		return nil
 	}
 
-	listeners := utils.GenericSetToTfSetValue(ctx, ListenersValue{}, listenersFromHTTP, *http.Listeners, diags)
+	listeners := utils.GenericSetToTfSetValue(ctx, listenersFromHTTP, *http.Listeners, diags)
 	if diags.HasError() {
 		return nil
 	}
 
-	stickyCookiePolicies := utils.GenericListToTfListValue(ctx, StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies, diags)
+	stickyCookiePolicies := utils.GenericListToTfListValue(ctx, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies, diags)
 	if diags.HasError() {
 		return nil
 	}

@@ -221,7 +221,7 @@ func (r *AclsResource) readAcls(
 		return nil
 	}
 
-	aclsTf := utils.GenericSetToTfSetValue(ctx, ACLValue{}, CreateTfAclFromHttp, acls, diags)
+	aclsTf := utils.GenericSetToTfSetValue(ctx, CreateTfAclFromHttp, acls, diags)
 	if diags.HasError() {
 		return nil
 	}

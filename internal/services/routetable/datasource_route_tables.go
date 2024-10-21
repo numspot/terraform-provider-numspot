@@ -139,14 +139,14 @@ func serializeRouteTableDatasource(ctx context.Context, http *numspot.RouteTable
 	)
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
 	}
 
 	if http.LinkRouteTables != nil {
-		linkRouteTablesList = utils.GenericListToTfListValue(ctx, LinkRouteTablesValue{}, serializeRouteTableLink, *http.LinkRouteTables, diags)
+		linkRouteTablesList = utils.GenericListToTfListValue(ctx, serializeRouteTableLink, *http.LinkRouteTables, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -154,7 +154,7 @@ func serializeRouteTableDatasource(ctx context.Context, http *numspot.RouteTable
 
 	if http.RoutePropagatingVirtualGateways != nil {
 		routePropagatingVirtualGatewaysList = utils.GenericListToTfListValue(
-			ctx, RoutePropagatingVirtualGatewaysValue{},
+			ctx,
 			serializaRouteTableRoutePropagatingVirtualGateways,
 			*http.RoutePropagatingVirtualGateways, diags)
 		if diags.HasError() {
@@ -163,7 +163,7 @@ func serializeRouteTableDatasource(ctx context.Context, http *numspot.RouteTable
 	}
 
 	if http.Routes != nil {
-		routes = utils.GenericListToTfListValue(ctx, RoutesValue{}, serializeRoute, *http.Routes, diags)
+		routes = utils.GenericListToTfListValue(ctx, serializeRoute, *http.Routes, diags)
 		if diags.HasError() {
 			return nil
 		}

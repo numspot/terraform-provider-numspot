@@ -101,7 +101,7 @@ func serializeNumSpotInternetGateways(ctx context.Context, internetGateways *[]n
 		var tagsList types.List
 
 		if internetGateway.Tags != nil {
-			tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *internetGateway.Tags, diags)
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *internetGateway.Tags, diags)
 		}
 
 		return &InternetGatewayModel{

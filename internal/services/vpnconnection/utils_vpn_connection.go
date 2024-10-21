@@ -159,7 +159,7 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection,
 	var tagsTf types.List
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	vpnConnectionModel := VpnConnectionModel{
@@ -179,12 +179,12 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection,
 		httpRoutes := slices.DeleteFunc(*http.Routes, func(r numspot.RouteLight) bool {
 			return *r.State == VPNConnectionRouteStateDeleted
 		})
-		routes := utils.GenericSetToTfSetValue(ctx, RoutesValue{}, routeFromHTTP, httpRoutes, diags)
+		routes := utils.GenericSetToTfSetValue(ctx, routeFromHTTP, httpRoutes, diags)
 		vpnConnectionModel.Routes = routes
 	}
 
 	if http.VgwTelemetries != nil {
-		vgwTelemetries := utils.GenericListToTfListValue(ctx, VgwTelemetriesValue{}, VGWTelemetryFromHTTPToTF, *http.VgwTelemetries, diags)
+		vgwTelemetries := utils.GenericListToTfListValue(ctx, VGWTelemetryFromHTTPToTF, *http.VgwTelemetries, diags)
 		vpnConnectionModel.VgwTelemetries = vgwTelemetries
 	}
 
@@ -252,7 +252,6 @@ func VpnConnectionsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpn
 	if http.Routes != nil {
 		routes = utils.GenericSetToTfSetValue(
 			ctx,
-			RoutesValue{},
 			routeFromHTTPDatasource,
 			*http.Routes,
 			diags,
@@ -261,7 +260,6 @@ func VpnConnectionsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpn
 	if http.VgwTelemetries != nil {
 		vgwTelemetriesValue = utils.GenericListToTfListValue(
 			ctx,
-			VgwTelemetriesValue{},
 			VGWTelemetryFromHTTPDatasource,
 			*http.VgwTelemetries,
 			diags,
@@ -269,7 +267,7 @@ func VpnConnectionsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpn
 	}
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	vpnOptions := vpnOptionsFromHTTPDatasource(ctx, http.VpnOptions, diags)

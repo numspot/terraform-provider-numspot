@@ -52,14 +52,14 @@ func VirtualGatewayFromHttpToTf(ctx context.Context, http *numspot.VirtualGatewa
 	var tagsTf, vpcToVirtualGatewayLinksTf types.List
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
 	}
 
 	if http.VpcToVirtualGatewayLinks != nil {
-		vpcToVirtualGatewayLinksTf = utils.GenericListToTfListValue(ctx, VpcToVirtualGatewayLinksValue{}, VpcToVirtualGatewayLinksFromHttpToTf, *http.VpcToVirtualGatewayLinks, diags)
+		vpcToVirtualGatewayLinksTf = utils.GenericListToTfListValue(ctx, VpcToVirtualGatewayLinksFromHttpToTf, *http.VpcToVirtualGatewayLinks, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -81,14 +81,14 @@ func VirtualGatewayDataSourceFromHttpToTf(ctx context.Context, http *numspot.Vir
 	var tagsTf, vpcToVirtualGatewayLinksTf types.List
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
 	}
 
 	if http.VpcToVirtualGatewayLinks != nil {
-		vpcToVirtualGatewayLinksTf = utils.GenericListToTfListValue(ctx, VpcToVirtualGatewayLinksValue{}, VpcToVirtualGatewayLinksFromHttpToTf, *http.VpcToVirtualGatewayLinks, diags)
+		vpcToVirtualGatewayLinksTf = utils.GenericListToTfListValue(ctx, VpcToVirtualGatewayLinksFromHttpToTf, *http.VpcToVirtualGatewayLinks, diags)
 		if diags.HasError() {
 			return nil
 		}

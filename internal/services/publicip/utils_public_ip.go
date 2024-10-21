@@ -17,7 +17,7 @@ func PublicIpFromHttpToTf(ctx context.Context, elt *numspot.PublicIp, diags *dia
 	var tagsList types.List
 
 	if elt.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *elt.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *elt.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -125,7 +125,7 @@ func PublicIpsFromHttpToTfDatasource(ctx context.Context, http *numspot.PublicIp
 	var tagsList types.List
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
