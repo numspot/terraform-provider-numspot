@@ -93,9 +93,8 @@ resource "numspot_vm" "vm" {
 
 - `client_token` (String) A unique identifier which enables you to manage the idempotency.
 - `deletion_protection` (Boolean) If true, you cannot delete the VM unless you change this parameter back to false.
+- `initiated_shutdown_behavior` (String) The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted.
 - `keypair_name` (String) The name of the keypair.
-- `max_vms_count` (Number) The maximum number of VMs you want to create. If all the VMs cannot be created, the largest possible number of VMs above MinVmsCount is created.
-- `min_vms_count` (Number) The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.
 - `nested_virtualization` (Boolean) (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
 - `placement` (Attributes) Information about the placement of the VM. (see [below for nested schema](#nestedatt--placement))
 - `private_ips` (List of String) One or more private IPs of the VM.
@@ -104,7 +103,6 @@ resource "numspot_vm" "vm" {
 - `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
 - `type` (String) The type of VM.
 - `user_data` (String) Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
-- `vm_initiated_shutdown_behavior` (String) The VM behavior when you stop it. By default or if set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.
 
 ### Read-Only
 
@@ -113,7 +111,6 @@ resource "numspot_vm" "vm" {
 - `creation_date` (String) The date and time of creation of the VM.
 - `hypervisor` (String) The hypervisor type of the VMs (`ovm` \| `xen`).
 - `id` (String) The ID of the VM.
-- `initiated_shutdown_behavior` (String) The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted.
 - `is_source_dest_checked` (Boolean) (Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.
 - `launch_number` (Number) The number for the VM when launching a group of several VMs (for example, `0`, `1`, `2`, and so on).
 - `nics` (Attributes List) (Vpc only) The network interface cards (NICs) the VMs are attached to. (see [below for nested schema](#nestedatt--nics))
@@ -128,6 +125,7 @@ resource "numspot_vm" "vm" {
 - `root_device_type` (String) The type of root device used by the VM (always `bsu`).
 - `state` (String) The state of the VM (`pending` \| `running` \| `stopping` \| `stopped` \| `shutting-down` \| `terminated` \| `quarantine`).
 - `state_reason` (String) The reason explaining the current state of the VM.
+- `vm_initiated_shutdown_behavior` (String) The VM behavior when you stop it. By default or if set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.
 - `vpc_id` (String) The ID of the Vpc in which the VM is running.
 
 <a id="nestedatt--placement"></a>
