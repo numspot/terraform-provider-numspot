@@ -100,7 +100,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 		ctx,
 		createdId,
 		r.provider.SpaceID,
-		[]string{"pending"},
+		[]string{"pending", "stopping"},
 		[]string{"running", "stopped"}, // In some cases, when there is insufficient capacity the VM is created with state = stopped
 		numspotClient.ReadVmsByIdWithResponse,
 	)
