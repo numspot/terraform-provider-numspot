@@ -18,6 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
@@ -121,7 +122,6 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Optional:            true,
 				Description:         "Information about the public IP association.",
 				MarkdownDescription: "Information about the public IP association.",
 			},
@@ -135,7 +135,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The name of the private DNS.",
 				MarkdownDescription: "The name of the private DNS.",
 			},
-			"private_ips": schema.ListNestedAttribute{
+			"private_ips": schema.SetNestedAttribute{ // MANUALLY EDITED : Set instead of List
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"is_primary": schema.BoolAttribute{
@@ -198,8 +198,8 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The primary private IP for the NIC.<br />\nThis IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.<br />\nIf you do not specify this attribute, a random private IP is selected within the IP range of the Subnet.",
 				MarkdownDescription: "The primary private IP for the NIC.<br />\nThis IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.<br />\nIf you do not specify this attribute, a random private IP is selected within the IP range of the Subnet.",
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"security_group_ids": schema.ListAttribute{
@@ -277,7 +277,7 @@ type NicModel struct {
 	LinkPublicIp         LinkPublicIpValue `tfsdk:"link_public_ip"`
 	MacAddress           types.String      `tfsdk:"mac_address"`
 	PrivateDnsName       types.String      `tfsdk:"private_dns_name"`
-	PrivateIps           types.List        `tfsdk:"private_ips"`
+	PrivateIps           types.Set         `tfsdk:"private_ips"` // MANUALLY EDITED : Set instead of List
 	SecurityGroupIds     types.List        `tfsdk:"security_group_ids"`
 	SecurityGroups       types.List        `tfsdk:"security_groups"`
 	SpaceId              types.String      `tfsdk:"space_id"`

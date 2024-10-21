@@ -26,8 +26,7 @@ func CreateVolume(ctx context.Context, provider *client.NumSpotSDK, numSpotVolum
 	}
 
 	var retryCreate *numspot.CreateVolumeResponse
-	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotVolumeCreate,
-		numspotClient.CreateVolumeWithResponse); err != nil {
+	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotVolumeCreate, numspotClient.CreateVolumeWithResponse); err != nil {
 		return nil, err
 	}
 
