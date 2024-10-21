@@ -257,7 +257,6 @@ func nicsFromApi(ctx context.Context, nic numspot.NicLight, diags *diag.Diagnost
 	}
 	privateIpsTf = utils.GenericListToTfListValue(
 		ctx,
-		PrivateIpsValue{},
 		privateIpsFromApi,
 		privateIps,
 		diags,
@@ -269,7 +268,6 @@ func nicsFromApi(ctx context.Context, nic numspot.NicLight, diags *diag.Diagnost
 	}
 	securityGroupsTf = utils.GenericListToTfListValue(
 		ctx,
-		SecurityGroupsValue{},
 		securityGroupsFromApi,
 		securityGroups,
 		diags,
@@ -350,7 +348,7 @@ func serializeNumSpotVM(ctx context.Context, http *numspot.Vm, diags *diag.Diagn
 		blockDeviceMappings = *http.BlockDeviceMappings
 		blockDeviceMappingTf = utils.GenericListToTfListValue(
 			ctx,
-			BlockDeviceMappingsValue{},
+
 			vmBlockDeviceMappingFromApi,
 			blockDeviceMappings,
 			diags,
@@ -365,11 +363,11 @@ func serializeNumSpotVM(ctx context.Context, http *numspot.Vm, diags *diag.Diagn
 
 	// Tags
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	if http.Nics != nil {
-		nics = utils.GenericListToTfListValue(ctx, NicsValue{}, nicsFromApi, *http.Nics, diags)
+		nics = utils.GenericListToTfListValue(ctx, nicsFromApi, *http.Nics, diags)
 	}
 
 	var launchNumber basetypes.Int64Value
