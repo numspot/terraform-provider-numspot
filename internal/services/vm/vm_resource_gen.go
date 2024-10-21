@@ -117,6 +117,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "A unique identifier which enables you to manage the idempotency.",
 				MarkdownDescription: "A unique identifier which enables you to manage the idempotency.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"creation_date": schema.StringAttribute{
 				Computed:            true,
@@ -128,6 +131,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "If true, you cannot delete the VM unless you change this parameter back to false.",
 				MarkdownDescription: "If true, you cannot delete the VM unless you change this parameter back to false.",
+				Default:             booldefault.StaticBool(false),
 			},
 			"hypervisor": schema.StringAttribute{
 				Computed:            true,
@@ -149,8 +153,10 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"initiated_shutdown_behavior": schema.StringAttribute{
 				Computed:            true,
+				Optional:            true,
 				Description:         "The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted.",
 				MarkdownDescription: "The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted.",
+				Default:             stringdefault.StaticString("stop"),
 			},
 			"is_source_dest_checked": schema.BoolAttribute{
 				Computed:            true,
@@ -167,18 +173,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The number for the VM when launching a group of several VMs (for example, `0`, `1`, `2`, and so on).",
 				MarkdownDescription: "The number for the VM when launching a group of several VMs (for example, `0`, `1`, `2`, and so on).",
-			},
-			"max_vms_count": schema.Int64Attribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The maximum number of VMs you want to create. If all the VMs cannot be created, the largest possible number of VMs above MinVmsCount is created.",
-				MarkdownDescription: "The maximum number of VMs you want to create. If all the VMs cannot be created, the largest possible number of VMs above MinVmsCount is created.",
-			},
-			"min_vms_count": schema.Int64Attribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.",
-				MarkdownDescription: "The minimum number of VMs you want to create. If this number of VMs cannot be created, no VMs are created.",
 			},
 			"nested_virtualization": schema.BoolAttribute{
 				Optional:            true,
@@ -382,12 +376,18 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						Computed:            true,
 						Description:         "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
 						MarkdownDescription: "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+						},
 					},
 					"tenancy": schema.StringAttribute{
 						Optional:            true,
 						Computed:            true,
 						Description:         "The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID).",
 						MarkdownDescription: "The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID).",
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+						},
 					},
 				},
 				CustomType: PlacementType{
@@ -416,6 +416,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "One or more private IPs of the VM.",
 				MarkdownDescription: "One or more private IPs of the VM.",
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			"product_codes": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -454,9 +457,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "One or more IDs of security group for the VMs.",
 				MarkdownDescription: "One or more IDs of security group for the VMs.",
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-				},
 			},
 			"security_groups": schema.ListAttribute{
 				ElementType:         types.StringType,
@@ -468,7 +468,6 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 					listplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
-			// MANUALLY EDITED : remove space_id
 			"state": schema.StringAttribute{
 				Computed:            true,
 				Description:         "The state of the VM (`pending` \\| `running` \\| `stopping` \\| `stopped` \\| `shutting-down` \\| `terminated` \\| `quarantine`).",
@@ -501,11 +500,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).",
 			},
 			"vm_initiated_shutdown_behavior": schema.StringAttribute{
-				Optional:            true,
 				Computed:            true,
 				Description:         "The VM behavior when you stop it. By default or if set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.",
 				MarkdownDescription: "The VM behavior when you stop it. By default or if set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated.",
-				Default:             stringdefault.StaticString("stop"),
 			},
 			"vpc_id": schema.StringAttribute{
 				Computed:            true,
@@ -529,8 +526,6 @@ type VmModel struct {
 	IsSourceDestChecked       types.Bool     `tfsdk:"is_source_dest_checked"`
 	KeypairName               types.String   `tfsdk:"keypair_name"`
 	LaunchNumber              types.Int64    `tfsdk:"launch_number"`
-	MaxVmsCount               types.Int64    `tfsdk:"max_vms_count"`
-	MinVmsCount               types.Int64    `tfsdk:"min_vms_count"`
 	NestedVirtualization      types.Bool     `tfsdk:"nested_virtualization"`
 	Nics                      types.List     `tfsdk:"nics"`
 	OsFamily                  types.String   `tfsdk:"os_family"`
