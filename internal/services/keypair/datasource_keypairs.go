@@ -3,13 +3,14 @@ package keypair
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -69,26 +70,18 @@ func (d *keypairsDataSource) Read(ctx context.Context, request datasource.ReadRe
 		return
 	}
 
-	params := KeypairsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializeReadNumSpotKeypairs(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	numspotClient, err := d.provider.GetClient(ctx)
+
+	numSpotKeypair, err := core.ReadKeypairsWithParams(ctx, d.provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("unable to read keypairs", err.Error())
 		return
-	}
-	res := utils.ExecuteRequest(func() (*numspot.ReadKeypairsResponse, error) {
-		return numspotClient.ReadKeypairsWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Keypair list")
 	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, KeypairsFromHttpToTfDatasource, &response.Diagnostics)
+	objectItems := serializeNumSpotKeypairs(ctx, numSpotKeypair, &response.Diagnostics)
 
 	if response.Diagnostics.HasError() {
 		return
@@ -98,4 +91,22 @@ func (d *keypairsDataSource) Read(ctx context.Context, request datasource.ReadRe
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func serializeNumSpotKeypairs(ctx context.Context, keypairs *[]numspot.Keypair, diags *diag.Diagnostics) []KeyPairDatasourceItemModel {
+	return utils.FromHttpGenericListToTfList(ctx, keypairs, func(ctx context.Context, http *numspot.Keypair, diags *diag.Diagnostics) *KeyPairDatasourceItemModel {
+		return &KeyPairDatasourceItemModel{
+			Fingerprint: types.StringPointerValue(http.Fingerprint),
+			Name:        types.StringPointerValue(http.Name),
+			Type:        types.StringPointerValue(http.Type),
+		}
+	}, diags)
+}
+
+func deserializeReadNumSpotKeypairs(ctx context.Context, tf KeypairsDataSourceModel, diags *diag.Diagnostics) numspot.ReadKeypairsParams {
+	return numspot.ReadKeypairsParams{
+		KeypairFingerprints: utils.TfStringListToStringPtrList(ctx, tf.KeypairFingerprints, diags),
+		KeypairNames:        utils.TfStringListToStringPtrList(ctx, tf.KeypairNames, diags),
+		KeypairTypes:        utils.TfStringListToStringPtrList(ctx, tf.KeypairTypes, diags),
+	}
 }
