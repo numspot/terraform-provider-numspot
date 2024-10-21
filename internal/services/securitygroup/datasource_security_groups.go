@@ -3,13 +3,16 @@ package securitygroup
 import (
 	"context"
 	"fmt"
-	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -85,28 +88,23 @@ func (d *securityGroupsDataSource) Read(ctx context.Context, request datasource.
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	params := SecurityGroupsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializeSecurityGroupsDatasourceParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadSecurityGroupsResponse, error) {
-		return numspotClient.ReadSecurityGroupsWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	res, err := core.ReadSecurityGroups(ctx, d.provider, params)
+	if err != nil {
+		response.Diagnostics.AddError("failed to read security groups", err.Error())
 		return
 	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Security Groups list")
+
+	if res == nil {
+		response.Diagnostics.AddError("failed to read security groups", "got empty Security Groups list")
+		return
 	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SecurityGroupsFromHttpToTfDatasource, &response.Diagnostics)
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res, serializeSecurityGroupsDatasource, &response.Diagnostics)
 
 	if response.Diagnostics.HasError() {
 		return
@@ -116,4 +114,127 @@ func (d *securityGroupsDataSource) Read(ctx context.Context, request datasource.
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func deserializeSecurityGroupsDatasourceParams(ctx context.Context, tf SecurityGroupsDataSourceModel, diags *diag.Diagnostics) numspot.ReadSecurityGroupsParams {
+	return numspot.ReadSecurityGroupsParams{
+		Descriptions:                 utils.TfStringListToStringPtrList(ctx, tf.Descriptions, diags),
+		InboundRuleFromPortRanges:    utils.TFInt64ListToIntListPointer(ctx, tf.InboundRuleFromPortRanges, diags),
+		InboundRuleProtocols:         utils.TfStringListToStringPtrList(ctx, tf.InboundRuleProtocols, diags),
+		InboundRuleIpRanges:          utils.TfStringListToStringPtrList(ctx, tf.InboundRuleIpRanges, diags),
+		InboundRuleSecurityGroupIds:  utils.TfStringListToStringPtrList(ctx, tf.InboundRuleSecurityGroupIds, diags),
+		InboundRuleToPortRanges:      utils.TFInt64ListToIntListPointer(ctx, tf.InboundRuleToPortRanges, diags),
+		SecurityGroupIds:             utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
+		SecurityGroupNames:           utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupNames, diags),
+		OutboundRuleFromPortRanges:   utils.TFInt64ListToIntListPointer(ctx, tf.OutboundRuleFromPortRanges, diags),
+		OutboundRuleProtocols:        utils.TfStringListToStringPtrList(ctx, tf.OutboundRuleProtocols, diags),
+		OutboundRuleIpRanges:         utils.TfStringListToStringPtrList(ctx, tf.OutboundRuleIpRanges, diags),
+		OutboundRuleSecurityGroupIds: utils.TfStringListToStringPtrList(ctx, tf.OutboundRuleSecurityGroupIds, diags),
+		OutboundRuleToPortRanges:     utils.TFInt64ListToIntListPointer(ctx, tf.OutboundRuleToPortRanges, diags),
+		VpcIds:                       utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
+		TagKeys:                      utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:                    utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:                         utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+	}
+}
+
+func serializeSecurityGroupsDatasource(ctx context.Context, http *numspot.SecurityGroup, diags *diag.Diagnostics) *SecurityGroupModel {
+	var (
+		inboundRules  = types.SetNull(InboundRulesValue{}.Type(ctx))
+		outboundRules = types.SetNull(OutboundRulesValue{}.Type(ctx))
+		tagsList      types.List
+	)
+
+	if http.InboundRules != nil {
+		inboundRules = utils.GenericSetToTfSetValue(
+			ctx,
+			serializeInboundRuleDatasource,
+			*http.InboundRules,
+			diags,
+		)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	if http.OutboundRules != nil {
+		outboundRules = utils.GenericSetToTfSetValue(
+			ctx,
+			serializeOutboundRuleDatasource,
+			*http.OutboundRules,
+			diags,
+		)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	if http.Tags != nil {
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	return &SecurityGroupModel{
+		Id:            types.StringPointerValue(http.Id),
+		Tags:          tagsList,
+		Description:   types.StringPointerValue(http.Description),
+		InboundRules:  inboundRules,
+		Name:          types.StringPointerValue(http.Name),
+		OutboundRules: outboundRules,
+		VpcId:         types.StringPointerValue(http.VpcId),
+	}
+}
+
+func serializeInboundRuleDatasource(ctx context.Context, rules numspot.SecurityGroupRule, diags *diag.Diagnostics) InboundRulesValue {
+	ipRanges, diagnostics := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
+	diags.Append(diagnostics...)
+	serviceIds, diagnostics := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
+	diags.Append(diagnostics...)
+	if rules.ServiceIds == nil {
+		serviceIds, diagnostics = types.ListValueFrom(ctx, types.StringType, []string{})
+		diags.Append(diagnostics...)
+	}
+
+	value, diagnostics := NewInboundRulesValue(
+		InboundRulesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"from_port_range":         utils.FromIntPtrToTfInt64(rules.FromPortRange),
+			"to_port_range":           utils.FromIntPtrToTfInt64(rules.ToPortRange),
+			"ip_protocol":             types.StringPointerValue(rules.IpProtocol),
+			"ip_ranges":               ipRanges,
+			"security_groups_members": types.ListNull(SecurityGroupsMembersValue{}.Type(ctx)),
+			"service_ids":             serviceIds,
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
+}
+
+func serializeOutboundRuleDatasource(ctx context.Context, rules numspot.SecurityGroupRule, diags *diag.Diagnostics) OutboundRulesValue {
+	ipRanges, diagnostics := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
+	diags.Append(diagnostics...)
+
+	serviceIds, diagnostics := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
+	diags.Append(diagnostics...)
+
+	if rules.ServiceIds == nil {
+		serviceIds, diagnostics = types.ListValueFrom(ctx, types.StringType, []string{})
+		diags.Append(diagnostics...)
+	}
+
+	value, diagnostics := NewOutboundRulesValue(
+		OutboundRulesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"from_port_range":         utils.FromIntPtrToTfInt64(rules.FromPortRange),
+			"to_port_range":           utils.FromIntPtrToTfInt64(rules.ToPortRange),
+			"ip_protocol":             types.StringPointerValue(rules.IpProtocol),
+			"ip_ranges":               ipRanges,
+			"security_groups_members": types.ListNull(SecurityGroupsMembersValue{}.Type(ctx)),
+			"service_ids":             serviceIds,
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
 }
