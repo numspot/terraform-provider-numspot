@@ -149,13 +149,12 @@ func serializeNumSpotDataSource(ctx context.Context, http *numspot.Volume, diags
 	)
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	if http.LinkedVolumes != nil {
 		linkedVolumes = utils.GenericListToTfListValue(
 			ctx,
-			LinkedVolumesValue{},
 			fromLinkedVolumeSchemaToTFVolumesList,
 			*http.LinkedVolumes,
 			diags,

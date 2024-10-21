@@ -225,13 +225,13 @@ func serializeRouteTable(ctx context.Context, http *numspot.RouteTable, diags *d
 	}
 
 	// Routes
-	tfRoutes := utils.GenericSetToTfSetValue(ctx, RoutesValue{}, serializeRoute, routes, diags)
+	tfRoutes := utils.GenericSetToTfSetValue(ctx, serializeRoute, routes, diags)
 	if diags.HasError() {
 		return nil
 	}
 
 	// Links
-	tfLinks := utils.GenericListToTfListValue(ctx, LinkRouteTablesValue{}, serializeRouteTableLink, *http.LinkRouteTables, diags)
+	tfLinks := utils.GenericListToTfListValue(ctx, serializeRouteTableLink, *http.LinkRouteTables, diags)
 	if diags.HasError() {
 		return nil
 	}
@@ -246,7 +246,7 @@ func serializeRouteTable(ctx context.Context, http *numspot.RouteTable, diags *d
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}

@@ -131,7 +131,7 @@ func SecurityGroupFromHttpToTf(ctx context.Context, http *numspot.SecurityGroup,
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -253,7 +253,6 @@ func SecurityGroupsFromHttpToTfDatasource(ctx context.Context, http *numspot.Sec
 	if http.InboundRules != nil {
 		inboundRules = utils.GenericSetToTfSetValue(
 			ctx,
-			InboundRulesValue{},
 			inboundRuleFromHttpToTfDatasource,
 			*http.InboundRules,
 			diags,
@@ -266,7 +265,6 @@ func SecurityGroupsFromHttpToTfDatasource(ctx context.Context, http *numspot.Sec
 	if http.OutboundRules != nil {
 		outboundRules = utils.GenericSetToTfSetValue(
 			ctx,
-			OutboundRulesValue{},
 			outboundRuleFromHttpToTfDatasource,
 			*http.OutboundRules,
 			diags,
@@ -277,7 +275,7 @@ func SecurityGroupsFromHttpToTfDatasource(ctx context.Context, http *numspot.Sec
 	}
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}

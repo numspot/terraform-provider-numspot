@@ -116,7 +116,6 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image, diags *diag.Dia
 	if http.BlockDeviceMappings != nil {
 		blockDeviceMappingsTf = utils.GenericListToTfListValue(
 			ctx,
-			BlockDeviceMappingsValue{},
 			blockDeviceMappingFromApi,
 			*http.BlockDeviceMappings,
 			diags,
@@ -150,7 +149,7 @@ func ImageFromHttpToTf(ctx context.Context, http *numspot.Image, diags *diag.Dia
 
 	// Tags
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}

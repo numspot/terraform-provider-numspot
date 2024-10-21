@@ -15,7 +15,7 @@ func NetFromHttpToTf(ctx context.Context, http *numspot.Vpc, diags *diag.Diagnos
 	var tagsTf types.List
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return &VpcModel{
@@ -52,7 +52,7 @@ func VPCsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpc, diags *d
 	var tagsList types.List
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return &VpcModel{

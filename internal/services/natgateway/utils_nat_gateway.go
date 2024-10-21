@@ -34,7 +34,6 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *numspot.NatGateway, diags
 	// Public Ips
 	publicIpsTf := utils.GenericListToTfListValue(
 		ctx,
-		PublicIpsValue{},
 		publicIpFromApi,
 		publicIp,
 		diags,
@@ -52,7 +51,7 @@ func NatGatewayFromHttpToTf(ctx context.Context, http *numspot.NatGateway, diags
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -79,7 +78,6 @@ func NatGatewayFromHttpToTfDatasource(ctx context.Context, http *numspot.NatGate
 	// Public Ips
 	publicIpsTf := utils.GenericListToTfListValue(
 		ctx,
-		PublicIpsValue{},
 		publicIpFromApi,
 		publicIp,
 		diags,
@@ -89,7 +87,7 @@ func NatGatewayFromHttpToTfDatasource(ctx context.Context, http *numspot.NatGate
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
