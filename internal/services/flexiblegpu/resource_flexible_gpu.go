@@ -84,7 +84,7 @@ func (r *FlexibleGpuResource) linkVm(ctx context.Context, gpuId string, data Fle
 	//}
 }
 
-func (r *FlexibleGpuResource) unlinkVm(ctx context.Context, gpuId string, data FlexibleGpuModel, diags *diag.Diagnostics) {
+func (r *FlexibleGpuResource) unlinkVm(ctx context.Context, gpuId string, _ FlexibleGpuModel, diags *diag.Diagnostics) {
 	numspotClient, err := r.provider.GetClient(ctx)
 	if err != nil {
 		diags.AddError("Error while initiating numspotClient", err.Error())
