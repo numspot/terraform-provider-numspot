@@ -75,10 +75,11 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	state, diags := serializeSubnet(ctx, numSpotSubnet)
-	if diags.HasError() {
+	state := serializeSubnet(ctx, numSpotSubnet, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
@@ -97,8 +98,8 @@ func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest,
 		return
 	}
 
-	newState, diags := serializeSubnet(ctx, numSpotSubnet)
-	if diags.HasError() {
+	newState := serializeSubnet(ctx, numSpotSubnet, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
@@ -138,9 +139,8 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 		}
 	}
 
-	newState, diags := serializeSubnet(ctx, numSpotSubnet)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	newState := serializeSubnet(ctx, numSpotSubnet, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 

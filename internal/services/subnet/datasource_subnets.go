@@ -120,7 +120,7 @@ func SubnetsFromHttpToTfDatasource(ctx context.Context, http *numspot.Subnet, di
 	var tagsList types.List
 
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return &SubnetModel{
