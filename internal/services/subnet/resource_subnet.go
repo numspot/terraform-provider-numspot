@@ -67,47 +67,49 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	createSubnetPayload := deserializeCreateSubnet(plan)
-	tags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	res, err := core.CreateSubnet(ctx, r.provider, createSubnetPayload, plan.MapPublicIpOnLaunch.ValueBool(), tags)
+	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+
+	numSpotSubnet, err := core.CreateSubnet(ctx, r.provider, deserializeCreateSubnet(plan), plan.MapPublicIpOnLaunch.ValueBool(), tagsValue)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create subnet", err.Error())
+		response.Diagnostics.AddError("unable to create subnet", err.Error())
 		return
 	}
 
-	tf := serializeSubnet(ctx, res, &response.Diagnostics)
+	state := serializeSubnet(ctx, numSpotSubnet, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
 func (r *SubnetResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var data SubnetModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state SubnetModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res, err := core.ReadSubnet(ctx, r.provider, data.Id.ValueString())
+	subnetID := state.Id.ValueString()
+
+	numSpotSubnet, err := core.ReadSubnet(ctx, r.provider, subnetID)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to read subnet", err.Error())
+		response.Diagnostics.AddError("unable to read subnet", err.Error())
 		return
 	}
 
-	tf := serializeSubnet(ctx, res, &response.Diagnostics)
+	newState := serializeSubnet(ctx, numSpotSubnet, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
 func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
-		plan, state SubnetModel
-		res         *numspot.Subnet
-		err         error
-		updated     bool
+		err           error
+		numSpotSubnet *numspot.Subnet
+		plan, state   SubnetModel
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -119,47 +121,43 @@ func (r *SubnetResource) Update(ctx context.Context, request resource.UpdateRequ
 		return
 	}
 
-	if !state.Tags.Equal(plan.Tags) {
-		updated = true
-		planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-		stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
-		if res, err = core.UpdateSubnetTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags); err != nil {
-			response.Diagnostics.AddError("Failed to update subnet", fmt.Sprintf("failed to update tags: %s", err.Error()))
-		}
-	}
+	subnetID := state.Id.ValueString()
+	mapPublicIPOnLaunch := plan.MapPublicIpOnLaunch.ValueBool()
+	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
 
-	if !utils.IsTfValueNull(plan.MapPublicIpOnLaunch) {
-		updated = true
-		if res, err = core.UpdateSubnetAttributes(
-			ctx,
-			r.provider,
-			state.Id.ValueString(),
-			plan.MapPublicIpOnLaunch.ValueBool(),
-		); err != nil {
-			response.Diagnostics.AddError("Failed to update subnet", fmt.Sprintf("failed to update MapPublicIPOnLaunch: %s", err.Error()))
+	if !plan.MapPublicIpOnLaunch.Equal(state.MapPublicIpOnLaunch) {
+		if numSpotSubnet, err = core.UpdateSubnetAttributes(ctx, r.provider, subnetID, mapPublicIPOnLaunch); err != nil {
+			response.Diagnostics.AddError("unable to update subnet attributes", err.Error())
 			return
 		}
 	}
 
-	if updated {
-		tf := serializeSubnet(ctx, res, &response.Diagnostics)
-		if response.Diagnostics.HasError() {
-			return
+	if !plan.Tags.Equal(state.Tags) {
+		if numSpotSubnet, err = core.UpdateSubnetTags(ctx, r.provider, subnetID, stateTags, planTags); err != nil {
+			response.Diagnostics.AddError("unable to update subnet tags", err.Error())
 		}
-
-		response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 	}
-}
 
-func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data SubnetModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	newState := serializeSubnet(ctx, numSpotSubnet, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if err := core.DeleteSubnet(ctx, r.provider, data.Id.ValueString()); err != nil {
-		response.Diagnostics.AddError("Failed to delete subnet", err.Error())
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+}
+
+func (r *SubnetResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+	var state SubnetModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	subnetID := state.Id.ValueString()
+
+	if err := core.DeleteSubnet(ctx, r.provider, subnetID); err != nil {
+		response.Diagnostics.AddError("unable to delete subnet", err.Error())
 	}
 }
 
