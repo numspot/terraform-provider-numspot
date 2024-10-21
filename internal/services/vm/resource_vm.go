@@ -170,10 +170,6 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 			return
 		}
 	}
-	if http.SecurityGroups != nil {
-		listValue, _ := types.ListValueFrom(ctx, types.StringType, securityGroups)
-		r.SecurityGroupIds = listValue
-	}
 
 	newState := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
