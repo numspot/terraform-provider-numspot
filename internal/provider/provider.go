@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/acl"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/clientgateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/dhcpoptions"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/flexiblegpu"
@@ -23,12 +22,9 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/loadbalancer"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/natgateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/nic"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/permission"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/publicip"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/role"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/routetable"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/securitygroup"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/serviceaccount"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/snapshot"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/space"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/subnet"
@@ -242,9 +238,6 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 		space.NewSpaceDataSource,
 		vm.NewVmsDataSource,
 		flexiblegpu.NewFlexibleGpusDataSource,
-		serviceaccount.NewServiceAccountsDataSource,
-		permission.NewPermissionsDataSource,
-		role.NewRolesDatasource,
 	}
 }
 
@@ -271,7 +264,5 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		virtualgateway.NewVirtualGatewayResource,
 		vpcpeering.NewVpcPeeringResource,
 		space.NewSpaceResource,
-		serviceaccount.NewServiceAccountResource,
-		acl.NewAclsResource,
 	}
 }
