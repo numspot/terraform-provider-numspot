@@ -3,6 +3,9 @@ package vpc
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -59,12 +62,25 @@ func (r *VpcResource) Schema(ctx context.Context, request resource.SchemaRequest
 }
 
 func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data VpcModel
-	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	var (
+		plan          VpcModel
+		updatePayload *numspot.UpdateVpcJSONRequestBody
+	)
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
+	createPayload := deserializeCreateVPCRequest(&plan)
+	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	if !plan.DhcpOptionsSetId.IsNull() && !plan.DhcpOptionsSetId.IsUnknown() {
+		p := deserializeUpdateVPCRequest(ctx, &plan)
+		updatePayload = &p
+	}
+	vpc, err := core.CreateVPC(ctx, r.provider, createPayload, tagsValue, updatePayload)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create VPC", err.Error())
+		return
+	}
 	numspotClient, err := r.provider.GetClient(ctx)
 	if err != nil {
 		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
@@ -75,7 +91,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.SpaceID,
-		NetFromTfToCreateRequest(&data),
+		deserializeCreateVPCRequest(&plan),
 		numspotClient.CreateVpcWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPC", err.Error())
@@ -84,17 +100,17 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 
 	// Handle tags
 	createdId := *res.JSON201.Id
-	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
+	if len(plan.Tags.Elements()) > 0 {
+		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
 		if response.Diagnostics.HasError() {
 			return
 		}
 	}
 
 	// if dhcp_options_set_id is set, we need to update the Vpc as this attribute can be set on Update only and not on Create
-	if !data.DhcpOptionsSetId.IsNull() && !data.DhcpOptionsSetId.IsUnknown() {
+	if !plan.DhcpOptionsSetId.IsNull() && !plan.DhcpOptionsSetId.IsUnknown() {
 		updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
-			body := VpcFromTfToUpdaterequest(ctx, &data)
+			body := deserializeUpdateVPCRequest(ctx, &plan)
 			return numspotClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, createdId, body)
 		}, http.StatusOK, &response.Diagnostics)
 
@@ -121,7 +137,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 		return
 	}
 
-	tf := NetFromHttpToTf(ctx, vpc, &response.Diagnostics)
+	tf := serializeVPC(ctx, vpc, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -136,25 +152,13 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
+	vpc, err := core.ReadVPC(ctx, r.provider, data.Id.ValueString())
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("failed to read VPC", err.Error())
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadVpcsByIdResponse, error) {
-		return numspotClient.ReadVpcsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	// TODO: read Nets returns tags in response, do not need to relist tags
-	tf := NetFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
+	tf := serializeVPC(ctx, vpc, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -199,7 +203,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 
 	// Update Vpc
 	updatedRes := utils.ExecuteRequest(func() (*numspot.UpdateVpcResponse, error) {
-		body := VpcFromTfToUpdaterequest(ctx, &plan)
+		body := deserializeUpdateVPCRequest(ctx, &plan)
 		return numspotClient.UpdateVpcWithResponse(ctx, r.provider.SpaceID, vpcId, body)
 	}, http.StatusOK, &response.Diagnostics)
 
@@ -215,7 +219,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 		return
 	}
 
-	tf := NetFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	tf := serializeVPC(ctx, res.JSON200, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -234,17 +238,38 @@ func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+	if err := core.DeleteVPC(ctx, r.provider, data.Id.ValueString()); err != nil {
+		response.Diagnostics.AddError("failed to delete VPC", err.Error())
 		return
 	}
+}
 
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteVpcWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete VPC", err.Error())
-		return
+func serializeVPC(ctx context.Context, http *numspot.Vpc, diags *diag.Diagnostics) *VpcModel {
+	var tagsTf types.List
+
+	if http.Tags != nil {
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
-	response.State.RemoveResource(ctx)
+	return &VpcModel{
+		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
+		Id:               types.StringPointerValue(http.Id),
+		IpRange:          types.StringPointerValue(http.IpRange),
+		State:            types.StringPointerValue(http.State),
+		Tenancy:          types.StringPointerValue(http.Tenancy),
+		Tags:             tagsTf,
+	}
+}
+
+func deserializeUpdateVPCRequest(ctx context.Context, tf *VpcModel) numspot.UpdateVpcJSONRequestBody {
+	return numspot.UpdateVpcJSONRequestBody{
+		DhcpOptionsSetId: tf.DhcpOptionsSetId.ValueString(),
+	}
+}
+
+func deserializeCreateVPCRequest(tf *VpcModel) numspot.CreateVpcJSONRequestBody {
+	return numspot.CreateVpcJSONRequestBody{
+		IpRange: tf.IpRange.ValueString(),
+		Tenancy: tf.Tenancy.ValueStringPointer(),
+	}
 }

@@ -11,30 +11,6 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func NetFromHttpToTf(ctx context.Context, http *numspot.Vpc, diags *diag.Diagnostics) *VpcModel {
-	var tagsTf types.List
-
-	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-	}
-
-	return &VpcModel{
-		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
-		Id:               types.StringPointerValue(http.Id),
-		IpRange:          types.StringPointerValue(http.IpRange),
-		State:            types.StringPointerValue(http.State),
-		Tenancy:          types.StringPointerValue(http.Tenancy),
-		Tags:             tagsTf,
-	}
-}
-
-func NetFromTfToCreateRequest(tf *VpcModel) numspot.CreateVpcJSONRequestBody {
-	return numspot.CreateVpcJSONRequestBody{
-		IpRange: tf.IpRange.ValueString(),
-		Tenancy: tf.Tenancy.ValueStringPointer(),
-	}
-}
-
 func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVpcsParams {
 	return numspot.ReadVpcsParams{
 		DhcpOptionsSetIds: utils.TfStringListToStringPtrList(ctx, tf.DHCPOptionsSetIds, diags),
@@ -62,11 +38,5 @@ func VPCsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpc, diags *d
 		State:            types.StringPointerValue(http.State),
 		Tenancy:          types.StringPointerValue(http.Tenancy),
 		Tags:             tagsList,
-	}
-}
-
-func VpcFromTfToUpdaterequest(ctx context.Context, tf *VpcModel) numspot.UpdateVpcJSONRequestBody {
-	return numspot.UpdateVpcJSONRequestBody{
-		DhcpOptionsSetId: tf.DhcpOptionsSetId.ValueString(),
 	}
 }
