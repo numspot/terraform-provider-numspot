@@ -187,18 +187,15 @@ resource "numspot_load_balancer" "lb" {
 
 - `listeners` (Attributes Set) One or more listeners to create. (see [below for nested schema](#nestedatt--listeners))
 - `name` (String) The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).
-- `subnets` (List of String) (Vpc only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Vpc.
+- `subnets` (List of String) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Vpc.
 
 ### Optional
 
-- `availability_zone_names` (List of String) (public Cloud only) The Subregion in which you want to create the load balancer. Regardless of this Subregion, the load balancer can distribute traffic to all Subregions. This parameter is required in the public Cloud.
 - `backend_ips` (Set of String) One or more public IPs of back-end VMs.
 - `backend_vm_ids` (Set of String) One or more IDs of back-end VMs for the load balancer.
 - `health_check` (Attributes) Information about the health check configuration. (see [below for nested schema](#nestedatt--health_check))
-- `id` (String) ID for ReadLoadBalancers
 - `public_ip` (String) (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by NumSpot is associated.
-- `security_groups` (List of String) (Vpc only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Vpc is assigned to the load balancer.
-- `space_id` (String) Identifier of the Space
+- `security_groups` (List of String) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Vpc is assigned to the load balancer.
 - `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
 - `type` (String) The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Vpc.
 
@@ -206,6 +203,7 @@ resource "numspot_load_balancer" "lb" {
 
 - `application_sticky_cookie_policies` (Attributes List) The stickiness policies defined for the load balancer. (see [below for nested schema](#nestedatt--application_sticky_cookie_policies))
 - `dns_name` (String) The DNS name of the load balancer.
+- `id` (String) ID for ReadLoadBalancers
 - `secured_cookies` (Boolean) Whether secure cookies are enabled for the load balancer.
 - `source_security_group` (Attributes) Information about the source security group of the load balancer, which you can use as part of your inbound rules for your registered VMs.<br />
 To only allow traffic from load balancers, add a security group rule that specifies this source security group as the inbound source. (see [below for nested schema](#nestedatt--source_security_group))

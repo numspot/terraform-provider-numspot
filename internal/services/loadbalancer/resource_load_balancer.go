@@ -3,20 +3,16 @@ package loadbalancer
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
-
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -40,7 +36,7 @@ func (r *LoadBalancerResource) Configure(ctx context.Context, request resource.C
 		return
 	}
 
-	client, ok := request.ProviderData.(*client.NumSpotSDK)
+	numSpotClient, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -50,11 +46,11 @@ func (r *LoadBalancerResource) Configure(ctx context.Context, request resource.C
 		return
 	}
 
-	r.provider = client
+	r.provider = numSpotClient
 }
 
 func (r *LoadBalancerResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
+	resource.ImportStatePassthroughID(ctx, path.Root("name"), request, response)
 }
 
 func (r *LoadBalancerResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
@@ -93,63 +89,11 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 		return
 	}
 
-	numSpotLoadBalancer, err := core.CreateLoadBalancer(ctx, r.provider, createNumSpotLoadBalancer, tagsValue, updateNumSpotLoadBalancer.HealthCheck, backendVM, backendIP)
+	numSpotLoadBalancer, err := core.CreateLoadBalancer(ctx, r.provider, createNumSpotLoadBalancer, updateNumSpotLoadBalancer, tagsValue, backendVM, backendIP)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create load balancer", err.Error())
 		return
 	}
-
-	//numspotClient, err := r.provider.GetClient(ctx)
-	//if err != nil {
-	//	response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-	//	return
-	//}
-	//// Retries create until request response is OK
-	//_, err = utils.RetryCreateUntilResourceAvailableWithBody(
-	//	ctx,
-	//	r.provider.SpaceID,
-	//	LoadBalancerFromTfToCreateRequest(ctx, &data, &response.Diagnostics),
-	//	numspotClient.CreateLoadBalancerWithResponse)
-	//if err != nil {
-	//	response.Diagnostics.AddError("Failed to create Load Balancer", err.Error())
-	//	return
-	//}
-	//
-	//// Backends
-	//if len(data.BackendVmIds.Elements()) > 0 || len(data.BackendIps.Elements()) > 0 {
-	//	r.linkBackendMachines(ctx,
-	//		data.Name.ValueString(),
-	//		utils.TfStringSetToStringPtrSet(ctx, data.BackendIps, &response.Diagnostics),
-	//		utils.TfStringSetToStringPtrSet(ctx, data.BackendVmIds, &response.Diagnostics),
-	//		&response.Diagnostics,
-	//	)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//}
-	//
-	//// Health Check
-	//if !data.HealthCheck.IsUnknown() {
-	//	_ = r.AttachHealthCheck(ctx, data.Name.ValueString(), data.HealthCheck, &response.Diagnostics)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//}
-	//
-	//// Tags
-	//// In load balancer case, tags are not handled in the same way as other resources
-	//if len(data.Tags.Elements()) > 0 {
-	//	CreateLoadBalancerTags(ctx, r.provider.SpaceID, numspotClient, data.Name.ValueString(), data.Tags, &response.Diagnostics)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//}
-	//
-	//// Update state with updated resource
-	//tf := r.readLoadBalancer(ctx, data.Name.ValueString(), response.Diagnostics)
-	//if response.Diagnostics.HasError() {
-	//	return
-	//}
 
 	state := serializeNumSpotLoadBalancer(ctx, numSpotLoadBalancer, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
@@ -185,9 +129,9 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 
 func (r *LoadBalancerResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
-		state, plan LoadBalancerModel
-		//diags       diag.Diagnostics
-		//modifs      = false
+		state, plan         LoadBalancerModel
+		numSpotLoadBalancer *numspot.LoadBalancer
+		err                 error
 	)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -199,209 +143,89 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 		return
 	}
 
-	//numspotClient, err := r.provider.GetClient(ctx)
-	//if err != nil {
-	//	response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-	//	return
-	//}
-	//
-	//if !plan.Tags.IsUnknown() && !plan.Tags.Equal(state.Tags) {
-	//	stateTags := make([]tags.TagsValue, 0, len(state.Tags.Elements()))
-	//	diags = state.Tags.ElementsAs(ctx, &stateTags, false)
-	//	response.Diagnostics.Append(diags...)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//
-	//	planTags := make([]tags.TagsValue, 0, len(plan.Tags.Elements()))
-	//	diags = plan.Tags.ElementsAs(ctx, &planTags, false)
-	//	response.Diagnostics.Append(diags...)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//
-	//	toCreate, toDelete := utils.Diff(stateTags, planTags)
-	//	var toDeleteTf, toCreateTf types.List
-	//	tagType := tags.TagsValue{}.Type(ctx)
-	//
-	//	toDeleteTf, diags = types.ListValueFrom(ctx, tagType, toDelete)
-	//	response.Diagnostics.Append(diags...)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//
-	//	DeleteLoadBalancerTags(ctx, r.provider.SpaceID, numspotClient, state.Name.ValueString(), toDeleteTf, &response.Diagnostics)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//
-	//	toCreateTf, diags = types.ListValueFrom(ctx, tagType, toCreate)
-	//	response.Diagnostics.Append(diags...)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//
-	//	CreateLoadBalancerTags(ctx, r.provider.SpaceID, numspotClient, state.Name.ValueString(), toCreateTf, &response.Diagnostics)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//
-	//	modifs = true
-	//}
-	//
-	//if !plan.Listeners.IsUnknown() && !plan.Listeners.Equal(state.Listeners) {
-	//	stateListeners := make([]ListenersValue, 0, len(state.Listeners.Elements()))
-	//	planListeners := make([]ListenersValue, 0, len(plan.Listeners.Elements()))
-	//
-	//	diags = state.Listeners.ElementsAs(ctx, &stateListeners, false)
-	//	response.Diagnostics.Append(diags...)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//
-	//	diags = plan.Listeners.ElementsAs(ctx, &planListeners, false)
-	//	response.Diagnostics.Append(diags...)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//
-	//	toCreate, toDelete := utils.Diff(stateListeners, planListeners)
-	//
-	//	if len(toCreate) > 0 {
-	//		r.createListeners(ctx, state.Id.ValueString(), toCreate, &response.Diagnostics)
-	//		if response.Diagnostics.HasError() {
-	//			return
-	//		}
-	//	}
-	//
-	//	if len(toDelete) > 0 {
-	//		r.deleteListeners(ctx, state.Id.ValueString(), toDelete, &response.Diagnostics)
-	//		if response.Diagnostics.HasError() {
-	//			return
-	//		}
-	//	}
-	//
-	//	modifs = true
-	//}
-	//
-	//if !plan.HealthCheck.IsUnknown() && !state.HealthCheck.Equal(plan.HealthCheck) {
-	//	// HealthCheck:
-	//	if !plan.HealthCheck.IsUnknown() && !state.HealthCheck.Equal(plan.HealthCheck) {
-	//		res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
-	//			return numspotClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, plan.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
-	//				HealthCheck: &numspot.HealthCheck{
-	//					CheckInterval:      utils.FromTfInt64ToInt(plan.HealthCheck.CheckInterval),
-	//					HealthyThreshold:   utils.FromTfInt64ToInt(plan.HealthCheck.HealthyThreshold),
-	//					Path:               plan.HealthCheck.Path.ValueStringPointer(),
-	//					Port:               utils.FromTfInt64ToInt(plan.HealthCheck.Port),
-	//					Protocol:           plan.HealthCheck.Protocol.ValueString(),
-	//					Timeout:            utils.FromTfInt64ToInt(plan.HealthCheck.Timeout),
-	//					UnhealthyThreshold: utils.FromTfInt64ToInt(plan.HealthCheck.UnhealthyThreshold),
-	//				},
-	//			})
-	//		}, http.StatusOK, &response.Diagnostics)
-	//		if res == nil {
-	//			return
-	//		}
-	//	}
-	//
-	//	modifs = true
-	//}
-	//
-	//if modifs {
-	//	tf := r.readLoadBalancer(ctx, state.Id.ValueString(), response.Diagnostics)
-	//	if response.Diagnostics.HasError() {
-	//		return
-	//	}
-	//
-	//	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
-	//}
-}
-
-func (r *LoadBalancerResource) createListeners(ctx context.Context, loadBalancerId string, listeners []ListenersValue, diags *diag.Diagnostics) {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	listenersForCreation := make([]numspot.ListenerForCreation, 0, len(listeners))
-	for _, e := range listeners {
-		listenersForCreation = append(listenersForCreation, numspot.ListenerForCreation{
-			BackendPort:          utils.FromTfInt64ToInt(e.BackendPort),
-			BackendProtocol:      utils.FromTfStringToStringPtr(e.BackendProtocol),
-			LoadBalancerPort:     utils.FromTfInt64ToInt(e.LoadBalancerPort),
-			LoadBalancerProtocol: e.LoadBalancerProtocol.ValueString(),
-		})
-	}
-
-	utils.ExecuteRequest(func() (*numspot.CreateLoadBalancerListenersResponse, error) {
-		return numspotClient.CreateLoadBalancerListenersWithResponse(
-			ctx,
-			r.provider.SpaceID,
-			loadBalancerId,
-			numspot.CreateLoadBalancerListenersJSONRequestBody{
-				Listeners: listenersForCreation,
-			},
-		)
-	}, http.StatusCreated, diags)
-}
-
-func (r *LoadBalancerResource) deleteListeners(ctx context.Context, loadBalancerId string, listeners []ListenersValue, diags *diag.Diagnostics) {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	listenersLoadBalancerPortToDelete := make([]int, 0, len(listeners))
-	for _, e := range listeners {
-		listenersLoadBalancerPortToDelete = append(listenersLoadBalancerPortToDelete, utils.FromTfInt64ToInt(e.LoadBalancerPort))
-	}
-
-	utils.ExecuteRequest(func() (*numspot.DeleteLoadBalancerListenersResponse, error) {
-		return numspotClient.DeleteLoadBalancerListenersWithResponse(
-			ctx,
-			r.provider.SpaceID,
-			loadBalancerId,
-			numspot.DeleteLoadBalancerListenersJSONRequestBody{
-				LoadBalancerPorts: listenersLoadBalancerPortToDelete,
-			},
-		)
-	}, http.StatusNoContent, diags)
-}
-
-func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data LoadBalancerModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	planBackendIP := utils.FromTfStringSetToStringList(ctx, plan.BackendIps, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-	tflog.Debug(ctx, fmt.Sprintf("Deleting load balancer %s", data.Name))
-
-	// Detach security groups
-	emptyList := []string{}
-	res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
-		return numspotClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, data.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
-			SecurityGroups: &emptyList,
-		})
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	planBackendVM := utils.FromTfStringSetToStringList(ctx, plan.BackendVmIds, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Name.ValueString(), numspotClient.DeleteLoadBalancerWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete Load Balancer", err.Error())
+	stateBackendIP := utils.FromTfStringSetToStringList(ctx, state.BackendIps, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+	stateBackendVM := utils.FromTfStringSetToStringList(ctx, state.BackendVmIds, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.State.RemoveResource(ctx)
+	loadBalancerName := state.Name.ValueString()
+	updateNumSpotLoadBalancer := deserializeUpdateNumSpotLoadBalancer(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	stateTags := deserializeTagsToDelete(ctx, state.Tags)
+	statePublicIP := state.PublicIp.ValueString()
+	planPublicIP := plan.PublicIp.ValueString()
+
+	if !plan.HealthCheck.Equal(state.HealthCheck) || planPublicIP != statePublicIP {
+		numSpotLoadBalancer, err = core.UpdateLoadBalancerAttributes(ctx, r.provider, loadBalancerName, updateNumSpotLoadBalancer)
+		if err != nil {
+			response.Diagnostics.AddError("unable to update load balancer attributes", err.Error())
+			return
+		}
+	}
+
+	if !plan.SecurityGroups.Equal(state.SecurityGroups) {
+		numSpotLoadBalancer, err = core.UpdateLoadBalancerSecurityGroup(ctx, r.provider, loadBalancerName, updateNumSpotLoadBalancer)
+		if err != nil {
+			response.Diagnostics.AddError("unable to update load balancer security groups", err.Error())
+			return
+		}
+
+	}
+	if !plan.BackendVmIds.Equal(state.BackendVmIds) || !plan.BackendIps.Equal(state.BackendIps) {
+		numSpotLoadBalancer, err = core.UpdateLoadBalancerBackend(ctx, r.provider, loadBalancerName, stateBackendVM, planBackendVM, stateBackendIP, planBackendIP)
+		if err != nil {
+			response.Diagnostics.AddError("unable to update load balancer backend", err.Error())
+			return
+		}
+	}
+
+	if !plan.Tags.Equal(state.Tags) {
+		numSpotLoadBalancer, err = core.UpdateLoadBalancerTags(ctx, r.provider, loadBalancerName, planTags, stateTags)
+		if err != nil {
+			response.Diagnostics.AddError("unable to update load balancer tags", err.Error())
+			return
+		}
+	}
+
+	newState := serializeNumSpotLoadBalancer(ctx, numSpotLoadBalancer, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+}
+
+func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+	var state LoadBalancerModel
+
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	loadBalancerName := state.Name.ValueString()
+
+	if err := core.DeleteLoadBalancer(ctx, r.provider, loadBalancerName); err != nil {
+		response.Diagnostics.AddError("unable to delete load balancer", err.Error())
+		return
+	}
 }
 
 func deserializeCreateNumSpotLoadBalancer(ctx context.Context, tf LoadBalancerModel, diags *diag.Diagnostics) numspot.CreateLoadBalancerJSONRequestBody {
@@ -429,13 +253,23 @@ func deserializeCreateNumSpotLoadBalancer(ctx context.Context, tf LoadBalancerMo
 		Type:           tf.Type.ValueStringPointer(),
 	}
 }
+
 func deserializeUpdateNumSpotLoadBalancer(ctx context.Context, tf LoadBalancerModel, diags *diag.Diagnostics) numspot.UpdateLoadBalancerJSONRequestBody {
 	var (
-		loadBalancerPort *int                 = nil
-		policyNames      *[]string            = nil
-		hc               *numspot.HealthCheck = nil
-		publicIp         *string              = nil
-		securedCookies   *bool                = nil
+		loadBalancerPort *int = nil
+		policyNames           = make([]string, 0)
+		hc                    = &numspot.HealthCheck{
+			CheckInterval:      30,
+			HealthyThreshold:   10,
+			Path:               nil,
+			Port:               80,
+			Protocol:           "TCP",
+			Timeout:            5,
+			UnhealthyThreshold: 2,
+		} // Default health check
+		publicIp       *string   = nil
+		securedCookies *bool     = nil
+		securityGroups *[]string = nil
 	)
 
 	if !tf.HealthCheck.IsUnknown() {
@@ -455,48 +289,56 @@ func deserializeUpdateNumSpotLoadBalancer(ctx context.Context, tf LoadBalancerMo
 	if !tf.SecuredCookies.IsUnknown() {
 		securedCookies = tf.SecuredCookies.ValueBoolPointer()
 	}
-	securityGroups := utils.TfStringListToStringList(ctx, tf.SecurityGroups, diags)
+
+	if !tf.SecurityGroups.IsUnknown() {
+		sg := utils.TfStringListToStringList(ctx, tf.SecurityGroups, diags)
+		securityGroups = &sg
+	}
+
 	listeners := utils.TfSetToGenericSet(func(elt ListenersValue) numspot.Listener {
-		policyNames := utils.TfStringListToStringList(ctx, elt.PolicyNames, diags)
+		policyNamesListener := utils.TfStringListToStringList(ctx, elt.PolicyNames, diags)
+		if policyNamesListener == nil {
+			policyNamesListener = make([]string, 0)
+		}
 		return numspot.Listener{
 			BackendPort:          utils.FromTfInt64ToIntPtr(elt.BackendPort),
 			BackendProtocol:      elt.BackendProtocol.ValueStringPointer(),
 			LoadBalancerPort:     utils.FromTfInt64ToIntPtr(elt.LoadBalancerPort),
 			LoadBalancerProtocol: elt.BackendProtocol.ValueStringPointer(),
-			PolicyNames:          &policyNames,
+			PolicyNames:          &policyNamesListener,
 			ServerCertificateId:  elt.ServerCertificateId.ValueStringPointer(),
 		}
 	}, ctx, tf.Listeners, diags)
 
 	if len(listeners) == 1 {
 		loadBalancerPort = listeners[0].LoadBalancerPort
-		policyNames = listeners[0].PolicyNames
+		policyNames = *listeners[0].PolicyNames
 	}
 
 	return numspot.UpdateLoadBalancerJSONRequestBody{
 		HealthCheck:      hc,
 		LoadBalancerPort: loadBalancerPort,
-		PolicyNames:      policyNames,
+		PolicyNames:      &policyNames,
 		PublicIp:         publicIp,
 		SecuredCookies:   securedCookies,
-		SecurityGroups:   &securityGroups,
+		SecurityGroups:   securityGroups,
 	}
 }
 
 func serializeNumSpotLoadBalancer(ctx context.Context, http *numspot.LoadBalancer, diags *diag.Diagnostics) LoadBalancerModel {
 	var tagsTf types.List
 
-	applicationStickyCookiePoliciestypes := utils.GenericListToTfListValue(ctx, ApplicationStickyCookiePoliciesValue{}, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
+	applicationStickyCookiePoliciesTypes := utils.GenericListToTfListValue(ctx, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
 	if diags.HasError() {
 		return LoadBalancerModel{}
 	}
 
-	listeners := utils.GenericSetToTfSetValue(ctx, ListenersValue{}, listenersFromHTTP, *http.Listeners, diags)
+	listeners := utils.GenericSetToTfSetValue(ctx, listenersFromHTTP, *http.Listeners, diags)
 	if diags.HasError() {
 		return LoadBalancerModel{}
 	}
 
-	stickyCookiePolicies := utils.GenericListToTfListValue(ctx, StickyCookiePoliciesValue{}, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies, diags)
+	stickyCookiePolicies := utils.GenericListToTfListValue(ctx, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies, diags)
 	if diags.HasError() {
 		return LoadBalancerModel{}
 	}
@@ -512,7 +354,7 @@ func serializeNumSpotLoadBalancer(ctx context.Context, http *numspot.LoadBalance
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.TagsValue{}, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return LoadBalancerModel{}
 		}
@@ -548,13 +390,9 @@ func serializeNumSpotLoadBalancer(ctx context.Context, http *numspot.LoadBalance
 		return LoadBalancerModel{}
 	}
 
-	azNames := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames, diags)
-	if diags.HasError() {
-		return LoadBalancerModel{}
-	}
-
 	return LoadBalancerModel{
-		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciestypes,
+		Id:                              types.StringPointerValue(http.Name),
+		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciesTypes,
 		BackendIps:                      backendIps,
 		BackendVmIds:                    backendVmIds,
 		DnsName:                         types.StringPointerValue(http.DnsName),
@@ -568,8 +406,18 @@ func serializeNumSpotLoadBalancer(ctx context.Context, http *numspot.LoadBalance
 		SourceSecurityGroup:             sourceSecurityGroup,
 		StickyCookiePolicies:            stickyCookiePolicies,
 		Subnets:                         subnets,
-		AvailabilityZoneNames:           azNames,
 		Type:                            types.StringPointerValue(http.Type),
 		Tags:                            tagsTf,
 	}
+}
+
+func deserializeTagsToDelete(ctx context.Context, t types.List) []numspot.ResourceLoadBalancerTag {
+	lbTags := make([]numspot.ResourceLoadBalancerTag, len(t.Elements()))
+	stateTags := tags.TfTagsToApiTags(ctx, t)
+	for idx, tag := range stateTags {
+		lbTags[idx] = numspot.ResourceLoadBalancerTag{
+			Key: &tag.Key,
+		}
+	}
+	return lbTags
 }

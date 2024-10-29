@@ -2,16 +2,11 @@ package core
 
 import (
 	"context"
-	"fmt"
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
-)
-
-const (
-	kindVM = "kindVM"
-	kindIP = "kindIP"
 )
 
 var (
@@ -19,7 +14,7 @@ var (
 	loadBalancerTargetStates  = []string{}
 )
 
-func CreateLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, numSpotLoadBalancerCreate numspot.CreateLoadBalancerJSONRequestBody, tags []numspot.ResourceTag, healthCheck *numspot.HealthCheck, backendVM, backendIP []string) (numSpotVolume *numspot.LoadBalancer, err error) {
+func CreateLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, numSpotLoadBalancerCreate numspot.CreateLoadBalancerJSONRequestBody, numSpotLoadBalancerUpdate numspot.UpdateLoadBalancerJSONRequestBody, tags []numspot.ResourceTag, backendVM, backendIP []string) (numSpotVolume *numspot.LoadBalancer, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -35,30 +30,37 @@ func CreateLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, numSpo
 
 	loadBalancerName := *retryCreate.JSON201.Name
 
-	switch {
-	case len(backendVM) > 0:
-		if err = linkBackend(ctx, provider, loadBalancerName, kindVM, backendVM); err != nil {
-			return nil, err
-		}
-	case len(backendIP) > 0:
-		if err = linkBackend(ctx, provider, loadBalancerName, kindIP, backendIP); err != nil {
+	if len(backendIP) > 0 || len(backendVM) > 0 {
+		if err = linkBackend(ctx, provider, loadBalancerName, backendIP, backendVM); err != nil {
 			return nil, err
 		}
 	}
 
-	if healthCheck != nil {
-		if err = attachHealthCheck(ctx, provider, loadBalancerName, healthCheck); err != nil {
+	if numSpotLoadBalancerUpdate.HealthCheck != nil || numSpotLoadBalancerUpdate.PublicIp != nil {
+		if _, err = UpdateLoadBalancerAttributes(ctx, provider, loadBalancerName, numSpotLoadBalancerUpdate); err != nil {
+			return nil, err
+		}
+	}
+
+	if numSpotLoadBalancerUpdate.SecurityGroups != nil {
+		if _, err = UpdateLoadBalancerSecurityGroup(ctx, provider, loadBalancerName, numSpotLoadBalancerUpdate); err != nil {
+			return nil, err
+		}
+	}
+
+	if len(numSpotLoadBalancerCreate.Listeners) > 0 {
+		if err = createListeners(ctx, provider, loadBalancerName, numSpotLoadBalancerCreate.Listeners); err != nil {
 			return nil, err
 		}
 	}
 
 	if len(tags) > 0 {
-		if err = CreateLoadBalancerTags(ctx, provider, loadBalancerName, tags); err != nil {
+		if err = createLoadBalancerTags(ctx, provider, loadBalancerName, tags); err != nil {
 			return nil, err
 		}
 	}
 
-	return RetryReadLoadBalancer(ctx, provider, createOp, loadBalancerName)
+	return ReadLoadBalancer(ctx, provider, loadBalancerName)
 }
 
 func DeleteLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBalancerID string) (err error) {
@@ -67,29 +69,23 @@ func DeleteLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBa
 		return err
 	}
 
+	// Delete security groups
+	//emptyList := []string{}
+	//res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
+	//	return numspotClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, data.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
+	//		SecurityGroups: &emptyList,
+	//	})
+	//}, http.StatusOK, &response.Diagnostics)
+	//if res == nil {
+	//	return
+	//}
+
 	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, loadBalancerID, numspotClient.DeleteLoadBalancerWithResponse)
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func RetryReadLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, op string, loadBalancerID string) (*numspot.LoadBalancer, error) {
-	numspotClient, err := provider.GetClient(ctx)
-	if err != nil {
-		return nil, err
-	}
-	read, err := utils.RetryReadUntilStateValid(ctx, loadBalancerID, provider.SpaceID, loadBalancerPendingStates, loadBalancerTargetStates, numspotClient.ReadLoadBalancersByIdWithResponse)
-	if err != nil {
-		return nil, err
-	}
-
-	numSpotLoadBalancer, assert := read.(*numspot.LoadBalancer)
-	if !assert {
-		return nil, fmt.Errorf("invalid load balancer assertion %s: %s", loadBalancerID, op)
-	}
-	return numSpotLoadBalancer, err
 }
 
 func ReadLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBalancerID string) (numSpotVolume *numspot.LoadBalancer, err error) {
@@ -109,25 +105,136 @@ func ReadLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBala
 	return numSpotReadLoadBalancer.JSON200, err
 }
 
-func linkBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, backendKind string, backendToLink []string) error {
+func UpdateLoadBalancerAttributes(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, numSpotLoadBalancerUpdate numspot.UpdateLoadBalancerJSONRequestBody) (numSpotLoadBalancer *numspot.LoadBalancer, err error) {
+	spaceID := provider.SpaceID
+
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var loadBalancerUpdateResponse *numspot.UpdateLoadBalancerResponse
+	if loadBalancerUpdateResponse, err = numspotClient.UpdateLoadBalancerWithResponse(ctx, spaceID, loadBalancerName, numspot.UpdateLoadBalancerJSONRequestBody{
+		HealthCheck: numSpotLoadBalancerUpdate.HealthCheck,
+		PublicIp:    numSpotLoadBalancerUpdate.PublicIp,
+	}); err != nil {
+		return nil, err
+	}
+
+	if err = utils.ParseHTTPError(loadBalancerUpdateResponse.Body, loadBalancerUpdateResponse.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	return ReadLoadBalancer(ctx, provider, loadBalancerName)
+}
+
+func UpdateLoadBalancerSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, numSpotLoadBalancerUpdate numspot.UpdateLoadBalancerJSONRequestBody) (numSpotLoadBalancer *numspot.LoadBalancer, err error) {
+	spaceID := provider.SpaceID
+
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	securityGroups := make([]string, 0)
+	if numSpotLoadBalancerUpdate.SecurityGroups != nil {
+		securityGroups = *numSpotLoadBalancerUpdate.SecurityGroups
+	}
+
+	var loadBalancerUpdateResponse *numspot.UpdateLoadBalancerResponse
+	if loadBalancerUpdateResponse, err = numspotClient.UpdateLoadBalancerWithResponse(ctx, spaceID, loadBalancerName, numspot.UpdateLoadBalancerJSONRequestBody{
+		SecurityGroups: &securityGroups,
+	}); err != nil {
+		return nil, err
+	}
+
+	if err = utils.ParseHTTPError(loadBalancerUpdateResponse.Body, loadBalancerUpdateResponse.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	return ReadLoadBalancer(ctx, provider, loadBalancerName)
+}
+
+func UpdateLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, planTags []numspot.ResourceTag, stateTags []numspot.ResourceLoadBalancerTag) (numSpotLoadBalancer *numspot.LoadBalancer, err error) {
+	spaceID := provider.SpaceID
+
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var loadBalancerDeleteTagsResponse *numspot.DeleteLoadBalancerTagsResponse
+	if loadBalancerDeleteTagsResponse, err = numspotClient.DeleteLoadBalancerTagsWithResponse(ctx, spaceID, numspot.DeleteLoadBalancerTagsJSONRequestBody{
+		Names: []string{loadBalancerName},
+		Tags:  stateTags,
+	}); err != nil {
+		return nil, err
+	}
+
+	if err = utils.ParseHTTPError(loadBalancerDeleteTagsResponse.Body, loadBalancerDeleteTagsResponse.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	var loadBalancerCreateTagsResponse *numspot.CreateLoadBalancerTagsResponse
+	if loadBalancerCreateTagsResponse, err = numspotClient.CreateLoadBalancerTagsWithResponse(ctx, spaceID, numspot.CreateLoadBalancerTagsJSONRequestBody{
+		Names: []string{loadBalancerName},
+		Tags:  planTags,
+	}); err != nil {
+		return nil, err
+	}
+
+	if err = utils.ParseHTTPError(loadBalancerCreateTagsResponse.Body, loadBalancerCreateTagsResponse.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	return ReadLoadBalancer(ctx, provider, loadBalancerName)
+}
+
+func UpdateLoadBalancerBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, stateVMIDList, planVMIDList []string, stateIPList, planIPList []string) (numSpotLoadBalancer *numspot.LoadBalancer, err error) {
+	if len(stateVMIDList) > 0 || len(stateIPList) > 0 {
+		if err = unlinkBackend(ctx, provider, loadBalancerName, stateIPList, stateVMIDList); err != nil {
+			return nil, err
+		}
+	}
+	if len(planVMIDList) > 0 || len(planIPList) > 0 {
+		if err = linkBackend(ctx, provider, loadBalancerName, planIPList, planVMIDList); err != nil {
+			return nil, err
+		}
+	}
+
+	return ReadLoadBalancer(ctx, provider, loadBalancerName)
+}
+
+func linkBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, backendIP, backendVM []string) error {
 	spaceID := provider.SpaceID
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
 	}
 
-	linkLB := numspot.LinkLoadBalancerBackendMachinesJSONRequestBody{}
-
-	switch backendKind {
-	case kindVM:
-		linkLB.BackendVmIds = &backendToLink
-	case kindIP:
-		linkLB.BackendIps = &backendToLink
+	bVM := make([]string, 0)
+	if backendVM != nil {
+		bVM = backendVM
 	}
 
-	if _, err = numspotClient.LinkLoadBalancerBackendMachinesWithResponse(ctx, spaceID, loadBalancerName, linkLB); err != nil {
+	bIP := make([]string, 0)
+	if backendIP != nil {
+		bIP = backendIP
+	}
+
+	linkLB := numspot.LinkLoadBalancerBackendMachinesJSONRequestBody{
+		BackendIps:   &bIP,
+		BackendVmIds: &bVM,
+	}
+
+	linkLoadBalancerBackendResponse, err := numspotClient.LinkLoadBalancerBackendMachinesWithResponse(ctx, spaceID, loadBalancerName, linkLB)
+	if err != nil {
 		return err
 	}
+	if err = utils.ParseHTTPError(linkLoadBalancerBackendResponse.Body, linkLoadBalancerBackendResponse.StatusCode()); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -138,33 +245,33 @@ func unlinkBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalance
 		return err
 	}
 
+	bVM := make([]string, 0)
+	if backendVM != nil {
+		bVM = backendVM
+	}
+
+	bIP := make([]string, 0)
+	if backendIP != nil {
+		bIP = backendIP
+	}
+
 	unlinkLB := numspot.UnlinkLoadBalancerBackendMachinesJSONRequestBody{
-		BackendIps:   &backendIP,
-		BackendVmIds: &backendVM,
+		BackendIps:   &bIP,
+		BackendVmIds: &bVM,
 	}
 
-	if _, err = numspotClient.UnlinkLoadBalancerBackendMachinesWithResponse(ctx, spaceID, loadBalancerName, unlinkLB); err != nil {
-		return err
-	}
-	return nil
-}
-
-func attachHealthCheck(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, healthCheck *numspot.HealthCheck) error {
-	spaceID := provider.SpaceID
-
-	numspotClient, err := provider.GetClient(ctx)
+	unlinkLoadBalancerBackendResponse, err := numspotClient.UnlinkLoadBalancerBackendMachinesWithResponse(ctx, spaceID, loadBalancerName, unlinkLB)
 	if err != nil {
 		return err
 	}
-
-	if _, err = numspotClient.UpdateLoadBalancerWithResponse(ctx, spaceID, loadBalancerName, numspot.UpdateLoadBalancerJSONRequestBody{HealthCheck: healthCheck}); err != nil {
+	if err = utils.ParseHTTPError(unlinkLoadBalancerBackendResponse.Body, unlinkLoadBalancerBackendResponse.StatusCode()); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func CreateLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, tagList []numspot.ResourceTag) error {
+func createLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, tagList []numspot.ResourceTag) error {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -188,52 +295,21 @@ func CreateLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, lo
 	return nil
 }
 
-func DeleteLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, tagList []numspot.ResourceLoadBalancerTag) error {
-	spaceID := provider.SpaceID
-
+func createListeners(ctx context.Context, provider *client.NumSpotSDK, loadBalancerId string, listeners []numspot.ListenerForCreation) error {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
 	}
-
-	deleteTags := numspot.DeleteLoadBalancerTagsRequest{
-		Names: []string{loadBalancerName},
-		Tags:  tagList,
-	}
-
-	var loadBalancerDeleteTagsResponse *numspot.DeleteLoadBalancerTagsResponse
-	if loadBalancerDeleteTagsResponse, err = numspotClient.DeleteLoadBalancerTagsWithResponse(ctx, spaceID, deleteTags); err != nil {
-		return err
-	}
-	if err = utils.ParseHTTPError(loadBalancerDeleteTagsResponse.Body, loadBalancerDeleteTagsResponse.StatusCode()); err != nil {
+	numSpotLoadBalancerListenersResponse, err := numspotClient.CreateLoadBalancerListenersWithResponse(ctx, provider.SpaceID, loadBalancerId,
+		numspot.CreateLoadBalancerListenersJSONRequestBody{
+			Listeners: listeners,
+		})
+	if err != nil {
 		return err
 	}
 
-	return nil
+	if err = utils.ParseHTTPError(numSpotLoadBalancerListenersResponse.Body, numSpotLoadBalancerListenersResponse.StatusCode()); err != nil {
+		return err
+	}
+	return err
 }
-
-//func DeleteLoadBalancerTags(
-//	ctx context.Context,
-//	spaceId numspot.SpaceId,
-//	iaasClient *numspot.ClientWithResponses,
-//	loadBalancerName string,
-//	tagList types.List,
-//	diags *diag.Diagnostics,
-//) {
-//	tfTags := make([]tags.TagsValue, 0, len(tagList.Elements()))
-//	tagList.ElementsAs(ctx, &tfTags, false)
-//
-//	apiTags := make([]numspot.ResourceLoadBalancerTag, 0, len(tfTags))
-//	for _, tfTag := range tfTags {
-//		apiTags = append(apiTags, numspot.ResourceLoadBalancerTag{
-//			Key: tfTag.Key.ValueStringPointer(),
-//		})
-//	}
-//
-//	_ = utils.ExecuteRequest(func() (*numspot.DeleteLoadBalancerTagsResponse, error) {
-//		return iaasClient.DeleteLoadBalancerTagsWithResponse(ctx, spaceId, numspot.DeleteLoadBalancerTagsJSONRequestBody{
-//			Names: []string{loadBalancerName},
-//			Tags:  apiTags,
-//		})
-//	}, http.StatusNoContent, diags)
-//}

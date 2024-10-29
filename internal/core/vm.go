@@ -62,29 +62,9 @@ func UpdateVMAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpo
 		return nil, err
 	}
 
-	//}, http.StatusOK, &response.Diagnostics)
-	//
-	//if updatedRes == nil || response.Diagnostics.HasError() {
-	//	return
-	//}
-
 	if err = StartVM(ctx, provider, vmID); err != nil {
 		return nil, err
 	}
-
-	// Retries read on VM until state is OK
-	//read, err := utils.RetryReadUntilStateValid(
-	//	ctx,
-	//	vmId,
-	//	r.provider.SpaceID,
-	//	[]string{"pending"},
-	//	[]string{"running"},
-	//	numspotClient.ReadVmsByIdWithResponse,
-	//)
-	//if err != nil {
-	//	response.Diagnostics.AddError("Failed to update VM", fmt.Sprintf("Error waiting for VM to be created: %s", err))
-	//	return
-	//}
 
 	return RetryReadVM(ctx, provider, createOp, vmID)
 }
@@ -120,29 +100,9 @@ func UpdateVMKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotVM
 		return nil, err
 	}
 
-	//}, http.StatusOK, &response.Diagnostics)
-	//
-	//if updatedRes == nil || response.Diagnostics.HasError() {
-	//	return
-	//}
-
 	if err = StartVM(ctx, provider, vmID); err != nil {
 		return nil, err
 	}
-
-	// Retries read on VM until state is OK
-	//read, err := utils.RetryReadUntilStateValid(
-	//	ctx,
-	//	vmId,
-	//	r.provider.SpaceID,
-	//	[]string{"pending"},
-	//	[]string{"running"},
-	//	numspotClient.ReadVmsByIdWithResponse,
-	//)
-	//if err != nil {
-	//	response.Diagnostics.AddError("Failed to update VM", fmt.Sprintf("Error waiting for VM to be created: %s", err))
-	//	return
-	//}
 
 	return RetryReadVM(ctx, provider, createOp, vmID)
 }

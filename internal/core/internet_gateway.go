@@ -32,15 +32,15 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tag
 	}
 
 	if vpcID != "" {
-		linkResponse, err := numspotClient.LinkInternetGatewayWithResponse(ctx, provider.SpaceID, internetGatewayID,
+		var linkVPCResponse *numspot.LinkInternetGatewayResponse
+		if linkVPCResponse, err = numspotClient.LinkInternetGatewayWithResponse(ctx, provider.SpaceID, internetGatewayID,
 			numspot.LinkInternetGatewayJSONRequestBody{
 				VpcId: vpcID,
 			},
-		)
-		if err != nil {
+		); err != nil {
 			return nil, err
 		}
-		if err = utils.ParseHTTPError(linkResponse.Body, linkResponse.StatusCode()); err != nil {
+		if err = utils.ParseHTTPError(linkVPCResponse.Body, linkVPCResponse.StatusCode()); err != nil {
 			return nil, err
 		}
 	}
@@ -61,18 +61,20 @@ func UpdateInternetGatewayTags(ctx context.Context, provider *client.NumSpotSDK,
 }
 
 func DeleteInternetGateway(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID string, vpcID string) (err error) {
+	spaceID := provider.SpaceID
+
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
 	}
 
 	if vpcID != "" {
-		_, _ = numspotClient.UnlinkInternetGatewayWithResponse(ctx, provider.SpaceID, internetGatewayID,
+		if _, err = utils.RetryUntilResourceAvailableWithBody(ctx, spaceID, internetGatewayID,
 			numspot.UnlinkInternetGatewayJSONRequestBody{
 				VpcId: vpcID,
-			},
-		)
-		// Error not handled, we try to delete internet gateway anyway
+			}, numspotClient.UnlinkInternetGatewayWithResponse); err != nil {
+			return err
+		}
 	}
 
 	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, internetGatewayID, numspotClient.DeleteInternetGatewayWithResponse)
