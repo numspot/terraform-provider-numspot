@@ -9,11 +9,6 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-var (
-	loadBalancerPendingStates = []string{}
-	loadBalancerTargetStates  = []string{}
-)
-
 func CreateLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, numSpotLoadBalancerCreate numspot.CreateLoadBalancerJSONRequestBody, numSpotLoadBalancerUpdate numspot.UpdateLoadBalancerJSONRequestBody, tags []numspot.ResourceTag, backendVM, backendIP []string) (numSpotVolume *numspot.LoadBalancer, err error) {
 	spaceID := provider.SpaceID
 

@@ -415,8 +415,9 @@ func deserializeTagsToDelete(ctx context.Context, t types.List) []numspot.Resour
 	lbTags := make([]numspot.ResourceLoadBalancerTag, len(t.Elements()))
 	stateTags := tags.TfTagsToApiTags(ctx, t)
 	for idx, tag := range stateTags {
+		key := &tag.Key
 		lbTags[idx] = numspot.ResourceLoadBalancerTag{
-			Key: &tag.Key,
+			Key: key,
 		}
 	}
 	return lbTags
