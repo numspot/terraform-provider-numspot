@@ -422,3 +422,44 @@ func deserializeTagsToDelete(ctx context.Context, t types.List) []numspot.Resour
 	}
 	return lbTags
 }
+
+func applicationStickyCookiePoliciesFromHTTP(ctx context.Context, elt numspot.ApplicationStickyCookiePolicy, diags *diag.Diagnostics) ApplicationStickyCookiePoliciesValue {
+	value, diagnostics := NewApplicationStickyCookiePoliciesValue(
+		ApplicationStickyCookiePoliciesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"cookie_name": types.StringPointerValue(elt.CookieName),
+			"policy_name": types.StringPointerValue(elt.PolicyName),
+		})
+	diags.Append(diagnostics...)
+	return value
+}
+
+func listenersFromHTTP(ctx context.Context, elt numspot.Listener, diags *diag.Diagnostics) ListenersValue {
+	tfPolicyNames := utils.FromStringListPointerToTfStringList(ctx, elt.PolicyNames, diags)
+	if diags.HasError() {
+		return ListenersValue{}
+	}
+	value, diagnostics := NewListenersValue(
+		ListenersValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"backend_port":           utils.FromIntPtrToTfInt64(elt.BackendPort),
+			"backend_protocol":       types.StringPointerValue(elt.BackendProtocol),
+			"load_balancer_port":     utils.FromIntPtrToTfInt64(elt.LoadBalancerPort),
+			"load_balancer_protocol": types.StringPointerValue(elt.BackendProtocol),
+			"policy_names":           tfPolicyNames,
+			"server_certificate_id":  types.StringPointerValue(elt.BackendProtocol),
+		})
+	diags.Append(diagnostics...)
+	return value
+}
+
+func stickyCookiePoliciesFromHTTP(ctx context.Context, elt numspot.LoadBalancerStickyCookiePolicy, diags *diag.Diagnostics) StickyCookiePoliciesValue {
+	value, diagnostics := NewStickyCookiePoliciesValue(
+		StickyCookiePoliciesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"cookie_expiration_period": utils.FromIntPtrToTfInt64(elt.CookieExpirationPeriod),
+			"policy_name":              types.StringPointerValue(elt.PolicyName),
+		})
+	diags.Append(diagnostics...)
+	return value
+}

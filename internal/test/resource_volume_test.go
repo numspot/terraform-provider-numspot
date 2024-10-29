@@ -40,7 +40,7 @@ resource "numspot_vpc" "terraform-dep-vpc-volume" {
   tags = [
     {
       key   = "name"
-      value = "terraform-volume-acctest"
+      value = "terraform-dep-vpc-volume"
     }
   ]
 }
@@ -52,7 +52,7 @@ resource "numspot_subnet" "terraform-dep-subnet-volume" {
   tags = [
     {
       key   = "name"
-      value = "terraform-volume-acctest"
+      value = "terraform-dep-subnet-volume"
     }
   ]
 }
