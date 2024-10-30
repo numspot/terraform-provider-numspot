@@ -11,6 +11,8 @@ import (
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 	"github.com/google/uuid"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 const (
@@ -140,8 +142,12 @@ func (s *NumSpotSDK) AuthenticateUser(ctx context.Context) error {
 			ClientSecret: &s.ClientSecret,
 		},
 	)
-	if err != nil || response.JSON200 == nil {
+	if err != nil {
 		return err
+	}
+	err = utils.ParseHTTPError(response.Body, response.StatusCode())
+	if err != nil {
+		return fmt.Errorf("error while retrieving access token for client : %v", err.Error())
 	}
 
 	expirationTimeMargin := 5 * 60 // Add a margin of 5 minutes to refresh the token

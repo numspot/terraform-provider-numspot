@@ -39,18 +39,12 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"public_ip": schema.StringAttribute{
-							Computed: true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
-							},
+							Computed:            true,
 							Description:         "The public IP associated with the NAT gateway.",
 							MarkdownDescription: "The public IP associated with the NAT gateway.",
 						},
 						"public_ip_id": schema.StringAttribute{
-							Computed: true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
-							},
+							Computed:            true,
 							Description:         "The allocation ID of the public IP associated with the NAT gateway.",
 							MarkdownDescription: "The allocation ID of the public IP associated with the NAT gateway.",
 						},

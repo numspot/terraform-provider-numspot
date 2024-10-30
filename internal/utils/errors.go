@@ -32,23 +32,11 @@ func HandleError(httpResponseBody []byte) error {
 }
 
 func ParseHTTPError(httpResponseBody []byte, statusCode int) error {
-	var apiError numspot.Error
-
 	if statusCode == http.StatusOK || statusCode == http.StatusCreated || statusCode == http.StatusAccepted || statusCode == http.StatusNoContent {
 		return nil
 	}
 
-	err := json.Unmarshal(httpResponseBody, &apiError)
-	if err != nil {
-		return errors.New("API Error : " + string(httpResponseBody))
-	}
-
-	errorString := apiError.Title
-	if apiError.Detail != nil && *apiError.Detail != "" {
-		errorString = errorString + ": " + *apiError.Detail
-	}
-
-	return errors.New(errorString)
+	return HandleError(httpResponseBody)
 }
 
 func getCallerFunctionName() string {

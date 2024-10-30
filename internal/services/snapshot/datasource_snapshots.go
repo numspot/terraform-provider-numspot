@@ -3,13 +3,17 @@ package snapshot
 import (
 	"context"
 	"fmt"
-	"net/http"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -78,28 +82,18 @@ func (d *snapshotsDataSource) Read(ctx context.Context, request datasource.ReadR
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	params := SnapshotsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializeSnapshotsParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsResponse, error) {
-		return numspotClient.ReadSnapshotsWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+
+	numSpotSnapshot, err := core.ReadSnapshotsWithParams(ctx, d.provider, params)
+	if err != nil {
+		response.Diagnostics.AddError("unable to read snapshot", err.Error())
 		return
 	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Snapshot list")
-	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SnapshotsFromHttpToTfDatasource, &response.Diagnostics)
-
+	objectItems := serializeSnapshots(ctx, numSpotSnapshot, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -108,4 +102,75 @@ func (d *snapshotsDataSource) Read(ctx context.Context, request datasource.ReadR
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func deserializeSnapshotsParams(ctx context.Context, tf SnapshotsDataSourceModel, diags *diag.Diagnostics) numspot.ReadSnapshotsParams {
+	return numspot.ReadSnapshotsParams{
+		Descriptions:     utils.TfStringListToStringPtrList(ctx, tf.Descriptions, diags),
+		FromCreationDate: utils.FromTfStringToStringPtr(tf.FromCreationDate),
+		IsPublic:         utils.FromTfBoolToBoolPtr(tf.IsPublic),
+		Progresses:       utils.TFInt64ListToIntListPointer(ctx, tf.Progresses, diags),
+		States:           utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		ToCreationDate:   utils.FromTfStringToStringPtr(tf.ToCreationDate),
+		VolumeIds:        utils.TfStringListToStringPtrList(ctx, tf.VolumeIds, diags),
+		VolumeSizes:      utils.TFInt64ListToIntListPointer(ctx, tf.VolumeSizes, diags),
+		TagKeys:          utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:        utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:             utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:              utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+	}
+}
+
+func serializeSnapshots(ctx context.Context, snapshots *[]numspot.Snapshot, diags *diag.Diagnostics) []SnapshotModelDatasource {
+	return utils.FromHttpGenericListToTfList(ctx, snapshots, func(ctx context.Context, http *numspot.Snapshot, diags *diag.Diagnostics) *SnapshotModelDatasource {
+		var (
+			tagsList       types.List
+			creationDateTf types.String
+			progressTf     types.Int64
+			volumeSizeTf   types.Int64
+		)
+
+		if http.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+			if diags.HasError() {
+				return nil
+			}
+		}
+
+		// Creation Date
+		if http.CreationDate != nil {
+			date := *http.CreationDate
+			creationDateTf = types.StringValue(date.Format(time.RFC3339))
+		}
+
+		if http.Progress != nil {
+			progress := int64(*http.Progress)
+			progressTf = types.Int64PointerValue(&progress)
+		}
+
+		if http.VolumeSize != nil {
+			volumeSize := int64(*http.VolumeSize)
+			volumeSizeTf = types.Int64PointerValue(&volumeSize)
+		}
+
+		access, err := NewAccessValue(AccessValue{}.AttributeTypes(ctx),
+			map[string]attr.Value{
+				"is_public": types.BoolPointerValue(http.Access.IsPublic),
+			})
+		if err != nil {
+			return nil
+		}
+
+		return &SnapshotModelDatasource{
+			Id:           types.StringPointerValue(http.Id),
+			State:        types.StringPointerValue(http.State),
+			Tags:         tagsList,
+			CreationDate: creationDateTf,
+			Description:  types.StringPointerValue(http.Description),
+			VolumeId:     types.StringPointerValue(http.VolumeId),
+			Progress:     progressTf,
+			VolumeSize:   volumeSizeTf,
+			Access:       access,
+		}
+	}, diags)
 }

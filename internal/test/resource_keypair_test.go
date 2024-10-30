@@ -1,11 +1,9 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
@@ -40,11 +38,7 @@ resource "numspot_keypair" "test" {
 					resource.TestCheckResourceAttr("numspot_keypair.test", "name", "key-pair-name-terraform"),
 					resource.TestCheckResourceAttr("numspot_keypair.test", "public_key", "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEm78d7vfikcOXDdvT0yioYUDm3spxjVws/xnL0J5f0P"),
 					resource.TestCheckResourceAttrWith("numspot_keypair.test", "name", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						resourceId = v
-						return nil
+						return acctest.InitResourceId(t, v, &resourceId)
 					}),
 				),
 			},
@@ -64,13 +58,7 @@ resource "numspot_keypair" "test" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_keypair.test", "name", "key-pair-name-terraform-updated"),
 					resource.TestCheckResourceAttrWith("numspot_keypair.test", "name", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						return nil
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -83,13 +71,7 @@ resource "numspot_keypair" "test_recreated" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_keypair.test_recreated", "name", "key-pair-name-terraform-updated"),
 					resource.TestCheckResourceAttrWith("numspot_keypair.test_recreated", "name", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						return nil
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},

@@ -45,6 +45,7 @@ resource "numspot_vpc" "terraform-dep-vpc-volume" {
   ]
 }
 
+
 resource "numspot_subnet" "terraform-dep-subnet-volume" {
   vpc_id                 = numspot_vpc.terraform-dep-vpc-volume.id
   ip_range               = "10.101.1.0/24"

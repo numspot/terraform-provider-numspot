@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -16,6 +18,35 @@ const (
 	PAIR_PREFIX   = "[[FROM PAIR]]"
 	sentinelIndex = "*"
 )
+
+func InitResourceId(t *testing.T, v string, resourceId *string) error {
+	if !assert.NotEmpty(t, v) {
+		return fmt.Errorf("Id field should not be empty")
+	}
+	*resourceId = v
+	return nil
+}
+
+func CheckResourceIdUnchanged(t *testing.T, v string, resourceId *string) error {
+	if !assert.NotEmpty(t, v) {
+		return fmt.Errorf("Id field should not be empty")
+	}
+	if !assert.Equal(t, *resourceId, v) {
+		return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", *resourceId, v)
+	}
+	return nil
+}
+
+func CheckResourceIdChanged(t *testing.T, v string, resourceId *string) error {
+	if !assert.NotEmpty(t, v) {
+		return fmt.Errorf("Id field should not be empty")
+	}
+	if !assert.NotEqual(t, *resourceId, v) {
+		return fmt.Errorf("Id should have changed")
+	}
+	*resourceId = v
+	return nil
+}
 
 func ListToStringList(list []string) string {
 	var strList string

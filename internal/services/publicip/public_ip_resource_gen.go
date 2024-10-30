@@ -57,11 +57,7 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
-			"link_public_ip": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The ID of the association between the public IP and VM/NIC (if any).",
-				MarkdownDescription: "The ID of the association between the public IP and VM/NIC (if any).",
-			},
+			// MANUALLY EDITED : link_public_ip removed
 			"link_public_ip_id": schema.StringAttribute{
 				Computed:            true,
 				Description:         "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.",
@@ -74,12 +70,12 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type PublicIpModel struct {
-	Id             types.String `tfsdk:"id"`
-	NicId          types.String `tfsdk:"nic_id"`
-	PrivateIp      types.String `tfsdk:"private_ip"`
-	PublicIp       types.String `tfsdk:"public_ip"`
-	VmId           types.String `tfsdk:"vm_id"`
-	LinkPublicIP   types.String `tfsdk:"link_public_ip"`
+	Id        types.String `tfsdk:"id"`
+	NicId     types.String `tfsdk:"nic_id"`
+	PrivateIp types.String `tfsdk:"private_ip"`
+	PublicIp  types.String `tfsdk:"public_ip"`
+	VmId      types.String `tfsdk:"vm_id"`
+	// MANUALLY EDITED : LinkPublicIP removed
 	LinkPublicIpId types.String `tfsdk:"link_public_ip_id"`
 	Tags           types.List   `tfsdk:"tags"`
 	// MANUALLY EDITED : SpaceId Removed

@@ -3,13 +3,15 @@ package publicip
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -74,29 +76,18 @@ func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadR
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	params := PublicIpsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializePublicIpParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadPublicIpsResponse, error) {
-		return numspotClient.ReadPublicIpsWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	numSpotPublicIp, err := core.ReadPublicIpsWithParams(ctx, d.provider, params)
+	if err != nil {
+		response.Diagnostics.AddError("unable to read internet gateway", err.Error())
 		return
 	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Public Ips list")
-	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, PublicIpsFromHttpToTfDatasource, &response.Diagnostics)
-
+	objectItems := serializePublicIps(ctx, numSpotPublicIp, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -105,4 +96,40 @@ func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadR
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func deserializePublicIpParams(ctx context.Context, tf PublicIpsDataSourceModel, diags *diag.Diagnostics) numspot.ReadPublicIpsParams {
+	return numspot.ReadPublicIpsParams{
+		LinkPublicIpIds: utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpIds, diags),
+		NicIds:          utils.TfStringListToStringPtrList(ctx, tf.NicIds, diags),
+		PrivateIps:      utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags),
+		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:            utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:             utils.TfStringListToStringPtrList(ctx, tf.IDs, diags),
+		VmIds:           utils.TfStringListToStringPtrList(ctx, tf.VmIds, diags),
+	}
+}
+
+func serializePublicIps(ctx context.Context, publicIp *[]numspot.PublicIp, diags *diag.Diagnostics) []PublicIpModelDatasource {
+	return utils.FromHttpGenericListToTfList(ctx, publicIp, func(ctx context.Context, publicIP *numspot.PublicIp, diags *diag.Diagnostics) *PublicIpModelDatasource {
+		var tagsList types.List
+
+		if publicIP.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *publicIP.Tags, diags)
+			if diags.HasError() {
+				return nil
+			}
+		}
+
+		return &PublicIpModelDatasource{
+			Id:             types.StringPointerValue(publicIP.Id),
+			NicId:          types.StringPointerValue(publicIP.NicId),
+			PrivateIp:      types.StringPointerValue(publicIP.PrivateIp),
+			PublicIp:       types.StringPointerValue(publicIP.PublicIp),
+			VmId:           types.StringPointerValue(publicIP.VmId),
+			LinkPublicIpId: types.StringPointerValue(publicIP.LinkPublicIpId),
+			Tags:           tagsList,
+		}
+	}, diags)
 }

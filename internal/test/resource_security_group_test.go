@@ -1,11 +1,9 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
@@ -107,11 +105,7 @@ resource "numspot_security_group" "test" {
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
 					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						resourceId = v
-						return nil
+						return acctest.InitResourceId(t, v, &resourceId)
 					}),
 				),
 			},
@@ -175,13 +169,7 @@ resource "numspot_security_group" "test" {
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
 					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						return nil
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -258,13 +246,7 @@ resource "numspot_security_group" "test" {
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
 					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						return nil
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -352,14 +334,7 @@ resource "numspot_security_group" "test" {
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
 					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						resourceId = v
-						return nil
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -449,13 +424,7 @@ resource "numspot_security_group" "test" {
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test_new", "id"),
 					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						return nil
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},

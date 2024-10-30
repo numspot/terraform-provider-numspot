@@ -1,11 +1,9 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
@@ -50,11 +48,7 @@ resource "numspot_virtual_gateway" "test" {
 					resource.TestCheckResourceAttr("numspot_virtual_gateway.test", "vpc_to_virtual_gateway_links.#", "1"),
 					resource.TestCheckResourceAttrPair("numspot_virtual_gateway.test", "vpc_id", "numspot_vpc.test", "id"),
 					resource.TestCheckResourceAttrWith("numspot_virtual_gateway.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						resourceId = v
-						return nil
+						return acctest.InitResourceId(t, v, &resourceId)
 					}),
 				),
 			},
@@ -92,13 +86,7 @@ resource "numspot_virtual_gateway" "test" {
 					resource.TestCheckResourceAttr("numspot_virtual_gateway.test", "vpc_to_virtual_gateway_links.#", "1"),
 					resource.TestCheckResourceAttrPair("numspot_virtual_gateway.test", "vpc_id", "numspot_vpc.test", "id"),
 					resource.TestCheckResourceAttrWith("numspot_virtual_gateway.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						return nil
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -131,13 +119,7 @@ resource "numspot_virtual_gateway" "test" {
 					resource.TestCheckResourceAttr("numspot_virtual_gateway.test", "vpc_to_virtual_gateway_links.#", "1"),
 					resource.TestCheckResourceAttrPair("numspot_virtual_gateway.test", "vpc_id", "numspot_vpc.test_new", "id"),
 					resource.TestCheckResourceAttrWith("numspot_virtual_gateway.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						return nil
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
