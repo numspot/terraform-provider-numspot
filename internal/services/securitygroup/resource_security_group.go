@@ -68,22 +68,21 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	payload := deserializeCreateSecurityGroupRequest(&plan)
 	tagsList := tags.TfTagsToApiTags(ctx, plan.Tags)
-	inboundRules := deserializeCreateInboundRulesRequest(ctx, plan)
-	outboundRules := deserializeCreateOutboundRulesRequest(ctx, plan)
+	inboundRules := deserializeCreateInboundRules(ctx, plan.InboundRules)
+	outboundRules := deserializeCreateOutboundRules(ctx, plan.OutboundRules)
 
-	sg, err := core.CreateSecurityGroup(ctx, r.provider, payload, tagsList, &inboundRules, &outboundRules)
+	numSpotSecurityGroup, err := core.CreateSecurityGroup(ctx, r.provider, deserializeCreateSecurityGroupRequest(plan), tagsList, &inboundRules, &outboundRules)
 	if err != nil {
-		response.Diagnostics.AddError("failed to create security group", err.Error())
+		response.Diagnostics.AddError("unable to create security group", err.Error())
 	}
 
-	tf := serializeSecurityGroup(ctx, sg, &response.Diagnostics)
+	state := serializeSecurityGroup(ctx, numSpotSecurityGroup, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
 func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
@@ -93,25 +92,30 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 		return
 	}
 
-	sg, err := core.ReadSecurityGroup(ctx, r.provider, state.Id.ValueString())
+	securityGroupID := state.Id.ValueString()
+
+	numSpotSecurityGroup, err := core.ReadSecurityGroup(ctx, r.provider, securityGroupID)
 	if err != nil {
-		response.Diagnostics.AddError("failed to read Security Group", err.Error())
+		response.Diagnostics.AddError("unable to read security group", err.Error())
 	}
 
-	tf := serializeSecurityGroup(ctx, sg, &response.Diagnostics)
+	newState := serializeSecurityGroup(ctx, numSpotSecurityGroup, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
 func (r *SecurityGroupResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
-		state, plan SecurityGroupModel
-		err         error
-		sg          *numspot.SecurityGroup
+		state, plan          SecurityGroupModel
+		err                  error
+		numSpotSecurityGroup *numspot.SecurityGroup
 	)
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -120,38 +124,43 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
 	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
 	if !plan.Tags.Equal(state.Tags) {
-		sg, err = core.UpdateSecurityGroupTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags)
+		numSpotSecurityGroup, err = core.UpdateSecurityGroupTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags)
 		if err != nil {
-			response.Diagnostics.AddError("failed to update security group", err.Error())
+			response.Diagnostics.AddError("unable to update security group tags", err.Error())
 		}
 	}
 
-	inboundRules := deserializeCreateInboundRulesRequest(ctx, plan)
-	outboundRules := deserializeCreateOutboundRulesRequest(ctx, plan)
+	planInboundRules := deserializeCreateInboundRules(ctx, plan.InboundRules)
+	planOutboundRules := deserializeCreateOutboundRules(ctx, plan.OutboundRules)
+	stateInboundRules := deserializeDeleteInboundRules(ctx, state.InboundRules)
+	stateOutboundRules := deserializeDeleteOutboundRules(ctx, state.OutboundRules)
+
 	if !plan.InboundRules.Equal(state.InboundRules) || !plan.OutboundRules.Equal(state.OutboundRules) {
-		sg, err = core.UpdateSecurityGroupRules(ctx, r.provider, state.Id.ValueString(), &inboundRules, &outboundRules)
+		numSpotSecurityGroup, err = core.UpdateSecurityGroupRules(ctx, r.provider, state.Id.ValueString(), planInboundRules, planOutboundRules, &stateInboundRules, &stateOutboundRules)
 		if err != nil {
-			response.Diagnostics.AddError("failed to update security group", err.Error())
+			response.Diagnostics.AddError("unable to update security group rules", err.Error())
 		}
 	}
 
-	tf := serializeSecurityGroup(ctx, sg, &response.Diagnostics)
+	newState := serializeSecurityGroup(ctx, numSpotSecurityGroup, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
 func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data SecurityGroupModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state SecurityGroupModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if err := core.DeleteSecurityGroup(ctx, r.provider, data.Id.ValueString()); err != nil {
-		response.Diagnostics.AddError("Failed to delete Security Group", err.Error())
+	securityGroupID := state.Id.ValueString()
+
+	if err := core.DeleteSecurityGroup(ctx, r.provider, securityGroupID); err != nil {
+		response.Diagnostics.AddError("unable to delete security group", err.Error())
 	}
 }
 
@@ -216,7 +225,7 @@ func serializeSecurityGroup(ctx context.Context, http *numspot.SecurityGroup, di
 	return &res
 }
 
-func deserializeCreateSecurityGroupRequest(tf *SecurityGroupModel) numspot.CreateSecurityGroupJSONRequestBody {
+func deserializeCreateSecurityGroupRequest(tf SecurityGroupModel) numspot.CreateSecurityGroupJSONRequestBody {
 	return numspot.CreateSecurityGroupJSONRequestBody{
 		Description: tf.Description.ValueString(),
 		VpcId:       tf.VpcId.ValueString(),
@@ -224,64 +233,19 @@ func deserializeCreateSecurityGroupRequest(tf *SecurityGroupModel) numspot.Creat
 	}
 }
 
-func deserializeCreateInboundRulesRequest(ctx context.Context, plan SecurityGroupModel) numspot.CreateSecurityGroupRuleJSONRequestBody {
-	tfRules := make([]InboundRulesValue, 0, len(plan.InboundRules.Elements()))
-	plan.InboundRules.ElementsAs(ctx, &tfRules, false)
-	rules := make([]numspot.SecurityGroupRule, 0, len(tfRules))
-	for i := range tfRules {
-		e := &tfRules[i]
-		fpr := int(e.FromPortRange.ValueInt64())
-		tpr := int(e.ToPortRange.ValueInt64())
+func deserializeCreateInboundRules(ctx context.Context, inboundRules types.Set) numspot.CreateSecurityGroupRuleJSONRequestBody {
+	rules := deserializeInboundRules(ctx, inboundRules)
 
-		tfIpRange := make([]types.String, 0, len(e.IpRanges.Elements()))
-		e.IpRanges.ElementsAs(ctx, &tfIpRange, false)
-		var ipRanges []string
-		for _, ip := range tfIpRange {
-			ipRanges = append(ipRanges, ip.ValueString())
-		}
-
-		rules = append(rules, numspot.SecurityGroupRule{
-			FromPortRange: &fpr,
-			IpProtocol:    e.IpProtocol.ValueStringPointer(),
-			IpRanges:      &ipRanges,
-			ToPortRange:   &tpr,
-		})
-	}
-	tt := 22
 	inboundRulesCreationBody := numspot.CreateSecurityGroupRuleJSONRequestBody{
-		Flow:          "Inbound",
-		Rules:         &rules,
-		FromPortRange: &tt,
-		ToPortRange:   &tt,
+		Flow:  "Inbound",
+		Rules: &rules,
 	}
 
 	return inboundRulesCreationBody
 }
 
-func deserializeCreateOutboundRulesRequest(ctx context.Context, plan SecurityGroupModel) numspot.CreateSecurityGroupRuleJSONRequestBody {
-	tfRules := make([]OutboundRulesValue, 0, len(plan.OutboundRules.Elements()))
-	plan.OutboundRules.ElementsAs(ctx, &tfRules, false)
-	rules := make([]numspot.SecurityGroupRule, 0, len(tfRules))
-	for i := range tfRules {
-		e := &tfRules[i]
-
-		fpr := int(e.FromPortRange.ValueInt64())
-		tpr := int(e.ToPortRange.ValueInt64())
-
-		tfIpRange := make([]types.String, 0, len(e.IpRanges.Elements()))
-		e.IpRanges.ElementsAs(ctx, &tfIpRange, false)
-		var ipRanges []string
-		for _, ip := range tfIpRange {
-			ipRanges = append(ipRanges, ip.ValueString())
-		}
-
-		rules = append(rules, numspot.SecurityGroupRule{
-			FromPortRange: &fpr,
-			IpProtocol:    e.IpProtocol.ValueStringPointer(),
-			IpRanges:      &ipRanges,
-			ToPortRange:   &tpr,
-		})
-	}
+func deserializeCreateOutboundRules(ctx context.Context, outboundRules types.Set) numspot.CreateSecurityGroupRuleJSONRequestBody {
+	rules := deserializeOutboundRules(ctx, outboundRules)
 
 	outboundRulesCreationBody := numspot.CreateSecurityGroupRuleJSONRequestBody{
 		Flow:  "Outbound",
@@ -289,6 +253,79 @@ func deserializeCreateOutboundRulesRequest(ctx context.Context, plan SecurityGro
 	}
 
 	return outboundRulesCreationBody
+}
+
+func deserializeDeleteInboundRules(ctx context.Context, inboundRules types.Set) numspot.DeleteSecurityGroupRuleJSONRequestBody {
+	rules := deserializeInboundRules(ctx, inboundRules)
+
+	return numspot.DeleteSecurityGroupRuleJSONRequestBody{
+		Flow:  "Inbound",
+		Rules: &rules,
+	}
+}
+
+func deserializeDeleteOutboundRules(ctx context.Context, outboundRules types.Set) numspot.DeleteSecurityGroupRuleJSONRequestBody {
+	rules := deserializeOutboundRules(ctx, outboundRules)
+
+	return numspot.DeleteSecurityGroupRuleJSONRequestBody{
+		Flow:  "Outbound",
+		Rules: &rules,
+	}
+}
+
+func deserializeInboundRules(ctx context.Context, inboundRules types.Set) []numspot.SecurityGroupRule {
+	tfRules := make([]InboundRulesValue, 0, len(inboundRules.Elements()))
+	inboundRules.ElementsAs(ctx, &tfRules, false)
+	rules := make([]numspot.SecurityGroupRule, 0, len(tfRules))
+	for i := range tfRules {
+		e := &tfRules[i]
+		fpr := int(e.FromPortRange.ValueInt64())
+		tpr := int(e.ToPortRange.ValueInt64())
+
+		tfIpRange := make([]types.String, 0, len(e.IpRanges.Elements()))
+		e.IpRanges.ElementsAs(ctx, &tfIpRange, false)
+		var ipRanges []string
+		for _, ip := range tfIpRange {
+			ipRanges = append(ipRanges, ip.ValueString())
+		}
+
+		rules = append(rules, numspot.SecurityGroupRule{
+			FromPortRange: &fpr,
+			IpProtocol:    e.IpProtocol.ValueStringPointer(),
+			IpRanges:      &ipRanges,
+			ToPortRange:   &tpr,
+		})
+	}
+
+	return rules
+}
+
+func deserializeOutboundRules(ctx context.Context, outboundRules types.Set) []numspot.SecurityGroupRule {
+	tfRules := make([]OutboundRulesValue, 0, len(outboundRules.Elements()))
+	outboundRules.ElementsAs(ctx, &tfRules, false)
+	rules := make([]numspot.SecurityGroupRule, 0, len(tfRules))
+	for i := range tfRules {
+		e := &tfRules[i]
+
+		fpr := int(e.FromPortRange.ValueInt64())
+		tpr := int(e.ToPortRange.ValueInt64())
+
+		tfIpRange := make([]types.String, 0, len(e.IpRanges.Elements()))
+		e.IpRanges.ElementsAs(ctx, &tfIpRange, false)
+		var ipRanges []string
+		for _, ip := range tfIpRange {
+			ipRanges = append(ipRanges, ip.ValueString())
+		}
+
+		rules = append(rules, numspot.SecurityGroupRule{
+			FromPortRange: &fpr,
+			IpProtocol:    e.IpProtocol.ValueStringPointer(),
+			IpRanges:      &ipRanges,
+			ToPortRange:   &tpr,
+		})
+	}
+
+	return rules
 }
 
 func serializeInboundRule(ctx context.Context, rules numspot.SecurityGroupRule) InboundRulesValue {

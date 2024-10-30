@@ -1,15 +1,18 @@
 package test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 )
 
 func TestAccSecurityGroupResource(t *testing.T) {
+	var resourceId string
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
 		err := acct.Cleanup()
@@ -17,12 +20,11 @@ func TestAccSecurityGroupResource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
-	var resourceId string
-
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{ // 1 - Create testing
+			// 1 - Create Security group
+			{
 				Config: `
 resource "numspot_vpc" "test" {
   ip_range = "10.101.0.0/16"
@@ -64,7 +66,7 @@ resource "numspot_security_group" "test" {
       to_port_range   = 90
       ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
-    },
+    }
   ]
   tags = [
     {
@@ -104,12 +106,9 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						return acctest.InitResourceId(t, v, &resourceId)
-					}),
 				),
 			},
-			// 2 - ImportState testing
+			// 2 - Import
 			{
 				ResourceName:            "numspot_security_group.test",
 				ImportState:             true,
@@ -168,9 +167,6 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "20",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
-					}),
 				),
 			},
 			// 4 - Update testing Without Replace (if needed)
@@ -245,9 +241,6 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "70",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
-					}),
 				),
 			},
 			// 5 - Update testing With Replace
@@ -333,9 +326,6 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
-					}),
 				),
 			},
 			// <== If resource has required dependencies ==>
@@ -423,8 +413,236 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test_new", "id"),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
+				),
+			},
+			// 7- recreate testing
+			{
+				Config: `
+resource "numspot_vpc" "test_recreate" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_security_group" "test_recreate" {
+  vpc_id      = numspot_vpc.test_recreate.id
+  name        = "security-group-name"
+  description = "security-group"
+  inbound_rules = [
+    {
+      from_port_range = 453
+      to_port_range   = 453
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 22
+      to_port_range   = 22
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
+  outbound_rules = [
+    {
+      from_port_range = 455
+      to_port_range   = 455
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 90
+      to_port_range   = 90
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+  ]
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-SecurityGroup"
+    }
+  ]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "name", "security-group-name"),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "description", "security-group"),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-SecurityGroup",
+					}),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "inbound_rules.#", "3"),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "outbound_rules.#", "2"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "inbound_rules.*", map[string]string{
+						"from_port_range": "453",
+						"to_port_range":   "453",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "inbound_rules.*", map[string]string{
+						"from_port_range": "80",
+						"to_port_range":   "80",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "inbound_rules.*", map[string]string{
+						"from_port_range": "22",
+						"to_port_range":   "22",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "outbound_rules.*", map[string]string{
+						"from_port_range": "455",
+						"to_port_range":   "455",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "outbound_rules.*", map[string]string{
+						"from_port_range": "90",
+						"to_port_range":   "90",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_security_group.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test_recreate", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.NotEqual(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						resourceId = v
+						return nil
+					}),
+				),
+			},
+			// 8- reset rules
+			{
+				Config: `
+resource "numspot_vpc" "test_recreate" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_security_group" "test_recreate" {
+  vpc_id         = numspot_vpc.test_recreate.id
+  name           = "security-group-name"
+  description    = "security-group"
+  inbound_rules  = []
+  outbound_rules = []
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-SecurityGroup"
+    }
+  ]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "name", "security-group-name"),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "description", "security-group"),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-SecurityGroup",
+					}),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "inbound_rules.#", "0"),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "outbound_rules.#", "0"),
+					resource.TestCheckResourceAttrPair("numspot_security_group.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test_recreate", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.Equal(t, resourceId, v) {
+							return fmt.Errorf("Id should not have changed")
+						}
+						return nil
+					}),
+				),
+			},
+			// 9- Add rules
+			{
+				Config: `
+resource "numspot_vpc" "test_recreate" {
+  ip_range = "10.101.0.0/16"
+}
+
+resource "numspot_security_group" "test_recreate" {
+  vpc_id      = numspot_vpc.test_recreate.id
+  name        = "security-group-name"
+  description = "security-group"
+  inbound_rules = [
+    {
+      from_port_range = 453
+      to_port_range   = 453
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 22
+      to_port_range   = 22
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
+  outbound_rules = [
+    {
+      from_port_range = 455
+      to_port_range   = 455
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+    {
+      from_port_range = 90
+      to_port_range   = 90
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    },
+  ]
+  tags = [
+    {
+      key   = "name"
+      value = "Terraform-Test-SecurityGroup"
+    }
+  ]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "name", "security-group-name"),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "description", "security-group"),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "Terraform-Test-SecurityGroup",
+					}),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "inbound_rules.#", "3"),
+					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "outbound_rules.#", "2"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "inbound_rules.*", map[string]string{
+						"from_port_range": "453",
+						"to_port_range":   "453",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "inbound_rules.*", map[string]string{
+						"from_port_range": "80",
+						"to_port_range":   "80",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "inbound_rules.*", map[string]string{
+						"from_port_range": "22",
+						"to_port_range":   "22",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "outbound_rules.*", map[string]string{
+						"from_port_range": "455",
+						"to_port_range":   "455",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_security_group.test_recreate", "outbound_rules.*", map[string]string{
+						"from_port_range": "90",
+						"to_port_range":   "90",
+					}),
+					resource.TestCheckResourceAttrPair("numspot_security_group.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test_recreate", "id", func(v string) error {
+						if !assert.NotEmpty(t, v) {
+							return fmt.Errorf("Id field should not be empty")
+						}
+						if !assert.Equal(t, resourceId, v) {
+							return fmt.Errorf("Id should have changed")
+						}
+						return nil
 					}),
 				),
 			},
