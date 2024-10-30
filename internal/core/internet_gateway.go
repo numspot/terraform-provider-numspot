@@ -26,7 +26,7 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tag
 	internetGatewayID := *retryCreateResponse.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, internetGatewayID, tags); err != nil {
+		if err = createTags(ctx, provider, internetGatewayID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -54,7 +54,7 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tag
 }
 
 func UpdateInternetGatewayTags(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.InternetGateway, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, internetGatewayID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, internetGatewayID); err != nil {
 		return nil, err
 	}
 	return ReadInternetGatewaysWithID(ctx, provider, internetGatewayID)

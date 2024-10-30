@@ -32,12 +32,12 @@ func CreateSubnet(ctx context.Context, provider *client.NumSpotSDK, payload nums
 
 	if mapPublicIPOnLaunch {
 		if _, err = UpdateSubnetAttributes(ctx, provider, subnetID, mapPublicIPOnLaunch); err != nil {
-			return nil, fmt.Errorf("failed to update MapPublicIPOnLaunch: %w", err)
+			return nil, err
 		}
 	}
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, subnetID, tags); err != nil {
+		if err = createTags(ctx, provider, subnetID, tags); err != nil {
 			return nil, fmt.Errorf("failed to update tags: %w", err)
 		}
 	}
@@ -67,7 +67,7 @@ func UpdateSubnetAttributes(ctx context.Context, provider *client.NumSpotSDK, su
 }
 
 func UpdateSubnetTags(ctx context.Context, provider *client.NumSpotSDK, subnetID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Subnet, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, subnetID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, subnetID); err != nil {
 		return nil, err
 	}
 	return RetryReadSubnet(ctx, provider, updateOp, subnetID)
@@ -79,10 +79,7 @@ func DeleteSubnet(ctx context.Context, provider *client.NumSpotSDK, subnetID str
 		return err
 	}
 
-	if err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, subnetID, numspotClient.DeleteSubnetWithResponse); err != nil {
-		return err
-	}
-	return nil
+	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, subnetID, numspotClient.DeleteSubnetWithResponse)
 }
 
 func ReadSubnet(ctx context.Context, provider *client.NumSpotSDK, subnetID string) (*numspot.Subnet, error) {

@@ -31,7 +31,7 @@ func CreateClientGateway(ctx context.Context, provider *client.NumSpotSDK, numSp
 	createdId := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, createdId, tags); err != nil {
+		if err = createTags(ctx, provider, createdId, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -40,7 +40,7 @@ func CreateClientGateway(ctx context.Context, provider *client.NumSpotSDK, numSp
 }
 
 func UpdateClientGatewayTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, clientGatewayID string) (*numspot.ClientGateway, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, clientGatewayID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, clientGatewayID); err != nil {
 		return nil, err
 	}
 	return RetryReadClientGateway(ctx, provider, updateOp, clientGatewayID)
@@ -51,12 +51,7 @@ func DeleteClientGateway(ctx context.Context, provider *client.NumSpotSDK, clien
 	if err != nil {
 		return err
 	}
-
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, clientGatewayID, numspotClient.DeleteClientGatewayWithResponse)
-	if err != nil {
-		return err
-	}
-	return nil
+	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, clientGatewayID, numspotClient.DeleteClientGatewayWithResponse)
 }
 
 func ReadClientGateway(ctx context.Context, provider *client.NumSpotSDK, clientGatewayID string) (*numspot.ClientGateway, error) {

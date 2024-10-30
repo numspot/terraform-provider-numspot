@@ -68,8 +68,9 @@ func (r *SubnetResource) Create(ctx context.Context, request resource.CreateRequ
 	}
 
 	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	mapPublicIP := plan.MapPublicIpOnLaunch.ValueBool()
 
-	numSpotSubnet, err := core.CreateSubnet(ctx, r.provider, deserializeCreateSubnet(plan), plan.MapPublicIpOnLaunch.ValueBool(), tagsValue)
+	numSpotSubnet, err := core.CreateSubnet(ctx, r.provider, deserializeCreateSubnet(plan), mapPublicIP, tagsValue)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create subnet", err.Error())
 		return

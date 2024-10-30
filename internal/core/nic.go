@@ -28,7 +28,7 @@ func CreateNic(ctx context.Context, provider *client.NumSpotSDK, numSpotNicCreat
 	nicID := *retryCreateResponse.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, nicID, tags); err != nil {
+		if err = createTags(ctx, provider, nicID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -49,7 +49,7 @@ func CreateNic(ctx context.Context, provider *client.NumSpotSDK, numSpotNicCreat
 }
 
 func UpdateNicTags(ctx context.Context, provider *client.NumSpotSDK, nicID string, stateTags, planTags []numspot.ResourceTag) (*numspot.Nic, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, nicID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, nicID); err != nil {
 		return nil, err
 	}
 	return ReadNicWithID(ctx, provider, nicID)
@@ -151,12 +151,7 @@ func DeleteNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, u
 		// Error not handled, we try to delete internet gateway anyway
 	}
 
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, nicID, numspotClient.DeleteNicWithResponse)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, nicID, numspotClient.DeleteNicWithResponse)
 }
 
 func RetryReadLinkNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, startState, targetState []string) (*numspot.Nic, error) {

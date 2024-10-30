@@ -11,7 +11,7 @@ import (
 )
 
 // CreateTags Same as CreateTags but without using Diagnostics. Remove CreateTags when other function are reworked
-func CreateTags(
+func createTags(
 	ctx context.Context,
 	provider *client.NumSpotSDK,
 	resourceId string,
@@ -38,8 +38,8 @@ func CreateTags(
 	return nil
 }
 
-func UpdateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, resourceID string) (err error) {
-	toCreate, toDelete, toUpdate := Diff(stateTags, planTags)
+func updateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, resourceID string) (err error) {
+	toCreate, toDelete, toUpdate := diff(stateTags, planTags)
 
 	toDeleteApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toDelete))
 	toCreateApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toCreate))
@@ -72,7 +72,7 @@ func UpdateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateT
 	}
 
 	if len(toDeleteApiTags) > 0 {
-		if err = DeleteTags(
+		if err = deleteTags(
 			ctx,
 			provider,
 			resourceID,
@@ -83,7 +83,7 @@ func UpdateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateT
 	}
 
 	if len(toCreateApiTags) > 0 {
-		if err = CreateTags(
+		if err = createTags(
 			ctx,
 			provider,
 			resourceID,
@@ -96,7 +96,7 @@ func UpdateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateT
 	return nil
 }
 
-func DeleteTags(
+func deleteTags(
 	ctx context.Context,
 	provider *client.NumSpotSDK,
 	resourceId string,
@@ -123,7 +123,7 @@ func DeleteTags(
 
 // Diff calculates the differences between two slices of tags: which tags to create, delete, and update.
 // Assumes that a tag's Key is unique in the slice.
-func Diff(current, desired []numspot.ResourceTag) (toCreate, toDelete, toUpdate []numspot.ResourceTag) {
+func diff(current, desired []numspot.ResourceTag) (toCreate, toDelete, toUpdate []numspot.ResourceTag) {
 	currentMap := make(map[string]numspot.ResourceTag)
 	desiredMap := make(map[string]numspot.ResourceTag)
 

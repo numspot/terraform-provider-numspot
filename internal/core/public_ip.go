@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
@@ -27,7 +26,7 @@ func CreatePublicIp(ctx context.Context, provider *client.NumSpotSDK, tags []num
 	createdId := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, createdId, tags); err != nil {
+		if err = createTags(ctx, provider, createdId, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -37,8 +36,7 @@ func CreatePublicIp(ctx context.Context, provider *client.NumSpotSDK, tags []num
 	// This constraint is enforced by the stringvalidator.ConflictsWith function.
 	if vmId != "" || nicId != "" {
 		// Call Link publicIP
-		_, err := linkPublicIP(ctx, provider, createdId, vmId, nicId)
-		if err != nil {
+		if _, err = linkPublicIP(ctx, provider, createdId, vmId, nicId); err != nil {
 			return nil, err
 		}
 	}
@@ -53,68 +51,69 @@ func linkPublicIP(ctx context.Context, provider *client.NumSpotSDK, publicIpId, 
 		return nil, err
 	}
 
-	if vmId != "" && nicId != "" {
-		return nil, fmt.Errorf("cannot link publicIp to both NIC and VM. You must specify only one")
-	}
+	//if vmId != "" && nicId != "" {
+	//	return nil, fmt.Errorf("cannot link publicIp to both NIC and VM. You must specify only one")
+	//}
 
 	if vmId != "" {
 		payload = numspot.LinkPublicIpJSONRequestBody{VmId: &vmId}
 	} else {
 		payload = numspot.LinkPublicIpJSONRequestBody{NicId: &nicId}
 	}
-	res, err := numspotClient.LinkPublicIpWithResponse(ctx, provider.SpaceID, publicIpId, payload)
+	linkPublicIPResponse, err := numspotClient.LinkPublicIpWithResponse(ctx, provider.SpaceID, publicIpId, payload)
 	if err != nil {
 		return nil, err
 	}
-	if res.StatusCode() != http.StatusOK {
-		return nil, utils.HandleError(res.Body)
+	if err = utils.ParseHTTPError(linkPublicIPResponse.Body, linkPublicIPResponse.StatusCode()); err != nil {
+		return nil, err
 	}
 
-	return res.JSON200.LinkPublicIpId, nil
+	return linkPublicIPResponse.JSON200.LinkPublicIpId, nil
 }
 
-func unlinkPublicIP(ctx context.Context, provider *client.NumSpotSDK, publicIpId string) error {
-	numspotClient, err := provider.GetClient(ctx)
-	if err != nil {
-		return err
-	}
-
-	payload := numspot.UnlinkPublicIpJSONRequestBody{
-		LinkPublicIpId: &publicIpId,
-	}
-	res, err := numspotClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, publicIpId, payload)
-	if err != nil {
-		return err
-	}
-	if res.StatusCode() != http.StatusNoContent {
-		return utils.HandleError(res.Body)
-	}
-
-	return nil
-}
+//func unlinkPublicIP(ctx context.Context, provider *client.NumSpotSDK, publicIpId string) error {
+//	numspotClient, err := provider.GetClient(ctx)
+//	if err != nil {
+//		return err
+//	}
+//
+//	payload := numspot.UnlinkPublicIpJSONRequestBody{
+//		LinkPublicIpId: &publicIpId,
+//	}
+//
+//	res, err := numspotClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, publicIpId, payload)
+//	if err != nil {
+//		return err
+//	}
+//	if res.StatusCode() != http.StatusNoContent {
+//		return utils.HandleError(res.Body)
+//	}
+//
+//	return nil
+//}
 
 func UpdatePublicIpTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, publicIpID string) (*numspot.PublicIp, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, publicIpID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, publicIpID); err != nil {
 		return nil, err
 	}
 	return ReadPublicIp(ctx, provider, publicIpID)
 }
 
 func DeletePublicIp(ctx context.Context, provider *client.NumSpotSDK, publicIpID, linkPublicIpID string) error {
+	spaceID := provider.SpaceID
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
 	}
 
 	if linkPublicIpID != "" {
-		_ = unlinkPublicIP(ctx, provider, linkPublicIpID) // Try to delete publicIp even if unlink failed
+		if _, err = utils.RetryDeleteUntilWithBody(ctx, spaceID, publicIpID, numspot.UnlinkPublicIpJSONRequestBody{LinkPublicIpId: &linkPublicIpID}, numspotClient.UnlinkPublicIpWithResponse); err != nil {
+			return err
+		}
+		//_ = unlinkPublicIP(ctx, provider, linkPublicIpID) // Try to delete publicIp even if unlink failed
 	}
 
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, publicIpID, numspotClient.DeletePublicIpWithResponse)
-	if err != nil {
-		return err
-	}
-	return nil
+	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, publicIpID, numspotClient.DeletePublicIpWithResponse)
 }
 
 func ReadPublicIp(ctx context.Context, provider *client.NumSpotSDK, publicIpID string) (*numspot.PublicIp, error) {

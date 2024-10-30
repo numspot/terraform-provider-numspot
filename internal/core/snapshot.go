@@ -31,7 +31,7 @@ func CreateSnapshot(ctx context.Context, provider *client.NumSpotSDK, tags []num
 	createdId := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, createdId, tags); err != nil {
+		if err = createTags(ctx, provider, createdId, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -40,7 +40,7 @@ func CreateSnapshot(ctx context.Context, provider *client.NumSpotSDK, tags []num
 }
 
 func UpdateSnapshotTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, snapshotID string) (*numspot.Snapshot, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, snapshotID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, snapshotID); err != nil {
 		return nil, err
 	}
 	return ReadSnapshot(ctx, provider, snapshotID)

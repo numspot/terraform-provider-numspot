@@ -25,7 +25,7 @@ func CreateDHCPOptions(ctx context.Context, provider *client.NumSpotSDK, numSpot
 	dhcpOptionsID := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, dhcpOptionsID, tags); err != nil {
+		if err = createTags(ctx, provider, dhcpOptionsID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -34,7 +34,7 @@ func CreateDHCPOptions(ctx context.Context, provider *client.NumSpotSDK, numSpot
 }
 
 func UpdateDHCPOptionsTags(ctx context.Context, provider *client.NumSpotSDK, dhcpOptionsID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.DhcpOptionsSet, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, dhcpOptionsID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, dhcpOptionsID); err != nil {
 		return nil, err
 	}
 	return ReadDHCPOption(ctx, provider, dhcpOptionsID)

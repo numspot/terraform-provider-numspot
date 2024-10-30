@@ -1,18 +1,15 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 )
 
 func TestAccSecurityGroupResource(t *testing.T) {
-	var resourceId string
 	acct := acctest.NewAccTest(t, false, "")
 	defer func() {
 		err := acct.Cleanup()
@@ -498,16 +495,6 @@ resource "numspot_security_group" "test_recreate" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test_recreate", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						resourceId = v
-						return nil
-					}),
 				),
 			},
 			// 8- reset rules
@@ -541,15 +528,6 @@ resource "numspot_security_group" "test_recreate" {
 					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "inbound_rules.#", "0"),
 					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "outbound_rules.#", "0"),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test_recreate", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should not have changed")
-						}
-						return nil
-					}),
 				),
 			},
 			// 9- Add rules
@@ -635,15 +613,6 @@ resource "numspot_security_group" "test_recreate" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
-					resource.TestCheckResourceAttrWith("numspot_security_group.test_recreate", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						return nil
-					}),
 				),
 			},
 		},

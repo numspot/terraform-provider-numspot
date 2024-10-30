@@ -39,7 +39,7 @@ func CreateVolume(ctx context.Context, provider *client.NumSpotSDK, numSpotVolum
 	}
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, volumeID, tags); err != nil {
+		if err = createTags(ctx, provider, volumeID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -77,7 +77,7 @@ func UpdateVolumeAttributes(ctx context.Context, provider *client.NumSpotSDK, nu
 }
 
 func UpdateVolumeTags(ctx context.Context, provider *client.NumSpotSDK, volumeID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Volume, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, volumeID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, volumeID); err != nil {
 		return nil, err
 	}
 	return RetryReadVolume(ctx, provider, updateOp, volumeID)

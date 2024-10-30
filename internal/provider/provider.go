@@ -26,7 +26,6 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/routetable"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/securitygroup"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/snapshot"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/space"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/subnet"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/virtualgateway"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/vm"
@@ -235,7 +234,6 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 		securitygroup.NewSecurityGroupsDataSource,
 		routetable.NewRouteTablesDataSource,
 		vpnconnection.NewVpnConnectionsDataSource,
-		space.NewSpaceDataSource,
 		vm.NewVmsDataSource,
 		flexiblegpu.NewFlexibleGpusDataSource,
 	}
@@ -263,6 +261,5 @@ func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resou
 		dhcpoptions.NewDhcpOptionsResource,
 		virtualgateway.NewVirtualGatewayResource,
 		vpcpeering.NewVpcPeeringResource,
-		space.NewSpaceResource,
 	}
 }
