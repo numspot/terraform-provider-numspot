@@ -181,7 +181,7 @@ func StopVM(ctx context.Context, provider *client.NumSpotSDK, vm string) (err er
 	if vmStatus == nil || vmStatus.JSON200 == nil {
 		return nil
 	}
-	if *vmStatus.JSON200.State == "stopped" || *vmStatus.JSON200.State == "terminated" {
+	if *vmStatus.JSON200.State == stopped || *vmStatus.JSON200.State == terminated {
 		return nil
 	}
 
@@ -192,7 +192,7 @@ func StopVM(ctx context.Context, provider *client.NumSpotSDK, vm string) (err er
 		return err
 	}
 
-	if _, err = utils.RetryReadUntilStateValid(ctx, vm, provider.SpaceID, []string{"stopping"}, []string{"stopped", "terminated"},
+	if _, err = utils.RetryReadUntilStateValid(ctx, vm, provider.SpaceID, []string{stopping}, []string{stopped, terminated},
 		numspotClient.ReadVmsByIdWithResponse); err != nil {
 		return err
 	}
@@ -212,20 +212,14 @@ func StartVM(ctx context.Context, provider *client.NumSpotSDK, vm string) (err e
 	}
 
 	var vmStatus *numspot.ReadVmsByIdResponse
-	if vmStatus, err = numspotClient.ReadVmsByIdWithResponse(
-		ctx,
-		provider.SpaceID,
-		vm,
-	); err != nil {
+	if vmStatus, err = numspotClient.ReadVmsByIdWithResponse(ctx, provider.SpaceID, vm); err != nil {
 		return err
 	}
-
 	// VM does not exist
 	if vmStatus == nil || vmStatus.JSON200 == nil {
 		return nil
 	}
-
-	if *vmStatus.JSON200.State == "running" || *vmStatus.JSON200.State == "terminated" {
+	if *vmStatus.JSON200.State == running || *vmStatus.JSON200.State == terminated {
 		return nil
 	}
 
@@ -235,15 +229,7 @@ func StartVM(ctx context.Context, provider *client.NumSpotSDK, vm string) (err e
 		return err
 	}
 
-	_, err = utils.RetryReadUntilStateValid(
-		ctx,
-		vm,
-		provider.SpaceID,
-		[]string{"pending"},
-		[]string{"running"},
-		numspotClient.ReadVmsByIdWithResponse,
-	)
-	if err != nil {
+	if _, err = utils.RetryReadUntilStateValid(ctx, vm, provider.SpaceID, []string{pending}, []string{running}, numspotClient.ReadVmsByIdWithResponse); err != nil {
 		return err
 	}
 
