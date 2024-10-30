@@ -134,18 +134,11 @@ func DeleteVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID, st
 			return err // TODO : remove and try to delete volume anyway ?
 		}
 	}
-
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
 	}
-
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, volumeID, numspotClient.DeleteVolumeWithResponse)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, volumeID, numspotClient.DeleteVolumeWithResponse)
 }
 
 func RetryReadVolume(ctx context.Context, provider *client.NumSpotSDK, op string, volumeID string) (*numspot.Volume, error) {
