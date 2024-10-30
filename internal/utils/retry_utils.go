@@ -102,31 +102,17 @@ func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, ret
 	}
 }
 
-func RetryUnlinkUntilSuccess[A any, R TfRequestResp](
-	ctx context.Context,
-	spaceId numspot.SpaceId,
-	resourceId string,
-	unlinkBody A,
-	fun func(context.Context, numspot.SpaceId, string, A, ...numspot.RequestEditorFn) (R, error),
-) error {
-	return retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
-		tflog.Debug(ctx, fmt.Sprintf("Retry delete on resource: %s", resourceId))
-		res, err := fun(ctx, spaceId, resourceId, unlinkBody)
-		tflog.Debug(ctx, fmt.Sprintf("Retry delete got response: %d", res.StatusCode()))
-
-		return checkRetryCondition(res, err, StatusCodeStopRetryOnCreate, StatusCodeRetryOnCreate)
-	})
-}
-
 func RetryDeleteUntilResourceAvailable[R TfRequestResp](
 	ctx context.Context,
 	spaceID numspot.SpaceId,
 	id string,
 	fun func(context.Context, numspot.SpaceId, string, ...numspot.RequestEditorFn) (R, error),
 ) error {
+	var res R
 	return retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
+		var err error
 		tflog.Debug(ctx, fmt.Sprintf("Retry delete on resource: %s", id))
-		res, err := fun(ctx, spaceID, id)
+		res, err = fun(ctx, spaceID, id)
 		tflog.Debug(ctx, fmt.Sprintf("Retry delete got response: %d", res.StatusCode()))
 
 		return checkRetryCondition(res, err, StatusCodeStopRetryOnCreate, StatusCodeRetryOnCreate)

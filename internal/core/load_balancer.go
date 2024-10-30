@@ -64,17 +64,6 @@ func DeleteLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBa
 		return err
 	}
 
-	// Delete security groups
-	//emptyList := []string{}
-	//res := utils.ExecuteRequest(func() (*numspot.UpdateLoadBalancerResponse, error) {
-	//	return numspotClient.UpdateLoadBalancerWithResponse(ctx, r.provider.SpaceID, data.Name.ValueString(), numspot.UpdateLoadBalancerJSONRequestBody{
-	//		SecurityGroups: &emptyList,
-	//	})
-	//}, http.StatusOK, &response.Diagnostics)
-	//if res == nil {
-	//	return
-	//}
-
 	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, loadBalancerID, numspotClient.DeleteLoadBalancerWithResponse)
 	if err != nil {
 		return err
