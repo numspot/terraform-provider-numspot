@@ -75,6 +75,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	numSpotSecurityGroup, err := core.CreateSecurityGroup(ctx, r.provider, deserializeCreateSecurityGroupRequest(plan), tagsList, &inboundRules, &outboundRules)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create security group", err.Error())
+		return
 	}
 
 	state := serializeSecurityGroup(ctx, numSpotSecurityGroup, &response.Diagnostics)
@@ -97,6 +98,7 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 	numSpotSecurityGroup, err := core.ReadSecurityGroup(ctx, r.provider, securityGroupID)
 	if err != nil {
 		response.Diagnostics.AddError("unable to read security group", err.Error())
+		return
 	}
 
 	newState := serializeSecurityGroup(ctx, numSpotSecurityGroup, &response.Diagnostics)
@@ -127,6 +129,7 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 		numSpotSecurityGroup, err = core.UpdateSecurityGroupTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags)
 		if err != nil {
 			response.Diagnostics.AddError("unable to update security group tags", err.Error())
+			return
 		}
 	}
 
@@ -161,6 +164,7 @@ func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.Del
 
 	if err := core.DeleteSecurityGroup(ctx, r.provider, securityGroupID); err != nil {
 		response.Diagnostics.AddError("unable to delete security group", err.Error())
+		return
 	}
 }
 

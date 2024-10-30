@@ -73,7 +73,7 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 
 	publicIp, err := core.CreatePublicIp(ctx, r.provider, tagsValue, vmId, nicId)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Public IP", err.Error())
+		response.Diagnostics.AddError("unable to create public ip", err.Error())
 		return
 	}
 
@@ -97,7 +97,7 @@ func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadReques
 
 	numSpotPublicIp, err := core.ReadPublicIp(ctx, r.provider, publicIpID)
 	if err != nil {
-		response.Diagnostics.AddError("error while reading public ip", err.Error())
+		response.Diagnostics.AddError("unable to read public ip", err.Error())
 		return
 	}
 
@@ -127,7 +127,7 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 	if !state.Tags.Equal(plan.Tags) {
 		numSpotPublicIp, err = core.UpdatePublicIpTags(ctx, r.provider, stateTags, planTags, publicIpID)
 		if err != nil {
-			response.Diagnostics.AddError("error while updating tags", err.Error())
+			response.Diagnostics.AddError("unable to update public ip tags", err.Error())
 			return
 		}
 	}
@@ -152,7 +152,7 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 	linkPublicIpId := state.LinkPublicIpId.ValueString()
 	err := core.DeletePublicIp(ctx, r.provider, publicIpID, linkPublicIpId)
 	if err != nil {
-		response.Diagnostics.AddError("error while deleting publicIp", err.Error())
+		response.Diagnostics.AddError("unable to delete public ip", err.Error())
 		return
 	}
 }
