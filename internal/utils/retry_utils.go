@@ -166,17 +166,17 @@ func RetryCreateUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
 	return res, retryError
 }
 
-func RetryLinkUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
+func RetryUntilResourceAvailableWithBody[R TfRequestResp, BodyType any](
 	ctx context.Context,
 	spaceID numspot.SpaceId,
-	volumeID string,
+	resourceID string,
 	body BodyType,
 	fun func(context.Context, numspot.SpaceId, string, BodyType, ...numspot.RequestEditorFn) (R, error),
 ) (R, error) {
 	var res R
 	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		var err error
-		res, err = fun(ctx, spaceID, volumeID, body)
+		res, err = fun(ctx, spaceID, resourceID, body)
 
 		return checkRetryCondition(res, err, StatusCodeStopRetryOnCreate, StatusCodeRetryOnCreate)
 	})

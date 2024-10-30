@@ -225,7 +225,7 @@ func linkVolume(ctx context.Context, provider *client.NumSpotSDK, op, volumeID, 
 	if err != nil {
 		return err
 	}
-	if _, err = utils.RetryLinkUntilResourceAvailableWithBody(ctx, spaceID, volumeID, linkBody, numspotClient.LinkVolumeWithResponse); err != nil {
+	if _, err = utils.RetryUntilResourceAvailableWithBody(ctx, spaceID, volumeID, linkBody, numspotClient.LinkVolumeWithResponse); err != nil {
 		return err
 	}
 

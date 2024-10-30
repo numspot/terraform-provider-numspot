@@ -1,781 +1,744 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 )
 
-// This test sequence is quite long (~8 minutes)
-
 func TestAccLoadBalancerResource(t *testing.T) {
-	// We spotted a bug on Outscale side:
-	// When a load balancer is created, deleted and the recreated with the same name, the API returns 409 Resource conflict
-	// Bug reported to Outscale: https://support.outscale.com/hc/fr-fr/requests/378437
-	// Setting random name is not compliant with recorded test cassettes
-	// For instance We skip this test in the CI pipeline until Outscale fixes the bug or we foind a better solution
-	t.Skip()
-	acct := acctest.NewAccTest(t, false, "")
+	acct := acctest.NewAccTest(t, true, "record")
 	defer func() {
 		err := acct.Cleanup()
 		require.NoError(t, err)
 	}()
 	pr := acct.TestProvider
 
-	var resourceId string
+	loadBalancerDependencies := `
+resource "numspot_vpc" "terraform-dep-vpc-lb" {
+  ip_range = "10.101.0.0/16"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+
+resource "numspot_subnet" "terraform-dep-subnet-lb" {
+  vpc_id   = numspot_vpc.terraform-dep-vpc-lb.id
+  ip_range = "10.101.1.0/24"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+
+resource "numspot_vm" "terraform-dep-vm-lb" {
+  image_id = "ami-8ef5b47e"
+  type     = "ns-cus6-2c4r"
+
+  subnet_id = numspot_subnet.terraform-dep-subnet-lb.id
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+`
+
+	loadBalancerUpdateDependencies := `
+resource "numspot_vpc" "terraform-dep-vpc-lb" {
+  ip_range = "10.101.0.0/16"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+
+resource "numspot_subnet" "terraform-dep-subnet-lb" {
+  vpc_id   = numspot_vpc.terraform-dep-vpc-lb.id
+  ip_range = "10.101.1.0/24"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+
+resource "numspot_security_group" "terraform-dep-sg-lb" {
+  vpc_id      = numspot_vpc.terraform-dep-vpc-lb.id
+  name        = "terraform acctest lb name"
+  description = "terraform acctest lb description"
+  outbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+
+resource "numspot_vm" "terraform-dep-vm-lb" {
+  image_id = "ami-8ef5b47e"
+  type     = "ns-cus6-2c4r"
+
+  subnet_id = numspot_subnet.terraform-dep-subnet-lb.id
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+`
+
+	loadBalancerReplaceDependencies := `
+resource "numspot_vpc" "terraform-dep-vpc-lb" {
+  ip_range = "10.101.0.0/16"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+
+resource "numspot_internet_gateway" "terraform-dep-igw-lb" {
+  vpc_id = numspot_vpc.terraform-dep-vpc-lb.id
+
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest"
+  }]
+}
+
+resource "numspot_subnet" "terraform-dep-subnet-replace-lb" {
+  vpc_id   = numspot_vpc.terraform-dep-vpc-lb.id
+  ip_range = "10.101.1.0/24"
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+
+resource "numspot_security_group" "terraform-dep-sg-lb" {
+  vpc_id      = numspot_vpc.terraform-dep-vpc-lb.id
+  name        = "terraform acctest lb name"
+  description = "terraform acctest lb description"
+  outbound_rules = [
+    {
+      from_port_range = 80
+      to_port_range   = 80
+      ip_ranges       = ["0.0.0.0/0"]
+      ip_protocol     = "tcp"
+    }
+  ]
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+
+resource "numspot_vm" "terraform-dep-vm-lb" {
+  image_id = "ami-8ef5b47e"
+  type     = "ns-cus6-2c4r"
+
+  subnet_id = numspot_subnet.terraform-dep-subnet-replace-lb.id
+  tags = [
+    {
+      key   = "name"
+      value = "terraform-load-balancer-acctest"
+    }
+  ]
+}
+`
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{ // 1 - Create testing
-				Config: `
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.vpc.id
-  name        = "group name"
-  description = "this is a security group"
-  outbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    }
-  ]
-}
-
-resource "numspot_vm" "test" {
-  image_id = "ami-8ef5b47e"
-  type     = "ns-cus6-2c4r"
-
-  subnet_id = numspot_subnet.test.id
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_load_balancer" "test" {
+			// Step 1 - Create simple load-balancer
+			{
+				Config: loadBalancerDependencies + `
+resource "numspot_load_balancer" "terraform-lb-acctest" {
   name = "elb-terraform-test"
-  listeners = [
-    {
-      backend_port           = 80
-      load_balancer_port     = 80
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  subnets         = [numspot_subnet.test.id]
-  security_groups = [numspot_security_group.test.id]
-  backend_vm_ids  = [numspot_vm.test.id]
-
   type = "internal"
 
-  health_check = {
-    healthy_threshold   = 10
-    check_interval      = 30
-    path                = "/index.html"
-    port                = 8080
-    protocol            = "HTTPS"
-    timeout             = 5
-    unhealthy_threshold = 5
-  }
+  subnets = [numspot_subnet.terraform-dep-subnet-lb.id]
 
-  tags = [
-    {
-      key   = "name"
-      value = "Terraform-Test-Volume"
-    }
-  ]
+  listeners = [{
+    backend_port           = 80
+    load_balancer_port     = 80
+    load_balancer_protocol = "TCP"
+  }]
+
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", "elb-terraform-test"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "name", "elb-terraform-test"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "type", "internal"),
+
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "subnets.*", "numspot_subnet.terraform-dep-subnet-lb", "id"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "listeners.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "80",
+						"load_balancer_port":     "80",
+						"load_balancer_protocol": "TCP",
+					}),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Volume",
-					}),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "listeners.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "80",
-						"load_balancer_port": "80",
-					}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "health_check", map[string]string{
-						"healthy_threshold": "10",
-						"check_interval":    "30",
-						"port":              "8080",
-					}),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "backend_vm_ids.*", "numspot_vm.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_load_balancer.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						resourceId = v
-						return nil
+						"value": "terraform-load-balancer-acctest",
 					}),
 				),
 			},
-			// 2 - ImportState testing
+			// Step 2 - Import
 			{
-				ResourceName:            "numspot_load_balancer.test",
+				ResourceName:            "numspot_load_balancer.terraform-lb-acctest",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"id"},
 			},
-			// 3 - Update testing Without Replace
+			// Step 3 - Link load-balancer Backend
 			{
-				Config: `
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.vpc.id
-  name        = "group name"
-  description = "this is a security group"
-  outbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    },
-
-  ]
-}
-
-resource "numspot_vm" "test" {
-  image_id = "ami-8ef5b47e"
-  type     = "ns-cus6-4c8r"
-
-  subnet_id = numspot_subnet.test.id
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_load_balancer" "test" {
+				Config: loadBalancerDependencies + `
+resource "numspot_load_balancer" "terraform-lb-acctest" {
   name = "elb-terraform-test"
-  listeners = [
-    {
-      backend_port           = 443
-      load_balancer_port     = 443
-      load_balancer_protocol = "TCP"
-    },
-    {
-      backend_port           = 8080
-      load_balancer_port     = 8080
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  subnets         = [numspot_subnet.test.id]
-  security_groups = [numspot_security_group.test.id]
-  backend_vm_ids  = [numspot_vm.test.id]
-
   type = "internal"
 
-  health_check = {
-    healthy_threshold   = 15
-    check_interval      = 35
-    path                = "/index.html"
-    port                = 8081
-    protocol            = "HTTPS"
-    timeout             = 5
-    unhealthy_threshold = 5
-  }
+  subnets        = [numspot_subnet.terraform-dep-subnet-lb.id]
+  backend_vm_ids = [numspot_vm.terraform-dep-vm-lb.id]
 
-  tags = [
-    {
-      key   = "name"
-      value = "Terraform-Test-Volume-Updated"
-    }
-  ]
+  listeners = [{
+    backend_port           = 80
+    load_balancer_port     = 80
+    load_balancer_protocol = "TCP"
+  }]
+
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", "elb-terraform-test"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "name", "elb-terraform-test"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "type", "internal"),
+
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "subnets.*", "numspot_subnet.terraform-dep-subnet-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "backend_vm_ids.*", "numspot_vm.terraform-dep-vm-lb", "id"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "listeners.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "80",
+						"load_balancer_port":     "80",
+						"load_balancer_protocol": "TCP",
+					}),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Volume-Updated",
-					}),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "listeners.#", "2"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "443",
-						"load_balancer_port": "443",
-					}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "8080",
-						"load_balancer_port": "8080",
-					}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "health_check", map[string]string{
-						"healthy_threshold": "15",
-						"check_interval":    "35",
-						"port":              "8081",
-					}),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "backend_vm_ids.*", "numspot_vm.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_load_balancer.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						return nil
+						"value": "terraform-load-balancer-acctest",
 					}),
 				),
 			},
-			// 4 - Update testing With Replace (if needed)
+			// Step 4 - Link load-balancer HealthCheck
 			{
-				Config: `
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.vpc.id
-  name        = "group name"
-  description = "this is a security group"
-  outbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    },
-
-  ]
-}
-
-resource "numspot_vm" "test" {
-  image_id = "ami-8ef5b47e"
-  type     = "ns-cus6-4c8r"
-
-  subnet_id = numspot_subnet.test.id
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_load_balancer" "test" {
-  name = "elb-terraform-test-updated"
-  listeners = [
-    {
-      backend_port           = 443
-      load_balancer_port     = 443
-      load_balancer_protocol = "TCP"
-    },
-    {
-      backend_port           = 8080
-      load_balancer_port     = 8080
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  subnets         = [numspot_subnet.test.id]
-  security_groups = [numspot_security_group.test.id]
-  backend_vm_ids  = [numspot_vm.test.id]
-
+				Config: loadBalancerDependencies + `
+resource "numspot_load_balancer" "terraform-lb-acctest" {
+  name = "elb-terraform-test"
   type = "internal"
+
+  subnets        = [numspot_subnet.terraform-dep-subnet-lb.id]
+  backend_vm_ids = [numspot_vm.terraform-dep-vm-lb.id]
+
+  listeners = [{
+    backend_port           = 80
+    load_balancer_port     = 80
+    load_balancer_protocol = "TCP"
+  }]
 
   health_check = {
     healthy_threshold   = 10
     check_interval      = 30
-    path                = "/index.html"
-    port                = 8080
-    protocol            = "HTTPS"
+    path                = "/"
+    port                = 80
+    protocol            = "HTTP"
     timeout             = 5
     unhealthy_threshold = 5
   }
 
-  tags = [
-    {
-      key   = "name"
-      value = "Terraform-Test-Volume-Updated"
-    }
-  ]
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", "elb-terraform-test-updated"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "name", "elb-terraform-test"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "type", "internal"),
+
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "subnets.*", "numspot_subnet.terraform-dep-subnet-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "backend_vm_ids.*", "numspot_vm.terraform-dep-vm-lb", "id"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "listeners.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "80",
+						"load_balancer_port":     "80",
+						"load_balancer_protocol": "TCP",
+					}),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.healthy_threshold", "10"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.check_interval", "30"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.path", "/"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.port", "80"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.protocol", "HTTP"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.timeout", "5"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.unhealthy_threshold", "5"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Volume-Updated",
-					}),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "listeners.#", "2"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "443",
-						"load_balancer_port": "443",
-					}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "8080",
-						"load_balancer_port": "8080",
-					}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "health_check", map[string]string{
-						"healthy_threshold": "10",
-						"check_interval":    "30",
-						"port":              "8080",
-					}),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "backend_vm_ids.*", "numspot_vm.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_load_balancer.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						resourceId = v
-						return nil
+						"value": "terraform-load-balancer-acctest",
 					}),
 				),
 			},
-			// 5 - Update from Internal Load Balancer to Public Load Balancer
+			// Step 5 - Update load-balancer attributes
 			{
-				Config: `
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
+				Config: loadBalancerUpdateDependencies + `
+resource "numspot_load_balancer" "terraform-lb-acctest" {
+  name = "elb-terraform-test"
+  type = "internal"
 
-resource "numspot_internet_gateway" "ig" {
-  vpc_id = numspot_vpc.vpc.id
-}
+  subnets         = [numspot_subnet.terraform-dep-subnet-lb.id]
+  backend_vm_ids  = [numspot_vm.terraform-dep-vm-lb.id]
+  security_groups = [numspot_security_group.terraform-dep-sg-lb.id]
 
-resource "numspot_subnet" "test" {
-  vpc_id                  = numspot_vpc.vpc.id
-  ip_range                = "10.101.1.0/24"
-  map_public_ip_on_launch = true
-}
+  listeners = [{
+    backend_port           = 80
+    load_balancer_port     = 80
+    load_balancer_protocol = "TCP"
+  }]
 
-resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.vpc.id
-  name        = "group name"
-  description = "this is a security group"
-  outbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    }
-  ]
-}
+  health_check = {
+    healthy_threshold   = 10
+    check_interval      = 30
+    path                = "/"
+    port                = 80
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 5
+  }
 
-resource "numspot_route_table" "test" {
-  vpc_id    = numspot_vpc.vpc.id
-  subnet_id = numspot_subnet.test.id
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest-update"
+  }]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "name", "elb-terraform-test"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "type", "internal"),
 
-  routes = [
-    {
-      destination_ip_range = "0.0.0.0/0"
-      gateway_id           = numspot_internet_gateway.ig.id
-    }
-  ]
-}
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "subnets.*", "numspot_subnet.terraform-dep-subnet-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "backend_vm_ids.*", "numspot_vm.terraform-dep-vm-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "security_groups.*", "numspot_security_group.terraform-dep-sg-lb", "id"),
 
-resource "numspot_vm" "test" {
-  image_id = "ami-8ef5b47e"
-  type     = "ns-cus6-4c8r"
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "listeners.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "80",
+						"load_balancer_port":     "80",
+						"load_balancer_protocol": "TCP",
+					}),
 
-  subnet_id = numspot_subnet.test.id
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.healthy_threshold", "10"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.check_interval", "30"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.path", "/"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.port", "80"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.protocol", "HTTP"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.timeout", "5"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.unhealthy_threshold", "5"),
 
-resource "numspot_load_balancer" "test" {
-  name = "elb-terraform-test-updated"
-  listeners = [
-    {
-      backend_port           = 443
-      load_balancer_port     = 443
-      load_balancer_protocol = "TCP"
-    },
-    {
-      backend_port           = 8080
-      load_balancer_port     = 8080
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  subnets         = [numspot_subnet.test.id]
-  security_groups = [numspot_security_group.test.id]
-  backend_vm_ids  = [numspot_vm.test.id]
-
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-load-balancer-acctest-update",
+					}),
+				),
+			},
+			// Step 6 - Replace load-balancer attributes
+			{
+				Config: loadBalancerReplaceDependencies + `
+resource "numspot_load_balancer" "terraform-lb-acctest" {
+  name = "elb-terraform-test"
   type = "internet-facing"
 
-  health_check = {
-    healthy_threshold   = 10
-    check_interval      = 30
-    path                = "/index.html"
-    port                = 8080
-    protocol            = "HTTPS"
-    timeout             = 5
-    unhealthy_threshold = 5
-  }
+  subnets         = [numspot_subnet.terraform-dep-subnet-replace-lb.id]
+  backend_vm_ids  = [numspot_vm.terraform-dep-vm-lb.id]
+  security_groups = [numspot_security_group.terraform-dep-sg-lb.id]
 
-  tags = [
-    {
-      key   = "name"
-      value = "Terraform-Test-Volume-Updated"
-    }
-  ]
-
-  depends_on = [numspot_internet_gateway.ig]
-}`,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", "elb-terraform-test-updated"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "type", "internet-facing"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "tags.*", map[string]string{
-						"key":   "name",
-						"value": "Terraform-Test-Volume-Updated",
-					}),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "listeners.#", "2"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "443",
-						"load_balancer_port": "443",
-					}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "8080",
-						"load_balancer_port": "8080",
-					}),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "backend_vm_ids.*", "numspot_vm.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_load_balancer.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						resourceId = v
-						return nil
-					}),
-				),
-			},
-			// 6 - Update testing With Replace of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			{
-				Config: `
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_subnet" "test_new" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_security_group" "test_new" {
-  vpc_id      = numspot_vpc.vpc.id
-  name        = "group name"
-  description = "this is a security group"
-  outbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    },
-
-  ]
-}
-
-resource "numspot_vm" "test_new" {
-  image_id = "ami-8ef5b47e"
-  type     = "ns-cus6-4c8r"
-
-  subnet_id = numspot_subnet.test.id
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_load_balancer" "test" {
-  name = "elb-terraform-test-updated"
-  listeners = [
-    {
-      backend_port           = 443
-      load_balancer_port     = 443
-      load_balancer_protocol = "TCP"
-    },
-    {
-      backend_port           = 8080
-      load_balancer_port     = 8080
-      load_balancer_protocol = "TCP"
-    }
-  ]
-
-  subnets         = [numspot_subnet.test_new.id]
-  security_groups = [numspot_security_group.test_new.id]
-  backend_vm_ids  = [numspot_vm.test_new.id]
-
-  type = "internal"
-
-  health_check = {
-    healthy_threshold   = 10
-    check_interval      = 30
-    path                = "/index.html"
-    port                = 8080
-    protocol            = "HTTPS"
-    timeout             = 5
-    unhealthy_threshold = 5
-  }
-
-  tags = [
-    {
-      key   = "name"
-      value = "Terraform-Test-Volume-Updated"
-    }
-  ]
-}`,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", "elb-terraform-test-updated"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "tags.*", map[string]string{
-						"key":   "name",
-						"value": "Terraform-Test-Volume-Updated",
-					}),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "listeners.#", "2"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "443",
-						"load_balancer_port": "443",
-					}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "8080",
-						"load_balancer_port": "8080",
-					}),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "subnets.*", "numspot_subnet.test_new", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "security_groups.*", "numspot_security_group.test_new", "id"),
-					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.test", "backend_vm_ids.*", "numspot_vm.test_new", "id"),
-					resource.TestCheckResourceAttrWith("numspot_load_balancer.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						resourceId = v
-						return nil
-					}),
-				),
-			},
-			// <== If resource has optional dependencies ==>
-			{ // 7 - Reset the resource to initial state (resource tied to a subresource) in prevision of next test
-				Config: `
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-
-resource "numspot_security_group" "test" {
-  vpc_id      = numspot_vpc.vpc.id
-  name        = "group name"
-  description = "this is a security group"
-  outbound_rules = [
-    {
-      from_port_range = 80
-      to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
-      ip_protocol     = "tcp"
-    }
-  ]
-}
-
-resource "numspot_vm" "test" {
-  image_id = "ami-8ef5b47e"
-  type     = "ns-cus6-2c4r"
-
-  subnet_id = numspot_subnet.test.id
-  tags = [
-    {
-      key   = "name"
-      value = "terraform-loadbalancer-acctest"
-    }
-  ]
-}
-
-resource "numspot_load_balancer" "test" {
-  name = "elb-terraform-test"
   listeners = [
     {
       backend_port           = 80
       load_balancer_port     = 80
       load_balancer_protocol = "TCP"
-    }
-  ]
-
-  subnets         = [numspot_subnet.test.id]
-  security_groups = [numspot_security_group.test.id]
-  backend_vm_ids  = [numspot_vm.test.id]
-
-  type = "internal"
-
-  health_check = {
-    healthy_threshold   = 10
-    check_interval      = 30
-    path                = "/index.html"
-    port                = 8080
-    protocol            = "HTTPS"
-    timeout             = 5
-    unhealthy_threshold = 5
-  }
-
-  tags = [
-    {
-      key   = "name"
-      value = "Terraform-Test-Volume"
-    }
-  ]
-}`,
-			},
-			{ // 8 - Update testing With delete of dependency resource and without Replacing the resource
-				// This test is useful to check wether or not the deletion of the dependencies and then the update of the main resource works properly (empty dependency)
-
-				Config: `
-resource "numspot_vpc" "vpc" {
-  ip_range = "10.101.0.0/16"
-}
-
-resource "numspot_subnet" "test" {
-  vpc_id   = numspot_vpc.vpc.id
-  ip_range = "10.101.1.0/24"
-}
-resource "numspot_load_balancer" "test" {
-  name    = "elb-terraform-test"
-  subnets = [numspot_subnet.test.id]
-
-  listeners = [
+    },
     {
       backend_port           = 443
       load_balancer_port     = 443
       load_balancer_protocol = "TCP"
+    }
+  ]
+
+  health_check = {
+    healthy_threshold   = 10
+    check_interval      = 30
+    path                = "/"
+    port                = 80
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 5
+  }
+
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest-replace"
+  }]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "name", "elb-terraform-test"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "type", "internet-facing"),
+
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "subnets.*", "numspot_subnet.terraform-dep-subnet-replace-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "backend_vm_ids.*", "numspot_vm.terraform-dep-vm-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "security_groups.*", "numspot_security_group.terraform-dep-sg-lb", "id"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "listeners.#", "2"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "80",
+						"load_balancer_port":     "80",
+						"load_balancer_protocol": "TCP",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "443",
+						"load_balancer_port":     "443",
+						"load_balancer_protocol": "TCP",
+					}),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.healthy_threshold", "10"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.check_interval", "30"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.path", "/"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.port", "80"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.protocol", "HTTP"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.timeout", "5"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.unhealthy_threshold", "5"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-load-balancer-acctest-replace",
+					}),
+				),
+			},
+			// Step 7 - Reset
+			{
+				Config: ` `,
+				Check:  resource.ComposeAggregateTestCheckFunc(),
+			},
+			// Step 8 - Create load-balancer with attributes
+			{
+				Config: loadBalancerReplaceDependencies + `
+resource "numspot_load_balancer" "terraform-lb-acctest" {
+  name = "elb-terraform-test"
+  type = "internet-facing"
+
+  subnets         = [numspot_subnet.terraform-dep-subnet-replace-lb.id]
+  backend_vm_ids  = [numspot_vm.terraform-dep-vm-lb.id]
+  security_groups = [numspot_security_group.terraform-dep-sg-lb.id]
+
+  listeners = [
+    {
+      backend_port           = 80
+      load_balancer_port     = 80
+      load_balancer_protocol = "TCP"
     },
     {
-      backend_port           = 8080
-      load_balancer_port     = 8080
+      backend_port           = 443
+      load_balancer_port     = 443
       load_balancer_protocol = "TCP"
     }
   ]
 
-  type = "internal"
+  health_check = {
+    healthy_threshold   = 10
+    check_interval      = 30
+    path                = "/"
+    port                = 80
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 5
+  }
 
-  tags = [
-    {
-      key   = "name"
-      value = "Terraform-Test-Volume-Updated"
-    }
-  ]
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest-replace"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "name", "elb-terraform-test"),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "name", "elb-terraform-test"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "type", "internet-facing"),
+
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "subnets.*", "numspot_subnet.terraform-dep-subnet-replace-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "backend_vm_ids.*", "numspot_vm.terraform-dep-vm-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "security_groups.*", "numspot_security_group.terraform-dep-sg-lb", "id"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "listeners.#", "2"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "80",
+						"load_balancer_port":     "80",
+						"load_balancer_protocol": "TCP",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "443",
+						"load_balancer_port":     "443",
+						"load_balancer_protocol": "TCP",
+					}),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.healthy_threshold", "10"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.check_interval", "30"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.path", "/"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.port", "80"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.protocol", "HTTP"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.timeout", "5"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.unhealthy_threshold", "5"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Volume-Updated",
+						"value": "terraform-load-balancer-acctest-replace",
 					}),
-					resource.TestCheckResourceAttr("numspot_load_balancer.test", "listeners.#", "2"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "443",
-						"load_balancer_port": "443",
+				),
+			},
+			// Step 9 - Unlink load-balancer Backend
+			{
+				Config: loadBalancerReplaceDependencies + `
+resource "numspot_load_balancer" "terraform-lb-acctest" {
+  name = "elb-terraform-test"
+  type = "internet-facing"
+
+  subnets         = [numspot_subnet.terraform-dep-subnet-replace-lb.id]
+  security_groups = [numspot_security_group.terraform-dep-sg-lb.id]
+
+  listeners = [
+    {
+      backend_port           = 80
+      load_balancer_port     = 80
+      load_balancer_protocol = "TCP"
+    },
+    {
+      backend_port           = 443
+      load_balancer_port     = 443
+      load_balancer_protocol = "TCP"
+    }
+  ]
+
+  health_check = {
+    healthy_threshold   = 10
+    check_interval      = 30
+    path                = "/"
+    port                = 80
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 5
+  }
+
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest-replace"
+  }]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "name", "elb-terraform-test"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "type", "internet-facing"),
+
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "subnets.*", "numspot_subnet.terraform-dep-subnet-replace-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "security_groups.*", "numspot_security_group.terraform-dep-sg-lb", "id"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "listeners.#", "2"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "80",
+						"load_balancer_port":     "80",
+						"load_balancer_protocol": "TCP",
 					}),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.test", "listeners.*", map[string]string{
-						"backend_port":       "8080",
-						"load_balancer_port": "8080",
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "443",
+						"load_balancer_port":     "443",
+						"load_balancer_protocol": "TCP",
 					}),
-					resource.TestCheckResourceAttrWith("numspot_load_balancer.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged")
-						}
-						resourceId = v
-						return nil
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.healthy_threshold", "10"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.check_interval", "30"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.path", "/"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.port", "80"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.protocol", "HTTP"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.timeout", "5"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "health_check.unhealthy_threshold", "5"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-load-balancer-acctest-replace",
+					}),
+				),
+			},
+			// Step 10 - Unlink load-balancer HealthChecks
+			{
+				Config: loadBalancerReplaceDependencies + `
+resource "numspot_load_balancer" "terraform-lb-acctest" {
+  name = "elb-terraform-test"
+  type = "internet-facing"
+
+  subnets         = [numspot_subnet.terraform-dep-subnet-replace-lb.id]
+  security_groups = [numspot_security_group.terraform-dep-sg-lb.id]
+
+  listeners = [
+    {
+      backend_port           = 80
+      load_balancer_port     = 80
+      load_balancer_protocol = "TCP"
+    },
+    {
+      backend_port           = 443
+      load_balancer_port     = 443
+      load_balancer_protocol = "TCP"
+    }
+  ]
+
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest-replace"
+  }]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "name", "elb-terraform-test"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "type", "internet-facing"),
+
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "subnets.*", "numspot_subnet.terraform-dep-subnet-replace-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest", "security_groups.*", "numspot_security_group.terraform-dep-sg-lb", "id"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "listeners.#", "2"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "80",
+						"load_balancer_port":     "80",
+						"load_balancer_protocol": "TCP",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "listeners.*", map[string]string{
+						"backend_port":           "443",
+						"load_balancer_port":     "443",
+						"load_balancer_protocol": "TCP",
+					}),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-load-balancer-acctest-replace",
+					}),
+				),
+			},
+			// Step 11 - Recreate load-balancer
+			{
+				Config: loadBalancerReplaceDependencies + `
+resource "numspot_load_balancer" "terraform-lb-acctest-recreate" {
+  name = "elb-terraform-test"
+  type = "internet-facing"
+
+  subnets         = [numspot_subnet.terraform-dep-subnet-replace-lb.id]
+  backend_vm_ids  = [numspot_vm.terraform-dep-vm-lb.id]
+  security_groups = [numspot_security_group.terraform-dep-sg-lb.id]
+
+  listeners = [
+    {
+      backend_port           = 80
+      load_balancer_port     = 80
+      load_balancer_protocol = "TCP"
+    },
+    {
+      backend_port           = 443
+      load_balancer_port     = 443
+      load_balancer_protocol = "TCP"
+    }
+  ]
+
+  health_check = {
+    healthy_threshold   = 10
+    check_interval      = 30
+    path                = "/"
+    port                = 80
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 5
+  }
+
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest-recreate"
+  }]
+}`,
+
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "name", "elb-terraform-test"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "type", "internet-facing"),
+
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest-recreate", "subnets.*", "numspot_subnet.terraform-dep-subnet-replace-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest-recreate", "backend_vm_ids.*", "numspot_vm.terraform-dep-vm-lb", "id"),
+					resource.TestCheckTypeSetElemAttrPair("numspot_load_balancer.terraform-lb-acctest-recreate", "security_groups.*", "numspot_security_group.terraform-dep-sg-lb", "id"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "listeners.#", "2"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest-recreate", "listeners.*", map[string]string{
+						"backend_port":           "80",
+						"load_balancer_port":     "80",
+						"load_balancer_protocol": "TCP",
+					}),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest-recreate", "listeners.*", map[string]string{
+						"backend_port":           "443",
+						"load_balancer_port":     "443",
+						"load_balancer_protocol": "TCP",
+					}),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "health_check.healthy_threshold", "10"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "health_check.check_interval", "30"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "health_check.path", "/"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "health_check.port", "80"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "health_check.protocol", "HTTP"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "health_check.timeout", "5"),
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "health_check.unhealthy_threshold", "5"),
+
+					resource.TestCheckResourceAttr("numspot_load_balancer.terraform-lb-acctest-recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_load_balancer.terraform-lb-acctest-recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-load-balancer-acctest-recreate",
 					}),
 				),
 			},
