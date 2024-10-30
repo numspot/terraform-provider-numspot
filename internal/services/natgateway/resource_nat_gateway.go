@@ -151,7 +151,6 @@ func (r *NatGatewayResource) Delete(ctx context.Context, request resource.Delete
 	if response.Diagnostics.HasError() {
 		return
 	}
-}
 
 	natGatewayID := state.Id.ValueString()
 	err := core.DeleteNatGateway(ctx, r.provider, natGatewayID)
