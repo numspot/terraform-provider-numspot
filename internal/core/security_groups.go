@@ -28,7 +28,7 @@ func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, paylo
 	}
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, securityGroupID, tags); err != nil {
+		if err = createTags(ctx, provider, securityGroupID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -47,7 +47,7 @@ func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, paylo
 }
 
 func UpdateSecurityGroupTags(ctx context.Context, provider *client.NumSpotSDK, securityGroupID string, stateTags, planTags []numspot.ResourceTag) (*numspot.SecurityGroup, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, securityGroupID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, securityGroupID); err != nil {
 		return nil, err
 	}
 	return ReadSecurityGroup(ctx, provider, securityGroupID)

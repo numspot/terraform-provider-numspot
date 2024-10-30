@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccLoadBalancerResource(t *testing.T) {
-	acct := acctest.NewAccTest(t, false, "")
+	acct := acctest.NewAccTest(t, true, "replay")
 	defer func() {
 		err := acct.Cleanup()
 		require.NoError(t, err)

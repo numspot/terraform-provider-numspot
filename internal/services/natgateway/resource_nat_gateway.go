@@ -36,7 +36,7 @@ func (r *NatGatewayResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
+	numSpotClient, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -46,7 +46,7 @@ func (r *NatGatewayResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	r.provider = provider
+	r.provider = numSpotClient
 }
 
 func (r *NatGatewayResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -63,24 +63,21 @@ func (r *NatGatewayResource) Schema(ctx context.Context, request resource.Schema
 
 func (r *NatGatewayResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan NatGatewayModel
+
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
-	body := deserializeCreateNatGateway(plan)
-	if response.Diagnostics.HasError() {
-		return
-	}
 
-	natGateway, err := core.CreateNatGateway(ctx, r.provider, tagsValue, body)
+	natGateway, err := core.CreateNATGateway(ctx, r.provider, tagsValue, deserializeCreateNATGateway(plan))
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Nat Gateway", err.Error())
+		response.Diagnostics.AddError("unable to create nat gateway", err.Error())
 		return
 	}
 
-	state := serializeNatGateway(ctx, natGateway, &response.Diagnostics)
+	state := serializeNATGateway(ctx, natGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -90,32 +87,40 @@ func (r *NatGatewayResource) Create(ctx context.Context, request resource.Create
 
 func (r *NatGatewayResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state NatGatewayModel
-	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	natGatewayID := state.Id.ValueString()
 
-	numSpotNatGateway, err := core.ReadNatGateway(ctx, r.provider, natGatewayID)
+	numSpotNatGateway, err := core.ReadNATGateway(ctx, r.provider, natGatewayID)
 	if err != nil {
-		response.Diagnostics.AddError("error while reading nat gateway", err.Error())
+		response.Diagnostics.AddError("unable to read nat gateway", err.Error())
 		return
 	}
 
-	newState := serializeNatGateway(ctx, numSpotNatGateway, &response.Diagnostics)
+	newState := serializeNATGateway(ctx, numSpotNatGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
 func (r *NatGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var state, plan NatGatewayModel
-	var numSpotNatGateway *numspot.NatGateway
-	var err error
+	var (
+		state, plan       NatGatewayModel
+		numSpotNatGateway *numspot.NatGateway
+		err               error
+	)
+
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -126,14 +131,14 @@ func (r *NatGatewayResource) Update(ctx context.Context, request resource.Update
 	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
 
 	if !state.Tags.Equal(plan.Tags) {
-		numSpotNatGateway, err = core.UpdateNatGatewayTags(ctx, r.provider, stateTags, planTags, natGatewayID)
+		numSpotNatGateway, err = core.UpdateNATGatewayTags(ctx, r.provider, stateTags, planTags, natGatewayID)
 		if err != nil {
-			response.Diagnostics.AddError("error while updating tags", err.Error())
+			response.Diagnostics.AddError("unable to update nat gateway tags", err.Error())
 			return
 		}
 	}
 
-	newState := *serializeNatGateway(ctx, numSpotNatGateway, &response.Diagnostics)
+	newState := serializeNATGateway(ctx, numSpotNatGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -143,24 +148,21 @@ func (r *NatGatewayResource) Update(ctx context.Context, request resource.Update
 
 func (r *NatGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state NatGatewayModel
+
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if response.Diagnostics.HasError() {
-		return
-	}
-
 	natGatewayID := state.Id.ValueString()
-	err := core.DeleteNatGateway(ctx, r.provider, natGatewayID)
-	if err != nil {
-		response.Diagnostics.AddError("error while deleting nat gateway", err.Error())
+
+	if err := core.DeleteNATGateway(ctx, r.provider, natGatewayID); err != nil {
+		response.Diagnostics.AddError("unable to delete nat gateway", err.Error())
 		return
 	}
 }
 
-func deserializeCreateNatGateway(tf NatGatewayModel) numspot.CreateNatGatewayJSONRequestBody {
+func deserializeCreateNATGateway(tf NatGatewayModel) numspot.CreateNatGatewayJSONRequestBody {
 	return numspot.CreateNatGatewayJSONRequestBody{
 		PublicIpId: tf.PublicIpId.ValueString(),
 		SubnetId:   tf.SubnetId.ValueString(),
@@ -179,7 +181,7 @@ func serializePublicIp(ctx context.Context, elt numspot.PublicIpLight, diags *di
 	return value
 }
 
-func serializeNatGateway(ctx context.Context, http *numspot.NatGateway, diags *diag.Diagnostics) *NatGatewayModel {
+func serializeNATGateway(ctx context.Context, http *numspot.NatGateway, diags *diag.Diagnostics) NatGatewayModel {
 	var tagsTf types.List
 
 	var publicIp []numspot.PublicIpLight
@@ -194,7 +196,7 @@ func serializeNatGateway(ctx context.Context, http *numspot.NatGateway, diags *d
 		diags,
 	)
 	if diags.HasError() {
-		return nil
+		return NatGatewayModel{}
 	}
 
 	// PublicIpId must be the id of the first public io
@@ -208,11 +210,11 @@ func serializeNatGateway(ctx context.Context, http *numspot.NatGateway, diags *d
 	if http.Tags != nil {
 		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return nil
+			return NatGatewayModel{}
 		}
 	}
 
-	return &NatGatewayModel{
+	return NatGatewayModel{
 		Id:         types.StringPointerValue(http.Id),
 		PublicIps:  publicIpsTf,
 		State:      types.StringPointerValue(http.State),

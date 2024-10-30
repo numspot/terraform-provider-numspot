@@ -36,7 +36,7 @@ func (r *RouteTableResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
+	numSpotClient, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -46,7 +46,7 @@ func (r *RouteTableResource) Configure(ctx context.Context, request resource.Con
 		return
 	}
 
-	r.provider = provider
+	r.provider = numSpotClient
 }
 
 func (r *RouteTableResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {

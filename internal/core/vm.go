@@ -32,7 +32,7 @@ func CreateVM(ctx context.Context, provider *client.NumSpotSDK, numSpotVMCreate 
 	vmID := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, vmID, tags); err != nil {
+		if err = createTags(ctx, provider, vmID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -108,7 +108,7 @@ func UpdateVMKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotVM
 }
 
 func UpdateVMTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, vmID string) (numSpotVM *numspot.Vm, err error) {
-	if err = UpdateResourceTags(ctx, provider, stateTags, planTags, vmID); err != nil {
+	if err = updateResourceTags(ctx, provider, stateTags, planTags, vmID); err != nil {
 		return nil, err
 	}
 	return RetryReadVM(ctx, provider, updateOp, vmID)

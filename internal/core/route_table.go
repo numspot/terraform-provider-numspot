@@ -54,7 +54,7 @@ func CreateRouteTable(
 	createdID := *res.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, createdID, tags); err != nil {
+		if err = createTags(ctx, provider, createdID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -66,29 +66,21 @@ func CreateRouteTable(
 	}
 
 	if subnetID != nil {
-		if err = LinkRouteTable(ctx, provider, createdID, *subnetID); err != nil {
+		if err = linkRouteTable(ctx, provider, createdID, *subnetID); err != nil {
 			return nil, err
 		}
 	}
 
-	rt, err := ReadRouteTable(ctx, provider, createdID)
-	if err != nil {
-		return nil, err
-	}
-
-	return rt, nil
+	return ReadRouteTable(ctx, provider, createdID)
 }
 
 func DeleteRouteTable(ctx context.Context, provider *client.NumSpotSDK, id string, links []string) error {
 	for _, link := range links {
-		if err := UnlinkRouteTable(ctx, provider, id, link); err != nil {
+		if err := unlinkRouteTable(ctx, provider, id, link); err != nil {
 			return err
 		}
 	}
-	if err := utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, id, provider.Client.DeleteRouteTableWithResponse); err != nil {
-		return err
-	}
-	return nil
+	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, id, provider.Client.DeleteRouteTableWithResponse)
 }
 
 func UpdateRouteTableRoutes(
@@ -118,10 +110,9 @@ func UpdateRouteTableTags(
 	stateTags []numspot.ResourceTag,
 	planTags []numspot.ResourceTag,
 ) (*numspot.RouteTable, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, id); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, id); err != nil {
 		return nil, err
 	}
-
 	return ReadRouteTable(ctx, provider, id)
 }
 
@@ -177,19 +168,15 @@ func removeLocalRouteFromRoutes(routes []numspot.Route) []numspot.Route {
 	return arr
 }
 
-func LinkRouteTable(ctx context.Context, provider *client.NumSpotSDK, routeTableId, subnetId string) error {
+func linkRouteTable(ctx context.Context, provider *client.NumSpotSDK, routeTableId, subnetId string) error {
 	res, err := provider.Client.LinkRouteTableWithResponse(ctx, provider.SpaceID, routeTableId, numspot.LinkRouteTableJSONRequestBody{SubnetId: subnetId})
 	if err != nil {
 		return err
 	}
-	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return err
-	}
-
-	return nil
+	return utils.ParseHTTPError(res.Body, res.StatusCode())
 }
 
-func UnlinkRouteTable(ctx context.Context, provider *client.NumSpotSDK, routeTableId, linkRouteTableId string) error {
+func unlinkRouteTable(ctx context.Context, provider *client.NumSpotSDK, routeTableId, linkRouteTableId string) error {
 	res, err := provider.Client.UnlinkRouteTableWithResponse(
 		ctx,
 		provider.SpaceID,
@@ -198,8 +185,5 @@ func UnlinkRouteTable(ctx context.Context, provider *client.NumSpotSDK, routeTab
 	if err != nil {
 		return err
 	}
-	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return err
-	}
-	return nil
+	return utils.ParseHTTPError(res.Body, res.StatusCode())
 }

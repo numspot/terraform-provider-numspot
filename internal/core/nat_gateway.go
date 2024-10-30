@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	natGatewayPendingStates = []string{pending}
-	natGatewayTargetStates  = []string{available}
+	natGatewayPendingStates = []string{pending, deleting}
+	natGatewayTargetStates  = []string{available, deleted}
 )
 
-func CreateNatGateway(ctx context.Context, provider *client.NumSpotSDK, tags []numspot.ResourceTag, body numspot.CreateNatGatewayJSONRequestBody) (numSpotNatGateway *numspot.NatGateway, err error) {
+func CreateNATGateway(ctx context.Context, provider *client.NumSpotSDK, tags []numspot.ResourceTag, body numspot.CreateNatGatewayJSONRequestBody) (numSpotNatGateway *numspot.NatGateway, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -31,40 +31,42 @@ func CreateNatGateway(ctx context.Context, provider *client.NumSpotSDK, tags []n
 	createdId := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, createdId, tags); err != nil {
+		if err = createTags(ctx, provider, createdId, tags); err != nil {
 			return nil, err
 		}
 	}
 
-	return RetryReadNatGateway(ctx, provider, createdId)
+	return RetryReadNATGateway(ctx, provider, createdId)
 }
 
-func UpdateNatGatewayTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, natGatewayID string) (*numspot.NatGateway, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, natGatewayID); err != nil {
+func UpdateNATGatewayTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, natGatewayID string) (*numspot.NatGateway, error) {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, natGatewayID); err != nil {
 		return nil, err
 	}
-	return ReadNatGateway(ctx, provider, natGatewayID)
+
+	return ReadNATGateway(ctx, provider, natGatewayID)
 }
 
-func DeleteNatGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) error {
+func DeleteNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) error {
+	spaceID := provider.SpaceID
+
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
 	}
 
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, natGatewayID, numspotClient.DeleteNatGatewayWithResponse)
-	if err != nil {
-		return err
-	}
-	return nil
+	return utils.RetryDeleteUntilResourceAvailable(ctx, spaceID, natGatewayID, numspotClient.DeleteNatGatewayWithResponse)
 }
 
-func ReadNatGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) (*numspot.NatGateway, error) {
+func ReadNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) (*numspot.NatGateway, error) {
+	spaceID := provider.SpaceID
+
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	numSpotNatGateway, err := numspotClient.ReadNatGatewayByIdWithResponse(ctx, provider.SpaceID, natGatewayID)
+
+	numSpotNatGateway, err := numspotClient.ReadNatGatewayByIdWithResponse(ctx, spaceID, natGatewayID)
 	if err != nil {
 		return nil, err
 	}
@@ -76,12 +78,15 @@ func ReadNatGateway(ctx context.Context, provider *client.NumSpotSDK, natGateway
 	return numSpotNatGateway.JSON200, nil
 }
 
-func RetryReadNatGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) (*numspot.NatGateway, error) {
+func RetryReadNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) (*numspot.NatGateway, error) {
+	spaceID := provider.SpaceID
+
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
 	}
-	read, err := utils.RetryReadUntilStateValid(ctx, natGatewayID, provider.SpaceID, natGatewayPendingStates, natGatewayTargetStates,
+
+	read, err := utils.RetryReadUntilStateValid(ctx, natGatewayID, spaceID, natGatewayPendingStates, natGatewayTargetStates,
 		numspotClient.ReadNatGatewayByIdWithResponse)
 	if err != nil {
 		return nil, err
@@ -94,7 +99,7 @@ func RetryReadNatGateway(ctx context.Context, provider *client.NumSpotSDK, natGa
 	return numSpotNatGateway, nil
 }
 
-func ReadNatGatewaysWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadNatGatewayParams) (numSpotNatGateway *[]numspot.NatGateway, err error) {
+func ReadNATGatewaysWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadNatGatewayParams) (numSpotNatGateway *[]numspot.NatGateway, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

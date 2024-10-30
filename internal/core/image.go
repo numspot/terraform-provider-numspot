@@ -31,7 +31,7 @@ func CreateImage(ctx context.Context, provider *client.NumSpotSDK, body numspot.
 	imageID := *retryCreateResponse.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, imageID, tags); err != nil {
+		if err = createTags(ctx, provider, imageID, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -90,7 +90,7 @@ func UpdateImageAccess(ctx context.Context, provider *client.NumSpotSDK, id stri
 }
 
 func UpdateImageTags(ctx context.Context, provider *client.NumSpotSDK, imageID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Image, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, imageID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, imageID); err != nil {
 		return nil, err
 	}
 	return ReadImageWithID(ctx, provider, imageID)

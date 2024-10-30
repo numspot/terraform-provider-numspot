@@ -26,7 +26,7 @@ func CreatePublicIp(ctx context.Context, provider *client.NumSpotSDK, tags []num
 	createdId := *retryCreate.JSON201.Id
 
 	if len(tags) > 0 {
-		if err = CreateTags(ctx, provider, createdId, tags); err != nil {
+		if err = createTags(ctx, provider, createdId, tags); err != nil {
 			return nil, err
 		}
 	}
@@ -93,7 +93,7 @@ func linkPublicIP(ctx context.Context, provider *client.NumSpotSDK, publicIpId, 
 //}
 
 func UpdatePublicIpTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, publicIpID string) (*numspot.PublicIp, error) {
-	if err := UpdateResourceTags(ctx, provider, stateTags, planTags, publicIpID); err != nil {
+	if err := updateResourceTags(ctx, provider, stateTags, planTags, publicIpID); err != nil {
 		return nil, err
 	}
 	return ReadPublicIp(ctx, provider, publicIpID)

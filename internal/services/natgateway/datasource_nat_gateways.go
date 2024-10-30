@@ -80,13 +80,13 @@ func (d *natGatewaysDataSource) Read(ctx context.Context, request datasource.Rea
 		return
 	}
 
-	numSpotNatGateway, err := core.ReadNatGatewaysWithParams(ctx, d.provider, params)
+	numSpotNATGateway, err := core.ReadNATGatewaysWithParams(ctx, d.provider, params)
 	if err != nil {
 		response.Diagnostics.AddError("unable to read nat gateway", err.Error())
 		return
 	}
 
-	objectItems := serializeNatGateways(ctx, numSpotNatGateway, &response.Diagnostics)
+	objectItems := serializeNATGateways(ctx, numSpotNATGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -97,7 +97,7 @@ func (d *natGatewaysDataSource) Read(ctx context.Context, request datasource.Rea
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func serializeNatGateways(ctx context.Context, natGateways *[]numspot.NatGateway, diags *diag.Diagnostics) []NatGatewayModelDatasource {
+func serializeNATGateways(ctx context.Context, natGateways *[]numspot.NatGateway, diags *diag.Diagnostics) []NatGatewayModelDatasource {
 	return utils.FromHttpGenericListToTfList(ctx, natGateways, func(ctx context.Context, http *numspot.NatGateway, diags *diag.Diagnostics) *NatGatewayModelDatasource {
 		var tagsTf types.List
 

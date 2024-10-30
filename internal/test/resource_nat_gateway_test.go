@@ -19,7 +19,7 @@ import (
 // 6 - Associate NatGateway to a new publicIp and new Subnet (with delete of old ones)
 // 7 - Recreate route table on VPC associated to the natgateway
 func TestAccNatGatewayResource(t *testing.T) {
-	acct := acctest.NewAccTest(t, false, "")
+	acct := acctest.NewAccTest(t, true, "record")
 	defer func() {
 		err := acct.Cleanup()
 		require.NoError(t, err)
