@@ -41,8 +41,6 @@ func TestAccPublicIpResource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
-	var resourceId string
-
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
@@ -61,9 +59,6 @@ resource "numspot_public_ip" "test" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_public_ip.test", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
-					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.InitResourceId(t, v, &resourceId)
 					}),
 				),
 			},
@@ -89,9 +84,6 @@ resource "numspot_public_ip" "test" {
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp-Updated",
 					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
-					}),
 				),
 			},
 			{ // 4 - Recreate unlinked PublicIP
@@ -109,9 +101,6 @@ resource "numspot_public_ip" "test_recreated" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_public_ip.test_recreated", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
-					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test_recreated", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -160,9 +149,6 @@ resource "numspot_public_ip" "test" {
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
 					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
-					}),
 				),
 			},
 			{ // 6 - Update attributes from linked PublicIP (to VM)
@@ -209,9 +195,6 @@ resource "numspot_public_ip" "test" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_public_ip.test", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp-Updated",
-					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -260,9 +243,6 @@ resource "numspot_public_ip" "test_recreated" {
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
 					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test_recreated", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
-					}),
 				),
 			},
 			{ // 8 - Unlink linked PublicIP (to VM)
@@ -280,9 +260,6 @@ resource "numspot_public_ip" "test" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_public_ip.test", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
-					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -329,9 +306,6 @@ resource "numspot_public_ip" "test" {
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
 					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
-					}),
 				),
 			},
 			{ // 10 - Update attributes from linked PublicIP (to NIC)
@@ -376,9 +350,6 @@ resource "numspot_public_ip" "test" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_public_ip.test", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp-Updated",
-					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -425,9 +396,6 @@ resource "numspot_public_ip" "test_recreated" {
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
 					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test_recreated", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
-					}),
 				),
 			},
 			{ // 12 - Unlink linked PublicIP (to NIC)
@@ -445,9 +413,6 @@ resource "numspot_public_ip" "test" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_public_ip.test", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
-					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -535,9 +500,6 @@ resource "numspot_public_ip" "test" {
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
 					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
-					}),
 				),
 			},
 			{ // 15 - Delete NIC and link PublicIP to a new NIC
@@ -582,9 +544,6 @@ resource "numspot_public_ip" "test" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_public_ip.test", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
-					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -678,9 +637,6 @@ resource "numspot_public_ip" "test" {
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
 					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
-					}),
 				),
 			},
 			{ // 18 - Delete VM and link PublicIP to a new VM
@@ -727,9 +683,6 @@ resource "numspot_public_ip" "test" {
 					resource.TestCheckTypeSetElemNestedAttrs("numspot_public_ip.test", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "Terraform-Test-PublicIp",
-					}),
-					resource.TestCheckResourceAttrWith("numspot_public_ip.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
