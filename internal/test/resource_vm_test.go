@@ -35,7 +35,7 @@ resource "numspot_subnet" "terraform-dep-vm-subnet" {
     value = "terraform-dep-vm-subnet"
   }]
 }
-	`
+`
 
 	vmUpdateDependencies := `
 resource "numspot_vpc" "terraform-dep-vm-vpc" {
@@ -129,7 +129,7 @@ resource "numspot_vm" "numspot-vm-acctest" {
     value = "terraform-vm-acctest-update"
   }]
 }
-			`,
+						`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "subnet_id", "numspot_subnet.terraform-dep-vm-subnet", "id"),
 					resource.TestCheckResourceAttrPair("numspot_vm.numspot-vm-acctest", "keypair_name", "numspot_keypair.terraform-dep-vm-keypair", "name"),
@@ -198,8 +198,7 @@ resource "numspot_vm" "numspot-vm-acctest" {
   user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
   initiated_shutdown_behavior = "terminate"
 
-  client_token = "M39Fx9Oys2"
-  private_ips  = ["10.101.1.15"]
+  private_ips = ["10.101.1.15"]
   placement = {
     tenancy                = "default"
     availability_zone_name = "cloudgouv-eu-west-1a"
@@ -221,7 +220,6 @@ resource "numspot_vm" "numspot-vm-acctest" {
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "user_data", "dXNlci1kYXRhLWVuY29kZWQ="),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "initiated_shutdown_behavior", "terminate"),
 
-					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "client_token", "M39Fx9Oys2"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "private_ips.#", "1"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "private_ips.0", "10.101.1.15"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest", "placement.tenancy", "default"),
@@ -247,8 +245,7 @@ resource "numspot_vm" "numspot-vm-acctest-recreate" {
   user_data                   = "dXNlci1kYXRhLWVuY29kZWQ="
   initiated_shutdown_behavior = "stop"
 
-  client_token = "3s77OVJ4qU"
-  private_ips  = ["10.101.1.20"]
+  private_ips = ["10.101.1.20"]
   placement = {
     tenancy                = "default"
     availability_zone_name = "cloudgouv-eu-west-1a"
@@ -270,7 +267,6 @@ resource "numspot_vm" "numspot-vm-acctest-recreate" {
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "user_data", "dXNlci1kYXRhLWVuY29kZWQ="),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "initiated_shutdown_behavior", "stop"),
 
-					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "client_token", "3s77OVJ4qU"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "private_ips.#", "1"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "private_ips.0", "10.101.1.20"),
 					resource.TestCheckResourceAttr("numspot_vm.numspot-vm-acctest-recreate", "placement.tenancy", "default"),

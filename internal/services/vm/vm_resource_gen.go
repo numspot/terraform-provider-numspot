@@ -113,13 +113,9 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				MarkdownDescription: "One or more block device mappings.",
 			},
 			"client_token": schema.StringAttribute{
-				Optional:            true,
 				Computed:            true,
 				Description:         "A unique identifier which enables you to manage the idempotency.",
 				MarkdownDescription: "A unique identifier which enables you to manage the idempotency.",
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
-				},
 			},
 			"creation_date": schema.StringAttribute{
 				Computed:            true,

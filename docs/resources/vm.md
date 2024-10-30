@@ -91,7 +91,6 @@ resource "numspot_vm" "vm" {
 
 ### Optional
 
-- `client_token` (String) A unique identifier which enables you to manage the idempotency.
 - `deletion_protection` (Boolean) If true, you cannot delete the VM unless you change this parameter back to false.
 - `initiated_shutdown_behavior` (String) The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted.
 - `keypair_name` (String) The name of the keypair.
@@ -108,6 +107,7 @@ resource "numspot_vm" "vm" {
 
 - `architecture` (String) The architecture of the VM (`i386` \| `x86_64`).
 - `block_device_mappings` (Attributes List) One or more block device mappings. (see [below for nested schema](#nestedatt--block_device_mappings))
+- `client_token` (String) A unique identifier which enables you to manage the idempotency.
 - `creation_date` (String) The date and time of creation of the VM.
 - `hypervisor` (String) The hypervisor type of the VMs (`ovm` \| `xen`).
 - `id` (String) The ID of the VM.

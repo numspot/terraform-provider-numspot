@@ -63,6 +63,7 @@ func (r *SecurityGroupResource) Schema(ctx context.Context, request resource.Sch
 
 func (r *SecurityGroupResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan SecurityGroupModel
+
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -72,7 +73,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	inboundRules := deserializeCreateInboundRules(ctx, plan.InboundRules)
 	outboundRules := deserializeCreateOutboundRules(ctx, plan.OutboundRules)
 
-	numSpotSecurityGroup, err := core.CreateSecurityGroup(ctx, r.provider, deserializeCreateSecurityGroupRequest(plan), tagsList, &inboundRules, &outboundRules)
+	numSpotSecurityGroup, err := core.CreateSecurityGroup(ctx, r.provider, deserializeCreateSecurityGroupRequest(plan), tagsList, inboundRules, outboundRules)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create security group", err.Error())
 		return
@@ -88,6 +89,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 
 func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state SecurityGroupModel
+
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -114,10 +116,12 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 		err                  error
 		numSpotSecurityGroup *numspot.SecurityGroup
 	)
+
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
+
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -125,6 +129,7 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 
 	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
 	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+
 	if !plan.Tags.Equal(state.Tags) {
 		numSpotSecurityGroup, err = core.UpdateSecurityGroupTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags)
 		if err != nil {
@@ -133,13 +138,14 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 		}
 	}
 
+	securityGroupID := state.Id.ValueString()
 	planInboundRules := deserializeCreateInboundRules(ctx, plan.InboundRules)
 	planOutboundRules := deserializeCreateOutboundRules(ctx, plan.OutboundRules)
 	stateInboundRules := deserializeDeleteInboundRules(ctx, state.InboundRules)
 	stateOutboundRules := deserializeDeleteOutboundRules(ctx, state.OutboundRules)
 
 	if !plan.InboundRules.Equal(state.InboundRules) || !plan.OutboundRules.Equal(state.OutboundRules) {
-		numSpotSecurityGroup, err = core.UpdateSecurityGroupRules(ctx, r.provider, state.Id.ValueString(), planInboundRules, planOutboundRules, &stateInboundRules, &stateOutboundRules)
+		numSpotSecurityGroup, err = core.UpdateSecurityGroupRules(ctx, r.provider, securityGroupID, stateInboundRules, stateOutboundRules, planInboundRules, planOutboundRules)
 		if err != nil {
 			response.Diagnostics.AddError("unable to update security group rules", err.Error())
 		}

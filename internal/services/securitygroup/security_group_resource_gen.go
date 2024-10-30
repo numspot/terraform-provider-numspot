@@ -187,9 +187,9 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Computed:            true,
-				Optional:            true, // MANUALLY EDITED : Add Optional attribute
-				Description:         "The outbound rules associated with the security group.",
-				MarkdownDescription: "The outbound rules associated with the security group.",
+				Optional:            true,                                                                                                                                                                              // MANUALLY EDITED : Add Optional attribute
+				Description:         "The outbound rules associated with the security group. The default 'any' outbound rule is deleted on creation, if you want to add this rule you need to specify it explicitely.", // MANUALLY EDITED : Modified description
+				MarkdownDescription: "The outbound rules associated with the security group. The default 'any' outbound rule is deleted on creation, if you want to add this rule you need to specify it explicitely.", // MANUALLY EDITED : Modified description
 			},
 			"tags": tags.TagsSchema(ctx), // MANUALLY EDITED : Use shared tags
 			"vpc_id": schema.StringAttribute{

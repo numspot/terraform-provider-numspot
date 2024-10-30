@@ -9,7 +9,7 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, payload numspot.CreateSecurityGroupJSONRequestBody, tags []numspot.ResourceTag, inboundRules, outboundRules *numspot.CreateSecurityGroupRuleJSONRequestBody) (numSpotSecurityGroup *numspot.SecurityGroup, err error) {
+func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, payload numspot.CreateSecurityGroupJSONRequestBody, tags []numspot.ResourceTag, inboundRules, outboundRules numspot.CreateSecurityGroupRuleJSONRequestBody) (numSpotSecurityGroup *numspot.SecurityGroup, err error) {
 	numSpotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -22,24 +22,43 @@ func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, paylo
 
 	securityGroupID := *retryCreate.JSON201.Id
 
-	sg, err := ReadSecurityGroup(ctx, provider, securityGroupID)
-	if err != nil {
-		return nil, err
-	}
-
 	if len(tags) > 0 {
 		if err = createTags(ctx, provider, securityGroupID, tags); err != nil {
 			return nil, err
 		}
 	}
 
-	defaultRuleToDelete := numspot.DeleteSecurityGroupRuleJSONRequestBody{
-		Flow:  "Outbound",
-		Rules: sg.OutboundRules,
+	defaultIPProtocol := "-1"
+	defaultFromPortRange := -1
+	defaultIPRanges := []string{"0.0.0.0/0"}
+	defaultToPortRange := -1
+
+	defaultRule := []numspot.SecurityGroupRule{
+		{
+			FromPortRange:         &defaultFromPortRange,
+			IpProtocol:            &defaultIPProtocol,
+			IpRanges:              &defaultIPRanges,
+			SecurityGroupsMembers: nil,
+			ServiceIds:            nil,
+			ToPortRange:           &defaultToPortRange,
+		},
 	}
 
-	_, err = UpdateSecurityGroupRules(ctx, provider, securityGroupID, *inboundRules, *outboundRules, nil, &defaultRuleToDelete)
-	if err != nil {
+	if _, err = UpdateSecurityGroupRules(ctx, provider, securityGroupID,
+		numspot.DeleteSecurityGroupRuleJSONRequestBody{},
+		numspot.DeleteSecurityGroupRuleJSONRequestBody{
+			Rules: &defaultRule,
+			Flow:  "Outbound",
+		},
+		numspot.CreateSecurityGroupRuleJSONRequestBody{
+			Rules: inboundRules.Rules,
+			Flow:  inboundRules.Flow,
+		},
+		numspot.CreateSecurityGroupRuleJSONRequestBody{
+			Rules: outboundRules.Rules,
+			Flow:  outboundRules.Flow,
+		},
+	); err != nil {
 		return nil, err
 	}
 
@@ -54,11 +73,16 @@ func UpdateSecurityGroupTags(ctx context.Context, provider *client.NumSpotSDK, s
 }
 
 func UpdateSecurityGroupRules(ctx context.Context, provider *client.NumSpotSDK, securityGroupID string,
+	stateInboundRules, stateOutboundRules numspot.DeleteSecurityGroupRuleJSONRequestBody,
 	planInboundRules, planOutboundRules numspot.CreateSecurityGroupRuleJSONRequestBody,
-	stateInboundRules, stateOutboundRules *numspot.DeleteSecurityGroupRuleJSONRequestBody,
 ) (numSpotSecurityGroup *numspot.SecurityGroup, err error) {
-	if stateInboundRules != nil && stateInboundRules.Rules != nil && len(*stateInboundRules.Rules) > 0 {
-		if err = deleteRules(ctx, provider, securityGroupID, *stateInboundRules); err != nil {
+	if stateInboundRules.Rules != nil && len(*stateInboundRules.Rules) > 0 {
+		if err = deleteRules(ctx, provider, securityGroupID, stateInboundRules); err != nil {
+			return nil, err
+		}
+	}
+	if stateOutboundRules.Rules != nil && len(*stateOutboundRules.Rules) > 0 {
+		if err = deleteRules(ctx, provider, securityGroupID, stateOutboundRules); err != nil {
 			return nil, err
 		}
 	}
@@ -68,13 +92,6 @@ func UpdateSecurityGroupRules(ctx context.Context, provider *client.NumSpotSDK, 
 			return nil, err
 		}
 	}
-
-	if stateOutboundRules != nil && stateOutboundRules.Rules != nil && len(*stateOutboundRules.Rules) > 0 {
-		if err = deleteRules(ctx, provider, securityGroupID, *stateOutboundRules); err != nil {
-			return nil, err
-		}
-	}
-
 	if planOutboundRules.Rules != nil && len(*planOutboundRules.Rules) > 0 {
 		if err = createRules(ctx, provider, securityGroupID, planOutboundRules); err != nil {
 			return nil, err
@@ -97,21 +114,6 @@ func ReadSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, id stri
 		return nil, err
 	}
 	return numSpotReadSecurityGroup.JSON200, nil
-}
-
-func ReadSecurityGroups(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadSecurityGroupsParams) (*[]numspot.SecurityGroup, error) {
-	numSpotClient, err := provider.GetClient(ctx)
-	if err != nil {
-		return nil, err
-	}
-	res, err := numSpotClient.ReadSecurityGroupsWithResponse(ctx, provider.SpaceID, &params)
-	if err != nil {
-		return nil, err
-	}
-	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		return nil, err
-	}
-	return res.JSON200.Items, nil
 }
 
 func DeleteSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, id string) error {
@@ -152,4 +154,19 @@ func createRules(ctx context.Context, provider *client.NumSpotSDK, id string, ru
 		return err
 	}
 	return nil
+}
+
+func ReadSecurityGroups(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadSecurityGroupsParams) (*[]numspot.SecurityGroup, error) {
+	numSpotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res, err := numSpotClient.ReadSecurityGroupsWithResponse(ctx, provider.SpaceID, &params)
+	if err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
+		return nil, err
+	}
+	return res.JSON200.Items, nil
 }

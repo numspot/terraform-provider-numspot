@@ -32,7 +32,7 @@ func CreateSubnet(ctx context.Context, provider *client.NumSpotSDK, payload nums
 
 	if mapPublicIPOnLaunch {
 		if _, err = UpdateSubnetAttributes(ctx, provider, subnetID, mapPublicIPOnLaunch); err != nil {
-			return nil, fmt.Errorf("failed to update MapPublicIPOnLaunch: %w", err)
+			return nil, err
 		}
 	}
 
