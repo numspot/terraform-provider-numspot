@@ -62,6 +62,7 @@ func (r *PublicIpResource) Schema(ctx context.Context, request resource.SchemaRe
 
 func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan PublicIpModel
+
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -87,8 +88,8 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 
 func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state PublicIpModel
-	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -115,6 +116,9 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 	var err error
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
