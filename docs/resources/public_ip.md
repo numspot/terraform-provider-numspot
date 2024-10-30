@@ -57,7 +57,6 @@ resource "numspot_public_ip" "public_ip" {
 ### Read-Only
 
 - `id` (String) The allocation ID of the public IP.
-- `link_public_ip` (String) The ID of the association between the public IP and VM/NIC (if any).
 - `link_public_ip_id` (String) (Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC.
 - `private_ip` (String) The private IP associated with the public IP.
 - `public_ip` (String) The public IP.

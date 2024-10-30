@@ -1,11 +1,9 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
@@ -56,11 +54,7 @@ resource "numspot_flexible_gpu" "test" {
 					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "generation", "v6"),
 					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "availability_zone_name", "cloudgouv-eu-west-1a"),
 					resource.TestCheckResourceAttrWith("numspot_flexible_gpu.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						resourceId = v
-						return nil
+						return acctest.InitResourceId(t, v, &resourceId)
 					}),
 				),
 			},
@@ -102,14 +96,7 @@ resource "numspot_flexible_gpu" "test" {
 					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "generation", "v6"),
 					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "availability_zone_name", "cloudgouv-eu-west-1b"),
 					resource.TestCheckResourceAttrWith("numspot_flexible_gpu.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						resourceId = v
-						return nil
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -144,14 +131,7 @@ resource "numspot_flexible_gpu" "test" {
 					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "generation", "v6"),
 					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "availability_zone_name", "cloudgouv-eu-west-1a"),
 					resource.TestCheckResourceAttrWith("numspot_flexible_gpu.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						resourceId = v
-						return nil
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},
@@ -171,13 +151,7 @@ resource "numspot_flexible_gpu" "test" {
 					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "generation", "v6"),
 					resource.TestCheckResourceAttr("numspot_flexible_gpu.test", "availability_zone_name", "cloudgouv-eu-west-1a"),
 					resource.TestCheckResourceAttrWith("numspot_flexible_gpu.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						return nil
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},

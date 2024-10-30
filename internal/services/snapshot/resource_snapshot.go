@@ -3,14 +3,15 @@ package snapshot
 import (
 	"context"
 	"fmt"
-	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -60,113 +61,51 @@ func (r *SnapshotResource) Schema(ctx context.Context, request resource.SchemaRe
 }
 
 func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data SnapshotModel
-	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	var plan SnapshotModel
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	// Retries create until request response is OK
-	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
-		ctx,
-		r.provider.SpaceID,
-		SnapshotFromTfToCreateRequest(&data),
-		numspotClient.CreateSnapshotWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Snapshot", err.Error())
-		return
-	}
-
-	createdId := *res.JSON201.Id
-	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
-
-	// Retries read on resource until state is OK
-	readRes, err := utils.RetryReadUntilStateValid(
-		ctx,
-		createdId,
-		r.provider.SpaceID,
-		[]string{"pending/queued", "in-queue", "pending"},
-		[]string{"completed"},
-		numspotClient.ReadSnapshotsByIdWithResponse,
-	)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create Snapshot", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", createdId, err))
-		return
-	}
-
-	rr, ok := readRes.(*numspot.Snapshot)
-	if !ok {
-		response.Diagnostics.AddError("Failed to create Snapshot", "object conversion error")
-		return
-	}
-
-	tf := SnapshotFromHttpToTf(ctx, rr, &response.Diagnostics)
+	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	body := deserializeCreateSnapshot(plan)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if !data.SourceRegionName.IsUnknown() {
-		tf.SourceRegionName = data.SourceRegionName
-	} else {
-		tf.SourceRegionName = types.StringNull()
+	snapshot, err := core.CreateSnapshot(ctx, r.provider, tagsValue, body)
+	if err != nil {
+		response.Diagnostics.AddError("Failed to create Nat Gateway", err.Error())
+		return
 	}
 
-	if !data.SourceSnapshotId.IsUnknown() {
-		tf.SourceSnapshotId = data.SourceSnapshotId
-	} else {
-		tf.SourceSnapshotId = types.StringNull()
+	tf := serializeSnapshot(ctx, snapshot, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var data SnapshotModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state SnapshotModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
+	snapshotID := state.Id.ValueString()
+
+	snapshot, err := core.ReadSnapshot(ctx, r.provider, snapshotID)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("error while reading snapshot", err.Error())
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
-		return numspotClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	tf := SnapshotFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	tf := serializeSnapshot(ctx, snapshot, state, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
-	}
-
-	if !data.SourceRegionName.IsUnknown() {
-		tf.SourceRegionName = data.SourceRegionName
-	} else {
-		tf.SourceRegionName = types.StringNull()
-	}
-
-	if !data.SourceSnapshotId.IsUnknown() {
-		tf.SourceSnapshotId = data.SourceSnapshotId
-	} else {
-		tf.SourceSnapshotId = types.StringNull()
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -174,7 +113,6 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 
 func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan SnapshotModel
-	modifications := false
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -182,76 +120,92 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
+	snapshotID := state.Id.ValueString()
+	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
 
+	var numspotSnapshot *numspot.Snapshot
+	var err error
 	if !state.Tags.Equal(plan.Tags) {
-		tags.UpdateTags(
-			ctx,
-			state.Tags,
-			plan.Tags,
-			&response.Diagnostics,
-			numspotClient,
-			r.provider.SpaceID,
-			state.Id.ValueString(),
-		)
-		if response.Diagnostics.HasError() {
+		numspotSnapshot, err = core.UpdateSnapshotTags(ctx, r.provider, stateTags, planTags, snapshotID)
+		if err != nil {
+			response.Diagnostics.AddError("error while updating tags", err.Error())
 			return
 		}
-
-		modifications = true
 	}
 
-	if !modifications {
-		return
-	}
-
-	res := utils.ExecuteRequest(func() (*numspot.ReadSnapshotsByIdResponse, error) {
-		return numspotClient.ReadSnapshotsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	tf := SnapshotFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	tf := serializeSnapshot(ctx, numspotSnapshot, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
-	}
-
-	if !state.SourceRegionName.IsUnknown() {
-		tf.SourceRegionName = state.SourceRegionName
-	} else {
-		tf.SourceRegionName = types.StringNull()
-	}
-
-	if !state.SourceSnapshotId.IsUnknown() {
-		tf.SourceSnapshotId = state.SourceSnapshotId
-	} else {
-		tf.SourceSnapshotId = types.StringNull()
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data SnapshotModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state SnapshotModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
+	snapshotID := state.Id.ValueString()
+	err := core.DeleteSnapshot(ctx, r.provider, snapshotID)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("error while deleting snapshot", err.Error())
 		return
+	}
+}
+
+func deserializeCreateSnapshot(tf SnapshotModel) numspot.CreateSnapshotJSONRequestBody {
+	return numspot.CreateSnapshotJSONRequestBody{
+		Description:      tf.Description.ValueStringPointer(),
+		SourceRegionName: tf.SourceRegionName.ValueStringPointer(),
+		SourceSnapshotId: tf.SourceSnapshotId.ValueStringPointer(),
+		VolumeId:         tf.VolumeId.ValueStringPointer(),
+	}
+}
+
+func serializeSnapshot(ctx context.Context, http *numspot.Snapshot, model SnapshotModel, diags *diag.Diagnostics) *SnapshotModel {
+	var (
+		tagsTf          types.List
+		creationDateStr *string
+	)
+
+	if http.CreationDate != nil {
+		tmp := (*http.CreationDate).String()
+		creationDateStr = &tmp
 	}
 
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteSnapshotWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete Snapshot", err.Error())
-		return
+	if http.Tags != nil {
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		if diags.HasError() {
+			return nil
+		}
 	}
+
+	snapshot := SnapshotModel{
+		CreationDate: types.StringPointerValue(creationDateStr),
+		Description:  types.StringPointerValue(http.Description),
+		Id:           types.StringPointerValue(http.Id),
+		Progress:     utils.FromIntPtrToTfInt64(http.Progress),
+		State:        types.StringPointerValue(http.State),
+		VolumeId:     types.StringPointerValue(http.VolumeId),
+		VolumeSize:   utils.FromIntPtrToTfInt64(http.VolumeSize),
+		Tags:         tagsTf,
+	}
+
+	if !model.SourceRegionName.IsUnknown() {
+		snapshot.SourceRegionName = model.SourceRegionName
+	} else {
+		snapshot.SourceRegionName = types.StringNull()
+	}
+
+	if !model.SourceSnapshotId.IsUnknown() {
+		snapshot.SourceSnapshotId = model.SourceSnapshotId
+	} else {
+		snapshot.SourceSnapshotId = types.StringNull()
+	}
+
+	return &snapshot
 }

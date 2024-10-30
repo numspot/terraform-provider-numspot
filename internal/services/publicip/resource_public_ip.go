@@ -3,14 +3,15 @@ package publicip
 import (
 	"context"
 	"fmt"
-	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -66,90 +67,52 @@ func (r *PublicIpResource) Create(ctx context.Context, request resource.CreateRe
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
+	vmId := plan.VmId.ValueString()
+	nicId := plan.NicId.ValueString()
+	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
 
-	// Retries create until request response is OK
-	createRes, err := utils.RetryCreateUntilResourceAvailable(
-		ctx,
-		r.provider.SpaceID,
-		numspotClient.CreatePublicIpWithResponse)
+	publicIp, err := core.CreatePublicIp(ctx, r.provider, tagsValue, vmId, nicId)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create Public IP", err.Error())
 		return
 	}
 
-	publicIp := PublicIpFromHttpToTf(ctx, createRes.JSON201, &response.Diagnostics)
+	state := serializePublicIp(ctx, publicIp, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	createdId := *createRes.JSON201.Id
-	if len(plan.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
-
-	// Attach the public IP to a VM or NIC if their IDs are provided:
-	// Note: According to the resource schema, vmId and nicId cannot be set simultaneously.
-	// This constraint is enforced by the stringvalidator.ConflictsWith function.
-	if (!plan.VmId.IsNull() && !plan.VmId.IsUnknown()) || (!plan.NicId.IsNull() && !plan.NicId.IsUnknown()) {
-		publicIp.VmId = plan.VmId
-		publicIp.NicId = plan.NicId
-
-		// Call Link publicIP
-		linkPublicIP, err := invokeLinkPublicIP(ctx, r.provider, publicIp)
-		if err != nil {
-			response.Diagnostics.AddError("Failed to link public IP", err.Error())
-		}
-		publicIp.LinkPublicIP = types.StringPointerValue(linkPublicIP)
-	}
-
-	// Refresh state
-	data := refreshState(ctx, r.provider, publicIp.Id.ValueString(), &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	response.Diagnostics.Append(response.State.Set(ctx, *data)...)
+	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
 func (r *PublicIpResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var data PublicIpModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state PublicIpModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
+	publicIpID := state.Id.ValueString()
+
+	numSpotPublicIp, err := core.ReadPublicIp(ctx, r.provider, publicIpID)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("error while reading public ip", err.Error())
 		return
 	}
 
-	readRes := utils.ExecuteRequest(func() (*numspot.ReadPublicIpsByIdResponse, error) {
-		return numspotClient.ReadPublicIpsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if readRes == nil {
-		return
-	}
-
-	tf := PublicIpFromHttpToTf(ctx, readRes.JSON200, &response.Diagnostics)
+	newState := serializePublicIp(ctx, numSpotPublicIp, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, newState)...)
 }
 
 func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var plan, state PublicIpModel
+	var numSpotPublicIp *numspot.PublicIp
+	var err error
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -157,33 +120,24 @@ func (r *PublicIpResource) Update(ctx context.Context, request resource.UpdateRe
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+	publicIpID := state.Id.ValueString()
+	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+
+	if !state.Tags.Equal(plan.Tags) {
+		numSpotPublicIp, err = core.UpdatePublicIpTags(ctx, r.provider, stateTags, planTags, publicIpID)
+		if err != nil {
+			response.Diagnostics.AddError("error while updating tags", err.Error())
+			return
+		}
+	}
+
+	state = serializePublicIp(ctx, numSpotPublicIp, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if !state.Tags.Equal(plan.Tags) {
-		tags.UpdateTags(
-			ctx,
-			state.Tags,
-			plan.Tags,
-			&response.Diagnostics,
-			numspotClient,
-			r.provider.SpaceID,
-			state.Id.ValueString(),
-		)
-		if response.Diagnostics.HasError() {
-			return
-		}
-
-		data := refreshState(ctx, r.provider, state.Id.ValueString(), &response.Diagnostics)
-		if response.Diagnostics.HasError() {
-			return
-		}
-
-		response.Diagnostics.Append(response.State.Set(ctx, *data)...)
-	}
+	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
 func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
@@ -194,19 +148,32 @@ func (r *PublicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
+	publicIpID := state.Id.ValueString()
+	linkPublicIpId := state.LinkPublicIpId.ValueString()
+	err := core.DeletePublicIp(ctx, r.provider, publicIpID, linkPublicIpId)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("error while deleting publicIp", err.Error())
 		return
 	}
+}
 
-	if !state.LinkPublicIP.IsNull() {
-		_ = invokeUnlinkPublicIP(ctx, r.provider, &state) // We still want to try delete resource even if the unlink didn't work (ressource has been unlinked before for example)
+func serializePublicIp(ctx context.Context, elt *numspot.PublicIp, diags *diag.Diagnostics) PublicIpModel {
+	var tagsList types.List
+
+	if elt.Tags != nil {
+		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *elt.Tags, diags)
+		if diags.HasError() {
+			return PublicIpModel{}
+		}
 	}
 
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, state.Id.ValueString(), numspotClient.DeletePublicIpWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete Public IP", err.Error())
-		return
+	return PublicIpModel{
+		Id:             types.StringPointerValue(elt.Id),
+		NicId:          types.StringPointerValue(elt.NicId),
+		PrivateIp:      types.StringPointerValue(elt.PrivateIp),
+		PublicIp:       types.StringPointerValue(elt.PublicIp),
+		VmId:           types.StringPointerValue(elt.VmId),
+		LinkPublicIpId: types.StringPointerValue(elt.LinkPublicIpId),
+		Tags:           tagsList,
 	}
 }

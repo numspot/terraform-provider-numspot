@@ -1,15 +1,27 @@
 package test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/acctest"
 )
+
+// Test cases
+//
+// 1 - Create Snapshot from Volume
+// 2 - Import
+// 3 - Update attributes (Snapshot from Volume)
+// 4 - Update attributes with Replace (Snapshot from Volume)
+// 5 - Recreate (Snapshot from Volume)
+//
+// 6 - Create Snapshot from Snapshot
+// 7 - Import
+// 8 - Update attributes (Snapshot from Snapshot)
+// 9 - Update attributes with Replace (Snapshot from Snapshot)
+// 10 - Recreate (Snapshot from Snapshot)
 
 func TestAccSnapshotResource(t *testing.T) {
 	acct := acctest.NewAccTest(t, false, "")
@@ -24,8 +36,7 @@ func TestAccSnapshotResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			//////// Test snapshot created from Volume
-			{ // 1 - Create testing
+			{ // 1 - Create Snapshot from Volume
 				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
@@ -52,23 +63,17 @@ resource "numspot_snapshot" "test" {
 					}),
 					resource.TestCheckResourceAttrPair("numspot_snapshot.test", "volume_id", "numspot_volume.test", "id"),
 					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						resourceId = v
-						return nil
+						return acctest.InitResourceId(t, v, &resourceId)
 					}),
 				),
 			},
-			// 2 - ImportState testing
-			{
+			{ // 2 - ImportState testing
 				ResourceName:            "numspot_snapshot.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"id"},
+				ImportStateVerifyIgnore: []string{},
 			},
-			// 3 - Update testing Without Replace
-			{
+			{ // 3 - Update attributes (Snapshot from Volume)
 				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
@@ -95,18 +100,11 @@ resource "numspot_snapshot" "test" {
 					}),
 					resource.TestCheckResourceAttrPair("numspot_snapshot.test", "volume_id", "numspot_volume.test", "id"),
 					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						return nil
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},
-			// 4 - Update testing With Replace (if needed)
-			{
+			{ // 4 - Update attributes with Replace (Snapshot from Volume)
 				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
@@ -133,19 +131,11 @@ resource "numspot_snapshot" "test" {
 					}),
 					resource.TestCheckResourceAttrPair("numspot_snapshot.test", "volume_id", "numspot_volume.test", "id"),
 					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						return nil
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
-
-			// <== If resource has required dependencies ==>
-			{ // 5 - Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+			{ // 5 - Recreate (Snapshot from Volume)
 				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
@@ -153,7 +143,7 @@ resource "numspot_volume" "test" {
   availability_zone_name = "cloudgouv-eu-west-1a"
 }
 
-resource "numspot_snapshot" "test" {
+resource "numspot_snapshot" "test_recreated" {
   volume_id   = numspot_volume.test.id
   description = "A beautiful snapshot"
   tags = [
@@ -163,49 +153,20 @@ resource "numspot_snapshot" "test" {
     }
   ]
 }`,
-			},
-			// 6 - Update testing With Replace of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			{
-				Config: `
-resource "numspot_volume" "test_new" {
-  type                   = "standard"
-  size                   = 11
-  availability_zone_name = "cloudgouv-eu-west-1a"
-}
-
-resource "numspot_snapshot" "test" {
-  volume_id   = numspot_volume.test_new.id
-  description = "A beautiful snapshot but updated"
-  tags = [
-    {
-      key   = "name"
-      value = "Snapshot-Terraform-Test-Updated"
-    }
-  ]
-}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_snapshot.test", "description", "A beautiful snapshot but updated"),
-					resource.TestCheckResourceAttr("numspot_snapshot.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_snapshot.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_snapshot.test_recreated", "description", "A beautiful snapshot"),
+					resource.TestCheckResourceAttr("numspot_snapshot.test_recreated", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_snapshot.test_recreated", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Snapshot-Terraform-Test-Updated",
+						"value": "Snapshot-Terraform-Test",
 					}),
-					resource.TestCheckResourceAttrPair("numspot_snapshot.test", "volume_id", "numspot_volume.test_new", "id"),
-					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						return nil
+					resource.TestCheckResourceAttrPair("numspot_snapshot.test_recreated", "volume_id", "numspot_volume.test", "id"),
+					resource.TestCheckResourceAttrWith("numspot_snapshot.test_recreated", "id", func(v string) error {
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
-
-			//////// Test snapshot created from another Snapshot
-			{ // 7 - Create testing
+			{ // 6 - Create Snapshot from Snapshot
 				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
@@ -238,23 +199,17 @@ resource "numspot_snapshot" "test" {
 					resource.TestCheckResourceAttrPair("numspot_snapshot.test", "source_snapshot_id", "numspot_snapshot.snapshot", "id"),
 
 					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						resourceId = v
-						return nil
+						return acctest.InitResourceId(t, v, &resourceId)
 					}),
 				),
 			},
-			// 8 - ImportState testing
-			{
+			{ // 7 - ImportState testing
 				ResourceName:            "numspot_snapshot.test",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"source_region_name", "source_snapshot_id"},
 			},
-			// 9 - Update testing Without Replace (if needed)
-			{
+			{ // 8 - Update attributes (Snapshot from Snapshot)
 				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
@@ -287,18 +242,11 @@ resource "numspot_snapshot" "test" {
 					resource.TestCheckResourceAttrPair("numspot_snapshot.test", "source_snapshot_id", "numspot_snapshot.snapshot", "id"),
 
 					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.Equal(t, resourceId, v) {
-							return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", resourceId, v)
-						}
-						return nil
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
 					}),
 				),
 			},
-			// 10 - Update testing With Replace
-			{
+			{ // 9 - Update attributes with Replace (Snapshot from Snapshot)
 				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
@@ -331,20 +279,11 @@ resource "numspot_snapshot" "test" {
 					resource.TestCheckResourceAttrPair("numspot_snapshot.test", "source_snapshot_id", "numspot_snapshot.snapshot", "id"),
 
 					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						resourceId = v
-						return nil
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
-
-			// <== If resource has required dependencies ==>
-			{ // 11 - Reset the resource to initial state (resource tied to a subresource) in prevision of next test
+			{ // 10 - Recreate (Snapshot from Snapshot)
 				Config: `
 resource "numspot_volume" "test" {
   type                   = "standard"
@@ -356,35 +295,8 @@ resource "numspot_snapshot" "snapshot" {
   volume_id = numspot_volume.test.id
 }
 
-resource "numspot_snapshot" "test" {
+resource "numspot_snapshot" "test_recreated" {
   source_snapshot_id = numspot_snapshot.snapshot.id
-  source_region_name = "cloudgouv-eu-west-1"
-  description        = "A beautiful snapshot"
-  tags = [
-    {
-      key   = "name"
-      value = "Snapshot-Terraform-Test"
-    }
-  ]
-}`,
-			},
-
-			// 12 - Update testing With Replace of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
-			{
-				Config: `
-resource "numspot_volume" "test" {
-  type                   = "standard"
-  size                   = 11
-  availability_zone_name = "cloudgouv-eu-west-1a"
-}
-
-resource "numspot_snapshot" "snapshot_new" {
-  volume_id = numspot_volume.test.id
-}
-
-resource "numspot_snapshot" "test" {
-  source_snapshot_id = numspot_snapshot.snapshot_new.id
   source_region_name = "cloudgouv-eu-west-1"
   description        = "A beautiful snapshot but updated"
   tags = [
@@ -395,23 +307,16 @@ resource "numspot_snapshot" "test" {
   ]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_snapshot.test", "description", "A beautiful snapshot but updated"),
-					resource.TestCheckResourceAttr("numspot_snapshot.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_snapshot.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_snapshot.test_recreated", "description", "A beautiful snapshot but updated"),
+					resource.TestCheckResourceAttr("numspot_snapshot.test_recreated", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_snapshot.test_recreated", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "Snapshot-Terraform-Test-Updated",
 					}),
-					resource.TestCheckResourceAttrPair("numspot_snapshot.test", "source_snapshot_id", "numspot_snapshot.snapshot_new", "id"),
+					resource.TestCheckResourceAttrPair("numspot_snapshot.test_recreated", "source_snapshot_id", "numspot_snapshot.snapshot", "id"),
 
-					resource.TestCheckResourceAttrWith("numspot_snapshot.test", "id", func(v string) error {
-						if !assert.NotEmpty(t, v) {
-							return fmt.Errorf("Id field should not be empty")
-						}
-						if !assert.NotEqual(t, resourceId, v) {
-							return fmt.Errorf("Id should have changed")
-						}
-						resourceId = v
-						return nil
+					resource.TestCheckResourceAttrWith("numspot_snapshot.test_recreated", "id", func(v string) error {
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
 					}),
 				),
 			},
