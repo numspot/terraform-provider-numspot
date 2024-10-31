@@ -237,7 +237,7 @@ func linkVolume(ctx context.Context, provider *client.NumSpotSDK, op, volumeID, 
 				linkState := (*volume.LinkedVolumes)[0].State
 				return volume, *linkState, nil
 			}
-			return nil, "", fmt.Errorf("volume not linked to any VM : %v", err)
+			return nil, "", fmt.Errorf("volume not linked to any vm : %v", err)
 		},
 	}
 

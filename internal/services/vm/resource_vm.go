@@ -79,7 +79,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 
 	numSpotVM, err := core.CreateVM(ctx, r.provider, numSpotCreateVM, tagsValue)
 	if err != nil {
-		response.Diagnostics.AddError("unable to create VM", err.Error())
+		response.Diagnostics.AddError("unable to create vm", err.Error())
 		return
 	}
 
@@ -102,7 +102,7 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 
 	numSpotVM, err := core.ReadVM(ctx, r.provider, vmID)
 	if err != nil {
-		response.Diagnostics.AddError("unable to read VM", err.Error())
+		response.Diagnostics.AddError("unable to read vm", err.Error())
 	}
 
 	newState := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
@@ -141,7 +141,7 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 	if !plan.KeypairName.Equal(state.KeypairName) {
 		numSpotVM, err = core.UpdateVMKeypair(ctx, r.provider, numSpotUpdateVM, vmID)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update VM keypair", err.Error())
+			response.Diagnostics.AddError("unable to update vm keypair", err.Error())
 			return
 		}
 	}
@@ -154,7 +154,7 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 		!plan.VmInitiatedShutdownBehavior.Equal(state.VmInitiatedShutdownBehavior) {
 		numSpotVM, err = core.UpdateVMAttributes(ctx, r.provider, numSpotUpdateVM, vmID)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update VM attributes", err.Error())
+			response.Diagnostics.AddError("unable to update vm attributes", err.Error())
 			return
 		}
 	}
@@ -162,7 +162,7 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 	if !plan.Tags.Equal(state.Tags) {
 		numSpotVM, err = core.UpdateVMTags(ctx, r.provider, stateTags, planTags, vmID)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update VM tags", err.Error())
+			response.Diagnostics.AddError("unable to update vm tags", err.Error())
 			return
 		}
 	}
@@ -182,7 +182,7 @@ func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 	}
 
 	if err := core.DeleteVM(ctx, r.provider, state.Id.ValueString()); err != nil {
-		response.Diagnostics.AddError("unable to delete VM", err.Error())
+		response.Diagnostics.AddError("unable to delete vm", err.Error())
 		return
 	}
 }

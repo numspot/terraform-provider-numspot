@@ -71,7 +71,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 
 	clientGateway, err := core.CreateClientGateway(ctx, r.provider, deserializeCreateClientGateway(plan), tagsValue)
 	if err != nil {
-		response.Diagnostics.AddError("", err.Error())
+		response.Diagnostics.AddError("unable to create client gateway", err.Error())
 		return
 	}
 
@@ -80,7 +80,7 @@ func (r *ClientGatewayResource) Create(ctx context.Context, request resource.Cre
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
 func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
@@ -94,16 +94,16 @@ func (r *ClientGatewayResource) Read(ctx context.Context, request resource.ReadR
 
 	numSpotClientGateway, err := core.ReadClientGateway(ctx, r.provider, clientGatewayID)
 	if err != nil {
-		response.Diagnostics.AddError("", err.Error())
+		response.Diagnostics.AddError("unable to read client gateway", err.Error())
 		return
 	}
 
-	state = serializeClientGateway(ctx, numSpotClientGateway, &response.Diagnostics)
+	newState := serializeClientGateway(ctx, numSpotClientGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
 func (r *ClientGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
@@ -130,17 +130,17 @@ func (r *ClientGatewayResource) Update(ctx context.Context, request resource.Upd
 	if !state.Tags.Equal(plan.Tags) {
 		numSpotClientGateway, err = core.UpdateClientGatewayTags(ctx, r.provider, stateTags, planTags, clientGatewayID)
 		if err != nil {
-			response.Diagnostics.AddError("", err.Error())
+			response.Diagnostics.AddError("unable to update client gateway", err.Error())
 			return
 		}
 	}
 
-	state = serializeClientGateway(ctx, numSpotClientGateway, &response.Diagnostics)
+	newState := serializeClientGateway(ctx, numSpotClientGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
 func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
@@ -155,7 +155,7 @@ func (r *ClientGatewayResource) Delete(ctx context.Context, request resource.Del
 
 	err := core.DeleteClientGateway(ctx, r.provider, clientGatewayID)
 	if err != nil {
-		response.Diagnostics.AddError("", err.Error())
+		response.Diagnostics.AddError("unable to delete client gateway", err.Error())
 		return
 	}
 }

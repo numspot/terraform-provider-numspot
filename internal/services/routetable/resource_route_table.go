@@ -63,21 +63,23 @@ func (r *RouteTableResource) Schema(ctx context.Context, request resource.Schema
 
 func (r *RouteTableResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan RouteTableModel
+
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
-	payload := deserializeCreateRouteTable(&plan)
-	tagsList := tags.TfTagsToApiTags(ctx, plan.Tags)
-	routes := deserializeRoutes(ctx, plan.Routes)
-	res, err := core.CreateRouteTable(ctx, r.provider, payload, tagsList, routes, plan.SubnetId.ValueStringPointer())
-	if err != nil {
-		response.Diagnostics.AddError("failed to create route table", err.Error())
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tf := serializeRouteTable(
-		ctx,
-		res,
-		&response.Diagnostics,
-	)
+	payload := deserializeCreateRouteTable(&plan)
+	tagsList := tags.TfTagsToApiTags(ctx, plan.Tags)
+	routes := deserializeRoutes(ctx, plan.Routes)
+
+	res, err := core.CreateRouteTable(ctx, r.provider, payload, tagsList, routes, plan.SubnetId.ValueStringPointer())
+	if err != nil {
+		response.Diagnostics.AddError("unable to create route table", err.Error())
+		return
+	}
+
+	tf := serializeRouteTable(ctx, res, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -86,12 +88,16 @@ func (r *RouteTableResource) Create(ctx context.Context, request resource.Create
 }
 
 func (r *RouteTableResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var data RouteTableModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state RouteTableModel
 
-	res, err := core.ReadRouteTable(ctx, r.provider, data.Id.ValueString())
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	res, err := core.ReadRouteTable(ctx, r.provider, state.Id.ValueString())
 	if err != nil {
-		response.Diagnostics.AddError("failed to read Route Table", err.Error())
+		response.Diagnostics.AddError("unable to read route table", err.Error())
 		return
 	}
 
@@ -129,7 +135,7 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 	if !state.Tags.Equal(plan.Tags) {
 		routeTable, err = core.UpdateRouteTableTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags)
 		if err != nil {
-			response.Diagnostics.AddError("failed to update route table tags", err.Error())
+			response.Diagnostics.AddError("unable to update route table tags", err.Error())
 			return
 		}
 	}
@@ -139,22 +145,16 @@ func (r *RouteTableResource) Update(ctx context.Context, request resource.Update
 	if !state.Routes.Equal(plan.Routes) {
 		routeTable, err = core.UpdateRouteTableRoutes(ctx, r.provider, state.Id.ValueString(), stRoutes, plRoutes)
 		if err != nil {
-			response.Diagnostics.AddError("failed to update route table routes", err.Error())
+			response.Diagnostics.AddError("unable to update route table routes", err.Error())
 			return
 		}
 	}
-	if routeTable != nil {
-		tf := serializeRouteTable(
-			ctx,
-			routeTable,
-			&response.Diagnostics,
-		)
-		if response.Diagnostics.HasError() {
-			return
-		}
-		response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 
+	tf := serializeRouteTable(ctx, routeTable, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
 	}
+	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
 func (r *RouteTableResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
@@ -165,7 +165,7 @@ func (r *RouteTableResource) Delete(ctx context.Context, request resource.Delete
 		return link.Id.ValueString()
 	}, ctx, data.LinkRouteTables, &response.Diagnostics)
 	if err := core.DeleteRouteTable(ctx, r.provider, data.Id.ValueString(), links); err != nil {
-		response.Diagnostics.AddError("failed to delete route table", err.Error())
+		response.Diagnostics.AddError("unable to delete route table", err.Error())
 	}
 }
 

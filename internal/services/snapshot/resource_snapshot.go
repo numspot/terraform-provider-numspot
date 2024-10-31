@@ -75,7 +75,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 
 	snapshot, err := core.CreateSnapshot(ctx, r.provider, tagsValue, body)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Nat Gateway", err.Error())
+		response.Diagnostics.AddError("unable to create snapshot", err.Error())
 		return
 	}
 
@@ -99,7 +99,7 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 
 	snapshot, err := core.ReadSnapshot(ctx, r.provider, snapshotID)
 	if err != nil {
-		response.Diagnostics.AddError("error while reading snapshot", err.Error())
+		response.Diagnostics.AddError("unable to read snapshot", err.Error())
 		return
 	}
 
@@ -129,7 +129,7 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 	if !state.Tags.Equal(plan.Tags) {
 		numspotSnapshot, err = core.UpdateSnapshotTags(ctx, r.provider, stateTags, planTags, snapshotID)
 		if err != nil {
-			response.Diagnostics.AddError("error while updating tags", err.Error())
+			response.Diagnostics.AddError("unable to update snapshot tags", err.Error())
 			return
 		}
 	}
@@ -152,7 +152,7 @@ func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRe
 	snapshotID := state.Id.ValueString()
 	err := core.DeleteSnapshot(ctx, r.provider, snapshotID)
 	if err != nil {
-		response.Diagnostics.AddError("error while deleting snapshot", err.Error())
+		response.Diagnostics.AddError("unable to delete snapshot", err.Error())
 		return
 	}
 }

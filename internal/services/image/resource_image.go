@@ -80,7 +80,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 		return
 	}
 
-	state := serializeNumSpotImage(ctx, plan, *numSpotImage, &response.Diagnostics)
+	state := serializeNumSpotImage(ctx, plan, numSpotImage, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -104,7 +104,7 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 		return
 	}
 
-	newState := serializeNumSpotImage(ctx, state, *numSpotImage, &response.Diagnostics)
+	newState := serializeNumSpotImage(ctx, state, numSpotImage, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -139,12 +139,12 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 	if !state.Access.Equal(plan.Access) {
 		numSpotImage, err = core.UpdateImageAccess(ctx, r.provider, imageID, *deserializeAccess(plan.Access))
 		if err != nil {
-			response.Diagnostics.AddError("unable to update image tags", err.Error())
+			response.Diagnostics.AddError("unable to update image access", err.Error())
 			return
 		}
 	}
 
-	newState := serializeNumSpotImage(ctx, state, *numSpotImage, &response.Diagnostics)
+	newState := serializeNumSpotImage(ctx, state, numSpotImage, &response.Diagnostics)
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
@@ -156,7 +156,7 @@ func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteReque
 	}
 
 	if err := core.DeleteImage(ctx, r.provider, state.Id.ValueString()); err != nil {
-		response.Diagnostics.AddError("failed to delete image", err.Error())
+		response.Diagnostics.AddError("unable to delete image", err.Error())
 		return
 	}
 }
@@ -175,7 +175,7 @@ func deserializeCreateNumSpotImage(tf ImageModel, diag *diag.Diagnostics) *numsp
 	for _, bdmTf := range tf.BlockDeviceMappings.Elements() {
 		bdmTfRes, ok := bdmTf.(BlockDeviceMappingsValue)
 		if !ok {
-			diag.AddError("Failed to cast block device mapping resource", "")
+			diag.AddError("unable to cast block device mapping resource", "")
 			return nil
 		}
 
@@ -187,7 +187,7 @@ func deserializeCreateNumSpotImage(tf ImageModel, diag *diag.Diagnostics) *numsp
 	for _, pcTf := range tf.ProductCodes.Elements() {
 		pcTfStr, ok := pcTf.(types.String)
 		if !ok {
-			diag.AddError("Failed to cast product code to string", "")
+			diag.AddError("unable to cast product code to string", "")
 			return nil
 		}
 		if pcTfStr.IsUnknown() || pcTfStr.IsNull() {
@@ -240,7 +240,7 @@ func deserializeBsuFromTf(bsu BsuValue) *numspot.BsuToCreate {
 	}
 }
 
-func serializeNumSpotImage(ctx context.Context, plan ImageModel, image numspot.Image, diags *diag.Diagnostics) *ImageModel {
+func serializeNumSpotImage(ctx context.Context, plan ImageModel, image *numspot.Image, diags *diag.Diagnostics) *ImageModel {
 	var (
 		creationDateTf        types.String
 		blockDeviceMappingsTf types.List

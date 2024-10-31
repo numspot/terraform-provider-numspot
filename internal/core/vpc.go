@@ -77,7 +77,7 @@ func RetryReadVPC(ctx context.Context, provider *client.NumSpotSDK, op string, v
 	}
 	numSpotVPC, assert := read.(*numspot.Vpc)
 	if !assert {
-		return nil, fmt.Errorf("invalid vpc assertion %s: %s", vpcID, op)
+		return nil, fmt.Errorf("invalid vpc assertion %s", vpcID)
 	}
 	return numSpotVPC, err
 }

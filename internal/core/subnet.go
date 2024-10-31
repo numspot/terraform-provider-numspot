@@ -38,7 +38,7 @@ func CreateSubnet(ctx context.Context, provider *client.NumSpotSDK, payload nums
 
 	if len(tags) > 0 {
 		if err = createTags(ctx, provider, subnetID, tags); err != nil {
-			return nil, fmt.Errorf("failed to update tags: %w", err)
+			return nil, err
 		}
 	}
 
