@@ -45,7 +45,7 @@ func VirtualGatewayResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The ID of the Vpc to which the virtual gateway is attached.",
 				MarkdownDescription: "The ID of the Vpc to which the virtual gateway is attached.",
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // MANUALLY EDITED : Adds RequireReplace
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
 				},
 			},
 			"vpc_to_virtual_gateway_links": schema.ListNestedAttribute{
