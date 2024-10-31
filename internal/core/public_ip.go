@@ -110,7 +110,6 @@ func DeletePublicIp(ctx context.Context, provider *client.NumSpotSDK, publicIpID
 		if _, err = utils.RetryDeleteUntilWithBody(ctx, spaceID, publicIpID, numspot.UnlinkPublicIpJSONRequestBody{LinkPublicIpId: &linkPublicIpID}, numspotClient.UnlinkPublicIpWithResponse); err != nil {
 			return err
 		}
-		//_ = unlinkPublicIP(ctx, provider, linkPublicIpID) // Try to delete publicIp even if unlink failed
 	}
 
 	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, publicIpID, numspotClient.DeletePublicIpWithResponse)
