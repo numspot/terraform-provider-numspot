@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -79,7 +80,6 @@ func RetryReadVPC(ctx context.Context, provider *client.NumSpotSDK, op string, v
 		return nil, fmt.Errorf("invalid vpc assertion %s: %s", vpcID, op)
 	}
 	return numSpotVPC, err
-
 }
 
 func UpdateVPCTags(ctx context.Context, provider *client.NumSpotSDK, volumeID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Vpc, error) {

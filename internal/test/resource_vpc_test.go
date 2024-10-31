@@ -30,11 +30,11 @@ resource "numspot_dhcp_options" "terraform-dep-dhcp-options-vpc" {
 			{
 				Config: `
 resource "numspot_vpc" "terraform-vpc-acctest" {
-  ip_range            = "10.101.0.0/16"
+  ip_range = "10.101.0.0/16"
   tags = [{
-      key   = "name"
-      value = "terraform-vpc-acctest"
-    }]
+    key   = "name"
+    value = "terraform-vpc-acctest"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "ip_range", "10.101.0.0/16"),
@@ -56,11 +56,11 @@ resource "numspot_vpc" "terraform-vpc-acctest" {
 			{
 				Config: `
 resource "numspot_vpc" "terraform-vpc-acctest" {
-  ip_range            = "10.101.0.0/16"
+  ip_range = "10.101.0.0/16"
   tags = [{
-      key   = "name"
-      value = "terraform-vpc-acctest-update"
-    }]
+    key   = "name"
+    value = "terraform-vpc-acctest-update"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "ip_range", "10.101.0.0/16"),
@@ -79,9 +79,9 @@ resource "numspot_vpc" "terraform-vpc-acctest" {
   dhcp_options_set_id = numspot_dhcp_options.terraform-dep-dhcp-options-vpc.id
   tenancy             = "dedicated"
   tags = [{
-      key   = "name"
-      value = "terraform-vpc-acctest-replace"
-    }]
+    key   = "name"
+    value = "terraform-vpc-acctest-replace"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "ip_range", "10.102.0.0/16"),
@@ -107,9 +107,9 @@ resource "numspot_vpc" "terraform-vpc-acctest" {
   dhcp_options_set_id = numspot_dhcp_options.terraform-dep-dhcp-options-vpc.id
   tenancy             = "dedicated"
   tags = [{
-      key   = "name"
-      value = "terraform-vpc-acctest"
-    }]
+    key   = "name"
+    value = "terraform-vpc-acctest"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "ip_range", "10.101.0.0/16"),
@@ -130,9 +130,9 @@ resource "numspot_vpc" "terraform-vpc-acctest-recreate" {
   dhcp_options_set_id = numspot_dhcp_options.terraform-dep-dhcp-options-vpc.id
   tenancy             = "dedicated"
   tags = [{
-      key   = "name"
-      value = "terraform-vpc-acctest-recreate"
-    }]
+    key   = "name"
+    value = "terraform-vpc-acctest-recreate"
+  }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest-recreate", "ip_range", "10.101.0.0/16"),
