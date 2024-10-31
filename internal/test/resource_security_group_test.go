@@ -17,6 +17,8 @@ func TestAccSecurityGroupResource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
+	var resourceId string
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
@@ -103,6 +105,9 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+						return acctest.InitResourceId(t, v, &resourceId)
+					}),
 				),
 			},
 			// 2 - Import
@@ -164,6 +169,9 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "20",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
+					}),
 				),
 			},
 			// 4 - Update testing Without Replace (if needed)
@@ -238,6 +246,9 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "70",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
+					}),
 				),
 			},
 			// 5 - Update testing With Replace
@@ -323,6 +334,9 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
+					}),
 				),
 			},
 			// <== If resource has required dependencies ==>
@@ -410,6 +424,9 @@ resource "numspot_security_group" "test" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test", "vpc_id", "numspot_vpc.test_new", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test", "id", func(v string) error {
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
+					}),
 				),
 			},
 			// 7- recreate testing
@@ -495,6 +512,9 @@ resource "numspot_security_group" "test_recreate" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test_recreate", "id", func(v string) error {
+						return acctest.CheckResourceIdChanged(t, v, &resourceId)
+					}),
 				),
 			},
 			// 8- reset rules
@@ -528,6 +548,9 @@ resource "numspot_security_group" "test_recreate" {
 					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "inbound_rules.#", "0"),
 					resource.TestCheckResourceAttr("numspot_security_group.test_recreate", "outbound_rules.#", "0"),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test_recreate", "id", func(v string) error {
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
+					}),
 				),
 			},
 			// 9- Add rules
@@ -613,6 +636,9 @@ resource "numspot_security_group" "test_recreate" {
 						"to_port_range":   "90",
 					}),
 					resource.TestCheckResourceAttrPair("numspot_security_group.test_recreate", "vpc_id", "numspot_vpc.test_recreate", "id"),
+					resource.TestCheckResourceAttrWith("numspot_security_group.test_recreate", "id", func(v string) error {
+						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
+					}),
 				),
 			},
 		},

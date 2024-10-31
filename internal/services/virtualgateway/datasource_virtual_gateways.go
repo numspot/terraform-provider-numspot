@@ -6,10 +6,12 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -80,7 +82,7 @@ func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource
 		return
 	}
 
-	params := VirtualGatewaysFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializeVirtualGatewayParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -95,7 +97,7 @@ func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource
 		response.Diagnostics.AddError("HTTP call failed", "got empty Virtual Gateways list")
 	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VirtualGatewayDataSourceFromHttpToTf, &response.Diagnostics)
+	objectItems := serializeVirtualGatewayDatasource(ctx, res.JSON200.Items, &response.Diagnostics)
 
 	if response.Diagnostics.HasError() {
 		return
@@ -105,4 +107,45 @@ func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func serializeVirtualGatewayDatasource(ctx context.Context, virtualGateways *[]numspot.VirtualGateway, diags *diag.Diagnostics) []VirtualGatewayModelItemDataSource {
+	return utils.FromHttpGenericListToTfList(ctx, virtualGateways, func(ctx context.Context, http *numspot.VirtualGateway, diags *diag.Diagnostics) *VirtualGatewayModelItemDataSource {
+		var tagsTf, vpcToVirtualGatewayLinksTf types.List
+
+		if http.Tags != nil {
+			tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+			if diags.HasError() {
+				return nil
+			}
+		}
+
+		if http.VpcToVirtualGatewayLinks != nil {
+			vpcToVirtualGatewayLinksTf = utils.GenericListToTfListValue(ctx, serializeVpcToVirtualGatewayLinks, *http.VpcToVirtualGatewayLinks, diags)
+			if diags.HasError() {
+				return nil
+			}
+		}
+
+		return &VirtualGatewayModelItemDataSource{
+			ConnectionType:           types.StringPointerValue(http.ConnectionType),
+			Id:                       types.StringPointerValue(http.Id),
+			VpcToVirtualGatewayLinks: vpcToVirtualGatewayLinksTf,
+			State:                    types.StringPointerValue(http.State),
+			Tags:                     tagsTf,
+		}
+	}, diags)
+}
+
+func deserializeVirtualGatewayParams(ctx context.Context, tf VirtualGatewaysDataSourceModel, diags *diag.Diagnostics) numspot.ReadVirtualGatewaysParams {
+	return numspot.ReadVirtualGatewaysParams{
+		States:          utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:            utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:             utils.TfStringListToStringPtrList(ctx, tf.IDs, diags),
+		ConnectionTypes: utils.TfStringListToStringPtrList(ctx, tf.ConnectionTypes, diags),
+		LinkStates:      utils.TfStringListToStringPtrList(ctx, tf.LinkStates, diags),
+		LinkVpcIds:      utils.TfStringListToStringPtrList(ctx, tf.LinkVpcIds, diags),
+	}
 }
