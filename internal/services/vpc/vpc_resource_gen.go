@@ -49,6 +49,9 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The tenancy options for the VMs:<br />\n- `default` if a VM created in a Vpc can be launched with any tenancy.<br />\n- `dedicated` if it can be launched with dedicated tenancy VMs running on single-tenant hardware.<br />\n- `dedicated group ID`: if it can be launched in a dedicated group on single-tenant hardware.",
 				MarkdownDescription: "The tenancy options for the VMs:<br />\n- `default` if a VM created in a Vpc can be launched with any tenancy.<br />\n- `dedicated` if it can be launched with dedicated tenancy VMs running on single-tenant hardware.<br />\n- `dedicated group ID`: if it can be launched in a dedicated group on single-tenant hardware.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(), // MANUALLY EDITED : Adds RequireReplace
+				},
 			},
 			// MANUALLY EDITED : spaceId removed
 		},

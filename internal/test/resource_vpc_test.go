@@ -17,147 +17,132 @@ func TestAccVpcResource(t *testing.T) {
 	}()
 	pr := acct.TestProvider
 
-	var resourceId string
+	vpcReplaceDependcies := `
+resource "numspot_dhcp_options" "terraform-dep-dhcp-options-vpc" {
+  domain_name = "domain name"
+}
+`
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: pr,
 		Steps: []resource.TestStep{
-			{ // 1 - Create testing
+			// Step 1 - Create VPC
+			{
 				Config: `
-resource "numspot_dhcp_options" "test" {
-  domain_name = "domain"
-}
-
-resource "numspot_vpc" "test" {
+resource "numspot_vpc" "terraform-vpc-acctest" {
   ip_range            = "10.101.0.0/16"
-  dhcp_options_set_id = numspot_dhcp_options.test.id
-  tenancy             = "default"
-  tags = [
-    {
+  tags = [{
       key   = "name"
-      value = "Terraform-Test-Volume"
-    }
-  ]
+      value = "terraform-vpc-acctest"
+    }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpc.test", "ip_range", "10.101.0.0/16"),
-					resource.TestCheckResourceAttr("numspot_vpc.test", "tenancy", "default"),
-					resource.TestCheckResourceAttr("numspot_vpc.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_vpc.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "ip_range", "10.101.0.0/16"),
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_vpc.terraform-vpc-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Volume",
-					}),
-					resource.TestCheckResourceAttrPair("numspot_vpc.test", "dhcp_options_set_id", "numspot_dhcp_options.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
-						return acctest.InitResourceId(t, v, &resourceId)
+						"value": "terraform-vpc-acctest",
 					}),
 				),
 			},
-			// 2 - ImportState testing
+			// Step 2 - Import
 			{
-				ResourceName:            "numspot_vpc.test",
+				ResourceName:            "numspot_vpc.terraform-vpc-acctest",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"id"},
 			},
-			// 3 - Update testing Without Replace
+			// Step 3 - Update VPC
 			{
 				Config: `
-resource "numspot_dhcp_options" "test" {
-  domain_name = "domain"
-}
-
-resource "numspot_vpc" "test" {
+resource "numspot_vpc" "terraform-vpc-acctest" {
   ip_range            = "10.101.0.0/16"
-  dhcp_options_set_id = numspot_dhcp_options.test.id
-  tenancy             = "default"
-  tags = [
-    {
+  tags = [{
       key   = "name"
-      value = "Terraform-Test-Volume-Updated"
-    }
-  ]
+      value = "terraform-vpc-acctest-update"
+    }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpc.test", "ip_range", "10.101.0.0/16"),
-					resource.TestCheckResourceAttr("numspot_vpc.test", "tenancy", "default"),
-					resource.TestCheckResourceAttr("numspot_vpc.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_vpc.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "ip_range", "10.101.0.0/16"),
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_vpc.terraform-vpc-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Volume-Updated",
-					}),
-					resource.TestCheckResourceAttrPair("numspot_vpc.test", "dhcp_options_set_id", "numspot_dhcp_options.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
-						return acctest.CheckResourceIdUnchanged(t, v, &resourceId)
+						"value": "terraform-vpc-acctest-update",
 					}),
 				),
 			},
-			// 4 - Update testing With Replace
+			// Step 4 - Replace VPC
 			{
-				Config: `
-resource "numspot_dhcp_options" "test" {
-  domain_name = "domain"
-}
-
-resource "numspot_vpc" "test" {
+				Config: vpcReplaceDependcies + `
+resource "numspot_vpc" "terraform-vpc-acctest" {
   ip_range            = "10.102.0.0/16"
-  dhcp_options_set_id = numspot_dhcp_options.test.id
+  dhcp_options_set_id = numspot_dhcp_options.terraform-dep-dhcp-options-vpc.id
   tenancy             = "dedicated"
-  tags = [
-    {
+  tags = [{
       key   = "name"
-      value = "Terraform-Test-Volume-Updated"
-    }
-  ]
+      value = "terraform-vpc-acctest-replace"
+    }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpc.test", "ip_range", "10.102.0.0/16"),
-					resource.TestCheckResourceAttr("numspot_vpc.test", "tenancy", "dedicated"),
-					resource.TestCheckResourceAttr("numspot_vpc.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_vpc.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "ip_range", "10.102.0.0/16"),
+					resource.TestCheckResourceAttrPair("numspot_vpc.terraform-vpc-acctest", "dhcp_options_set_id", "numspot_dhcp_options.terraform-dep-dhcp-options-vpc", "id"),
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "tenancy", "dedicated"),
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_vpc.terraform-vpc-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Volume-Updated",
-					}),
-					resource.TestCheckResourceAttrPair("numspot_vpc.test", "dhcp_options_set_id", "numspot_dhcp_options.test", "id"),
-					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
+						"value": "terraform-vpc-acctest-replace",
 					}),
 				),
 			},
-
-			// <== If resource has required dependencies ==>
-			// 5 - Update testing With Replace of dependency resource and with Replace of the resource (if needed)
-			// This test is useful to check wether or not the deletion of the dependencies and then the deletion of the main resource works properly
+			// Step 5 - Reset
 			{
-				Config: `
-resource "numspot_dhcp_options" "test_new" {
-  domain_name = "domain"
-}
-
-resource "numspot_vpc" "test" {
-  ip_range            = "10.102.0.0/16"
-  dhcp_options_set_id = numspot_dhcp_options.test_new.id
+				Config: vpcReplaceDependcies + ` `,
+				Check:  resource.ComposeAggregateTestCheckFunc(),
+			},
+			// Step 6 - Create with attributes
+			{
+				Config: vpcReplaceDependcies + `
+resource "numspot_vpc" "terraform-vpc-acctest" {
+  ip_range            = "10.101.0.0/16"
+  dhcp_options_set_id = numspot_dhcp_options.terraform-dep-dhcp-options-vpc.id
   tenancy             = "dedicated"
-  tags = [
-    {
+  tags = [{
       key   = "name"
-      value = "Terraform-Test-Volume-Updated"
-    }
-  ]
+      value = "terraform-vpc-acctest"
+    }]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_vpc.test", "ip_range", "10.102.0.0/16"),
-					resource.TestCheckResourceAttr("numspot_vpc.test", "tenancy", "dedicated"),
-					resource.TestCheckResourceAttr("numspot_vpc.test", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_vpc.test", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "ip_range", "10.101.0.0/16"),
+					resource.TestCheckResourceAttrPair("numspot_vpc.terraform-vpc-acctest", "dhcp_options_set_id", "numspot_dhcp_options.terraform-dep-dhcp-options-vpc", "id"),
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "tenancy", "dedicated"),
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_vpc.terraform-vpc-acctest", "tags.*", map[string]string{
 						"key":   "name",
-						"value": "Terraform-Test-Volume-Updated",
-					}),
-					resource.TestCheckResourceAttrPair("numspot_vpc.test", "dhcp_options_set_id", "numspot_dhcp_options.test_new", "id"),
-					resource.TestCheckResourceAttrWith("numspot_vpc.test", "id", func(v string) error {
-						return acctest.CheckResourceIdChanged(t, v, &resourceId)
+						"value": "terraform-vpc-acctest",
 					}),
 				),
+			},
+			// Step 7 - Recreate VPC
+			{
+				Config: vpcReplaceDependcies + `
+resource "numspot_vpc" "terraform-vpc-acctest-recreate" {
+  ip_range            = "10.101.0.0/16"
+  dhcp_options_set_id = numspot_dhcp_options.terraform-dep-dhcp-options-vpc.id
+  tenancy             = "dedicated"
+  tags = [{
+      key   = "name"
+      value = "terraform-vpc-acctest-recreate"
+    }]
+}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest-recreate", "ip_range", "10.101.0.0/16"),
+					resource.TestCheckResourceAttrPair("numspot_vpc.terraform-vpc-acctest-recreate", "dhcp_options_set_id", "numspot_dhcp_options.terraform-dep-dhcp-options-vpc", "id"),
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest-recreate", "tenancy", "dedicated"),
+					resource.TestCheckResourceAttr("numspot_vpc.terraform-vpc-acctest-recreate", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_vpc.terraform-vpc-acctest-recreate", "tags.*", map[string]string{
+						"key":   "name",
+						"value": "terraform-vpc-acctest-recreate",
+					})),
 			},
 		},
 	})
