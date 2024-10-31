@@ -84,7 +84,7 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 
 	numSpotDHCPOptions, err := core.CreateDHCPOptions(ctx, r.provider, deserializeDHCPOption(ctx, plan), tagsValue)
 	if err != nil {
-		response.Diagnostics.AddError("unable to create DHCP options", err.Error())
+		response.Diagnostics.AddError("unable to create dhcp options", err.Error())
 		return
 	}
 
@@ -107,7 +107,7 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 
 	dhcpOptions, err := core.ReadDHCPOption(ctx, r.provider, dhcpOptionsID)
 	if err != nil {
-		response.Diagnostics.AddError("unable to read DHCP option", err.Error())
+		response.Diagnostics.AddError("unable to read dhcp options", err.Error())
 		return
 	}
 
@@ -143,7 +143,7 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 	if !plan.Tags.Equal(state.Tags) {
 		numSpotDHCPOptions, err = core.UpdateDHCPOptionsTags(ctx, r.provider, dhcpOptionsID, stateTags, planTags)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update DHCP options tags", err.Error())
+			response.Diagnostics.AddError("unable to update dhcp options tags", err.Error())
 			return
 		}
 	}
@@ -166,7 +166,7 @@ func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.Delet
 	dhcpOptionsID := state.Id.ValueString()
 
 	if err := core.DeleteDHCPOptions(ctx, r.provider, dhcpOptionsID); err != nil {
-		response.Diagnostics.AddError("unable to delete DHCP Options", err.Error())
+		response.Diagnostics.AddError("unable to delete dhcp options", err.Error())
 		return
 	}
 }

@@ -88,7 +88,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 
 	keypairID := state.Id.ValueString()
 
-	numSpotKeypair, err := core.ReadKeypairsWithID(ctx, r.provider, keypairID)
+	numSpotKeypair, err := core.ReadKeypairs(ctx, r.provider, keypairID)
 	if err != nil {
 		response.Diagnostics.AddError("unable to read keypair", err.Error())
 		return
@@ -96,10 +96,10 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 
 	newState := serializeNumSpotKeypair(numSpotKeypair)
 
-	if !utils.IsTfValueNull(state.PublicKey) {
+	if state.PublicKey.ValueString() != "" {
 		newState.PublicKey = state.PublicKey
 	}
-	if !utils.IsTfValueNull(state.PrivateKey) {
+	if state.PrivateKey.ValueString() != "" {
 		newState.PrivateKey = state.PrivateKey
 	}
 
@@ -107,7 +107,6 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 }
 
 func (r *KeyPairResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	panic("no update for keypairs")
 }
 
 func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
@@ -117,7 +116,7 @@ func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteReq
 		return
 	}
 	if err := core.DeleteKeypair(ctx, r.provider, state.Id.ValueString()); err != nil {
-		response.Diagnostics.AddError("failed to delete keypair", err.Error())
+		response.Diagnostics.AddError("unable to delete keypair", err.Error())
 		return
 	}
 }

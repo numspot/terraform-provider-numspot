@@ -148,7 +148,7 @@ func (r *InternetGatewayResource) Delete(ctx context.Context, request resource.D
 	}
 
 	if err := core.DeleteInternetGateway(ctx, r.provider, state.Id.ValueString(), state.VpcId.ValueString()); err != nil {
-		response.Diagnostics.AddError("failed to delete internet gateway", err.Error())
+		response.Diagnostics.AddError("unable to delete internet gateway", err.Error())
 		return
 	}
 }

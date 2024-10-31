@@ -186,8 +186,8 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 			response.Diagnostics.AddError("unable to update load balancer security groups", err.Error())
 			return
 		}
-
 	}
+
 	if !plan.BackendVmIds.Equal(state.BackendVmIds) || !plan.BackendIps.Equal(state.BackendIps) {
 		numSpotLoadBalancer, err = core.UpdateLoadBalancerBackend(ctx, r.provider, loadBalancerName, stateBackendVM, planBackendVM, stateBackendIP, planBackendIP)
 		if err != nil {

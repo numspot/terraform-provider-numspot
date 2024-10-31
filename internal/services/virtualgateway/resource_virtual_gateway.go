@@ -72,7 +72,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 	vpcId := plan.VpcId.ValueString()
 	virtualGateway, err := core.CreateVirtualGateway(ctx, r.provider, deserializeCreateVirtualGateway(plan), vpcId, tagsValue)
 	if err != nil {
-		response.Diagnostics.AddError("Failed to create Virtual Gateway", err.Error())
+		response.Diagnostics.AddError("unable to create virtual gateway", err.Error())
 		return
 	}
 
@@ -95,7 +95,7 @@ func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.Read
 
 	numSpotVirtualGateway, err := core.ReadVirtualGateway(ctx, r.provider, virtualGatewayID)
 	if err != nil {
-		response.Diagnostics.AddError("", err.Error())
+		response.Diagnostics.AddError("unable to read virtual gateway", err.Error())
 		return
 	}
 
@@ -127,7 +127,7 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 	if !state.Tags.Equal(plan.Tags) {
 		numSpotVirtualGateway, err = core.UpdateVirtualGatewayTags(ctx, r.provider, stateTags, planTags, clientGatewayID)
 		if err != nil {
-			response.Diagnostics.AddError("", err.Error())
+			response.Diagnostics.AddError("unable to update virtual gateway tags", err.Error())
 			return
 		}
 	}
@@ -153,7 +153,7 @@ func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.De
 
 	err := core.DeleteVirtualGateway(ctx, r.provider, virtualGatewayID, vpcId)
 	if err != nil {
-		response.Diagnostics.AddError("failed to delete virtual gateway", err.Error())
+		response.Diagnostics.AddError("unable to delete virtual gateway", err.Error())
 		return
 	}
 }

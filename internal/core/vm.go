@@ -140,7 +140,7 @@ func RetryReadVM(ctx context.Context, provider *client.NumSpotSDK, op string, vm
 
 	numSpotVM, assert := read.(*numspot.Vm)
 	if !assert {
-		return nil, fmt.Errorf("invalid VM assertion %s: %s", vmID, op)
+		return nil, fmt.Errorf("invalid vm assertion %s: %s", vmID, op)
 	}
 	return numSpotVM, err
 }

@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
@@ -42,7 +41,7 @@ func DeleteKeypair(ctx context.Context, provider *client.NumSpotSDK, keypairID s
 	return nil
 }
 
-func ReadKeypairsWithID(ctx context.Context, provider *client.NumSpotSDK, keypairID string) (numSpotKeypair *numspot.Keypair, err error) {
+func ReadKeypairs(ctx context.Context, provider *client.NumSpotSDK, keypairID string) (*numspot.Keypair, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -55,11 +54,7 @@ func ReadKeypairsWithID(ctx context.Context, provider *client.NumSpotSDK, keypai
 		return nil, err
 	}
 
-	keypair := (*numspot.Keypair)(numSpotReadKeypair.JSON200)
-	if keypair == nil {
-		return nil, fmt.Errorf("Failed to cast read response to keypair object.")
-	}
-	return keypair, nil
+	return (*numspot.Keypair)(numSpotReadKeypair.JSON200), nil
 }
 
 func ReadKeypairsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadKeypairsParams) (numSpotKeypair *[]numspot.Keypair, err error) {
@@ -73,9 +68,6 @@ func ReadKeypairsWithParams(ctx context.Context, provider *client.NumSpotSDK, pa
 	}
 	if err = utils.ParseHTTPError(numSpotReadKeypair.Body, numSpotReadKeypair.StatusCode()); err != nil {
 		return nil, err
-	}
-	if numSpotReadKeypair.JSON200.Items == nil {
-		return nil, fmt.Errorf("HTTP call failed : expected a list of keypair but got nil")
 	}
 
 	return numSpotReadKeypair.JSON200.Items, err

@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
@@ -112,9 +111,6 @@ func ReadInternetGatewaysWithParams(ctx context.Context, provider *client.NumSpo
 	}
 	if err = utils.ParseHTTPError(numSpotReadInternetGateway.Body, numSpotReadInternetGateway.StatusCode()); err != nil {
 		return nil, err
-	}
-	if numSpotReadInternetGateway.JSON200.Items == nil {
-		return nil, fmt.Errorf("HTTP call failed : expected a list of internetGateway but got nil")
 	}
 
 	return numSpotReadInternetGateway.JSON200.Items, err

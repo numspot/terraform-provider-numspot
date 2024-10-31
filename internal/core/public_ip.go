@@ -51,10 +51,6 @@ func linkPublicIP(ctx context.Context, provider *client.NumSpotSDK, publicIpId, 
 		return nil, err
 	}
 
-	//if vmId != "" && nicId != "" {
-	//	return nil, fmt.Errorf("cannot link publicIp to both NIC and VM. You must specify only one")
-	//}
-
 	if vmId != "" {
 		payload = numspot.LinkPublicIpJSONRequestBody{VmId: &vmId}
 	} else {

@@ -157,7 +157,7 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 		}
 		numspotNic, err = core.UpdateNicAttributes(ctx, r.provider, body, nicId)
 		if err != nil {
-			response.Diagnostics.AddError("unable to update nic link", err.Error())
+			response.Diagnostics.AddError("unable to update nic attributes", err.Error())
 			return
 		}
 	}
@@ -178,7 +178,7 @@ func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest
 	}
 
 	if err := core.DeleteNic(ctx, r.provider, state.Id.ValueString(), deserializeUnlinkNic(state.LinkNic)); err != nil {
-		response.Diagnostics.AddError("Failed to delete Nic", err.Error())
+		response.Diagnostics.AddError("unable to delete Nic", err.Error())
 		return
 	}
 }
