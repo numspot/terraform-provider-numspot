@@ -3,13 +3,17 @@ package vpcpeering
 import (
 	"context"
 	"fmt"
-	"net/http"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -77,28 +81,17 @@ func (d *vpcPeeringsDataSource) Read(ctx context.Context, request datasource.Rea
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	params := VpcPeeringsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializeVpcPeeringDatasource(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
-	res := utils.ExecuteRequest(func() (*numspot.ReadVpcPeeringsResponse, error) {
-		return numspotClient.ReadVpcPeeringsWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	vpcPeerings, err := core.ReadVPCPeerings(ctx, d.provider, params)
+	if err != nil {
+		response.Diagnostics.AddError("failed to read VPC peerings", err.Error())
 		return
 	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty VPC Peering list")
-	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VpcPeeringsFromHttpToTfDatasource, &response.Diagnostics)
+	objectItems := serializeVpcPeeringDatasource(ctx, vpcPeerings, &response.Diagnostics)
 
 	if response.Diagnostics.HasError() {
 		return
@@ -108,4 +101,90 @@ func (d *vpcPeeringsDataSource) Read(ctx context.Context, request datasource.Rea
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func serializeVpcPeeringDatasource(ctx context.Context, vpcPeerings *[]numspot.VpcPeering, diags *diag.Diagnostics) []VpcPeeringDatasourceItemModel {
+	serializeVPCPeeringDatasourceItem := func(
+		ctx context.Context,
+		http *numspot.VpcPeering,
+		diags *diag.Diagnostics,
+	) *VpcPeeringDatasourceItemModel {
+		var (
+			tagsList         types.List
+			accepterVpc      AccepterVpcValue
+			sourceVpc        SourceVpcValue
+			state            StateValue
+			expirationDateTf types.String
+		)
+
+		if http.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+			if diags.HasError() {
+				return nil
+			}
+		}
+
+		if http.ExpirationDate != nil {
+			expirationDate := *http.ExpirationDate
+			expirationDateTf = types.StringValue(expirationDate.Format(time.RFC3339))
+		}
+
+		if http.AccepterVpc != nil {
+			var diagnostics diag.Diagnostics
+			accepterVpc, diagnostics = NewAccepterVpcValue(AccepterVpcValue{}.AttributeTypes(ctx),
+				map[string]attr.Value{
+					"ip_range": types.StringPointerValue(http.AccepterVpc.IpRange),
+					"vpc_id":   types.StringPointerValue(http.AccepterVpc.VpcId),
+				})
+			diags.Append(diagnostics...)
+		}
+
+		if http.SourceVpc != nil {
+			var diagnostics diag.Diagnostics
+			sourceVpc, diagnostics = NewSourceVpcValue(SourceVpcValue{}.AttributeTypes(ctx),
+				map[string]attr.Value{
+					"ip_range": types.StringPointerValue(http.SourceVpc.IpRange),
+					"vpc_id":   types.StringPointerValue(http.SourceVpc.VpcId),
+				})
+			diags.Append(diagnostics...)
+		}
+
+		if http.State != nil {
+			var diagnostics diag.Diagnostics
+			state, diagnostics = NewStateValue(StateValue{}.AttributeTypes(ctx),
+				map[string]attr.Value{
+					"message": types.StringPointerValue(http.State.Message),
+					"name":    types.StringPointerValue(http.State.Name),
+				})
+			diags.Append(diagnostics...)
+		}
+
+		return &VpcPeeringDatasourceItemModel{
+			Id:             types.StringPointerValue(http.Id),
+			Tags:           tagsList,
+			AccepterVpc:    accepterVpc,
+			ExpirationDate: expirationDateTf,
+			SourceVpc:      sourceVpc,
+			State:          state,
+		}
+	}
+	return utils.FromHttpGenericListToTfList(ctx, vpcPeerings, serializeVPCPeeringDatasourceItem, diags)
+}
+
+func deserializeVpcPeeringDatasource(ctx context.Context, tf VpcPeeringsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVpcPeeringsParams {
+	expirationDates := utils.TfStringListToTimeList(ctx, tf.ExpirationDates, "2020-06-30T00:00:00.000Z", diags)
+
+	return numspot.ReadVpcPeeringsParams{
+		ExpirationDates:     &expirationDates,
+		StateMessages:       utils.TfStringListToStringPtrList(ctx, tf.StateMessages, diags),
+		StateNames:          utils.TfStringListToStringPtrList(ctx, tf.StateNames, diags),
+		AccepterVpcIpRanges: utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcIpRanges, diags),
+		AccepterVpcVpcIds:   utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcVpcIds, diags),
+		Ids:                 utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		SourceVpcIpRanges:   utils.TfStringListToStringPtrList(ctx, tf.SourceVpcIpRanges, diags),
+		SourceVpcVpcIds:     utils.TfStringListToStringPtrList(ctx, tf.SourceVpcVpcIds, diags),
+		TagKeys:             utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:           utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:                utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+	}
 }
