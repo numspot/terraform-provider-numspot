@@ -3,12 +3,15 @@ package vpcpeering
 import (
 	"context"
 	"fmt"
-	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -53,59 +56,23 @@ func (r *VpcPeeringResource) Schema(ctx context.Context, request resource.Schema
 }
 
 func (r *VpcPeeringResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data VpcPeeringModel
-	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
+	var plan VpcPeeringModel
+	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
+	payload := deserializeVpcPeering(plan)
+	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	vpcPeering, err := core.CreateVPCPeering(ctx, r.provider, payload, tagsValue)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("failed to create VPC peering", err.Error())
 		return
 	}
 
-	// Retries create until request response is OK
-	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
-		ctx,
-		r.provider.SpaceID,
-		VpcPeeringFromTfToCreateRequest(data),
-		numspotClient.CreateVpcPeeringWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create VPC Peering", err.Error())
-		return
-	}
-
-	// Retries can't success with retry_utils.RetryReadUntilStateValid because vpc_peering state is an object but a string.
-	// Also, VPC Peering resource State is used to provided status of the peering process, not the creation process
-	// So we do not need to implement specific retry process here.
-
-	createdId := *res.JSON201.Id
-	if len(data.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, data.Tags)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
-
-	readRes := utils.ExecuteRequest(func() (*numspot.ReadVpcPeeringsByIdResponse, error) {
-		return numspotClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, createdId)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	tf := VpcPeeringFromHttpToTf(ctx, readRes.JSON200, &response.Diagnostics)
+	tf := serializeVpcPeering(ctx, vpcPeering, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
-	}
-
-	if tf.SourceVpcId.IsNull() {
-		tf.SourceVpcId = data.SourceVpcId
-	}
-
-	if tf.AccepterVpcId.IsNull() {
-		tf.AccepterVpcId = data.AccepterVpcId
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -118,30 +85,15 @@ func (r *VpcPeeringResource) Read(ctx context.Context, request resource.ReadRequ
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
+	vpcPeering, err := core.ReadVPCPeering(ctx, r.provider, data.Id.ValueString())
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("failed to read VPC peering", err.Error())
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadVpcPeeringsByIdResponse, error) {
-		return numspotClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, data.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	tf := VpcPeeringFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	tf := serializeVpcPeering(ctx, vpcPeering, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
-	}
-
-	if tf.SourceVpcId.IsNull() {
-		tf.SourceVpcId = data.SourceVpcId
-	}
-
-	if tf.AccepterVpcId.IsNull() {
-		tf.AccepterVpcId = data.AccepterVpcId
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -149,57 +101,28 @@ func (r *VpcPeeringResource) Read(ctx context.Context, request resource.ReadRequ
 
 func (r *VpcPeeringResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan VpcPeeringModel
-	modifications := false
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	numspotClient, err := r.provider.GetClient(ctx)
+
+	if state.Tags.Equal(plan.Tags) { // Nothing to do here
+		return
+	}
+
+	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	vpcPeering, err := core.UpdateVPCPeeringTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("failed to update VPC peering", err.Error())
 		return
 	}
 
-	if !state.Tags.Equal(plan.Tags) {
-		tags.UpdateTags(
-			ctx,
-			state.Tags,
-			plan.Tags,
-			&response.Diagnostics,
-			numspotClient,
-			r.provider.SpaceID,
-			state.Id.ValueString(),
-		)
-		if response.Diagnostics.HasError() {
-			return
-		}
-		modifications = true
-	}
-
-	if !modifications {
-		return
-	}
-
-	res := utils.ExecuteRequest(func() (*numspot.ReadVpcPeeringsByIdResponse, error) {
-		return numspotClient.ReadVpcPeeringsByIdWithResponse(ctx, r.provider.SpaceID, state.Id.ValueString())
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-
-	tf := VpcPeeringFromHttpToTf(ctx, res.JSON200, &response.Diagnostics)
+	tf := serializeVpcPeering(ctx, vpcPeering, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
-	}
-
-	if tf.SourceVpcId.IsNull() {
-		tf.SourceVpcId = state.SourceVpcId
-	}
-
-	if tf.AccepterVpcId.IsNull() {
-		tf.AccepterVpcId = state.AccepterVpcId
 	}
 
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
@@ -211,16 +134,122 @@ func (r *VpcPeeringResource) Delete(ctx context.Context, request resource.Delete
 	if response.Diagnostics.HasError() {
 		return
 	}
+	if err := core.DeleteVPCPeering(ctx, r.provider, data.Id.ValueString()); err != nil {
+		response.Diagnostics.AddError("failed to delete VPC peering", err.Error())
+	}
+}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
+func serializeVpcPeering(ctx context.Context, http *numspot.VpcPeering, diags *diag.Diagnostics) *VpcPeeringModel {
+	// In the event that the creation of VPC peering fails, the error message might be found in
+	// the "state" field. If the state's name is "failed", then the error message will be contained
+	// in the state's message. We must address this particular scenario.
+	var tagsTf types.List
+
+	vpcPeeringStateHttp := http.State
+
+	if vpcPeeringStateHttp != nil {
+		message := vpcPeeringStateHttp.Message
+		name := vpcPeeringStateHttp.Name
+
+		if name != nil && *name == "failed" {
+			var errorMessage string
+			if message != nil {
+				errorMessage = *message
+			}
+			diags.AddError("Failed to create vpc peering", errorMessage)
+			return nil
+		}
 	}
 
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteVpcPeeringWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete VPC Peering", err.Error())
-		return
+	vpcPeeringState := serializeVpcPeeringState(ctx, vpcPeeringStateHttp, diags)
+	accepterVpcTf := serializeVpcPeeringAccepterVPC(ctx, http.AccepterVpc, diags)
+	sourceVpcTf := serializeVpcPeeringSourceVPC(ctx, http.SourceVpc, diags)
+
+	var httpExpirationDate, accepterVpcId, sourceVpcId *string
+	if http.ExpirationDate != nil {
+		tmpDate := *(http.ExpirationDate)
+		tmpStr := tmpDate.String()
+		httpExpirationDate = &tmpStr
+	}
+	if http.AccepterVpc != nil {
+		tmp := *(http.AccepterVpc)
+		accepterVpcId = tmp.VpcId
+	}
+	if http.SourceVpc != nil {
+		tmp := *(http.SourceVpc)
+		sourceVpcId = tmp.VpcId
+	}
+
+	if http.Tags != nil {
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		if diags.HasError() {
+			return nil
+		}
+	}
+
+	return &VpcPeeringModel{
+		AccepterVpc:    accepterVpcTf,
+		AccepterVpcId:  types.StringPointerValue(accepterVpcId),
+		ExpirationDate: types.StringPointerValue(httpExpirationDate),
+		Id:             types.StringPointerValue(http.Id),
+		SourceVpc:      sourceVpcTf,
+		SourceVpcId:    types.StringPointerValue(sourceVpcId),
+		State:          vpcPeeringState,
+		Tags:           tagsTf,
+	}
+}
+
+func serializeVpcPeeringAccepterVPC(ctx context.Context, http *numspot.AccepterVpc, diags *diag.Diagnostics) AccepterVpcValue {
+	if http == nil {
+		return NewAccepterVpcValueNull()
+	}
+
+	value, diagnostics := NewAccepterVpcValue(
+		AccepterVpcValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"ip_range": types.StringPointerValue(http.IpRange),
+			"vpc_id":   types.StringPointerValue(http.VpcId),
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
+}
+
+func serializeVpcPeeringSourceVPC(ctx context.Context, http *numspot.SourceVpc, diags *diag.Diagnostics) SourceVpcValue {
+	if http == nil {
+		return NewSourceVpcValueNull()
+	}
+
+	value, diagnostics := NewSourceVpcValue(
+		SourceVpcValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"ip_range": types.StringPointerValue(http.IpRange),
+			"vpc_id":   types.StringPointerValue(http.VpcId),
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
+}
+
+func serializeVpcPeeringState(ctx context.Context, http *numspot.VpcPeeringState, diags *diag.Diagnostics) StateValue {
+	if http == nil {
+		return NewStateValueNull()
+	}
+
+	value, diagnostics := NewStateValue(
+		StateValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"message": types.StringPointerValue(http.Message),
+			"name":    types.StringPointerValue(http.Name),
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
+}
+
+func deserializeVpcPeering(tf VpcPeeringModel) numspot.CreateVpcPeeringJSONRequestBody {
+	return numspot.CreateVpcPeeringJSONRequestBody{
+		AccepterVpcId: tf.AccepterVpcId.ValueString(),
+		SourceVpcId:   tf.SourceVpcId.ValueString(),
 	}
 }
