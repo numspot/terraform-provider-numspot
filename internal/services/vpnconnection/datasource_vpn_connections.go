@@ -5,9 +5,12 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
@@ -74,28 +77,19 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 	if response.Diagnostics.HasError() {
 		return
 	}
-	numspotClient, err := d.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
 
-	params := VpnConnectionsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializeVpnConnectionsParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res, err := numspotClient.ReadVpnConnectionsWithResponse(ctx, d.provider.SpaceID, &params)
+	numSpotVpnConnections, err := core.ReadVpnConnectionsWithParams(ctx, d.provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("unable to read vpn connection", err.Error())
-		return
-	}
-	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		response.Diagnostics.AddError("unable to read vpn connection", err.Error())
+		response.Diagnostics.AddError("unable to read vpn connections", err.Error())
 		return
 	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VpnConnectionsFromHttpToTfDatasource, &response.Diagnostics)
+	objectItems := serializeVpnConnections(ctx, numSpotVpnConnections, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -104,4 +98,24 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func deserializeVpnConnectionsParams(ctx context.Context, tf VpnConnectionsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVpnConnectionsParams {
+	return numspot.ReadVpnConnectionsParams{
+		States:                   utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		TagKeys:                  utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
+		TagValues:                utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+		Tags:                     utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
+		Ids:                      utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		ConnectionTypes:          utils.TfStringListToStringPtrList(ctx, tf.ConnectionTypes, diags),
+		ClientGatewayIds:         utils.TfStringListToStringPtrList(ctx, tf.ClientGatewayIds, diags),
+		RouteDestinationIpRanges: utils.TfStringListToStringPtrList(ctx, tf.RouteDestinationIpRanges, diags),
+		StaticRoutesOnly:         utils.FromTfBoolToBoolPtr(tf.StaticRouteOnly),
+		BgpAsns:                  utils.TFInt64ListToIntListPointer(ctx, tf.BgpAsns, diags),
+		VirtualGatewayIds:        utils.TfStringListToStringPtrList(ctx, tf.VirtualGatewayIds, diags),
+	}
+}
+
+func serializeVpnConnections(ctx context.Context, vpnConnections *[]numspot.VpnConnection, diags *diag.Diagnostics) []VpnConnectionModel {
+	return utils.FromHttpGenericListToTfList(ctx, vpnConnections, serializeVpnConnection, diags)
 }

@@ -66,7 +66,7 @@ func ParseRetryBackoff() time.Duration {
 	return retryBackoff
 }
 
-func getErrorMessage(res TfRequestResp) (string, error) {
+func GetErrorMessage(res TfRequestResp) (string, error) {
 	errorResponse, err := getFieldFromReflectStructPtr(reflect.ValueOf(res), "Body")
 	if err != nil {
 		return "", err
@@ -88,7 +88,7 @@ func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, ret
 	if slices.Contains(stopRetryCodes, res.StatusCode()) {
 		return nil
 	} else {
-		errorMessage, err := getErrorMessage(res)
+		errorMessage, err := GetErrorMessage(res)
 		if err != nil {
 			return retry.NonRetryableError(fmt.Errorf("error : got http status code %v but failed to parse error message. Reason : %v", res.StatusCode(), err))
 		}

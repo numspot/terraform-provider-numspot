@@ -3,7 +3,9 @@ package vpnconnection
 import (
 	"context"
 	"fmt"
+	"slices"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -11,6 +13,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -66,74 +69,53 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
+	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+
+	routeSlice := routesSetToRoutesSlice(ctx, plan.Routes, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	vpnConnection, err := core.CreateVpnConnection(ctx, r.provider, deserializeCreateVpnConnection(plan), *deserializeUpdateVpnOptions(ctx, plan), deserializeCreateRoutes(routeSlice), tagsValue)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("unable to create vpn connection", err.Error())
 		return
 	}
 
-	// Retries create until request response is OK
-	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
-		ctx,
-		r.provider.SpaceID,
-		vpnConnectionFromTfToCreateRequest(&plan),
-		numspotClient.CreateVpnConnectionWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to create VPN Connection", err.Error())
-		return
-	}
-
-	createdId := *res.JSON201.Id
-	if len(plan.Tags.Elements()) > 0 {
-		tags.CreateTagsFromTf(ctx, numspotClient, r.provider.SpaceID, &response.Diagnostics, createdId, plan.Tags)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
-
-	if !utils.IsTfValueNull(plan.Routes) {
-		routes := r.routesSetToRoutesSlice(ctx, plan.Routes, &response.Diagnostics)
-		r.addRoutes(ctx, createdId, routes, &response.Diagnostics)
-		if response.Diagnostics.HasError() {
-			return
-		}
-	}
-
-	tf := r.updateVPNOptions(ctx, createdId, plan, &response.Diagnostics)
+	state := serializeVpnConnection(ctx, vpnConnection, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	tf = r.readVPNConnection(ctx, createdId, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var data VpnConnectionModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state VpnConnectionModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tf := r.readVPNConnection(ctx, data.Id.ValueString(), &response.Diagnostics)
+	vpnConnectionID := state.Id.ValueString()
+
+	vpnConnection, err := core.ReadVpnConnection(ctx, r.provider, vpnConnectionID)
+	if err != nil {
+		return
+	}
+
+	newState := serializeVpnConnection(ctx, vpnConnection, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, newState)...)
 }
 
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan VpnConnectionModel
-	modifications := false
+	var vpnConnection *numspot.VpnConnection
+	var err error
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -141,148 +123,70 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 		return
 	}
 
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
+	vpnConnectionID := state.Id.ValueString()
+	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
 
 	if !state.Tags.Equal(plan.Tags) {
-		tags.UpdateTags(
+		vpnConnection, err = core.UpdateVpnConnectionTags(
 			ctx,
-			state.Tags,
-			plan.Tags,
-			&response.Diagnostics,
-			numspotClient,
-			r.provider.SpaceID,
-			state.Id.ValueString(),
+			r.provider,
+			stateTags,
+			planTags,
+			vpnConnectionID,
 		)
-		if response.Diagnostics.HasError() {
-			return
-		}
-		modifications = true
-	}
-
-	if !modifications {
-		return
-	}
-
-	if !state.Routes.Equal(plan.Routes) {
-		planRoutes := r.routesSetToRoutesSlice(ctx, plan.Routes, &response.Diagnostics)
-		stateRoutes := r.routesSetToRoutesSlice(ctx, state.Routes, &response.Diagnostics)
-
-		routesToCreate, routesToDelete := utils.Diff(stateRoutes, planRoutes)
-		r.deleteRoutes(ctx, state.Id.ValueString(), routesToDelete, &response.Diagnostics)
-		if response.Diagnostics.HasError() {
-			return
-		}
-
-		r.addRoutes(ctx, state.Id.ValueString(), routesToCreate, &response.Diagnostics)
-		if response.Diagnostics.HasError() {
+		if err != nil {
+			response.Diagnostics.AddError("unable to update vpn connection tags", err.Error())
 			return
 		}
 	}
 
-	tf := r.readVPNConnection(ctx, state.Id.ValueString(), &response.Diagnostics)
+	if !state.Routes.Equal(plan.Routes) { // TODO : test is always true, even if state/plan routes are the same => implement a better test
+		planRoutes := routesSetToRoutesSlice(ctx, plan.Routes, &response.Diagnostics)
+		stateRoutes := routesSetToRoutesSlice(ctx, state.Routes, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
+			return
+		}
+
+		tfRoutesToCreate, tfRoutesToDelete := utils.Diff(stateRoutes, planRoutes)
+
+		vpnConnection, err = core.UpdateVpnConnectionRoutes(ctx, r.provider, deserializeDeleteRoutes(tfRoutesToDelete), deserializeCreateRoutes(tfRoutesToCreate), vpnConnectionID)
+		if err != nil {
+			response.Diagnostics.AddError("unable to update vpn connection routes", err.Error())
+			return
+		}
+	}
+
+	if !plan.VpnOptions.Equal(state.VpnOptions) { // TODO : test is always true, even if state/plan options are the same => implement a better test
+		vpnConnection, err = core.UpdateVpnConnectionAttributes(ctx, r.provider, vpnConnectionID, deserializeUpdateVpnConnection(ctx, plan))
+		if err != nil {
+			response.Diagnostics.AddError("unable to update vpn connection attributes", err.Error())
+			return
+		}
+	}
+
+	newState := serializeVpnConnection(ctx, vpnConnection, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	tf = r.updateVPNOptions(ctx, state.Id.ValueString(), plan, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-
-	tf = r.readVPNConnection(ctx, state.Id.ValueString(), &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
-	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
+	response.Diagnostics.Append(response.State.Set(ctx, newState)...)
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data VpnConnectionModel
-	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
+	var state VpnConnectionModel
+	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
-
-	numspotClient, err := r.provider.GetClient(ctx)
+	err := core.DeleteVpnConnection(ctx, r.provider, state.Id.ValueString())
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	err = utils.RetryDeleteUntilResourceAvailable(ctx, r.provider.SpaceID, data.Id.ValueString(), numspotClient.DeleteVpnConnectionWithResponse)
-	if err != nil {
-		response.Diagnostics.AddError("Failed to delete VPN Connection", err.Error())
+		response.Diagnostics.AddError("unable to delete vpn connection", err.Error())
 		return
 	}
 }
 
-func (r *Resource) addRoutes(ctx context.Context, vpnID string, tfRoutes []RoutesValue, diags *diag.Diagnostics) {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-	routes := make([]numspot.CreateVpnConnectionRoute, len(tfRoutes))
-	for i := range tfRoutes {
-		routes[i] = numspot.CreateVpnConnectionRoute{
-			DestinationIpRange: tfRoutes[i].DestinationIpRange.ValueString(),
-		}
-	}
-
-	for _, route := range routes {
-		res, err := numspotClient.CreateVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
-		if err != nil {
-			diags.AddError("Error while creating VPN Connection Route", err.Error())
-			return
-		}
-		if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-			diags.AddError("Error while parsing VPN Connection Route", err.Error())
-			return
-		}
-	}
-}
-
-func (r *Resource) deleteRoutes(ctx context.Context, vpnID string, tfRoutes []RoutesValue, diags *diag.Diagnostics) {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-	routes := make([]numspot.DeleteVpnConnectionRoute, len(tfRoutes))
-	for i := range tfRoutes {
-		routes[i] = numspot.DeleteVpnConnectionRoute{
-			DestinationIpRange: tfRoutes[i].DestinationIpRange.ValueString(),
-		}
-	}
-
-	for _, route := range routes {
-		res, err := numspotClient.DeleteVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
-		if err != nil {
-			diags.AddError("Error while deleting VPN Connection Route", err.Error())
-			return
-		}
-		if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-			diags.AddError("Error while parsing VPN Connection Route", err.Error())
-			return
-		}
-	}
-}
-
-func (r *Resource) routesSetToRoutesSlice(ctx context.Context, list types.Set, diags *diag.Diagnostics) []RoutesValue {
+func routesSetToRoutesSlice(ctx context.Context, list types.Set, diags *diag.Diagnostics) []RoutesValue {
 	return utils.TfSetToGenericList(func(a RoutesValue) RoutesValue {
 		return RoutesValue{
 			DestinationIpRange: a.DestinationIpRange,
@@ -290,64 +194,249 @@ func (r *Resource) routesSetToRoutesSlice(ctx context.Context, list types.Set, d
 	}, ctx, list, diags)
 }
 
-func (r *Resource) readVPNConnection(
-	ctx context.Context,
-	id string,
-	diags *diag.Diagnostics,
-) *VpnConnectionModel {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return nil
+func deserializeCreateVpnConnection(tf VpnConnectionModel) numspot.CreateVpnConnectionJSONRequestBody {
+	return numspot.CreateVpnConnectionJSONRequestBody{
+		ClientGatewayId:  tf.ClientGatewayId.ValueString(),
+		ConnectionType:   tf.ConnectionType.ValueString(),
+		StaticRoutesOnly: tf.StaticRoutesOnly.ValueBoolPointer(),
+		VirtualGatewayId: tf.VirtualGatewayId.ValueString(),
 	}
-
-	// Retries read on resource until state is OK
-	read, err := utils.RetryReadUntilStateValid(
-		ctx,
-		id,
-		r.provider.SpaceID,
-		[]string{"pending"},
-		[]string{"available"},
-		numspotClient.ReadVpnConnectionsByIdWithResponse,
-	)
-	if err != nil {
-		diags.AddError("Failed to read VpnConnection", fmt.Sprintf("Error waiting for instance (%s) to be created: %s", id, err))
-		return nil
-	}
-
-	rr, ok := read.(*numspot.VpnConnection)
-	if !ok {
-		diags.AddError("Failed to read vpn connection", "object conversion error")
-		return nil
-	}
-
-	tf := vpnConnectionFromHttpToTf(ctx, rr, diags)
-
-	return tf
 }
 
-func (r *Resource) updateVPNOptions(
-	ctx context.Context,
-	id string,
-	plan VpnConnectionModel,
-	diags *diag.Diagnostics,
-) *VpnConnectionModel {
-	numspotClient, err := r.provider.GetClient(ctx)
-	if err != nil {
-		diags.AddError("Error while initiating numspotClient", err.Error())
-		return nil
+func deserializeUpdateVpnConnection(ctx context.Context, tf VpnConnectionModel) numspot.UpdateVpnConnectionJSONRequestBody {
+	var vpnOptions *numspot.VpnOptionsToUpdate
+
+	phase2Options := deserializeUpdatePhase2Options(ctx, tf.VpnOptions)
+	if phase2Options != nil || tf.VpnOptions.TunnelInsideIpRange.ValueStringPointer() != nil {
+		vpnOptions = &numspot.VpnOptionsToUpdate{}
+	}
+	if vpnOptions != nil {
+		vpnOptions.Phase2Options = phase2Options
+		vpnOptions.TunnelInsideIpRange = tf.VpnOptions.TunnelInsideIpRange.ValueStringPointer()
 	}
 
-	res, err := numspotClient.UpdateVpnConnectionWithResponse(ctx, r.provider.SpaceID, id, vpnConnectionFromTfToUpdateRequest(ctx, &plan, diags))
-	if err != nil {
-		diags.AddError("Error while updating VPN Connection", err.Error())
-		return nil
+	return numspot.UpdateVpnConnectionJSONRequestBody{
+		VpnOptions: deserializeUpdateVpnOptions(ctx, tf),
+		// ClientGatewayId:  tf.ClientGatewayId.ValueStringPointer(),
+		// VirtualGatewayId: tf.VirtualGatewayId.ValueStringPointer(),
 	}
-	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
-		diags.AddError("Error while parsing VPN Connection", err.Error())
-		return nil
-	}
-	tf := vpnConnectionFromHttpToTf(ctx, res.JSON200, diags)
+}
 
-	return tf
+func deserializeUpdateVpnOptions(ctx context.Context, tf VpnConnectionModel) *numspot.VpnOptionsToUpdate {
+	var vpnOptions *numspot.VpnOptionsToUpdate
+
+	phase2Options := deserializeUpdatePhase2Options(ctx, tf.VpnOptions)
+	if phase2Options != nil || tf.VpnOptions.TunnelInsideIpRange.ValueStringPointer() != nil {
+		vpnOptions = &numspot.VpnOptionsToUpdate{}
+		vpnOptions.Phase2Options = phase2Options
+		vpnOptions.TunnelInsideIpRange = tf.VpnOptions.TunnelInsideIpRange.ValueStringPointer()
+	}
+
+	return vpnOptions
+}
+
+func deserializeUpdatePhase2Options(ctx context.Context, vpnOptions VpnOptionsValue) *numspot.Phase2OptionsToUpdate {
+	attrtypes := vpnOptions.Phase2options.AttributeTypes(ctx)
+	attrVals := vpnOptions.Phase2options.Attributes()
+
+	phase2OptionsTf, diagnostics := NewPhase2optionsValue(attrtypes, attrVals)
+	if diagnostics.HasError() {
+		return &numspot.Phase2OptionsToUpdate{}
+	}
+
+	return &numspot.Phase2OptionsToUpdate{PreSharedKey: phase2OptionsTf.PreSharedKey.ValueStringPointer()}
+}
+
+func deserializeCreateRoutes(tfRoutes []RoutesValue) []numspot.CreateVpnConnectionRoute {
+	routes := make([]numspot.CreateVpnConnectionRoute, len(tfRoutes))
+	for i := range tfRoutes {
+		routes[i] = numspot.CreateVpnConnectionRoute{
+			DestinationIpRange: tfRoutes[i].DestinationIpRange.ValueString(),
+		}
+	}
+
+	return routes
+}
+
+func deserializeDeleteRoutes(tfRoutes []RoutesValue) []numspot.DeleteVpnConnectionRoute {
+	routes := make([]numspot.DeleteVpnConnectionRoute, len(tfRoutes))
+	for i := range tfRoutes {
+		routes[i] = numspot.DeleteVpnConnectionRoute{
+			DestinationIpRange: tfRoutes[i].DestinationIpRange.ValueString(),
+		}
+	}
+
+	return routes
+}
+
+func serializeVpnConnection(ctx context.Context, http *numspot.VpnConnection, diags *diag.Diagnostics) *VpnConnectionModel {
+	var tagsTf types.List
+
+	if http.Tags != nil {
+		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+	}
+
+	vpnConnectionModel := VpnConnectionModel{
+		ClientGatewayConfiguration: types.StringPointerValue(http.ClientGatewayConfiguration),
+		ClientGatewayId:            types.StringPointerValue(http.ClientGatewayId),
+		ConnectionType:             types.StringPointerValue(http.ConnectionType),
+		Id:                         types.StringPointerValue(http.Id),
+		State:                      types.StringPointerValue(http.State),
+		StaticRoutesOnly:           types.BoolPointerValue(http.StaticRoutesOnly),
+		VirtualGatewayId:           types.StringPointerValue(http.VirtualGatewayId),
+		VpnOptions:                 serializeVpnOptions(ctx, http.VpnOptions, diags),
+		Tags:                       tagsTf,
+	}
+
+	if http.Routes != nil {
+		// Skip vpn routes with state deleted
+		httpRoutes := slices.DeleteFunc(*http.Routes, func(r numspot.RouteLight) bool {
+			return *r.State == "deleted"
+		})
+		routes := utils.GenericSetToTfSetValue(ctx, serializeRoutes, httpRoutes, diags)
+		vpnConnectionModel.Routes = routes
+	}
+
+	if http.VgwTelemetries != nil {
+		vgwTelemetries := utils.GenericListToTfListValue(ctx, serializeVGWTelemetry, *http.VgwTelemetries, diags)
+		vpnConnectionModel.VgwTelemetries = vgwTelemetries
+	}
+
+	return &vpnConnectionModel
+}
+
+func serializeRoutes(ctx context.Context, elt numspot.RouteLight, diags *diag.Diagnostics) RoutesValue {
+	value, diagnostics := NewRoutesValue(
+		RoutesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"destination_ip_range": types.StringPointerValue(elt.DestinationIpRange),
+			"route_type":           types.StringPointerValue(elt.RouteType),
+			"state":                types.StringPointerValue(elt.State),
+		})
+	diags.Append(diagnostics...)
+	return value
+}
+
+func serializeVpnOptions(ctx context.Context, elt *numspot.VpnOptions, diags *diag.Diagnostics) VpnOptionsValue {
+	if elt == nil {
+		return VpnOptionsValue{}
+	}
+
+	phase1OptionsNull, diagnostics := NewPhase1optionsValueUnknown().ToObjectValue(ctx)
+	diags.Append(diagnostics...)
+	phase2OptionsNull, diagnostics := NewPhase2optionsValueUnknown().ToObjectValue(ctx)
+	diags.Append(diagnostics...)
+
+	vpnOptions, diagnostics := NewVpnOptionsValue(
+		VpnOptionsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"phase1options":          phase1OptionsNull,
+			"phase2options":          phase2OptionsNull,
+			"tunnel_inside_ip_range": types.StringPointerValue(elt.TunnelInsideIpRange),
+		})
+	diags.Append(diagnostics...)
+
+	if elt.Phase1Options != nil {
+		phase1Options := serializePhase1Options(ctx, elt.Phase1Options, diags)
+		if diags.HasError() {
+			return VpnOptionsValue{}
+		}
+		ph1OptsObj, diagnostics := phase1Options.ToObjectValue(ctx)
+		diags.Append(diagnostics...)
+
+		vpnOptions.Phase1options = ph1OptsObj
+	}
+
+	if elt.Phase2Options != nil {
+		phase2Options := serializePhase2Options(ctx, elt.Phase2Options, diags)
+		ph2OptsObj, diagnostics := phase2Options.ToObjectValue(ctx)
+		diags.Append(diagnostics...)
+
+		vpnOptions.Phase2options = ph2OptsObj
+	}
+
+	return vpnOptions
+}
+
+func serializePhase1Options(ctx context.Context, elt *numspot.Phase1Options, diags *diag.Diagnostics) Phase1optionsValue {
+	phase1IntegrityAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms, diags)
+	if diags.HasError() {
+		return Phase1optionsValue{}
+	}
+	phase1EncryptionAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1EncryptionAlgorithms, diags)
+	if diags.HasError() {
+		return Phase1optionsValue{}
+	}
+	phase1DHGroupNumbers := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase1DhGroupNumbers, diags)
+	if diags.HasError() {
+		return Phase1optionsValue{}
+	}
+	ikeVersions := utils.FromStringListPointerToTfStringList(ctx, elt.IkeVersions, diags)
+	if diags.HasError() {
+		return Phase1optionsValue{}
+	}
+
+	value, diagnostics := NewPhase1optionsValue(
+		Phase1optionsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"dpd_timeout_action":          types.StringPointerValue(elt.DpdTimeoutAction),
+			"dpd_timeout_seconds":         utils.FromIntPtrToTfInt64(elt.DpdTimeoutSeconds),
+			"ike_versions":                ikeVersions,
+			"phase1dh_group_numbers":      phase1DHGroupNumbers,
+			"phase1encryption_algorithms": phase1EncryptionAlgorithms,
+			"phase1integrity_algorithms":  phase1IntegrityAlgorithms,
+			"phase1lifetime_seconds":      utils.FromIntPtrToTfInt64(elt.Phase1LifetimeSeconds),
+			"replay_window_size":          utils.FromIntPtrToTfInt64(elt.ReplayWindowSize),
+			"startup_action":              types.StringPointerValue(elt.StartupAction),
+		})
+	diags.Append(diagnostics...)
+	return value
+}
+
+func serializePhase2Options(ctx context.Context, elt *numspot.Phase2Options, diags *diag.Diagnostics) Phase2optionsValue {
+	phase2IntegrityAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms, diags)
+	if diags.HasError() {
+		return Phase2optionsValue{}
+	}
+	phase2EncryptionAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2EncryptionAlgorithms, diags)
+	if diags.HasError() {
+		return Phase2optionsValue{}
+	}
+	phase2DHGroupNumbers := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase2DhGroupNumbers, diags)
+	if diags.HasError() {
+		return Phase2optionsValue{}
+	}
+
+	value, diagnostics := NewPhase2optionsValue(
+		Phase2optionsValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"phase2dh_group_numbers":      phase2DHGroupNumbers,
+			"phase2encryption_algorithms": phase2EncryptionAlgorithms,
+			"phase2integrity_algorithms":  phase2IntegrityAlgorithms,
+			"phase2lifetime_seconds":      utils.FromIntPtrToTfInt64(elt.Phase2LifetimeSeconds),
+			"pre_shared_key":              types.StringPointerValue(elt.PreSharedKey),
+		})
+
+	diags.Append(diagnostics...)
+	return value
+}
+
+func serializeVGWTelemetry(ctx context.Context, http numspot.VgwTelemetry, diags *diag.Diagnostics) VgwTelemetriesValue {
+	var lastStateChangeDate string
+	if http.LastStateChangeDate != nil {
+		lastStateChangeDate = http.LastStateChangeDate.String()
+	} else {
+		lastStateChangeDate = ""
+	}
+	value, diagnostics := NewVgwTelemetriesValue(
+		VgwTelemetriesValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"accepted_route_count":   utils.FromIntPtrToTfInt64(http.AcceptedRouteCount),
+			"last_state_change_date": types.StringValue(lastStateChangeDate),
+			"outside_ip_address":     types.StringPointerValue(http.OutsideIpAddress),
+			"state":                  types.StringPointerValue(http.State),
+			"state_description":      types.StringPointerValue(http.StateDescription),
+		})
+	diags.Append(diagnostics...)
+	return value
 }

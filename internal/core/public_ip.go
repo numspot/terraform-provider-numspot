@@ -67,27 +67,6 @@ func linkPublicIP(ctx context.Context, provider *client.NumSpotSDK, publicIpId, 
 	return linkPublicIPResponse.JSON200.LinkPublicIpId, nil
 }
 
-//func unlinkPublicIP(ctx context.Context, provider *client.NumSpotSDK, publicIpId string) error {
-//	numspotClient, err := provider.GetClient(ctx)
-//	if err != nil {
-//		return err
-//	}
-//
-//	payload := numspot.UnlinkPublicIpJSONRequestBody{
-//		LinkPublicIpId: &publicIpId,
-//	}
-//
-//	res, err := numspotClient.UnlinkPublicIpWithResponse(ctx, provider.SpaceID, publicIpId, payload)
-//	if err != nil {
-//		return err
-//	}
-//	if res.StatusCode() != http.StatusNoContent {
-//		return utils.HandleError(res.Body)
-//	}
-//
-//	return nil
-//}
-
 func UpdatePublicIpTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, publicIpID string) (*numspot.PublicIp, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, publicIpID); err != nil {
 		return nil, err
