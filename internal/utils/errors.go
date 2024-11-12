@@ -20,7 +20,7 @@ func HandleError(httpResponseBody []byte) error {
 	var apiError numspot.Error
 
 	err := json.Unmarshal(httpResponseBody, &apiError)
-	if err != nil {
+	if err != nil && string(httpResponseBody) != "" {
 		return errors.New("API Error : " + string(httpResponseBody))
 	}
 
