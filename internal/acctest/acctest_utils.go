@@ -13,15 +13,13 @@ import (
 )
 
 const (
-	BASE_SUFFIX   = ""
-	NEW_SUFFIX    = "new"
-	PAIR_PREFIX   = "[[FROM PAIR]]"
+	PairPrefix    = "[[FROM PAIR]]"
 	sentinelIndex = "*"
 )
 
 func InitResourceId(t *testing.T, v string, resourceId *string) error {
 	if !assert.NotEmpty(t, v) {
-		return fmt.Errorf("Id field should not be empty")
+		return fmt.Errorf("id field should not be empty")
 	}
 	*resourceId = v
 	return nil
@@ -29,35 +27,35 @@ func InitResourceId(t *testing.T, v string, resourceId *string) error {
 
 func CheckResourceIdUnchanged(t *testing.T, v string, resourceId *string) error {
 	if !assert.NotEmpty(t, v) {
-		return fmt.Errorf("Id field should not be empty")
+		return fmt.Errorf("id field should not be empty")
 	}
 	if !assert.Equal(t, *resourceId, v) {
-		return fmt.Errorf("Id should be unchanged. Expected %s but got %s.", *resourceId, v)
+		return fmt.Errorf("id should be unchanged. Expected %s but got %s", *resourceId, v)
 	}
 	return nil
 }
 
 func CheckResourceIdChanged(t *testing.T, v string, resourceId *string) error {
 	if !assert.NotEmpty(t, v) {
-		return fmt.Errorf("Id field should not be empty")
+		return fmt.Errorf("id field should not be empty")
 	}
 	if !assert.NotEqual(t, *resourceId, v) {
-		return fmt.Errorf("Id should have changed")
+		return fmt.Errorf("id should have changed")
 	}
 	*resourceId = v
 	return nil
 }
 
-func ListToStringList(list []string) string {
-	var strList string
-	if len(list) > 0 {
-		strList = fmt.Sprintf(`["%s"]`, strings.Join(list, `", "`))
-	} else {
-		strList = `[]`
-	}
-
-	return strList
-}
+//func ListToStringList(list []string) string {
+//	var strList string
+//	if len(list) > 0 {
+//		strList = fmt.Sprintf(`["%s"]`, strings.Join(list, `", "`))
+//	} else {
+//		strList = `[]`
+//	}
+//
+//	return strList
+//}
 
 func TestCheckTypeSetElemNestedAttrsWithPair(name, attr string, values map[string]string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
@@ -142,12 +140,12 @@ func primaryInstanceState(s *terraform.State, name string) (*terraform.InstanceS
 func modulePrimaryInstanceState(ms *terraform.ModuleState, name string) (*terraform.InstanceState, error) {
 	rs, ok := ms.Resources[name]
 	if !ok {
-		return nil, fmt.Errorf("Not found: %s in %s", name, ms.Path)
+		return nil, fmt.Errorf("not found: %s in %s", name, ms.Path)
 	}
 
 	is := rs.Primary
 	if is == nil {
-		return nil, fmt.Errorf("No primary instance: %s in %s", name, ms.Path)
+		return nil, fmt.Errorf("no primary instance: %s in %s", name, ms.Path)
 	}
 
 	return is, nil
@@ -200,10 +198,10 @@ func testCheckTypeSetElemNestedAttrsInStateWithPair(s *terraform.State, name str
 		var match bool
 		switch t := values.(type) {
 		case map[string]string:
-			if strings.HasPrefix(t[nestedAttr], PAIR_PREFIX) {
-				nameAttrSecond := strings.TrimPrefix(t[nestedAttr], PAIR_PREFIX)
+			if strings.HasPrefix(t[nestedAttr], PairPrefix) {
+				nameAttrSecond := strings.TrimPrefix(t[nestedAttr], PairPrefix)
 				if !strings.Contains(nameAttrSecond, ".") {
-					return fmt.Errorf("Invalid field name %s. Field starting with prefix %s must contain resource name and resource field separated by a dot. ", nameAttrSecond, PAIR_PREFIX)
+					return fmt.Errorf("Invalid field name %s. Field starting with prefix %s must contain resource name and resource field separated by a dot. ", nameAttrSecond, PairPrefix)
 				}
 				lastDotIndex := strings.LastIndex(nameAttrSecond, ".")
 				nameSecond, attrSec := nameAttrSecond[:lastDotIndex], nameAttrSecond[lastDotIndex+1:]

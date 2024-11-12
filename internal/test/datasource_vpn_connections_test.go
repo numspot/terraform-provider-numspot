@@ -41,9 +41,9 @@ package test
 //			//				Check: resource.ComposeAggregateTestCheckFunc(
 //			//					resource.TestCheckResourceAttr("data.numspot_vpn_connections.testdata", "items.#", "1"),
 //			//					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vpn_connections.testdata", "items.*", map[string]string{
-//			//						"id":                 acctest.PAIR_PREFIX + "numspot_vpn_connection.test.id",
-//			//						"client_gateway_id":  acctest.PAIR_PREFIX + "numspot_client_gateway.test.id",
-//			//						"virtual_gateway_id": acctest.PAIR_PREFIX + "numspot_virtual_gateway.test.id",
+//			//						"id":                 acctest.PairPrefix + "numspot_vpn_connection.test.id",
+//			//						"client_gateway_id":  acctest.PairPrefix + "numspot_client_gateway.test.id",
+//			//						"virtual_gateway_id": acctest.PairPrefix + "numspot_virtual_gateway.test.id",
 //			//					}),
 //			//				),
 //			//			},

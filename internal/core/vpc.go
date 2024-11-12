@@ -66,7 +66,22 @@ func ReadVPC(ctx context.Context, provider *client.NumSpotSDK, vpcID string) (*n
 	return numSpotReadVPC.JSON200, nil
 }
 
-func RetryReadVPC(ctx context.Context, provider *client.NumSpotSDK, op string, vpcID string) (*numspot.Vpc, error) {
+func ReadVPCsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadVpcsParams) (*[]numspot.Vpc, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotReadVPC, err := numspotClient.ReadVpcsWithResponse(ctx, provider.SpaceID, &params)
+	if err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(numSpotReadVPC.Body, numSpotReadVPC.StatusCode()); err != nil {
+		return nil, err
+	}
+	return numSpotReadVPC.JSON200.Items, nil
+}
+
+func RetryReadVPC(ctx context.Context, provider *client.NumSpotSDK, _ string, vpcID string) (*numspot.Vpc, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

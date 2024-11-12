@@ -17,20 +17,20 @@ import (
 )
 
 var (
-	_ resource.Resource                = &SnapshotResource{}
-	_ resource.ResourceWithConfigure   = &SnapshotResource{}
-	_ resource.ResourceWithImportState = &SnapshotResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type SnapshotResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewSnapshotResource() resource.Resource {
-	return &SnapshotResource{}
+	return &Resource{}
 }
 
-func (r *SnapshotResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -48,19 +48,19 @@ func (r *SnapshotResource) Configure(ctx context.Context, request resource.Confi
 	r.provider = provider
 }
 
-func (r *SnapshotResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *SnapshotResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_snapshot"
 }
 
-func (r *SnapshotResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = SnapshotResourceSchema(ctx)
 }
 
-func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan SnapshotModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -87,7 +87,7 @@ func (r *SnapshotResource) Create(ctx context.Context, request resource.CreateRe
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
@@ -111,7 +111,7 @@ func (r *SnapshotResource) Read(ctx context.Context, request resource.ReadReques
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan SnapshotModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -142,7 +142,7 @@ func (r *SnapshotResource) Update(ctx context.Context, request resource.UpdateRe
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *SnapshotResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {

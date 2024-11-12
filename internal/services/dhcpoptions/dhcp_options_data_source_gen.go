@@ -124,6 +124,17 @@ func DhcpOptionsDataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
-// MANUALLY EDITED : Model declaration removed
+type DHCPOptionsDataSourceModel struct {
+	Items             []DhcpOptionsModel `tfsdk:"items"`
+	IDs               types.List         `tfsdk:"ids"`
+	Default           types.Bool         `tfsdk:"default"`
+	DomainNameServers types.List         `tfsdk:"domain_name_servers"`
+	DomainNames       types.List         `tfsdk:"domain_names"`
+	LogServers        types.List         `tfsdk:"log_servers"`
+	NTPServers        types.List         `tfsdk:"ntp_servers"`
+	TagKeys           types.List         `tfsdk:"tag_keys"`
+	TagValues         types.List         `tfsdk:"tag_values"`
+	Tags              types.List         `tfsdk:"tags"`
+}
 
 // MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

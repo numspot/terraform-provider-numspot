@@ -18,20 +18,20 @@ import (
 )
 
 var (
-	_ resource.Resource                = &SecurityGroupResource{}
-	_ resource.ResourceWithConfigure   = &SecurityGroupResource{}
-	_ resource.ResourceWithImportState = &SecurityGroupResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type SecurityGroupResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewSecurityGroupResource() resource.Resource {
-	return &SecurityGroupResource{}
+	return &Resource{}
 }
 
-func (r *SecurityGroupResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -49,19 +49,19 @@ func (r *SecurityGroupResource) Configure(ctx context.Context, request resource.
 	r.provider = provider
 }
 
-func (r *SecurityGroupResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *SecurityGroupResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_security_group"
 }
 
-func (r *SecurityGroupResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = SecurityGroupResourceSchema(ctx)
 }
 
-func (r *SecurityGroupResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan SecurityGroupModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -87,7 +87,7 @@ func (r *SecurityGroupResource) Create(ctx context.Context, request resource.Cre
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state SecurityGroupModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -110,7 +110,7 @@ func (r *SecurityGroupResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *SecurityGroupResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan          SecurityGroupModel
 		err                  error
@@ -159,7 +159,7 @@ func (r *SecurityGroupResource) Update(ctx context.Context, request resource.Upd
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *SecurityGroupResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state SecurityGroupModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {

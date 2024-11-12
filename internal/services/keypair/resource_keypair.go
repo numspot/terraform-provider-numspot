@@ -15,20 +15,20 @@ import (
 )
 
 var (
-	_ resource.Resource                = &KeyPairResource{}
-	_ resource.ResourceWithConfigure   = &KeyPairResource{}
-	_ resource.ResourceWithImportState = &KeyPairResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type KeyPairResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewKeyPairResource() resource.Resource {
-	return &KeyPairResource{}
+	return &Resource{}
 }
 
-func (r *KeyPairResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -46,19 +46,19 @@ func (r *KeyPairResource) Configure(ctx context.Context, request resource.Config
 	r.provider = provider
 }
 
-func (r *KeyPairResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *KeyPairResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_keypair"
 }
 
-func (r *KeyPairResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = KeyPairResourceSchema(ctx)
 }
 
-func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan KeyPairModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -79,7 +79,7 @@ func (r *KeyPairResource) Create(ctx context.Context, request resource.CreateReq
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -88,7 +88,7 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 
 	keypairID := state.Id.ValueString()
 
-	numSpotKeypair, err := core.ReadKeypairs(ctx, r.provider, keypairID)
+	numSpotKeypair, err := core.ReadKeypair(ctx, r.provider, keypairID)
 	if err != nil {
 		response.Diagnostics.AddError("unable to read keypair", err.Error())
 		return
@@ -106,10 +106,10 @@ func (r *KeyPairResource) Read(ctx context.Context, request resource.ReadRequest
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *KeyPairResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(_ context.Context, _ resource.UpdateRequest, _ *resource.UpdateResponse) {
 }
 
-func (r *KeyPairResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state KeyPairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {

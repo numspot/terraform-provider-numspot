@@ -84,6 +84,14 @@ func InternetGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
-// MANUALLY EDITED : Model declaration removed
+type InternetGatewaysDataSourceModel struct {
+	Items      []InternetGatewayModel `tfsdk:"items"`
+	IDs        types.List             `tfsdk:"ids"`
+	LinkStates types.List             `tfsdk:"link_states"`
+	TagKeys    types.List             `tfsdk:"tag_keys"`
+	TagValues  types.List             `tfsdk:"tag_values"`
+	Tags       types.List             `tfsdk:"tags"`
+	LinkVpcIds types.List             `tfsdk:"link_vpc_ids"`
+}
 
 // MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

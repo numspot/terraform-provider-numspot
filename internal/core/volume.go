@@ -47,7 +47,7 @@ func CreateVolume(ctx context.Context, provider *client.NumSpotSDK, numSpotVolum
 	return RetryReadVolume(ctx, provider, createOp, volumeID)
 }
 
-func UpdateVolumeAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpotVolumeUpdate numspot.UpdateVolumeJSONRequestBody, volumeID, stateVM, planVM string) (*numspot.Volume, error) {
+func UpdateVolumeAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpotVolumeUpdate numspot.UpdateVolumeJSONRequestBody, volumeID, stateVM string) (*numspot.Volume, error) {
 	var err error
 
 	// If this volume is attached to a VM, we need to change it from hot to cold volume to update its attributes
@@ -173,6 +173,25 @@ func ReadVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID strin
 	}
 
 	return numSpotReadVolume.JSON200, nil
+}
+
+func ReadVolumeWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadVolumesParams) (numSpotVolume *[]numspot.Volume, err error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotReadVolume, err := numspotClient.ReadVolumesWithResponse(ctx, provider.SpaceID, &params)
+	if err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(numSpotReadVolume.Body, numSpotReadVolume.StatusCode()); err != nil {
+		return nil, err
+	}
+	if numSpotReadVolume.JSON200.Items == nil {
+		return nil, fmt.Errorf("HTTP call failed : expected a list of volumes but got nil")
+	}
+
+	return numSpotReadVolume.JSON200.Items, nil
 }
 
 func unlinkVolume(ctx context.Context, provider *client.NumSpotSDK, volumeID, stateVM string) (err error) {

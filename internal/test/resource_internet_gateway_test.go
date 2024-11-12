@@ -247,7 +247,7 @@ resource "numspot_internet_gateway" "test_recreated" {
 					}),
 				),
 			},
-			// 9 Setup a linked internet gateway to prepare for next step
+			// 9 Set up a linked internet gateway to prepare for next step
 			{
 				Config: `
 resource "numspot_vpc" "test" {

@@ -3,7 +3,6 @@ package clientgateway
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -11,21 +10,10 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
-
-type ClientGatewaysDataSourceModel struct {
-	Items           []ClientGatewayModel `tfsdk:"items"`
-	BgpAsns         types.List           `tfsdk:"bgp_asns"`
-	ConnectionTypes types.List           `tfsdk:"connection_types"`
-	IDs             types.List           `tfsdk:"ids"`
-	PublicIps       types.List           `tfsdk:"public_ips"`
-	States          types.List           `tfsdk:"states"`
-	TagKeys         types.List           `tfsdk:"tag_keys"`
-	TagValues       types.List           `tfsdk:"tag_values"`
-	Tags            types.List           `tfsdk:"tags"`
-}
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
@@ -71,45 +59,35 @@ func (d *clientGatewaysDataSource) Schema(ctx context.Context, _ datasource.Sche
 // Read refreshes the Terraform state with the latest data.
 func (d *clientGatewaysDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan ClientGatewaysDataSourceModel
+
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	params := ClientGatewaysFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	clientGatewayParams := deserializeReadClientGateways(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
+	clientGateways, err := core.ReadClientGateways(ctx, d.provider, clientGatewayParams)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("unable to read client gateways", err.Error())
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadClientGatewaysResponse, error) {
-		return numspotClient.ReadClientGatewaysWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Client Gateways list")
-	}
-
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, clientGatewaysFromHttpToTfDatasource, &response.Diagnostics)
-
+	clientGatewayItems := utils.FromHttpGenericListToTfList(ctx, clientGateways, serializeClientGateways, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems
+	state.Items = clientGatewayItems
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func ClientGatewaysFromTfToAPIReadParams(ctx context.Context, tf ClientGatewaysDataSourceModel, diags *diag.Diagnostics) numspot.ReadClientGatewaysParams {
+func deserializeReadClientGateways(ctx context.Context, tf ClientGatewaysDataSourceModel, diags *diag.Diagnostics) numspot.ReadClientGatewaysParams {
 	return numspot.ReadClientGatewaysParams{
 		States:          utils.TfStringListToStringPtrList(ctx, tf.States, diags),
 		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
@@ -122,7 +100,7 @@ func ClientGatewaysFromTfToAPIReadParams(ctx context.Context, tf ClientGatewaysD
 	}
 }
 
-func clientGatewaysFromHttpToTfDatasource(ctx context.Context, http *numspot.ClientGateway, diags *diag.Diagnostics) *ClientGatewayModel {
+func serializeClientGateways(ctx context.Context, http *numspot.ClientGateway, diags *diag.Diagnostics) *ClientGatewayModel {
 	var (
 		tagsList types.List
 		bgpAsnTf types.Int64

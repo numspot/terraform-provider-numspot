@@ -88,6 +88,7 @@ resource "numspot_vm" "vm" {
 
 - `image_id` (String) The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.
 - `subnet_id` (String) The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.
+- `type` (String) The type of VM.
 
 ### Optional
 
@@ -100,7 +101,6 @@ resource "numspot_vm" "vm" {
 - `security_group_ids` (List of String) One or more IDs of security group for the VMs.
 - `security_groups` (List of String) One or more names of security groups for the VMs.
 - `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
-- `type` (String) The type of VM.
 - `user_data` (String) Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
 
 ### Read-Only

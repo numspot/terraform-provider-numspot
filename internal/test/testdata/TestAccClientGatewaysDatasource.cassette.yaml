@@ -125,7 +125,7 @@ interactions:
         trailer: {}
         content_length: 116
         uncompressed: false
-        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-96c6cc0d","publicIp":"192.0.2.0","state":"available","tags":[]}'
+        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-136a0a83","publicIp":"192.0.2.0","state":"available","tags":[]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -157,35 +157,33 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 0
+        content_length: 99
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: ""
+        body: '{"resourceIds":["cgw-136a0a83"],"tags":[{"key":"name","value":"terraform-client-gateway-acctest"}]}'
         form: {}
-        headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-96c6cc0d
-        method: GET
+        headers:
+            Content-Type:
+                - application/json
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/bulk/tags
+        method: PATCH
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 116
+        content_length: 0
         uncompressed: false
-        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-96c6cc0d","publicIp":"192.0.2.0","state":"available","tags":[]}'
+        body: ""
         headers:
             Api-Gateway-Completed:
                 - "false"
-            Cache-Control:
-                - public, max-age=300
             Connection:
                 - keep-alive
-            Content-Length:
-                - "116"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -199,9 +197,9 @@ interactions:
                 - Version 2.6.3
             X-Krakend-Completed:
                 - "false"
-                - "true"
-        status: 200 OK
-        code: 200
+                - "false"
+        status: 204 No Content
+        code: 204
         duration: 5ms
     - id: 4
       request:
@@ -217,7 +215,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-96c6cc0d
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-136a0a83
         method: GET
       response:
         proto: HTTP/1.1
@@ -225,9 +223,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 128
+        content_length: 173
         uncompressed: false
-        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-96c6cc0d","publicIp":"192.0.2.0","state":"available","tags":[]}]}'
+        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-136a0a83","publicIp":"192.0.2.0","state":"available","tags":[{"key":"name","value":"terraform-client-gateway-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -236,7 +234,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "128"
+                - "173"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -259,47 +257,49 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 117
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
         body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-136a0a83
+        method: GET
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 1229
+        content_length: 185
         uncompressed: false
-        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-136a0a83","publicIp":"192.0.2.0","state":"available","tags":[{"key":"name","value":"terraform-client-gateway-acctest"}]}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
+            Cache-Control:
+                - public, max-age=300
             Connection:
                 - keep-alive
             Content-Length:
-                - "1229"
+                - "185"
             Content-Type:
-                - application/json
+                - application/json; charset=utf-8
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
+                - Origin
             X-Krakend:
                 - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -308,6 +308,55 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 7
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
         content_length: 0
         transfer_encoding: []
         trailer: {}
@@ -317,7 +366,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-96c6cc0d
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-136a0a83
         method: GET
       response:
         proto: HTTP/1.1
@@ -325,9 +374,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 128
+        content_length: 185
         uncompressed: false
-        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-96c6cc0d","publicIp":"192.0.2.0","state":"available","tags":[]}]}'
+        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-136a0a83","publicIp":"192.0.2.0","state":"available","tags":[{"key":"name","value":"terraform-client-gateway-acctest"}]}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -336,7 +385,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "128"
+                - "185"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -354,7 +403,7 @@ interactions:
         status: 200 OK
         code: 200
         duration: 5ms
-    - id: 7
+    - id: 8
       request:
         proto: HTTP/1.1
         proto_major: 1
@@ -400,57 +449,6 @@ interactions:
                 - Origin
             X-Krakend:
                 - Version undefined
-        status: 200 OK
-        code: 200
-        duration: 5ms
-    - id: 8
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-96c6cc0d
-        method: GET
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 116
-        uncompressed: false
-        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-96c6cc0d","publicIp":"192.0.2.0","state":"available","tags":[]}'
-        headers:
-            Api-Gateway-Completed:
-                - "false"
-            Cache-Control:
-                - public, max-age=300
-            Connection:
-                - keep-alive
-            Content-Length:
-                - "116"
-            Content-Type:
-                - application/json; charset=utf-8
-            Strict-Transport-Security:
-                - max-age=31536000; includeSubDomains
-            Vary:
-                - Origin
-                - Origin
-            X-Krakend:
-                - Version undefined
-                - Version 2.6.3-1.3.0
-                - Version 2.6.3
-            X-Krakend-Completed:
-                - "false"
-                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -468,7 +466,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-96c6cc0d
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-136a0a83
         method: GET
       response:
         proto: HTTP/1.1
@@ -476,9 +474,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 128
+        content_length: 173
         uncompressed: false
-        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-96c6cc0d","publicIp":"192.0.2.0","state":"available","tags":[]}]}'
+        body: '{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-136a0a83","publicIp":"192.0.2.0","state":"available","tags":[{"key":"name","value":"terraform-client-gateway-acctest"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -487,7 +485,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "128"
+                - "173"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -510,47 +508,49 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 117
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
         body: ""
-        form:
-            grant_type:
-                - client_credentials
-        headers:
-            Content-Type:
-                - application/x-www-form-urlencoded
-            User-Agent:
-                - TERRAFORM-NUMSPOT
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
-        method: POST
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways?ids=cgw-136a0a83
+        method: GET
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 1229
+        content_length: 185
         uncompressed: false
-        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        body: '{"items":[{"bgpAsn":65000,"connectionType":"ipsec.1","id":"cgw-136a0a83","publicIp":"192.0.2.0","state":"available","tags":[{"key":"name","value":"terraform-client-gateway-acctest"}]}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
+            Cache-Control:
+                - public, max-age=300
             Connection:
                 - keep-alive
             Content-Length:
-                - "1229"
+                - "185"
             Content-Type:
-                - application/json
+                - application/json; charset=utf-8
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
+                - Origin
             X-Krakend:
                 - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "true"
         status: 200 OK
         code: 200
         duration: 5ms
@@ -608,6 +608,55 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 13
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
         content_length: 0
         transfer_encoding: []
         trailer: {}
@@ -617,7 +666,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-96c6cc0d
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/clientGateways/cgw-136a0a83
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -641,7 +690,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - cgw-96c6cc0d
+                - cgw-136a0a83
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0

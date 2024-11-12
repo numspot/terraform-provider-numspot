@@ -20,7 +20,7 @@ type ClusterResource struct {
 	provider *client.NumSpotSDK
 }
 
-func (r *ClusterResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *ClusterResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -42,30 +42,30 @@ func (r *ClusterResource) ImportState(ctx context.Context, request resource.Impo
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *ClusterResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *ClusterResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_ocp_cluster"
 }
 
-func (r *ClusterResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *ClusterResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = ClusterResourceSchema(ctx)
 }
 
-func (r *ClusterResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *ClusterResource) Create(_ context.Context, _ resource.CreateRequest, _ *resource.CreateResponse) {
 	// TODO implement me
 	panic("implement me")
 }
 
-func (r *ClusterResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *ClusterResource) Read(_ context.Context, _ resource.ReadRequest, _ *resource.ReadResponse) {
 	// TODO implement me
 	panic("implement me")
 }
 
-func (r *ClusterResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *ClusterResource) Update(_ context.Context, _ resource.UpdateRequest, _ *resource.UpdateResponse) {
 	// TODO implement me
 	panic("implement me")
 }
 
-func (r *ClusterResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *ClusterResource) Delete(_ context.Context, _ resource.DeleteRequest, _ *resource.DeleteResponse) {
 	// TODO implement me
 	panic("implement me")
 }

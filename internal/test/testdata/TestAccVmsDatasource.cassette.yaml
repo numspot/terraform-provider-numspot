@@ -125,7 +125,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-1ada8044","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-33d9ec3c","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -166,7 +166,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-1ada8044
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-33d9ec3c
         method: GET
       response:
         proto: HTTP/1.1
@@ -176,7 +176,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-1ada8044","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-33d9ec3c","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -214,7 +214,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","ipRange":"10.101.1.0/24","vpcId":"vpc-1ada8044"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","ipRange":"10.101.1.0/24","vpcId":"vpc-33d9ec3c"}'
         form: {}
         headers:
             Content-Type:
@@ -229,7 +229,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-3559c5e8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-1ada8044"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-7ee30211","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -270,7 +270,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: GET
       response:
         proto: HTTP/1.1
@@ -280,7 +280,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-3559c5e8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-1ada8044"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":251,"id":"subnet-7ee30211","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -318,7 +318,7 @@ interactions:
         host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
         remote_addr: ""
         request_uri: ""
-        body: '{"bootOnCreation":true,"deletionProtection":false,"imageId":"ami-0b7df82c","nestedVirtualization":false,"subnetId":"subnet-3559c5e8","type":"ns-cus6-2c4r","vmInitiatedShutdownBehavior":"stop"}'
+        body: '{"bootOnCreation":true,"deletionProtection":false,"imageId":"ami-0b7df82c","nestedVirtualization":false,"subnetId":"subnet-7ee30211","type":"ns-cus6-2c4r","vmInitiatedShutdownBehavior":"stop"}'
         form: {}
         headers:
             Content-Type:
@@ -333,7 +333,7 @@ interactions:
         trailer: {}
         content_length: 1589
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attaching","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attaching","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -374,7 +374,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -382,9 +382,9 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 1588
+        content_length: 1589
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attaching","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -393,7 +393,7 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "1588"
+                - "1589"
             Content-Type:
                 - application/json; charset=utf-8
             Strict-Transport-Security:
@@ -425,7 +425,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -435,7 +435,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -476,7 +476,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -486,7 +486,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -527,7 +527,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -537,7 +537,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -578,7 +578,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -588,7 +588,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -629,7 +629,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -639,7 +639,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -680,7 +680,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -690,7 +690,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -731,7 +731,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -741,7 +741,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -782,7 +782,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -792,7 +792,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -833,7 +833,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -843,7 +843,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -884,7 +884,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -894,7 +894,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -935,7 +935,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -945,7 +945,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -986,7 +986,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -996,7 +996,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"pending","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1037,7 +1037,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -1047,7 +1047,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1088,7 +1088,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms?ids=i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms?ids=i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -1098,7 +1098,7 @@ interactions:
         trailer: {}
         content_length: 1600
         uncompressed: false
-        body: '{"items":[{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}]}'
+        body: '{"items":[{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1188,7 +1188,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms?ids=i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms?ids=i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -1198,7 +1198,7 @@ interactions:
         trailer: {}
         content_length: 1600
         uncompressed: false
-        body: '{"items":[{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}]}'
+        body: '{"items":[{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1288,7 +1288,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-1ada8044
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-33d9ec3c
         method: GET
       response:
         proto: HTTP/1.1
@@ -1298,7 +1298,7 @@ interactions:
         trailer: {}
         content_length: 132
         uncompressed: false
-        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-1ada8044","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
+        body: '{"dhcpOptionsSetId":"dopt-073bd83a","id":"vpc-33d9ec3c","ipRange":"10.101.0.0/16","state":"available","tags":[],"tenancy":"default"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1339,7 +1339,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: GET
       response:
         proto: HTTP/1.1
@@ -1349,7 +1349,7 @@ interactions:
         trailer: {}
         content_length: 201
         uncompressed: false
-        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":250,"id":"subnet-3559c5e8","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-1ada8044"}'
+        body: '{"availabilityZoneName":"cloudgouv-eu-west-1a","availableIpsCount":250,"id":"subnet-7ee30211","ipRange":"10.101.1.0/24","mapPublicIpOnLaunch":false,"state":"available","tags":[],"vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1390,7 +1390,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -1400,7 +1400,7 @@ interactions:
         trailer: {}
         content_length: 1588
         uncompressed: false
-        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}'
+        body: '{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1441,7 +1441,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms?ids=i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms?ids=i-59457ccd
         method: GET
       response:
         proto: HTTP/1.1
@@ -1451,7 +1451,7 @@ interactions:
         trailer: {}
         content_length: 1600
         uncompressed: false
-        body: '{"items":[{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-10-21T15:45:52.203Z","state":"attached","volumeId":"vol-683f0a2e"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-10-21T15:45:52.203Z","deletionProtection":false,"hypervisor":"xen","id":"i-5fd0f42c","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-77f25783","state":"attached"},"macAddress":"aa:94:2e:9d:ab:a4","nicId":"eni-bde79766","privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66"}],"securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-3559c5e8","vpcId":"vpc-1ada8044"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-66.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.66","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-ecbab42c","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-acce459d","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-3559c5e8","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-1ada8044"}]}'
+        body: '{"items":[{"architecture":"x86_64","blockDeviceMappings":[{"bsu":{"deleteOnVmDeletion":true,"linkDate":"2024-11-06T10:58:06.502Z","state":"attached","volumeId":"vol-59164ac5"},"deviceName":"/dev/sda1"}],"bsuOptimized":false,"creationDate":"2024-11-06T10:58:06.502Z","deletionProtection":false,"hypervisor":"xen","id":"i-59457ccd","imageId":"ami-0b7df82c","initiatedShutdownBehavior":"stop","isSourceDestChecked":true,"launchNumber":0,"nestedVirtualization":false,"nics":[{"description":"Primary network interface","isSourceDestChecked":true,"linkNic":{"deleteOnVmDeletion":true,"deviceNumber":0,"linkNicId":"eni-attach-597fe498","state":"attached"},"macAddress":"aa:11:a6:e2:d3:3e","nicId":"eni-57325e47","privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIps":[{"isPrimary":true,"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93"}],"securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"in-use","subnetId":"subnet-7ee30211","vpcId":"vpc-33d9ec3c"}],"performance":"highest","placement":{"availabilityZoneName":"cloudgouv-eu-west-1a","tenancy":"default"},"privateDnsName":"ip-10-101-1-93.cloudgouv-eu-west-1.compute.internal","privateIp":"10.101.1.93","productCodes":["pty-ce73ebf1","0001"],"reservationId":"r-f183178e","rootDeviceName":"/dev/sda1","rootDeviceType":"ebs","securityGroups":[{"securityGroupId":"sg-25155cd5","securityGroupName":"default"}],"state":"running","stateReason":"","subnetId":"subnet-7ee30211","tags":[],"type":"ns-cus6-2c4r","userData":"","vpcId":"vpc-33d9ec3c"}]}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1590,7 +1590,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-5fd0f42c
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vms/i-59457ccd
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1614,7 +1614,7 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - i-5fd0f42c
+                - i-59457ccd
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
@@ -1639,7 +1639,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1649,7 +1649,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1686,7 +1686,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1696,7 +1696,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1733,7 +1733,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1743,7 +1743,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1780,7 +1780,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1790,7 +1790,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1827,7 +1827,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1837,7 +1837,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1874,7 +1874,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1884,7 +1884,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1921,7 +1921,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1931,7 +1931,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -1968,7 +1968,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -1978,7 +1978,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2015,7 +2015,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2025,7 +2025,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2062,7 +2062,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2072,7 +2072,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2109,7 +2109,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2119,7 +2119,7 @@ interactions:
         trailer: {}
         content_length: 210
         uncompressed: false
-        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8"}'
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
@@ -2156,7 +2156,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-3559c5e8
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2164,32 +2164,30 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 0
+        content_length: 210
         uncompressed: false
-        body: ""
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
         headers:
             Api-Gateway-Completed:
                 - "false"
             Connection:
                 - keep-alive
+            Content-Length:
+                - "210"
             Content-Type:
-                - application/json; charset=utf-8
+                - application/problem+json
             Strict-Transport-Security:
                 - max-age=31536000; includeSubDomains
             Vary:
                 - Origin
                 - Origin
-            X-Id:
-                - subnet-3559c5e8
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0
-                - Version 2.6.3
             X-Krakend-Completed:
                 - "false"
-                - "false"
-        status: 204 No Content
-        code: 204
+        status: 409 Conflict
+        code: 409
         duration: 5ms
     - id: 44
       request:
@@ -2205,7 +2203,242 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-1ada8044
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 210
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "210"
+            Content-Type:
+                - application/problem+json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 5ms
+    - id: 45
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 210
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "210"
+            Content-Type:
+                - application/problem+json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 5ms
+    - id: 46
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 210
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "210"
+            Content-Type:
+                - application/problem+json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 5ms
+    - id: 47
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 210
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "210"
+            Content-Type:
+                - application/problem+json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 5ms
+    - id: 48
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 210
+        uncompressed: false
+        body: '{"type":"https://docs.numspot.cloud/docs/domains/cloud/errors#invalid_parameter","title":"ResourceConflict","detail":"","instance":"/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211"}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "210"
+            Content-Type:
+                - application/problem+json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+            X-Krakend-Completed:
+                - "false"
+        status: 409 Conflict
+        code: 409
+        duration: 5ms
+    - id: 49
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/subnets/subnet-7ee30211
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -2229,7 +2462,56 @@ interactions:
                 - Origin
                 - Origin
             X-Id:
-                - vpc-1ada8044
+                - subnet-7ee30211
+            X-Krakend:
+                - Version undefined
+                - Version 2.6.3-1.3.0
+                - Version 2.6.3
+            X-Krakend-Completed:
+                - "false"
+                - "false"
+        status: 204 No Content
+        code: 204
+        duration: 5ms
+    - id: 50
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/compute/spaces/bba8c1df-609f-4775-9638-952d488502e6/vpcs/vpc-33d9ec3c
+        method: DELETE
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 0
+        uncompressed: false
+        body: ""
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json; charset=utf-8
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+                - Origin
+            X-Id:
+                - vpc-33d9ec3c
             X-Krakend:
                 - Version undefined
                 - Version 2.6.3-1.3.0

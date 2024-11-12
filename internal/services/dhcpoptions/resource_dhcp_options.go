@@ -18,21 +18,21 @@ import (
 )
 
 var (
-	_ resource.Resource                     = &DhcpOptionsResource{}
-	_ resource.ResourceWithConfigure        = &DhcpOptionsResource{}
-	_ resource.ResourceWithImportState      = &DhcpOptionsResource{}
-	_ resource.ResourceWithConfigValidators = &DhcpOptionsResource{}
+	_ resource.Resource                     = &Resource{}
+	_ resource.ResourceWithConfigure        = &Resource{}
+	_ resource.ResourceWithImportState      = &Resource{}
+	_ resource.ResourceWithConfigValidators = &Resource{}
 )
 
-type DhcpOptionsResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewDhcpOptionsResource() resource.Resource {
-	return &DhcpOptionsResource{}
+	return &Resource{}
 }
 
-func (r *DhcpOptionsResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -50,19 +50,19 @@ func (r *DhcpOptionsResource) Configure(_ context.Context, request resource.Conf
 	r.provider = provider
 }
 
-func (r *DhcpOptionsResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *DhcpOptionsResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_dhcp_options"
 }
 
-func (r *DhcpOptionsResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = DhcpOptionsResourceSchema(ctx)
 }
 
-func (r *DhcpOptionsResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
+func (r *Resource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
 	return []resource.ConfigValidator{
 		resourcevalidator.AtLeastOneOf(
 			path.Root("domain_name").Expression(),
@@ -73,7 +73,7 @@ func (r *DhcpOptionsResource) ConfigValidators(_ context.Context) []resource.Con
 	}
 }
 
-func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan DhcpOptionsModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -96,7 +96,7 @@ func (r *DhcpOptionsResource) Create(ctx context.Context, request resource.Creat
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -119,7 +119,7 @@ func (r *DhcpOptionsResource) Read(ctx context.Context, request resource.ReadReq
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err                error
 		numSpotDHCPOptions *numspot.DhcpOptionsSet
@@ -156,7 +156,7 @@ func (r *DhcpOptionsResource) Update(ctx context.Context, request resource.Updat
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *DhcpOptionsResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {

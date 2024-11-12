@@ -19,20 +19,20 @@ import (
 )
 
 var (
-	_ resource.Resource                = &ImageResource{}
-	_ resource.ResourceWithConfigure   = &ImageResource{}
-	_ resource.ResourceWithImportState = &ImageResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type ImageResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewImageResource() resource.Resource {
-	return &ImageResource{}
+	return &Resource{}
 }
 
-func (r *ImageResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -50,19 +50,19 @@ func (r *ImageResource) Configure(ctx context.Context, request resource.Configur
 	r.provider = provider
 }
 
-func (r *ImageResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *ImageResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_image"
 }
 
-func (r *ImageResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = ImageResourceSchema(ctx)
 }
 
-func (r *ImageResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan ImageModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -88,7 +88,7 @@ func (r *ImageResource) Create(ctx context.Context, request resource.CreateReque
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state ImageModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -112,7 +112,7 @@ func (r *ImageResource) Read(ctx context.Context, request resource.ReadRequest, 
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *ImageResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan  ImageModel
 		err          error
@@ -148,7 +148,7 @@ func (r *ImageResource) Update(ctx context.Context, request resource.UpdateReque
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *ImageResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {

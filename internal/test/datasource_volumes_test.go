@@ -34,7 +34,7 @@ data "numspot_volumes" "testdata" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_volumes.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_volumes.testdata", "items.*", map[string]string{
-						"id":                     acctest.PAIR_PREFIX + "numspot_volume.test.id",
+						"id":                     acctest.PairPrefix + "numspot_volume.test.id",
 						"type":                   "standard",
 						"size":                   "11",
 						"availability_zone_name": "cloudgouv-eu-west-1a",

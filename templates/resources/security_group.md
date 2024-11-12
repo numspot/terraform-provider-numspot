@@ -69,7 +69,7 @@ resource "numspot_security_group" "test" {
 ---
 **NOTE**
 
-By default when a security group is created on Numspot Cloud it come with a default outbound rule.
+By default, when a security group is created on Numspot Cloud it come with a default outbound rule.
 
 In order to be consistent with the plan the provider will remove this rule and require you to define it explicitly if you want it.
 

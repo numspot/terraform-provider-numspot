@@ -340,7 +340,7 @@ resource "numspot_image" "test" {
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test", "block_device_mappings.*", map[string]string{
-						"bsu.snapshot_id": acctest.PAIR_PREFIX + "numspot_snapshot.test.id",
+						"bsu.snapshot_id": acctest.PairPrefix + "numspot_snapshot.test.id",
 					}),
 					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform image test updated"),
 					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "true"),
@@ -394,7 +394,7 @@ resource "numspot_image" "test_recreate" {
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test_recreate", "block_device_mappings.*", map[string]string{
-						"bsu.snapshot_id": acctest.PAIR_PREFIX + "numspot_snapshot.test.id",
+						"bsu.snapshot_id": acctest.PairPrefix + "numspot_snapshot.test.id",
 					}),
 					resource.TestCheckResourceAttr("numspot_image.test_recreate", "name", "terraform image test updated"),
 					resource.TestCheckResourceAttr("numspot_image.test_recreate", "access.is_public", "true"),
@@ -448,7 +448,7 @@ resource "numspot_image" "test_recreate" {
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test_recreate", "block_device_mappings.*", map[string]string{
-						"bsu.snapshot_id": acctest.PAIR_PREFIX + "numspot_snapshot.test.id",
+						"bsu.snapshot_id": acctest.PairPrefix + "numspot_snapshot.test.id",
 					}),
 					resource.TestCheckResourceAttr("numspot_image.test_recreate", "name", "terraform image test updated"),
 					resource.TestCheckResourceAttr("numspot_image.test_recreate", "access.is_public", "false"),
@@ -602,7 +602,7 @@ resource "numspot_image" "test" {
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("numspot_image.test", "block_device_mappings.*", map[string]string{
-						"bsu.snapshot_id": acctest.PAIR_PREFIX + "numspot_snapshot.test_new.id",
+						"bsu.snapshot_id": acctest.PairPrefix + "numspot_snapshot.test_new.id",
 					}),
 					resource.TestCheckResourceAttr("numspot_image.test", "name", "terraform image test updated"),
 					resource.TestCheckResourceAttr("numspot_image.test", "access.is_public", "false"),

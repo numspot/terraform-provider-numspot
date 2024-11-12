@@ -71,6 +71,23 @@ func ReadClientGateway(ctx context.Context, provider *client.NumSpotSDK, clientG
 	return numSpotClientGateway.JSON200, nil
 }
 
+func ReadClientGateways(ctx context.Context, provider *client.NumSpotSDK, clientGateways numspot.ReadClientGatewaysParams) (*[]numspot.ClientGateway, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotClientGateways, err := numspotClient.ReadClientGatewaysWithResponse(ctx, provider.SpaceID, &clientGateways)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = utils.ParseHTTPError(numSpotClientGateways.Body, numSpotClientGateways.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	return numSpotClientGateways.JSON200.Items, nil
+}
+
 func RetryReadClientGateway(ctx context.Context, provider *client.NumSpotSDK, op string, clientGatewayID string) (*numspot.ClientGateway, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {

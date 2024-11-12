@@ -32,7 +32,7 @@ data "numspot_vpcs" "testdata" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_vpcs.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vpcs.testdata", "items.*", map[string]string{
-						"id":       acctest.PAIR_PREFIX + "numspot_vpc.test.id",
+						"id":       acctest.PairPrefix + "numspot_vpc.test.id",
 						"ip_range": "10.101.0.0/16",
 					}),
 				),

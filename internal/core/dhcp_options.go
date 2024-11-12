@@ -55,7 +55,7 @@ func DeleteDHCPOptions(ctx context.Context, provider *client.NumSpotSDK, dhcpOpt
 	return nil
 }
 
-func ReadDHCPOptions(ctx context.Context, provider *client.NumSpotSDK, dhcpOptions numspot.ReadDhcpOptionsParams) (*numspot.ReadDhcpOptionsResponseSchema, error) {
+func ReadDHCPOptions(ctx context.Context, provider *client.NumSpotSDK, dhcpOptions numspot.ReadDhcpOptionsParams) (*[]numspot.DhcpOptionsSet, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func ReadDHCPOptions(ctx context.Context, provider *client.NumSpotSDK, dhcpOptio
 		return nil, err
 	}
 
-	return read.JSON200, nil
+	return read.JSON200.Items, nil
 }
 
 func ReadDHCPOption(ctx context.Context, provider *client.NumSpotSDK, dhcpOptionID string) (*numspot.DhcpOptionsSet, error) {

@@ -484,8 +484,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"tags": tags.TagsSchema(ctx),
 			"type": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Description:         "The type of VM.",
 				MarkdownDescription: "The type of VM.",
 			},

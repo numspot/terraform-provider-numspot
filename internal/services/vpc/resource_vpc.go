@@ -17,20 +17,20 @@ import (
 )
 
 var (
-	_ resource.Resource                = &VpcResource{}
-	_ resource.ResourceWithConfigure   = &VpcResource{}
-	_ resource.ResourceWithImportState = &VpcResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type VpcResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewNetResource() resource.Resource {
-	return &VpcResource{}
+	return &Resource{}
 }
 
-func (r *VpcResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -48,19 +48,19 @@ func (r *VpcResource) Configure(ctx context.Context, request resource.ConfigureR
 	r.provider = provider
 }
 
-func (r *VpcResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *VpcResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_vpc"
 }
 
-func (r *VpcResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = VpcResourceSchema(ctx)
 }
 
-func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan VpcModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -85,7 +85,7 @@ func (r *VpcResource) Create(ctx context.Context, request resource.CreateRequest
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state VpcModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -109,7 +109,7 @@ func (r *VpcResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err         error
 		state, plan VpcModel
@@ -146,7 +146,7 @@ func (r *VpcResource) Update(ctx context.Context, request resource.UpdateRequest
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *VpcResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state VpcModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)

@@ -20,20 +20,20 @@ import (
 )
 
 var (
-	_ resource.Resource                = &NicResource{}
-	_ resource.ResourceWithConfigure   = &NicResource{}
-	_ resource.ResourceWithImportState = &NicResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type NicResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewNicResource() resource.Resource {
-	return &NicResource{}
+	return &Resource{}
 }
 
-func (r *NicResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -51,19 +51,19 @@ func (r *NicResource) Configure(ctx context.Context, request resource.ConfigureR
 	r.provider = provider
 }
 
-func (r *NicResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *NicResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_nic"
 }
 
-func (r *NicResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = NicResourceSchema(ctx)
 }
 
-func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan NicModel
 	var linkNicBody *numspot.LinkNicJSONRequestBody
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -92,7 +92,7 @@ func (r *NicResource) Create(ctx context.Context, request resource.CreateRequest
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
@@ -115,7 +115,7 @@ func (r *NicResource) Read(ctx context.Context, request resource.ReadRequest, re
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan NicModel
 		numspotNic  *numspot.Nic
@@ -170,7 +170,7 @@ func (r *NicResource) Update(ctx context.Context, request resource.UpdateRequest
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *NicResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {

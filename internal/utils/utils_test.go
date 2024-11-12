@@ -26,11 +26,11 @@ type StringObjValuable struct {
 	value string
 }
 
-func (s StringObjValuable) Type(ctx context.Context) attr.Type {
+func (s StringObjValuable) Type(_ context.Context) attr.Type {
 	return nil
 }
 
-func (s StringObjValuable) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+func (s StringObjValuable) ToTerraformValue(_ context.Context) (tftypes.Value, error) {
 	// TODO implement me
 	// return nil, nil
 	panic("implement me")
@@ -52,7 +52,7 @@ func (s StringObjValuable) String() string {
 	return s.value
 }
 
-func (s StringObjValuable) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+func (s StringObjValuable) ToObjectValue(_ context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	panic("implement me")
 }
 
@@ -61,7 +61,7 @@ var _ basetypes.ObjectValuable = &StringObjValuable{}
 func TestDiff_Create(t *testing.T) {
 	t.Parallel()
 
-	givenCurrent := []basetypes.ObjectValuable{}
+	givenCurrent := make([]basetypes.ObjectValuable, 0)
 	givenDesired := []basetypes.ObjectValuable{StringObjValuable{value: "toto"}}
 
 	wantCreate := givenDesired
@@ -95,7 +95,7 @@ func TestDiff_Update2(t *testing.T) {
 	givenDesired := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}, StringObjValuable{value: "toto"}}
 
 	wantCreate := []basetypes.ObjectValuable{StringObjValuable{value: "toto"}}
-	wantDelete := []basetypes.ObjectValuable{}
+	wantDelete := make([]basetypes.ObjectValuable, 0)
 
 	toCreate, toDelete := Diff(givenCurrent, givenDesired)
 
@@ -107,9 +107,9 @@ func TestDiff_Delete(t *testing.T) {
 	t.Parallel()
 
 	givenCurrent := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}}
-	givenDesired := []basetypes.ObjectValuable{}
+	givenDesired := make([]basetypes.ObjectValuable, 0)
 
-	wantCreate := []basetypes.ObjectValuable{}
+	wantCreate := make([]basetypes.ObjectValuable, 0)
 	wantDelete := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}}
 
 	toCreate, toDelete := Diff(givenCurrent, givenDesired)
@@ -121,7 +121,7 @@ func TestDiff_Delete(t *testing.T) {
 func TestDiffComparable_Create(t *testing.T) {
 	t.Parallel()
 
-	givenCurrent := []basetypes.ObjectValuable{}
+	givenCurrent := make([]basetypes.ObjectValuable, 0)
 	givenDesired := []basetypes.ObjectValuable{StringObjValuable{value: "toto"}}
 
 	wantCreate := givenDesired
@@ -155,7 +155,7 @@ func TestDiffComparable_Update2(t *testing.T) {
 	givenDesired := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}, StringObjValuable{value: "toto"}}
 
 	wantCreate := []basetypes.ObjectValuable{StringObjValuable{value: "toto"}}
-	wantDelete := []basetypes.ObjectValuable{}
+	wantDelete := make([]basetypes.ObjectValuable, 0)
 
 	toCreate, toDelete := DiffComparable(givenCurrent, givenDesired)
 
@@ -167,9 +167,9 @@ func TestDiffComparable_Delete(t *testing.T) {
 	t.Parallel()
 
 	givenCurrent := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}}
-	givenDesired := []basetypes.ObjectValuable{}
+	givenDesired := make([]basetypes.ObjectValuable, 0)
 
-	wantCreate := []basetypes.ObjectValuable{}
+	wantCreate := make([]basetypes.ObjectValuable, 0)
 	wantDelete := []basetypes.ObjectValuable{StringObjValuable{value: "tata"}}
 
 	toCreate, toDelete := DiffComparable(givenCurrent, givenDesired)

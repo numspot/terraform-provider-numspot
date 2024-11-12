@@ -22,23 +22,28 @@ func TestAccClientGatewaysDatasource(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: `
-resource "numspot_client_gateway" "test" {
+resource "numspot_client_gateway" "terraform-client-gateway-acctest" {
   connection_type = "ipsec.1"
   public_ip       = "192.0.2.0"
-  bgp_asn         = "65000"
+  bgp_asn         = 65000
+  tags = [{
+    key   = "name"
+    value = "terraform-client-gateway-acctest"
+  }]
 }
 
-data "numspot_client_gateways" "testdata" {
-  ids = [numspot_client_gateway.test.id]
+data "numspot_client_gateways" "datasource-client-gateways-acctest" {
+  ids = [numspot_client_gateway.terraform-client-gateway-acctest.id]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_client_gateways.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_client_gateways.testdata", "items.*", map[string]string{
-						"id":              acctest.PAIR_PREFIX + "numspot_client_gateway.test.id",
-						"connection_type": "ipsec.1",
-						"public_ip":       "192.0.2.0",
-						"bgp_asn":         "65000",
-					}),
+					resource.TestCheckResourceAttr("data.numspot_client_gateways.datasource-client-gateways-acctest", "items.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("data.numspot_client_gateways.datasource-client-gateways-acctest", "items.*",
+						map[string]string{
+							"connection_type": "ipsec.1",
+							"public_ip":       "192.0.2.0",
+							"bgp_asn":         "65000",
+						},
+					),
 				),
 			},
 		},

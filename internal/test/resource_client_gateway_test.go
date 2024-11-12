@@ -23,7 +23,7 @@ func TestAccClientGatewayResource(t *testing.T) {
 			// Step 1 - Create client gateway
 			{
 				Config: `
-resource "numspot_client_gateway" "terraform-client-gateway" {
+resource "numspot_client_gateway" "terraform-client-gateway-acctest" {
   connection_type = "ipsec.1"
   public_ip       = "192.0.0.1"
   bgp_asn         = 65000
@@ -36,11 +36,11 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
   ]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "connection_type", "ipsec.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "public_ip", "192.0.0.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "bgp_asn", "65000"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "connection_type", "ipsec.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "public_ip", "192.0.0.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "bgp_asn", "65000"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway-acctest", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "terraform-client-gateway",
 					}),
@@ -48,7 +48,7 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
 			},
 			// Step 2 - Import client gateway
 			{
-				ResourceName:            "numspot_client_gateway.terraform-client-gateway",
+				ResourceName:            "numspot_client_gateway.terraform-client-gateway-acctest",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"id"},
@@ -56,7 +56,7 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
 			// Step 3 - Replace client gateway public IP
 			{
 				Config: `
-resource "numspot_client_gateway" "terraform-client-gateway" {
+resource "numspot_client_gateway" "terraform-client-gateway-acctest" {
   connection_type = "ipsec.1"
   public_ip       = "192.0.0.2"
   bgp_asn         = 65000
@@ -69,11 +69,11 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
   ]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "connection_type", "ipsec.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "public_ip", "192.0.0.2"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "bgp_asn", "65000"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "connection_type", "ipsec.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "public_ip", "192.0.0.2"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "bgp_asn", "65000"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway-acctest", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "terraform-client-gateway",
 					}),
@@ -82,7 +82,7 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
 			// Step 4 - Replace client gateway BGP
 			{
 				Config: `
-resource "numspot_client_gateway" "terraform-client-gateway" {
+resource "numspot_client_gateway" "terraform-client-gateway-acctest" {
   connection_type = "ipsec.1"
   public_ip       = "192.0.0.1"
   bgp_asn         = 65001
@@ -95,11 +95,11 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
   ]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "connection_type", "ipsec.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "public_ip", "192.0.0.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "bgp_asn", "65001"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "connection_type", "ipsec.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "public_ip", "192.0.0.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "bgp_asn", "65001"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway-acctest", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "terraform-client-gateway",
 					}),
@@ -113,7 +113,7 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
 			// Step 6 - Create client gateway
 			{
 				Config: `
-resource "numspot_client_gateway" "terraform-client-gateway" {
+resource "numspot_client_gateway" "terraform-client-gateway-acctest" {
   connection_type = "ipsec.1"
   public_ip       = "192.0.0.1"
   bgp_asn         = "65000"
@@ -126,11 +126,11 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
   ]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "connection_type", "ipsec.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "public_ip", "192.0.0.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "bgp_asn", "65000"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "connection_type", "ipsec.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "public_ip", "192.0.0.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "bgp_asn", "65000"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway-acctest", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "terraform-client-gateway",
 					}),
@@ -139,7 +139,7 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
 			// Step 7 - Update client gateway tags
 			{
 				Config: `
-resource "numspot_client_gateway" "terraform-client-gateway" {
+resource "numspot_client_gateway" "terraform-client-gateway-acctest" {
   connection_type = "ipsec.1"
   public_ip       = "192.0.0.1"
   bgp_asn         = "65000"
@@ -152,11 +152,11 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
   ]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "connection_type", "ipsec.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "public_ip", "192.0.0.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "bgp_asn", "65000"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "connection_type", "ipsec.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "public_ip", "192.0.0.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "bgp_asn", "65000"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway-acctest", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "terraform-client-gateway-update",
 					}),
@@ -165,7 +165,7 @@ resource "numspot_client_gateway" "terraform-client-gateway" {
 			// Step 8 - Recreate client gateway
 			{
 				Config: `
-resource "numspot_client_gateway" "terraform-client-gateway-recreate" {
+resource "numspot_client_gateway" "terraform-client-gateway-recreate-acctest" {
   connection_type = "ipsec.1"
   public_ip       = "192.0.0.1"
   bgp_asn         = "65000"
@@ -178,11 +178,11 @@ resource "numspot_client_gateway" "terraform-client-gateway-recreate" {
   ]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-recreate", "connection_type", "ipsec.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-recreate", "public_ip", "192.0.0.1"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-recreate", "bgp_asn", "65000"),
-					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-recreate", "tags.#", "1"),
-					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway-recreate", "tags.*", map[string]string{
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-recreate-acctest", "connection_type", "ipsec.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-recreate-acctest", "public_ip", "192.0.0.1"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-recreate-acctest", "bgp_asn", "65000"),
+					resource.TestCheckResourceAttr("numspot_client_gateway.terraform-client-gateway-recreate-acctest", "tags.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs("numspot_client_gateway.terraform-client-gateway-recreate-acctest", "tags.*", map[string]string{
 						"key":   "name",
 						"value": "terraform-client-gateway-recreate",
 					}),

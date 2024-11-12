@@ -109,6 +109,18 @@ func ClientGatewayDataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
+type ClientGatewaysDataSourceModel struct {
+	Items           []ClientGatewayModel `tfsdk:"items"`
+	BgpAsns         types.List           `tfsdk:"bgp_asns"`
+	ConnectionTypes types.List           `tfsdk:"connection_types"`
+	IDs             types.List           `tfsdk:"ids"`
+	PublicIps       types.List           `tfsdk:"public_ips"`
+	States          types.List           `tfsdk:"states"`
+	TagKeys         types.List           `tfsdk:"tag_keys"`
+	TagValues       types.List           `tfsdk:"tag_values"`
+	Tags            types.List           `tfsdk:"tags"`
+}
+
 // MANUALLY EDITED : Model declaration removed
 
 // MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed

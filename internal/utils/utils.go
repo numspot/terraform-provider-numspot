@@ -6,7 +6,6 @@ import (
 	"slices"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -83,22 +82,6 @@ func PointerOf[T any](v T) *T {
 
 func IsTfValueNull(val attr.Value) bool {
 	return val.IsNull() || val.IsUnknown()
-}
-
-func FromUUIDListToTfStringSet(ctx context.Context, arr []uuid.UUID, diags *diag.Diagnostics) types.Set {
-	if arr == nil {
-		arr = make([]uuid.UUID, 0)
-	}
-
-	nArr := make([]string, 0, len(arr))
-	for _, id := range arr {
-		nArr = append(nArr, id.String())
-	}
-
-	setValue, diagnostics := types.SetValueFrom(ctx, types.StringType, nArr)
-
-	diags.Append(diagnostics...)
-	return setValue
 }
 
 func FromStringListPointerToTfStringSet(ctx context.Context, arr *[]string, diags *diag.Diagnostics) types.Set {
@@ -209,16 +192,6 @@ func TfStringListToStringList(ctx context.Context, list types.List, diags *diag.
 	}, ctx, list, diags)
 }
 
-func TfStringSetToStringPtrSet(ctx context.Context, set types.Set, diags *diag.Diagnostics) *[]string {
-	if set.IsNull() {
-		return nil
-	}
-	slice := TfSetToGenericSet(func(a types.String) string {
-		return a.ValueString()
-	}, ctx, set, diags)
-	return &slice
-}
-
 func TfStringListToStringPtrList(ctx context.Context, list types.List, diags *diag.Diagnostics) *[]string {
 	if list.IsNull() || list.IsUnknown() {
 		return nil
@@ -243,7 +216,7 @@ func TfStringListToTimeList(ctx context.Context, list types.List, format string,
 }
 
 func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, fn func(ctx context.Context, from B, diags *diag.Diagnostics) A, from []B, diags *diag.Diagnostics) basetypes.ListValue {
-	var emptyA A
+	emptyA := new(A)
 
 	to := make([]A, 0, len(from))
 	for i := range from {
@@ -255,13 +228,13 @@ func GenericListToTfListValue[A ITFValue, B any](ctx context.Context, fn func(ct
 		to = append(to, res)
 	}
 
-	listValue, diagnostics := types.ListValueFrom(ctx, emptyA.Type(ctx), to)
+	listValue, diagnostics := types.ListValueFrom(ctx, (*emptyA).Type(ctx), to)
 	diags.Append(diagnostics...)
 	return listValue
 }
 
 func GenericSetToTfSetValue[A ITFValue, B any](ctx context.Context, fn func(ctx context.Context, from B, diags *diag.Diagnostics) A, from []B, diags *diag.Diagnostics) basetypes.SetValue {
-	var emptyA A
+	emptyA := new(A)
 
 	to := make([]A, 0, len(from))
 	for i := range from {
@@ -273,20 +246,9 @@ func GenericSetToTfSetValue[A ITFValue, B any](ctx context.Context, fn func(ctx 
 		to = append(to, res)
 	}
 
-	setValue, diagnostics := types.SetValueFrom(ctx, emptyA.Type(ctx), to)
+	setValue, diagnostics := types.SetValueFrom(ctx, (*emptyA).Type(ctx), to)
 	diags.Append(diagnostics...)
 	return setValue
-}
-
-func StringSetToTfSetValue(ctx context.Context, from []string, diags *diag.Diagnostics) types.Set {
-	return GenericSetToTfSetValue(
-		ctx,
-		func(_ context.Context, from string, diags *diag.Diagnostics) types.String {
-			return types.StringValue(from)
-		},
-		from,
-		diags,
-	)
 }
 
 func StringListToTfListValue(ctx context.Context, from []string, diags *diag.Diagnostics) types.List {
@@ -316,35 +278,21 @@ func FromTfBoolValueToTfOrNull(element basetypes.BoolValue) basetypes.BoolValue 
 	return element
 }
 
-func FromTfStringListToStringList(ctx context.Context, list types.List, diags *diag.Diagnostics) []string {
-	return TfListToGenericList(func(a types.String) string {
-		return a.ValueString()
-	}, ctx, list, diags)
-}
-
 func FromTfStringSetToStringList(ctx context.Context, set types.Set, diags *diag.Diagnostics) []string {
 	return TfSetToGenericList(func(a types.String) string {
 		return a.ValueString()
 	}, ctx, set, diags)
 }
 
-func ParseUUID(id string, diags *diag.Diagnostics) uuid.UUID {
-	parsedUUID, err := uuid.Parse(id)
-	if err != nil {
-		diags.AddError("Failed to parse id", err.Error())
-	}
-	return parsedUUID
-}
-
 func FromHttpGenericListToTfList[httpType any, tfType any](
 	ctx context.Context,
-	http_items *[]httpType,
+	httpItems *[]httpType,
 	httpToTfParser func(context.Context, *httpType, *diag.Diagnostics) *tfType,
 	diags *diag.Diagnostics,
 ) []tfType {
-	itemList := make([]tfType, 0, len(*http_items))
+	itemList := make([]tfType, 0, len(*httpItems))
 
-	for _, item := range *http_items {
+	for _, item := range *httpItems {
 		tf := httpToTfParser(ctx, &item, diags)
 		if diags.HasError() {
 			return nil
@@ -400,10 +348,5 @@ func diffComparable[A comparable](slice1, slice2 []A) []A {
 
 func EmptyTrueBoolPointer() *bool {
 	value := true
-	return &value
-}
-
-func EmptyStrPointer() *string {
-	value := ""
 	return &value
 }

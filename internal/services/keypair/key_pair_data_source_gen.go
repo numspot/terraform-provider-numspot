@@ -69,4 +69,11 @@ type KeyPairDatasourceItemModel struct { // MANUALLY EDITED : Create Model from 
 	Type        types.String `tfsdk:"type"`
 }
 
+type KeypairsDataSourceModel struct {
+	Items               []KeyPairDatasourceItemModel `tfsdk:"items"`
+	KeypairFingerprints types.List                   `tfsdk:"keypair_fingerprints"`
+	KeypairNames        types.List                   `tfsdk:"keypair_names"`
+	KeypairTypes        types.List                   `tfsdk:"keypair_types"`
+}
+
 // MANUALLY EDITED : Functions associated with ItemsType / ItemsValue and Tags removed
