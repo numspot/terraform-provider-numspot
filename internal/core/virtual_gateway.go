@@ -126,6 +126,27 @@ func ReadVirtualGateway(ctx context.Context, provider *client.NumSpotSDK, virtua
 	return numSpotVirtualGateway.JSON200, nil
 }
 
+func ReadVirtualGatewaysWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadVirtualGatewaysParams) (*[]numspot.VirtualGateway, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotVirtualGateway, err := numspotClient.ReadVirtualGatewaysWithResponse(ctx, provider.SpaceID, &params)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = utils.ParseHTTPError(numSpotVirtualGateway.Body, numSpotVirtualGateway.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	if numSpotVirtualGateway.JSON200.Items == nil {
+		return nil, fmt.Errorf("HTTP call failed : expected a list of virtual gateway but got nil")
+	}
+
+	return numSpotVirtualGateway.JSON200.Items, nil
+}
+
 func RetryReadVirtualGateway(ctx context.Context, provider *client.NumSpotSDK, op string, virtualGatewayID string) (*numspot.VirtualGateway, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {

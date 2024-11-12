@@ -12,8 +12,9 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	utils "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type VolumesDataSourceModel struct {
@@ -83,21 +84,18 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 	if response.Diagnostics.HasError() {
 		return
 	}
-	numspotClient, err := d.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+
+	params := deserializeVolumeParams(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res, err := numspotClient.ReadVolumesWithResponse(ctx, d.provider.SpaceID, deserializeNumSpotVolumeDataSource(ctx, plan, &response.Diagnostics))
+	volumes, err := core.ReadVolumeWithParams(ctx, d.provider, params)
 	if err != nil {
 		return
 	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty volumes list")
-	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, serializeNumSpotDataSource, &response.Diagnostics)
+	objectItems := serializeVolumes(ctx, volumes, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -107,7 +105,7 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func deserializeNumSpotVolumeDataSource(ctx context.Context, tf VolumesDataSourceModel, diags *diag.Diagnostics) *numspot.ReadVolumesParams {
+func deserializeVolumeParams(ctx context.Context, tf VolumesDataSourceModel, diags *diag.Diagnostics) numspot.ReadVolumesParams {
 	var creationDatesPtr *[]time.Time
 	var linkVolumeLinkDatesPtr *[]time.Time
 	var volumeSizesPtr *[]int
@@ -126,7 +124,7 @@ func deserializeNumSpotVolumeDataSource(ctx context.Context, tf VolumesDataSourc
 		volumeSizes := utils.TFInt64ListToIntList(ctx, tf.VolumeSizes, diags)
 		volumeSizesPtr = &volumeSizes
 	}
-	return &numspot.ReadVolumesParams{
+	return numspot.ReadVolumesParams{
 		CreationDates:                creationDatesPtr,
 		LinkVolumeDeleteOnVmDeletion: tf.LinkVolumeDeleteOnVmDeletion.ValueBoolPointer(),
 		LinkVolumeDeviceNames:        utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeDeviceNames, diags),
@@ -142,40 +140,42 @@ func deserializeNumSpotVolumeDataSource(ctx context.Context, tf VolumesDataSourc
 	}
 }
 
-func serializeNumSpotDataSource(ctx context.Context, http *numspot.Volume, diags *diag.Diagnostics) *DatasourceVolumeModel {
-	var (
-		linkedVolumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
-		tagsList      types.List
-	)
-
-	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-	}
-
-	if http.LinkedVolumes != nil {
-		linkedVolumes = utils.GenericListToTfListValue(
-			ctx,
-			fromLinkedVolumeSchemaToTFVolumesList,
-			*http.LinkedVolumes,
-			diags,
+func serializeVolumes(ctx context.Context, volumes *[]numspot.Volume, diags *diag.Diagnostics) []DatasourceVolumeModel {
+	return utils.FromHttpGenericListToTfList(ctx, volumes, func(ctx context.Context, volume *numspot.Volume, diags *diag.Diagnostics) *DatasourceVolumeModel {
+		var (
+			linkedVolumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
+			tagsList      types.List
 		)
-	}
 
-	return &DatasourceVolumeModel{
-		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
-		CreationDate:         types.StringValue(http.CreationDate.String()),
-		Id:                   types.StringPointerValue(http.Id),
-		Iops:                 utils.FromIntPtrToTfInt64(http.Iops),
-		LinkedVolumes:        linkedVolumes,
-		Size:                 utils.FromIntPtrToTfInt64(http.Size),
-		SnapshotId:           types.StringPointerValue(http.SnapshotId),
-		State:                types.StringPointerValue(http.State),
-		Type:                 types.StringPointerValue(http.Type),
-		Tags:                 tagsList,
-	}
+		if volume.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *volume.Tags, diags)
+		}
+
+		if volume.LinkedVolumes != nil {
+			linkedVolumes = utils.GenericListToTfListValue(
+				ctx,
+				serializeLinkedVolume,
+				*volume.LinkedVolumes,
+				diags,
+			)
+		}
+
+		return &DatasourceVolumeModel{
+			AvailabilityZoneName: types.StringPointerValue(volume.AvailabilityZoneName),
+			CreationDate:         types.StringValue(volume.CreationDate.String()),
+			Id:                   types.StringPointerValue(volume.Id),
+			Iops:                 utils.FromIntPtrToTfInt64(volume.Iops),
+			LinkedVolumes:        linkedVolumes,
+			Size:                 utils.FromIntPtrToTfInt64(volume.Size),
+			SnapshotId:           types.StringPointerValue(volume.SnapshotId),
+			State:                types.StringPointerValue(volume.State),
+			Type:                 types.StringPointerValue(volume.Type),
+			Tags:                 tagsList,
+		}
+	}, diags)
 }
 
-func fromLinkedVolumeSchemaToTFVolumesList(ctx context.Context, http numspot.LinkedVolume, diags *diag.Diagnostics) LinkedVolumesValue {
+func serializeLinkedVolume(ctx context.Context, http numspot.LinkedVolume, diags *diag.Diagnostics) LinkedVolumesValue {
 	value, diagnostics := NewLinkedVolumesValue(
 		LinkedVolumesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{

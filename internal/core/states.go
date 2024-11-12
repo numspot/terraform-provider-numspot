@@ -2,9 +2,9 @@ package core
 
 const (
 	createOp = "create"
-	readOp   = "read"
+	// readOp   = "read"
 	updateOp = "update"
-	deleteOp = "delete"
+	// deleteOp = "delete"
 )
 
 const (
@@ -25,7 +25,7 @@ const (
 	shutdown      = "shutdown"
 	shuttingDown  = "shutting-down"
 	terminated    = "terminated"
-	created       = "created"
-	available     = "available"
-	inUse         = "in-use"
+	// created       = "created"
+	available = "available"
+	inUse     = "in-use"
 )

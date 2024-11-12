@@ -52,7 +52,7 @@ data "numspot_route_tables" "testdata" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_route_tables.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_route_tables.testdata", "items.*", map[string]string{
-						"id": acctest.PAIR_PREFIX + "numspot_route_table.test.id",
+						"id": acctest.PairPrefix + "numspot_route_table.test.id",
 					}),
 				),
 			},

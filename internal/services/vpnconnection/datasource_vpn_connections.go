@@ -3,11 +3,9 @@ package vpnconnection
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
@@ -87,18 +85,17 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadVpnConnectionsResponse, error) {
-		return numspotClient.ReadVpnConnectionsWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	res, err := numspotClient.ReadVpnConnectionsWithResponse(ctx, d.provider.SpaceID, &params)
+	if err != nil {
+		response.Diagnostics.AddError("unable to read vpn connection", err.Error())
 		return
 	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Vpn Connection list")
+	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
+		response.Diagnostics.AddError("unable to read vpn connection", err.Error())
+		return
 	}
 
 	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VpnConnectionsFromHttpToTfDatasource, &response.Diagnostics)
-
 	if response.Diagnostics.HasError() {
 		return
 	}

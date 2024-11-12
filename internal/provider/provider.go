@@ -61,7 +61,7 @@ func ProvideNumSpotProviderWithHTTPClient(client *http.Client) func() provider.P
 	}
 }
 
-func (p *numspotProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *numspotProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"numspot_host": schema.StringAttribute{
@@ -210,12 +210,12 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	resp.ResourceData = numSpotSDK
 }
 
-func (p *numspotProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+func (p *numspotProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "numspot"
 	resp.Version = p.version
 }
 
-func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p *numspotProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		loadbalancer.NewLoadBalancersDataSource,
 		dhcpoptions.NewDHCPOptionsDataSource,
@@ -239,7 +239,7 @@ func (p *numspotProvider) DataSources(ctx context.Context) []func() datasource.D
 	}
 }
 
-func (p *numspotProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		clientgateway.NewClientGatewayResource,
 		flexiblegpu.NewFlexibleGpuResource,

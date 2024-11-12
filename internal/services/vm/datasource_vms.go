@@ -3,7 +3,6 @@ package vm
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -12,6 +11,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -65,28 +65,18 @@ func (d *vmsDataSource) Read(ctx context.Context, request datasource.ReadRequest
 		return
 	}
 
-	params := VmsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializeVmParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
+	numspotVm, err := core.ReadVMsWithParams(ctx, d.provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("unable to read vms", err.Error())
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadVmsResponse, error) {
-		return numspotClient.ReadVmsWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty VM list")
-	}
-
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VmsFromHttpToTfDatasource, &response.Diagnostics)
+	objectItems := serializeVms(ctx, numspotVm, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -97,7 +87,7 @@ func (d *vmsDataSource) Read(ctx context.Context, request datasource.ReadRequest
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func VmsFromTfToAPIReadParams(ctx context.Context, tf VmsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVmsParams {
+func deserializeVmParams(ctx context.Context, tf VmsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVmsParams {
 	return numspot.ReadVmsParams{
 		TagKeys:                              utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
 		TagValues:                            utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
@@ -149,114 +139,116 @@ func VmsFromTfToAPIReadParams(ctx context.Context, tf VmsDataSourceModel, diags 
 	}
 }
 
-func VmsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vm, diags *diag.Diagnostics) *VmModelItemDataSource {
-	var (
-		blockDeviceMappings = types.ListNull(BlockDeviceMappingsValue{}.Type(ctx))
-		nics                = types.ListNull(NicsValue{}.Type(ctx))
-		securityGroups      = types.ListNull(SecurityGroupsValue{}.Type(ctx))
-		productCodes        types.List
-		placement           PlacementValue
-		tagsList            types.List
-		launchNumberTf      types.Int64
-		creationDateTf      types.String
-	)
-
-	if http.BlockDeviceMappings != nil {
-		blockDeviceMappings = utils.GenericListToTfListValue(
-			ctx,
-			fromBlockDeviceMappingsToBlockDeviceMappingsList,
-			*http.BlockDeviceMappings,
-			diags,
+func serializeVms(ctx context.Context, vms *[]numspot.Vm, diags *diag.Diagnostics) []VmModelItemDataSource {
+	return utils.FromHttpGenericListToTfList(ctx, vms, func(ctx context.Context, vm *numspot.Vm, diags *diag.Diagnostics) *VmModelItemDataSource {
+		var (
+			blockDeviceMappings = types.ListNull(BlockDeviceMappingsValue{}.Type(ctx))
+			nics                = types.ListNull(NicsValue{}.Type(ctx))
+			securityGroups      = types.ListNull(SecurityGroupsValue{}.Type(ctx))
+			productCodes        types.List
+			placement           PlacementValue
+			tagsList            types.List
+			launchNumberTf      types.Int64
+			creationDateTf      types.String
 		)
-	}
 
-	if http.Nics != nil {
-		nics = utils.GenericListToTfListValue(
-			ctx,
-			fromNicsToNicsList,
-			*http.Nics,
-			diags,
-		)
-	}
-
-	if http.SecurityGroups != nil {
-		securityGroups = utils.GenericListToTfListValue(
-			ctx,
-			fromSecurityGroupToTFSecurityGroupList,
-			*http.SecurityGroups,
-			diags,
-		)
-	}
-
-	if http.Placement != nil {
-		var diagnostics diag.Diagnostics
-		placement, diagnostics = NewPlacementValue(
-			PlacementValue{}.AttributeTypes(ctx),
-			map[string]attr.Value{
-				"availability_zone_name": types.StringPointerValue(http.Placement.AvailabilityZoneName),
-				"tenancy":                types.StringPointerValue(http.Placement.Tenancy),
-			},
-		)
-		diags.Append(diagnostics...)
-	}
-
-	if http.ProductCodes != nil {
-		productCodes = utils.StringListToTfListValue(ctx, *http.ProductCodes, diags)
-	}
-
-	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-		if diags.HasError() {
-			return nil
+		if vm.BlockDeviceMappings != nil {
+			blockDeviceMappings = utils.GenericListToTfListValue(
+				ctx,
+				fromBlockDeviceMappingsToBlockDeviceMappingsList,
+				*vm.BlockDeviceMappings,
+				diags,
+			)
 		}
-	}
 
-	if http.LaunchNumber != nil {
-		launchNumber := int64(*http.LaunchNumber)
-		launchNumberTf = types.Int64PointerValue(&launchNumber)
-	}
+		if vm.Nics != nil {
+			nics = utils.GenericListToTfListValue(
+				ctx,
+				fromNicsToNicsList,
+				*vm.Nics,
+				diags,
+			)
+		}
 
-	if http.CreationDate != nil {
-		creationDate := http.CreationDate.String()
-		creationDateTf = types.StringPointerValue(&creationDate)
-	}
+		if vm.SecurityGroups != nil {
+			securityGroups = utils.GenericListToTfListValue(
+				ctx,
+				fromSecurityGroupToTFSecurityGroupList,
+				*vm.SecurityGroups,
+				diags,
+			)
+		}
 
-	return &VmModelItemDataSource{
-		Id:                            types.StringPointerValue(http.Id),
-		State:                         types.StringPointerValue(http.State),
-		BsuOptimized:                  types.BoolPointerValue(http.BsuOptimized),
-		Performance:                   types.StringPointerValue(http.Performance),
-		Tags:                          tagsList,
-		Architecture:                  types.StringPointerValue(http.Architecture),
-		BlockDeviceMappingsDataSource: blockDeviceMappings,
-		ClientToken:                   types.StringPointerValue(http.ClientToken),
-		CreationDate:                  creationDateTf,
-		DeletionProtection:            types.BoolPointerValue(http.DeletionProtection),
-		Hypervisor:                    types.StringPointerValue(http.Hypervisor),
-		ImageId:                       types.StringPointerValue(http.ImageId),
-		InitiatedShutdownBehavior:     types.StringPointerValue(http.InitiatedShutdownBehavior),
-		IsSourceDestChecked:           types.BoolPointerValue(http.IsSourceDestChecked),
-		KeypairName:                   types.StringPointerValue(http.KeypairName),
-		LaunchNumber:                  launchNumberTf,
-		NestedVirtualization:          types.BoolPointerValue(http.NestedVirtualization),
-		Nics:                          nics,
-		OsFamily:                      types.StringPointerValue(http.OsFamily),
-		Placement:                     placement,
-		PrivateDnsName:                types.StringPointerValue(http.PrivateDnsName),
-		PrivateIp:                     types.StringPointerValue(http.PrivateIp),
-		ProductCodes:                  productCodes,
-		PublicDnsName:                 types.StringPointerValue(http.PublicDnsName),
-		PublicIp:                      types.StringPointerValue(http.PublicIp),
-		ReservationId:                 types.StringPointerValue(http.ReservationId),
-		RootDeviceName:                types.StringPointerValue(http.RootDeviceName),
-		RootDeviceType:                types.StringPointerValue(http.RootDeviceType),
-		SecurityGroups:                securityGroups,
-		StateReason:                   types.StringPointerValue(http.StateReason),
-		SubnetId:                      types.StringPointerValue(http.SubnetId),
-		Type:                          types.StringPointerValue(http.Type),
-		UserData:                      types.StringPointerValue(http.UserData),
-		VpcId:                         types.StringPointerValue(http.VpcId),
-	}
+		if vm.Placement != nil {
+			var diagnostics diag.Diagnostics
+			placement, diagnostics = NewPlacementValue(
+				PlacementValue{}.AttributeTypes(ctx),
+				map[string]attr.Value{
+					"availability_zone_name": types.StringPointerValue(vm.Placement.AvailabilityZoneName),
+					"tenancy":                types.StringPointerValue(vm.Placement.Tenancy),
+				},
+			)
+			diags.Append(diagnostics...)
+		}
+
+		if vm.ProductCodes != nil {
+			productCodes = utils.StringListToTfListValue(ctx, *vm.ProductCodes, diags)
+		}
+
+		if vm.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *vm.Tags, diags)
+			if diags.HasError() {
+				return nil
+			}
+		}
+
+		if vm.LaunchNumber != nil {
+			launchNumber := int64(*vm.LaunchNumber)
+			launchNumberTf = types.Int64PointerValue(&launchNumber)
+		}
+
+		if vm.CreationDate != nil {
+			creationDate := vm.CreationDate.String()
+			creationDateTf = types.StringPointerValue(&creationDate)
+		}
+
+		return &VmModelItemDataSource{
+			Id:                            types.StringPointerValue(vm.Id),
+			State:                         types.StringPointerValue(vm.State),
+			BsuOptimized:                  types.BoolPointerValue(vm.BsuOptimized),
+			Performance:                   types.StringPointerValue(vm.Performance),
+			Tags:                          tagsList,
+			Architecture:                  types.StringPointerValue(vm.Architecture),
+			BlockDeviceMappingsDataSource: blockDeviceMappings,
+			ClientToken:                   types.StringPointerValue(vm.ClientToken),
+			CreationDate:                  creationDateTf,
+			DeletionProtection:            types.BoolPointerValue(vm.DeletionProtection),
+			Hypervisor:                    types.StringPointerValue(vm.Hypervisor),
+			ImageId:                       types.StringPointerValue(vm.ImageId),
+			InitiatedShutdownBehavior:     types.StringPointerValue(vm.InitiatedShutdownBehavior),
+			IsSourceDestChecked:           types.BoolPointerValue(vm.IsSourceDestChecked),
+			KeypairName:                   types.StringPointerValue(vm.KeypairName),
+			LaunchNumber:                  launchNumberTf,
+			NestedVirtualization:          types.BoolPointerValue(vm.NestedVirtualization),
+			Nics:                          nics,
+			OsFamily:                      types.StringPointerValue(vm.OsFamily),
+			Placement:                     placement,
+			PrivateDnsName:                types.StringPointerValue(vm.PrivateDnsName),
+			PrivateIp:                     types.StringPointerValue(vm.PrivateIp),
+			ProductCodes:                  productCodes,
+			PublicDnsName:                 types.StringPointerValue(vm.PublicDnsName),
+			PublicIp:                      types.StringPointerValue(vm.PublicIp),
+			ReservationId:                 types.StringPointerValue(vm.ReservationId),
+			RootDeviceName:                types.StringPointerValue(vm.RootDeviceName),
+			RootDeviceType:                types.StringPointerValue(vm.RootDeviceType),
+			SecurityGroups:                securityGroups,
+			StateReason:                   types.StringPointerValue(vm.StateReason),
+			SubnetId:                      types.StringPointerValue(vm.SubnetId),
+			Type:                          types.StringPointerValue(vm.Type),
+			UserData:                      types.StringPointerValue(vm.UserData),
+			VpcId:                         types.StringPointerValue(vm.VpcId),
+		}
+	}, diags)
 }
 
 func fromBlockDeviceMappingsToBlockDeviceMappingsList(ctx context.Context, http numspot.BlockDeviceMappingCreated, diags *diag.Diagnostics) BlockDeviceMappingsDataSourceValue {

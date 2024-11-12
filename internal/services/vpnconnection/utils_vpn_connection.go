@@ -13,11 +13,11 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-const VPNConnectionRouteStateDeleted = "deleted"
+const vpnConnectionRouteStateDeleted = "deleted"
 
-func VpnConnectionFromTfToHttp(tf *VpnConnectionModel) *numspot.VpnConnection {
-	return &numspot.VpnConnection{}
-}
+//func VpnConnectionFromTfToHttp(tf *VpnConnectionModel) *numspot.VpnConnection {
+//	return &numspot.VpnConnection{}
+//}
 
 func routeFromHTTP(ctx context.Context, elt numspot.RouteLight, diags *diag.Diagnostics) RoutesValue {
 	value, diagnostics := NewRoutesValue(
@@ -155,7 +155,7 @@ func VGWTelemetryFromHTTPToTF(ctx context.Context, http numspot.VgwTelemetry, di
 	return value
 }
 
-func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection, diags *diag.Diagnostics) *VpnConnectionModel {
+func vpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection, diags *diag.Diagnostics) *VpnConnectionModel {
 	var tagsTf types.List
 
 	if http.Tags != nil {
@@ -177,7 +177,7 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection,
 	if http.Routes != nil {
 		// Skip vpn routes with state deleted
 		httpRoutes := slices.DeleteFunc(*http.Routes, func(r numspot.RouteLight) bool {
-			return *r.State == VPNConnectionRouteStateDeleted
+			return *r.State == vpnConnectionRouteStateDeleted
 		})
 		routes := utils.GenericSetToTfSetValue(ctx, routeFromHTTP, httpRoutes, diags)
 		vpnConnectionModel.Routes = routes
@@ -191,7 +191,7 @@ func VpnConnectionFromHttpToTf(ctx context.Context, http *numspot.VpnConnection,
 	return &vpnConnectionModel
 }
 
-func VpnConnectionFromTfToCreateRequest(tf *VpnConnectionModel) numspot.CreateVpnConnectionJSONRequestBody {
+func vpnConnectionFromTfToCreateRequest(tf *VpnConnectionModel) numspot.CreateVpnConnectionJSONRequestBody {
 	return numspot.CreateVpnConnectionJSONRequestBody{
 		ClientGatewayId:  tf.ClientGatewayId.ValueString(),
 		ConnectionType:   tf.ConnectionType.ValueString(),
@@ -200,7 +200,7 @@ func VpnConnectionFromTfToCreateRequest(tf *VpnConnectionModel) numspot.CreateVp
 	}
 }
 
-func VpnConnectionFromTfToUpdateRequest(ctx context.Context, tf *VpnConnectionModel, diags *diag.Diagnostics) numspot.UpdateVpnConnectionJSONRequestBody {
+func vpnConnectionFromTfToUpdateRequest(ctx context.Context, tf *VpnConnectionModel, diags *diag.Diagnostics) numspot.UpdateVpnConnectionJSONRequestBody {
 	var vpnOptions *numspot.VpnOptionsToUpdate
 
 	phase2Options := phase2OptionsToUpdateFromTFToHTTP(ctx, tf.VpnOptions, diags)

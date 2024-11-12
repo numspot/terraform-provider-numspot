@@ -3,7 +3,6 @@ package vpc
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -11,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -76,28 +76,18 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
-	params := VPCsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
+	params := deserializeVPCParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
-	res := utils.ExecuteRequest(func() (*numspot.ReadVpcsResponse, error) {
-		return numspotClient.ReadVpcsWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+
+	numSpotVpc, err := core.ReadVPCsWithParams(ctx, d.provider, params)
+	if err != nil {
+		response.Diagnostics.AddError("unable to read internet gateway", err.Error())
 		return
 	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty VPCs list")
-	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, VPCsFromHttpToTfDatasource, &response.Diagnostics)
-
+	objectItems := serializeVPCs(ctx, numSpotVpc, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -108,7 +98,7 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVpcsParams {
+func deserializeVPCParams(ctx context.Context, tf VPCsDataSourceModel, diags *diag.Diagnostics) numspot.ReadVpcsParams {
 	return numspot.ReadVpcsParams{
 		DhcpOptionsSetIds: utils.TfStringListToStringPtrList(ctx, tf.DHCPOptionsSetIds, diags),
 		IpRanges:          utils.TfStringListToStringPtrList(ctx, tf.IPRanges, diags),
@@ -121,19 +111,21 @@ func VPCsFromTfToAPIReadParams(ctx context.Context, tf VPCsDataSourceModel, diag
 	}
 }
 
-func VPCsFromHttpToTfDatasource(ctx context.Context, http *numspot.Vpc, diags *diag.Diagnostics) *VpcModel {
-	var tagsList types.List
+func serializeVPCs(ctx context.Context, vpcs *[]numspot.Vpc, diags *diag.Diagnostics) []VpcModel {
+	return utils.FromHttpGenericListToTfList(ctx, vpcs, func(ctx context.Context, http *numspot.Vpc, diags *diag.Diagnostics) *VpcModel {
+		var tagsList types.List
 
-	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-	}
+		if http.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		}
 
-	return &VpcModel{
-		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
-		Id:               types.StringPointerValue(http.Id),
-		IpRange:          types.StringPointerValue(http.IpRange),
-		State:            types.StringPointerValue(http.State),
-		Tenancy:          types.StringPointerValue(http.Tenancy),
-		Tags:             tagsList,
-	}
+		return &VpcModel{
+			DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
+			Id:               types.StringPointerValue(http.Id),
+			IpRange:          types.StringPointerValue(http.IpRange),
+			State:            types.StringPointerValue(http.State),
+			Tenancy:          types.StringPointerValue(http.Tenancy),
+			Tags:             tagsList,
+		}
+	}, diags)
 }

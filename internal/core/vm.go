@@ -162,6 +162,26 @@ func ReadVM(ctx context.Context, provider *client.NumSpotSDK, vmID string) (*num
 	return numSpotReadVM.JSON200, err
 }
 
+func ReadVMsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadVmsParams) (*[]numspot.Vm, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotReadVM, err := numspotClient.ReadVmsWithResponse(ctx, provider.SpaceID, &params)
+	if err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(numSpotReadVM.Body, numSpotReadVM.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	if numSpotReadVM.JSON200.Items == nil {
+		return nil, fmt.Errorf("HTTP call failed : expected a list of vms but got nil")
+	}
+
+	return numSpotReadVM.JSON200.Items, err
+}
+
 func StopVM(ctx context.Context, provider *client.NumSpotSDK, vm string) (err error) {
 	if vm == "" {
 		return nil

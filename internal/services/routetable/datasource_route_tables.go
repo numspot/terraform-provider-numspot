@@ -155,7 +155,7 @@ func serializeRouteTableDatasource(ctx context.Context, http *numspot.RouteTable
 	if http.RoutePropagatingVirtualGateways != nil {
 		routePropagatingVirtualGatewaysList = utils.GenericListToTfListValue(
 			ctx,
-			serializaRouteTableRoutePropagatingVirtualGateways,
+			serializeRouteTableRoutePropagatingVirtualGateways,
 			*http.RoutePropagatingVirtualGateways, diags)
 		if diags.HasError() {
 			return nil
@@ -179,7 +179,7 @@ func serializeRouteTableDatasource(ctx context.Context, http *numspot.RouteTable
 	}
 }
 
-func serializaRouteTableRoutePropagatingVirtualGateways(ctx context.Context, route numspot.RoutePropagatingVirtualGateway, diags *diag.Diagnostics) RoutePropagatingVirtualGatewaysValue {
+func serializeRouteTableRoutePropagatingVirtualGateways(ctx context.Context, route numspot.RoutePropagatingVirtualGateway, diags *diag.Diagnostics) RoutePropagatingVirtualGatewaysValue {
 	value, diagnostics := NewRoutePropagatingVirtualGatewaysValue(
 		RoutePropagatingVirtualGatewaysValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{

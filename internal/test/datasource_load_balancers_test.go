@@ -22,36 +22,46 @@ func TestAccLoadBalancerDatasource(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: `
-resource "numspot_vpc" "vpc" {
+resource "numspot_vpc" "terraform-dep-vpc-load-balancer" {
   ip_range = "10.101.0.0/16"
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest"
+  }]
 }
 
-resource "numspot_subnet" "subnet" {
-  vpc_id   = numspot_vpc.vpc.id
+resource "numspot_subnet" "terraform-dep-subnet-load-balancer" {
+  vpc_id   = numspot_vpc.terraform-dep-vpc-load-balancer.id
   ip_range = "10.101.1.0/24"
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest"
+  }]
 }
 
-resource "numspot_load_balancer" "test" {
-  name = "elb-test"
-  listeners = [
-    {
-      backend_port           = "80"
-      load_balancer_port     = "80"
-      load_balancer_protocol = "TCP"
+resource "numspot_load_balancer" "terraform-load-balancer-acctest" {
+  name = "terraform-load-balancer-acctest"
+  listeners = [{
+    backend_port           = "80"
+    load_balancer_port     = "80"
+    load_balancer_protocol = "TCP"
 
-    }
-  ]
-  subnets = [numspot_subnet.subnet.id]
+  }]
+  subnets = [numspot_subnet.terraform-dep-subnet-load-balancer.id]
   type    = "internal"
+  tags = [{
+    key   = "name"
+    value = "terraform-load-balancer-acctest"
+  }]
 }
-data "numspot_load_balancers" "testdata" {
-  load_balancer_names = [numspot_load_balancer.test.name]
+
+data "numspot_load_balancers" "datasource-load-balancer-acctest" {
+  load_balancer_names = [numspot_load_balancer.terraform-load-balancer-acctest.name]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_load_balancers.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_load_balancers.testdata", "items.*", map[string]string{
-						"subnets.0":                          acctest.PAIR_PREFIX + "numspot_subnet.subnet.id",
-						"name":                               "elb-test",
+					resource.TestCheckResourceAttr("data.numspot_load_balancers.datasource-load-balancer-acctest", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_load_balancers.datasource-load-balancer-acctest", "items.*", map[string]string{
+						"name":                               "terraform-load-balancer-acctest",
 						"listeners.0.backend_port":           "80",
 						"listeners.0.load_balancer_port":     "80",
 						"listeners.0.load_balancer_protocol": "TCP",

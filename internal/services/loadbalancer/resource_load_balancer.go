@@ -18,20 +18,20 @@ import (
 )
 
 var (
-	_ resource.Resource                = &LoadBalancerResource{}
-	_ resource.ResourceWithConfigure   = &LoadBalancerResource{}
-	_ resource.ResourceWithImportState = &LoadBalancerResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type LoadBalancerResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewLoadBalancerResource() resource.Resource {
-	return &LoadBalancerResource{}
+	return &Resource{}
 }
 
-func (r *LoadBalancerResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -49,19 +49,19 @@ func (r *LoadBalancerResource) Configure(ctx context.Context, request resource.C
 	r.provider = numSpotClient
 }
 
-func (r *LoadBalancerResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("name"), request, response)
 }
 
-func (r *LoadBalancerResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_load_balancer"
 }
 
-func (r *LoadBalancerResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = LoadBalancerResourceSchema(ctx)
 }
 
-func (r *LoadBalancerResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan LoadBalancerModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -103,7 +103,7 @@ func (r *LoadBalancerResource) Create(ctx context.Context, request resource.Crea
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state LoadBalancerModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -127,7 +127,7 @@ func (r *LoadBalancerResource) Read(ctx context.Context, request resource.ReadRe
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *LoadBalancerResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan         LoadBalancerModel
 		numSpotLoadBalancer *numspot.LoadBalancer
@@ -212,7 +212,7 @@ func (r *LoadBalancerResource) Update(ctx context.Context, request resource.Upda
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *LoadBalancerResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state LoadBalancerModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)

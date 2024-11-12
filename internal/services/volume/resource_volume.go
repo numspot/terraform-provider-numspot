@@ -19,20 +19,20 @@ import (
 )
 
 var (
-	_ resource.Resource                = &VolumeResource{}
-	_ resource.ResourceWithConfigure   = &VolumeResource{}
-	_ resource.ResourceWithImportState = &VolumeResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type VolumeResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewVolumeResource() resource.Resource {
-	return &VolumeResource{}
+	return &Resource{}
 }
 
-func (r *VolumeResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -50,19 +50,19 @@ func (r *VolumeResource) Configure(ctx context.Context, request resource.Configu
 	r.provider = provider
 }
 
-func (r *VolumeResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *VolumeResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_volume"
 }
 
-func (r *VolumeResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = VolumeResourceSchema(ctx)
 }
 
-func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan VolumeModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -87,7 +87,7 @@ func (r *VolumeResource) Create(ctx context.Context, request resource.CreateRequ
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state VolumeModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -110,7 +110,7 @@ func (r *VolumeResource) Read(ctx context.Context, request resource.ReadRequest,
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err           error
 		numSpotVolume *numspot.Volume
@@ -141,7 +141,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	newDeviceName := plan.LinkVM.DeviceName.ValueString()
 
 	if !plan.Size.Equal(state.Size) || !plan.Type.Equal(state.Type) || (!utils.IsTfValueNull(plan.Iops) && !plan.Iops.Equal(state.Iops)) {
-		numSpotVolume, err = core.UpdateVolumeAttributes(ctx, r.provider, deserializeUpdateNumspotVolume(plan), volumeID, stateVMID, planVMID)
+		numSpotVolume, err = core.UpdateVolumeAttributes(ctx, r.provider, deserializeUpdateNumspotVolume(plan), volumeID, stateVMID)
 		if err != nil {
 			response.Diagnostics.AddError("unable to update volume attributes", err.Error())
 			return
@@ -171,7 +171,7 @@ func (r *VolumeResource) Update(ctx context.Context, request resource.UpdateRequ
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *VolumeResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state VolumeModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)

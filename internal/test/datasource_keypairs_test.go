@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccKeypairDatasource(t *testing.T) {
-	acct := acctest.NewAccTest(t, false, "")
+	acct := acctest.NewAccTest(t, true, "record")
 	defer func() {
 		err := acct.Cleanup()
 		require.NoError(t, err)
@@ -22,17 +22,17 @@ func TestAccKeypairDatasource(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: `
-resource "numspot_keypair" "test" {
-  name = "key-pair-name-test-terraform"
+resource "numspot_keypair" "terraform-keypair-acctest" {
+  name = "key-pair-name-terraform-acctest"
 }
 
-data "numspot_keypairs" "testdata" {
-  keypair_names = [numspot_keypair.test.name]
+data "numspot_keypairs" "datasource-keypair-acctest" {
+  keypair_names = [numspot_keypair.terraform-keypair-acctest.name]
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.numspot_keypairs.testdata", "items.#", "1"),
-					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_keypairs.testdata", "items.*", map[string]string{
-						"name": "key-pair-name-test-terraform",
+					resource.TestCheckResourceAttr("data.numspot_keypairs.datasource-keypair-acctest", "items.#", "1"),
+					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_keypairs.datasource-keypair-acctest", "items.*", map[string]string{
+						"name": "key-pair-name-terraform-acctest",
 					}),
 				),
 			},

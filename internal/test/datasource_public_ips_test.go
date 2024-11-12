@@ -51,8 +51,8 @@ data "numspot_public_ips" "testdata" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_public_ips.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_public_ips.testdata", "items.*", map[string]string{
-						"id":        acctest.PAIR_PREFIX + "numspot_public_ip.test.id",
-						"public_ip": acctest.PAIR_PREFIX + "numspot_public_ip.test.public_ip",
+						"id":        acctest.PairPrefix + "numspot_public_ip.test.id",
+						"public_ip": acctest.PairPrefix + "numspot_public_ip.test.public_ip",
 					}),
 				),
 			},

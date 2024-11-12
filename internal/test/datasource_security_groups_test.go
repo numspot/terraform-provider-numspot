@@ -52,7 +52,7 @@ data "numspot_security_groups" "testdata" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_security_groups.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_security_groups.testdata", "items.*", map[string]string{
-						"id": acctest.PAIR_PREFIX + "numspot_security_group.test.id",
+						"id": acctest.PairPrefix + "numspot_security_group.test.id",
 					}),
 				),
 			},

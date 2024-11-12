@@ -44,7 +44,7 @@ data "numspot_vms" "testdata" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_vms.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vms.testdata", "items.*", map[string]string{
-						"id":       acctest.PAIR_PREFIX + "numspot_vm.test.id",
+						"id":       acctest.PairPrefix + "numspot_vm.test.id",
 						"type":     "ns-cus6-2c4r",
 						"image_id": "ami-0b7df82c",
 					}),

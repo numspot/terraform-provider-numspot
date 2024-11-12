@@ -89,6 +89,23 @@ func ReadLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBala
 	return numSpotReadLoadBalancer.JSON200, err
 }
 
+func ReadLoadBalancers(ctx context.Context, provider *client.NumSpotSDK, loadBalancerParams numspot.ReadLoadBalancersParams) (numSpotLoadBalancers *[]numspot.LoadBalancer, err error) {
+	var numSpotReadLoadBalancer *numspot.ReadLoadBalancersResponse
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	numSpotReadLoadBalancer, err = numspotClient.ReadLoadBalancersWithResponse(ctx, provider.SpaceID, &loadBalancerParams)
+	if err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(numSpotReadLoadBalancer.Body, numSpotReadLoadBalancer.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	return numSpotReadLoadBalancer.JSON200.Items, err
+}
+
 func UpdateLoadBalancerAttributes(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, numSpotLoadBalancerUpdate numspot.UpdateLoadBalancerJSONRequestBody) (numSpotLoadBalancer *numspot.LoadBalancer, err error) {
 	spaceID := provider.SpaceID
 

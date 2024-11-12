@@ -41,7 +41,7 @@ data "numspot_vpc_peerings" "testdata" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_vpc_peerings.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_vpc_peerings.testdata", "items.*", map[string]string{
-						"id": acctest.PAIR_PREFIX + "numspot_vpc_peering.test.id",
+						"id": acctest.PairPrefix + "numspot_vpc_peering.test.id",
 					}),
 				),
 			},

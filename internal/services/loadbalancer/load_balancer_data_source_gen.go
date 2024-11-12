@@ -252,6 +252,11 @@ func LoadBalancerDataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
+type loadBalancersDataSourceModel struct {
+	Items             []LoadBalancerModelDatasource `tfsdk:"items"`
+	LoadBalancerNames types.List                    `tfsdk:"load_balancer_names"`
+}
+
 type LoadBalancerModelDatasource struct { // MANUALLY EDITED : Create Model from ItemsValue struct
 	ApplicationStickyCookiePolicies types.List               `tfsdk:"application_sticky_cookie_policies"`
 	AvailabilityZoneNames           types.List               `tfsdk:"availability_zone_names"`
@@ -271,7 +276,5 @@ type LoadBalancerModelDatasource struct { // MANUALLY EDITED : Create Model from
 	ItemsType                       types.String             `tfsdk:"type"`
 	VpcId                           types.String             `tfsdk:"vpc_id"`
 }
-
-// MANUALLY EDITED : Model declaration removed
 
 // MANUALLY EDITED : All functions associated with ItemsType / ItemsValue and Tags removed

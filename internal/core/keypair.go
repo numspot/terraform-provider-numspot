@@ -41,7 +41,7 @@ func DeleteKeypair(ctx context.Context, provider *client.NumSpotSDK, keypairID s
 	return nil
 }
 
-func ReadKeypairs(ctx context.Context, provider *client.NumSpotSDK, keypairID string) (*numspot.Keypair, error) {
+func ReadKeypair(ctx context.Context, provider *client.NumSpotSDK, keypairID string) (*numspot.Keypair, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func ReadKeypairs(ctx context.Context, provider *client.NumSpotSDK, keypairID st
 	return (*numspot.Keypair)(numSpotReadKeypair.JSON200), nil
 }
 
-func ReadKeypairsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadKeypairsParams) (numSpotKeypair *[]numspot.Keypair, err error) {
+func ReadKeypairs(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadKeypairsParams) (numSpotKeypair *[]numspot.Keypair, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

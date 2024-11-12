@@ -41,8 +41,8 @@ data "numspot_nics" "testdata" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_nics.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_nics.testdata", "items.*", map[string]string{
-						"id":        acctest.PAIR_PREFIX + "numspot_nic.test.id",
-						"subnet_id": acctest.PAIR_PREFIX + "numspot_subnet.subnet.id",
+						"id":        acctest.PairPrefix + "numspot_nic.test.id",
+						"subnet_id": acctest.PairPrefix + "numspot_subnet.subnet.id",
 					}),
 				),
 			},

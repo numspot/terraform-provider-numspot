@@ -37,7 +37,7 @@ resource "numspot_subnet" "test" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_subnets.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_subnets.testdata", "items.*", map[string]string{
-						"id":       acctest.PAIR_PREFIX + "numspot_subnet.test.id",
+						"id":       acctest.PairPrefix + "numspot_subnet.test.id",
 						"ip_range": "10.101.1.0/24",
 					}),
 				),

@@ -99,6 +99,23 @@ func ReadSubnet(ctx context.Context, provider *client.NumSpotSDK, subnetID strin
 	return numSpotReadSubnet.JSON200, nil
 }
 
+func ReadSubnetsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadSubnetsParams) (*[]numspot.Subnet, error) {
+	numspotClient, err := provider.GetClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	numSpotReadSubnet, err := numspotClient.ReadSubnetsWithResponse(ctx, provider.SpaceID, &params)
+	if err != nil {
+		return nil, err
+	}
+	if err = utils.ParseHTTPError(numSpotReadSubnet.Body, numSpotReadSubnet.StatusCode()); err != nil {
+		return nil, err
+	}
+
+	return numSpotReadSubnet.JSON200.Items, nil
+}
+
 func RetryReadSubnet(ctx context.Context, provider *client.NumSpotSDK, op, subnetID string) (*numspot.Subnet, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {

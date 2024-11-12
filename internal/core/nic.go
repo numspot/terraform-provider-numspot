@@ -176,7 +176,7 @@ func RetryReadLinkNic(ctx context.Context, provider *client.NumSpotSDK, nicID st
 			if resp != nil && resp.JSON200 != nil && resp.JSON200.LinkNic != nil && resp.JSON200.State != nil {
 				return resp.JSON200, *resp.JSON200.LinkNic.State, nil
 			} else {
-				return nil, "", fmt.Errorf("Error while reading operation. No 'LinkNic.State' field found in response.")
+				return nil, "", fmt.Errorf("error while reading operation. No 'LinkNic.State' field found in response")
 			}
 		},
 		Timeout: utils.TfRequestRetryTimeout,

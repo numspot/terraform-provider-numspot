@@ -3,7 +3,6 @@ package virtualgateway
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -11,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -76,29 +76,18 @@ func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
-	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
-		return
-	}
-
 	params := deserializeVirtualGatewayParams(ctx, plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	res := utils.ExecuteRequest(func() (*numspot.ReadVirtualGatewaysResponse, error) {
-		return numspotClient.ReadVirtualGatewaysWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	numspotVirtualGateway, err := core.ReadVirtualGatewaysWithParams(ctx, d.provider, params)
+	if err != nil {
+		response.Diagnostics.AddError("unable to read virtual gateways", err.Error())
 		return
 	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Virtual Gateways list")
-	}
 
-	objectItems := serializeVirtualGatewayDatasource(ctx, res.JSON200.Items, &response.Diagnostics)
-
+	objectItems := serializeVirtualGatewayDatasource(ctx, numspotVirtualGateway, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}

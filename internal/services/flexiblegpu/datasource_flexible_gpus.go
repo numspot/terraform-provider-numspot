@@ -3,26 +3,15 @@ package flexiblegpu
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
-
-type FlexibleGpuDataSourceModel struct {
-	Items                 []FlexibleGpuModelItemDataSource `tfsdk:"items"`
-	AvailabilityZoneNames types.List                       `tfsdk:"availability_zone_names"`
-	DeleteOnVmDeletion    types.Bool                       `tfsdk:"delete_on_vm_deletion"`
-	Generations           types.List                       `tfsdk:"generations"`
-	Ids                   types.List                       `tfsdk:"ids"`
-	ModelNames            types.List                       `tfsdk:"model_names"`
-	States                types.List                       `tfsdk:"states"`
-	VmIds                 types.List                       `tfsdk:"vm_ids"`
-}
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
@@ -78,19 +67,20 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
 		return
 	}
-	params := FlexibleGpusFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
-	res := utils.ExecuteRequest(func() (*numspot.ReadFlexibleGpusResponse, error) {
-		return numspotClient.ReadFlexibleGpusWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
+	params := deserializeFlexibleGPUDataSource(ctx, plan, &response.Diagnostics)
+
+	res, err := numspotClient.ReadFlexibleGpusWithResponse(ctx, d.provider.SpaceID, &params)
+	if err != nil {
+		response.Diagnostics.AddError("unable to read flexible gpus", err.Error())
 		return
 	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty FlexibleGpus list")
+
+	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
+		response.Diagnostics.AddError("unable to read flexible gpus", err.Error())
+		return
 	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, FlexibleGpusFromHttpToTfDatasource, &response.Diagnostics)
-
+	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, serializeFlexibleGPUDataSource, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -99,4 +89,28 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 	state.Items = objectItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+}
+
+func deserializeFlexibleGPUDataSource(ctx context.Context, tf FlexibleGpuDataSourceModel, diags *diag.Diagnostics) numspot.ReadFlexibleGpusParams {
+	return numspot.ReadFlexibleGpusParams{
+		States:                utils.TfStringListToStringPtrList(ctx, tf.States, diags),
+		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		AvailabilityZoneNames: utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames, diags),
+		DeleteOnVmDeletion:    utils.FromTfBoolToBoolPtr(tf.DeleteOnVmDeletion),
+		Generations:           utils.TfStringListToStringPtrList(ctx, tf.Generations, diags),
+		ModelNames:            utils.TfStringListToStringPtrList(ctx, tf.ModelNames, diags),
+		VmIds:                 utils.TfStringListToStringPtrList(ctx, tf.VmIds, diags),
+	}
+}
+
+func serializeFlexibleGPUDataSource(_ context.Context, http *numspot.FlexibleGpu, _ *diag.Diagnostics) *FlexibleGpuModelItemDataSource {
+	return &FlexibleGpuModelItemDataSource{
+		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
+		Id:                   types.StringPointerValue(http.Id),
+		State:                types.StringPointerValue(http.State),
+		DeleteOnVmDeletion:   types.BoolPointerValue(http.DeleteOnVmDeletion),
+		Generation:           types.StringPointerValue(http.Generation),
+		ModelName:            types.StringPointerValue(http.ModelName),
+		VmId:                 types.StringPointerValue(http.VmId),
+	}
 }

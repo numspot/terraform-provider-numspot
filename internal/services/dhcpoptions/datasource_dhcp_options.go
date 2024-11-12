@@ -15,19 +15,6 @@ import (
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
 
-type DHCPOptionsDataSourceModel struct {
-	Items             []DhcpOptionsModel `tfsdk:"items"`
-	IDs               types.List         `tfsdk:"ids"`
-	Default           types.Bool         `tfsdk:"default"`
-	DomainNameServers types.List         `tfsdk:"domain_name_servers"`
-	DomainNames       types.List         `tfsdk:"domain_names"`
-	LogServers        types.List         `tfsdk:"log_servers"`
-	NTPServers        types.List         `tfsdk:"ntp_servers"`
-	TagKeys           types.List         `tfsdk:"tag_keys"`
-	TagValues         types.List         `tfsdk:"tag_values"`
-	Tags              types.List         `tfsdk:"tags"`
-}
-
 // Ensure the implementation satisfies the expected interfaces.
 var (
 	_ datasource.DataSource = &dhcpOptionsDataSource{}
@@ -72,32 +59,35 @@ func (d *dhcpOptionsDataSource) Schema(ctx context.Context, _ datasource.SchemaR
 // Read refreshes the Terraform state with the latest data.
 func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan DHCPOptionsDataSourceModel
-	var diags diag.Diagnostics
+
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	params := dhcpOptionsFromTfToAPIReadParams(ctx, plan, &diags)
-
-	dhcpOptions, err := core.ReadDHCPOptions(ctx, d.provider, params)
-	if err != nil {
+	dhcpOptionParams := deserializeReadDHCPOptions(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, dhcpOptions.Items, dhcpOptionsFromHttpToTfDatasource, &diags)
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
+	dhcpOptions, err := core.ReadDHCPOptions(ctx, d.provider, dhcpOptionParams)
+	if err != nil {
+		response.Diagnostics.AddError("unable to read dhcp options", err.Error())
+		return
+	}
+
+	dhcpOptionItems := serializeDHCPOptions(ctx, dhcpOptions, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems
+	state.Items = dhcpOptionItems
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func dhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSourceModel, diags *diag.Diagnostics) numspot.ReadDhcpOptionsParams {
+func deserializeReadDHCPOptions(ctx context.Context, tf DHCPOptionsDataSourceModel, diags *diag.Diagnostics) numspot.ReadDhcpOptionsParams {
 	ids := utils.TfStringListToStringPtrList(ctx, tf.IDs, diags)
 	domainNames := utils.TfStringListToStringPtrList(ctx, tf.DomainNames, diags)
 	dnsServers := utils.TfStringListToStringPtrList(ctx, tf.DomainNameServers, diags)
@@ -105,7 +95,7 @@ func dhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSou
 	ntpServers := utils.TfStringListToStringPtrList(ctx, tf.NTPServers, diags)
 	tagKeys := utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags)
 	tagValues := utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags)
-	tags := utils.TfStringListToStringPtrList(ctx, tf.Tags, diags)
+	numSpotTags := utils.TfStringListToStringPtrList(ctx, tf.Tags, diags)
 
 	return numspot.ReadDhcpOptionsParams{
 		Default:           tf.Default.ValueBoolPointer(),
@@ -115,38 +105,40 @@ func dhcpOptionsFromTfToAPIReadParams(ctx context.Context, tf DHCPOptionsDataSou
 		NtpServers:        ntpServers,
 		TagKeys:           tagKeys,
 		TagValues:         tagValues,
-		Tags:              tags,
+		Tags:              numSpotTags,
 		Ids:               ids,
 	}
 }
 
-func dhcpOptionsFromHttpToTfDatasource(ctx context.Context, http *numspot.DhcpOptionsSet, diags *diag.Diagnostics) *DhcpOptionsModel {
-	var tagsList types.List
-	dnsServers := utils.FromStringListPointerToTfStringList(ctx, http.DomainNameServers, diags)
-	if diags.HasError() {
-		return nil
-	}
-	logServers := utils.FromStringListPointerToTfStringList(ctx, http.LogServers, diags)
-	if diags.HasError() {
-		return nil
-	}
-	ntpServers := utils.FromStringListPointerToTfStringList(ctx, http.NtpServers, diags)
-	if diags.HasError() {
-		return nil
-	}
-	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+func serializeDHCPOptions(ctx context.Context, dhcpOptions *[]numspot.DhcpOptionsSet, diags *diag.Diagnostics) []DhcpOptionsModel {
+	return utils.FromHttpGenericListToTfList(ctx, dhcpOptions, func(ctx context.Context, dhcpOption *numspot.DhcpOptionsSet, diags *diag.Diagnostics) *DhcpOptionsModel {
+		var tagsList types.List
+		dnsServers := utils.FromStringListPointerToTfStringList(ctx, dhcpOption.DomainNameServers, diags)
 		if diags.HasError() {
 			return nil
 		}
-	}
-	return &DhcpOptionsModel{
-		Default:           types.BoolPointerValue(http.Default),
-		DomainName:        types.StringPointerValue(http.DomainName),
-		DomainNameServers: dnsServers,
-		Id:                types.StringPointerValue(http.Id),
-		LogServers:        logServers,
-		NtpServers:        ntpServers,
-		Tags:              tagsList,
-	}
+		logServers := utils.FromStringListPointerToTfStringList(ctx, dhcpOption.LogServers, diags)
+		if diags.HasError() {
+			return nil
+		}
+		ntpServers := utils.FromStringListPointerToTfStringList(ctx, dhcpOption.NtpServers, diags)
+		if diags.HasError() {
+			return nil
+		}
+		if dhcpOption.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *dhcpOption.Tags, diags)
+			if diags.HasError() {
+				return nil
+			}
+		}
+		return &DhcpOptionsModel{
+			Default:           types.BoolPointerValue(dhcpOption.Default),
+			DomainName:        types.StringPointerValue(dhcpOption.DomainName),
+			DomainNameServers: dnsServers,
+			Id:                types.StringPointerValue(dhcpOption.Id),
+			LogServers:        logServers,
+			NtpServers:        ntpServers,
+			Tags:              tagsList,
+		}
+	}, diags)
 }

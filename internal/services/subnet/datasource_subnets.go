@@ -3,7 +3,6 @@ package subnet
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -11,6 +10,7 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
@@ -76,25 +76,19 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 	if response.Diagnostics.HasError() {
 		return
 	}
-	numspotClient, err := d.provider.GetClient(ctx)
+
+	params := deserializeParams(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	numspotSubnet, err := core.ReadSubnetsWithParams(ctx, d.provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("unable to read subnets", err.Error())
 		return
 	}
 
-	params := SubnetsFromTfToAPIReadParams(ctx, plan, &response.Diagnostics)
-	res := utils.ExecuteRequest(func() (*numspot.ReadSubnetsResponse, error) {
-		return numspotClient.ReadSubnetsWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty Subnets list")
-	}
-
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, SubnetsFromHttpToTfDatasource, &response.Diagnostics)
-
+	objectItems := serializeSubnets(ctx, numspotSubnet, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -105,7 +99,7 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func SubnetsFromTfToAPIReadParams(ctx context.Context, tf SubnetsDataSourceModel, diags *diag.Diagnostics) numspot.ReadSubnetsParams {
+func deserializeParams(ctx context.Context, tf SubnetsDataSourceModel, diags *diag.Diagnostics) numspot.ReadSubnetsParams {
 	return numspot.ReadSubnetsParams{
 		AvailableIpsCounts:    utils.TFInt64ListToIntListPointer(ctx, tf.AvailableIpsCounts, diags),
 		IpRanges:              utils.TfStringListToStringPtrList(ctx, tf.IpRanges, diags),
@@ -116,21 +110,23 @@ func SubnetsFromTfToAPIReadParams(ctx context.Context, tf SubnetsDataSourceModel
 	}
 }
 
-func SubnetsFromHttpToTfDatasource(ctx context.Context, http *numspot.Subnet, diags *diag.Diagnostics) *SubnetModel {
-	var tagsList types.List
+func serializeSubnets(ctx context.Context, subnets *[]numspot.Subnet, diags *diag.Diagnostics) []SubnetModel {
+	return utils.FromHttpGenericListToTfList(ctx, subnets, func(ctx context.Context, subnet *numspot.Subnet, diags *diag.Diagnostics) *SubnetModel {
+		var tagsList types.List
 
-	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-	}
+		if subnet.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *subnet.Tags, diags)
+		}
 
-	return &SubnetModel{
-		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
-		AvailableIpsCount:    utils.FromIntPtrToTfInt64(http.AvailableIpsCount),
-		Id:                   types.StringPointerValue(http.Id),
-		IpRange:              types.StringPointerValue(http.IpRange),
-		MapPublicIpOnLaunch:  types.BoolPointerValue(http.MapPublicIpOnLaunch),
-		State:                types.StringPointerValue(http.State),
-		VpcId:                types.StringPointerValue(http.VpcId),
-		Tags:                 tagsList,
-	}
+		return &SubnetModel{
+			AvailabilityZoneName: types.StringPointerValue(subnet.AvailabilityZoneName),
+			AvailableIpsCount:    utils.FromIntPtrToTfInt64(subnet.AvailableIpsCount),
+			Id:                   types.StringPointerValue(subnet.Id),
+			IpRange:              types.StringPointerValue(subnet.IpRange),
+			MapPublicIpOnLaunch:  types.BoolPointerValue(subnet.MapPublicIpOnLaunch),
+			State:                types.StringPointerValue(subnet.State),
+			VpcId:                types.StringPointerValue(subnet.VpcId),
+			Tags:                 tagsList,
+		}
+	}, diags)
 }

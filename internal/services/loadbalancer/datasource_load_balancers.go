@@ -3,7 +3,6 @@ package loadbalancer
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -12,14 +11,10 @@ import (
 	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
 
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
 	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
 )
-
-type loadBalancersDataSourceModel struct {
-	Items             []LoadBalancerModelDatasource `tfsdk:"items"`
-	LoadBalancerNames types.List                    `tfsdk:"load_balancer_names"`
-}
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
@@ -65,107 +60,108 @@ func (d *loadBalancersDataSource) Schema(ctx context.Context, _ datasource.Schem
 // Read refreshes the Terraform state with the latest data.
 func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan loadBalancersDataSourceModel
+
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	numspotClient, err := d.provider.GetClient(ctx)
+	loadBalancerParams := deserializeReadLoadBalancers(ctx, plan, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	loadBalancers, err := core.ReadLoadBalancers(ctx, d.provider, loadBalancerParams)
 	if err != nil {
-		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
+		response.Diagnostics.AddError("unable to read load balancers", err.Error())
 		return
 	}
 
-	params := numspot.ReadLoadBalancersParams{}
-	if !plan.LoadBalancerNames.IsNull() {
-		lbNames := utils.TfStringListToStringList(ctx, plan.LoadBalancerNames, &response.Diagnostics)
-		params.LoadBalancerNames = &lbNames
-	}
-	res := utils.ExecuteRequest(func() (*numspot.ReadLoadBalancersResponse, error) {
-		return numspotClient.ReadLoadBalancersWithResponse(ctx, d.provider.SpaceID, &params)
-	}, http.StatusOK, &response.Diagnostics)
-	if res == nil {
-		return
-	}
-	if res.JSON200.Items == nil {
-		response.Diagnostics.AddError("HTTP call failed", "got empty load balancers list")
-	}
-
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, LoadBalancerFromHttpToTfDatasource, &response.Diagnostics)
-
+	loadBalancerItems := serializeLoadBalancers(ctx, loadBalancers, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems
+	state.Items = loadBalancerItems
 
-	response.Diagnostics.Append(response.State.Set(ctx, state)...)
+	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func LoadBalancerFromHttpToTfDatasource(ctx context.Context, http *numspot.LoadBalancer, diags *diag.Diagnostics) *LoadBalancerModelDatasource {
-	var tagsList types.List
+func deserializeReadLoadBalancers(ctx context.Context, plan loadBalancersDataSourceModel, diags *diag.Diagnostics) numspot.ReadLoadBalancersParams {
+	params := numspot.ReadLoadBalancersParams{}
+	if !plan.LoadBalancerNames.IsNull() {
+		lbNames := utils.TfStringListToStringList(ctx, plan.LoadBalancerNames, diags)
+		params.LoadBalancerNames = &lbNames
+	}
+	return params
+}
 
-	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+func serializeLoadBalancers(ctx context.Context, loadBalancers *[]numspot.LoadBalancer, diags *diag.Diagnostics) []LoadBalancerModelDatasource {
+	return utils.FromHttpGenericListToTfList(ctx, loadBalancers, func(ctx context.Context, loadBalancer *numspot.LoadBalancer, diags *diag.Diagnostics) *LoadBalancerModelDatasource {
+		var tagsList types.List
+
+		if loadBalancer.Tags != nil {
+			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *loadBalancer.Tags, diags)
+			if diags.HasError() {
+				return nil
+			}
+		}
+
+		applicationStickyCookiePoliciesTypes := utils.GenericListToTfListValue(ctx, applicationStickyCookiePoliciesFromHTTP, *loadBalancer.ApplicationStickyCookiePolicies, diags)
 		if diags.HasError() {
 			return nil
 		}
-	}
 
-	applicationStickyCookiePoliciestypes := utils.GenericListToTfListValue(ctx, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
-	if diags.HasError() {
-		return nil
-	}
+		listeners := utils.GenericSetToTfSetValue(ctx, listenersFromHTTP, *loadBalancer.Listeners, diags)
+		if diags.HasError() {
+			return nil
+		}
 
-	listeners := utils.GenericSetToTfSetValue(ctx, listenersFromHTTP, *http.Listeners, diags)
-	if diags.HasError() {
-		return nil
-	}
+		stickyCookiePolicies := utils.GenericListToTfListValue(ctx, stickyCookiePoliciesFromHTTP, *loadBalancer.StickyCookiePolicies, diags)
+		if diags.HasError() {
+			return nil
+		}
 
-	stickyCookiePolicies := utils.GenericListToTfListValue(ctx, stickyCookiePoliciesFromHTTP, *http.StickyCookiePolicies, diags)
-	if diags.HasError() {
-		return nil
-	}
+		backendIps := utils.FromStringListPointerToTfStringSet(ctx, loadBalancer.BackendIps, diags)
+		backendVmIds := utils.FromStringListPointerToTfStringSet(ctx, loadBalancer.BackendVmIds, diags)
+		healthCheck, diagnostics := NewHealthCheckValue(HealthCheckValue{}.AttributeTypes(ctx),
+			map[string]attr.Value{
+				"check_interval":      utils.FromIntToTfInt64(loadBalancer.HealthCheck.CheckInterval),
+				"healthy_threshold":   utils.FromIntToTfInt64(loadBalancer.HealthCheck.HealthyThreshold),
+				"path":                types.StringPointerValue(loadBalancer.HealthCheck.Path),
+				"port":                utils.FromIntToTfInt64(loadBalancer.HealthCheck.Port),
+				"protocol":            types.StringValue(loadBalancer.HealthCheck.Protocol),
+				"timeout":             utils.FromIntToTfInt64(loadBalancer.HealthCheck.Timeout),
+				"unhealthy_threshold": utils.FromIntToTfInt64(loadBalancer.HealthCheck.UnhealthyThreshold),
+			})
 
-	backendIps := utils.FromStringListPointerToTfStringSet(ctx, http.BackendIps, diags)
-	backendVmIds := utils.FromStringListPointerToTfStringSet(ctx, http.BackendVmIds, diags)
-	healthCheck, diagnostics := NewHealthCheckValue(HealthCheckValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"check_interval":      utils.FromIntToTfInt64(http.HealthCheck.CheckInterval),
-			"healthy_threshold":   utils.FromIntToTfInt64(http.HealthCheck.HealthyThreshold),
-			"path":                types.StringPointerValue(http.HealthCheck.Path),
-			"port":                utils.FromIntToTfInt64(http.HealthCheck.Port),
-			"protocol":            types.StringValue(http.HealthCheck.Protocol),
-			"timeout":             utils.FromIntToTfInt64(http.HealthCheck.Timeout),
-			"unhealthy_threshold": utils.FromIntToTfInt64(http.HealthCheck.UnhealthyThreshold),
-		})
+		diags.Append(diagnostics...)
+		securityGroups := utils.FromStringListPointerToTfStringList(ctx, loadBalancer.SecurityGroups, diags)
+		sourceSecurityGroup := SourceSecurityGroupValue{
+			SecurityGroupName: types.StringPointerValue(loadBalancer.SourceSecurityGroup.SecurityGroupName),
+		}
+		subnets := utils.FromStringListPointerToTfStringList(ctx, loadBalancer.Subnets, diags)
+		azNames := utils.FromStringListPointerToTfStringList(ctx, loadBalancer.AvailabilityZoneNames, diags)
 
-	diags.Append(diagnostics...)
-	securityGroups := utils.FromStringListPointerToTfStringList(ctx, http.SecurityGroups, diags)
-	sourceSecurityGroup := SourceSecurityGroupValue{
-		SecurityGroupName: types.StringPointerValue(http.SourceSecurityGroup.SecurityGroupName),
-	}
-	subnets := utils.FromStringListPointerToTfStringList(ctx, http.Subnets, diags)
-	azNames := utils.FromStringListPointerToTfStringList(ctx, http.AvailabilityZoneNames, diags)
-
-	return &LoadBalancerModelDatasource{
-		ApplicationStickyCookiePolicies: applicationStickyCookiePoliciestypes,
-		BackendIps:                      backendIps,
-		BackendVmIds:                    backendVmIds,
-		DnsName:                         types.StringPointerValue(http.DnsName),
-		HealthCheck:                     healthCheck,
-		Listeners:                       listeners,
-		Name:                            types.StringPointerValue(http.Name),
-		VpcId:                           types.StringPointerValue(http.VpcId),
-		PublicIp:                        types.StringPointerValue(http.PublicIp),
-		SecuredCookies:                  types.BoolPointerValue(http.SecuredCookies),
-		SecurityGroups:                  securityGroups,
-		SourceSecurityGroup:             sourceSecurityGroup,
-		StickyCookiePolicies:            stickyCookiePolicies,
-		Subnets:                         subnets,
-		AvailabilityZoneNames:           azNames,
-		ItemsType:                       types.StringPointerValue(http.Type),
-		Tags:                            tagsList,
-	}
+		return &LoadBalancerModelDatasource{
+			ApplicationStickyCookiePolicies: applicationStickyCookiePoliciesTypes,
+			BackendIps:                      backendIps,
+			BackendVmIds:                    backendVmIds,
+			DnsName:                         types.StringPointerValue(loadBalancer.DnsName),
+			HealthCheck:                     healthCheck,
+			Listeners:                       listeners,
+			Name:                            types.StringPointerValue(loadBalancer.Name),
+			VpcId:                           types.StringPointerValue(loadBalancer.VpcId),
+			PublicIp:                        types.StringPointerValue(loadBalancer.PublicIp),
+			SecuredCookies:                  types.BoolPointerValue(loadBalancer.SecuredCookies),
+			SecurityGroups:                  securityGroups,
+			SourceSecurityGroup:             sourceSecurityGroup,
+			StickyCookiePolicies:            stickyCookiePolicies,
+			Subnets:                         subnets,
+			AvailabilityZoneNames:           azNames,
+			ItemsType:                       types.StringPointerValue(loadBalancer.Type),
+			Tags:                            tagsList,
+		}
+	}, diags)
 }

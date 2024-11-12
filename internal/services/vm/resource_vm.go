@@ -19,20 +19,20 @@ import (
 )
 
 var (
-	_ resource.Resource                = &VmResource{}
-	_ resource.ResourceWithConfigure   = &VmResource{}
-	_ resource.ResourceWithImportState = &VmResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type VmResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewVmResource() resource.Resource {
-	return &VmResource{}
+	return &Resource{}
 }
 
-func (r *VmResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
@@ -49,19 +49,19 @@ func (r *VmResource) Configure(ctx context.Context, request resource.ConfigureRe
 	r.provider = provider
 }
 
-func (r *VmResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *VmResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_vm"
 }
 
-func (r *VmResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = VmResourceSchema(ctx)
 }
 
-func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan VmModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -91,7 +91,7 @@ func (r *VmResource) Create(ctx context.Context, request resource.CreateRequest,
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -113,7 +113,7 @@ func (r *VmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err         error
 		state, plan VmModel
@@ -174,7 +174,7 @@ func (r *VmResource) Update(ctx context.Context, request resource.UpdateRequest,
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *VmResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state VmModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {

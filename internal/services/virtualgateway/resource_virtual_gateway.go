@@ -18,25 +18,25 @@ import (
 )
 
 var (
-	_ resource.Resource                = &VirtualGatewayResource{}
-	_ resource.ResourceWithConfigure   = &VirtualGatewayResource{}
-	_ resource.ResourceWithImportState = &VirtualGatewayResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type VirtualGatewayResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewVirtualGatewayResource() resource.Resource {
-	return &VirtualGatewayResource{}
+	return &Resource{}
 }
 
-func (r *VirtualGatewayResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
 
-	client, ok := request.ProviderData.(*client.NumSpotSDK)
+	numSpotClient, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -46,22 +46,22 @@ func (r *VirtualGatewayResource) Configure(ctx context.Context, request resource
 		return
 	}
 
-	r.provider = client
+	r.provider = numSpotClient
 }
 
-func (r *VirtualGatewayResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *VirtualGatewayResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_virtual_gateway"
 }
 
-func (r *VirtualGatewayResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = VirtualGatewayResourceSchema(ctx)
 }
 
-func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan VirtualGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -84,7 +84,7 @@ func (r *VirtualGatewayResource) Create(ctx context.Context, request resource.Cr
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state *VirtualGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -107,7 +107,7 @@ func (r *VirtualGatewayResource) Read(ctx context.Context, request resource.Read
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan           VirtualGatewayModel
 		numSpotVirtualGateway *numspot.VirtualGateway
@@ -140,7 +140,7 @@ func (r *VirtualGatewayResource) Update(ctx context.Context, request resource.Up
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func (r *VirtualGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state VirtualGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 

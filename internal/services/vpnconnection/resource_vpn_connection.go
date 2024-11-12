@@ -3,7 +3,6 @@ package vpnconnection
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -17,25 +16,25 @@ import (
 )
 
 var (
-	_ resource.Resource                = &VpnConnectionResource{}
-	_ resource.ResourceWithConfigure   = &VpnConnectionResource{}
-	_ resource.ResourceWithImportState = &VpnConnectionResource{}
+	_ resource.Resource                = &Resource{}
+	_ resource.ResourceWithConfigure   = &Resource{}
+	_ resource.ResourceWithImportState = &Resource{}
 )
 
-type VpnConnectionResource struct {
+type Resource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewVpnConnectionResource() resource.Resource {
-	return &VpnConnectionResource{}
+	return &Resource{}
 }
 
-func (r *VpnConnectionResource) Configure(ctx context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
 
-	client, ok := request.ProviderData.(*client.NumSpotSDK)
+	numSpotClient, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
@@ -45,22 +44,22 @@ func (r *VpnConnectionResource) Configure(ctx context.Context, request resource.
 		return
 	}
 
-	r.provider = client
+	r.provider = numSpotClient
 }
 
-func (r *VpnConnectionResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *VpnConnectionResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_vpn_connection"
 }
 
-func (r *VpnConnectionResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = VpnConnectionResourceSchema(ctx)
 }
 
-func (r *VpnConnectionResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan VpnConnectionModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -77,7 +76,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.SpaceID,
-		VpnConnectionFromTfToCreateRequest(&plan),
+		vpnConnectionFromTfToCreateRequest(&plan),
 		numspotClient.CreateVpnConnectionWithResponse)
 	if err != nil {
 		response.Diagnostics.AddError("Failed to create VPN Connection", err.Error())
@@ -117,7 +116,7 @@ func (r *VpnConnectionResource) Create(ctx context.Context, request resource.Cre
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
-func (r *VpnConnectionResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var data VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 	if response.Diagnostics.HasError() {
@@ -132,7 +131,7 @@ func (r *VpnConnectionResource) Read(ctx context.Context, request resource.ReadR
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
-func (r *VpnConnectionResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan VpnConnectionModel
 	modifications := false
 
@@ -211,7 +210,7 @@ func (r *VpnConnectionResource) Update(ctx context.Context, request resource.Upd
 	response.Diagnostics.Append(response.State.Set(ctx, tf)...)
 }
 
-func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 	if response.Diagnostics.HasError() {
@@ -231,7 +230,7 @@ func (r *VpnConnectionResource) Delete(ctx context.Context, request resource.Del
 	}
 }
 
-func (r *VpnConnectionResource) addRoutes(ctx context.Context, vpnID string, tfRoutes []RoutesValue, diags *diag.Diagnostics) {
+func (r *Resource) addRoutes(ctx context.Context, vpnID string, tfRoutes []RoutesValue, diags *diag.Diagnostics) {
 	numspotClient, err := r.provider.GetClient(ctx)
 	if err != nil {
 		diags.AddError("Error while initiating numspotClient", err.Error())
@@ -245,13 +244,19 @@ func (r *VpnConnectionResource) addRoutes(ctx context.Context, vpnID string, tfR
 	}
 
 	for _, route := range routes {
-		_ = utils.ExecuteRequest(func() (*numspot.CreateVpnConnectionRouteResponse, error) {
-			return numspotClient.CreateVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
-		}, http.StatusOK, diags)
+		res, err := numspotClient.CreateVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
+		if err != nil {
+			diags.AddError("Error while creating VPN Connection Route", err.Error())
+			return
+		}
+		if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
+			diags.AddError("Error while parsing VPN Connection Route", err.Error())
+			return
+		}
 	}
 }
 
-func (r *VpnConnectionResource) deleteRoutes(ctx context.Context, vpnID string, tfRoutes []RoutesValue, diags *diag.Diagnostics) {
+func (r *Resource) deleteRoutes(ctx context.Context, vpnID string, tfRoutes []RoutesValue, diags *diag.Diagnostics) {
 	numspotClient, err := r.provider.GetClient(ctx)
 	if err != nil {
 		diags.AddError("Error while initiating numspotClient", err.Error())
@@ -265,13 +270,19 @@ func (r *VpnConnectionResource) deleteRoutes(ctx context.Context, vpnID string, 
 	}
 
 	for _, route := range routes {
-		_ = utils.ExecuteRequest(func() (*numspot.DeleteVpnConnectionRouteResponse, error) {
-			return numspotClient.DeleteVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
-		}, http.StatusNoContent, diags)
+		res, err := numspotClient.DeleteVpnConnectionRouteWithResponse(ctx, r.provider.SpaceID, vpnID, route)
+		if err != nil {
+			diags.AddError("Error while deleting VPN Connection Route", err.Error())
+			return
+		}
+		if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
+			diags.AddError("Error while parsing VPN Connection Route", err.Error())
+			return
+		}
 	}
 }
 
-func (r *VpnConnectionResource) routesSetToRoutesSlice(ctx context.Context, list types.Set, diags *diag.Diagnostics) []RoutesValue {
+func (r *Resource) routesSetToRoutesSlice(ctx context.Context, list types.Set, diags *diag.Diagnostics) []RoutesValue {
 	return utils.TfSetToGenericList(func(a RoutesValue) RoutesValue {
 		return RoutesValue{
 			DestinationIpRange: a.DestinationIpRange,
@@ -279,7 +290,7 @@ func (r *VpnConnectionResource) routesSetToRoutesSlice(ctx context.Context, list
 	}, ctx, list, diags)
 }
 
-func (r *VpnConnectionResource) readVPNConnection(
+func (r *Resource) readVPNConnection(
 	ctx context.Context,
 	id string,
 	diags *diag.Diagnostics,
@@ -310,12 +321,12 @@ func (r *VpnConnectionResource) readVPNConnection(
 		return nil
 	}
 
-	tf := VpnConnectionFromHttpToTf(ctx, rr, diags)
+	tf := vpnConnectionFromHttpToTf(ctx, rr, diags)
 
 	return tf
 }
 
-func (r *VpnConnectionResource) updateVPNOptions(
+func (r *Resource) updateVPNOptions(
 	ctx context.Context,
 	id string,
 	plan VpnConnectionModel,
@@ -326,18 +337,17 @@ func (r *VpnConnectionResource) updateVPNOptions(
 		diags.AddError("Error while initiating numspotClient", err.Error())
 		return nil
 	}
-	res := utils.ExecuteRequest(func() (*numspot.UpdateVpnConnectionResponse, error) {
-		return numspotClient.UpdateVpnConnectionWithResponse(
-			ctx,
-			r.provider.SpaceID,
-			id,
-			VpnConnectionFromTfToUpdateRequest(ctx, &plan, diags))
-	}, http.StatusOK, diags)
-	if res == nil {
+
+	res, err := numspotClient.UpdateVpnConnectionWithResponse(ctx, r.provider.SpaceID, id, vpnConnectionFromTfToUpdateRequest(ctx, &plan, diags))
+	if err != nil {
+		diags.AddError("Error while updating VPN Connection", err.Error())
 		return nil
 	}
-
-	tf := VpnConnectionFromHttpToTf(ctx, res.JSON200, diags)
+	if err = utils.ParseHTTPError(res.Body, res.StatusCode()); err != nil {
+		diags.AddError("Error while parsing VPN Connection", err.Error())
+		return nil
+	}
+	tf := vpnConnectionFromHttpToTf(ctx, res.JSON200, diags)
 
 	return tf
 }

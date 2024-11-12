@@ -110,6 +110,17 @@ func FlexibleGpuDataSourceSchema(ctx context.Context) schema.Schema {
 	}
 }
 
+type FlexibleGpuDataSourceModel struct {
+	Items                 []FlexibleGpuModelItemDataSource `tfsdk:"items"`
+	AvailabilityZoneNames types.List                       `tfsdk:"availability_zone_names"`
+	DeleteOnVmDeletion    types.Bool                       `tfsdk:"delete_on_vm_deletion"`
+	Generations           types.List                       `tfsdk:"generations"`
+	Ids                   types.List                       `tfsdk:"ids"`
+	ModelNames            types.List                       `tfsdk:"model_names"`
+	States                types.List                       `tfsdk:"states"`
+	VmIds                 types.List                       `tfsdk:"vm_ids"`
+}
+
 type FlexibleGpuModelItemDataSource struct {
 	AvailabilityZoneName types.String `tfsdk:"availability_zone_name"`
 	DeleteOnVmDeletion   types.Bool   `tfsdk:"delete_on_vm_deletion"`

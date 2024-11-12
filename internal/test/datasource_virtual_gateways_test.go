@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccVirtualGatewaysDatasource(t *testing.T) {
-	acct := acctest.NewAccTest(t, false, "")
+	acct := acctest.NewAccTest(t, true, "record")
 	defer func() {
 		err := acct.Cleanup()
 		require.NoError(t, err)
@@ -37,7 +37,7 @@ data "numspot_virtual_gateways" "testdata" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.numspot_virtual_gateways.testdata", "items.#", "1"),
 					acctest.TestCheckTypeSetElemNestedAttrsWithPair("data.numspot_virtual_gateways.testdata", "items.*", map[string]string{
-						"id":              acctest.PAIR_PREFIX + "numspot_virtual_gateway.test.id",
+						"id":              acctest.PairPrefix + "numspot_virtual_gateway.test.id",
 						"connection_type": "ipsec.1",
 					}),
 				),
