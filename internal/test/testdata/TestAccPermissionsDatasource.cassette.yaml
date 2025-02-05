@@ -1,0 +1,847 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 1
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"delete","createdOn":"2024-06-25T15:35:51.796771Z","description":"","name":"postgresql.backup.delete","resource":"backup","service":"postgresql","updatedOn":"2024-06-25T15:35:51.796771Z","uuid":"c39e4fe4-fe20-40e6-994b-b51e4a64058a"},{"action":"get","createdOn":"2024-06-25T15:35:51.353557Z","description":"","name":"postgresql.backup.get","resource":"backup","service":"postgresql","updatedOn":"2024-06-25T15:35:51.353557Z","uuid":"eb92ff57-8654-448a-a1b3-70c6bb14b89d"},{"action":"resetPassword","createdOn":"2024-06-25T14:11:16.525687Z","description":"","name":"postgresql.cluster.resetPassword","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:16.525687Z","uuid":"a346e147-eba5-4af6-8e3e-e62d36aae203"},{"action":"delete","createdOn":"2024-06-25T14:11:15.188439Z","description":"","name":"postgresql.cluster.delete","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:15.188439Z","uuid":"a5ba1db7-5af8-44e8-8ade-f6b346a0fdf3"},{"action":"update","createdOn":"2024-06-25T14:11:13.988819Z","description":"","name":"postgresql.cluster.update","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:13.988819Z","uuid":"f7e55aa6-3819-4e78-a39d-e2d765bca13d"},{"action":"get","createdOn":"2024-06-25T14:11:12.799599Z","description":"","name":"postgresql.cluster.get","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:12.799599Z","uuid":"d0992f7f-953a-4be4-b0b1-0f3a1b115735"},{"action":"create","createdOn":"2024-06-25T14:11:11.875108Z","description":"","name":"postgresql.cluster.create","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:11.875108Z","uuid":"fbc9e2b8-d2e2-473c-a966-586e12882ca7"},{"action":"createAdmin","createdOn":"2024-06-25T14:11:10.547363Z","description":"","name":"iam.space.createAdmin","resource":"space","service":"iam","updatedOn":"2024-06-25T14:11:10.547363Z","uuid":"0924e1f7-ad42-41c3-8874-c56298b80725"},{"action":"deletePolicy","createdOn":"2024-06-25T14:11:09.571256Z","description":"","name":"iam.deletePolicy","service":"iam","updatedOn":"2024-06-25T14:11:09.571256Z","uuid":"e818b1d0-1b0b-4d4f-965e-3a31228f1217"},{"action":"getPolicy","createdOn":"2024-06-25T14:11:08.556215Z","description":"","name":"iam.getPolicy","service":"iam","updatedOn":"2024-06-25T14:11:08.556215Z","uuid":"16ac4a47-131b-42a6-888c-a9a8f5dfcc79"},{"action":"createPolicy","createdOn":"2024-06-25T14:11:07.598435Z","description":"","name":"iam.createPolicy","service":"iam","updatedOn":"2024-06-25T14:11:07.598435Z","uuid":"b6601ce2-e9f6-4810-b445-53aeaa89f4d2"},{"action":"all","createdOn":"2024-06-25T14:11:06.622199Z","description":"","name":"compute.all","service":"compute","updatedOn":"2024-06-25T14:11:06.622199Z","uuid":"af8a2321-29ce-451b-b963-997eb8725fa0"},{"action":"update","createdOn":"2024-04-22T17:23:36.079945Z","description":"","name":"kubernetes.cluster.update","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:36.079945Z","uuid":"3562b842-7946-43e4-878a-fad75ab3c099"},{"action":"delete","createdOn":"2024-04-22T17:23:35.757704Z","description":"","name":"kubernetes.cluster.delete","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:35.757704Z","uuid":"8448a8ce-e8a3-4fce-8869-0965db49b614"},{"action":"get","createdOn":"2024-04-22T17:23:35.395762Z","description":"","name":"kubernetes.cluster.get","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:35.395762Z","uuid":"99fd8769-83ec-49dd-86fd-416f55de5412"},{"action":"create","createdOn":"2024-04-22T17:23:35.003505Z","description":"","name":"kubernetes.cluster.create","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:35.003505Z","uuid":"58b1bd98-f92e-4689-b883-f6f1f1d53091"},{"action":"list","createdOn":"2024-04-22T17:23:34.865568Z","description":"","name":"kubernetes.version.list","resource":"version","service":"kubernetes","updatedOn":"2024-04-22T17:23:34.865568Z","uuid":"381c6f75-b8e1-4c48-8a31-5ac95a44e5fc"},{"action":"delete","createdOn":"2024-03-29T15:08:07.149464Z","description":"","name":"openshift.cluster.delete","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:07.149464Z","uuid":"addd7159-4922-4b70-86e1-c9fb432e9a0e"},{"action":"update","createdOn":"2024-03-29T15:08:07.110513Z","description":"","name":"openshift.cluster.update","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:07.110513Z","uuid":"de313ab3-93b6-4ffb-8304-6b1bd175db93"},{"action":"get","createdOn":"2024-03-29T15:08:07.068619Z","description":"","name":"openshift.cluster.get","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:07.068619Z","uuid":"340cd899-ce72-42c8-ac6e-b937639c135a"}],"nextPageToken":"340cd899-ce72-42c8-ac6e-b937639c135a"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 2
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=340cd899-ce72-42c8-ac6e-b937639c135a&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"create","createdOn":"2024-03-29T15:08:06.973764Z","description":"","name":"openshift.cluster.create","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:06.973764Z","uuid":"9a74c40f-6a87-476d-8bf3-09eea5a7917f"},{"action":"list","createdOn":"2024-03-29T15:08:06.87915Z","description":"","name":"openshift.version.list","resource":"version","service":"openshift","updatedOn":"2024-03-29T15:08:06.87915Z","uuid":"7005d0d8-83ab-412f-966b-a244775a2f4f"},{"action":"createURL","createdOn":"2024-03-20T15:26:04.313776Z","description":"","name":"storageobject.bucket.object.createURL","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.313776Z","uuid":"6b3cbe16-8f58-4daa-9fcc-7459b903f0ff"},{"action":"update","createdOn":"2024-03-20T15:26:04.302654Z","description":"","name":"storageobject.bucket.update","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.302654Z","uuid":"b63a888e-56e5-498a-bcd3-68282e7ecd3f"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:04.291828Z","description":"","name":"storageobject.bucket.setIAMPolicy","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.291828Z","uuid":"06f59d9c-9bcc-462b-b118-fc9e1ef7edc6"},{"action":"update","createdOn":"2024-03-20T15:26:04.281178Z","description":"","name":"storageobject.bucket.object.update","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.281178Z","uuid":"9b8a51c1-cda9-4971-9b66-4d357c0e8eaf"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:04.270849Z","description":"","name":"storageobject.bucket.object.setIAMPolicy","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.270849Z","uuid":"62b3826f-111f-41ef-b99f-9c23fafccd69"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:04.258808Z","description":"","name":"storageobject.bucket.object.getIAMPolicy","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.258808Z","uuid":"1ac7e02a-5993-45c8-b305-80cbe16e3642"},{"action":"get","createdOn":"2024-03-20T15:26:04.249026Z","description":"","name":"storageobject.bucket.object.get","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.249026Z","uuid":"b58ba0ac-fa7d-47ce-a474-a50c8934cb28"},{"action":"delete","createdOn":"2024-03-20T15:26:04.239768Z","description":"","name":"storageobject.bucket.object.delete","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.239768Z","uuid":"ceaff159-5800-4aa7-a861-4ad017df48db"},{"action":"create","createdOn":"2024-03-20T15:26:04.22413Z","description":"","name":"storageobject.bucket.object.create","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.22413Z","uuid":"ab8dbfca-8635-4c26-869f-f0a04297a3ca"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:04.21429Z","description":"","name":"storageobject.bucket.getIAMPolicy","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.21429Z","uuid":"44e0723d-d0c6-4908-a4af-3ad09a33bb8a"},{"action":"get","createdOn":"2024-03-20T15:26:04.205133Z","description":"","name":"storageobject.bucket.get","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.205133Z","uuid":"84e1b7f1-eccc-45ee-ae55-5e674b43effb"},{"action":"enable","createdOn":"2024-03-20T15:26:04.1948Z","description":"","name":"storageobject.bucket.enable","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.1948Z","uuid":"7e0c1cad-151b-4809-a3bf-a83eb359dfa3"},{"action":"disable","createdOn":"2024-03-20T15:26:04.184745Z","description":"","name":"storageobject.bucket.disable","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.184745Z","uuid":"a847cd5c-45dd-4d80-b4ac-cb4dd2068361"}],"nextPageToken":"a847cd5c-45dd-4d80-b4ac-cb4dd2068361"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 3
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=a847cd5c-45dd-4d80-b4ac-cb4dd2068361&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"delete","createdOn":"2024-03-20T15:26:04.174583Z","description":"","name":"storageobject.bucket.delete","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.174583Z","uuid":"3851f77d-0771-4401-8ef0-29b77a236411"},{"action":"create","createdOn":"2024-03-20T15:26:04.164643Z","description":"","name":"storageobject.bucket.create","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.164643Z","uuid":"90fd2a2d-1a7a-417e-8d04-3e7d2e4e8591"},{"action":"update","createdOn":"2024-03-20T15:26:01.556146Z","description":"","name":"identity.user.update","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.556146Z","uuid":"2a6119fb-54b9-4593-a0b1-e5a78486919a"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.545306Z","description":"","name":"identity.user.setIAMPolicy","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.545306Z","uuid":"acd70aa9-d8e1-46a5-ac0f-5788e834493a"},{"action":"recover","createdOn":"2024-03-20T15:26:01.535479Z","description":"","name":"identity.user.recover","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.535479Z","uuid":"e4e2225e-bfb1-435d-8c07-303cbc45cf95"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.52491Z","description":"","name":"identity.user.getIAMPolicy","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.52491Z","uuid":"faaeb04a-5b36-4fda-9fae-7c47a1c367c0"},{"action":"get","createdOn":"2024-03-20T15:26:01.515312Z","description":"","name":"identity.user.get","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.515312Z","uuid":"d207f14f-37ed-46a6-a4a3-0087111d31eb"},{"action":"delete","createdOn":"2024-03-20T15:26:01.50602Z","description":"","name":"identity.user.delete","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.50602Z","uuid":"6df5f235-5a70-44b7-9c68-19203bc003ee"},{"action":"create","createdOn":"2024-03-20T15:26:01.496369Z","description":"","name":"identity.user.create","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.496369Z","uuid":"804264fd-5368-4618-b8e2-5f48f88f6560"},{"action":"update","createdOn":"2024-03-20T15:26:01.487204Z","description":"","name":"identity.serviceAccount.update","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.487204Z","uuid":"ab37694e-8d93-4b67-87e0-719d1ac04e40"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.476923Z","description":"","name":"identity.serviceAccount.setIAMPolicy","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.476923Z","uuid":"7fe19a33-ae4c-4c09-980d-5b7b4713b9c2"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.46725Z","description":"","name":"identity.serviceAccount.getIAMPolicy","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.46725Z","uuid":"52ed842c-bed5-4010-bb6f-276edbd97dd1"},{"action":"get","createdOn":"2024-03-20T15:26:01.456862Z","description":"","name":"identity.serviceAccount.get","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.456862Z","uuid":"1dabfa08-c1cf-44a5-8415-d1c298bd47c5"},{"action":"delete","createdOn":"2024-03-20T15:26:01.447005Z","description":"","name":"identity.serviceAccount.delete","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.447005Z","uuid":"3b5cb73f-5e56-40c2-a4da-06a3a4c368aa"},{"action":"create","createdOn":"2024-03-20T15:26:01.437872Z","description":"","name":"identity.serviceAccount.create","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.437872Z","uuid":"a32adeec-3b64-4f57-ae56-a30a5c7a6f4a"}],"nextPageToken":"a32adeec-3b64-4f57-ae56-a30a5c7a6f4a"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 4
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=a32adeec-3b64-4f57-ae56-a30a5c7a6f4a&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"update","createdOn":"2024-03-20T15:26:01.428662Z","description":"","name":"iam.space.update","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.428662Z","uuid":"1bd22b03-0363-40f6-819f-bc2ddd884bf8"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.419529Z","description":"","name":"iam.space.setIAMPolicy","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.419529Z","uuid":"1f55f0ee-d89c-47df-810c-3b4bd4cc4cfe"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.409247Z","description":"","name":"iam.space.getIAMPolicy","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.409247Z","uuid":"1e6f642f-38bf-433a-b813-857aca439511"},{"action":"get","createdOn":"2024-03-20T15:26:01.400416Z","description":"","name":"iam.space.get","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.400416Z","uuid":"fdc6f87f-8886-4c34-a99f-01f9e4e51dbe"},{"action":"enable","createdOn":"2024-03-20T15:26:01.390411Z","description":"","name":"iam.space.enable","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.390411Z","uuid":"69405dc8-060a-406d-84a0-c33b87002b6d"},{"action":"disable","createdOn":"2024-03-20T15:26:01.38097Z","description":"","name":"iam.space.disable","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.38097Z","uuid":"d89d6c6c-7978-435d-827a-9e685ce6edad"},{"action":"delete","createdOn":"2024-03-20T15:26:01.371153Z","description":"","name":"iam.space.delete","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.371153Z","uuid":"3e21ca9c-93bb-41eb-9c90-3130c7f517a6"},{"action":"create","createdOn":"2024-03-20T15:26:01.357747Z","description":"","name":"iam.space.create","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.357747Z","uuid":"15b5ec47-07d8-48a9-8964-ae17f978005f"},{"action":"update","createdOn":"2024-03-20T15:26:01.348098Z","description":"","name":"iam.role.update","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.348098Z","uuid":"0a02fb81-a1a8-4e53-9725-81a0430af5db"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.339026Z","description":"","name":"iam.role.setIAMPolicy","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.339026Z","uuid":"693f20f7-99e8-4f2a-b3a4-fcedf90a48f9"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.329477Z","description":"","name":"iam.role.getIAMPolicy","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.329477Z","uuid":"d29525d1-1f9a-4a31-a317-e98695edaed7"},{"action":"get","createdOn":"2024-03-20T15:26:01.319638Z","description":"","name":"iam.role.get","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.319638Z","uuid":"00f12337-5f8d-47d2-a66e-273810f55fea"},{"action":"enable","createdOn":"2024-03-20T15:26:01.306713Z","description":"","name":"iam.role.enable","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.306713Z","uuid":"de98c28d-5141-4249-9996-6d1e3df6ccfc"},{"action":"disable","createdOn":"2024-03-20T15:26:01.296456Z","description":"","name":"iam.role.disable","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.296456Z","uuid":"09b7b590-a331-4bd0-9d82-68e9cd3edaaa"},{"action":"delete","createdOn":"2024-03-20T15:26:01.28685Z","description":"","name":"iam.role.delete","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.28685Z","uuid":"7c6d06e8-eb40-42ee-8459-094788e02b69"}],"nextPageToken":"7c6d06e8-eb40-42ee-8459-094788e02b69"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 5
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=7c6d06e8-eb40-42ee-8459-094788e02b69&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 468
+        uncompressed: false
+        body: |
+            {"items":[{"action":"create","createdOn":"2024-03-20T15:26:01.276306Z","description":"","name":"iam.role.create","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.276306Z","uuid":"93d6c839-125c-4bff-b191-64abfbad74b7"},{"action":"get","createdOn":"2024-03-20T15:26:01.26572Z","description":"","name":"iam.permission.get","resource":"permission","service":"iam","updatedOn":"2024-03-20T15:26:01.26572Z","uuid":"1ff362e9-381e-4183-8bb6-ff5bba2d7eec"}]}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "468"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 6
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 7
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"delete","createdOn":"2024-06-25T15:35:51.796771Z","description":"","name":"postgresql.backup.delete","resource":"backup","service":"postgresql","updatedOn":"2024-06-25T15:35:51.796771Z","uuid":"c39e4fe4-fe20-40e6-994b-b51e4a64058a"},{"action":"get","createdOn":"2024-06-25T15:35:51.353557Z","description":"","name":"postgresql.backup.get","resource":"backup","service":"postgresql","updatedOn":"2024-06-25T15:35:51.353557Z","uuid":"eb92ff57-8654-448a-a1b3-70c6bb14b89d"},{"action":"resetPassword","createdOn":"2024-06-25T14:11:16.525687Z","description":"","name":"postgresql.cluster.resetPassword","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:16.525687Z","uuid":"a346e147-eba5-4af6-8e3e-e62d36aae203"},{"action":"delete","createdOn":"2024-06-25T14:11:15.188439Z","description":"","name":"postgresql.cluster.delete","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:15.188439Z","uuid":"a5ba1db7-5af8-44e8-8ade-f6b346a0fdf3"},{"action":"update","createdOn":"2024-06-25T14:11:13.988819Z","description":"","name":"postgresql.cluster.update","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:13.988819Z","uuid":"f7e55aa6-3819-4e78-a39d-e2d765bca13d"},{"action":"get","createdOn":"2024-06-25T14:11:12.799599Z","description":"","name":"postgresql.cluster.get","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:12.799599Z","uuid":"d0992f7f-953a-4be4-b0b1-0f3a1b115735"},{"action":"create","createdOn":"2024-06-25T14:11:11.875108Z","description":"","name":"postgresql.cluster.create","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:11.875108Z","uuid":"fbc9e2b8-d2e2-473c-a966-586e12882ca7"},{"action":"createAdmin","createdOn":"2024-06-25T14:11:10.547363Z","description":"","name":"iam.space.createAdmin","resource":"space","service":"iam","updatedOn":"2024-06-25T14:11:10.547363Z","uuid":"0924e1f7-ad42-41c3-8874-c56298b80725"},{"action":"deletePolicy","createdOn":"2024-06-25T14:11:09.571256Z","description":"","name":"iam.deletePolicy","service":"iam","updatedOn":"2024-06-25T14:11:09.571256Z","uuid":"e818b1d0-1b0b-4d4f-965e-3a31228f1217"},{"action":"getPolicy","createdOn":"2024-06-25T14:11:08.556215Z","description":"","name":"iam.getPolicy","service":"iam","updatedOn":"2024-06-25T14:11:08.556215Z","uuid":"16ac4a47-131b-42a6-888c-a9a8f5dfcc79"},{"action":"createPolicy","createdOn":"2024-06-25T14:11:07.598435Z","description":"","name":"iam.createPolicy","service":"iam","updatedOn":"2024-06-25T14:11:07.598435Z","uuid":"b6601ce2-e9f6-4810-b445-53aeaa89f4d2"},{"action":"all","createdOn":"2024-06-25T14:11:06.622199Z","description":"","name":"compute.all","service":"compute","updatedOn":"2024-06-25T14:11:06.622199Z","uuid":"af8a2321-29ce-451b-b963-997eb8725fa0"},{"action":"update","createdOn":"2024-04-22T17:23:36.079945Z","description":"","name":"kubernetes.cluster.update","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:36.079945Z","uuid":"3562b842-7946-43e4-878a-fad75ab3c099"},{"action":"delete","createdOn":"2024-04-22T17:23:35.757704Z","description":"","name":"kubernetes.cluster.delete","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:35.757704Z","uuid":"8448a8ce-e8a3-4fce-8869-0965db49b614"},{"action":"get","createdOn":"2024-04-22T17:23:35.395762Z","description":"","name":"kubernetes.cluster.get","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:35.395762Z","uuid":"99fd8769-83ec-49dd-86fd-416f55de5412"},{"action":"create","createdOn":"2024-04-22T17:23:35.003505Z","description":"","name":"kubernetes.cluster.create","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:35.003505Z","uuid":"58b1bd98-f92e-4689-b883-f6f1f1d53091"},{"action":"list","createdOn":"2024-04-22T17:23:34.865568Z","description":"","name":"kubernetes.version.list","resource":"version","service":"kubernetes","updatedOn":"2024-04-22T17:23:34.865568Z","uuid":"381c6f75-b8e1-4c48-8a31-5ac95a44e5fc"},{"action":"delete","createdOn":"2024-03-29T15:08:07.149464Z","description":"","name":"openshift.cluster.delete","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:07.149464Z","uuid":"addd7159-4922-4b70-86e1-c9fb432e9a0e"},{"action":"update","createdOn":"2024-03-29T15:08:07.110513Z","description":"","name":"openshift.cluster.update","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:07.110513Z","uuid":"de313ab3-93b6-4ffb-8304-6b1bd175db93"},{"action":"get","createdOn":"2024-03-29T15:08:07.068619Z","description":"","name":"openshift.cluster.get","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:07.068619Z","uuid":"340cd899-ce72-42c8-ac6e-b937639c135a"}],"nextPageToken":"340cd899-ce72-42c8-ac6e-b937639c135a"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 8
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=340cd899-ce72-42c8-ac6e-b937639c135a&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"create","createdOn":"2024-03-29T15:08:06.973764Z","description":"","name":"openshift.cluster.create","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:06.973764Z","uuid":"9a74c40f-6a87-476d-8bf3-09eea5a7917f"},{"action":"list","createdOn":"2024-03-29T15:08:06.87915Z","description":"","name":"openshift.version.list","resource":"version","service":"openshift","updatedOn":"2024-03-29T15:08:06.87915Z","uuid":"7005d0d8-83ab-412f-966b-a244775a2f4f"},{"action":"createURL","createdOn":"2024-03-20T15:26:04.313776Z","description":"","name":"storageobject.bucket.object.createURL","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.313776Z","uuid":"6b3cbe16-8f58-4daa-9fcc-7459b903f0ff"},{"action":"update","createdOn":"2024-03-20T15:26:04.302654Z","description":"","name":"storageobject.bucket.update","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.302654Z","uuid":"b63a888e-56e5-498a-bcd3-68282e7ecd3f"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:04.291828Z","description":"","name":"storageobject.bucket.setIAMPolicy","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.291828Z","uuid":"06f59d9c-9bcc-462b-b118-fc9e1ef7edc6"},{"action":"update","createdOn":"2024-03-20T15:26:04.281178Z","description":"","name":"storageobject.bucket.object.update","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.281178Z","uuid":"9b8a51c1-cda9-4971-9b66-4d357c0e8eaf"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:04.270849Z","description":"","name":"storageobject.bucket.object.setIAMPolicy","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.270849Z","uuid":"62b3826f-111f-41ef-b99f-9c23fafccd69"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:04.258808Z","description":"","name":"storageobject.bucket.object.getIAMPolicy","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.258808Z","uuid":"1ac7e02a-5993-45c8-b305-80cbe16e3642"},{"action":"get","createdOn":"2024-03-20T15:26:04.249026Z","description":"","name":"storageobject.bucket.object.get","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.249026Z","uuid":"b58ba0ac-fa7d-47ce-a474-a50c8934cb28"},{"action":"delete","createdOn":"2024-03-20T15:26:04.239768Z","description":"","name":"storageobject.bucket.object.delete","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.239768Z","uuid":"ceaff159-5800-4aa7-a861-4ad017df48db"},{"action":"create","createdOn":"2024-03-20T15:26:04.22413Z","description":"","name":"storageobject.bucket.object.create","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.22413Z","uuid":"ab8dbfca-8635-4c26-869f-f0a04297a3ca"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:04.21429Z","description":"","name":"storageobject.bucket.getIAMPolicy","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.21429Z","uuid":"44e0723d-d0c6-4908-a4af-3ad09a33bb8a"},{"action":"get","createdOn":"2024-03-20T15:26:04.205133Z","description":"","name":"storageobject.bucket.get","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.205133Z","uuid":"84e1b7f1-eccc-45ee-ae55-5e674b43effb"},{"action":"enable","createdOn":"2024-03-20T15:26:04.1948Z","description":"","name":"storageobject.bucket.enable","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.1948Z","uuid":"7e0c1cad-151b-4809-a3bf-a83eb359dfa3"},{"action":"disable","createdOn":"2024-03-20T15:26:04.184745Z","description":"","name":"storageobject.bucket.disable","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.184745Z","uuid":"a847cd5c-45dd-4d80-b4ac-cb4dd2068361"}],"nextPageToken":"a847cd5c-45dd-4d80-b4ac-cb4dd2068361"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 9
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=a847cd5c-45dd-4d80-b4ac-cb4dd2068361&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"delete","createdOn":"2024-03-20T15:26:04.174583Z","description":"","name":"storageobject.bucket.delete","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.174583Z","uuid":"3851f77d-0771-4401-8ef0-29b77a236411"},{"action":"create","createdOn":"2024-03-20T15:26:04.164643Z","description":"","name":"storageobject.bucket.create","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.164643Z","uuid":"90fd2a2d-1a7a-417e-8d04-3e7d2e4e8591"},{"action":"update","createdOn":"2024-03-20T15:26:01.556146Z","description":"","name":"identity.user.update","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.556146Z","uuid":"2a6119fb-54b9-4593-a0b1-e5a78486919a"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.545306Z","description":"","name":"identity.user.setIAMPolicy","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.545306Z","uuid":"acd70aa9-d8e1-46a5-ac0f-5788e834493a"},{"action":"recover","createdOn":"2024-03-20T15:26:01.535479Z","description":"","name":"identity.user.recover","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.535479Z","uuid":"e4e2225e-bfb1-435d-8c07-303cbc45cf95"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.52491Z","description":"","name":"identity.user.getIAMPolicy","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.52491Z","uuid":"faaeb04a-5b36-4fda-9fae-7c47a1c367c0"},{"action":"get","createdOn":"2024-03-20T15:26:01.515312Z","description":"","name":"identity.user.get","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.515312Z","uuid":"d207f14f-37ed-46a6-a4a3-0087111d31eb"},{"action":"delete","createdOn":"2024-03-20T15:26:01.50602Z","description":"","name":"identity.user.delete","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.50602Z","uuid":"6df5f235-5a70-44b7-9c68-19203bc003ee"},{"action":"create","createdOn":"2024-03-20T15:26:01.496369Z","description":"","name":"identity.user.create","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.496369Z","uuid":"804264fd-5368-4618-b8e2-5f48f88f6560"},{"action":"update","createdOn":"2024-03-20T15:26:01.487204Z","description":"","name":"identity.serviceAccount.update","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.487204Z","uuid":"ab37694e-8d93-4b67-87e0-719d1ac04e40"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.476923Z","description":"","name":"identity.serviceAccount.setIAMPolicy","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.476923Z","uuid":"7fe19a33-ae4c-4c09-980d-5b7b4713b9c2"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.46725Z","description":"","name":"identity.serviceAccount.getIAMPolicy","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.46725Z","uuid":"52ed842c-bed5-4010-bb6f-276edbd97dd1"},{"action":"get","createdOn":"2024-03-20T15:26:01.456862Z","description":"","name":"identity.serviceAccount.get","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.456862Z","uuid":"1dabfa08-c1cf-44a5-8415-d1c298bd47c5"},{"action":"delete","createdOn":"2024-03-20T15:26:01.447005Z","description":"","name":"identity.serviceAccount.delete","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.447005Z","uuid":"3b5cb73f-5e56-40c2-a4da-06a3a4c368aa"},{"action":"create","createdOn":"2024-03-20T15:26:01.437872Z","description":"","name":"identity.serviceAccount.create","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.437872Z","uuid":"a32adeec-3b64-4f57-ae56-a30a5c7a6f4a"}],"nextPageToken":"a32adeec-3b64-4f57-ae56-a30a5c7a6f4a"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 10
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=a32adeec-3b64-4f57-ae56-a30a5c7a6f4a&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"update","createdOn":"2024-03-20T15:26:01.428662Z","description":"","name":"iam.space.update","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.428662Z","uuid":"1bd22b03-0363-40f6-819f-bc2ddd884bf8"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.419529Z","description":"","name":"iam.space.setIAMPolicy","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.419529Z","uuid":"1f55f0ee-d89c-47df-810c-3b4bd4cc4cfe"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.409247Z","description":"","name":"iam.space.getIAMPolicy","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.409247Z","uuid":"1e6f642f-38bf-433a-b813-857aca439511"},{"action":"get","createdOn":"2024-03-20T15:26:01.400416Z","description":"","name":"iam.space.get","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.400416Z","uuid":"fdc6f87f-8886-4c34-a99f-01f9e4e51dbe"},{"action":"enable","createdOn":"2024-03-20T15:26:01.390411Z","description":"","name":"iam.space.enable","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.390411Z","uuid":"69405dc8-060a-406d-84a0-c33b87002b6d"},{"action":"disable","createdOn":"2024-03-20T15:26:01.38097Z","description":"","name":"iam.space.disable","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.38097Z","uuid":"d89d6c6c-7978-435d-827a-9e685ce6edad"},{"action":"delete","createdOn":"2024-03-20T15:26:01.371153Z","description":"","name":"iam.space.delete","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.371153Z","uuid":"3e21ca9c-93bb-41eb-9c90-3130c7f517a6"},{"action":"create","createdOn":"2024-03-20T15:26:01.357747Z","description":"","name":"iam.space.create","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.357747Z","uuid":"15b5ec47-07d8-48a9-8964-ae17f978005f"},{"action":"update","createdOn":"2024-03-20T15:26:01.348098Z","description":"","name":"iam.role.update","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.348098Z","uuid":"0a02fb81-a1a8-4e53-9725-81a0430af5db"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.339026Z","description":"","name":"iam.role.setIAMPolicy","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.339026Z","uuid":"693f20f7-99e8-4f2a-b3a4-fcedf90a48f9"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.329477Z","description":"","name":"iam.role.getIAMPolicy","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.329477Z","uuid":"d29525d1-1f9a-4a31-a317-e98695edaed7"},{"action":"get","createdOn":"2024-03-20T15:26:01.319638Z","description":"","name":"iam.role.get","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.319638Z","uuid":"00f12337-5f8d-47d2-a66e-273810f55fea"},{"action":"enable","createdOn":"2024-03-20T15:26:01.306713Z","description":"","name":"iam.role.enable","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.306713Z","uuid":"de98c28d-5141-4249-9996-6d1e3df6ccfc"},{"action":"disable","createdOn":"2024-03-20T15:26:01.296456Z","description":"","name":"iam.role.disable","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.296456Z","uuid":"09b7b590-a331-4bd0-9d82-68e9cd3edaaa"},{"action":"delete","createdOn":"2024-03-20T15:26:01.28685Z","description":"","name":"iam.role.delete","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.28685Z","uuid":"7c6d06e8-eb40-42ee-8459-094788e02b69"}],"nextPageToken":"7c6d06e8-eb40-42ee-8459-094788e02b69"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 11
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=7c6d06e8-eb40-42ee-8459-094788e02b69&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 468
+        uncompressed: false
+        body: |
+            {"items":[{"action":"create","createdOn":"2024-03-20T15:26:01.276306Z","description":"","name":"iam.role.create","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.276306Z","uuid":"93d6c839-125c-4bff-b191-64abfbad74b7"},{"action":"get","createdOn":"2024-03-20T15:26:01.26572Z","description":"","name":"iam.permission.get","resource":"permission","service":"iam","updatedOn":"2024-03-20T15:26:01.26572Z","uuid":"1ff362e9-381e-4183-8bb6-ff5bba2d7eec"}]}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "468"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 12
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 13
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"delete","createdOn":"2024-06-25T15:35:51.796771Z","description":"","name":"postgresql.backup.delete","resource":"backup","service":"postgresql","updatedOn":"2024-06-25T15:35:51.796771Z","uuid":"c39e4fe4-fe20-40e6-994b-b51e4a64058a"},{"action":"get","createdOn":"2024-06-25T15:35:51.353557Z","description":"","name":"postgresql.backup.get","resource":"backup","service":"postgresql","updatedOn":"2024-06-25T15:35:51.353557Z","uuid":"eb92ff57-8654-448a-a1b3-70c6bb14b89d"},{"action":"resetPassword","createdOn":"2024-06-25T14:11:16.525687Z","description":"","name":"postgresql.cluster.resetPassword","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:16.525687Z","uuid":"a346e147-eba5-4af6-8e3e-e62d36aae203"},{"action":"delete","createdOn":"2024-06-25T14:11:15.188439Z","description":"","name":"postgresql.cluster.delete","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:15.188439Z","uuid":"a5ba1db7-5af8-44e8-8ade-f6b346a0fdf3"},{"action":"update","createdOn":"2024-06-25T14:11:13.988819Z","description":"","name":"postgresql.cluster.update","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:13.988819Z","uuid":"f7e55aa6-3819-4e78-a39d-e2d765bca13d"},{"action":"get","createdOn":"2024-06-25T14:11:12.799599Z","description":"","name":"postgresql.cluster.get","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:12.799599Z","uuid":"d0992f7f-953a-4be4-b0b1-0f3a1b115735"},{"action":"create","createdOn":"2024-06-25T14:11:11.875108Z","description":"","name":"postgresql.cluster.create","resource":"cluster","service":"postgresql","updatedOn":"2024-06-25T14:11:11.875108Z","uuid":"fbc9e2b8-d2e2-473c-a966-586e12882ca7"},{"action":"createAdmin","createdOn":"2024-06-25T14:11:10.547363Z","description":"","name":"iam.space.createAdmin","resource":"space","service":"iam","updatedOn":"2024-06-25T14:11:10.547363Z","uuid":"0924e1f7-ad42-41c3-8874-c56298b80725"},{"action":"deletePolicy","createdOn":"2024-06-25T14:11:09.571256Z","description":"","name":"iam.deletePolicy","service":"iam","updatedOn":"2024-06-25T14:11:09.571256Z","uuid":"e818b1d0-1b0b-4d4f-965e-3a31228f1217"},{"action":"getPolicy","createdOn":"2024-06-25T14:11:08.556215Z","description":"","name":"iam.getPolicy","service":"iam","updatedOn":"2024-06-25T14:11:08.556215Z","uuid":"16ac4a47-131b-42a6-888c-a9a8f5dfcc79"},{"action":"createPolicy","createdOn":"2024-06-25T14:11:07.598435Z","description":"","name":"iam.createPolicy","service":"iam","updatedOn":"2024-06-25T14:11:07.598435Z","uuid":"b6601ce2-e9f6-4810-b445-53aeaa89f4d2"},{"action":"all","createdOn":"2024-06-25T14:11:06.622199Z","description":"","name":"compute.all","service":"compute","updatedOn":"2024-06-25T14:11:06.622199Z","uuid":"af8a2321-29ce-451b-b963-997eb8725fa0"},{"action":"update","createdOn":"2024-04-22T17:23:36.079945Z","description":"","name":"kubernetes.cluster.update","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:36.079945Z","uuid":"3562b842-7946-43e4-878a-fad75ab3c099"},{"action":"delete","createdOn":"2024-04-22T17:23:35.757704Z","description":"","name":"kubernetes.cluster.delete","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:35.757704Z","uuid":"8448a8ce-e8a3-4fce-8869-0965db49b614"},{"action":"get","createdOn":"2024-04-22T17:23:35.395762Z","description":"","name":"kubernetes.cluster.get","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:35.395762Z","uuid":"99fd8769-83ec-49dd-86fd-416f55de5412"},{"action":"create","createdOn":"2024-04-22T17:23:35.003505Z","description":"","name":"kubernetes.cluster.create","resource":"cluster","service":"kubernetes","updatedOn":"2024-04-22T17:23:35.003505Z","uuid":"58b1bd98-f92e-4689-b883-f6f1f1d53091"},{"action":"list","createdOn":"2024-04-22T17:23:34.865568Z","description":"","name":"kubernetes.version.list","resource":"version","service":"kubernetes","updatedOn":"2024-04-22T17:23:34.865568Z","uuid":"381c6f75-b8e1-4c48-8a31-5ac95a44e5fc"},{"action":"delete","createdOn":"2024-03-29T15:08:07.149464Z","description":"","name":"openshift.cluster.delete","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:07.149464Z","uuid":"addd7159-4922-4b70-86e1-c9fb432e9a0e"},{"action":"update","createdOn":"2024-03-29T15:08:07.110513Z","description":"","name":"openshift.cluster.update","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:07.110513Z","uuid":"de313ab3-93b6-4ffb-8304-6b1bd175db93"},{"action":"get","createdOn":"2024-03-29T15:08:07.068619Z","description":"","name":"openshift.cluster.get","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:07.068619Z","uuid":"340cd899-ce72-42c8-ac6e-b937639c135a"}],"nextPageToken":"340cd899-ce72-42c8-ac6e-b937639c135a"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 14
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=340cd899-ce72-42c8-ac6e-b937639c135a&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"create","createdOn":"2024-03-29T15:08:06.973764Z","description":"","name":"openshift.cluster.create","resource":"cluster","service":"openshift","updatedOn":"2024-03-29T15:08:06.973764Z","uuid":"9a74c40f-6a87-476d-8bf3-09eea5a7917f"},{"action":"list","createdOn":"2024-03-29T15:08:06.87915Z","description":"","name":"openshift.version.list","resource":"version","service":"openshift","updatedOn":"2024-03-29T15:08:06.87915Z","uuid":"7005d0d8-83ab-412f-966b-a244775a2f4f"},{"action":"createURL","createdOn":"2024-03-20T15:26:04.313776Z","description":"","name":"storageobject.bucket.object.createURL","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.313776Z","uuid":"6b3cbe16-8f58-4daa-9fcc-7459b903f0ff"},{"action":"update","createdOn":"2024-03-20T15:26:04.302654Z","description":"","name":"storageobject.bucket.update","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.302654Z","uuid":"b63a888e-56e5-498a-bcd3-68282e7ecd3f"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:04.291828Z","description":"","name":"storageobject.bucket.setIAMPolicy","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.291828Z","uuid":"06f59d9c-9bcc-462b-b118-fc9e1ef7edc6"},{"action":"update","createdOn":"2024-03-20T15:26:04.281178Z","description":"","name":"storageobject.bucket.object.update","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.281178Z","uuid":"9b8a51c1-cda9-4971-9b66-4d357c0e8eaf"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:04.270849Z","description":"","name":"storageobject.bucket.object.setIAMPolicy","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.270849Z","uuid":"62b3826f-111f-41ef-b99f-9c23fafccd69"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:04.258808Z","description":"","name":"storageobject.bucket.object.getIAMPolicy","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.258808Z","uuid":"1ac7e02a-5993-45c8-b305-80cbe16e3642"},{"action":"get","createdOn":"2024-03-20T15:26:04.249026Z","description":"","name":"storageobject.bucket.object.get","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.249026Z","uuid":"b58ba0ac-fa7d-47ce-a474-a50c8934cb28"},{"action":"delete","createdOn":"2024-03-20T15:26:04.239768Z","description":"","name":"storageobject.bucket.object.delete","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.239768Z","uuid":"ceaff159-5800-4aa7-a861-4ad017df48db"},{"action":"create","createdOn":"2024-03-20T15:26:04.22413Z","description":"","name":"storageobject.bucket.object.create","resource":"bucket","service":"storageobject","subResource":"object","updatedOn":"2024-03-20T15:26:04.22413Z","uuid":"ab8dbfca-8635-4c26-869f-f0a04297a3ca"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:04.21429Z","description":"","name":"storageobject.bucket.getIAMPolicy","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.21429Z","uuid":"44e0723d-d0c6-4908-a4af-3ad09a33bb8a"},{"action":"get","createdOn":"2024-03-20T15:26:04.205133Z","description":"","name":"storageobject.bucket.get","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.205133Z","uuid":"84e1b7f1-eccc-45ee-ae55-5e674b43effb"},{"action":"enable","createdOn":"2024-03-20T15:26:04.1948Z","description":"","name":"storageobject.bucket.enable","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.1948Z","uuid":"7e0c1cad-151b-4809-a3bf-a83eb359dfa3"},{"action":"disable","createdOn":"2024-03-20T15:26:04.184745Z","description":"","name":"storageobject.bucket.disable","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.184745Z","uuid":"a847cd5c-45dd-4d80-b4ac-cb4dd2068361"}],"nextPageToken":"a847cd5c-45dd-4d80-b4ac-cb4dd2068361"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 15
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=a847cd5c-45dd-4d80-b4ac-cb4dd2068361&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"delete","createdOn":"2024-03-20T15:26:04.174583Z","description":"","name":"storageobject.bucket.delete","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.174583Z","uuid":"3851f77d-0771-4401-8ef0-29b77a236411"},{"action":"create","createdOn":"2024-03-20T15:26:04.164643Z","description":"","name":"storageobject.bucket.create","resource":"bucket","service":"storageobject","updatedOn":"2024-03-20T15:26:04.164643Z","uuid":"90fd2a2d-1a7a-417e-8d04-3e7d2e4e8591"},{"action":"update","createdOn":"2024-03-20T15:26:01.556146Z","description":"","name":"identity.user.update","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.556146Z","uuid":"2a6119fb-54b9-4593-a0b1-e5a78486919a"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.545306Z","description":"","name":"identity.user.setIAMPolicy","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.545306Z","uuid":"acd70aa9-d8e1-46a5-ac0f-5788e834493a"},{"action":"recover","createdOn":"2024-03-20T15:26:01.535479Z","description":"","name":"identity.user.recover","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.535479Z","uuid":"e4e2225e-bfb1-435d-8c07-303cbc45cf95"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.52491Z","description":"","name":"identity.user.getIAMPolicy","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.52491Z","uuid":"faaeb04a-5b36-4fda-9fae-7c47a1c367c0"},{"action":"get","createdOn":"2024-03-20T15:26:01.515312Z","description":"","name":"identity.user.get","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.515312Z","uuid":"d207f14f-37ed-46a6-a4a3-0087111d31eb"},{"action":"delete","createdOn":"2024-03-20T15:26:01.50602Z","description":"","name":"identity.user.delete","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.50602Z","uuid":"6df5f235-5a70-44b7-9c68-19203bc003ee"},{"action":"create","createdOn":"2024-03-20T15:26:01.496369Z","description":"","name":"identity.user.create","resource":"user","service":"identity","updatedOn":"2024-03-20T15:26:01.496369Z","uuid":"804264fd-5368-4618-b8e2-5f48f88f6560"},{"action":"update","createdOn":"2024-03-20T15:26:01.487204Z","description":"","name":"identity.serviceAccount.update","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.487204Z","uuid":"ab37694e-8d93-4b67-87e0-719d1ac04e40"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.476923Z","description":"","name":"identity.serviceAccount.setIAMPolicy","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.476923Z","uuid":"7fe19a33-ae4c-4c09-980d-5b7b4713b9c2"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.46725Z","description":"","name":"identity.serviceAccount.getIAMPolicy","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.46725Z","uuid":"52ed842c-bed5-4010-bb6f-276edbd97dd1"},{"action":"get","createdOn":"2024-03-20T15:26:01.456862Z","description":"","name":"identity.serviceAccount.get","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.456862Z","uuid":"1dabfa08-c1cf-44a5-8415-d1c298bd47c5"},{"action":"delete","createdOn":"2024-03-20T15:26:01.447005Z","description":"","name":"identity.serviceAccount.delete","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.447005Z","uuid":"3b5cb73f-5e56-40c2-a4da-06a3a4c368aa"},{"action":"create","createdOn":"2024-03-20T15:26:01.437872Z","description":"","name":"identity.serviceAccount.create","resource":"serviceAccount","service":"identity","updatedOn":"2024-03-20T15:26:01.437872Z","uuid":"a32adeec-3b64-4f57-ae56-a30a5c7a6f4a"}],"nextPageToken":"a32adeec-3b64-4f57-ae56-a30a5c7a6f4a"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 16
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=a32adeec-3b64-4f57-ae56-a30a5c7a6f4a&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"action":"update","createdOn":"2024-03-20T15:26:01.428662Z","description":"","name":"iam.space.update","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.428662Z","uuid":"1bd22b03-0363-40f6-819f-bc2ddd884bf8"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.419529Z","description":"","name":"iam.space.setIAMPolicy","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.419529Z","uuid":"1f55f0ee-d89c-47df-810c-3b4bd4cc4cfe"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.409247Z","description":"","name":"iam.space.getIAMPolicy","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.409247Z","uuid":"1e6f642f-38bf-433a-b813-857aca439511"},{"action":"get","createdOn":"2024-03-20T15:26:01.400416Z","description":"","name":"iam.space.get","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.400416Z","uuid":"fdc6f87f-8886-4c34-a99f-01f9e4e51dbe"},{"action":"enable","createdOn":"2024-03-20T15:26:01.390411Z","description":"","name":"iam.space.enable","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.390411Z","uuid":"69405dc8-060a-406d-84a0-c33b87002b6d"},{"action":"disable","createdOn":"2024-03-20T15:26:01.38097Z","description":"","name":"iam.space.disable","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.38097Z","uuid":"d89d6c6c-7978-435d-827a-9e685ce6edad"},{"action":"delete","createdOn":"2024-03-20T15:26:01.371153Z","description":"","name":"iam.space.delete","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.371153Z","uuid":"3e21ca9c-93bb-41eb-9c90-3130c7f517a6"},{"action":"create","createdOn":"2024-03-20T15:26:01.357747Z","description":"","name":"iam.space.create","resource":"space","service":"iam","updatedOn":"2024-03-20T15:26:01.357747Z","uuid":"15b5ec47-07d8-48a9-8964-ae17f978005f"},{"action":"update","createdOn":"2024-03-20T15:26:01.348098Z","description":"","name":"iam.role.update","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.348098Z","uuid":"0a02fb81-a1a8-4e53-9725-81a0430af5db"},{"action":"setIAMPolicy","createdOn":"2024-03-20T15:26:01.339026Z","description":"","name":"iam.role.setIAMPolicy","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.339026Z","uuid":"693f20f7-99e8-4f2a-b3a4-fcedf90a48f9"},{"action":"getIAMPolicy","createdOn":"2024-03-20T15:26:01.329477Z","description":"","name":"iam.role.getIAMPolicy","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.329477Z","uuid":"d29525d1-1f9a-4a31-a317-e98695edaed7"},{"action":"get","createdOn":"2024-03-20T15:26:01.319638Z","description":"","name":"iam.role.get","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.319638Z","uuid":"00f12337-5f8d-47d2-a66e-273810f55fea"},{"action":"enable","createdOn":"2024-03-20T15:26:01.306713Z","description":"","name":"iam.role.enable","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.306713Z","uuid":"de98c28d-5141-4249-9996-6d1e3df6ccfc"},{"action":"disable","createdOn":"2024-03-20T15:26:01.296456Z","description":"","name":"iam.role.disable","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.296456Z","uuid":"09b7b590-a331-4bd0-9d82-68e9cd3edaaa"},{"action":"delete","createdOn":"2024-03-20T15:26:01.28685Z","description":"","name":"iam.role.delete","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.28685Z","uuid":"7c6d06e8-eb40-42ee-8459-094788e02b69"}],"nextPageToken":"7c6d06e8-eb40-42ee-8459-094788e02b69"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 17
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/permissions?page%5BnextToken%5D=7c6d06e8-eb40-42ee-8459-094788e02b69&page%5Bsize%5D=15
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 468
+        uncompressed: false
+        body: |
+            {"items":[{"action":"create","createdOn":"2024-03-20T15:26:01.276306Z","description":"","name":"iam.role.create","resource":"role","service":"iam","updatedOn":"2024-03-20T15:26:01.276306Z","uuid":"93d6c839-125c-4bff-b191-64abfbad74b7"},{"action":"get","createdOn":"2024-03-20T15:26:01.26572Z","description":"","name":"iam.permission.get","resource":"permission","service":"iam","updatedOn":"2024-03-20T15:26:01.26572Z","uuid":"1ff362e9-381e-4183-8bb6-ff5bba2d7eec"}]}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "468"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 18
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
