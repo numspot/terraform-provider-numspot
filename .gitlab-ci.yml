@@ -110,6 +110,7 @@ push_to_github:
     - rm .gitlab-ci.yml
     - ls -la
   script:
+    - rm .gitlab-ci.yml
     - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
     - git push -f github HEAD:jordan
 #    - git push github HEAD:jordan --tags
