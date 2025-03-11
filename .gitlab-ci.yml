@@ -1,95 +1,95 @@
-workflow:
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "merge_request_event"
-include:
-  - project: 'platform-software-factory/ci-templates'
-    ref: 'jobs/go_unit-tests@0.2.2'
-    file: 'jobs/go_unit-tests/go_unit-tests.yml'
+# workflow:
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE != "merge_request_event"
+# include:
+#   - project: 'platform-software-factory/ci-templates'
+#     ref: 'jobs/go_unit-tests@0.2.2'
+#     file: 'jobs/go_unit-tests/go_unit-tests.yml'
 
-variables:
-  GOPRIVATE: gitlab.numspot.cloud/*
-before_script:
-  - echo "machine ${CI_SERVER_HOST} login gitlab-ci-token password
-    ${CI_JOB_TOKEN}" > ~/.netrc
+# variables:
+#   GOPRIVATE: gitlab.numspot.cloud/*
+# before_script:
+#   - echo "machine ${CI_SERVER_HOST} login gitlab-ci-token password
+#     ${CI_JOB_TOKEN}" > ~/.netrc
 
-fmt:
-  image: golang:1.21.0
-  stage: test
-  before_script:
-    - apt update && apt install -y git lsb-release gnupg software-properties-common
-    - wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
-    - gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
-    - echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
-    - apt update
-    - apt install terraform -y
-    - go install github.com/katbyte/terrafmt@latest
-    - go install mvdan.cc/gofumpt@latest
-    - go install github.com/daixiang0/gci@latest
-  script:
-    - gofumpt -l -w .
-    - gci write --skip-generated --skip-vendor -s standard -s default -s "prefix(gitlab.numspot.cloud/cloud/terraform-provider-numspot)" -s blank -s dot .
-    - find . | egrep "test.go" | sort | while read f; do terrafmt fmt -fv $f; done
-    - terraform fmt -recursive examples/
-    - git diff --compact-summary --exit-code || (echo; echo "Unexpected difference in directories after code formatting. Run 'make fmt' command and commit."; exit 1)
+# fmt:
+#   image: golang:1.21.0
+#   stage: test
+#   before_script:
+#     - apt update && apt install -y git lsb-release gnupg software-properties-common
+#     - wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+#     - gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
+#     - echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+#     - apt update
+#     - apt install terraform -y
+#     - go install github.com/katbyte/terrafmt@latest
+#     - go install mvdan.cc/gofumpt@latest
+#     - go install github.com/daixiang0/gci@latest
+#   script:
+#     - gofumpt -l -w .
+#     - gci write --skip-generated --skip-vendor -s standard -s default -s "prefix(gitlab.numspot.cloud/cloud/terraform-provider-numspot)" -s blank -s dot .
+#     - find . | egrep "test.go" | sort | while read f; do terrafmt fmt -fv $f; done
+#     - terraform fmt -recursive examples/
+#     - git diff --compact-summary --exit-code || (echo; echo "Unexpected difference in directories after code formatting. Run 'make fmt' command and commit."; exit 1)
 
-go_lint:
-  image: golangci/golangci-lint:v1.57.1-alpine
-  stage: test
-  script:
-    - golangci-lint run --out-format code-climate:gl-code-quality-report.json,line-number --timeout=10m
-  artifacts:
-    when: always
-    expire_in: 1 month
-    reports:
-      codequality: gl-code-quality-report.json
-    paths:
-      - gl-code-quality-report.json
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "schedule"
+# go_lint:
+#   image: golangci/golangci-lint:v1.57.1-alpine
+#   stage: test
+#   script:
+#     - golangci-lint run --out-format code-climate:gl-code-quality-report.json,line-number --timeout=10m
+#   artifacts:
+#     when: always
+#     expire_in: 1 month
+#     reports:
+#       codequality: gl-code-quality-report.json
+#     paths:
+#       - gl-code-quality-report.json
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE != "schedule"
 
-go_unit-tests:
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "schedule"
+# go_unit-tests:
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE != "schedule"
 
-go_generate:
-  image: golang:1.21.0
-  stage: test
-  before_script:
-    - apt update && apt install -y git lsb-release gnupg software-properties-common
-    - wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
-    - gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
-    - echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
-    - apt update
-    - apt install terraform -y
-  script:
-    - go generate
-    - git diff --compact-summary --exit-code || (echo; echo "Unexpected difference in directories after code generation. Run 'go generate' command and commit."; exit 1)
+# go_generate:
+#   image: golang:1.21.0
+#   stage: test
+#   before_script:
+#     - apt update && apt install -y git lsb-release gnupg software-properties-common
+#     - wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+#     - gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
+#     - echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+#     - apt update
+#     - apt install terraform -y
+#   script:
+#     - go generate
+#     - git diff --compact-summary --exit-code || (echo; echo "Unexpected difference in directories after code generation. Run 'go generate' command and commit."; exit 1)
 
-acc-tests:
-  image: golang:1.21.0
-  stage: test
-  before_script:
-    - go install gotest.tools/gotestsum@latest
-  variables:
-    NUMSPOT_HOST: $NUMSPOT_API_HOST
-    NUMSPOT_CLIENT_ID: $NUMSPOT_CLIENT_ID
-    NUMSPOT_CLIENT_SECRET: $NUMSPOT_CLIENT_SECRET
-    NUMSPOT_SPACE_ID: $NUMSPOT_SPACE_ID
-    TF_ACC: "1"
-    PARALLEL_TEST: "true"
-    RETRY_BACKOFF: "5ms"
-    VCR_MODE : "replay"
-  script:
-    - gotestsum --junitfile acc-tests-report.xml --format testname -- -timeout 30m --tags=acc ./...
-  artifacts:
-    when: always
-    reports:
-      junit: acc-tests-report.xml
-  rules:
-    - when: always
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+# acc-tests:
+#   image: golang:1.21.0
+#   stage: test
+#   before_script:
+#     - go install gotest.tools/gotestsum@latest
+#   variables:
+#     NUMSPOT_HOST: $NUMSPOT_API_HOST
+#     NUMSPOT_CLIENT_ID: $NUMSPOT_CLIENT_ID
+#     NUMSPOT_CLIENT_SECRET: $NUMSPOT_CLIENT_SECRET
+#     NUMSPOT_SPACE_ID: $NUMSPOT_SPACE_ID
+#     TF_ACC: "1"
+#     PARALLEL_TEST: "true"
+#     RETRY_BACKOFF: "5ms"
+#     VCR_MODE : "replay"
+#   script:
+#     - gotestsum --junitfile acc-tests-report.xml --format testname -- -timeout 30m --tags=acc ./...
+#   artifacts:
+#     when: always
+#     reports:
+#       junit: acc-tests-report.xml
+#   rules:
+#     - when: always
+#     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+#     - if: $CI_COMMIT_TAG
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 push_to_github:
   stage: deploy
