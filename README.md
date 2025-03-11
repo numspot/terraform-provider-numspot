@@ -25,7 +25,7 @@ Check the documentation in the [Terraform registry](https://registry.terraform.i
 ## Using locally built provider
 In order to use the locally build provider follow this steps.
 
-First build the provider:
+First this is building the provider:
 ```sh
 $ go install
 ```
