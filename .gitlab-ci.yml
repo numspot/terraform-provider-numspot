@@ -109,5 +109,5 @@ push_to_github:
     - git checkout release
     - git branch
     - ls -la
-#    - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
-#    - git push -f github HEAD:jordan
+    - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
+    - git push -f github HEAD:jordan
