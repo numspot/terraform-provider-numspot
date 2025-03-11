@@ -108,6 +108,7 @@ push_to_github:
     - git config http.sslVerify false
     - git fetch origin release
     - git checkout release
+    - git pull
     - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
     - git push -f github HEAD:jordan
   when: manual
