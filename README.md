@@ -25,11 +25,10 @@ Check the documentation in the [Terraform registry](https://registry.terraform.i
 ## Using locally built provider
 In order to use the locally build provider follow this steps.
 
-First build the provider:
+First thing is building the provider:
 ```sh
 $ go install
 ```
-
 Add development override to the .terraformrc CLI config file, check the [docs](https://developer.hashicorp.com/terraform/cli/config/config-file#development-overrides-for-provider-developers) for more details:
 ```sh
 
@@ -48,7 +47,6 @@ provider_installation {
 }
 EOF
 ```
-
 You could either pass provider parameters as environment variables like following or set them in the provider block in the terraform script file:
 ```sh
 $ export NUMSPOT_HOST="..."
