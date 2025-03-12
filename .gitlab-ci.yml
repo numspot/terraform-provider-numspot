@@ -110,5 +110,6 @@ push_to_github:
     - git checkout release
     - git pull
     - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
-    - git push -f github HEAD:jordan
+    - git push -f github HEAD:main
+    - git push -f github HEAD:main --tags
   when: manual
