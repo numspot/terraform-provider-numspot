@@ -135,7 +135,8 @@ try_push_to_github:
 #    - git clone https://github.com/numspot/terraform-provider-numspot.git
     - git config --global user.email "$GITLAB_USER_EMAIL"
 #    - cd -
-    - rm .gitlab-ci.yml
+    - git rm .gitlab-ci.yml
+    - git commit -m "test"
     - rm -r internal/test internal/acctest
 #    - rm -r .git
     - git reset --hard $(git commit-tree HEAD^{tree} -m "Initial commit") 
