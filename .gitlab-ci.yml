@@ -142,7 +142,7 @@ try_push_to_github:
     - git commit --amend --no-edit
     - rm -r internal/test internal/acctest
 #    - rm -r .git
-#    - git reset --hard $(git commit-tree HEAD^{tree} -m "version $CI_COMMIT_TAG")
+    - git reset --soft $(git commit-tree HEAD^{tree} -m "version $CI_COMMIT_TAG")
     - pwd
     - git log
 #    - cp -r /builds/cloud-terraform/terraform-provider-numspot/* /tmp/terraform-provider-numspot
