@@ -135,13 +135,13 @@ try_push_to_github:
 #    - git clone https://github.com/numspot/terraform-provider-numspot.git
     - git config --global user.email "$GITLAB_USER_EMAIL"
 #    - cd -
+    - git rebase -i --root
+    - git commit --amend --no-edit
     - git rm .gitlab-ci.yml
-    - git commit -m "test"
+    - git commit --amend --no-edit
     - rm -r internal/test internal/acctest
 #    - rm -r .git
-    - git reset --hard $(git commit-tree HEAD^{tree} -m "version $CI_COMMIT_TAG")
-#    - git rebase -i --root
-#    - git commit --amend --no-edit
+#    - git reset --hard $(git commit-tree HEAD^{tree} -m "version $CI_COMMIT_TAG")
     - pwd
 #    - cp -r /builds/cloud-terraform/terraform-provider-numspot/* /tmp/terraform-provider-numspot
 #    - ls -la /tmp/terraform-provider-numspot
