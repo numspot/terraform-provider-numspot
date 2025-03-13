@@ -139,6 +139,8 @@ try_push_to_github:
     - ls -la /tmp/terraform-provider-numspot
     - cd /tmp/terraform-provider-numspot
     - git branch
+    - git tag
+    - ll internal
 #    - git fetch origin release
 #    - git checkout release
 #    - rm .gitlab-ci.yml
