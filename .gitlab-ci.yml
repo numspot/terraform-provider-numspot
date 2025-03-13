@@ -136,5 +136,5 @@ try_push_to_github:
     - git commit -m "test"
     - git push
   rules:
-    - if: "$CI_COMMIT_BRANCH" == "release" && "$CI_COMMIT_TITLE" =~ /Merge branch.*/"
+    - if: "$CI_COMMIT_BRANCH" == "release" && "$CI_COMMIT_TITLE" =~ "/Merge branch.*/"
 #  when: manual
