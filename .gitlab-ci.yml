@@ -137,6 +137,7 @@ try_push_to_github:
     - cd -
     - rm .gitlab-ci.yml
     - rm -r internal/test internal/acctest
+    - rm -r .git
     - pwd
     - cp -r /builds/cloud-terraform/terraform-provider-numspot/* /tmp/terraform-provider-numspot
     - ls -la /tmp/terraform-provider-numspot
