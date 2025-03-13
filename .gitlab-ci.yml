@@ -133,6 +133,7 @@ try_push_to_github:
     - echo $CI_COMMIT_TAG
     - cd /tmp
     - git clone https://github.com/numspot/terraform-provider-numspot.git
+    - git config --global user.email "$GITLAB_USER_EMAIL"
     - cd -
     - rm .gitlab-ci.yml
     - rm -r internal/test internal/acctest
