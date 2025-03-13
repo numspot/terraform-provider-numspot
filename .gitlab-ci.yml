@@ -135,7 +135,7 @@ try_push_to_github:
 #    - git clone https://github.com/numspot/terraform-provider-numspot.git
     - git config --global user.email "$GITLAB_USER_EMAIL"
 #    - cd -
-    - git rebase -i --root
+    - git rebase --root
     - git rebase --continue
     - git commit --amend --no-edit
     - git rm .gitlab-ci.yml
