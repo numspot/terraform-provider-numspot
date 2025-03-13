@@ -129,9 +129,11 @@ try_push_to_github:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
     - git config http.sslVerify false
-    - cd /tmp
     - git clone https://github.com/numspot/terraform-provider-numspot.git
-    - cd terraform-provider-numspot
+    - git fetch origin main
+    - rm .gitlab-ci.yml
+    - pwd
+#    - cp -r * terraform-provider-numspot
 #    - git fetch origin release
 #    - git checkout release
 #    - rm .gitlab-ci.yml
