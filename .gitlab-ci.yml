@@ -133,7 +133,7 @@ try_push_to_github:
     - git fetch origin main
     - rm .gitlab-ci.yml
     - pwd
-    - cp -r * terraform-provider-numspot
+    - cp -rf * terraform-provider-numspot
     - cd terraform-provider-numspot
     - ls -la
 #    - git fetch origin release
