@@ -138,10 +138,9 @@ try_push_to_github:
 #    - COMMIT_MSG=$(git log -1 --format=%B)
 #    - GIT_SEQUENCE_EDITOR="sed -i '2,\$s/^pick/squash/'" git rebase --root -i
 #    - echo "$COMMIT_MSG" | git commit --amend -F -
-#    - git rm .gitlab-ci.yml
-#    - git commit --amend --no-edit
-#    - rm -r internal/test internal/acctest
-#    - rm -r .git
+    - git rm .gitlab-ci.yml
+    - git commit --amend --no-edit
+    - rm -r internal/test internal/acctest
     - git reset --soft $(git commit-tree HEAD^{tree} -m "version $CI_COMMIT_TAG")
     - pwd
     - git log
@@ -152,11 +151,11 @@ try_push_to_github:
 #    - git commit -m "version $CI_COMMIT_TAG"
 #    - git tag $CI_COMMIT_TAG
 #    - git tag
-#    - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
-#    - git fetch --unshallow || git fetch --all
-#    - git log
-#    - git push -f github HEAD:main
-#    - git push -f github HEAD:main $CI_COMMIT_TAG
+    - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
+    - git fetch --unshallow || git fetch --all
+    - git log
+    - git push -f github HEAD:main
+    - git push -f github HEAD:main $CI_COMMIT_TAG
 #    - git push --tags
 #    - git fetch origin release
 #    - git checkout release
