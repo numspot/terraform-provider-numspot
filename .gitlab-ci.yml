@@ -150,8 +150,8 @@ try_push_to_github:
     - git tag
     - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
     - git log
-    - git push -f github HEAD:main
-    - git push -f github HEAD:main --tags
+    - git push -f github main
+    - git push -f github main $CI_COMMIT_TAG
 #    - git push --tags
 #    - git fetch origin release
 #    - git checkout release
