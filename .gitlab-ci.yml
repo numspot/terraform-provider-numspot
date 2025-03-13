@@ -129,6 +129,7 @@ try_push_to_github:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
     - git config http.sslVerify false
+    - echo $CI_COMMIT_TAG
     - cd /tmp
     - git clone https://github.com/numspot/terraform-provider-numspot.git
     - cd -
@@ -147,6 +148,6 @@ try_push_to_github:
 #    - git add .
 #    - git commit -m "test"
 #    - git push
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == "release" && $CI_COMMIT_TITLE =~ "/Merge branch.*/"
+  rules:
+    - if: $CI_COMMIT_TAG
 #  when: manual
