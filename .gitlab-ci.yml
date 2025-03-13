@@ -93,7 +93,30 @@ go_generate:
 #
 
 
-push_to_github:
+# push_to_github:
+#   stage: deploy
+#   image:
+#     name: alpine/git
+#     entrypoint: [""]
+#   before_script:
+#     - which ssh-agent || ( apk add openssh-client )
+#     - eval $(ssh-agent -s)
+#     - echo "$GITHUB_DEPLOY_KEY" | ssh-add -
+#     - mkdir -p ~/.ssh
+#     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+#   script:
+#     - git config http.sslVerify false
+#     - git fetch origin release
+#     - git checkout release
+#     - git pull
+#     - git fetch --tags
+#     - git tag
+#     - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
+#     - git push -f github HEAD:main
+#     - git push -f github HEAD:main --tags
+#   when: manual
+
+try_push_to_github:
   stage: deploy
   image:
     name: alpine/git
@@ -108,10 +131,8 @@ push_to_github:
     - git config http.sslVerify false
     - git fetch origin release
     - git checkout release
-    - git pull
-    - git fetch --tags
-    - git tag
-    - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
-    - git push -f github HEAD:main
-    - git push -f github HEAD:main --tags
+    - rm .gitlab-ci.yml
+    - git add .
+    - git commit -m "test"
+    - git push
   when: manual
