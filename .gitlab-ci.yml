@@ -139,9 +139,10 @@ try_push_to_github:
     - cp -r /builds/cloud-terraform/terraform-provider-numspot/* /tmp/terraform-provider-numspot
     - ls -la /tmp/terraform-provider-numspot
     - cd /tmp/terraform-provider-numspot
-    - git branch
+    - git add .
+    - git commit -m "version: v$CI_COMMIT_TAG"
+    - git tag v$CI_COMMIT_TAG
     - git tag
-    - ls -la internal
 #    - git fetch origin release
 #    - git checkout release
 #    - rm .gitlab-ci.yml
