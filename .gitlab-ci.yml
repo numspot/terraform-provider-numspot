@@ -137,7 +137,7 @@ try_push_to_github:
 #    - cd -
     - rm .gitlab-ci.yml
     - rm -r internal/test internal/acctest
-    - rm -r .git
+#    - rm -r .git
     - git reset --hard $(git commit-tree HEAD^{tree} -m "Initial commit") 
     - pwd
 #    - cp -r /builds/cloud-terraform/terraform-provider-numspot/* /tmp/terraform-provider-numspot
