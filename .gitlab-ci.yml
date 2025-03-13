@@ -139,7 +139,7 @@ try_push_to_github:
     - git commit -m "test"
     - rm -r internal/test internal/acctest
 #    - rm -r .git
-    - git reset --hard $(git commit-tree HEAD^{tree} -m "Initial commit") 
+    - git reset --hard $(git commit-tree HEAD^{tree} -m "version $CI_COMMIT_TAG") 
     - pwd
 #    - cp -r /builds/cloud-terraform/terraform-provider-numspot/* /tmp/terraform-provider-numspot
 #    - ls -la /tmp/terraform-provider-numspot
@@ -147,6 +147,7 @@ try_push_to_github:
 #    - git add .
 #    - git commit -m "version $CI_COMMIT_TAG"
 #    - git tag $CI_COMMIT_TAG
+    - git pull --tags
     - git tag
     - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
     - git log
