@@ -1,0 +1,457 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 1
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"createdOn":"2024-08-08T17:53:36.86715Z","description":"Space Editor","name":"Space Editor","updatedOn":"2024-08-08T17:53:36.86715Z","uuid":"1271f17c-189b-4b31-842b-7ba21e60e70e"},{"createdOn":"2024-08-08T17:53:14.754203Z","description":"Organisation Viewer","name":"Organisation Viewer","updatedOn":"2024-08-08T17:53:14.754203Z","uuid":"56051145-68d4-48e8-87a1-e6aeb6129101"},{"createdOn":"2024-08-08T15:46:55.708453Z","description":"Compute Admin","name":"Compute Admin","updatedOn":"2024-08-08T15:46:55.708453Z","uuid":"6c0591c2-7877-440b-9d42-adbf6f18c0d6"},{"createdOn":"2024-04-22T17:23:36.943168Z","description":"","name":"kubernetes Viewer","updatedOn":"2024-04-22T17:23:36.943168Z","uuid":"92061163-c643-481f-96e2-37788864fd78"},{"createdOn":"2024-04-22T17:23:36.795734Z","description":"","name":"Kubernetes Admin","updatedOn":"2024-04-22T17:23:36.795734Z","uuid":"6f275ef2-6651-4150-86e7-9e6a51fa1f56"},{"createdOn":"2024-04-22T17:23:36.73979Z","description":"","name":"Postgres Viewer","updatedOn":"2024-04-22T17:23:36.73979Z","uuid":"708696a9-cb19-4d57-861e-ba5212d6b933"},{"createdOn":"2024-04-22T17:23:36.64179Z","description":"","name":"Postgres Admin","updatedOn":"2024-04-22T17:23:36.64179Z","uuid":"59dfad66-57c9-4438-88e5-cb3b5cd48915"},{"createdOn":"2024-03-29T15:08:07.68049Z","description":"","name":"OCP Viewer","updatedOn":"2024-03-29T15:08:07.68049Z","uuid":"31b75fdd-319d-4517-b543-80e18b88a410"},{"createdOn":"2024-03-29T15:08:07.639249Z","description":"","name":"OCP Admin","updatedOn":"2024-03-29T15:08:07.639249Z","uuid":"fba07c21-7b32-4da7-8c61-b5fc2dd35140"},{"createdOn":"2024-03-20T15:26:04.700736Z","description":"","name":"Object Storage Object Editor","updatedOn":"2024-03-20T15:26:04.700736Z","uuid":"cab64e7a-866e-4ed2-bc38-74e48768c52a"},{"createdOn":"2024-03-20T15:26:04.689492Z","description":"","name":"Object Storage Object Viewer","updatedOn":"2024-03-20T15:26:04.689492Z","uuid":"85160c3b-69a5-4430-b98b-7b7ca498d5c5"},{"createdOn":"2024-03-20T15:26:04.679156Z","description":"","name":"Object Storage Object Creator","updatedOn":"2024-03-20T15:26:04.679156Z","uuid":"7412bf23-28a7-4c90-8615-2dc7c23ff723"},{"createdOn":"2024-03-20T15:26:04.669108Z","description":"","name":"Object Storage Object Admin","updatedOn":"2024-03-20T15:26:04.669108Z","uuid":"18549c5c-12b3-4fc0-82c5-7853efeff9b4"},{"createdOn":"2024-03-20T15:26:04.658803Z","description":"","name":"Object Storage Bucket Editor","updatedOn":"2024-03-20T15:26:04.658803Z","uuid":"2d068bc2-eb53-4ce7-a0fd-ea0767fbd52f"},{"createdOn":"2024-03-20T15:26:04.648426Z","description":"","name":"Object Storage Bucket Viewer","updatedOn":"2024-03-20T15:26:04.648426Z","uuid":"1e417f1a-171e-4731-8b95-b007a69f6ac5"},{"createdOn":"2024-03-20T15:26:04.63797Z","description":"","name":"Object Storage Bucket Creator","updatedOn":"2024-03-20T15:26:04.63797Z","uuid":"1a657a38-d390-44ff-b665-c77ff9640ac5"},{"createdOn":"2024-03-20T15:26:04.627948Z","description":"","name":"Object Storage Bucket Admin","updatedOn":"2024-03-20T15:26:04.627948Z","uuid":"65d6e02a-ef48-42d3-b128-fa2be4134989"},{"createdOn":"2024-03-20T15:26:04.566245Z","description":"","name":"Space Deleter","updatedOn":"2024-03-20T15:26:04.566245Z","uuid":"5e4a5e71-27c3-47a1-a811-6a18952a8cb5"},{"createdOn":"2024-03-20T15:26:04.545677Z","description":"","name":"Space Viewer","updatedOn":"2024-03-20T15:26:04.545677Z","uuid":"4f189874-9ebc-420c-a3f2-b903eab7244f"},{"createdOn":"2024-03-20T15:26:04.535211Z","description":"","name":"Space Creator","updatedOn":"2024-03-20T15:26:04.535211Z","uuid":"dfe44385-7232-456e-9d13-a37e5f6ec1cc"}],"nextPageToken":"dfe44385-7232-456e-9d13-a37e5f6ec1cc"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 2
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles?page%5BnextToken%5D=dfe44385-7232-456e-9d13-a37e5f6ec1cc&page%5Bsize%5D=50
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"createdOn":"2024-03-20T15:26:04.525621Z","description":"","name":"Space Admin","updatedOn":"2024-03-20T15:26:04.525621Z","uuid":"5b17d346-0d61-42f9-b4c6-2af2ea32987e"},{"createdOn":"2024-03-20T15:26:04.504353Z","description":"","name":"Organisation Admin","updatedOn":"2024-06-21T09:49:03.076388Z","uuid":"4698acbb-2b04-4e26-9095-ae81e8dcfe62"},{"createdOn":"2024-03-20T15:26:04.461777Z","description":"","name":"Identity User Account Viewer","updatedOn":"2024-03-20T15:26:04.461777Z","uuid":"4fc5fd00-fff5-43ce-b06e-5c5838001fc5"},{"createdOn":"2024-03-20T15:26:04.451696Z","description":"","name":"Identity User Account Manager","updatedOn":"2024-03-20T15:26:04.451696Z","uuid":"b9352635-26cd-4846-a8c7-ac946efa08c5"},{"createdOn":"2024-03-20T15:26:04.441522Z","description":"","name":"Identity User Account Admin","updatedOn":"2024-03-20T15:26:04.441522Z","uuid":"335b8728-e885-4c0e-a821-8558b0b4b71e"},{"createdOn":"2024-03-20T15:26:04.430944Z","description":"","name":"Identity Service Account Viewer","updatedOn":"2024-03-20T15:26:04.430944Z","uuid":"12fc1c20-e1a6-4e17-b141-a198468e7c2e"},{"createdOn":"2024-03-20T15:26:04.409774Z","description":"","name":"Identity Service Account Manager","updatedOn":"2024-03-20T15:26:04.409774Z","uuid":"851180a0-d86b-4950-92e6-81bffe6eb2fb"},{"createdOn":"2024-03-20T15:26:04.399488Z","description":"","name":"Identity Service Account Admin","updatedOn":"2024-03-20T15:26:04.399488Z","uuid":"44507131-834f-4522-8962-77d8cd765003"},{"createdOn":"2024-03-20T15:26:04.389499Z","description":"","name":"Identity Viewer","updatedOn":"2024-03-20T15:26:04.389499Z","uuid":"0cecc180-e819-44af-ba56-b21fff3f8edb"},{"createdOn":"2024-03-20T15:26:04.380561Z","description":"","name":"Identity Admin","updatedOn":"2024-03-20T15:26:04.380561Z","uuid":"d07050c9-33ff-4de3-b720-eb1e957274c7"},{"createdOn":"2024-03-20T15:26:04.371845Z","description":"","name":"IAM Role Viewer","updatedOn":"2024-03-20T15:26:04.371845Z","uuid":"bf2a3d21-7a7b-49fd-9c86-fb8c4e881db4"},{"createdOn":"2024-03-20T15:26:04.362306Z","description":"","name":"IAM Role Admin","updatedOn":"2024-03-20T15:26:04.362306Z","uuid":"1d9cfd4c-7bf3-4dba-95cf-3b40356120ea"},{"createdOn":"2024-03-20T15:26:04.352394Z","description":"","name":"IAM Policy Viewer","updatedOn":"2024-03-20T15:26:04.352394Z","uuid":"30a89176-87b4-42b1-b0ca-d3467c358054"},{"createdOn":"2024-03-20T15:26:04.343201Z","description":"","name":"IAM Policy Admin","updatedOn":"2024-03-20T15:26:04.343201Z","uuid":"20a8f521-0e8c-4e4b-b5ba-ee95ea5a6fa9"},{"createdOn":"2024-03-20T15:26:04.332591Z","description":"","name":"IAM Security Reviewer","updatedOn":"2024-03-20T15:26:04.332591Z","uuid":"241afa27-f994-4a93-85b6-b3a6edd5f9d0"},{"createdOn":"2024-03-20T15:26:04.323249Z","description":"","name":"IAM Security Admin","updatedOn":"2024-03-20T15:26:04.323249Z","uuid":"cc14a907-3663-4321-873a-2eb099b58ca4"}]}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 3
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 4
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"createdOn":"2024-08-08T17:53:36.86715Z","description":"Space Editor","name":"Space Editor","updatedOn":"2024-08-08T17:53:36.86715Z","uuid":"1271f17c-189b-4b31-842b-7ba21e60e70e"},{"createdOn":"2024-08-08T17:53:14.754203Z","description":"Organisation Viewer","name":"Organisation Viewer","updatedOn":"2024-08-08T17:53:14.754203Z","uuid":"56051145-68d4-48e8-87a1-e6aeb6129101"},{"createdOn":"2024-08-08T15:46:55.708453Z","description":"Compute Admin","name":"Compute Admin","updatedOn":"2024-08-08T15:46:55.708453Z","uuid":"6c0591c2-7877-440b-9d42-adbf6f18c0d6"},{"createdOn":"2024-04-22T17:23:36.943168Z","description":"","name":"kubernetes Viewer","updatedOn":"2024-04-22T17:23:36.943168Z","uuid":"92061163-c643-481f-96e2-37788864fd78"},{"createdOn":"2024-04-22T17:23:36.795734Z","description":"","name":"Kubernetes Admin","updatedOn":"2024-04-22T17:23:36.795734Z","uuid":"6f275ef2-6651-4150-86e7-9e6a51fa1f56"},{"createdOn":"2024-04-22T17:23:36.73979Z","description":"","name":"Postgres Viewer","updatedOn":"2024-04-22T17:23:36.73979Z","uuid":"708696a9-cb19-4d57-861e-ba5212d6b933"},{"createdOn":"2024-04-22T17:23:36.64179Z","description":"","name":"Postgres Admin","updatedOn":"2024-04-22T17:23:36.64179Z","uuid":"59dfad66-57c9-4438-88e5-cb3b5cd48915"},{"createdOn":"2024-03-29T15:08:07.68049Z","description":"","name":"OCP Viewer","updatedOn":"2024-03-29T15:08:07.68049Z","uuid":"31b75fdd-319d-4517-b543-80e18b88a410"},{"createdOn":"2024-03-29T15:08:07.639249Z","description":"","name":"OCP Admin","updatedOn":"2024-03-29T15:08:07.639249Z","uuid":"fba07c21-7b32-4da7-8c61-b5fc2dd35140"},{"createdOn":"2024-03-20T15:26:04.700736Z","description":"","name":"Object Storage Object Editor","updatedOn":"2024-03-20T15:26:04.700736Z","uuid":"cab64e7a-866e-4ed2-bc38-74e48768c52a"},{"createdOn":"2024-03-20T15:26:04.689492Z","description":"","name":"Object Storage Object Viewer","updatedOn":"2024-03-20T15:26:04.689492Z","uuid":"85160c3b-69a5-4430-b98b-7b7ca498d5c5"},{"createdOn":"2024-03-20T15:26:04.679156Z","description":"","name":"Object Storage Object Creator","updatedOn":"2024-03-20T15:26:04.679156Z","uuid":"7412bf23-28a7-4c90-8615-2dc7c23ff723"},{"createdOn":"2024-03-20T15:26:04.669108Z","description":"","name":"Object Storage Object Admin","updatedOn":"2024-03-20T15:26:04.669108Z","uuid":"18549c5c-12b3-4fc0-82c5-7853efeff9b4"},{"createdOn":"2024-03-20T15:26:04.658803Z","description":"","name":"Object Storage Bucket Editor","updatedOn":"2024-03-20T15:26:04.658803Z","uuid":"2d068bc2-eb53-4ce7-a0fd-ea0767fbd52f"},{"createdOn":"2024-03-20T15:26:04.648426Z","description":"","name":"Object Storage Bucket Viewer","updatedOn":"2024-03-20T15:26:04.648426Z","uuid":"1e417f1a-171e-4731-8b95-b007a69f6ac5"},{"createdOn":"2024-03-20T15:26:04.63797Z","description":"","name":"Object Storage Bucket Creator","updatedOn":"2024-03-20T15:26:04.63797Z","uuid":"1a657a38-d390-44ff-b665-c77ff9640ac5"},{"createdOn":"2024-03-20T15:26:04.627948Z","description":"","name":"Object Storage Bucket Admin","updatedOn":"2024-03-20T15:26:04.627948Z","uuid":"65d6e02a-ef48-42d3-b128-fa2be4134989"},{"createdOn":"2024-03-20T15:26:04.566245Z","description":"","name":"Space Deleter","updatedOn":"2024-03-20T15:26:04.566245Z","uuid":"5e4a5e71-27c3-47a1-a811-6a18952a8cb5"},{"createdOn":"2024-03-20T15:26:04.545677Z","description":"","name":"Space Viewer","updatedOn":"2024-03-20T15:26:04.545677Z","uuid":"4f189874-9ebc-420c-a3f2-b903eab7244f"},{"createdOn":"2024-03-20T15:26:04.535211Z","description":"","name":"Space Creator","updatedOn":"2024-03-20T15:26:04.535211Z","uuid":"dfe44385-7232-456e-9d13-a37e5f6ec1cc"}],"nextPageToken":"dfe44385-7232-456e-9d13-a37e5f6ec1cc"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 5
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles?page%5BnextToken%5D=dfe44385-7232-456e-9d13-a37e5f6ec1cc&page%5Bsize%5D=50
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"createdOn":"2024-03-20T15:26:04.525621Z","description":"","name":"Space Admin","updatedOn":"2024-03-20T15:26:04.525621Z","uuid":"5b17d346-0d61-42f9-b4c6-2af2ea32987e"},{"createdOn":"2024-03-20T15:26:04.504353Z","description":"","name":"Organisation Admin","updatedOn":"2024-06-21T09:49:03.076388Z","uuid":"4698acbb-2b04-4e26-9095-ae81e8dcfe62"},{"createdOn":"2024-03-20T15:26:04.461777Z","description":"","name":"Identity User Account Viewer","updatedOn":"2024-03-20T15:26:04.461777Z","uuid":"4fc5fd00-fff5-43ce-b06e-5c5838001fc5"},{"createdOn":"2024-03-20T15:26:04.451696Z","description":"","name":"Identity User Account Manager","updatedOn":"2024-03-20T15:26:04.451696Z","uuid":"b9352635-26cd-4846-a8c7-ac946efa08c5"},{"createdOn":"2024-03-20T15:26:04.441522Z","description":"","name":"Identity User Account Admin","updatedOn":"2024-03-20T15:26:04.441522Z","uuid":"335b8728-e885-4c0e-a821-8558b0b4b71e"},{"createdOn":"2024-03-20T15:26:04.430944Z","description":"","name":"Identity Service Account Viewer","updatedOn":"2024-03-20T15:26:04.430944Z","uuid":"12fc1c20-e1a6-4e17-b141-a198468e7c2e"},{"createdOn":"2024-03-20T15:26:04.409774Z","description":"","name":"Identity Service Account Manager","updatedOn":"2024-03-20T15:26:04.409774Z","uuid":"851180a0-d86b-4950-92e6-81bffe6eb2fb"},{"createdOn":"2024-03-20T15:26:04.399488Z","description":"","name":"Identity Service Account Admin","updatedOn":"2024-03-20T15:26:04.399488Z","uuid":"44507131-834f-4522-8962-77d8cd765003"},{"createdOn":"2024-03-20T15:26:04.389499Z","description":"","name":"Identity Viewer","updatedOn":"2024-03-20T15:26:04.389499Z","uuid":"0cecc180-e819-44af-ba56-b21fff3f8edb"},{"createdOn":"2024-03-20T15:26:04.380561Z","description":"","name":"Identity Admin","updatedOn":"2024-03-20T15:26:04.380561Z","uuid":"d07050c9-33ff-4de3-b720-eb1e957274c7"},{"createdOn":"2024-03-20T15:26:04.371845Z","description":"","name":"IAM Role Viewer","updatedOn":"2024-03-20T15:26:04.371845Z","uuid":"bf2a3d21-7a7b-49fd-9c86-fb8c4e881db4"},{"createdOn":"2024-03-20T15:26:04.362306Z","description":"","name":"IAM Role Admin","updatedOn":"2024-03-20T15:26:04.362306Z","uuid":"1d9cfd4c-7bf3-4dba-95cf-3b40356120ea"},{"createdOn":"2024-03-20T15:26:04.352394Z","description":"","name":"IAM Policy Viewer","updatedOn":"2024-03-20T15:26:04.352394Z","uuid":"30a89176-87b4-42b1-b0ca-d3467c358054"},{"createdOn":"2024-03-20T15:26:04.343201Z","description":"","name":"IAM Policy Admin","updatedOn":"2024-03-20T15:26:04.343201Z","uuid":"20a8f521-0e8c-4e4b-b5ba-ee95ea5a6fa9"},{"createdOn":"2024-03-20T15:26:04.332591Z","description":"","name":"IAM Security Reviewer","updatedOn":"2024-03-20T15:26:04.332591Z","uuid":"241afa27-f994-4a93-85b6-b3a6edd5f9d0"},{"createdOn":"2024-03-20T15:26:04.323249Z","description":"","name":"IAM Security Admin","updatedOn":"2024-03-20T15:26:04.323249Z","uuid":"cc14a907-3663-4321-873a-2eb099b58ca4"}]}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 6
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 7
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"createdOn":"2024-08-08T17:53:36.86715Z","description":"Space Editor","name":"Space Editor","updatedOn":"2024-08-08T17:53:36.86715Z","uuid":"1271f17c-189b-4b31-842b-7ba21e60e70e"},{"createdOn":"2024-08-08T17:53:14.754203Z","description":"Organisation Viewer","name":"Organisation Viewer","updatedOn":"2024-08-08T17:53:14.754203Z","uuid":"56051145-68d4-48e8-87a1-e6aeb6129101"},{"createdOn":"2024-08-08T15:46:55.708453Z","description":"Compute Admin","name":"Compute Admin","updatedOn":"2024-08-08T15:46:55.708453Z","uuid":"6c0591c2-7877-440b-9d42-adbf6f18c0d6"},{"createdOn":"2024-04-22T17:23:36.943168Z","description":"","name":"kubernetes Viewer","updatedOn":"2024-04-22T17:23:36.943168Z","uuid":"92061163-c643-481f-96e2-37788864fd78"},{"createdOn":"2024-04-22T17:23:36.795734Z","description":"","name":"Kubernetes Admin","updatedOn":"2024-04-22T17:23:36.795734Z","uuid":"6f275ef2-6651-4150-86e7-9e6a51fa1f56"},{"createdOn":"2024-04-22T17:23:36.73979Z","description":"","name":"Postgres Viewer","updatedOn":"2024-04-22T17:23:36.73979Z","uuid":"708696a9-cb19-4d57-861e-ba5212d6b933"},{"createdOn":"2024-04-22T17:23:36.64179Z","description":"","name":"Postgres Admin","updatedOn":"2024-04-22T17:23:36.64179Z","uuid":"59dfad66-57c9-4438-88e5-cb3b5cd48915"},{"createdOn":"2024-03-29T15:08:07.68049Z","description":"","name":"OCP Viewer","updatedOn":"2024-03-29T15:08:07.68049Z","uuid":"31b75fdd-319d-4517-b543-80e18b88a410"},{"createdOn":"2024-03-29T15:08:07.639249Z","description":"","name":"OCP Admin","updatedOn":"2024-03-29T15:08:07.639249Z","uuid":"fba07c21-7b32-4da7-8c61-b5fc2dd35140"},{"createdOn":"2024-03-20T15:26:04.700736Z","description":"","name":"Object Storage Object Editor","updatedOn":"2024-03-20T15:26:04.700736Z","uuid":"cab64e7a-866e-4ed2-bc38-74e48768c52a"},{"createdOn":"2024-03-20T15:26:04.689492Z","description":"","name":"Object Storage Object Viewer","updatedOn":"2024-03-20T15:26:04.689492Z","uuid":"85160c3b-69a5-4430-b98b-7b7ca498d5c5"},{"createdOn":"2024-03-20T15:26:04.679156Z","description":"","name":"Object Storage Object Creator","updatedOn":"2024-03-20T15:26:04.679156Z","uuid":"7412bf23-28a7-4c90-8615-2dc7c23ff723"},{"createdOn":"2024-03-20T15:26:04.669108Z","description":"","name":"Object Storage Object Admin","updatedOn":"2024-03-20T15:26:04.669108Z","uuid":"18549c5c-12b3-4fc0-82c5-7853efeff9b4"},{"createdOn":"2024-03-20T15:26:04.658803Z","description":"","name":"Object Storage Bucket Editor","updatedOn":"2024-03-20T15:26:04.658803Z","uuid":"2d068bc2-eb53-4ce7-a0fd-ea0767fbd52f"},{"createdOn":"2024-03-20T15:26:04.648426Z","description":"","name":"Object Storage Bucket Viewer","updatedOn":"2024-03-20T15:26:04.648426Z","uuid":"1e417f1a-171e-4731-8b95-b007a69f6ac5"},{"createdOn":"2024-03-20T15:26:04.63797Z","description":"","name":"Object Storage Bucket Creator","updatedOn":"2024-03-20T15:26:04.63797Z","uuid":"1a657a38-d390-44ff-b665-c77ff9640ac5"},{"createdOn":"2024-03-20T15:26:04.627948Z","description":"","name":"Object Storage Bucket Admin","updatedOn":"2024-03-20T15:26:04.627948Z","uuid":"65d6e02a-ef48-42d3-b128-fa2be4134989"},{"createdOn":"2024-03-20T15:26:04.566245Z","description":"","name":"Space Deleter","updatedOn":"2024-03-20T15:26:04.566245Z","uuid":"5e4a5e71-27c3-47a1-a811-6a18952a8cb5"},{"createdOn":"2024-03-20T15:26:04.545677Z","description":"","name":"Space Viewer","updatedOn":"2024-03-20T15:26:04.545677Z","uuid":"4f189874-9ebc-420c-a3f2-b903eab7244f"},{"createdOn":"2024-03-20T15:26:04.535211Z","description":"","name":"Space Creator","updatedOn":"2024-03-20T15:26:04.535211Z","uuid":"dfe44385-7232-456e-9d13-a37e5f6ec1cc"}],"nextPageToken":"dfe44385-7232-456e-9d13-a37e5f6ec1cc"}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 8
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/spaces/bba8c1df-609f-4775-9638-952d488502e6/roles?page%5BnextToken%5D=dfe44385-7232-456e-9d13-a37e5f6ec1cc&page%5Bsize%5D=50
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding:
+            - chunked
+        trailer: {}
+        content_length: -1
+        uncompressed: false
+        body: |
+            {"items":[{"createdOn":"2024-03-20T15:26:04.525621Z","description":"","name":"Space Admin","updatedOn":"2024-03-20T15:26:04.525621Z","uuid":"5b17d346-0d61-42f9-b4c6-2af2ea32987e"},{"createdOn":"2024-03-20T15:26:04.504353Z","description":"","name":"Organisation Admin","updatedOn":"2024-06-21T09:49:03.076388Z","uuid":"4698acbb-2b04-4e26-9095-ae81e8dcfe62"},{"createdOn":"2024-03-20T15:26:04.461777Z","description":"","name":"Identity User Account Viewer","updatedOn":"2024-03-20T15:26:04.461777Z","uuid":"4fc5fd00-fff5-43ce-b06e-5c5838001fc5"},{"createdOn":"2024-03-20T15:26:04.451696Z","description":"","name":"Identity User Account Manager","updatedOn":"2024-03-20T15:26:04.451696Z","uuid":"b9352635-26cd-4846-a8c7-ac946efa08c5"},{"createdOn":"2024-03-20T15:26:04.441522Z","description":"","name":"Identity User Account Admin","updatedOn":"2024-03-20T15:26:04.441522Z","uuid":"335b8728-e885-4c0e-a821-8558b0b4b71e"},{"createdOn":"2024-03-20T15:26:04.430944Z","description":"","name":"Identity Service Account Viewer","updatedOn":"2024-03-20T15:26:04.430944Z","uuid":"12fc1c20-e1a6-4e17-b141-a198468e7c2e"},{"createdOn":"2024-03-20T15:26:04.409774Z","description":"","name":"Identity Service Account Manager","updatedOn":"2024-03-20T15:26:04.409774Z","uuid":"851180a0-d86b-4950-92e6-81bffe6eb2fb"},{"createdOn":"2024-03-20T15:26:04.399488Z","description":"","name":"Identity Service Account Admin","updatedOn":"2024-03-20T15:26:04.399488Z","uuid":"44507131-834f-4522-8962-77d8cd765003"},{"createdOn":"2024-03-20T15:26:04.389499Z","description":"","name":"Identity Viewer","updatedOn":"2024-03-20T15:26:04.389499Z","uuid":"0cecc180-e819-44af-ba56-b21fff3f8edb"},{"createdOn":"2024-03-20T15:26:04.380561Z","description":"","name":"Identity Admin","updatedOn":"2024-03-20T15:26:04.380561Z","uuid":"d07050c9-33ff-4de3-b720-eb1e957274c7"},{"createdOn":"2024-03-20T15:26:04.371845Z","description":"","name":"IAM Role Viewer","updatedOn":"2024-03-20T15:26:04.371845Z","uuid":"bf2a3d21-7a7b-49fd-9c86-fb8c4e881db4"},{"createdOn":"2024-03-20T15:26:04.362306Z","description":"","name":"IAM Role Admin","updatedOn":"2024-03-20T15:26:04.362306Z","uuid":"1d9cfd4c-7bf3-4dba-95cf-3b40356120ea"},{"createdOn":"2024-03-20T15:26:04.352394Z","description":"","name":"IAM Policy Viewer","updatedOn":"2024-03-20T15:26:04.352394Z","uuid":"30a89176-87b4-42b1-b0ca-d3467c358054"},{"createdOn":"2024-03-20T15:26:04.343201Z","description":"","name":"IAM Policy Admin","updatedOn":"2024-03-20T15:26:04.343201Z","uuid":"20a8f521-0e8c-4e4b-b5ba-ee95ea5a6fa9"},{"createdOn":"2024-03-20T15:26:04.332591Z","description":"","name":"IAM Security Reviewer","updatedOn":"2024-03-20T15:26:04.332591Z","uuid":"241afa27-f994-4a93-85b6-b3a6edd5f9d0"},{"createdOn":"2024-03-20T15:26:04.323249Z","description":"","name":"IAM Security Admin","updatedOn":"2024-03-20T15:26:04.323249Z","uuid":"cc14a907-3663-4321-873a-2eb099b58ca4"}]}
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
+    - id: 9
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 117
+        transfer_encoding: []
+        trailer: {}
+        host: api.zex-integ.cloudgouv-eu-west-1.numspot.internal
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form:
+            grant_type:
+                - client_credentials
+        headers:
+            Content-Type:
+                - application/x-www-form-urlencoded
+            User-Agent:
+                - TERRAFORM-NUMSPOT
+        url: https://api.zex-integ.cloudgouv-eu-west-1.numspot.internal/iam/token
+        method: POST
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 1229
+        uncompressed: false
+        body: '{"access_token": "just a fake token","expires_in": 3600}'
+        headers:
+            Api-Gateway-Completed:
+                - "false"
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "1229"
+            Content-Type:
+                - application/json
+            Strict-Transport-Security:
+                - max-age=31536000; includeSubDomains
+            Vary:
+                - Origin
+            X-Krakend:
+                - Version undefined
+        status: 200 OK
+        code: 200
+        duration: 5ms
