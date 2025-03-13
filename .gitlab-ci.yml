@@ -131,11 +131,10 @@ try_push_to_github:
     - git config http.sslVerify false
     - git fetch origin release
     - git checkout release
-    - git tag v0.0.0 
     - rm .gitlab-ci.yml
     - git add .
     - git commit -m "test"
     - git push
   rules:
     - if: "$CI_COMMIT_BRANCH" == "release" && "$CI_COMMIT_TITLE" =~ /Merge branch.*/"
-  when: manual
+#  when: manual
