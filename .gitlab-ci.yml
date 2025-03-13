@@ -131,23 +131,25 @@ try_push_to_github:
     - git config http.sslVerify false
     - echo $GITLAB_USER_EMAIL
     - echo $CI_COMMIT_TAG
-    - cd /tmp
-    - git clone https://github.com/numspot/terraform-provider-numspot.git
-    - git config --global user.email "$GITLAB_USER_EMAIL"
-    - cd -
+#    - cd /tmp
+#    - git clone https://github.com/numspot/terraform-provider-numspot.git
+#    - git config --global user.email "$GITLAB_USER_EMAIL"
+#    - cd -
     - rm .gitlab-ci.yml
     - rm -r internal/test internal/acctest
     - rm -r .git
+    - git reset --hard $(git commit-tree HEAD^{tree} -m "Initial commit") 
     - pwd
-    - cp -r /builds/cloud-terraform/terraform-provider-numspot/* /tmp/terraform-provider-numspot
-    - ls -la /tmp/terraform-provider-numspot
-    - cd /tmp/terraform-provider-numspot
-    - git add .
-    - git commit -m "version $CI_COMMIT_TAG"
-    - git tag $CI_COMMIT_TAG
+#    - cp -r /builds/cloud-terraform/terraform-provider-numspot/* /tmp/terraform-provider-numspot
+#    - ls -la /tmp/terraform-provider-numspot
+#    - cd /tmp/terraform-provider-numspot
+#    - git add .
+#    - git commit -m "version $CI_COMMIT_TAG"
+#    - git tag $CI_COMMIT_TAG
     - git tag
     - git config remote.github.url >&- || git remote add github git@github.com:numspot/terraform-provider-numspot.git
-    - git push --tags
+    - git log
+#    - git push --tags
 #    - git fetch origin release
 #    - git checkout release
 #    - rm .gitlab-ci.yml
