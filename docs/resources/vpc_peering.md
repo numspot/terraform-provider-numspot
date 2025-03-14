@@ -85,5 +85,4 @@ Read-Only:
 
 Read-Only:
 
-- `message` (String) Additional information about the state of the Vpc peering.
 - `name` (String) The state of the Vpc peering (`pending-acceptance` \| `active` \| `rejected` \| `failed` \| `expired` \| `deleted`).

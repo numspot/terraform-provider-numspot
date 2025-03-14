@@ -3,10 +3,10 @@ package core
 import (
 	"context"
 
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
 )
 
 func CreateLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, numSpotLoadBalancerCreate numspot.CreateLoadBalancerJSONRequestBody, numSpotLoadBalancerUpdate numspot.UpdateLoadBalancerJSONRequestBody, tags []numspot.ResourceTag, backendVM, backendIP []string) (numSpotVolume *numspot.LoadBalancer, err error) {

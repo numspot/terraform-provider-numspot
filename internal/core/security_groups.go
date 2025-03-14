@@ -3,10 +3,10 @@ package core
 import (
 	"context"
 
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
 )
 
 func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, payload numspot.CreateSecurityGroupJSONRequestBody, tags []numspot.ResourceTag, inboundRules, outboundRules numspot.CreateSecurityGroupRuleJSONRequestBody) (numSpotSecurityGroup *numspot.SecurityGroup, err error) {

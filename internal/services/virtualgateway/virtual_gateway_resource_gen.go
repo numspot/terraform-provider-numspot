@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"

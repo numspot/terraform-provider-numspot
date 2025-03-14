@@ -10,12 +10,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -188,15 +188,9 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 }
 
 func deserializeCreateNumSpotVM(ctx context.Context, tf VmModel, diags *diag.Diagnostics) numspot.CreateVmsJSONRequestBody {
-	var nicsPtr *[]numspot.NicForVmCreation
 	var blockDeviceMappingPtr *[]numspot.BlockDeviceMappingVmCreation
 	var placement *numspot.Placement
 
-	if !(tf.Nics.IsNull() || tf.Nics.IsUnknown()) {
-		nics := make([]numspot.NicForVmCreation, 0, len(tf.Nics.Elements()))
-		diags.Append(tf.Nics.ElementsAs(ctx, &nics, true)...)
-		nicsPtr = &nics
-	}
 	if !(tf.BlockDeviceMappings.IsNull() || tf.BlockDeviceMappings.IsUnknown()) {
 		blockDeviceMapping := make([]numspot.BlockDeviceMappingVmCreation, 0, len(tf.BlockDeviceMappings.Elements()))
 		diags.Append(tf.BlockDeviceMappings.ElementsAs(ctx, &blockDeviceMapping, true)...)
@@ -218,7 +212,6 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf VmModel, diags *diag.Dia
 		ImageId:                     tf.ImageId.ValueString(),
 		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
 		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
-		Nics:                        nicsPtr,
 		Placement:                   placement,
 		PrivateIps:                  utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags),
 		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
@@ -226,7 +219,7 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf VmModel, diags *diag.Dia
 		SubnetId:                    tf.SubnetId.ValueString(),
 		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
 		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.InitiatedShutdownBehavior),
-		Type:                        utils.FromTfStringToStringPtr(tf.Type),
+		Type:                        tf.Type.ValueString(),
 		BlockDeviceMappings:         blockDeviceMappingPtr,
 	}
 }

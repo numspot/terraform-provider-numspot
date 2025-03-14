@@ -12,7 +12,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
 )
 
 type TfRequestResp interface {

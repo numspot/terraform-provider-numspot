@@ -9,7 +9,7 @@ package producttype
 //	"github.com/hashicorp/terraform-plugin-framework/diag"
 //	"github.com/hashicorp/terraform-plugin-framework/types"
 //
-//	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+//	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
 //)
 //
 //func ProductTypesFromTfToAPIReadParams(ctx context.Context, tf ProductTypesDataSourceModel) numspot.ReadProductTypesParams {

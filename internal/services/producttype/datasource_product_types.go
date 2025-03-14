@@ -5,13 +5,13 @@ package producttype
 //import (
 //	"context"
 //	"fmt"
-//	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services"
+//	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services"
 //	"net/http"
 //
 //	"github.com/hashicorp/terraform-plugin-framework/datasource"
 //	"github.com/hashicorp/terraform-plugin-framework/types"
 //
-//	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+//	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
 //)
 //
 //type ProductTypesDataSourceModel struct {

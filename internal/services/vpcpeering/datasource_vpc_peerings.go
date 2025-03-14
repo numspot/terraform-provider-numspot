@@ -9,12 +9,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
 )
 
 type VpcPeeringsDataSourceModel struct {
@@ -25,7 +25,6 @@ type VpcPeeringsDataSourceModel struct {
 	Ids                 types.List                      `tfsdk:"ids"`
 	SourceVpcIpRanges   types.List                      `tfsdk:"source_vpc_ip_ranges"`
 	SourceVpcVpcIds     types.List                      `tfsdk:"source_vpc_vpc_ids"`
-	StateMessages       types.List                      `tfsdk:"state_messages"`
 	StateNames          types.List                      `tfsdk:"state_names"`
 	TagKeys             types.List                      `tfsdk:"tag_keys"`
 	TagValues           types.List                      `tfsdk:"tag_values"`
@@ -153,8 +152,7 @@ func serializeVpcPeeringDatasource(ctx context.Context, vpcPeerings *[]numspot.V
 			var diagnostics diag.Diagnostics
 			state, diagnostics = NewStateValue(StateValue{}.AttributeTypes(ctx),
 				map[string]attr.Value{
-					"message": types.StringPointerValue(http.State.Message),
-					"name":    types.StringPointerValue(http.State.Name),
+					"name": types.StringPointerValue(http.State.Name),
 				})
 			diags.Append(diagnostics...)
 		}
@@ -176,7 +174,6 @@ func deserializeVpcPeeringDatasource(ctx context.Context, tf VpcPeeringsDataSour
 
 	return numspot.ReadVpcPeeringsParams{
 		ExpirationDates:     &expirationDates,
-		StateMessages:       utils.TfStringListToStringPtrList(ctx, tf.StateMessages, diags),
 		StateNames:          utils.TfStringListToStringPtrList(ctx, tf.StateNames, diags),
 		AccepterVpcIpRanges: utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcIpRanges, diags),
 		AccepterVpcVpcIds:   utils.TfStringListToStringPtrList(ctx, tf.AccepterVpcVpcIds, diags),

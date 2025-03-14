@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/cmd/app"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/cmd/app"
 )
 
 const (

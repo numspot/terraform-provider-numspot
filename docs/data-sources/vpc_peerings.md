@@ -49,7 +49,6 @@ resource "null_resource" "print-datasource-id" {
 - `ids` (List of String) The IDs of the Vpc peerings.
 - `source_vpc_ip_ranges` (List of String) The IP ranges of the peer Vpcs
 - `source_vpc_vpc_ids` (List of String) The IDs of the peer Vpcs
-- `state_messages` (List of String) Additional information about the states of the Vpc peerings.
 - `state_names` (List of String) The states of the Vpc peerings (`pending-acceptance` \| `active` \| `rejected` \| `failed` \| `expired` \| `deleted`).
 - `tag_keys` (List of String) The keys of the tags associated with the Vpc peerings.
 - `tag_values` (List of String) The values of the tags associated with the Vpc peerings.
@@ -106,5 +105,4 @@ Read-Only:
 
 Read-Only:
 
-- `message` (String) Additional information about the state of the Vpc peering.
 - `name` (String) The state of the Vpc peering (`pending-acceptance` \| `active` \| `rejected` \| `failed` \| `expired` \| `deleted`).

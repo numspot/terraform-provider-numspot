@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
 )
 
 func ParseHTTPError(httpResponseBody []byte, statusCode int) error {

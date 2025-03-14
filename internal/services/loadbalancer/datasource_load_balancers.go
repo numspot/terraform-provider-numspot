@@ -8,12 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -138,9 +138,6 @@ func serializeLoadBalancers(ctx context.Context, loadBalancers *[]numspot.LoadBa
 
 		diags.Append(diagnostics...)
 		securityGroups := utils.FromStringListPointerToTfStringList(ctx, loadBalancer.SecurityGroups, diags)
-		sourceSecurityGroup := SourceSecurityGroupValue{
-			SecurityGroupName: types.StringPointerValue(loadBalancer.SourceSecurityGroup.SecurityGroupName),
-		}
 		subnets := utils.FromStringListPointerToTfStringList(ctx, loadBalancer.Subnets, diags)
 		azNames := utils.FromStringListPointerToTfStringList(ctx, loadBalancer.AvailabilityZoneNames, diags)
 
@@ -156,7 +153,6 @@ func serializeLoadBalancers(ctx context.Context, loadBalancers *[]numspot.LoadBa
 			PublicIp:                        types.StringPointerValue(loadBalancer.PublicIp),
 			SecuredCookies:                  types.BoolPointerValue(loadBalancer.SecuredCookies),
 			SecurityGroups:                  securityGroups,
-			SourceSecurityGroup:             sourceSecurityGroup,
 			StickyCookiePolicies:            stickyCookiePolicies,
 			Subnets:                         subnets,
 			AvailabilityZoneNames:           azNames,

@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -94,11 +94,6 @@ func VpcPeeringResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"state": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
-					"message": schema.StringAttribute{
-						Computed:            true,
-						Description:         "Additional information about the state of the Vpc peering.",
-						MarkdownDescription: "Additional information about the state of the Vpc peering.",
-					},
 					"name": schema.StringAttribute{
 						Computed:            true,
 						Description:         "The state of the Vpc peering (`pending-acceptance` \\| `active` \\| `rejected` \\| `failed` \\| `expired` \\| `deleted`).",
@@ -895,24 +890,6 @@ func (t StateType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 
 	attributes := in.Attributes()
 
-	messageAttribute, ok := attributes["message"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`message is missing from object`)
-
-		return nil, diags
-	}
-
-	messageVal, ok := messageAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`message expected to be basetypes.StringValue, was: %T`, messageAttribute))
-	}
-
 	nameAttribute, ok := attributes["name"]
 
 	if !ok {
@@ -936,9 +913,8 @@ func (t StateType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 	}
 
 	return StateValue{
-		Message: messageVal,
-		Name:    nameVal,
-		state:   attr.ValueStateKnown,
+		Name:  nameVal,
+		state: attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1005,24 +981,6 @@ func NewStateValue(attributeTypes map[string]attr.Type, attributes map[string]at
 		return NewStateValueUnknown(), diags
 	}
 
-	messageAttribute, ok := attributes["message"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`message is missing from object`)
-
-		return NewStateValueUnknown(), diags
-	}
-
-	messageVal, ok := messageAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`message expected to be basetypes.StringValue, was: %T`, messageAttribute))
-	}
-
 	nameAttribute, ok := attributes["name"]
 
 	if !ok {
@@ -1046,9 +1004,8 @@ func NewStateValue(attributeTypes map[string]attr.Type, attributes map[string]at
 	}
 
 	return StateValue{
-		Message: messageVal,
-		Name:    nameVal,
-		state:   attr.ValueStateKnown,
+		Name:  nameVal,
+		state: attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1120,9 +1077,8 @@ func (t StateType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = StateValue{}
 
 type StateValue struct {
-	Message basetypes.StringValue `tfsdk:"message"`
-	Name    basetypes.StringValue `tfsdk:"name"`
-	state   attr.ValueState
+	Name  basetypes.StringValue `tfsdk:"name"`
+	state attr.ValueState
 }
 
 func (v StateValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
@@ -1131,7 +1087,6 @@ func (v StateValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 	var val tftypes.Value
 	var err error
 
-	attrTypes["message"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["name"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
@@ -1139,14 +1094,6 @@ func (v StateValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 	switch v.state {
 	case attr.ValueStateKnown:
 		vals := make(map[string]tftypes.Value, 2)
-
-		val, err = v.Message.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["message"] = val
 
 		val, err = v.Name.ToTerraformValue(ctx)
 
@@ -1187,12 +1134,10 @@ func (v StateValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 
 	objVal, diags := types.ObjectValue(
 		map[string]attr.Type{
-			"message": basetypes.StringType{},
-			"name":    basetypes.StringType{},
+			"name": basetypes.StringType{},
 		},
 		map[string]attr.Value{
-			"message": v.Message,
-			"name":    v.Name,
+			"name": v.Name,
 		})
 
 	return objVal, diags
@@ -1213,10 +1158,6 @@ func (v StateValue) Equal(o attr.Value) bool {
 		return true
 	}
 
-	if !v.Message.Equal(other.Message) {
-		return false
-	}
-
 	if !v.Name.Equal(other.Name) {
 		return false
 	}
@@ -1234,7 +1175,6 @@ func (v StateValue) Type(ctx context.Context) attr.Type {
 
 func (v StateValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"message": basetypes.StringType{},
-		"name":    basetypes.StringType{},
+		"name": basetypes.StringType{},
 	}
 }

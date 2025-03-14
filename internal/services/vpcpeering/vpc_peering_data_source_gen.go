@@ -6,7 +6,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
@@ -101,11 +101,6 @@ func VpcPeeringDataSourceSchema(ctx context.Context) schema.Schema {
 						},
 						"state": schema.SingleNestedAttribute{
 							Attributes: map[string]schema.Attribute{
-								"message": schema.StringAttribute{
-									Computed:            true,
-									Description:         "Additional information about the state of the Vpc peering.",
-									MarkdownDescription: "Additional information about the state of the Vpc peering.",
-								},
 								"name": schema.StringAttribute{
 									Computed:            true,
 									Description:         "The state of the Vpc peering (`pending-acceptance` \\| `active` \\| `rejected` \\| `failed` \\| `expired` \\| `deleted`).",
@@ -141,13 +136,6 @@ func VpcPeeringDataSourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "The IDs of the peer Vpcs",
 				MarkdownDescription: "The IDs of the peer Vpcs",
-			},
-			"state_messages": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Computed:            true,
-				Description:         "Additional information about the states of the Vpc peerings.",
-				MarkdownDescription: "Additional information about the states of the Vpc peerings.",
 			},
 			"state_names": schema.ListAttribute{
 				ElementType:         types.StringType,

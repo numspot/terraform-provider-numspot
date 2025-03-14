@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 
-	numSpot "gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/provider"
+	numSpot "gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/provider"
 )
 
 type terraformServe func(ctx context.Context, providerFunc func() provider.Provider, opts providerserver.ServeOpts) error

@@ -8,12 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.numspot.cloud/cloud/numspot-sdk-go/pkg/numspot"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
 
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.numspot.cloud/cloud/terraform-provider-numspot/internal/utils"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
+	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -148,14 +148,14 @@ func serializeVpcPeering(ctx context.Context, http *numspot.VpcPeering, diags *d
 	vpcPeeringStateHttp := http.State
 
 	if vpcPeeringStateHttp != nil {
-		message := vpcPeeringStateHttp.Message
+		// message := vpcPeeringStateHttp.Message
 		name := vpcPeeringStateHttp.Name
 
 		if name != nil && *name == "failed" {
 			var errorMessage string
-			if message != nil {
-				errorMessage = *message
-			}
+			//if message != nil {
+			//	errorMessage = *message
+			//}
 			diags.AddError("Failed to create vpc peering", errorMessage)
 			return nil
 		}
@@ -239,8 +239,8 @@ func serializeVpcPeeringState(ctx context.Context, http *numspot.VpcPeeringState
 	value, diagnostics := NewStateValue(
 		StateValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"message": types.StringPointerValue(http.Message),
-			"name":    types.StringPointerValue(http.Name),
+			//"message": types.StringPointerValue(http.Message),
+			"name": types.StringPointerValue(http.Name),
 		},
 	)
 	diags.Append(diagnostics...)
