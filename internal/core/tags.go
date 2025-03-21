@@ -4,10 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
 // CreateTags Same as CreateTags but without using Diagnostics. Remove CreateTags when other function are reworked
@@ -15,14 +14,14 @@ func createTags(
 	ctx context.Context,
 	provider *client.NumSpotSDK,
 	resourceId string,
-	tags []numspot.ResourceTag,
+	tags []api.ResourceTag,
 ) error {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
 	}
 
-	res, err := numspotClient.CreateTagsWithResponse(ctx, provider.SpaceID, numspot.CreateTagsJSONRequestBody{
+	res, err := numspotClient.CreateTagsWithResponse(ctx, provider.SpaceID, api.CreateTagsJSONRequestBody{
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})
@@ -38,20 +37,20 @@ func createTags(
 	return nil
 }
 
-func updateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, resourceID string) (err error) {
+func updateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []api.ResourceTag, planTags []api.ResourceTag, resourceID string) (err error) {
 	toCreate, toDelete, toUpdate := diff(stateTags, planTags)
 
-	toDeleteApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toDelete))
-	toCreateApiTags := make([]numspot.ResourceTag, 0, len(toUpdate)+len(toCreate))
+	toDeleteApiTags := make([]api.ResourceTag, 0, len(toUpdate)+len(toDelete))
+	toCreateApiTags := make([]api.ResourceTag, 0, len(toUpdate)+len(toCreate))
 	for _, e := range toCreate {
-		toCreateApiTags = append(toCreateApiTags, numspot.ResourceTag{
+		toCreateApiTags = append(toCreateApiTags, api.ResourceTag{
 			Key:   e.Key,
 			Value: e.Value,
 		})
 	}
 
 	for _, e := range toDelete {
-		toDeleteApiTags = append(toDeleteApiTags, numspot.ResourceTag{
+		toDeleteApiTags = append(toDeleteApiTags, api.ResourceTag{
 			Key:   e.Key,
 			Value: e.Value,
 		})
@@ -59,13 +58,13 @@ func updateResourceTags(ctx context.Context, provider *client.NumSpotSDK, stateT
 
 	for _, e := range toUpdate {
 		// Delete
-		toDeleteApiTags = append(toDeleteApiTags, numspot.ResourceTag{
+		toDeleteApiTags = append(toDeleteApiTags, api.ResourceTag{
 			Key:   e.Key,
 			Value: e.Value,
 		})
 
 		// Create
-		toCreateApiTags = append(toCreateApiTags, numspot.ResourceTag{
+		toCreateApiTags = append(toCreateApiTags, api.ResourceTag{
 			Key:   e.Key,
 			Value: e.Value,
 		})
@@ -100,13 +99,13 @@ func deleteTags(
 	ctx context.Context,
 	provider *client.NumSpotSDK,
 	resourceId string,
-	tags []numspot.ResourceTag,
+	tags []api.ResourceTag,
 ) error {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
 	}
-	res, err := numspotClient.DeleteTagsWithResponse(ctx, provider.SpaceID, numspot.DeleteTagsJSONRequestBody{
+	res, err := numspotClient.DeleteTagsWithResponse(ctx, provider.SpaceID, api.DeleteTagsJSONRequestBody{
 		ResourceIds: []string{resourceId},
 		Tags:        tags,
 	})
@@ -123,9 +122,9 @@ func deleteTags(
 
 // Diff calculates the differences between two slices of tags: which tags to create, delete, and update.
 // Assumes that a tag's Key is unique in the slice.
-func diff(current, desired []numspot.ResourceTag) (toCreate, toDelete, toUpdate []numspot.ResourceTag) {
-	currentMap := make(map[string]numspot.ResourceTag)
-	desiredMap := make(map[string]numspot.ResourceTag)
+func diff(current, desired []api.ResourceTag) (toCreate, toDelete, toUpdate []api.ResourceTag) {
+	currentMap := make(map[string]api.ResourceTag)
+	desiredMap := make(map[string]api.ResourceTag)
 
 	for _, tag := range current {
 		currentMap[tag.Key] = tag

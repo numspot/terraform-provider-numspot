@@ -3,13 +3,12 @@ package core
 import (
 	"context"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
-func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tags []numspot.ResourceTag, vpcID string) (*numspot.InternetGateway, error) {
+func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tags []api.ResourceTag, vpcID string) (*api.InternetGateway, error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -17,7 +16,7 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tag
 		return nil, err
 	}
 
-	var retryCreateResponse *numspot.CreateInternetGatewayResponse
+	var retryCreateResponse *api.CreateInternetGatewayResponse
 	if retryCreateResponse, err = utils.RetryCreateUntilResourceAvailable(ctx, spaceID, numspotClient.CreateInternetGatewayWithResponse); err != nil {
 		return nil, err
 	}
@@ -31,9 +30,9 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tag
 	}
 
 	if vpcID != "" {
-		var linkVPCResponse *numspot.LinkInternetGatewayResponse
+		var linkVPCResponse *api.LinkInternetGatewayResponse
 		if linkVPCResponse, err = numspotClient.LinkInternetGatewayWithResponse(ctx, provider.SpaceID, internetGatewayID,
-			numspot.LinkInternetGatewayJSONRequestBody{
+			api.LinkInternetGatewayJSONRequestBody{
 				VpcId: vpcID,
 			},
 		); err != nil {
@@ -52,7 +51,7 @@ func CreateInternetGateway(ctx context.Context, provider *client.NumSpotSDK, tag
 	return internetGateway, nil
 }
 
-func UpdateInternetGatewayTags(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.InternetGateway, error) {
+func UpdateInternetGatewayTags(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID string, stateTags []api.ResourceTag, planTags []api.ResourceTag) (*api.InternetGateway, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, internetGatewayID); err != nil {
 		return nil, err
 	}
@@ -69,7 +68,7 @@ func DeleteInternetGateway(ctx context.Context, provider *client.NumSpotSDK, int
 
 	if vpcID != "" {
 		if _, err = utils.RetryUntilResourceAvailableWithBody(ctx, spaceID, internetGatewayID,
-			numspot.UnlinkInternetGatewayJSONRequestBody{
+			api.UnlinkInternetGatewayJSONRequestBody{
 				VpcId: vpcID,
 			}, numspotClient.UnlinkInternetGatewayWithResponse); err != nil {
 			return err
@@ -84,7 +83,7 @@ func DeleteInternetGateway(ctx context.Context, provider *client.NumSpotSDK, int
 	return nil
 }
 
-func ReadInternetGatewaysWithID(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID string) (numSpotInternetGateway *numspot.InternetGateway, err error) {
+func ReadInternetGatewaysWithID(ctx context.Context, provider *client.NumSpotSDK, internetGatewayID string) (numSpotInternetGateway *api.InternetGateway, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -100,7 +99,7 @@ func ReadInternetGatewaysWithID(ctx context.Context, provider *client.NumSpotSDK
 	return numSpotReadInternetGateway.JSON200, err
 }
 
-func ReadInternetGatewaysWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadInternetGatewaysParams) (numSpotInternetGateway *[]numspot.InternetGateway, err error) {
+func ReadInternetGatewaysWithParams(ctx context.Context, provider *client.NumSpotSDK, params api.ReadInternetGatewaysParams) (numSpotInternetGateway *[]api.InternetGateway, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

@@ -310,6 +310,91 @@ func Diff[A basetypes.ObjectValuable](current, desired []A) (toCreate, toDelete 
 	return
 }
 
+func ConvertTfListToArrayOfString(ctx context.Context, list types.List, diags *diag.Diagnostics) *[]string {
+	if list.IsNull() || list.IsUnknown() {
+		return nil
+	}
+
+	slice := tfListToArrayOfString(ctx, list, diags)
+	return slice
+}
+
+func tfListToArrayOfString(ctx context.Context, tfList types.List, diags *diag.Diagnostics) *[]string {
+	elements := tfList.Elements()
+	res := make([]string, 0, len(elements))
+
+	if len(elements) == 0 {
+		res = []string{}
+	} else {
+		tempList := make([]types.String, 0, len(elements))
+		diags.Append(tfList.ElementsAs(ctx, &tempList, false)...)
+
+		for _, e := range tempList {
+			res = append(res, e.ValueString())
+		}
+	}
+
+	return &res
+}
+
+func ConvertTfListToArrayOfInt(ctx context.Context, list types.List, diags *diag.Diagnostics) *[]int {
+	if list.IsNull() || list.IsUnknown() {
+		return nil
+	}
+
+	slice := tfListToArrayOfInt(ctx, list, diags)
+	return slice
+}
+
+func tfListToArrayOfInt(ctx context.Context, tfList types.List, diags *diag.Diagnostics) *[]int {
+	elements := tfList.Elements()
+	res := make([]int, 0, len(elements))
+
+	if len(elements) == 0 {
+		res = []int{}
+	} else {
+		tempList := make([]types.Int64, 0, len(elements))
+		diags.Append(tfList.ElementsAs(ctx, &tempList, false)...)
+
+		for _, e := range tempList {
+			res = append(res, int(e.ValueInt64()))
+		}
+	}
+
+	return &res
+}
+
+func ConvertTfListToArrayOfTime(ctx context.Context, list types.List, format string, diags *diag.Diagnostics) *[]time.Time {
+	if list.IsNull() || list.IsUnknown() {
+		return nil
+	}
+
+	slice := tfListToArrayOfTime(ctx, list, format, diags)
+	return slice
+}
+
+func tfListToArrayOfTime(ctx context.Context, tfList types.List, format string, diags *diag.Diagnostics) *[]time.Time {
+	elements := tfList.Elements()
+	res := make([]time.Time, 0, len(elements))
+
+	if len(elements) == 0 {
+		res = []time.Time{}
+	} else {
+		tempList := make([]types.String, 0, len(elements))
+		diags.Append(tfList.ElementsAs(ctx, &tempList, false)...)
+
+		for _, e := range tempList {
+			t, err := time.Parse(format, e.ValueString())
+			if err != nil {
+				return &[]time.Time{}
+			}
+			res = append(res, t)
+		}
+	}
+
+	return &res
+}
+
 // Return the subset of slice1 elements that are not in slice2
 func diff[A basetypes.ObjectValuable](slice1, slice2 []A) []A {
 	diff := make([]A, 0)
@@ -349,4 +434,20 @@ func diffComparable[A comparable](slice1, slice2 []A) []A {
 func EmptyTrueBoolPointer() *bool {
 	value := true
 	return &value
+}
+
+// ConvertStringPtrToString Convert string ptr to string
+func ConvertStringPtrToString(value *string) string {
+	if value != nil {
+		return *value
+	}
+	return ""
+}
+
+// ConvertIntPtrToInt64 Convert int ptr to int
+func ConvertIntPtrToInt64(value *int) int64 {
+	if value != nil {
+		return int64(*value)
+	}
+	return 0
 }

@@ -3,13 +3,12 @@ package core
 import (
 	"context"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
-func CreateLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, numSpotLoadBalancerCreate numspot.CreateLoadBalancerJSONRequestBody, numSpotLoadBalancerUpdate numspot.UpdateLoadBalancerJSONRequestBody, tags []numspot.ResourceTag, backendVM, backendIP []string) (numSpotVolume *numspot.LoadBalancer, err error) {
+func CreateLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, numSpotLoadBalancerCreate api.CreateLoadBalancerJSONRequestBody, numSpotLoadBalancerUpdate api.UpdateLoadBalancerJSONRequestBody, tags []api.ResourceTag, backendVM, backendIP []string) (numSpotVolume *api.LoadBalancer, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -17,7 +16,7 @@ func CreateLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, numSpo
 		return nil, err
 	}
 
-	var retryCreate *numspot.CreateLoadBalancerResponse
+	var retryCreate *api.CreateLoadBalancerResponse
 	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotLoadBalancerCreate,
 		numspotClient.CreateLoadBalancerWithResponse); err != nil {
 		return nil, err
@@ -72,8 +71,8 @@ func DeleteLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBa
 	return nil
 }
 
-func ReadLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBalancerID string) (numSpotVolume *numspot.LoadBalancer, err error) {
-	var numSpotReadLoadBalancer *numspot.ReadLoadBalancersByIdResponse
+func ReadLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBalancerID string) (numSpotVolume *api.LoadBalancer, err error) {
+	var numSpotReadLoadBalancer *api.ReadLoadBalancersByIdResponse
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -89,8 +88,8 @@ func ReadLoadBalancer(ctx context.Context, provider *client.NumSpotSDK, loadBala
 	return numSpotReadLoadBalancer.JSON200, err
 }
 
-func ReadLoadBalancers(ctx context.Context, provider *client.NumSpotSDK, loadBalancerParams numspot.ReadLoadBalancersParams) (numSpotLoadBalancers *[]numspot.LoadBalancer, err error) {
-	var numSpotReadLoadBalancer *numspot.ReadLoadBalancersResponse
+func ReadLoadBalancers(ctx context.Context, provider *client.NumSpotSDK, loadBalancerParams api.ReadLoadBalancersParams) (numSpotLoadBalancers *[]api.LoadBalancer, err error) {
+	var numSpotReadLoadBalancer *api.ReadLoadBalancersResponse
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -106,7 +105,7 @@ func ReadLoadBalancers(ctx context.Context, provider *client.NumSpotSDK, loadBal
 	return numSpotReadLoadBalancer.JSON200.Items, err
 }
 
-func UpdateLoadBalancerAttributes(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, numSpotLoadBalancerUpdate numspot.UpdateLoadBalancerJSONRequestBody) (numSpotLoadBalancer *numspot.LoadBalancer, err error) {
+func UpdateLoadBalancerAttributes(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, numSpotLoadBalancerUpdate api.UpdateLoadBalancerJSONRequestBody) (numSpotLoadBalancer *api.LoadBalancer, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -114,8 +113,8 @@ func UpdateLoadBalancerAttributes(ctx context.Context, provider *client.NumSpotS
 		return nil, err
 	}
 
-	var loadBalancerUpdateResponse *numspot.UpdateLoadBalancerResponse
-	if loadBalancerUpdateResponse, err = numspotClient.UpdateLoadBalancerWithResponse(ctx, spaceID, loadBalancerName, numspot.UpdateLoadBalancerJSONRequestBody{
+	var loadBalancerUpdateResponse *api.UpdateLoadBalancerResponse
+	if loadBalancerUpdateResponse, err = numspotClient.UpdateLoadBalancerWithResponse(ctx, spaceID, loadBalancerName, api.UpdateLoadBalancerJSONRequestBody{
 		HealthCheck: numSpotLoadBalancerUpdate.HealthCheck,
 		PublicIp:    numSpotLoadBalancerUpdate.PublicIp,
 	}); err != nil {
@@ -129,7 +128,7 @@ func UpdateLoadBalancerAttributes(ctx context.Context, provider *client.NumSpotS
 	return ReadLoadBalancer(ctx, provider, loadBalancerName)
 }
 
-func UpdateLoadBalancerSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, numSpotLoadBalancerUpdate numspot.UpdateLoadBalancerJSONRequestBody) (numSpotLoadBalancer *numspot.LoadBalancer, err error) {
+func UpdateLoadBalancerSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, numSpotLoadBalancerUpdate api.UpdateLoadBalancerJSONRequestBody) (numSpotLoadBalancer *api.LoadBalancer, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -142,8 +141,8 @@ func UpdateLoadBalancerSecurityGroup(ctx context.Context, provider *client.NumSp
 		securityGroups = *numSpotLoadBalancerUpdate.SecurityGroups
 	}
 
-	var loadBalancerUpdateResponse *numspot.UpdateLoadBalancerResponse
-	if loadBalancerUpdateResponse, err = numspotClient.UpdateLoadBalancerWithResponse(ctx, spaceID, loadBalancerName, numspot.UpdateLoadBalancerJSONRequestBody{
+	var loadBalancerUpdateResponse *api.UpdateLoadBalancerResponse
+	if loadBalancerUpdateResponse, err = numspotClient.UpdateLoadBalancerWithResponse(ctx, spaceID, loadBalancerName, api.UpdateLoadBalancerJSONRequestBody{
 		SecurityGroups: &securityGroups,
 	}); err != nil {
 		return nil, err
@@ -156,7 +155,7 @@ func UpdateLoadBalancerSecurityGroup(ctx context.Context, provider *client.NumSp
 	return ReadLoadBalancer(ctx, provider, loadBalancerName)
 }
 
-func UpdateLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, planTags []numspot.ResourceTag, stateTags []numspot.ResourceLoadBalancerTag) (numSpotLoadBalancer *numspot.LoadBalancer, err error) {
+func UpdateLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, planTags []api.ResourceTag, stateTags []api.ResourceLoadBalancerTag) (numSpotLoadBalancer *api.LoadBalancer, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -164,8 +163,8 @@ func UpdateLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, lo
 		return nil, err
 	}
 
-	var loadBalancerDeleteTagsResponse *numspot.DeleteLoadBalancerTagsResponse
-	if loadBalancerDeleteTagsResponse, err = numspotClient.DeleteLoadBalancerTagsWithResponse(ctx, spaceID, numspot.DeleteLoadBalancerTagsJSONRequestBody{
+	var loadBalancerDeleteTagsResponse *api.DeleteLoadBalancerTagsResponse
+	if loadBalancerDeleteTagsResponse, err = numspotClient.DeleteLoadBalancerTagsWithResponse(ctx, spaceID, api.DeleteLoadBalancerTagsJSONRequestBody{
 		Names: []string{loadBalancerName},
 		Tags:  stateTags,
 	}); err != nil {
@@ -176,8 +175,8 @@ func UpdateLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, lo
 		return nil, err
 	}
 
-	var loadBalancerCreateTagsResponse *numspot.CreateLoadBalancerTagsResponse
-	if loadBalancerCreateTagsResponse, err = numspotClient.CreateLoadBalancerTagsWithResponse(ctx, spaceID, numspot.CreateLoadBalancerTagsJSONRequestBody{
+	var loadBalancerCreateTagsResponse *api.CreateLoadBalancerTagsResponse
+	if loadBalancerCreateTagsResponse, err = numspotClient.CreateLoadBalancerTagsWithResponse(ctx, spaceID, api.CreateLoadBalancerTagsJSONRequestBody{
 		Names: []string{loadBalancerName},
 		Tags:  planTags,
 	}); err != nil {
@@ -191,7 +190,7 @@ func UpdateLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, lo
 	return ReadLoadBalancer(ctx, provider, loadBalancerName)
 }
 
-func UpdateLoadBalancerBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, stateVMIDList, planVMIDList []string, stateIPList, planIPList []string) (numSpotLoadBalancer *numspot.LoadBalancer, err error) {
+func UpdateLoadBalancerBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, stateVMIDList, planVMIDList []string, stateIPList, planIPList []string) (numSpotLoadBalancer *api.LoadBalancer, err error) {
 	if len(stateVMIDList) > 0 || len(stateIPList) > 0 {
 		if err = unlinkBackend(ctx, provider, loadBalancerName, stateIPList, stateVMIDList); err != nil {
 			return nil, err
@@ -223,7 +222,7 @@ func linkBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalancerN
 		bIP = backendIP
 	}
 
-	linkLB := numspot.LinkLoadBalancerBackendMachinesJSONRequestBody{
+	linkLB := api.LinkLoadBalancerBackendMachinesJSONRequestBody{
 		BackendIps:   &bIP,
 		BackendVmIds: &bVM,
 	}
@@ -256,7 +255,7 @@ func unlinkBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalance
 		bIP = backendIP
 	}
 
-	unlinkLB := numspot.UnlinkLoadBalancerBackendMachinesJSONRequestBody{
+	unlinkLB := api.UnlinkLoadBalancerBackendMachinesJSONRequestBody{
 		BackendIps:   &bIP,
 		BackendVmIds: &bVM,
 	}
@@ -272,7 +271,7 @@ func unlinkBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalance
 	return nil
 }
 
-func createLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, tagList []numspot.ResourceTag) error {
+func createLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, loadBalancerName string, tagList []api.ResourceTag) error {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -280,12 +279,12 @@ func createLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, lo
 		return err
 	}
 
-	createTags := numspot.CreateLoadBalancerTagsRequest{
+	createTags := api.CreateLoadBalancerTagsRequest{
 		Names: []string{loadBalancerName},
 		Tags:  tagList,
 	}
 
-	var loadBalancerCreateTagsResponse *numspot.CreateLoadBalancerTagsResponse
+	var loadBalancerCreateTagsResponse *api.CreateLoadBalancerTagsResponse
 	if loadBalancerCreateTagsResponse, err = numspotClient.CreateLoadBalancerTagsWithResponse(ctx, spaceID, createTags); err != nil {
 		return err
 	}
@@ -296,13 +295,13 @@ func createLoadBalancerTags(ctx context.Context, provider *client.NumSpotSDK, lo
 	return nil
 }
 
-func createListeners(ctx context.Context, provider *client.NumSpotSDK, loadBalancerId string, listeners []numspot.ListenerForCreation) error {
+func createListeners(ctx context.Context, provider *client.NumSpotSDK, loadBalancerId string, listeners []api.ListenerForCreation) error {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
 	}
 	numSpotLoadBalancerListenersResponse, err := numspotClient.CreateLoadBalancerListenersWithResponse(ctx, provider.SpaceID, loadBalancerId,
-		numspot.CreateLoadBalancerListenersJSONRequestBody{
+		api.CreateLoadBalancerListenersJSONRequestBody{
 			Listeners: listeners,
 		})
 	if err != nil {

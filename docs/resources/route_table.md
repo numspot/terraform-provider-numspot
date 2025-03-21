@@ -48,9 +48,8 @@ resource "numspot_route_table" "rt" {
 ### Optional
 
 - `routes` (Attributes Set) One or more routes in the route table. (see [below for nested schema](#nestedatt--routes))
-- `space_id` (String) Identifier of the Space
-- `subnet_id` (String) The ID of the SubNet for which you want to link the route table.
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `subnet_id` (String) The state of the Subnet (`pending` \| `available` \| `deleted`).
+- `tags` (Attributes List) One or more tags associated with the DHCP options set. (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only
 
@@ -105,19 +104,22 @@ Read-Only:
 <a id="nestedatt--local_route"></a>
 ### Nested Schema for `local_route`
 
+Required:
+
+- `destination_ip_range` (String) The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
+
 Optional:
 
-- `gateway_id` (String) The ID of the Internet service or virtual gateway attached to the Net.
-- `nat_gateway_id` (String) The ID of a NAT service attached to the Net.
+- `gateway_id` (String) The ID of the Internet gateway or virtual gateway attached to the Vpc.
+- `nat_gateway_id` (String) The ID of a NAT gateway attached to the Vpc.
 - `nic_id` (String) The ID of the NIC.
 - `vm_id` (String) The ID of a VM specified in a route in the table.
-- `vpc_peering_id` (String) The ID of the Net peering.
+- `vpc_peering_id` (String) The ID of the Vpc peering.
 
 Read-Only:
 
 - `creation_method` (String) The method used to create the route.
-- `destination_ip_range` (String) The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`).
-- `destination_service_id` (String) The ID of the OUTSCALE service.
+- `destination_service_id` (String) The ID of the NumSpot service.
 - `state` (String) The state of a route in the route table (always `active`).
 
 

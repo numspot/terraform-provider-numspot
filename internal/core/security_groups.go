@@ -3,19 +3,18 @@ package core
 import (
 	"context"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
-func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, payload numspot.CreateSecurityGroupJSONRequestBody, tags []numspot.ResourceTag, inboundRules, outboundRules numspot.CreateSecurityGroupRuleJSONRequestBody) (numSpotSecurityGroup *numspot.SecurityGroup, err error) {
+func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, payload api.CreateSecurityGroupJSONRequestBody, tags []api.ResourceTag, inboundRules, outboundRules api.CreateSecurityGroupRuleJSONRequestBody) (numSpotSecurityGroup *api.SecurityGroup, err error) {
 	numSpotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var retryCreate *numspot.CreateSecurityGroupResponse
+	var retryCreate *api.CreateSecurityGroupResponse
 	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, provider.SpaceID, payload, numSpotClient.CreateSecurityGroupWithResponse); err != nil {
 		return nil, err
 	}
@@ -33,7 +32,7 @@ func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, paylo
 	defaultIPRanges := []string{"0.0.0.0/0"}
 	defaultToPortRange := -1
 
-	defaultRule := []numspot.SecurityGroupRule{
+	defaultRule := []api.SecurityGroupRule{
 		{
 			FromPortRange:         &defaultFromPortRange,
 			IpProtocol:            &defaultIPProtocol,
@@ -45,16 +44,16 @@ func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, paylo
 	}
 
 	if _, err = UpdateSecurityGroupRules(ctx, provider, securityGroupID,
-		numspot.DeleteSecurityGroupRuleJSONRequestBody{},
-		numspot.DeleteSecurityGroupRuleJSONRequestBody{
+		api.DeleteSecurityGroupRuleJSONRequestBody{},
+		api.DeleteSecurityGroupRuleJSONRequestBody{
 			Rules: &defaultRule,
 			Flow:  "Outbound",
 		},
-		numspot.CreateSecurityGroupRuleJSONRequestBody{
+		api.CreateSecurityGroupRuleJSONRequestBody{
 			Rules: inboundRules.Rules,
 			Flow:  inboundRules.Flow,
 		},
-		numspot.CreateSecurityGroupRuleJSONRequestBody{
+		api.CreateSecurityGroupRuleJSONRequestBody{
 			Rules: outboundRules.Rules,
 			Flow:  outboundRules.Flow,
 		},
@@ -65,7 +64,7 @@ func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, paylo
 	return ReadSecurityGroup(ctx, provider, securityGroupID)
 }
 
-func UpdateSecurityGroupTags(ctx context.Context, provider *client.NumSpotSDK, securityGroupID string, stateTags, planTags []numspot.ResourceTag) (*numspot.SecurityGroup, error) {
+func UpdateSecurityGroupTags(ctx context.Context, provider *client.NumSpotSDK, securityGroupID string, stateTags, planTags []api.ResourceTag) (*api.SecurityGroup, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, securityGroupID); err != nil {
 		return nil, err
 	}
@@ -73,9 +72,9 @@ func UpdateSecurityGroupTags(ctx context.Context, provider *client.NumSpotSDK, s
 }
 
 func UpdateSecurityGroupRules(ctx context.Context, provider *client.NumSpotSDK, securityGroupID string,
-	stateInboundRules, stateOutboundRules numspot.DeleteSecurityGroupRuleJSONRequestBody,
-	planInboundRules, planOutboundRules numspot.CreateSecurityGroupRuleJSONRequestBody,
-) (numSpotSecurityGroup *numspot.SecurityGroup, err error) {
+	stateInboundRules, stateOutboundRules api.DeleteSecurityGroupRuleJSONRequestBody,
+	planInboundRules, planOutboundRules api.CreateSecurityGroupRuleJSONRequestBody,
+) (numSpotSecurityGroup *api.SecurityGroup, err error) {
 	if stateInboundRules.Rules != nil && len(*stateInboundRules.Rules) > 0 {
 		if err = deleteRules(ctx, provider, securityGroupID, stateInboundRules); err != nil {
 			return nil, err
@@ -101,7 +100,7 @@ func UpdateSecurityGroupRules(ctx context.Context, provider *client.NumSpotSDK, 
 	return ReadSecurityGroup(ctx, provider, securityGroupID)
 }
 
-func ReadSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, id string) (*numspot.SecurityGroup, error) {
+func ReadSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, id string) (*api.SecurityGroup, error) {
 	numSpotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -124,7 +123,7 @@ func DeleteSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, id st
 	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, id, numSpotClient.DeleteSecurityGroupWithResponse)
 }
 
-func deleteRules(ctx context.Context, provider *client.NumSpotSDK, id string, rulesToDelete numspot.DeleteSecurityGroupRuleJSONRequestBody) error {
+func deleteRules(ctx context.Context, provider *client.NumSpotSDK, id string, rulesToDelete api.DeleteSecurityGroupRuleJSONRequestBody) error {
 	numSpotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
@@ -141,7 +140,7 @@ func deleteRules(ctx context.Context, provider *client.NumSpotSDK, id string, ru
 	return nil
 }
 
-func createRules(ctx context.Context, provider *client.NumSpotSDK, id string, rulesToCreate numspot.CreateSecurityGroupRuleJSONRequestBody) error {
+func createRules(ctx context.Context, provider *client.NumSpotSDK, id string, rulesToCreate api.CreateSecurityGroupRuleJSONRequestBody) error {
 	numSpotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
@@ -156,7 +155,7 @@ func createRules(ctx context.Context, provider *client.NumSpotSDK, id string, ru
 	return nil
 }
 
-func ReadSecurityGroups(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadSecurityGroupsParams) (*[]numspot.SecurityGroup, error) {
+func ReadSecurityGroups(ctx context.Context, provider *client.NumSpotSDK, params api.ReadSecurityGroupsParams) (*[]api.SecurityGroup, error) {
 	numSpotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

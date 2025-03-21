@@ -1,0 +1,318 @@
+{
+	"datasources": [
+		{
+			"name": "subnet",
+			"schema": {
+				"attributes": [
+					{
+						"name": "available_ips_counts",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The number of available IPs."
+						}
+					},
+					{
+						"name": "ip_ranges",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IP ranges in the Subnets, in CIDR notation (for example, `10.0.0.0/16`)."
+						}
+					},
+					{
+						"name": "states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The states of the Subnets (`pending` \\| `available` \\| `deleted`)."
+						}
+					},
+					{
+						"name": "tag_keys",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The keys of the tags associated with the Subnets."
+						}
+					},
+					{
+						"name": "tag_values",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The values of the tags associated with the Subnets."
+						}
+					},
+					{
+						"name": "tags",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The key/value combination of the tags associated with the Subnets, in the following format: \u0026quot;Filters\u0026quot;:{\u0026quot;Tags\u0026quot;:[\u0026quot;TAGKEY=TAGVALUE\u0026quot;]}."
+						}
+					},
+					{
+						"name": "vpc_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Vpcs in which the Subnets are."
+						}
+					},
+					{
+						"name": "ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Subnets."
+						}
+					},
+					{
+						"name": "availability_zone_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the Subregions in which the Subnets are located."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "availability_zone_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the Subregion in which the Subnet is located."
+										}
+									},
+									{
+										"name": "available_ips_count",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "The number of available IPs in the Subnets."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Subnet."
+										}
+									},
+									{
+										"name": "ip_range",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`)."
+										}
+									},
+									{
+										"name": "map_public_ip_on_launch",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the Subnet (`pending` \\| `available` \\| `deleted`)."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the Subnet."
+										}
+									},
+									{
+										"name": "vpc_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Vpc in which the Subnet is."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more Subnets."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "subnet",
+			"schema": {
+				"attributes": [
+					{
+						"name": "availability_zone_name",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The name of the Subregion in which you want to create the Subnet.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "ip_range",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).\u003cbr /\u003e\nThe IP range of the Subnet can be either the same as the Vpc one if you create only a single Subnet in this Net, or a subset of the Vpc one. In case of several Subnets in a Vpc, their IP ranges must not overlap. The smallest Subnet you can create uses a /29 netmask (eight IPs).",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplace()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "vpc_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The ID of the Vpc for which you want to create a Subnet.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplace()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "available_ips_count",
+						"int64": {
+							"computed_optional_required": "computed",
+							"description": "The number of available IPs in the Subnets."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the Subnet."
+						}
+					},
+					{
+						"name": "map_public_ip_on_launch",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet."
+						}
+					},
+					{
+						"name": "state",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The state of the Subnet (`pending` \\| `available` \\| `deleted`)."
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags associated with the Subnet."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

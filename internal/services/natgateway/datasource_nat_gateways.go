@@ -4,27 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/natgateway/datasource_nat_gateway"
+	"terraform-provider-numspot/internal/utils"
 )
-
-type NatGatewaysDataSourceModel struct {
-	Items     []NatGatewayModelDatasource `tfsdk:"items"`
-	Ids       types.List                  `tfsdk:"ids"`
-	States    types.List                  `tfsdk:"states"`
-	SubnetIds types.List                  `tfsdk:"subnet_ids"`
-	TagKeys   types.List                  `tfsdk:"tag_keys"`
-	TagValues types.List                  `tfsdk:"tag_values"`
-	Tags      types.List                  `tfsdk:"tags"`
-	VpcIds    types.List                  `tfsdk:"vpc_ids"`
-}
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
@@ -64,12 +53,12 @@ func (d *natGatewaysDataSource) Metadata(_ context.Context, req datasource.Metad
 
 // Schema defines the schema for the data source.
 func (d *natGatewaysDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	resp.Schema = NatGatewayDataSourceSchema(ctx)
+	resp.Schema = datasource_nat_gateway.NatGatewayDataSourceSchema(ctx)
 }
 
 // Read refreshes the Terraform state with the latest data.
 func (d *natGatewaysDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	var state, plan NatGatewaysDataSourceModel
+	var state, plan datasource_nat_gateway.NatGatewayModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -92,56 +81,105 @@ func (d *natGatewaysDataSource) Read(ctx context.Context, request datasource.Rea
 	}
 
 	state = plan
-	state.Items = objectItems
+	state.Items = objectItems.Items
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func serializeNATGateways(ctx context.Context, natGateways *[]numspot.NatGateway, diags *diag.Diagnostics) []NatGatewayModelDatasource {
-	return utils.FromHttpGenericListToTfList(ctx, natGateways, func(ctx context.Context, http *numspot.NatGateway, diags *diag.Diagnostics) *NatGatewayModelDatasource {
-		var tagsTf types.List
+func serializeNATGateways(ctx context.Context, natGateways *[]api.NatGateway, diags *diag.Diagnostics) datasource_nat_gateway.NatGatewayModel {
+	var natGatewaysList types.List
+	var serializeDiags diag.Diagnostics
+	tagsList := types.List{}
+	publicIpsList := types.List{}
 
-		var publicIp []numspot.PublicIpLight
-		if http.PublicIps != nil {
-			publicIp = *http.PublicIps
-		}
-		// Public Ips
-		publicIpsTf := utils.GenericListToTfListValue(
-			ctx,
-			serializePublicIp,
-			publicIp,
-			diags,
-		)
-		if diags.HasError() {
-			return nil
-		}
+	if len(*natGateways) != 0 {
+		ll := len(*natGateways)
+		itemsValue := make([]datasource_nat_gateway.ItemsValue, ll)
 
-		if http.Tags != nil {
-			tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-			if diags.HasError() {
-				return nil
+		for i := 0; ll > i; i++ {
+			if (*natGateways)[i].Tags != nil {
+				tagsList, serializeDiags = mappingNatGatewayTags(ctx, natGateways, diags, i)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			if (*natGateways)[i].PublicIps != nil {
+				publicIpsList, serializeDiags = mappingNatGatewayPublicIps(ctx, natGateways, diags, i)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			itemsValue[i], serializeDiags = datasource_nat_gateway.NewItemsValue(datasource_nat_gateway.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+				"id":         types.StringValue(utils.ConvertStringPtrToString((*natGateways)[i].Id)),
+				"public_ips": publicIpsList,
+				"state":      types.StringValue(utils.ConvertStringPtrToString((*natGateways)[i].State)),
+				"subnet_id":  types.StringValue(utils.ConvertStringPtrToString((*natGateways)[i].SubnetId)),
+				"tags":       tagsList,
+				"vpc_id":     types.StringValue(utils.ConvertStringPtrToString((*natGateways)[i].VpcId)),
+			})
+			if serializeDiags.HasError() {
+				diags.Append(serializeDiags...)
+				continue
 			}
 		}
 
-		return &NatGatewayModelDatasource{
-			Id:        types.StringPointerValue(http.Id),
-			PublicIps: publicIpsTf,
-			State:     types.StringPointerValue(http.State),
-			SubnetId:  types.StringPointerValue(http.SubnetId),
-			VpcId:     types.StringPointerValue(http.VpcId),
-			Tags:      tagsTf,
+		natGatewaysList, serializeDiags = types.ListValueFrom(ctx, new(datasource_nat_gateway.ItemsValue).Type(ctx), itemsValue)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
 		}
-	}, diags)
+	} else {
+		natGatewaysList = types.ListNull(new(datasource_nat_gateway.ItemsValue).Type(ctx))
+	}
+
+	return datasource_nat_gateway.NatGatewayModel{
+		Items: natGatewaysList,
+	}
 }
 
-func deserializeNatGatewaysParams(ctx context.Context, tf NatGatewaysDataSourceModel, diags *diag.Diagnostics) numspot.ReadNatGatewayParams {
-	return numspot.ReadNatGatewayParams{
-		SubnetIds: utils.TfStringListToStringPtrList(ctx, tf.SubnetIds, diags),
-		VpcIds:    utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
-		States:    utils.TfStringListToStringPtrList(ctx, tf.States, diags),
-		TagKeys:   utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
-		TagValues: utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
-		Tags:      utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
-		Ids:       utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+func deserializeNatGatewaysParams(ctx context.Context, tf datasource_nat_gateway.NatGatewayModel, diags *diag.Diagnostics) api.ReadNatGatewayParams {
+	return api.ReadNatGatewayParams{
+		SubnetIds: utils.ConvertTfListToArrayOfString(ctx, tf.SubnetIds, diags),
+		VpcIds:    utils.ConvertTfListToArrayOfString(ctx, tf.VpcIds, diags),
+		States:    utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
+		TagKeys:   utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
+		TagValues: utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
+		Tags:      utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
+		Ids:       utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
 	}
+}
+
+func mappingNatGatewayTags(ctx context.Context, natGateways *[]api.NatGateway, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+	lt := len(*(*natGateways)[i].Tags)
+	elementValue := make([]datasource_nat_gateway.TagsValue, lt)
+	for y, tag := range *(*natGateways)[i].Tags {
+		elementValue[y], *diags = datasource_nat_gateway.NewTagsValue(datasource_nat_gateway.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+			"key":   types.StringValue(tag.Key),
+			"value": types.StringValue(tag.Value),
+		})
+		if diags.HasError() {
+			diags.Append(*diags...)
+			continue
+		}
+	}
+
+	return types.ListValueFrom(ctx, new(datasource_nat_gateway.TagsValue).Type(ctx), elementValue)
+}
+
+func mappingNatGatewayPublicIps(ctx context.Context, natGateways *[]api.NatGateway, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+	lt := len(*(*natGateways)[i].PublicIps)
+	elementValue := make([]datasource_nat_gateway.PublicIpsValue, lt)
+	for y, publicIp := range *(*natGateways)[i].PublicIps {
+		elementValue[y], *diags = datasource_nat_gateway.NewPublicIpsValue(datasource_nat_gateway.PublicIpsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+			"public_ip":    types.StringValue(utils.ConvertStringPtrToString(publicIp.PublicIp)),
+			"public_ip_id": types.StringValue(utils.ConvertStringPtrToString(publicIp.PublicIpId)),
+		})
+		if diags.HasError() {
+			diags.Append(*diags...)
+			continue
+		}
+	}
+
+	return types.ListValueFrom(ctx, new(datasource_nat_gateway.PublicIpsValue).Type(ctx), elementValue)
 }

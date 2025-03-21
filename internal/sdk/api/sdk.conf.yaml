@@ -1,0 +1,10 @@
+package: api
+output: ./internal/sdk/api/numspot-client.go
+generate:
+  client: true
+  models: true
+# Used to not generate duplication between schema and parameter object : State
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oapi-codegen/oapi-codegen/HEAD/configuration-schema.json
+output-options:
+  exclude-operation-ids:
+    - Authorize

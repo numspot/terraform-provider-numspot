@@ -4,28 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/publicip/datasource_public_ip"
+	"terraform-provider-numspot/internal/utils"
 )
-
-type PublicIpsDataSourceModel struct {
-	Items           []PublicIpModelDatasource `tfsdk:"items"`
-	LinkPublicIpIds types.List                `tfsdk:"link_public_ip_ids"`
-	NicIds          types.List                `tfsdk:"nic_ids"`
-	TagKeys         types.List                `tfsdk:"tag_keys"`
-	TagValues       types.List                `tfsdk:"tag_values"`
-	Tags            types.List                `tfsdk:"tags"`
-	PrivateIps      types.List                `tfsdk:"private_ips"`
-	VmIds           types.List                `tfsdk:"vm_ids"`
-	IDs             types.List                `tfsdk:"ids"`
-}
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
@@ -65,12 +53,12 @@ func (d *publicIpsDataSource) Metadata(_ context.Context, req datasource.Metadat
 
 // Schema defines the schema for the data source.
 func (d *publicIpsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	resp.Schema = PublicIpDataSourceSchema(ctx)
+	resp.Schema = datasource_public_ip.PublicIpDataSourceSchema(ctx)
 }
 
 // Read refreshes the Terraform state with the latest data.
 func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	var state, plan PublicIpsDataSourceModel
+	var state, plan datasource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -83,7 +71,7 @@ func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadR
 
 	numSpotPublicIp, err := core.ReadPublicIpsWithParams(ctx, d.provider, params)
 	if err != nil {
-		response.Diagnostics.AddError("unable to read internet gateway", err.Error())
+		response.Diagnostics.AddError("unable to read public ip", err.Error())
 		return
 	}
 
@@ -93,43 +81,84 @@ func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadR
 	}
 
 	state = plan
-	state.Items = objectItems
+	state.Items = objectItems.Items
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func deserializePublicIpParams(ctx context.Context, tf PublicIpsDataSourceModel, diags *diag.Diagnostics) numspot.ReadPublicIpsParams {
-	return numspot.ReadPublicIpsParams{
-		LinkPublicIpIds: utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpIds, diags),
-		NicIds:          utils.TfStringListToStringPtrList(ctx, tf.NicIds, diags),
-		PrivateIps:      utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags),
-		TagKeys:         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
-		TagValues:       utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
-		Tags:            utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
-		Ids:             utils.TfStringListToStringPtrList(ctx, tf.IDs, diags),
-		VmIds:           utils.TfStringListToStringPtrList(ctx, tf.VmIds, diags),
+func deserializePublicIpParams(ctx context.Context, tf datasource_public_ip.PublicIpModel, diags *diag.Diagnostics) api.ReadPublicIpsParams {
+	return api.ReadPublicIpsParams{
+		LinkPublicIpIds: utils.ConvertTfListToArrayOfString(ctx, tf.LinkPublicIpIds, diags),
+		NicIds:          utils.ConvertTfListToArrayOfString(ctx, tf.NicIds, diags),
+		PrivateIps:      utils.ConvertTfListToArrayOfString(ctx, tf.PrivateIps, diags),
+		TagKeys:         utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
+		TagValues:       utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
+		Tags:            utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
+		Ids:             utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
+		VmIds:           utils.ConvertTfListToArrayOfString(ctx, tf.VmIds, diags),
 	}
 }
 
-func serializePublicIps(ctx context.Context, publicIp *[]numspot.PublicIp, diags *diag.Diagnostics) []PublicIpModelDatasource {
-	return utils.FromHttpGenericListToTfList(ctx, publicIp, func(ctx context.Context, publicIP *numspot.PublicIp, diags *diag.Diagnostics) *PublicIpModelDatasource {
-		var tagsList types.List
+func serializePublicIps(ctx context.Context, publicIp *[]api.PublicIp, diags *diag.Diagnostics) datasource_public_ip.PublicIpModel {
+	var publicIpsList types.List
+	var serializeDiags diag.Diagnostics
 
-		if publicIP.Tags != nil {
-			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *publicIP.Tags, diags)
-			if diags.HasError() {
-				return nil
+	tagsList := types.List{}
+
+	if len(*publicIp) != 0 {
+		ll := len(*publicIp)
+		itemsValue := make([]datasource_public_ip.ItemsValue, ll)
+
+		for i := 0; ll > i; i++ {
+			if (*publicIp)[i].Tags != nil {
+
+				tagsList, serializeDiags = mappingPublicIpTags(ctx, publicIp, diags, i)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			itemsValue[i], serializeDiags = datasource_public_ip.NewItemsValue(datasource_public_ip.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+				"id":                types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].Id)),
+				"link_public_ip_id": types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].LinkPublicIpId)),
+				"nic_id":            types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].NicId)),
+				"private_ip":        types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].PrivateIp)),
+				"public_ip":         types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].PublicIp)),
+				"tags":              tagsList,
+				"vm_id":             types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].VmId)),
+			})
+			if serializeDiags.HasError() {
+				diags.Append(serializeDiags...)
+				continue
 			}
 		}
 
-		return &PublicIpModelDatasource{
-			Id:             types.StringPointerValue(publicIP.Id),
-			NicId:          types.StringPointerValue(publicIP.NicId),
-			PrivateIp:      types.StringPointerValue(publicIP.PrivateIp),
-			PublicIp:       types.StringPointerValue(publicIP.PublicIp),
-			VmId:           types.StringPointerValue(publicIP.VmId),
-			LinkPublicIpId: types.StringPointerValue(publicIP.LinkPublicIpId),
-			Tags:           tagsList,
+		publicIpsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_public_ip.ItemsValue).Type(ctx), itemsValue)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
 		}
-	}, diags)
+	} else {
+		publicIpsList = types.ListNull(new(datasource_public_ip.ItemsValue).Type(ctx))
+	}
+
+	return datasource_public_ip.PublicIpModel{
+		Items: publicIpsList,
+	}
+}
+
+func mappingPublicIpTags(ctx context.Context, publicIps *[]api.PublicIp, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+	lt := len(*(*publicIps)[i].Tags)
+	elementValue := make([]datasource_public_ip.TagsValue, lt)
+	for y, tag := range *(*publicIps)[i].Tags {
+		elementValue[y], *diags = datasource_public_ip.NewTagsValue(datasource_public_ip.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+			"key":   types.StringValue(tag.Key),
+			"value": types.StringValue(tag.Value),
+		})
+		if diags.HasError() {
+			diags.Append(*diags...)
+			continue
+		}
+	}
+
+	return types.ListValueFrom(ctx, new(datasource_public_ip.TagsValue).Type(ctx), elementValue)
 }

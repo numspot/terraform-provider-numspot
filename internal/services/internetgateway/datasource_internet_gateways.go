@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/internetgateway/datasource_internet_gateway"
+	"terraform-provider-numspot/internal/utils"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -53,12 +53,12 @@ func (d *internetGatewaysDataSource) Metadata(_ context.Context, req datasource.
 
 // Schema defines the schema for the data source.
 func (d *internetGatewaysDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	resp.Schema = InternetGatewayDataSourceSchema(ctx)
+	resp.Schema = datasource_internet_gateway.InternetGatewayDataSourceSchema(ctx)
 }
 
 // Read refreshes the Terraform state with the latest data.
 func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	var state, plan InternetGatewaysDataSourceModel
+	var state, plan datasource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -81,35 +81,78 @@ func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasourc
 	}
 
 	state = plan
-	state.Items = internetGatewayItems
+	state.Items = internetGatewayItems.Items
 
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func serializeInternetGateways(ctx context.Context, internetGateways *[]numspot.InternetGateway, diags *diag.Diagnostics) []InternetGatewayModel {
-	return utils.FromHttpGenericListToTfList(ctx, internetGateways, func(ctx context.Context, internetGateway *numspot.InternetGateway, diags *diag.Diagnostics) *InternetGatewayModel {
-		var tagsList types.List
+func serializeInternetGateways(ctx context.Context, internetGateways *[]api.InternetGateway, diags *diag.Diagnostics) datasource_internet_gateway.InternetGatewayModel {
+	var internetGatewaysList types.List
+	var serializeDiags diag.Diagnostics
+	tagsList := types.List{}
 
-		if internetGateway.Tags != nil {
-			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *internetGateway.Tags, diags)
+	if len(*internetGateways) != 0 {
+		ll := len(*internetGateways)
+		itemsValue := make([]datasource_internet_gateway.ItemsValue, ll)
+
+		for i := 0; ll > i; i++ {
+			if (*internetGateways)[i].Tags != nil {
+
+				tagsList, serializeDiags = mappingInternetGatewayTags(ctx, internetGateways, diags, i)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			itemsValue[i], serializeDiags = datasource_internet_gateway.NewItemsValue(datasource_internet_gateway.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+				"id":     types.StringValue(utils.ConvertStringPtrToString((*internetGateways)[i].Id)),
+				"state":  types.StringValue(utils.ConvertStringPtrToString((*internetGateways)[i].State)),
+				"tags":   tagsList,
+				"vpc_id": types.StringValue(utils.ConvertStringPtrToString((*internetGateways)[i].VpcId)),
+			})
+			if serializeDiags.HasError() {
+				diags.Append(serializeDiags...)
+				continue
+			}
 		}
 
-		return &InternetGatewayModel{
-			Id:    types.StringPointerValue(internetGateway.Id),
-			State: types.StringPointerValue(internetGateway.State),
-			VpcId: types.StringPointerValue(internetGateway.VpcId),
-			Tags:  tagsList,
+		internetGatewaysList, serializeDiags = types.ListValueFrom(ctx, new(datasource_internet_gateway.ItemsValue).Type(ctx), itemsValue)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
 		}
-	}, diags)
+	} else {
+		internetGatewaysList = types.ListNull(new(datasource_internet_gateway.ItemsValue).Type(ctx))
+	}
+
+	return datasource_internet_gateway.InternetGatewayModel{
+		Items: internetGatewaysList,
+	}
 }
 
-func deserializeReadInternetGateway(ctx context.Context, tf InternetGatewaysDataSourceModel, diags *diag.Diagnostics) numspot.ReadInternetGatewaysParams {
-	return numspot.ReadInternetGatewaysParams{
-		TagKeys:    utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
-		TagValues:  utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
-		Tags:       utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
-		Ids:        utils.TfStringListToStringPtrList(ctx, tf.IDs, diags),
-		LinkStates: utils.TfStringListToStringPtrList(ctx, tf.LinkStates, diags),
-		LinkVpcIds: utils.TfStringListToStringPtrList(ctx, tf.LinkVpcIds, diags),
+func deserializeReadInternetGateway(ctx context.Context, tf datasource_internet_gateway.InternetGatewayModel, diags *diag.Diagnostics) api.ReadInternetGatewaysParams {
+	return api.ReadInternetGatewaysParams{
+		TagKeys:    utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
+		TagValues:  utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
+		Tags:       utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
+		Ids:        utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
+		LinkStates: utils.ConvertTfListToArrayOfString(ctx, tf.LinkStates, diags),
+		LinkVpcIds: utils.ConvertTfListToArrayOfString(ctx, tf.LinkVpcIds, diags),
 	}
+}
+
+func mappingInternetGatewayTags(ctx context.Context, internetGateways *[]api.InternetGateway, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+	lt := len(*(*internetGateways)[i].Tags)
+	elementValue := make([]datasource_internet_gateway.TagsValue, lt)
+	for y, tag := range *(*internetGateways)[i].Tags {
+		elementValue[y], *diags = datasource_internet_gateway.NewTagsValue(datasource_internet_gateway.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+			"key":   types.StringValue(tag.Key),
+			"value": types.StringValue(tag.Value),
+		})
+		if diags.HasError() {
+			diags.Append(*diags...)
+			continue
+		}
+	}
+
+	return types.ListValueFrom(ctx, new(datasource_internet_gateway.TagsValue).Type(ctx), elementValue)
 }

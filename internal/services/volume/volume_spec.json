@@ -1,0 +1,490 @@
+{
+	"datasources": [
+		{
+			"name": "volume",
+			"schema": {
+				"attributes": [
+					{
+						"name": "creation_dates",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`)."
+						}
+					},
+					{
+						"name": "link_volume_delete_on_vm_deletion",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "Whether the volumes are deleted or not when terminating the VMs."
+						}
+					},
+					{
+						"name": "link_volume_device_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The VM device names."
+						}
+					},
+					{
+						"name": "link_volume_link_dates",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The dates and times of creation of the volumes, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`)."
+						}
+					},
+					{
+						"name": "link_volume_link_states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The attachment states of the volumes (`attaching` \\| `detaching` \\| `attached` \\| `detached`)."
+						}
+					},
+					{
+						"name": "link_volume_vm_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more IDs of VMs."
+						}
+					},
+					{
+						"name": "snapshot_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The snapshots from which the volumes were created."
+						}
+					},
+					{
+						"name": "tag_keys",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The keys of the tags associated with the volumes."
+						}
+					},
+					{
+						"name": "tag_values",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The values of the tags associated with the volumes."
+						}
+					},
+					{
+						"name": "tags",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The key/value combination of the tags associated with the volumes, in the following format: \u0026quot;Filters\u0026quot;:{\u0026quot;Tags\u0026quot;:[\u0026quot;TAGKEY=TAGVALUE\u0026quot;]}."
+						}
+					},
+					{
+						"name": "volume_sizes",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The sizes of the volumes, in gibibytes (GiB)."
+						}
+					},
+					{
+						"name": "volume_states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The states of the volumes (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`)."
+						}
+					},
+					{
+						"name": "volume_types",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The types of the volumes (`standard` \\| `gp2` \\| `io1`)."
+						}
+					},
+					{
+						"name": "availability_zone_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the Subregions in which the volumes were created."
+						}
+					},
+					{
+						"name": "ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the volumes."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "availability_zone_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The Subregion in which the volume was created."
+										}
+									},
+									{
+										"name": "creation_date",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The date and time of creation of the volume."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the volume."
+										}
+									},
+									{
+										"name": "iops",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "The number of I/O operations per second (IOPS):\u003cbr /\u003e\n- For `io1` volumes, the number of provisioned IOPS\u003cbr /\u003e\n- For `gp2` volumes, the baseline performance of the volume"
+										}
+									},
+									{
+										"name": "linked_volumes",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "delete_on_vm_deletion",
+														"bool": {
+															"computed_optional_required": "computed",
+															"description": "If true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM."
+														}
+													},
+													{
+														"name": "device_name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The name of the device."
+														}
+													},
+													{
+														"name": "id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the volume."
+														}
+													},
+													{
+														"name": "state",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The state of the attachment of the volume (`attaching` \\| `detaching` \\| `attached` \\| `detached`)."
+														}
+													},
+													{
+														"name": "vm_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the VM."
+														}
+													}
+												]
+											},
+											"description": "Information about your volume attachment."
+										}
+									},
+									{
+										"name": "size",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "The size of the volume, in gibibytes (GiB)."
+										}
+									},
+									{
+										"name": "snapshot_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The snapshot from which the volume was created."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`)."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the volume."
+										}
+									},
+									{
+										"name": "type",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The type of the volume (`standard` \\| `gp2` \\| `io1`)."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more volumes."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "volume",
+			"schema": {
+				"attributes": [
+					{
+						"name": "replace_volume_on_downsize",
+						"bool": {
+							"default": {
+								"static": false
+							},
+							"computed_optional_required": "computed_optional",
+							"description": "If replace_volume_on_downsize is set to 'true' and volume size is reduced, the volume will be deleted and recreated.  WARNING : All data on the volume will be lost. Default is false"
+						}
+					},
+					{
+						"name": "availability_zone_name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The Subregion in which you want to create the volume."
+						}
+					},
+					{
+						"name": "iops",
+						"int64": {
+							"computed_optional_required": "computed_optional",
+							"description": "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte."
+						}
+					},
+					{
+						"name": "size",
+						"int64": {
+							"default": {
+								"static": 10
+							},
+							"computed_optional_required": "computed_optional",
+							"description": "The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified).",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+											}
+										],
+										"schema_definition": "int64planmodifier.RequiresReplaceIf(ReplaceVolumeSize, \"If planned volume size is smaller than current size and 'replace_volume_on_downsize' is set to true, the volume will be replaced.\", \"If planned volume size is smaller than current size and 'replace_volume_on_downsize' is set to true, the volume will be replaced.\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "snapshot_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The ID of the snapshot from which you want to create the volume."
+						}
+					},
+					{
+						"name": "type",
+						"string": {
+							"default": {
+								"static": "standard"
+							},
+							"computed_optional_required": "computed_optional",
+							"description": "The type of volume you want to create (`io1` \\| `gp2` \\ | `standard`). If not specified, a `standard` volume is created.\u003cbr /\u003e"
+						}
+					},
+					{
+						"name": "creation_date",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The date and time of creation of the volume."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the volume."
+						}
+					},
+					{
+						"name": "linked_volumes",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "delete_on_vm_deletion",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "If true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM."
+										}
+									},
+									{
+										"name": "device_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the device."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the volume."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the attachment of the volume (`attaching` \\| `detaching` \\| `attached` \\| `detached`)."
+										}
+									},
+									{
+										"name": "vm_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the VM."
+										}
+									}
+								]
+							},
+							"description": "Information about your volume attachment."
+						}
+					},
+					{
+						"name": "state",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`)."
+						}
+					},
+					{
+						"name": "link_vm",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"description": "VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded.",
+							"attributes": [
+								{
+									"name": "device_name",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "The name of the device. For a root device, you must use /dev/sda1. For other volumes, you must use /dev/sdX, /dev/sdXX, /dev/xvdX, or /dev/xvdXX (where the first X is a letter between b and z, and the second X is a letter between a and z)."
+									}
+								},
+								{
+									"name": "vm_id",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "The ID of the VM you want to attach the volume to."
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags associated with the volume."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

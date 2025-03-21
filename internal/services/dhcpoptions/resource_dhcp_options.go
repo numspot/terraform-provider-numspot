@@ -9,12 +9,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/dhcpoptions/resource_dhcp_options"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -59,7 +59,7 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = DhcpOptionsResourceSchema(ctx)
+	response.Schema = resource_dhcp_options.DhcpOptionsResourceSchema(ctx)
 }
 
 func (r *Resource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
@@ -74,15 +74,15 @@ func (r *Resource) ConfigValidators(_ context.Context) []resource.ConfigValidato
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan DhcpOptionsModel
+	var plan resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	apiTags := dhcpTags(ctx, plan.Tags)
 
-	numSpotDHCPOptions, err := core.CreateDHCPOptions(ctx, r.provider, deserializeDHCPOption(ctx, plan), tagsValue)
+	numSpotDHCPOptions, err := core.CreateDHCPOptions(ctx, r.provider, deserializeDHCPOption(ctx, plan), apiTags)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create dhcp options", err.Error())
 		return
@@ -97,7 +97,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state DhcpOptionsModel
+	var state resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -122,8 +122,8 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err                error
-		numSpotDHCPOptions *numspot.DhcpOptionsSet
-		state, plan        DhcpOptionsModel
+		numSpotDHCPOptions *api.DhcpOptionsSet
+		state, plan        resource_dhcp_options.DhcpOptionsModel
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -137,8 +137,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 
 	dhcpOptionsID := state.Id.ValueString()
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	stateTags := dhcpTags(ctx, state.Tags)
+	planTags := dhcpTags(ctx, plan.Tags)
 
 	if !plan.Tags.Equal(state.Tags) {
 		numSpotDHCPOptions, err = core.UpdateDHCPOptionsTags(ctx, r.provider, dhcpOptionsID, stateTags, planTags)
@@ -146,18 +146,18 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 			response.Diagnostics.AddError("unable to update dhcp options tags", err.Error())
 			return
 		}
-	}
 
-	newState := serializeNumSpotDHCPOption(ctx, numSpotDHCPOptions, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
+		newState := serializeNumSpotDHCPOption(ctx, numSpotDHCPOptions, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
+			return
+		}
 
-	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+		response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+	}
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state DhcpOptionsModel
+	var state resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -171,7 +171,7 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func deserializeDHCPOption(ctx context.Context, tf DhcpOptionsModel) numspot.CreateDhcpOptionsJSONRequestBody {
+func deserializeDHCPOption(ctx context.Context, tf resource_dhcp_options.DhcpOptionsModel) api.CreateDhcpOptionsJSONRequestBody {
 	var domainNameServers, logServers, ntpServers []string
 
 	domainNameServers = make([]string, 0, len(tf.DomainNameServers.Elements()))
@@ -183,7 +183,7 @@ func deserializeDHCPOption(ctx context.Context, tf DhcpOptionsModel) numspot.Cre
 	ntpServers = make([]string, 0, len(tf.NtpServers.Elements()))
 	tf.NtpServers.ElementsAs(ctx, &ntpServers, false)
 
-	return numspot.CreateDhcpOptionsJSONRequestBody{
+	return api.CreateDhcpOptionsJSONRequestBody{
 		DomainName:        tf.DomainName.ValueStringPointer(),
 		DomainNameServers: &domainNameServers,
 		LogServers:        &logServers,
@@ -191,38 +191,38 @@ func deserializeDHCPOption(ctx context.Context, tf DhcpOptionsModel) numspot.Cre
 	}
 }
 
-func serializeNumSpotDHCPOption(ctx context.Context, http *numspot.DhcpOptionsSet, diags *diag.Diagnostics) DhcpOptionsModel {
+func serializeNumSpotDHCPOption(ctx context.Context, http *api.DhcpOptionsSet, diags *diag.Diagnostics) resource_dhcp_options.DhcpOptionsModel {
 	var domainNameServersTf, logServersTf, ntpServersTf, tagsTf types.List
 
 	if http.DomainNameServers != nil {
 		domainNameServersTf = utils.StringListToTfListValue(ctx, *http.DomainNameServers, diags)
 		if diags.HasError() {
-			return DhcpOptionsModel{}
+			return resource_dhcp_options.DhcpOptionsModel{}
 		}
 	}
 
 	if http.LogServers != nil {
 		logServersTf = utils.StringListToTfListValue(ctx, *http.LogServers, diags)
 		if diags.HasError() {
-			return DhcpOptionsModel{}
+			return resource_dhcp_options.DhcpOptionsModel{}
 		}
 	}
 
 	if http.NtpServers != nil {
 		ntpServersTf = utils.StringListToTfListValue(ctx, *http.NtpServers, diags)
 		if diags.HasError() {
-			return DhcpOptionsModel{}
+			return resource_dhcp_options.DhcpOptionsModel{}
 		}
 	}
 
 	if http.Tags != nil {
 		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return DhcpOptionsModel{}
+			return resource_dhcp_options.DhcpOptionsModel{}
 		}
 	}
 
-	return DhcpOptionsModel{
+	return resource_dhcp_options.DhcpOptionsModel{
 		Default:           types.BoolPointerValue(http.Default),
 		DomainName:        types.StringPointerValue(http.DomainName),
 		Id:                types.StringPointerValue(http.Id),
@@ -231,4 +231,19 @@ func serializeNumSpotDHCPOption(ctx context.Context, http *numspot.DhcpOptionsSe
 		NtpServers:        ntpServersTf,
 		Tags:              tagsTf,
 	}
+}
+
+func dhcpTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_dhcp_options.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

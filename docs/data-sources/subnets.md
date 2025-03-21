@@ -45,7 +45,7 @@ resource "null_resource" "print-datasource-id" {
 - `states` (List of String) The states of the Subnets (`pending` \| `available` \| `deleted`).
 - `tag_keys` (List of String) The keys of the tags associated with the Subnets.
 - `tag_values` (List of String) The values of the tags associated with the Subnets.
-- `tags` (List of String) The key/value combination of the tags associated with the Subnets, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the Subnets, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `vpc_ids` (List of String) The IDs of the Vpcs in which the Subnets are.
 
 ### Read-Only
@@ -55,10 +55,6 @@ resource "null_resource" "print-datasource-id" {
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
-
 Read-Only:
 
 - `availability_zone_name` (String) The name of the Subregion in which the Subnet is located.
@@ -67,12 +63,13 @@ Read-Only:
 - `ip_range` (String) The IP range in the Subnet, in CIDR notation (for example, `10.0.0.0/16`).
 - `map_public_ip_on_launch` (Boolean) If true, a public IP is assigned to the network interface cards (NICs) created in the specified Subnet.
 - `state` (String) The state of the Subnet (`pending` \| `available` \| `deleted`).
+- `tags` (Attributes List) One or more tags associated with the Subnet. (see [below for nested schema](#nestedatt--items--tags))
 - `vpc_id` (String) The ID of the Vpc in which the Subnet is.
 
 <a id="nestedatt--items--tags"></a>
 ### Nested Schema for `items.tags`
 
-Required:
+Read-Only:
 
 - `key` (String) The key of the tag, with a minimum of 1 character.
 - `value` (String) The value of the tag, between 0 and 255 characters.

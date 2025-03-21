@@ -1,0 +1,239 @@
+{
+	"datasources": [
+		{
+			"name": "vpc",
+			"schema": {
+				"attributes": [
+					{
+						"name": "dhcp_options_set_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the DHCP options sets."
+						}
+					},
+					{
+						"name": "ip_ranges",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IP ranges for the Vpcs, in CIDR notation (for example, `10.0.0.0/16`)."
+						}
+					},
+					{
+						"name": "is_default",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "If true, the Vpc used is the default one."
+						}
+					},
+					{
+						"name": "states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The states of the Vpcs (`pending` \\| `available` \\| `deleting`)."
+						}
+					},
+					{
+						"name": "tag_keys",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The keys of the tags associated with the Vpcs."
+						}
+					},
+					{
+						"name": "tag_values",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The values of the tags associated with the Vpcs."
+						}
+					},
+					{
+						"name": "tags",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The key/value combination of the tags associated with the Vpcs, in the following format: \u0026quot;Filters\u0026quot;:{\u0026quot;Tags\u0026quot;:[\u0026quot;TAGKEY=TAGVALUE\u0026quot;]}."
+						}
+					},
+					{
+						"name": "ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Vpcs."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "dhcp_options_set_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the DHCP options set (or `default` if you want to associate the default one)."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Vpc."
+										}
+									},
+									{
+										"name": "ip_range",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The IP range for the Vpc, in CIDR notation (for example, `10.0.0.0/16`)."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the Vpc (`pending` \\| `available` \\| `deleting`)."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the Vpc."
+										}
+									},
+									{
+										"name": "tenancy",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The VM tenancy in a Vpc."
+										}
+									}
+								]
+							},
+							"description": "Information about the described Vpcs."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "vpc",
+			"schema": {
+				"attributes": [
+					{
+						"name": "ip_range",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The IP range for the Vpc, in CIDR notation (for example, `10.0.0.0/16`).",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "tenancy",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The tenancy options for the VMs:\u003cbr /\u003e\n- `default` if a VM created in a Vpc can be launched with any tenancy.\u003cbr /\u003e\n- `dedicated` if it can be launched with dedicated tenancy VMs running on single-tenant hardware.\u003cbr /\u003e\n- `dedicated group ID`: if it can be launched in a dedicated group on single-tenant hardware."
+						}
+					},
+					{
+						"name": "dhcp_options_set_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The ID of the DHCP options set (or `default` if you want to associate the default one)."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the Vpc."
+						}
+					},
+					{
+						"name": "state",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The state of the Vpc (`pending` \\| `available` \\| `deleting`)."
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags associated with the Vpc."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

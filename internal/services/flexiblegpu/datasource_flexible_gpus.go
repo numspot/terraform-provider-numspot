@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/flexiblegpu/datasource_flexible_gpu"
+	"terraform-provider-numspot/internal/utils"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -51,12 +52,12 @@ func (d *flexibleGpusDataSource) Metadata(_ context.Context, req datasource.Meta
 
 // Schema defines the schema for the data source.
 func (d *flexibleGpusDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	resp.Schema = FlexibleGpuDataSourceSchema(ctx)
+	resp.Schema = datasource_flexible_gpu.FlexibleGpuDataSourceSchema(ctx)
 }
 
 // Read refreshes the Terraform state with the latest data.
 func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	var state, plan FlexibleGpuDataSourceModel
+	var state, plan datasource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -67,6 +68,7 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 		response.Diagnostics.AddError("Error while initiating numspotClient", err.Error())
 		return
 	}
+
 	params := deserializeFlexibleGPUDataSource(ctx, plan, &response.Diagnostics)
 
 	res, err := numspotClient.ReadFlexibleGpusWithResponse(ctx, d.provider.SpaceID, &params)
@@ -80,37 +82,62 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 		return
 	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, res.JSON200.Items, serializeFlexibleGPUDataSource, &response.Diagnostics)
+	objectItems := serializeFlexibleGPUDataSource(ctx, res.JSON200.Items, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems
+	state.Items = objectItems.Items
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func deserializeFlexibleGPUDataSource(ctx context.Context, tf FlexibleGpuDataSourceModel, diags *diag.Diagnostics) numspot.ReadFlexibleGpusParams {
-	return numspot.ReadFlexibleGpusParams{
-		States:                utils.TfStringListToStringPtrList(ctx, tf.States, diags),
-		Ids:                   utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
-		AvailabilityZoneNames: utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames, diags),
-		DeleteOnVmDeletion:    utils.FromTfBoolToBoolPtr(tf.DeleteOnVmDeletion),
-		Generations:           utils.TfStringListToStringPtrList(ctx, tf.Generations, diags),
-		ModelNames:            utils.TfStringListToStringPtrList(ctx, tf.ModelNames, diags),
-		VmIds:                 utils.TfStringListToStringPtrList(ctx, tf.VmIds, diags),
+func deserializeFlexibleGPUDataSource(ctx context.Context, tf datasource_flexible_gpu.FlexibleGpuModel, diags *diag.Diagnostics) api.ReadFlexibleGpusParams {
+	return api.ReadFlexibleGpusParams{
+		States:                utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
+		Ids:                   utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
+		AvailabilityZoneNames: utils.ConvertTfListToArrayOfString(ctx, tf.AvailabilityZoneNames, diags),
+		DeleteOnVmDeletion:    tf.DeleteOnVmDeletion.ValueBoolPointer(),
+		Generations:           utils.ConvertTfListToArrayOfString(ctx, tf.Generations, diags),
+		ModelNames:            utils.ConvertTfListToArrayOfString(ctx, tf.ModelNames, diags),
+		VmIds:                 utils.ConvertTfListToArrayOfString(ctx, tf.VmIds, diags),
 	}
 }
 
-func serializeFlexibleGPUDataSource(_ context.Context, http *numspot.FlexibleGpu, _ *diag.Diagnostics) *FlexibleGpuModelItemDataSource {
-	return &FlexibleGpuModelItemDataSource{
-		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
-		Id:                   types.StringPointerValue(http.Id),
-		State:                types.StringPointerValue(http.State),
-		DeleteOnVmDeletion:   types.BoolPointerValue(http.DeleteOnVmDeletion),
-		Generation:           types.StringPointerValue(http.Generation),
-		ModelName:            types.StringPointerValue(http.ModelName),
-		VmId:                 types.StringPointerValue(http.VmId),
+func serializeFlexibleGPUDataSource(ctx context.Context, flexiblGpus *[]api.FlexibleGpu, diags *diag.Diagnostics) datasource_flexible_gpu.FlexibleGpuModel {
+	var flexibleGpusList types.List
+	var serializeDiags diag.Diagnostics
+
+	if len(*flexiblGpus) != 0 {
+		ll := len(*flexiblGpus)
+		itemsValue := make([]datasource_flexible_gpu.ItemsValue, ll)
+
+		for i := 0; ll > i; i++ {
+			itemsValue[i], serializeDiags = datasource_flexible_gpu.NewItemsValue(datasource_flexible_gpu.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+				"availability_zone_name": types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].AvailabilityZoneName)),
+				"delete_on_vm_deletion":  types.BoolPointerValue((*flexiblGpus)[i].DeleteOnVmDeletion),
+				"generation":             types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].Generation)),
+				"id":                     types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].Id)),
+				"model_name":             types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].ModelName)),
+				"state":                  types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].State)),
+				"vm_id":                  types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].VmId)),
+			})
+			if serializeDiags.HasError() {
+				diags.Append(serializeDiags...)
+				continue
+			}
+		}
+
+		flexibleGpusList, serializeDiags = types.ListValueFrom(ctx, new(datasource_flexible_gpu.ItemsValue).Type(ctx), itemsValue)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
+	} else {
+		flexibleGpusList = types.ListNull(new(datasource_flexible_gpu.ItemsValue).Type(ctx))
+	}
+
+	return datasource_flexible_gpu.FlexibleGpuModel{
+		Items: flexibleGpusList,
 	}
 }

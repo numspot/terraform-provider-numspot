@@ -1,0 +1,26 @@
+provider:
+  name: numspot
+
+resources:
+  public_ip:
+    create:
+      method: POST
+      path: /compute/spaces/{spaceId}/publicIps
+    delete:
+      method: DELETE
+      path: /compute/spaces/{spaceId}/publicIps/{id}
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/publicIps/{id}
+    update:
+      method: PUT
+      path: /compute/spaces/{spaceId}/publicIps/{id}
+
+data_sources:
+  public_ip:
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/publicIps
+    schema:
+      ignores:
+        - spaceId

@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/keypair/datasource_keypair"
+	"terraform-provider-numspot/internal/utils"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -52,12 +53,12 @@ func (d *keypairsDataSource) Metadata(_ context.Context, req datasource.Metadata
 
 // Schema defines the schema for the data source.
 func (d *keypairsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	resp.Schema = KeyPairDataSourceSchema(ctx)
+	resp.Schema = datasource_keypair.KeypairDataSourceSchema(ctx)
 }
 
 // Read refreshes the Terraform state with the latest data.
 func (d *keypairsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	var state, plan KeypairsDataSourceModel
+	var state, plan datasource_keypair.KeypairModel
 
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -81,25 +82,48 @@ func (d *keypairsDataSource) Read(ctx context.Context, request datasource.ReadRe
 	}
 
 	state = plan
-	state.Items = keypairItems
+	state.Items = keypairItems.Items
 
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func serializeKeypairs(ctx context.Context, keypairs *[]numspot.Keypair, diags *diag.Diagnostics) []KeyPairDatasourceItemModel {
-	return utils.FromHttpGenericListToTfList(ctx, keypairs, func(ctx context.Context, http *numspot.Keypair, diags *diag.Diagnostics) *KeyPairDatasourceItemModel {
-		return &KeyPairDatasourceItemModel{
-			Fingerprint: types.StringPointerValue(http.Fingerprint),
-			Name:        types.StringPointerValue(http.Name),
-			Type:        types.StringPointerValue(http.Type),
+func serializeKeypairs(ctx context.Context, keypairs *[]api.Keypair, diags *diag.Diagnostics) datasource_keypair.KeypairModel {
+	var keypairsList types.List
+	var serializeDiags diag.Diagnostics
+
+	if len(*keypairs) != 0 {
+		ll := len(*keypairs)
+		itemsValue := make([]datasource_keypair.ItemsValue, ll)
+
+		for i := 0; ll > i; i++ {
+			itemsValue[i], serializeDiags = datasource_keypair.NewItemsValue(datasource_keypair.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+				"name":        types.StringValue(utils.ConvertStringPtrToString((*keypairs)[i].Name)),
+				"fingerprint": types.StringValue(utils.ConvertStringPtrToString((*keypairs)[i].Fingerprint)),
+				"type":        types.StringValue(utils.ConvertStringPtrToString((*keypairs)[i].Type)),
+			})
+			if serializeDiags.HasError() {
+				diags.Append(serializeDiags...)
+				continue
+			}
 		}
-	}, diags)
+
+		keypairsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_keypair.ItemsValue).Type(ctx), itemsValue)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
+	} else {
+		keypairsList = types.ListNull(new(datasource_keypair.ItemsValue).Type(ctx))
+	}
+
+	return datasource_keypair.KeypairModel{
+		Items: keypairsList,
+	}
 }
 
-func deserializeReadKeypairs(ctx context.Context, tf KeypairsDataSourceModel, diags *diag.Diagnostics) numspot.ReadKeypairsParams {
-	return numspot.ReadKeypairsParams{
-		KeypairFingerprints: utils.TfStringListToStringPtrList(ctx, tf.KeypairFingerprints, diags),
-		KeypairNames:        utils.TfStringListToStringPtrList(ctx, tf.KeypairNames, diags),
-		KeypairTypes:        utils.TfStringListToStringPtrList(ctx, tf.KeypairTypes, diags),
+func deserializeReadKeypairs(ctx context.Context, tf datasource_keypair.KeypairModel, diags *diag.Diagnostics) api.ReadKeypairsParams {
+	return api.ReadKeypairsParams{
+		KeypairFingerprints: utils.ConvertTfListToArrayOfString(ctx, tf.KeypairFingerprints, diags),
+		KeypairNames:        utils.ConvertTfListToArrayOfString(ctx, tf.KeypairNames, diags),
+		KeypairTypes:        utils.ConvertTfListToArrayOfString(ctx, tf.KeypairTypes, diags),
 	}
 }

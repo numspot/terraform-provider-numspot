@@ -60,40 +60,26 @@ resource "null_resource" "print-datasource-id" {
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
-
 Read-Only:
 
 - `application_sticky_cookie_policies` (Attributes List) The stickiness policies defined for the load balancer. (see [below for nested schema](#nestedatt--items--application_sticky_cookie_policies))
 - `availability_zone_names` (List of String) The ID of the Subregion in which the load balancer was created.
-- `backend_ips` (Set of String) One or more public IPs of back-end VMs.
-- `backend_vm_ids` (Set of String) One or more IDs of back-end VMs for the load balancer.
+- `backend_ips` (List of String) One or more public IPs of back-end VMs.
+- `backend_vm_ids` (List of String) One or more IDs of back-end VMs for the load balancer.
 - `dns_name` (String) The DNS name of the load balancer.
 - `health_check` (Attributes) Information about the health check configuration. (see [below for nested schema](#nestedatt--items--health_check))
-- `listeners` (Attributes Set) The listeners for the load balancer. (see [below for nested schema](#nestedatt--items--listeners))
+- `listeners` (Attributes List) The listeners for the load balancer. (see [below for nested schema](#nestedatt--items--listeners))
 - `name` (String) The name of the load balancer.
 - `public_ip` (String) (internet-facing only) The public IP associated with the load balancer.
 - `secured_cookies` (Boolean) Whether secure cookies are enabled for the load balancer.
 - `security_groups` (List of String) One or more IDs of security groups for the load balancers. Valid only for load balancers in a Vpc.
-- `source_security_group` (Attributes) Information about the source security group of the load balancer, which you can use as part of your inbound rules for your registered VMs.<br />
-To only allow traffic from load balancers, add a security group rule that specifies this source security group as the inbound source. (see [below for nested schema](#nestedatt--items--source_security_group))
 - `sticky_cookie_policies` (Attributes List) The policies defined for the load balancer. (see [below for nested schema](#nestedatt--items--sticky_cookie_policies))
 - `subnets` (List of String) The ID of the Subnet in which the load balancer was created.
+- `tags` (Attributes List) One or more tags associated with the load balancer. (see [below for nested schema](#nestedatt--items--tags))
 - `type` (String) The type of load balancer. Valid only for load balancers in a Vpc.<br />
 If `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.<br />
 If `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP.
 - `vpc_id` (String) The ID of the Vpc for the load balancer.
-
-<a id="nestedatt--items--tags"></a>
-### Nested Schema for `items.tags`
-
-Required:
-
-- `key` (String) The key of the tag, with a minimum of 1 character.
-- `value` (String) The value of the tag, between 0 and 255 characters.
-
 
 <a id="nestedatt--items--application_sticky_cookie_policies"></a>
 ### Nested Schema for `items.application_sticky_cookie_policies`
@@ -131,14 +117,6 @@ Read-Only:
 - `server_certificate_id` (String) The NumSpot Resource Name of the server certificate.
 
 
-<a id="nestedatt--items--source_security_group"></a>
-### Nested Schema for `items.source_security_group`
-
-Read-Only:
-
-- `security_group_name` (String) The name of the security group.
-
-
 <a id="nestedatt--items--sticky_cookie_policies"></a>
 ### Nested Schema for `items.sticky_cookie_policies`
 
@@ -147,3 +125,12 @@ Read-Only:
 - `cookie_expiration_period` (Number) The time period, in seconds, after which the cookie should be considered stale.<br />
 If `1`, the stickiness session lasts for the duration of the browser session.
 - `policy_name` (String) The name of the stickiness policy.
+
+
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
+
+Read-Only:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

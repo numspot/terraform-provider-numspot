@@ -8,12 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/snapshot/resource_snapshot"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -57,17 +57,17 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = SnapshotResourceSchema(ctx)
+	response.Schema = resource_snapshot.SnapshotResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan SnapshotModel
+	var plan resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	tagsValue := snapshotTags(ctx, plan.Tags)
 	body := deserializeCreateSnapshot(plan)
 	if response.Diagnostics.HasError() {
 		return
@@ -88,7 +88,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state SnapshotModel
+	var state resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
 	if response.Diagnostics.HasError() {
@@ -112,7 +112,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 }
 
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var state, plan SnapshotModel
+	var state, plan resource_snapshot.SnapshotModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -121,10 +121,10 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 
 	snapshotID := state.Id.ValueString()
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := snapshotTags(ctx, plan.Tags)
+	stateTags := snapshotTags(ctx, state.Tags)
 
-	var numspotSnapshot *numspot.Snapshot
+	var numspotSnapshot *api.Snapshot
 	var err error
 	if !state.Tags.Equal(plan.Tags) {
 		numspotSnapshot, err = core.UpdateSnapshotTags(ctx, r.provider, stateTags, planTags, snapshotID)
@@ -143,7 +143,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state SnapshotModel
+	var state resource_snapshot.SnapshotModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -157,8 +157,8 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func deserializeCreateSnapshot(tf SnapshotModel) numspot.CreateSnapshotJSONRequestBody {
-	return numspot.CreateSnapshotJSONRequestBody{
+func deserializeCreateSnapshot(tf resource_snapshot.SnapshotModel) api.CreateSnapshotJSONRequestBody {
+	return api.CreateSnapshotJSONRequestBody{
 		Description:      tf.Description.ValueStringPointer(),
 		SourceRegionName: tf.SourceRegionName.ValueStringPointer(),
 		SourceSnapshotId: tf.SourceSnapshotId.ValueStringPointer(),
@@ -166,7 +166,7 @@ func deserializeCreateSnapshot(tf SnapshotModel) numspot.CreateSnapshotJSONReque
 	}
 }
 
-func serializeSnapshot(ctx context.Context, http *numspot.Snapshot, model SnapshotModel, diags *diag.Diagnostics) *SnapshotModel {
+func serializeSnapshot(ctx context.Context, http *api.Snapshot, model resource_snapshot.SnapshotModel, diags *diag.Diagnostics) *resource_snapshot.SnapshotModel {
 	var (
 		tagsTf          types.List
 		creationDateStr *string
@@ -184,7 +184,7 @@ func serializeSnapshot(ctx context.Context, http *numspot.Snapshot, model Snapsh
 		}
 	}
 
-	snapshot := SnapshotModel{
+	snapshot := resource_snapshot.SnapshotModel{
 		CreationDate: types.StringPointerValue(creationDateStr),
 		Description:  types.StringPointerValue(http.Description),
 		Id:           types.StringPointerValue(http.Id),
@@ -208,4 +208,19 @@ func serializeSnapshot(ctx context.Context, http *numspot.Snapshot, model Snapsh
 	}
 
 	return &snapshot
+}
+
+func snapshotTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_snapshot.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

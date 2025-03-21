@@ -1,0 +1,684 @@
+{
+	"datasources": [
+		{
+			"name": "load_balancer",
+			"schema": {
+				"attributes": [
+					{
+						"name": "load_balancer_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the load balancers."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "application_sticky_cookie_policies",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "cookie_name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The name of the application cookie used for stickiness."
+														}
+													},
+													{
+														"name": "policy_name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The mnemonic name for the policy being created. The name must be unique within a set of policies for this load balancer."
+														}
+													}
+												]
+											},
+											"description": "The stickiness policies defined for the load balancer."
+										}
+									},
+									{
+										"name": "availability_zone_names",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "The ID of the Subregion in which the load balancer was created."
+										}
+									},
+									{
+										"name": "backend_ips",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more public IPs of back-end VMs."
+										}
+									},
+									{
+										"name": "backend_vm_ids",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more IDs of back-end VMs for the load balancer."
+										}
+									},
+									{
+										"name": "dns_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The DNS name of the load balancer."
+										}
+									},
+									{
+										"name": "health_check",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "check_interval",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The number of seconds between two requests (between `5` and `600` both included)."
+													}
+												},
+												{
+													"name": "healthy_threshold",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The number of consecutive successful requests before considering the VM as healthy (between `2` and `10` both included)."
+													}
+												},
+												{
+													"name": "path",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "If you use the HTTP or HTTPS protocols, the request URL path."
+													}
+												},
+												{
+													"name": "port",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The port number (between `1` and `65535`, both included)."
+													}
+												},
+												{
+													"name": "protocol",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The protocol for the URL of the VM (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`)."
+													}
+												},
+												{
+													"name": "timeout",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The maximum waiting time for a response before considering the VM as unhealthy, in seconds (between `2` and `60` both included)."
+													}
+												},
+												{
+													"name": "unhealthy_threshold",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The number of consecutive failed requests before considering the VM as unhealthy (between `2` and `10` both included)."
+													}
+												}
+											],
+											"description": "Information about the health check configuration."
+										}
+									},
+									{
+										"name": "listeners",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "backend_port",
+														"int64": {
+															"computed_optional_required": "computed",
+															"description": "The port on which the back-end VM is listening (between `1` and `65535`, both included)."
+														}
+													},
+													{
+														"name": "backend_protocol",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The protocol for routing traffic to back-end VMs (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`)."
+														}
+													},
+													{
+														"name": "load_balancer_port",
+														"int64": {
+															"computed_optional_required": "computed",
+															"description": "The port on which the load balancer is listening (between `1` and `65535`, both included)."
+														}
+													},
+													{
+														"name": "load_balancer_protocol",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The routing protocol (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`)."
+														}
+													},
+													{
+														"name": "policy_names",
+														"list": {
+															"computed_optional_required": "computed",
+															"element_type": {
+																"string": {}
+															},
+															"description": "The names of the policies. If there are no policies enabled, the list is empty."
+														}
+													},
+													{
+														"name": "server_certificate_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The NumSpot Resource Name of the server certificate."
+														}
+													}
+												]
+											},
+											"description": "The listeners for the load balancer."
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the load balancer."
+										}
+									},
+									{
+										"name": "public_ip",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "(internet-facing only) The public IP associated with the load balancer."
+										}
+									},
+									{
+										"name": "secured_cookies",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "Whether secure cookies are enabled for the load balancer."
+										}
+									},
+									{
+										"name": "security_groups",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more IDs of security groups for the load balancers. Valid only for load balancers in a Vpc."
+										}
+									},
+									{
+										"name": "sticky_cookie_policies",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "cookie_expiration_period",
+														"int64": {
+															"computed_optional_required": "computed",
+															"description": "The time period, in seconds, after which the cookie should be considered stale.\u003cbr /\u003e\nIf `1`, the stickiness session lasts for the duration of the browser session."
+														}
+													},
+													{
+														"name": "policy_name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The name of the stickiness policy."
+														}
+													}
+												]
+											},
+											"description": "The policies defined for the load balancer."
+										}
+									},
+									{
+										"name": "subnets",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "The ID of the Subnet in which the load balancer was created."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the load balancer."
+										}
+									},
+									{
+										"name": "type",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The type of load balancer. Valid only for load balancers in a Vpc.\u003cbr /\u003e\nIf `LoadBalancerType` is `internet-facing`, the load balancer has a public DNS name that resolves to a public IP.\u003cbr /\u003e\nIf `LoadBalancerType` is `internal`, the load balancer has a public DNS name that resolves to a private IP."
+										}
+									},
+									{
+										"name": "vpc_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Vpc for the load balancer."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more load balancers."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "load_balancer",
+			"schema": {
+				"attributes": [
+					{
+						"name": "listeners",
+						"set_nested": {
+							"computed_optional_required": "required",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "backend_port",
+										"int64": {
+											"computed_optional_required": "required",
+											"description": "The port on which the back-end VM is listening (between `1` and `65535`, both included)."
+										}
+									},
+									{
+										"name": "backend_protocol",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The protocol for routing traffic to back-end VMs (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`)."
+										}
+									},
+									{
+										"name": "load_balancer_port",
+										"int64": {
+											"computed_optional_required": "required",
+											"description": "The port on which the load balancer is listening (between `1` and `65535`, both included)."
+										}
+									},
+									{
+										"name": "load_balancer_protocol",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The routing protocol (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`)."
+										}
+									},
+									{
+										"name": "server_certificate_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The server certificate orn"
+										}
+									},
+									{
+										"name": "policy_names",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "The names of the policies. If there are no policies enabled, the list is empty."
+										}
+									}
+								]
+							},
+							"description": "One or more listeners to create."
+						}
+					},
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The unique name of the load balancer (32 alphanumeric or hyphen characters maximum, but cannot start or end with a hyphen).",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthAtMost(32)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9-]+$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "public_ip",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "(internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by NumSpot is associated."
+						}
+					},
+					{
+						"name": "security_groups",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "(Vpc only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Vpc is assigned to the load balancer."
+						}
+					},
+					{
+						"name": "subnets",
+						"list": {
+							"computed_optional_required": "required",
+							"element_type": {
+								"string": {}
+							},
+							"description": "(Vpc only) The ID of the Subnet in which you want to create the load balancer. Regardless of this Subnet, the load balancer can distribute traffic to all Subnets. This parameter is required in a Vpc.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											}
+										],
+										"schema_definition": "listplanmodifier.RequiresReplace()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags assigned to the load balancer."
+						}
+					},
+					{
+						"name": "type",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Vpc.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "application_sticky_cookie_policies",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "cookie_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the application cookie used for stickiness."
+										}
+									},
+									{
+										"name": "policy_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The mnemonic name for the policy being created. The name must be unique within a set of policies for this load balancer."
+										}
+									}
+								]
+							},
+							"description": "The stickiness policies defined for the load balancer."
+						}
+					},
+					{
+						"name": "backend_ips",
+						"set": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more public IPs of back-end VMs."
+						}
+					},
+					{
+						"name": "backend_vm_ids",
+						"set": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more IDs of back-end VMs for the load balancer."
+						}
+					},
+					{
+						"name": "dns_name",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The DNS name of the load balancer."
+						}
+					},
+					{
+						"name": "health_check",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "check_interval",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The number of seconds between two requests (between `5` and `600` both included)."
+									}
+								},
+								{
+									"name": "healthy_threshold",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The number of consecutive successful requests before considering the VM as healthy (between `2` and `10` both included)."
+									}
+								},
+								{
+									"name": "path",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "If you use the HTTP or HTTPS protocols, the request URL path."
+									}
+								},
+								{
+									"name": "port",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The port number (between `1` and `65535`, both included)."
+									}
+								},
+								{
+									"name": "protocol",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "The protocol for the URL of the VM (`HTTP` \\| `HTTPS` \\| `TCP` \\| `SSL`)."
+									}
+								},
+								{
+									"name": "timeout",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum waiting time for a response before considering the VM as unhealthy, in seconds (between `2` and `60` both included)."
+									}
+								},
+								{
+									"name": "unhealthy_threshold",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The number of consecutive failed requests before considering the VM as unhealthy (between `2` and `10` both included)."
+									}
+								}
+							],
+							"description": "Information about the health check configuration."
+						}
+					},
+					{
+						"name": "secured_cookies",
+						"bool": {
+							"computed_optional_required": "computed",
+							"description": "Whether secure cookies are enabled for the load balancer."
+						}
+					},
+					{
+						"name": "sticky_cookie_policies",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "cookie_expiration_period",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "The time period, in seconds, after which the cookie should be considered stale.\u003cbr /\u003e\nIf `1`, the stickiness session lasts for the duration of the browser session."
+										}
+									},
+									{
+										"name": "policy_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the stickiness policy."
+										}
+									}
+								]
+							},
+							"description": "The policies defined for the load balancer."
+						}
+					},
+					{
+						"name": "vpc_id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the Vpc for the load balancer."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "ID for ReadLoadBalancers",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthAtMost(32)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9-]+$\"), \"\")"
+									}
+								}
+							]
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

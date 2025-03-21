@@ -52,7 +52,7 @@ data "numspot_public_ips" "public_ip_data_source" {
 - `private_ips` (List of String) The private IPs associated with the public IPs.
 - `tag_keys` (List of String) The keys of the tags associated with the public IPs.
 - `tag_values` (List of String) The values of the tags associated with the public IPs.
-- `tags` (List of String) The key/value combination of the tags associated with the public IPs, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the public IPs, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `vm_ids` (List of String) The IDs of the VMs.
 
 ### Read-Only
@@ -62,10 +62,6 @@ data "numspot_public_ips" "public_ip_data_source" {
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
-
 Read-Only:
 
 - `id` (String) The allocation ID of the public IP.
@@ -73,12 +69,13 @@ Read-Only:
 - `nic_id` (String) The ID of the NIC the public IP is associated with (if any).
 - `private_ip` (String) The private IP associated with the public IP.
 - `public_ip` (String) The public IP.
+- `tags` (Attributes List) One or more tags associated with the public IP. (see [below for nested schema](#nestedatt--items--tags))
 - `vm_id` (String) The ID of the VM the public IP is associated with (if any).
 
 <a id="nestedatt--items--tags"></a>
 ### Nested Schema for `items.tags`
 
-Required:
+Read-Only:
 
 - `key` (String) The key of the tag, with a minimum of 1 character.
 - `value` (String) The value of the tag, between 0 and 255 characters.

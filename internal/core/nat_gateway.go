@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -15,7 +14,7 @@ var (
 	natGatewayTargetStates  = []string{available, deleted}
 )
 
-func CreateNATGateway(ctx context.Context, provider *client.NumSpotSDK, tags []numspot.ResourceTag, body numspot.CreateNatGatewayJSONRequestBody) (numSpotNatGateway *numspot.NatGateway, err error) {
+func CreateNATGateway(ctx context.Context, provider *client.NumSpotSDK, tags []api.ResourceTag, body api.CreateNatGatewayJSONRequestBody) (numSpotNatGateway *api.NatGateway, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -23,7 +22,7 @@ func CreateNATGateway(ctx context.Context, provider *client.NumSpotSDK, tags []n
 		return nil, err
 	}
 
-	var retryCreate *numspot.CreateNatGatewayResponse
+	var retryCreate *api.CreateNatGatewayResponse
 	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, body, numspotClient.CreateNatGatewayWithResponse); err != nil {
 		return nil, err
 	}
@@ -39,7 +38,7 @@ func CreateNATGateway(ctx context.Context, provider *client.NumSpotSDK, tags []n
 	return RetryReadNATGateway(ctx, provider, createdId)
 }
 
-func UpdateNATGatewayTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, natGatewayID string) (*numspot.NatGateway, error) {
+func UpdateNATGatewayTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []api.ResourceTag, planTags []api.ResourceTag, natGatewayID string) (*api.NatGateway, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, natGatewayID); err != nil {
 		return nil, err
 	}
@@ -58,7 +57,7 @@ func DeleteNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGatew
 	return utils.RetryDeleteUntilResourceAvailable(ctx, spaceID, natGatewayID, numspotClient.DeleteNatGatewayWithResponse)
 }
 
-func ReadNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) (*numspot.NatGateway, error) {
+func ReadNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) (*api.NatGateway, error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -78,7 +77,7 @@ func ReadNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGateway
 	return numSpotNatGateway.JSON200, nil
 }
 
-func RetryReadNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) (*numspot.NatGateway, error) {
+func RetryReadNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGatewayID string) (*api.NatGateway, error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -92,14 +91,14 @@ func RetryReadNATGateway(ctx context.Context, provider *client.NumSpotSDK, natGa
 		return nil, err
 	}
 
-	numSpotNatGateway, assert := read.(*numspot.NatGateway)
+	numSpotNatGateway, assert := read.(*api.NatGateway)
 	if !assert {
 		return nil, fmt.Errorf("invalid nat gateway assertion %s", natGatewayID)
 	}
 	return numSpotNatGateway, nil
 }
 
-func ReadNATGatewaysWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadNatGatewayParams) (numSpotNatGateway *[]numspot.NatGateway, err error) {
+func ReadNATGatewaysWithParams(ctx context.Context, provider *client.NumSpotSDK, params api.ReadNatGatewayParams) (numSpotNatGateway *[]api.NatGateway, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

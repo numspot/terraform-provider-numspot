@@ -39,7 +39,7 @@ resource "numspot_snapshot" "test" {
 - `description` (String) A description for the snapshot.
 - `source_region_name` (String) **(when copying a snapshot)** The name of the source Region, which must be the same as the Region of your account.
 - `source_snapshot_id` (String) **(when copying a snapshot)** The ID of the snapshot you want to copy.
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes List) One or more tags associated with the snapshot. (see [below for nested schema](#nestedatt--tags))
 - `volume_id` (String) **(when creating from a volume)** The ID of the volume you want to create a snapshot of.
 
 ### Read-Only

@@ -6,13 +6,12 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
-func CreateNic(ctx context.Context, provider *client.NumSpotSDK, numSpotNicCreate numspot.CreateNicJSONRequestBody, tags []numspot.ResourceTag, linkNicBody *numspot.LinkNicJSONRequestBody) (*numspot.Nic, error) {
+func CreateNic(ctx context.Context, provider *client.NumSpotSDK, numSpotNicCreate api.CreateNicJSONRequestBody, tags []api.ResourceTag, linkNicBody *api.LinkNicJSONRequestBody) (*api.Nic, error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -20,7 +19,7 @@ func CreateNic(ctx context.Context, provider *client.NumSpotSDK, numSpotNicCreat
 		return nil, err
 	}
 
-	var retryCreateResponse *numspot.CreateNicResponse
+	var retryCreateResponse *api.CreateNicResponse
 	if retryCreateResponse, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotNicCreate, numspotClient.CreateNicWithResponse); err != nil {
 		return nil, err
 	}
@@ -48,14 +47,14 @@ func CreateNic(ctx context.Context, provider *client.NumSpotSDK, numSpotNicCreat
 	return nic, nil
 }
 
-func UpdateNicTags(ctx context.Context, provider *client.NumSpotSDK, nicID string, stateTags, planTags []numspot.ResourceTag) (*numspot.Nic, error) {
+func UpdateNicTags(ctx context.Context, provider *client.NumSpotSDK, nicID string, stateTags, planTags []api.ResourceTag) (*api.Nic, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, nicID); err != nil {
 		return nil, err
 	}
 	return ReadNicWithID(ctx, provider, nicID)
 }
 
-func linkNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, linkNicBody numspot.LinkNicJSONRequestBody) (*numspot.Nic, error) {
+func linkNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, linkNicBody api.LinkNicJSONRequestBody) (*api.Nic, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -78,7 +77,7 @@ func linkNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, lin
 	return nic, nil
 }
 
-func unlinkNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, linkNicBody numspot.UnlinkNicJSONRequestBody) (*numspot.Nic, error) {
+func unlinkNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, linkNicBody api.UnlinkNicJSONRequestBody) (*api.Nic, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -102,8 +101,8 @@ func unlinkNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, l
 	return nic, nil
 }
 
-func UpdateNicLink(ctx context.Context, provider *client.NumSpotSDK, nicID string, stateUnlinkNic *numspot.UnlinkNicJSONRequestBody, planLinkNic *numspot.LinkNicJSONRequestBody) (*numspot.Nic, error) {
-	var nic *numspot.Nic
+func UpdateNicLink(ctx context.Context, provider *client.NumSpotSDK, nicID string, stateUnlinkNic *api.UnlinkNicJSONRequestBody, planLinkNic *api.LinkNicJSONRequestBody) (*api.Nic, error) {
+	var nic *api.Nic
 	var err error
 	if stateUnlinkNic != nil {
 		nic, err = unlinkNic(ctx, provider, nicID, *stateUnlinkNic)
@@ -122,7 +121,7 @@ func UpdateNicLink(ctx context.Context, provider *client.NumSpotSDK, nicID strin
 	return nic, nil
 }
 
-func UpdateNicAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpotNicUpdate numspot.UpdateNicJSONRequestBody, nicID string) (*numspot.Nic, error) {
+func UpdateNicAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpotNicUpdate api.UpdateNicJSONRequestBody, nicID string) (*api.Nic, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -140,7 +139,7 @@ func UpdateNicAttributes(ctx context.Context, provider *client.NumSpotSDK, numSp
 	return res.JSON200, nil
 }
 
-func DeleteNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, unlinkNicBody *numspot.UnlinkNicJSONRequestBody) (err error) {
+func DeleteNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, unlinkNicBody *api.UnlinkNicJSONRequestBody) (err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return err
@@ -154,7 +153,7 @@ func DeleteNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, u
 	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, nicID, numspotClient.DeleteNicWithResponse)
 }
 
-func RetryReadLinkNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, startState, targetState []string) (*numspot.Nic, error) {
+func RetryReadLinkNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, startState, targetState []string) (*api.Nic, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -188,14 +187,14 @@ func RetryReadLinkNic(ctx context.Context, provider *client.NumSpotSDK, nicID st
 		return nil, err
 	}
 
-	numSpotNic, assert := read.(*numspot.Nic)
+	numSpotNic, assert := read.(*api.Nic)
 	if !assert {
 		return nil, fmt.Errorf("invalid nic assertion %s", nicID)
 	}
 	return numSpotNic, err
 }
 
-func RetryReadNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, startState, targetState []string) (*numspot.Nic, error) {
+func RetryReadNic(ctx context.Context, provider *client.NumSpotSDK, nicID string, startState, targetState []string) (*api.Nic, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -205,14 +204,14 @@ func RetryReadNic(ctx context.Context, provider *client.NumSpotSDK, nicID string
 		return nil, err
 	}
 
-	numSpotNic, assert := read.(*numspot.Nic)
+	numSpotNic, assert := read.(*api.Nic)
 	if !assert {
 		return nil, fmt.Errorf("invalid nic assertion %s", nicID)
 	}
 	return numSpotNic, err
 }
 
-func ReadNicWithID(ctx context.Context, provider *client.NumSpotSDK, nicID string) (numSpotNic *numspot.Nic, err error) {
+func ReadNicWithID(ctx context.Context, provider *client.NumSpotSDK, nicID string) (numSpotNic *api.Nic, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -228,7 +227,7 @@ func ReadNicWithID(ctx context.Context, provider *client.NumSpotSDK, nicID strin
 	return numSpotReadNic.JSON200, err
 }
 
-func ReadNicsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadNicsParams) (numSpotNic *[]numspot.Nic, err error) {
+func ReadNicsWithParams(ctx context.Context, provider *client.NumSpotSDK, params api.ReadNicsParams) (numSpotNic *[]api.Nic, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

@@ -1,0 +1,29 @@
+provider:
+  name: numspot
+
+resources:
+  route_table:
+    create:
+      method: POST
+      path: /compute/spaces/{spaceId}/routeTables
+    delete:
+      method: DELETE
+      path: /compute/spaces/{spaceId}/routeTables/{id}
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/routeTables/{id}
+    update:
+      method: PUT
+      path: /compute/spaces/{spaceId}/routeTables/{id}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  route_table:
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/routeTables
+    schema:
+      ignores:
+        - spaceId

@@ -1,0 +1,415 @@
+{
+	"datasources": [
+		{
+			"name": "snapshot",
+			"schema": {
+				"attributes": [
+					{
+						"name": "descriptions",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The descriptions of the snapshots."
+						}
+					},
+					{
+						"name": "from_creation_date",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The beginning of the time period, in ISO 8601 date-time format (for example, `2020-06-14T00:00:00.000Z`)."
+						}
+					},
+					{
+						"name": "progresses",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The progresses of the snapshots, as a percentage."
+						}
+					},
+					{
+						"name": "states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The states of the snapshots (`in-queue` \\| `completed` \\| `error`)."
+						}
+					},
+					{
+						"name": "tag_keys",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The keys of the tags associated with the snapshots."
+						}
+					},
+					{
+						"name": "tag_values",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The values of the tags associated with the snapshots."
+						}
+					},
+					{
+						"name": "tags",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The key/value combination of the tags associated with the snapshots, in the following format: \u0026quot;Filters\u0026quot;:{\u0026quot;Tags\u0026quot;:[\u0026quot;TAGKEY=TAGVALUE\u0026quot;]}."
+						}
+					},
+					{
+						"name": "to_creation_date",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The end of the time period, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`)."
+						}
+					},
+					{
+						"name": "volume_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the volumes used to create the snapshots."
+						}
+					},
+					{
+						"name": "volume_sizes",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The sizes of the volumes used to create the snapshots, in gibibytes (GiB)."
+						}
+					},
+					{
+						"name": "is_public",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "If true, lists all public volumes. If false, lists all private volumes."
+						}
+					},
+					{
+						"name": "ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the snapshots."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "access",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "is_public",
+													"bool": {
+														"computed_optional_required": "computed",
+														"description": "A global permission for all accounts.\u003cbr /\u003e\n(Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).\u003cbr /\u003e\n(Response) If true, the resource is public. If false, the resource is private."
+													}
+												}
+											],
+											"description": "Permissions for the resource."
+										}
+									},
+									{
+										"name": "creation_date",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The date and time of creation of the snapshot."
+										}
+									},
+									{
+										"name": "description",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The description of the snapshot."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the snapshot."
+										}
+									},
+									{
+										"name": "progress",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "The progress of the snapshot, as a percentage."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the snapshot (`in-queue` \\| `completed` \\| `error`)."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the snapshot."
+										}
+									},
+									{
+										"name": "volume_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the volume used to create the snapshot."
+										}
+									},
+									{
+										"name": "volume_size",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "The size of the volume used to create the snapshot, in gibibytes (GiB)."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more snapshots and their permissions."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "snapshot",
+			"schema": {
+				"attributes": [
+					{
+						"name": "description",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "A description for the snapshot.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "source_region_name",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "**(when copying a snapshot)** The name of the source Region, which must be the same as the Region of your account.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "source_snapshot_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "**(when copying a snapshot)** The ID of the snapshot you want to copy.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "volume_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "**(when creating from a volume)** The ID of the volume you want to create a snapshot of.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "access",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+								{
+									"name": "is_public",
+									"bool": {
+										"computed_optional_required": "computed",
+										"description": "A global permission for all accounts.\u003cbr /\u003e\n(Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).\u003cbr /\u003e\n(Response) If true, the resource is public. If false, the resource is private."
+									}
+								}
+							],
+							"description": "Permissions for the resource."
+						}
+					},
+					{
+						"name": "creation_date",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The date and time of creation of the snapshot.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the snapshot."
+						}
+					},
+					{
+						"name": "progress",
+						"int64": {
+							"computed_optional_required": "computed",
+							"description": "The progress of the snapshot, as a percentage."
+						}
+					},
+					{
+						"name": "state",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The state of the snapshot (`in-queue` \\| `completed` \\| `error`)."
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags associated with the snapshot."
+						}
+					},
+					{
+						"name": "volume_size",
+						"int64": {
+							"computed_optional_required": "computed",
+							"description": "The size of the volume used to create the snapshot, in gibibytes (GiB)."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

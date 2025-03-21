@@ -8,12 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/publicip/resource_public_ip"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -57,11 +57,11 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = PublicIpResourceSchema(ctx)
+	response.Schema = resource_public_ip.PublicIpResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan PublicIpModel
+	var plan resource_public_ip.PublicIpModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -70,7 +70,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 
 	vmId := plan.VmId.ValueString()
 	nicId := plan.NicId.ValueString()
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	tagsValue := publicIpTags(ctx, plan.Tags)
 
 	publicIp, err := core.CreatePublicIp(ctx, r.provider, tagsValue, vmId, nicId)
 	if err != nil {
@@ -87,7 +87,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state PublicIpModel
+	var state resource_public_ip.PublicIpModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -111,8 +111,8 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 }
 
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var plan, state PublicIpModel
-	var numSpotPublicIp *numspot.PublicIp
+	var plan, state resource_public_ip.PublicIpModel
+	var numSpotPublicIp *api.PublicIp
 	var err error
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -125,8 +125,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 
 	publicIpID := state.Id.ValueString()
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := publicIpTags(ctx, plan.Tags)
+	stateTags := publicIpTags(ctx, state.Tags)
 
 	if !state.Tags.Equal(plan.Tags) {
 		numSpotPublicIp, err = core.UpdatePublicIpTags(ctx, r.provider, stateTags, planTags, publicIpID)
@@ -145,7 +145,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state PublicIpModel
+	var state resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
 	if response.Diagnostics.HasError() {
@@ -161,17 +161,17 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func serializePublicIp(ctx context.Context, elt *numspot.PublicIp, diags *diag.Diagnostics) PublicIpModel {
+func serializePublicIp(ctx context.Context, elt *api.PublicIp, diags *diag.Diagnostics) resource_public_ip.PublicIpModel {
 	var tagsList types.List
 
 	if elt.Tags != nil {
 		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *elt.Tags, diags)
 		if diags.HasError() {
-			return PublicIpModel{}
+			return resource_public_ip.PublicIpModel{}
 		}
 	}
 
-	return PublicIpModel{
+	return resource_public_ip.PublicIpModel{
 		Id:             types.StringPointerValue(elt.Id),
 		NicId:          types.StringPointerValue(elt.NicId),
 		PrivateIp:      types.StringPointerValue(elt.PrivateIp),
@@ -180,4 +180,19 @@ func serializePublicIp(ctx context.Context, elt *numspot.PublicIp, diags *diag.D
 		LinkPublicIpId: types.StringPointerValue(elt.LinkPublicIpId),
 		Tags:           tagsList,
 	}
+}
+
+func publicIpTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_public_ip.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

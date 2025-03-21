@@ -8,42 +8,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/nic/datasource_nic"
+	"terraform-provider-numspot/internal/utils"
 )
-
-type NicsDataSourceModel struct {
-	Items                           []NicModelDatasource `tfsdk:"items"`
-	AvailabilityZoneNames           types.List           `tfsdk:"availability_zone_names"`
-	Descriptions                    types.List           `tfsdk:"descriptions"`
-	Ids                             types.List           `tfsdk:"ids"`
-	IsSourceDestCheck               types.Bool           `tfsdk:"is_source_dest_check"`
-	LinkNicDeleteOnVmDeletion       types.Bool           `tfsdk:"link_nic_delete_on_vm_deletion"`
-	LinkNicDeviceNumbers            types.List           `tfsdk:"link_nic_device_numbers"`
-	LinkNicLinkNicIds               types.List           `tfsdk:"link_nic_link_nic_ids"`
-	LinkNicStates                   types.List           `tfsdk:"link_nic_states"`
-	LinkNicVmIds                    types.List           `tfsdk:"link_nic_vm_ids"`
-	LinkPublicIpLinkPublicIpIds     types.List           `tfsdk:"link_public_ip_link_public_ip_ids"`
-	LinkPublicIpPublicIpIds         types.List           `tfsdk:"link_public_ip_public_ip_ids"`
-	LinkPublicIpPublicIps           types.List           `tfsdk:"link_public_ip_public_ips"`
-	MacAddresses                    types.List           `tfsdk:"mac_addresses"`
-	PrivateDnsNames                 types.List           `tfsdk:"private_dns_names"`
-	PrivateIpsLinkPublicIpPublicIps types.List           `tfsdk:"private_ips_link_public_ip_public_ips"`
-	PrivateIpsPrimaryIp             types.Bool           `tfsdk:"private_ips_primary_ip"`
-	PrivateIpsPrivateIps            types.List           `tfsdk:"private_ips_private_ips"`
-	SecurityGroupIds                types.List           `tfsdk:"security_group_ids"`
-	SecurityGroupNames              types.List           `tfsdk:"security_group_names"`
-	States                          types.List           `tfsdk:"states"`
-	SubnetIds                       types.List           `tfsdk:"subnet_ids"`
-	TagKeys                         types.List           `tfsdk:"tag_keys"`
-	TagValues                       types.List           `tfsdk:"tag_values"`
-	Tags                            types.List           `tfsdk:"tags"`
-	VpcIds                          types.List           `tfsdk:"vpc_ids"`
-}
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
@@ -83,12 +54,12 @@ func (d *nicsDataSource) Metadata(_ context.Context, req datasource.MetadataRequ
 
 // Schema defines the schema for the data source.
 func (d *nicsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	resp.Schema = NicDataSourceSchema(ctx)
+	resp.Schema = datasource_nic.NicDataSourceSchema(ctx)
 }
 
 // Read refreshes the Terraform state with the latest data.
 func (d *nicsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	var plan, state NicsDataSourceModel
+	var plan, state datasource_nic.NicModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -105,117 +76,249 @@ func (d *nicsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		return
 	}
 
-	objectItems := utils.FromHttpGenericListToTfList(ctx, nics, serializeNicDatasource, &response.Diagnostics)
+	objectItems := serializeNicDatasource(ctx, nics, &response.Diagnostics)
 
 	if response.Diagnostics.HasError() {
 		return
 	}
 	state = plan
-	state.Items = objectItems
+	state.Items = objectItems.Items
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func deserializeReadParams(ctx context.Context, tf NicsDataSourceModel, diags *diag.Diagnostics) numspot.ReadNicsParams {
-	return numspot.ReadNicsParams{
-		Descriptions:                    utils.TfStringListToStringPtrList(ctx, tf.Descriptions, diags),
-		IsSourceDestCheck:               utils.FromTfBoolToBoolPtr(tf.IsSourceDestCheck),
-		LinkNicDeleteOnVmDeletion:       utils.FromTfBoolToBoolPtr(tf.LinkNicDeleteOnVmDeletion),
-		LinkNicDeviceNumbers:            utils.TFInt64ListToIntListPointer(ctx, tf.LinkNicDeviceNumbers, diags),
-		LinkNicLinkNicIds:               utils.TfStringListToStringPtrList(ctx, tf.LinkNicLinkNicIds, diags),
-		LinkNicStates:                   utils.TfStringListToStringPtrList(ctx, tf.LinkNicStates, diags),
-		LinkNicVmIds:                    utils.TfStringListToStringPtrList(ctx, tf.LinkNicVmIds, diags),
-		MacAddresses:                    utils.TfStringListToStringPtrList(ctx, tf.MacAddresses, diags),
-		LinkPublicIpLinkPublicIpIds:     utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpLinkPublicIpIds, diags),
-		LinkPublicIpPublicIpIds:         utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpPublicIpIds, diags),
-		LinkPublicIpPublicIps:           utils.TfStringListToStringPtrList(ctx, tf.LinkPublicIpPublicIps, diags),
-		PrivateDnsNames:                 utils.TfStringListToStringPtrList(ctx, tf.PrivateDnsNames, diags),
-		PrivateIpsPrimaryIp:             utils.FromTfBoolToBoolPtr(tf.PrivateIpsPrimaryIp),
-		PrivateIpsLinkPublicIpPublicIps: utils.TfStringListToStringPtrList(ctx, tf.PrivateIpsLinkPublicIpPublicIps, diags),
-		PrivateIpsPrivateIps:            utils.TfStringListToStringPtrList(ctx, tf.PrivateIpsPrivateIps, diags),
-		SecurityGroupIds:                utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
-		SecurityGroupNames:              utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupNames, diags),
-		States:                          utils.TfStringListToStringPtrList(ctx, tf.States, diags),
-		SubnetIds:                       utils.TfStringListToStringPtrList(ctx, tf.SubnetIds, diags),
-		VpcIds:                          utils.TfStringListToStringPtrList(ctx, tf.VpcIds, diags),
-		Ids:                             utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
-		AvailabilityZoneNames:           utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames, diags),
-		Tags:                            utils.TfStringListToStringPtrList(ctx, tf.Tags, diags),
-		TagKeys:                         utils.TfStringListToStringPtrList(ctx, tf.TagKeys, diags),
-		TagValues:                       utils.TfStringListToStringPtrList(ctx, tf.TagValues, diags),
+func deserializeReadParams(ctx context.Context, tf datasource_nic.NicModel, diags *diag.Diagnostics) api.ReadNicsParams {
+	return api.ReadNicsParams{
+		Descriptions:                    utils.ConvertTfListToArrayOfString(ctx, tf.Descriptions, diags),
+		IsSourceDestCheck:               tf.IsSourceDestCheck.ValueBoolPointer(),
+		LinkNicDeleteOnVmDeletion:       tf.LinkNicDeleteOnVmDeletion.ValueBoolPointer(),
+		LinkNicDeviceNumbers:            utils.ConvertTfListToArrayOfInt(ctx, tf.LinkNicDeviceNumbers, diags),
+		LinkNicLinkNicIds:               utils.ConvertTfListToArrayOfString(ctx, tf.LinkNicLinkNicIds, diags),
+		LinkNicStates:                   utils.ConvertTfListToArrayOfString(ctx, tf.LinkNicStates, diags),
+		LinkNicVmIds:                    utils.ConvertTfListToArrayOfString(ctx, tf.LinkNicVmIds, diags),
+		MacAddresses:                    utils.ConvertTfListToArrayOfString(ctx, tf.MacAddresses, diags),
+		LinkPublicIpLinkPublicIpIds:     utils.ConvertTfListToArrayOfString(ctx, tf.LinkPublicIpLinkPublicIpIds, diags),
+		LinkPublicIpPublicIpIds:         utils.ConvertTfListToArrayOfString(ctx, tf.LinkPublicIpPublicIpIds, diags),
+		LinkPublicIpPublicIps:           utils.ConvertTfListToArrayOfString(ctx, tf.LinkPublicIpPublicIps, diags),
+		PrivateDnsNames:                 utils.ConvertTfListToArrayOfString(ctx, tf.PrivateDnsNames, diags),
+		PrivateIpsPrimaryIp:             tf.PrivateIpsPrimaryIp.ValueBoolPointer(),
+		PrivateIpsLinkPublicIpPublicIps: utils.ConvertTfListToArrayOfString(ctx, tf.PrivateIpsLinkPublicIpPublicIps, diags),
+		PrivateIpsPrivateIps:            utils.ConvertTfListToArrayOfString(ctx, tf.PrivateIpsPrivateIps, diags),
+		SecurityGroupIds:                utils.ConvertTfListToArrayOfString(ctx, tf.SecurityGroupIds, diags),
+		SecurityGroupNames:              utils.ConvertTfListToArrayOfString(ctx, tf.SecurityGroupNames, diags),
+		States:                          utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
+		SubnetIds:                       utils.ConvertTfListToArrayOfString(ctx, tf.SubnetIds, diags),
+		VpcIds:                          utils.ConvertTfListToArrayOfString(ctx, tf.VpcIds, diags),
+		Ids:                             utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
+		AvailabilityZoneNames:           utils.ConvertTfListToArrayOfString(ctx, tf.AvailabilityZoneNames, diags),
+		Tags:                            utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
+		TagKeys:                         utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
+		TagValues:                       utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
 	}
 }
 
-func serializeNicDatasource(ctx context.Context, http *numspot.Nic, diags *diag.Diagnostics) *NicModelDatasource {
-	if http == nil {
-		return nil
-	}
+func serializeNicDatasource(ctx context.Context, nics *[]api.Nic, diags *diag.Diagnostics) datasource_nic.NicModel {
+	var serializeDiags diag.Diagnostics
+	var nicsList types.List
+	var linkNic basetypes.ObjectValue
+	var linkPublicIp basetypes.ObjectValue
 
-	var (
-		tagsList     types.List
-		linkNic      LinkNicValue
-		linkPublicIp LinkPublicIpValue
-	)
+	tagsList := types.List{}
+	securityGroupsList := types.List{}
+	privateIpsList := types.List{}
 
-	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
-	}
+	if len(*nics) != 0 {
+		ll := len(*nics)
+		itemsValue := make([]datasource_nic.ItemsValue, ll)
 
-	if http.LinkNic != nil {
-		var diagnostics diag.Diagnostics
-		linkNic, diagnostics = NewLinkNicValue(LinkNicValue{}.AttributeTypes(ctx),
-			map[string]attr.Value{
-				"delete_on_vm_deletion": types.BoolPointerValue(http.LinkNic.DeleteOnVmDeletion),
-				"device_number":         utils.FromIntPtrToTfInt64(http.LinkNic.DeviceNumber),
-				"id":                    types.StringPointerValue(http.LinkNic.Id),
-				"state":                 types.StringPointerValue(http.LinkNic.State),
-				"vm_id":                 types.StringPointerValue(http.LinkNic.VmId),
+		for i := 0; ll > i; i++ {
+			if (*nics)[i].Tags != nil {
+				tagsList, serializeDiags = mappingNicTags(ctx, nics, diags, i)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			if (*nics)[i].SecurityGroups != nil {
+				securityGroupsList, serializeDiags = mappingSecurityGroups(ctx, nics, diags, i)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			if (*nics)[i].PrivateIps != nil {
+				privateIpsList, serializeDiags = mappingPrivateIps(ctx, nics, diags, i)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			if (*nics)[i].LinkNic != nil {
+				linkNicValue, linkNicDiags := mappingLinkNic(ctx, (*nics)[i].LinkNic, diags)
+				if linkNicDiags.HasError() {
+					diags.Append(linkNicDiags...)
+				}
+				linkNic, serializeDiags = linkNicValue.ToObjectValue(ctx)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			} else {
+				linkNic, serializeDiags = datasource_nic.NewLinkNicValueNull().ToObjectValue(ctx)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			if (*nics)[i].LinkPublicIp != nil {
+				linkPublicIpValue, linkPublicIpDiags := mappingLinkPublicIp(ctx, (*nics)[i].LinkPublicIp, diags)
+				if linkPublicIpDiags.HasError() {
+					diags.Append(linkPublicIpDiags...)
+				}
+				linkPublicIp, serializeDiags = linkPublicIpValue.ToObjectValue(ctx)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			} else {
+				linkPublicIp, serializeDiags = datasource_nic.NewLinkPublicIpValueNull().ToObjectValue(ctx)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			itemsValue[i], serializeDiags = datasource_nic.NewItemsValue(datasource_nic.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+				"availability_zone_name": types.StringValue(utils.ConvertStringPtrToString((*nics)[i].AvailabilityZoneName)),
+				"description":            types.StringValue(utils.ConvertStringPtrToString((*nics)[i].Description)),
+				"id":                     types.StringValue(utils.ConvertStringPtrToString((*nics)[i].Id)),
+				"is_source_dest_checked": types.BoolPointerValue((*nics)[i].IsSourceDestChecked),
+				"link_nic":               linkNic,
+				"link_public_ip":         linkPublicIp,
+				"mac_address":            types.StringValue(utils.ConvertStringPtrToString((*nics)[i].MacAddress)),
+				"private_dns_name":       types.StringValue(utils.ConvertStringPtrToString((*nics)[i].PrivateDnsName)),
+				"private_ips":            privateIpsList,
+				"security_groups":        securityGroupsList,
+				"state":                  types.StringValue(utils.ConvertStringPtrToString((*nics)[i].State)),
+				"subnet_id":              types.StringValue(utils.ConvertStringPtrToString((*nics)[i].SubnetId)),
+				"tags":                   tagsList,
+				"vpc_id":                 types.StringValue(utils.ConvertStringPtrToString((*nics)[i].VpcId)),
 			})
-		diags.Append(diagnostics...)
+			if serializeDiags.HasError() {
+				diags.Append(serializeDiags...)
+				continue
+			}
+		}
+
+		nicsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_nic.ItemsValue).Type(ctx), itemsValue)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
+	} else {
+		nicsList = types.ListNull(new(datasource_nic.ItemsValue).Type(ctx))
+	}
+
+	return datasource_nic.NicModel{
+		Items: nicsList,
+	}
+}
+
+func mappingLinkNic(ctx context.Context, linkNic *api.LinkNic, diags *diag.Diagnostics) (datasource_nic.LinkNicValue, diag.Diagnostics) {
+	elementValue, mappingDiags := datasource_nic.NewLinkNicValue(datasource_nic.LinkNicValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"delete_on_vm_deletion": types.BoolPointerValue(linkNic.DeleteOnVmDeletion),
+		"device_number":         types.Int64Value(utils.ConvertIntPtrToInt64(linkNic.DeviceNumber)),
+		"id":                    types.StringPointerValue(linkNic.Id),
+		"state":                 types.StringPointerValue(linkNic.State),
+		"vm_id":                 types.StringPointerValue(linkNic.VmId),
+	})
+	if mappingDiags.HasError() {
+		diags.Append(mappingDiags...)
+	}
+
+	return elementValue, mappingDiags
+}
+
+func mappingPrivateIps(ctx context.Context, nics *[]api.Nic, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+	var mappingDiags diag.Diagnostics
+	var linkPublicIpPrivateIp basetypes.ObjectValue
+
+	lp := len(*(*nics)[i].PrivateIps)
+	elementValue := make([]datasource_nic.PrivateIpsValue, lp)
+
+	for y, privateIp := range *(*nics)[i].PrivateIps {
+
+		if privateIp.LinkPublicIp != nil {
+			linkPublicValue, serializeLinkPublicDiags := mappingLinkPublicIp(ctx, privateIp.LinkPublicIp, diags)
+			if serializeLinkPublicDiags.HasError() {
+				diags.Append(serializeLinkPublicDiags...)
+			}
+			linkPublicIpPrivateIp, mappingDiags = linkPublicValue.ToObjectValue(ctx)
+			if mappingDiags.HasError() {
+				diags.Append(mappingDiags...)
+			}
+		} else {
+			linkPublicIpPrivateIp, mappingDiags = datasource_nic.NewLinkPublicIpPrivateIpValueNull().ToObjectValue(ctx)
+			if mappingDiags.HasError() {
+				diags.Append(mappingDiags...)
+			}
+		}
+
+		elementValue[y], *diags = datasource_nic.NewPrivateIpsValue(datasource_nic.PrivateIpsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+			"is_primary":                types.BoolPointerValue(privateIp.IsPrimary),
+			"private_dns_name":          types.StringPointerValue(privateIp.PrivateDnsName),
+			"private_ip":                types.StringPointerValue(privateIp.PrivateIp),
+			"link_public_ip_private_ip": linkPublicIpPrivateIp,
+		})
 		if diags.HasError() {
-			return nil
+			diags.Append(*diags...)
+			continue
 		}
 	}
 
-	if http.LinkPublicIp != nil {
-		var diagnostics diag.Diagnostics
-		linkPublicIp, diagnostics = NewLinkPublicIpValue(LinkPublicIpValue{}.AttributeTypes(ctx),
-			map[string]attr.Value{
-				"id":              types.StringPointerValue(http.LinkPublicIp.Id),
-				"public_dns_name": types.StringPointerValue(http.LinkPublicIp.PublicDnsName),
-				"public_ip":       types.StringPointerValue(http.LinkPublicIp.PublicIp),
-				"public_ip_id":    types.StringPointerValue(http.LinkPublicIp.PublicIpId),
-			})
-		diags.Append(diagnostics...)
+	return types.ListValueFrom(ctx, new(datasource_nic.PrivateIpsValue).Type(ctx), elementValue)
+}
+
+func mappingLinkPublicIp(ctx context.Context, linkPublicIp *api.LinkPublicIp, diags *diag.Diagnostics) (datasource_nic.LinkPublicIpPrivateIpValue, diag.Diagnostics) {
+	elementValue, mappingDiags := datasource_nic.NewLinkPublicIpPrivateIpValue(datasource_nic.LinkPublicIpPrivateIpValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"id":              types.StringPointerValue(linkPublicIp.PublicIpId),
+		"public_dns_name": types.StringPointerValue(linkPublicIp.PublicDnsName),
+		"public_ip":       types.StringPointerValue(linkPublicIp.PublicIp),
+		"public_ip_id":    types.StringPointerValue(linkPublicIp.PublicIpId),
+	})
+	if mappingDiags.HasError() {
+		diags.Append(mappingDiags...)
+	}
+
+	return elementValue, mappingDiags
+}
+
+func mappingSecurityGroups(ctx context.Context, nics *[]api.Nic, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+	ls := len(*(*nics)[i].SecurityGroups)
+	elementValue := make([]datasource_nic.SecurityGroupsValue, ls)
+	for y, securityGroup := range *(*nics)[i].SecurityGroups {
+		elementValue[y], *diags = datasource_nic.NewSecurityGroupsValue(datasource_nic.SecurityGroupsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+			"security_group_id":   types.StringPointerValue(securityGroup.SecurityGroupId),
+			"security_group_name": types.StringPointerValue(securityGroup.SecurityGroupName),
+		})
 		if diags.HasError() {
-			return nil
+			diags.Append(*diags...)
+			continue
 		}
 	}
 
-	privateIps := utils.GenericListToTfListValue(ctx, serializeNumspotPrivateIps, utils.GetPtrValue(http.PrivateIps), diags)
-	if diags.HasError() {
-		return nil
+	return types.ListValueFrom(ctx, new(datasource_nic.SecurityGroupsValue).Type(ctx), elementValue)
+}
+
+func mappingNicTags(ctx context.Context, nics *[]api.Nic, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+	lt := len(*(*nics)[i].Tags)
+	elementValue := make([]datasource_nic.TagsValue, lt)
+	for y, tag := range *(*nics)[i].Tags {
+		elementValue[y], *diags = datasource_nic.NewTagsValue(datasource_nic.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+			"key":   types.StringValue(tag.Key),
+			"value": types.StringValue(tag.Value),
+		})
+		if diags.HasError() {
+			diags.Append(*diags...)
+			continue
+		}
 	}
 
-	securityGroups := utils.GenericListToTfListValue(ctx, serializeNumspotSecurityGroups, utils.GetPtrValue(http.SecurityGroups), diags)
-	if diags.HasError() {
-		return nil
-	}
-
-	return &NicModelDatasource{
-		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
-		Description:          types.StringPointerValue(http.Description),
-		Id:                   types.StringPointerValue(http.Id),
-		IsSourceDestChecked:  types.BoolPointerValue(http.IsSourceDestChecked),
-		LinkNic:              linkNic,
-		LinkPublicIp:         linkPublicIp,
-		MacAddress:           types.StringPointerValue(http.MacAddress),
-		PrivateDnsName:       types.StringPointerValue(http.PrivateDnsName),
-		PrivateIps:           privateIps,
-		SecurityGroups:       securityGroups,
-		State:                types.StringPointerValue(http.State),
-		SubnetId:             types.StringPointerValue(http.SubnetId),
-		VpcId:                types.StringPointerValue(http.VpcId),
-		Tags:                 tagsList,
-	}
+	return types.ListValueFrom(ctx, new(datasource_nic.TagsValue).Type(ctx), elementValue)
 }

@@ -9,32 +9,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/volume/datasource_volume"
+	"terraform-provider-numspot/internal/utils"
 )
-
-type VolumesDataSourceModel struct {
-	Items                        []DatasourceVolumeModel `tfsdk:"items"`
-	AvailabilityZoneNames        types.List              `tfsdk:"availability_zone_names"`
-	CreationDates                types.List              `tfsdk:"creation_dates"`
-	Ids                          types.List              `tfsdk:"ids"`
-	LinkVolumeDeleteOnVmDeletion types.Bool              `tfsdk:"link_volume_delete_on_vm_deletion"`
-	LinkVolumeDeviceNames        types.List              `tfsdk:"link_volume_device_names"`
-	LinkVolumeLinkDates          types.List              `tfsdk:"link_volume_link_dates"`
-	LinkVolumeLinkStates         types.List              `tfsdk:"link_volume_link_states"`
-	LinkVolumeVmIds              types.List              `tfsdk:"link_volume_vm_ids"`
-	SnapshotIds                  types.List              `tfsdk:"snapshot_ids"`
-	TagKeys                      types.List              `tfsdk:"tag_keys"`
-	TagValues                    types.List              `tfsdk:"tag_values"`
-	Tags                         types.List              `tfsdk:"tags"`
-	VolumeSizes                  types.List              `tfsdk:"volume_sizes"`
-	VolumeStates                 types.List              `tfsdk:"volume_states"`
-	VolumeTypes                  types.List              `tfsdk:"volume_types"`
-}
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
@@ -74,12 +54,12 @@ func (d *volumesDataSource) Metadata(_ context.Context, req datasource.MetadataR
 
 // Schema defines the schema for the data source.
 func (d *volumesDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	resp.Schema = VolumeDataSourceSchema(ctx)
+	resp.Schema = datasource_volume.VolumeDataSourceSchema(ctx)
 }
 
 // Read refreshes the Terraform state with the latest data.
 func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
-	var state, plan VolumesDataSourceModel
+	var state, plan datasource_volume.VolumeModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -101,90 +81,136 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 	}
 
 	state = plan
-	state.Items = objectItems
+	state.Items = objectItems.Items
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func deserializeVolumeParams(ctx context.Context, tf VolumesDataSourceModel, diags *diag.Diagnostics) numspot.ReadVolumesParams {
+func deserializeVolumeParams(ctx context.Context, tf datasource_volume.VolumeModel, diags *diag.Diagnostics) api.ReadVolumesParams {
 	var creationDatesPtr *[]time.Time
 	var linkVolumeLinkDatesPtr *[]time.Time
 	var volumeSizesPtr *[]int
 
 	if !(tf.CreationDates.IsNull() || tf.CreationDates.IsUnknown()) {
-		creationDates := utils.TfStringListToTimeList(ctx, tf.CreationDates, "2020-06-30T00:00:00.000Z", diags)
-		creationDatesPtr = &creationDates
+		creationDates := utils.ConvertTfListToArrayOfTime(ctx, tf.CreationDates, "2020-06-30T00:00:00.000Z", diags)
+		creationDatesPtr = creationDates
 	}
 
 	if !(tf.LinkVolumeLinkDates.IsNull() || tf.LinkVolumeLinkDates.IsUnknown()) {
-		linkVolumeLinkDates := utils.TfStringListToTimeList(ctx, tf.LinkVolumeLinkDates, "2020-06-30T00:00:00.000Z", diags)
-		linkVolumeLinkDatesPtr = &linkVolumeLinkDates
+		linkVolumeLinkDates := utils.ConvertTfListToArrayOfTime(ctx, tf.LinkVolumeLinkDates, "2020-06-30T00:00:00.000Z", diags)
+		linkVolumeLinkDatesPtr = linkVolumeLinkDates
 	}
 
 	if !(tf.VolumeSizes.IsNull() || tf.VolumeSizes.IsUnknown()) {
-		volumeSizes := utils.TFInt64ListToIntList(ctx, tf.VolumeSizes, diags)
-		volumeSizesPtr = &volumeSizes
+		volumeSizes := utils.ConvertTfListToArrayOfInt(ctx, tf.VolumeSizes, diags)
+		volumeSizesPtr = volumeSizes
 	}
-	return numspot.ReadVolumesParams{
+
+	return api.ReadVolumesParams{
 		CreationDates:                creationDatesPtr,
 		LinkVolumeDeleteOnVmDeletion: tf.LinkVolumeDeleteOnVmDeletion.ValueBoolPointer(),
-		LinkVolumeDeviceNames:        utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeDeviceNames, diags),
+		LinkVolumeDeviceNames:        utils.ConvertTfListToArrayOfString(ctx, tf.LinkVolumeDeviceNames, diags),
 		LinkVolumeLinkDates:          linkVolumeLinkDatesPtr,
-		LinkVolumeLinkStates:         utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeLinkStates, diags),
-		LinkVolumeVmIds:              utils.TfStringListToStringPtrList(ctx, tf.LinkVolumeVmIds, diags),
-		SnapshotIds:                  utils.TfStringListToStringPtrList(ctx, tf.SnapshotIds, diags),
+		LinkVolumeLinkStates:         utils.ConvertTfListToArrayOfString(ctx, tf.LinkVolumeLinkStates, diags),
+		LinkVolumeVmIds:              utils.ConvertTfListToArrayOfString(ctx, tf.LinkVolumeVmIds, diags),
+		SnapshotIds:                  utils.ConvertTfListToArrayOfString(ctx, tf.SnapshotIds, diags),
 		VolumeSizes:                  volumeSizesPtr,
-		VolumeStates:                 utils.TfStringListToStringPtrList(ctx, tf.VolumeStates, diags),
-		VolumeTypes:                  utils.TfStringListToStringPtrList(ctx, tf.VolumeTypes, diags),
-		AvailabilityZoneNames:        utils.TfStringListToStringPtrList(ctx, tf.AvailabilityZoneNames, diags),
-		Ids:                          utils.TfStringListToStringPtrList(ctx, tf.Ids, diags),
+		VolumeStates:                 utils.ConvertTfListToArrayOfString(ctx, tf.VolumeStates, diags),
+		VolumeTypes:                  utils.ConvertTfListToArrayOfString(ctx, tf.VolumeTypes, diags),
+		AvailabilityZoneNames:        utils.ConvertTfListToArrayOfString(ctx, tf.AvailabilityZoneNames, diags),
+		Ids:                          utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
 	}
 }
 
-func serializeVolumes(ctx context.Context, volumes *[]numspot.Volume, diags *diag.Diagnostics) []DatasourceVolumeModel {
-	return utils.FromHttpGenericListToTfList(ctx, volumes, func(ctx context.Context, volume *numspot.Volume, diags *diag.Diagnostics) *DatasourceVolumeModel {
-		var (
-			linkedVolumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
-			tagsList      types.List
-		)
+func serializeVolumes(ctx context.Context, volumes *[]api.Volume, diags *diag.Diagnostics) datasource_volume.VolumeModel {
+	var volumesList types.List
+	var serializeDiags diag.Diagnostics
 
-		if volume.Tags != nil {
-			tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *volume.Tags, diags)
+	tagsList := types.List{}
+	linkedVolumesList := types.List{}
+
+	if len(*volumes) != 0 {
+		ll := len(*volumes)
+		itemsValue := make([]datasource_volume.ItemsValue, ll)
+
+		for i := 0; ll > i; i++ {
+			if (*volumes)[i].Tags != nil {
+				tagsList, serializeDiags = mappingVolumeTags(ctx, volumes, diags, i)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			if (*volumes)[i].LinkedVolumes != nil {
+				linkedVolumesList, serializeDiags = mappingLinkedVolumes(ctx, volumes, diags, i)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+				}
+			}
+
+			itemsValue[i], serializeDiags = datasource_volume.NewItemsValue(datasource_volume.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+				"availability_zone_name": types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].AvailabilityZoneName)),
+				"creation_date":          types.StringValue((*volumes)[i].CreationDate.String()),
+				"id":                     types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].Id)),
+				"iops":                   types.Int64Value(utils.ConvertIntPtrToInt64((*volumes)[i].Iops)),
+				"linked_volumes":         linkedVolumesList,
+				"size":                   types.Int64Value(utils.ConvertIntPtrToInt64((*volumes)[i].Size)),
+				"snapshot_id":            types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].SnapshotId)),
+				"state":                  types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].State)),
+				"tags":                   tagsList,
+				"type":                   types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].Type)),
+			})
+			if serializeDiags.HasError() {
+				diags.Append(serializeDiags...)
+				continue
+			}
 		}
 
-		if volume.LinkedVolumes != nil {
-			linkedVolumes = utils.GenericListToTfListValue(
-				ctx,
-				serializeLinkedVolume,
-				*volume.LinkedVolumes,
-				diags,
-			)
+		volumesList, serializeDiags = types.ListValueFrom(ctx, new(datasource_volume.ItemsValue).Type(ctx), itemsValue)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
 		}
+	} else {
+		volumesList = types.ListNull(new(datasource_volume.ItemsValue).Type(ctx))
+	}
 
-		return &DatasourceVolumeModel{
-			AvailabilityZoneName: types.StringPointerValue(volume.AvailabilityZoneName),
-			CreationDate:         types.StringValue(volume.CreationDate.String()),
-			Id:                   types.StringPointerValue(volume.Id),
-			Iops:                 utils.FromIntPtrToTfInt64(volume.Iops),
-			LinkedVolumes:        linkedVolumes,
-			Size:                 utils.FromIntPtrToTfInt64(volume.Size),
-			SnapshotId:           types.StringPointerValue(volume.SnapshotId),
-			State:                types.StringPointerValue(volume.State),
-			Type:                 types.StringPointerValue(volume.Type),
-			Tags:                 tagsList,
-		}
-	}, diags)
+	return datasource_volume.VolumeModel{
+		Items: volumesList,
+	}
 }
 
-func serializeLinkedVolume(ctx context.Context, http numspot.LinkedVolume, diags *diag.Diagnostics) LinkedVolumesValue {
-	value, diagnostics := NewLinkedVolumesValue(
-		LinkedVolumesValue{}.AttributeTypes(ctx),
-		map[string]attr.Value{
-			"delete_on_vm_deletion": types.BoolPointerValue(http.DeleteOnVmDeletion),
-			"device_name":           types.StringPointerValue(http.DeviceName),
-			"state":                 types.StringPointerValue(http.State),
-			"vm_id":                 types.StringPointerValue(http.VmId),
-			"id":                    types.StringPointerValue(http.Id),
+func mappingVolumeTags(ctx context.Context, volumes *[]api.Volume, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+	lt := len(*(*volumes)[i].Tags)
+	elementValue := make([]datasource_volume.TagsValue, lt)
+	for y, tag := range *(*volumes)[i].Tags {
+		elementValue[y], *diags = datasource_volume.NewTagsValue(datasource_volume.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+			"key":   types.StringValue(tag.Key),
+			"value": types.StringValue(tag.Value),
 		})
-	diags.Append(diagnostics...)
-	return value
+		if diags.HasError() {
+			diags.Append(*diags...)
+			continue
+		}
+	}
+
+	return types.ListValueFrom(ctx, new(datasource_volume.TagsValue).Type(ctx), elementValue)
+}
+
+func mappingLinkedVolumes(ctx context.Context, volumes *[]api.Volume, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+	ll := len(*(*volumes)[i].LinkedVolumes)
+	elementValue := make([]datasource_volume.LinkedVolumesValue, ll)
+	for y, lv := range *(*volumes)[i].LinkedVolumes {
+		elementValue[y], *diags = datasource_volume.NewLinkedVolumesValue(datasource_volume.LinkedVolumesValue{}.AttributeTypes(ctx), map[string]attr.Value{
+			"delete_on_vm_deletion": types.BoolPointerValue(lv.DeleteOnVmDeletion),
+			"device_name":           types.StringPointerValue(lv.DeviceName),
+			"state":                 types.StringPointerValue(lv.State),
+			"vm_id":                 types.StringPointerValue(lv.VmId),
+			"id":                    types.StringPointerValue(lv.Id),
+		})
+		if diags.HasError() {
+			diags.Append(*diags...)
+			continue
+		}
+	}
+
+	return types.ListValueFrom(ctx, new(datasource_volume.LinkedVolumesValue).Type(ctx), elementValue)
 }

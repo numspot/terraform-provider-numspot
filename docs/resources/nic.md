@@ -48,8 +48,7 @@ resource "numspot_nic" "nic" {
 This IP must be within the IP range of the Subnet that you specify with the `SubnetId` attribute.<br />
 If you do not specify this attribute, a random private IP is selected within the IP range of the Subnet. (see [below for nested schema](#nestedatt--private_ips))
 - `security_group_ids` (List of String) One or more IDs of security groups for the NIC.
-- `space_id` (String) Identifier of the Space
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes List) One or more tags associated with the NIC. (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only
 
@@ -88,11 +87,11 @@ Optional:
 
 Read-Only:
 
-- `link_public_ip` (Attributes) Information about the public IP association. (see [below for nested schema](#nestedatt--private_ips--link_public_ip))
+- `link_public_ip_private_ip` (Attributes) Information about the public IP association. (see [below for nested schema](#nestedatt--private_ips--link_public_ip_private_ip))
 - `private_dns_name` (String) The name of the private DNS.
 
-<a id="nestedatt--private_ips--link_public_ip"></a>
-### Nested Schema for `private_ips.link_public_ip`
+<a id="nestedatt--private_ips--link_public_ip_private_ip"></a>
+### Nested Schema for `private_ips.link_public_ip_private_ip`
 
 Read-Only:
 

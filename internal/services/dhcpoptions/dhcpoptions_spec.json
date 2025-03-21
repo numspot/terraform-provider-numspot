@@ -1,0 +1,334 @@
+{
+	"datasources": [
+		{
+			"name": "dhcp_options",
+			"schema": {
+				"attributes": [
+					{
+						"name": "default",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "If true, lists all default DHCP options set. If false, lists all non-default DHCP options set."
+						}
+					},
+					{
+						"name": "domain_name_servers",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IPs of the domain name servers used for the DHCP options sets."
+						}
+					},
+					{
+						"name": "domain_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The domain names used for the DHCP options sets."
+						}
+					},
+					{
+						"name": "log_servers",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IPs of the log servers used for the DHCP options sets."
+						}
+					},
+					{
+						"name": "ntp_servers",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IPs of the Network Time Protocol (NTP) servers used for the DHCP options sets."
+						}
+					},
+					{
+						"name": "tag_keys",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The keys of the tags associated with the DHCP options sets."
+						}
+					},
+					{
+						"name": "tag_values",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The values of the tags associated with the DHCP options sets."
+						}
+					},
+					{
+						"name": "tags",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The key/value combination of the tags associated with the DHCP options sets, in the following format: \u0026quot;Filters\u0026quot;:{\u0026quot;Tags\u0026quot;:[\u0026quot;TAGKEY=TAGVALUE\u0026quot;]}."
+						}
+					},
+					{
+						"name": "ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the DHCP options sets."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "default",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "If true, the DHCP options set is a default one. If false, it is not."
+										}
+									},
+									{
+										"name": "domain_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The domain name."
+										}
+									},
+									{
+										"name": "domain_name_servers",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more IPs for the domain name servers."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the DHCP options set."
+										}
+									},
+									{
+										"name": "log_servers",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more IPs for the log servers."
+										}
+									},
+									{
+										"name": "ntp_servers",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more IPs for the NTP servers."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the DHCP options set."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more DHCP options sets."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "dhcp_options",
+			"schema": {
+				"attributes": [
+					{
+						"name": "domain_name",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "Specify a domain name (for example, `MyCompany.com`). You can specify only one domain name. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "domain_name_servers",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IPs of domain name servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+											}
+										],
+										"schema_definition": "listplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "log_servers",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IPs of the log servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+											}
+										],
+										"schema_definition": "listplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "ntp_servers",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IPs of the Network Time Protocol (NTP) servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+											}
+										],
+										"schema_definition": "listplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "default",
+						"bool": {
+							"computed_optional_required": "computed",
+							"description": "If true, the DHCP options set is a default one. If false, it is not."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the DHCP options set."
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags associated with the DHCP options set."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

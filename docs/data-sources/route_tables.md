@@ -69,7 +69,7 @@ resource "null_resource" "print-datasource-id" {
 - `route_vpc_peering_ids` (List of String) The IDs of the Vpc peerings specified in routes in the tables.
 - `tag_keys` (List of String) The keys of the tags associated with the route tables.
 - `tag_values` (List of String) The values of the tags associated with the route tables.
-- `tags` (List of String) The key/value combination of the tags associated with the route tables, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the route tables, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `vpc_ids` (List of String) The IDs of the Vpcs for the route tables.
 
 ### Read-Only
@@ -79,26 +79,14 @@ resource "null_resource" "print-datasource-id" {
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
-
 Read-Only:
 
 - `id` (String) The ID of the route table.
 - `link_route_tables` (Attributes List) One or more associations between the route table and Subnets. (see [below for nested schema](#nestedatt--items--link_route_tables))
 - `route_propagating_virtual_gateways` (Attributes List) Information about virtual gateways propagating routes. (see [below for nested schema](#nestedatt--items--route_propagating_virtual_gateways))
 - `routes` (Attributes List) One or more routes in the route table. (see [below for nested schema](#nestedatt--items--routes))
+- `tags` (Attributes List) One or more tags associated with the route table. (see [below for nested schema](#nestedatt--items--tags))
 - `vpc_id` (String) The ID of the Vpc for the route table.
-
-<a id="nestedatt--items--tags"></a>
-### Nested Schema for `items.tags`
-
-Required:
-
-- `key` (String) The key of the tag, with a minimum of 1 character.
-- `value` (String) The value of the tag, between 0 and 255 characters.
-
 
 <a id="nestedatt--items--link_route_tables"></a>
 ### Nested Schema for `items.link_route_tables`
@@ -134,3 +122,12 @@ Read-Only:
 - `state` (String) The state of a route in the route table (always `active`).
 - `vm_id` (String) The ID of a VM specified in a route in the table.
 - `vpc_peering_id` (String) The ID of the Vpc peering.
+
+
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
+
+Read-Only:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

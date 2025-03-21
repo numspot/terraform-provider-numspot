@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
+	"terraform-provider-numspot/internal/sdk/api"
 )
 
 func ParseHTTPError(httpResponseBody []byte, statusCode int) error {
@@ -17,7 +17,7 @@ func ParseHTTPError(httpResponseBody []byte, statusCode int) error {
 }
 
 func HandleError(httpResponseBody []byte) error {
-	var apiError numspot.Error
+	var apiError api.Error
 
 	err := json.Unmarshal(httpResponseBody, &apiError)
 	if err != nil && string(httpResponseBody) != "" {

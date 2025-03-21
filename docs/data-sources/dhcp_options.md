@@ -41,7 +41,7 @@ resource "null_resource" "print-datasource-id" {
 - `ntp_servers` (List of String) The IPs of the Network Time Protocol (NTP) servers used for the DHCP options sets.
 - `tag_keys` (List of String) The keys of the tags associated with the DHCP options sets.
 - `tag_values` (List of String) The values of the tags associated with the DHCP options sets.
-- `tags` (List of String) The key/value combination of the tags associated with the DHCP options sets, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the DHCP options sets, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 
 ### Read-Only
 
@@ -49,10 +49,6 @@ resource "null_resource" "print-datasource-id" {
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
-
-Optional:
-
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
 
 Read-Only:
 
@@ -62,11 +58,12 @@ Read-Only:
 - `id` (String) The ID of the DHCP options set.
 - `log_servers` (List of String) One or more IPs for the log servers.
 - `ntp_servers` (List of String) One or more IPs for the NTP servers.
+- `tags` (Attributes List) One or more tags associated with the DHCP options set. (see [below for nested schema](#nestedatt--items--tags))
 
 <a id="nestedatt--items--tags"></a>
 ### Nested Schema for `items.tags`
 
-Required:
+Read-Only:
 
 - `key` (String) The key of the tag, with a minimum of 1 character.
 - `value` (String) The value of the tag, between 0 and 255 characters.

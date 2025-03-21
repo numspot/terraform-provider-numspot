@@ -51,7 +51,7 @@ resource "numspot_public_ip" "public_ip" {
 ### Optional
 
 - `nic_id` (String) The ID of the NIC the public IP is associated with (if any).
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes List) One or more tags associated with the Vpc. (see [below for nested schema](#nestedatt--tags))
 - `vm_id` (String) The ID of the VM the public IP is associated with (if any).
 
 ### Read-Only

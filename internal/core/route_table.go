@@ -4,13 +4,12 @@ import (
 	"context"
 	"strings"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
-func ReadRouteTables(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadRouteTablesParams) (*[]numspot.RouteTable, error) {
+func ReadRouteTables(ctx context.Context, provider *client.NumSpotSDK, params api.ReadRouteTablesParams) (*[]api.RouteTable, error) {
 	res, err := provider.Client.ReadRouteTablesWithResponse(ctx, provider.SpaceID, &params)
 	if err != nil {
 		return nil, err
@@ -22,7 +21,7 @@ func ReadRouteTables(ctx context.Context, provider *client.NumSpotSDK, params nu
 	return res.JSON200.Items, nil
 }
 
-func ReadRouteTable(ctx context.Context, provider *client.NumSpotSDK, id string) (*numspot.RouteTable, error) {
+func ReadRouteTable(ctx context.Context, provider *client.NumSpotSDK, id string) (*api.RouteTable, error) {
 	res, err := provider.Client.ReadRouteTablesByIdWithResponse(ctx, provider.SpaceID, id)
 	if err != nil {
 		return nil, err
@@ -37,11 +36,11 @@ func ReadRouteTable(ctx context.Context, provider *client.NumSpotSDK, id string)
 func CreateRouteTable(
 	ctx context.Context,
 	provider *client.NumSpotSDK,
-	payload numspot.CreateRouteTableJSONRequestBody,
-	tags []numspot.ResourceTag,
-	routes []numspot.Route,
+	payload api.CreateRouteTableJSONRequestBody,
+	tags []api.ResourceTag,
+	routes []api.Route,
 	subnetID *string,
-) (*numspot.RouteTable, error) {
+) (*api.RouteTable, error) {
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		provider.SpaceID,
@@ -87,9 +86,9 @@ func UpdateRouteTableRoutes(
 	ctx context.Context,
 	provider *client.NumSpotSDK,
 	id string,
-	stateRoutes []numspot.Route,
-	planRoutes []numspot.Route,
-) (*numspot.RouteTable, error) {
+	stateRoutes []api.Route,
+	planRoutes []api.Route,
+) (*api.RouteTable, error) {
 	stateRoutesWithoutLocal := removeLocalRouteFromRoutes(stateRoutes)
 	toCreate, toDelete := utils.DiffComparable(stateRoutesWithoutLocal, planRoutes)
 	if err := createRouteTableRoutes(ctx, provider, id, toCreate); err != nil {
@@ -107,18 +106,18 @@ func UpdateRouteTableTags(
 	ctx context.Context,
 	provider *client.NumSpotSDK,
 	id string,
-	stateTags []numspot.ResourceTag,
-	planTags []numspot.ResourceTag,
-) (*numspot.RouteTable, error) {
+	stateTags []api.ResourceTag,
+	planTags []api.ResourceTag,
+) (*api.RouteTable, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, id); err != nil {
 		return nil, err
 	}
 	return ReadRouteTable(ctx, provider, id)
 }
 
-func createRouteTableRoutes(ctx context.Context, provider *client.NumSpotSDK, routeTableId string, routes []numspot.Route) error {
+func createRouteTableRoutes(ctx context.Context, provider *client.NumSpotSDK, routeTableId string, routes []api.Route) error {
 	for _, r := range routes {
-		payload := numspot.CreateRoute{
+		payload := api.CreateRoute{
 			GatewayId:    r.GatewayId,
 			NatGatewayId: r.NatGatewayId,
 			NicId:        r.NicId,
@@ -140,9 +139,9 @@ func createRouteTableRoutes(ctx context.Context, provider *client.NumSpotSDK, ro
 	return nil
 }
 
-func deleteRouteTableRoutes(ctx context.Context, provider *client.NumSpotSDK, routeTableId string, routes []numspot.Route) error {
+func deleteRouteTableRoutes(ctx context.Context, provider *client.NumSpotSDK, routeTableId string, routes []api.Route) error {
 	for _, r := range routes {
-		payload := numspot.DeleteRoute{}
+		payload := api.DeleteRoute{}
 		if r.DestinationIpRange != nil {
 			payload.DestinationIpRange = *r.DestinationIpRange
 		}
@@ -157,8 +156,8 @@ func deleteRouteTableRoutes(ctx context.Context, provider *client.NumSpotSDK, ro
 	return nil
 }
 
-func removeLocalRouteFromRoutes(routes []numspot.Route) []numspot.Route {
-	arr := make([]numspot.Route, 0)
+func removeLocalRouteFromRoutes(routes []api.Route) []api.Route {
+	arr := make([]api.Route, 0)
 	for _, route := range routes {
 		if route.GatewayId != nil && !strings.EqualFold(*route.GatewayId, "local") {
 			arr = append(arr, route)
@@ -169,7 +168,7 @@ func removeLocalRouteFromRoutes(routes []numspot.Route) []numspot.Route {
 }
 
 func linkRouteTable(ctx context.Context, provider *client.NumSpotSDK, routeTableId, subnetId string) error {
-	res, err := provider.Client.LinkRouteTableWithResponse(ctx, provider.SpaceID, routeTableId, numspot.LinkRouteTableJSONRequestBody{SubnetId: subnetId})
+	res, err := provider.Client.LinkRouteTableWithResponse(ctx, provider.SpaceID, routeTableId, api.LinkRouteTableJSONRequestBody{SubnetId: subnetId})
 	if err != nil {
 		return err
 	}
@@ -181,7 +180,7 @@ func unlinkRouteTable(ctx context.Context, provider *client.NumSpotSDK, routeTab
 		ctx,
 		provider.SpaceID,
 		routeTableId,
-		numspot.UnlinkRouteTableJSONRequestBody{LinkRouteTableId: linkRouteTableId})
+		api.UnlinkRouteTableJSONRequestBody{LinkRouteTableId: linkRouteTableId})
 	if err != nil {
 		return err
 	}

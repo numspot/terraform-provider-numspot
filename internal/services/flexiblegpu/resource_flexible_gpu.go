@@ -8,10 +8,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/flexiblegpu/resource_flexible_gpu"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -55,10 +55,10 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = FlexibleGpuResourceSchema(ctx)
+	response.Schema = resource_flexible_gpu.FlexibleGpuResourceSchema(ctx)
 }
 
-func (r *Resource) linkVm(ctx context.Context, gpuId string, data FlexibleGpuModel, diags *diag.Diagnostics) {
+func (r *Resource) linkVm(ctx context.Context, gpuId string, data resource_flexible_gpu.FlexibleGpuModel, diags *diag.Diagnostics) {
 	numspotClient, err := r.provider.GetClient(ctx)
 	if err != nil {
 		diags.AddError("Error while initiating numspotClient", err.Error())
@@ -92,7 +92,7 @@ func (r *Resource) linkVm(ctx context.Context, gpuId string, data FlexibleGpuMod
 	//}
 }
 
-func (r *Resource) unlinkVm(ctx context.Context, gpuId string, _ FlexibleGpuModel, diags *diag.Diagnostics) {
+func (r *Resource) unlinkVm(ctx context.Context, gpuId string, _ resource_flexible_gpu.FlexibleGpuModel, diags *diag.Diagnostics) {
 	numspotClient, err := r.provider.GetClient(ctx)
 	if err != nil {
 		diags.AddError("Error while initiating numspotClient", err.Error())
@@ -123,7 +123,7 @@ func (r *Resource) unlinkVm(ctx context.Context, gpuId string, _ FlexibleGpuMode
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var data FlexibleGpuModel
+	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &data)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -169,7 +169,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 		return
 	}
 
-	flexGPU, ok := read.(*numspot.FlexibleGpu)
+	flexGPU, ok := read.(*api.FlexibleGpu)
 	if !ok {
 		response.Diagnostics.AddError("Failed to create Flexible GPU", "object conversion error")
 		return
@@ -179,7 +179,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *Resource) read(ctx context.Context, id string, diags *diag.Diagnostics) *numspot.FlexibleGpu {
+func (r *Resource) read(ctx context.Context, id string, diags *diag.Diagnostics) *api.FlexibleGpu {
 	numspotClient, err := r.provider.GetClient(ctx)
 	if err != nil {
 		diags.AddError("Error while initiating numspotClient", err.Error())
@@ -200,7 +200,7 @@ func (r *Resource) read(ctx context.Context, id string, diags *diag.Diagnostics)
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var data FlexibleGpuModel
+	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -216,7 +216,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 }
 
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
-	var plan, state FlexibleGpuModel
+	var plan, state resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -302,7 +302,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data FlexibleGpuModel
+	var data resource_flexible_gpu.FlexibleGpuModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -341,8 +341,8 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func serializeFlexibleGPU(http *numspot.FlexibleGpu) FlexibleGpuModel {
-	return FlexibleGpuModel{
+func serializeFlexibleGPU(http *api.FlexibleGpu) resource_flexible_gpu.FlexibleGpuModel {
+	return resource_flexible_gpu.FlexibleGpuModel{
 		DeleteOnVmDeletion:   types.BoolPointerValue(http.DeleteOnVmDeletion),
 		Generation:           types.StringPointerValue(http.Generation),
 		Id:                   types.StringPointerValue(http.Id),
@@ -353,15 +353,15 @@ func serializeFlexibleGPU(http *numspot.FlexibleGpu) FlexibleGpuModel {
 	}
 }
 
-func deserializeLinkFlexibleGPU(tf *FlexibleGpuModel) numspot.LinkFlexibleGpuJSONRequestBody {
+func deserializeLinkFlexibleGPU(tf *resource_flexible_gpu.FlexibleGpuModel) api.LinkFlexibleGpuJSONRequestBody {
 	vmId := utils.FromTfStringToStringPtr(tf.VmId)
-	return numspot.LinkFlexibleGpuJSONRequestBody{
+	return api.LinkFlexibleGpuJSONRequestBody{
 		VmId: utils.GetPtrValue(vmId),
 	}
 }
 
-func deserializeCreateFlexibleGPU(tf *FlexibleGpuModel) numspot.CreateFlexibleGpuJSONRequestBody {
-	return numspot.CreateFlexibleGpuJSONRequestBody{
+func deserializeCreateFlexibleGPU(tf *resource_flexible_gpu.FlexibleGpuModel) api.CreateFlexibleGpuJSONRequestBody {
+	return api.CreateFlexibleGpuJSONRequestBody{
 		DeleteOnVmDeletion:   tf.DeleteOnVmDeletion.ValueBoolPointer(),
 		Generation:           tf.Generation.ValueStringPointer(),
 		ModelName:            tf.ModelName.ValueString(),
@@ -369,8 +369,8 @@ func deserializeCreateFlexibleGPU(tf *FlexibleGpuModel) numspot.CreateFlexibleGp
 	}
 }
 
-func deserializeUpdateFlexibleGPU(tf *FlexibleGpuModel) numspot.UpdateFlexibleGpuJSONRequestBody {
-	return numspot.UpdateFlexibleGpuJSONRequestBody{
+func deserializeUpdateFlexibleGPU(tf *resource_flexible_gpu.FlexibleGpuModel) api.UpdateFlexibleGpuJSONRequestBody {
+	return api.UpdateFlexibleGpuJSONRequestBody{
 		DeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(tf.DeleteOnVmDeletion),
 	}
 }

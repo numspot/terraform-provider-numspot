@@ -10,22 +10,30 @@ import (
 
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 	"github.com/google/uuid"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
 const (
 	UserAgentHeader    = "User-Agent"
 	TerraformUserAgent = "TERRAFORM-NUMSPOT"
 	Credentials        = "client_credentials"
+	ServiceS3          = "s3"
+	RegionS3           = "eu-west-2"
 )
+
+type S3Client struct {
+	Service string
+	Region  string
+	Ak      string
+	Sk      string
+}
 
 type NumSpotSDK struct {
 	ID                    string
-	Client                *numspot.ClientWithResponses
+	Client                *api.ClientWithResponses
 	HTTPClient            *http.Client
-	SpaceID               numspot.SpaceId
+	SpaceID               api.SpaceId
 	ClientID              uuid.UUID
 	ClientSecret          string
 	Host                  string
@@ -99,7 +107,7 @@ func isTokenExpired(expirationTime time.Time) bool {
 	return time.Now().After(expirationTime)
 }
 
-func (s *NumSpotSDK) GetClient(ctx context.Context) (*numspot.ClientWithResponses, error) {
+func (s *NumSpotSDK) GetClient(ctx context.Context) (*api.ClientWithResponses, error) {
 	if isTokenExpired(s.AccessTokenExpiration) {
 		if err := s.AuthenticateUser(ctx); err != nil {
 			return nil, fmt.Errorf("error while refreshing access token : %v", err)
@@ -112,7 +120,7 @@ func (s *NumSpotSDK) GetClient(ctx context.Context) (*numspot.ClientWithResponse
 func (s *NumSpotSDK) AuthenticateUser(ctx context.Context) error {
 	var err error
 	// TODO can we activate secure transport ?
-	newTransport := func(c *numspot.Client) error {
+	newTransport := func(c *api.Client) error {
 		if s.HTTPClient != nil {
 			c.Client = s.HTTPClient
 		} else {
@@ -123,20 +131,20 @@ func (s *NumSpotSDK) AuthenticateUser(ctx context.Context) error {
 		return nil
 	}
 
-	requestEditor := numspot.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
+	requestEditor := api.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
 		req.Header.Add(UserAgentHeader, TerraformUserAgent)
 		return nil
 	})
 
-	numSpotClient, err := numspot.NewClientWithResponses(s.Host, newTransport, requestEditor)
+	numSpotClient, err := api.NewClientWithResponses(s.Host, newTransport, requestEditor)
 	if err != nil {
 		return err
 	}
 
 	basicAuth := buildBasicAuth(s.ClientID.String(), s.ClientSecret)
 
-	response, err := numSpotClient.TokenWithFormdataBodyWithResponse(ctx, &numspot.TokenParams{Authorization: &basicAuth},
-		numspot.TokenReq{
+	response, err := numSpotClient.TokenWithFormdataBodyWithResponse(ctx, &api.TokenParams{Authorization: &basicAuth},
+		api.TokenReq{
 			GrantType:    Credentials,
 			ClientId:     &s.ClientID,
 			ClientSecret: &s.ClientSecret,
@@ -165,7 +173,7 @@ func (s *NumSpotSDK) AuthenticateUser(ctx context.Context) error {
 		return err
 	}
 
-	s.Client, err = numspot.NewClientWithResponses(s.Host, newTransport, numspot.WithRequestEditorFn(bearerProvider.Intercept))
+	s.Client, err = api.NewClientWithResponses(s.Host, newTransport, api.WithRequestEditorFn(bearerProvider.Intercept))
 	if err != nil {
 		return err
 	}

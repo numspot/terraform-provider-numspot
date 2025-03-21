@@ -35,3 +35,4 @@ acc-tests-report.xml
 # Keep windows files with windows line endings
 *.winfile eol=crlf
 
+/tmp

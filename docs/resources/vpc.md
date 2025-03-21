@@ -40,7 +40,7 @@ resource "numspot_vpc" "example" {
 ### Optional
 
 - `dhcp_options_set_id` (String) The ID of the DHCP options set (or `default` if you want to associate the default one).
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes List) One or more tags associated with the Vpc. (see [below for nested schema](#nestedatt--tags))
 - `tenancy` (String) The tenancy options for the VMs:<br />
 - `default` if a VM created in a Vpc can be launched with any tenancy.<br />
 - `dedicated` if it can be launched with dedicated tenancy VMs running on single-tenant hardware.<br />

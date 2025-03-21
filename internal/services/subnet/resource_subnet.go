@@ -8,12 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/subnet/resource_subnet"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -57,17 +57,17 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = SubnetResourceSchema(ctx)
+	response.Schema = resource_subnet.SubnetResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan SubnetModel
+	var plan resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	tagsValue := subnetTags(ctx, plan.Tags)
 	mapPublicIP := plan.MapPublicIpOnLaunch.ValueBool()
 
 	numSpotSubnet, err := core.CreateSubnet(ctx, r.provider, deserializeCreateSubnet(plan), mapPublicIP, tagsValue)
@@ -85,7 +85,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state SubnetModel
+	var state resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -109,8 +109,8 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err           error
-		numSpotSubnet *numspot.Subnet
-		plan, state   SubnetModel
+		numSpotSubnet *api.Subnet
+		plan, state   resource_subnet.SubnetModel
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -124,8 +124,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 
 	subnetID := state.Id.ValueString()
 	mapPublicIPOnLaunch := plan.MapPublicIpOnLaunch.ValueBool()
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := subnetTags(ctx, plan.Tags)
+	stateTags := subnetTags(ctx, state.Tags)
 
 	if !plan.MapPublicIpOnLaunch.Equal(state.MapPublicIpOnLaunch) {
 		if numSpotSubnet, err = core.UpdateSubnetAttributes(ctx, r.provider, subnetID, mapPublicIPOnLaunch); err != nil {
@@ -149,7 +149,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state SubnetModel
+	var state resource_subnet.SubnetModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -162,15 +162,15 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func deserializeCreateSubnet(tf SubnetModel) numspot.CreateSubnetJSONRequestBody {
-	return numspot.CreateSubnetJSONRequestBody{
+func deserializeCreateSubnet(tf resource_subnet.SubnetModel) api.CreateSubnetJSONRequestBody {
+	return api.CreateSubnetJSONRequestBody{
 		IpRange:              tf.IpRange.ValueString(),
 		VpcId:                tf.VpcId.ValueString(),
 		AvailabilityZoneName: tf.AvailabilityZoneName.ValueStringPointer(),
 	}
 }
 
-func serializeSubnet(ctx context.Context, http *numspot.Subnet, diags *diag.Diagnostics) *SubnetModel {
+func serializeSubnet(ctx context.Context, http *api.Subnet, diags *diag.Diagnostics) *resource_subnet.SubnetModel {
 	var tagsList types.List
 	if http.Tags != nil {
 		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
@@ -179,7 +179,7 @@ func serializeSubnet(ctx context.Context, http *numspot.Subnet, diags *diag.Diag
 		}
 	}
 
-	return &SubnetModel{
+	return &resource_subnet.SubnetModel{
 		AvailableIpsCount:    utils.FromIntPtrToTfInt64(http.AvailableIpsCount),
 		Id:                   types.StringPointerValue(http.Id),
 		IpRange:              types.StringPointerValue(http.IpRange),
@@ -189,4 +189,19 @@ func serializeSubnet(ctx context.Context, http *numspot.Subnet, diags *diag.Diag
 		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
 		Tags:                 tagsList,
 	}
+}
+
+func subnetTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_subnet.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

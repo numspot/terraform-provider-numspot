@@ -48,7 +48,7 @@ resource "null_resource" "print-datasource-id" {
 - `states` (List of String) The states of the snapshots (`in-queue` \| `completed` \| `error`).
 - `tag_keys` (List of String) The keys of the tags associated with the snapshots.
 - `tag_values` (List of String) The values of the tags associated with the snapshots.
-- `tags` (List of String) The key/value combination of the tags associated with the snapshots, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the snapshots, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `to_creation_date` (String) The end of the time period, in ISO 8601 date-time format (for example, `2020-06-30T00:00:00.000Z`).
 - `volume_ids` (List of String) The IDs of the volumes used to create the snapshots.
 - `volume_sizes` (List of Number) The sizes of the volumes used to create the snapshots, in gibibytes (GiB).
@@ -60,10 +60,6 @@ resource "null_resource" "print-datasource-id" {
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
-
 Read-Only:
 
 - `access` (Attributes) Permissions for the resource. (see [below for nested schema](#nestedatt--items--access))
@@ -72,17 +68,9 @@ Read-Only:
 - `id` (String) The ID of the snapshot.
 - `progress` (Number) The progress of the snapshot, as a percentage.
 - `state` (String) The state of the snapshot (`in-queue` \| `completed` \| `error`).
+- `tags` (Attributes List) One or more tags associated with the snapshot. (see [below for nested schema](#nestedatt--items--tags))
 - `volume_id` (String) The ID of the volume used to create the snapshot.
 - `volume_size` (Number) The size of the volume used to create the snapshot, in gibibytes (GiB).
-
-<a id="nestedatt--items--tags"></a>
-### Nested Schema for `items.tags`
-
-Required:
-
-- `key` (String) The key of the tag, with a minimum of 1 character.
-- `value` (String) The value of the tag, between 0 and 255 characters.
-
 
 <a id="nestedatt--items--access"></a>
 ### Nested Schema for `items.access`
@@ -92,3 +80,12 @@ Read-Only:
 - `is_public` (Boolean) A global permission for all accounts.<br />
 (Request) Set this parameter to true to make the resource public (if the parent parameter is `Additions`) or to make the resource private (if the parent parameter is `Removals`).<br />
 (Response) If true, the resource is public. If false, the resource is private.
+
+
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
+
+Read-Only:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

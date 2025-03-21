@@ -47,7 +47,6 @@ resource "numspot_flexible_gpu" "gpu" {
 ### Optional
 
 - `generation` (String) The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU).
-- `space_id` (String) Identifier of the Space
 - `vm_id` (String) The ID of the VM the fGPU is attached to, if any.
 
 ### Read-Only

@@ -9,12 +9,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/routetable/resource_route_table"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -58,11 +58,11 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = RouteTableResourceSchema(ctx)
+	response.Schema = resource_route_table.RouteTableResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan RouteTableModel
+	var plan resource_route_table.RouteTableModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -70,7 +70,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	}
 
 	payload := deserializeCreateRouteTable(&plan)
-	tagsList := tags.TfTagsToApiTags(ctx, plan.Tags)
+	tagsList := routeTableTags(ctx, plan.Tags)
 	routes := deserializeRoutes(ctx, plan.Routes)
 
 	res, err := core.CreateRouteTable(ctx, r.provider, payload, tagsList, routes, plan.SubnetId.ValueStringPointer())
@@ -88,7 +88,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state RouteTableModel
+	var state resource_route_table.RouteTableModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -115,8 +115,8 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
-		state, plan RouteTableModel
-		routeTable  *numspot.RouteTable
+		state, plan resource_route_table.RouteTableModel
+		routeTable  *api.RouteTable
 		err         error
 	)
 
@@ -130,8 +130,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 		return
 	}
 
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
+	stateTags := routeTableTags(ctx, state.Tags)
+	planTags := routeTableTags(ctx, plan.Tags)
 	if !state.Tags.Equal(plan.Tags) {
 		routeTable, err = core.UpdateRouteTableTags(ctx, r.provider, state.Id.ValueString(), stateTags, planTags)
 		if err != nil {
@@ -158,10 +158,10 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var data RouteTableModel
+	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
-	links := utils.TfListToGenericList(func(link LinkRouteTablesValue) string {
+	links := utils.TfListToGenericList(func(link resource_route_table.LinkRouteTablesValue) string {
 		return link.Id.ValueString()
 	}, ctx, data.LinkRouteTables, &response.Diagnostics)
 	if err := core.DeleteRouteTable(ctx, r.provider, data.Id.ValueString(), links); err != nil {
@@ -169,9 +169,9 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func serializeRouteTableLink(ctx context.Context, link numspot.LinkRouteTable, diags *diag.Diagnostics) LinkRouteTablesValue {
-	value, diagnostics := NewLinkRouteTablesValue(
-		LinkRouteTablesValue{}.AttributeTypes(ctx),
+func serializeRouteTableLink(ctx context.Context, link api.LinkRouteTable, diags *diag.Diagnostics) resource_route_table.LinkRouteTablesValue {
+	value, diagnostics := resource_route_table.NewLinkRouteTablesValue(
+		resource_route_table.LinkRouteTablesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"id":             types.StringPointerValue(link.Id),
 			"main":           types.BoolPointerValue(link.Main),
@@ -184,9 +184,9 @@ func serializeRouteTableLink(ctx context.Context, link numspot.LinkRouteTable, d
 	return value
 }
 
-func serializeRoute(ctx context.Context, route numspot.Route, diags *diag.Diagnostics) RoutesValue {
-	value, diagnostics := NewRoutesValue(
-		RoutesValue{}.AttributeTypes(ctx),
+func serializeRoute(ctx context.Context, route api.Route, diags *diag.Diagnostics) resource_route_table.RoutesValue {
+	value, diagnostics := resource_route_table.NewRoutesValue(
+		resource_route_table.RoutesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"creation_method":        types.StringPointerValue(route.CreationMethod),
 			"destination_ip_range":   types.StringPointerValue(route.DestinationIpRange),
@@ -203,10 +203,29 @@ func serializeRoute(ctx context.Context, route numspot.Route, diags *diag.Diagno
 	return value
 }
 
-func serializeRouteTable(ctx context.Context, http *numspot.RouteTable, diags *diag.Diagnostics) *RouteTableModel {
+func serializeLocalRoute(ctx context.Context, route api.Route, diags *diag.Diagnostics) resource_route_table.LocalRouteValue {
+	value, diagnostics := resource_route_table.NewLocalRouteValue(
+		resource_route_table.LocalRouteValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"creation_method":        types.StringPointerValue(route.CreationMethod),
+			"destination_ip_range":   types.StringPointerValue(route.DestinationIpRange),
+			"destination_service_id": types.StringPointerValue(route.DestinationServiceId),
+			"gateway_id":             types.StringPointerValue(route.GatewayId),
+			"nat_gateway_id":         types.StringPointerValue(route.NatGatewayId),
+			"vpc_peering_id":         types.StringPointerValue(route.VpcPeeringId),
+			"nic_id":                 types.StringPointerValue(route.NicId),
+			"state":                  types.StringPointerValue(route.State),
+			"vm_id":                  types.StringPointerValue(route.VmId),
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
+}
+
+func serializeRouteTable(ctx context.Context, http *api.RouteTable, diags *diag.Diagnostics) *resource_route_table.RouteTableModel {
 	var (
-		localRoute RoutesValue
-		routes     []numspot.Route
+		localRoute resource_route_table.LocalRouteValue
+		routes     []api.Route
 		tagsTf     types.List
 	)
 
@@ -215,7 +234,7 @@ func serializeRouteTable(ctx context.Context, http *numspot.RouteTable, diags *d
 	}
 	for _, route := range *http.Routes {
 		if route.GatewayId != nil && *route.GatewayId == "local" {
-			localRoute = serializeRoute(ctx, route, diags)
+			localRoute = serializeLocalRoute(ctx, route, diags)
 			if diags.HasError() {
 				return nil
 			}
@@ -252,11 +271,11 @@ func serializeRouteTable(ctx context.Context, http *numspot.RouteTable, diags *d
 		}
 	}
 
-	res := RouteTableModel{
+	res := resource_route_table.RouteTableModel{
 		Id:                              types.StringPointerValue(http.Id),
 		LinkRouteTables:                 tfLinks,
 		VpcId:                           types.StringPointerValue(http.VpcId),
-		RoutePropagatingVirtualGateways: types.ListNull(RoutePropagatingVirtualGatewaysValue{}.Type(ctx)),
+		RoutePropagatingVirtualGateways: types.ListNull(resource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(ctx)),
 		Routes:                          tfRoutes,
 		SubnetId:                        types.StringPointerValue(subnetId),
 		Tags:                            tagsTf,
@@ -266,18 +285,18 @@ func serializeRouteTable(ctx context.Context, http *numspot.RouteTable, diags *d
 	return &res
 }
 
-func deserializeCreateRouteTable(tf *RouteTableModel) numspot.CreateRouteTableJSONRequestBody {
-	return numspot.CreateRouteTableJSONRequestBody{
+func deserializeCreateRouteTable(tf *resource_route_table.RouteTableModel) api.CreateRouteTableJSONRequestBody {
+	return api.CreateRouteTableJSONRequestBody{
 		VpcId: tf.VpcId.ValueString(),
 	}
 }
 
-func deserializeRoutes(ctx context.Context, tfRoutes types.Set) []numspot.Route {
-	routes := make([]numspot.Route, len(tfRoutes.Elements()))
-	swap := make([]RoutesValue, len(tfRoutes.Elements()))
+func deserializeRoutes(ctx context.Context, tfRoutes types.Set) []api.Route {
+	routes := make([]api.Route, len(tfRoutes.Elements()))
+	swap := make([]resource_route_table.RoutesValue, len(tfRoutes.Elements()))
 	tfRoutes.ElementsAs(ctx, &swap, false)
 	for i := 0; i < len(swap); i++ {
-		obj := numspot.Route{
+		obj := api.Route{
 			DestinationIpRange: swap[i].DestinationIpRange.ValueStringPointer(),
 			GatewayId:          swap[i].GatewayId.ValueStringPointer(),
 			NatGatewayId:       swap[i].NatGatewayId.ValueStringPointer(),
@@ -288,4 +307,19 @@ func deserializeRoutes(ctx context.Context, tfRoutes types.Set) []numspot.Route 
 		routes[i] = obj
 	}
 	return routes
+}
+
+func routeTableTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_route_table.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

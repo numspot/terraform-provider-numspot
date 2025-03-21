@@ -1,0 +1,20 @@
+provider:
+  name: numspot
+
+resources:
+  image:
+    create:
+      method: POST
+      path: /compute/spaces/{spaceId}/images
+    delete:
+      method: DELETE
+      path: /compute/spaces/{spaceId}/images/{id}
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/images/{id}
+    update:
+      method: PUT
+      path: /compute/spaces/{spaceId}/images/{id}
+    schema:
+      ignores:
+        - spaceId

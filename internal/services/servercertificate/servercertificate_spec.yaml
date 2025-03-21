@@ -1,0 +1,29 @@
+provider:
+  name: numspot
+
+resources:
+  server_certificate:
+    create:
+      method: POST
+      path: /compute/spaces/{spaceId}/serverCertificates
+    delete:
+      method: DELETE
+      path: /compute/spaces/{spaceId}/serverCertificates/{id}
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/serverCertificates
+    update:
+      method: PUT
+      path: /compute/spaces/{spaceId}/serverCertificates/{id}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  server_certificate:
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/serverCertificates
+    schema:
+      ignores:
+        - spaceId

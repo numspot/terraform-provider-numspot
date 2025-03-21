@@ -3,13 +3,12 @@ package core
 import (
 	"context"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
-func CreateKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotKeypairCreate numspot.CreateKeypairJSONRequestBody) (*numspot.CreateKeypair, error) {
+func CreateKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotKeypairCreate api.CreateKeypairJSONRequestBody) (*api.CreateKeypair, error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -17,7 +16,7 @@ func CreateKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotKeyp
 		return nil, err
 	}
 
-	var retryCreateResponse *numspot.CreateKeypairResponse
+	var retryCreateResponse *api.CreateKeypairResponse
 
 	if retryCreateResponse, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotKeypairCreate,
 		numspotClient.CreateKeypairWithResponse); err != nil {
@@ -41,7 +40,7 @@ func DeleteKeypair(ctx context.Context, provider *client.NumSpotSDK, keypairID s
 	return nil
 }
 
-func ReadKeypair(ctx context.Context, provider *client.NumSpotSDK, keypairID string) (*numspot.Keypair, error) {
+func ReadKeypair(ctx context.Context, provider *client.NumSpotSDK, keypairID string) (*api.Keypair, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -54,10 +53,10 @@ func ReadKeypair(ctx context.Context, provider *client.NumSpotSDK, keypairID str
 		return nil, err
 	}
 
-	return (*numspot.Keypair)(numSpotReadKeypair.JSON200), nil
+	return (*api.Keypair)(numSpotReadKeypair.JSON200), nil
 }
 
-func ReadKeypairs(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadKeypairsParams) (numSpotKeypair *[]numspot.Keypair, err error) {
+func ReadKeypairs(ctx context.Context, provider *client.NumSpotSDK, params api.ReadKeypairsParams) (numSpotKeypair *[]api.Keypair, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

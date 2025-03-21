@@ -1,0 +1,669 @@
+{
+	"datasources": [
+		{
+			"name": "security_group",
+			"schema": {
+				"attributes": [
+					{
+						"name": "descriptions",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The descriptions of the security groups."
+						}
+					},
+					{
+						"name": "inbound_rule_from_port_ranges",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The beginnings of the port ranges for the TCP and UDP protocols, or the ICMP type numbers."
+						}
+					},
+					{
+						"name": "inbound_rule_ip_ranges",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IP ranges that have been granted permissions, in CIDR notation (for example, `10.0.0.0/24`)."
+						}
+					},
+					{
+						"name": "inbound_rule_protocols",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IP protocols for the permissions (`tcp` \\| `udp` \\| `icmp`, or a protocol number, or `-1` for all protocols)."
+						}
+					},
+					{
+						"name": "inbound_rule_security_group_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the security groups that have been granted permissions."
+						}
+					},
+					{
+						"name": "inbound_rule_security_group_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the security groups that have been granted permissions."
+						}
+					},
+					{
+						"name": "inbound_rule_to_port_ranges",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The ends of the port ranges for the TCP and UDP protocols, or the ICMP code numbers."
+						}
+					},
+					{
+						"name": "outbound_rule_from_port_ranges",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The beginnings of the port ranges for the TCP and UDP protocols, or the ICMP type numbers."
+						}
+					},
+					{
+						"name": "outbound_rule_ip_ranges",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IP ranges that have been granted permissions, in CIDR notation (for example, `10.0.0.0/24`)."
+						}
+					},
+					{
+						"name": "outbound_rule_protocols",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IP protocols for the permissions (`tcp` \\| `udp` \\| `icmp`, or a protocol number, or `-1` for all protocols)."
+						}
+					},
+					{
+						"name": "outbound_rule_security_group_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the security groups that have been granted permissions."
+						}
+					},
+					{
+						"name": "outbound_rule_security_group_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the security groups that have been granted permissions."
+						}
+					},
+					{
+						"name": "outbound_rule_to_port_ranges",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The ends of the port ranges for the TCP and UDP protocols, or the ICMP code numbers."
+						}
+					},
+					{
+						"name": "security_group_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the security groups."
+						}
+					},
+					{
+						"name": "security_group_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the security groups."
+						}
+					},
+					{
+						"name": "tag_keys",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The keys of the tags associated with the security groups."
+						}
+					},
+					{
+						"name": "tag_values",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The values of the tags associated with the security groups."
+						}
+					},
+					{
+						"name": "tags",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The key/value combination of the tags associated with the security groups, in the following format: \u0026quot;Filters\u0026quot;:{\u0026quot;Tags\u0026quot;:[\u0026quot;TAGKEY=TAGVALUE\u0026quot;]}."
+						}
+					},
+					{
+						"name": "vpc_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Vpcs specified when the security groups were created."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "description",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The description of the security group."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the security group."
+										}
+									},
+									{
+										"name": "inbound_rules",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "from_port_range",
+														"int64": {
+															"computed_optional_required": "computed",
+															"description": "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number."
+														}
+													},
+													{
+														"name": "ip_protocol",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)."
+														}
+													},
+													{
+														"name": "ip_ranges",
+														"list": {
+															"computed_optional_required": "computed",
+															"element_type": {
+																"string": {}
+															},
+															"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
+														}
+													},
+													{
+														"name": "inbound_security_groups_members",
+														"list_nested": {
+															"computed_optional_required": "computed",
+															"nested_object": {
+																"attributes": [
+																	{
+																		"name": "security_group_id",
+																		"string": {
+																			"computed_optional_required": "computed",
+																			"description": "The ID of a source or destination security group that you want to link to the security group of the rule."
+																		}
+																	},
+																	{
+																		"name": "security_group_name",
+																		"string": {
+																			"computed_optional_required": "computed",
+																			"description": "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule."
+																		}
+																	}
+																]
+															},
+															"description": "Information about one or more source or destination security groups."
+														}
+													},
+													{
+														"name": "service_ids",
+														"list": {
+															"computed_optional_required": "computed",
+															"element_type": {
+																"string": {}
+															},
+															"description": "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services."
+														}
+													},
+													{
+														"name": "to_port_range",
+														"int64": {
+															"computed_optional_required": "computed",
+															"description": "The end of the port range for the TCP and UDP protocols, or an ICMP code number."
+														}
+													}
+												]
+											},
+											"description": "The inbound rules associated with the security group."
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the security group."
+										}
+									},
+									{
+										"name": "outbound_rules",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "from_port_range",
+														"int64": {
+															"computed_optional_required": "computed",
+															"description": "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number."
+														}
+													},
+													{
+														"name": "ip_protocol",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)."
+														}
+													},
+													{
+														"name": "ip_ranges",
+														"list": {
+															"computed_optional_required": "computed",
+															"element_type": {
+																"string": {}
+															},
+															"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
+														}
+													},
+													{
+														"name": "outbound_security_groups_members",
+														"list_nested": {
+															"computed_optional_required": "computed",
+															"nested_object": {
+																"attributes": [
+																	{
+																		"name": "security_group_id",
+																		"string": {
+																			"computed_optional_required": "computed",
+																			"description": "The ID of a source or destination security group that you want to link to the security group of the rule."
+																		}
+																	},
+																	{
+																		"name": "security_group_name",
+																		"string": {
+																			"computed_optional_required": "computed",
+																			"description": "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule."
+																		}
+																	}
+																]
+															},
+															"description": "Information about one or more source or destination security groups."
+														}
+													},
+													{
+														"name": "service_ids",
+														"list": {
+															"computed_optional_required": "computed",
+															"element_type": {
+																"string": {}
+															},
+															"description": "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services."
+														}
+													},
+													{
+														"name": "to_port_range",
+														"int64": {
+															"computed_optional_required": "computed",
+															"description": "The end of the port range for the TCP and UDP protocols, or an ICMP code number."
+														}
+													}
+												]
+											},
+											"description": "The outbound rules associated with the security group."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the security group."
+										}
+									},
+									{
+										"name": "vpc_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Vpc for the security group."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more security groups."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "security_group",
+			"schema": {
+				"attributes": [
+					{
+						"name": "description",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "A description for the security group.\u003cbr /\u003e\nThis description can contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, accented letters, spaces, and `_.-:/()#,@[]+=\u0026;{}!$*`."
+						}
+					},
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The name of the security group.\u003cbr /\u003e\nThis name must not start with `sg-`.\u003cbr /\u003e\nThis name must be unique and contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, spaces, and `_.-:/()#,@[]+=\u0026;{}!$*`.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplace()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "vpc_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The ID of the Vpc for the security group.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the security group."
+						}
+					},
+					{
+						"name": "inbound_rules",
+						"set_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "from_port_range",
+										"int64": {
+											"computed_optional_required": "computed_optional",
+											"description": "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number."
+										}
+									},
+									{
+										"name": "ip_protocol",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)."
+										}
+									},
+									{
+										"name": "ip_ranges",
+										"list": {
+											"computed_optional_required": "computed_optional",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
+										}
+									},
+									{
+										"name": "inbound_security_groups_members",
+										"list_nested": {
+											"computed_optional_required": "computed_optional",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "security_group_id",
+														"string": {
+															"computed_optional_required": "computed_optional",
+															"description": "The ID of a source or destination security group that you want to link to the security group of the rule."
+														}
+													},
+													{
+														"name": "security_group_name",
+														"string": {
+															"computed_optional_required": "computed_optional",
+															"description": "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule."
+														}
+													}
+												]
+											},
+											"description": "Information about one or more source or destination security groups."
+										}
+									},
+									{
+										"name": "service_ids",
+										"list": {
+											"computed_optional_required": "computed_optional",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services."
+										}
+									},
+									{
+										"name": "to_port_range",
+										"int64": {
+											"computed_optional_required": "computed_optional",
+											"description": "The end of the port range for the TCP and UDP protocols, or an ICMP code number."
+										}
+									}
+								]
+							},
+							"description": "The inbound rules associated with the security group."
+						}
+					},
+					{
+						"name": "outbound_rules",
+						"set_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "from_port_range",
+										"int64": {
+											"computed_optional_required": "computed_optional",
+											"description": "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number."
+										}
+									},
+									{
+										"name": "ip_protocol",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)."
+										}
+									},
+									{
+										"name": "ip_ranges",
+										"list": {
+											"computed_optional_required": "computed_optional",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
+										}
+									},
+									{
+										"name": "outbound_security_groups_members",
+										"list_nested": {
+											"computed_optional_required": "computed_optional",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "security_group_id",
+														"string": {
+															"computed_optional_required": "computed_optional",
+															"description": "The ID of a source or destination security group that you want to link to the security group of the rule."
+														}
+													},
+													{
+														"name": "security_group_name",
+														"string": {
+															"computed_optional_required": "computed_optional",
+															"description": "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule."
+														}
+													}
+												]
+											},
+											"description": "Information about one or more source or destination security groups."
+										}
+									},
+									{
+										"name": "service_ids",
+										"list": {
+											"computed_optional_required": "computed_optional",
+											"element_type": {
+												"string": {}
+											},
+											"description": "One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services."
+										}
+									},
+									{
+										"name": "to_port_range",
+										"int64": {
+											"computed_optional_required": "computed_optional",
+											"description": "The end of the port range for the TCP and UDP protocols, or an ICMP code number."
+										}
+									}
+								]
+							},
+							"description": "The outbound rules associated with the security group."
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags associated with the security group."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

@@ -33,7 +33,7 @@ resource "numspot_dhcp_options" "test" {
 - `domain_name_servers` (List of String) The IPs of domain name servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.
 - `log_servers` (List of String) The IPs of the log servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.
 - `ntp_servers` (List of String) The IPs of the Network Time Protocol (NTP) servers. You must specify at least one of the following parameters: `DomainName`, `DomainNameServers`, `LogServers`, or `NtpServers`.
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes List) One or more tags associated with the DHCP options set. (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only
 

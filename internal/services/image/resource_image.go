@@ -10,12 +10,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/image/resource_image"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -59,17 +59,17 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = ImageResourceSchema(ctx)
+	response.Schema = resource_image.ImageResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan ImageModel
+	var plan resource_image.ImageModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	tagsValue := imageTags(ctx, plan.Tags)
 	body := deserializeCreateNumSpotImage(plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
@@ -89,7 +89,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state ImageModel
+	var state resource_image.ImageModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -114,9 +114,9 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
-		state, plan  ImageModel
+		state, plan  resource_image.ImageModel
 		err          error
-		numSpotImage *numspot.Image
+		numSpotImage *api.Image
 	)
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -125,8 +125,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 
 	imageID := state.Id.ValueString()
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := imageTags(ctx, plan.Tags)
+	stateTags := imageTags(ctx, state.Tags)
 
 	if !state.Tags.Equal(plan.Tags) {
 		numSpotImage, err = core.UpdateImageTags(ctx, r.provider, imageID, stateTags, planTags)
@@ -149,7 +149,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state ImageModel
+	var state resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -161,19 +161,19 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func deserializeAccess(accessValue AccessValue) *numspot.Access {
+func deserializeAccess(accessValue resource_image.AccessValue) *api.Access {
 	if utils.IsTfValueNull(accessValue) {
 		return nil
 	}
-	return &numspot.Access{
+	return &api.Access{
 		IsPublic: accessValue.IsPublic.ValueBoolPointer(),
 	}
 }
 
-func deserializeCreateNumSpotImage(tf ImageModel, diag *diag.Diagnostics) *numspot.CreateImageJSONRequestBody {
-	blockDevicesMappingApi := make([]numspot.BlockDeviceMappingImage, 0, len(tf.BlockDeviceMappings.Elements()))
+func deserializeCreateNumSpotImage(tf resource_image.ImageModel, diag *diag.Diagnostics) *api.CreateImageJSONRequestBody {
+	blockDevicesMappingApi := make([]api.BlockDeviceMappingImage, 0, len(tf.BlockDeviceMappings.Elements()))
 	for _, bdmTf := range tf.BlockDeviceMappings.Elements() {
-		bdmTfRes, ok := bdmTf.(BlockDeviceMappingsValue)
+		bdmTfRes, ok := bdmTf.(resource_image.BlockDeviceMappingsValue)
 		if !ok {
 			diag.AddError("unable to cast block device mapping resource", "")
 			return nil
@@ -196,7 +196,7 @@ func deserializeCreateNumSpotImage(tf ImageModel, diag *diag.Diagnostics) *numsp
 		productCodesApi = append(productCodesApi, pcTfStr.ValueString())
 	}
 
-	return &numspot.CreateImageJSONRequestBody{
+	return &api.CreateImageJSONRequestBody{
 		Architecture:        utils.FromTfStringToStringPtr(tf.Architecture),
 		BlockDeviceMappings: &blockDevicesMappingApi,
 		Description:         utils.FromTfStringToStringPtr(tf.Description),
@@ -210,28 +210,28 @@ func deserializeCreateNumSpotImage(tf ImageModel, diag *diag.Diagnostics) *numsp
 	}
 }
 
-func deserializeBlockDeviceMapping(bdm BlockDeviceMappingsValue) numspot.BlockDeviceMappingImage {
+func deserializeBlockDeviceMapping(bdm resource_image.BlockDeviceMappingsValue) api.BlockDeviceMappingImage {
 	attrtypes := bdm.Bsu.AttributeTypes(context.Background())
 	attrVals := bdm.Bsu.Attributes()
-	bsuTF, diags := NewBsuValue(attrtypes, attrVals)
+	bsuTF, diags := resource_image.NewBsuValue(attrtypes, attrVals)
 	if diags.HasError() {
-		return numspot.BlockDeviceMappingImage{}
+		return api.BlockDeviceMappingImage{}
 	}
 	bsu := deserializeBsuFromTf(bsuTF)
 
-	return numspot.BlockDeviceMappingImage{
+	return api.BlockDeviceMappingImage{
 		Bsu:               bsu,
 		DeviceName:        bdm.DeviceName.ValueStringPointer(),
 		VirtualDeviceName: utils.FromTfStringToStringPtr(bdm.VirtualDeviceName),
 	}
 }
 
-func deserializeBsuFromTf(bsu BsuValue) *numspot.BsuToCreate {
+func deserializeBsuFromTf(bsu resource_image.BsuValue) *api.BsuToCreate {
 	if bsu.IsNull() || bsu.IsUnknown() {
 		return nil
 	}
 
-	return &numspot.BsuToCreate{
+	return &api.BsuToCreate{
 		DeleteOnVmDeletion: bsu.DeleteOnVmDeletion.ValueBoolPointer(),
 		Iops:               utils.FromTfInt64ToIntPtr(bsu.Iops),
 		SnapshotId:         bsu.SnapshotId.ValueStringPointer(),
@@ -240,12 +240,12 @@ func deserializeBsuFromTf(bsu BsuValue) *numspot.BsuToCreate {
 	}
 }
 
-func serializeNumSpotImage(ctx context.Context, plan ImageModel, image *numspot.Image, diags *diag.Diagnostics) *ImageModel {
+func serializeNumSpotImage(ctx context.Context, plan resource_image.ImageModel, image *api.Image, diags *diag.Diagnostics) *resource_image.ImageModel {
 	var (
 		creationDateTf        types.String
 		blockDeviceMappingsTf types.List
 		productCodesTf        types.List
-		stateCommentTf        StateCommentValue
+		stateCommentTf        resource_image.StateCommentValue
 		tagsTf                types.List
 	)
 
@@ -267,7 +267,7 @@ func serializeNumSpotImage(ctx context.Context, plan ImageModel, image *numspot.
 			return nil
 		}
 	} else {
-		blockDeviceMappingsTf = types.ListNull(BlockDeviceMappingsValue{}.Type(ctx))
+		blockDeviceMappingsTf = types.ListNull(resource_image.BlockDeviceMappingsValue{}.Type(ctx))
 	}
 
 	// Product Codes
@@ -287,7 +287,7 @@ func serializeNumSpotImage(ctx context.Context, plan ImageModel, image *numspot.
 			return nil
 		}
 	} else {
-		stateCommentTf = NewStateCommentValueNull()
+		stateCommentTf = resource_image.NewStateCommentValueNull()
 	}
 
 	// Tags
@@ -298,7 +298,7 @@ func serializeNumSpotImage(ctx context.Context, plan ImageModel, image *numspot.
 		}
 	}
 
-	access, diagnostics := NewAccessValue(AccessValue{}.AttributeTypes(ctx),
+	access, diagnostics := resource_image.NewAccessValue(resource_image.AccessValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"is_public": types.BoolPointerValue(image.Access.IsPublic),
 		},
@@ -306,7 +306,7 @@ func serializeNumSpotImage(ctx context.Context, plan ImageModel, image *numspot.
 
 	diags.Append(diagnostics...)
 
-	serializedImage := ImageModel{
+	serializedImage := resource_image.ImageModel{
 		Architecture:        types.StringPointerValue(image.Architecture),
 		CreationDate:        creationDateTf,
 		Description:         types.StringPointerValue(image.Description),
@@ -331,9 +331,9 @@ func serializeNumSpotImage(ctx context.Context, plan ImageModel, image *numspot.
 	return &serializedImage
 }
 
-func serializeStateComment(ctx context.Context, state numspot.StateComment, diags *diag.Diagnostics) StateCommentValue {
-	stateCommentValue, diagnostics := NewStateCommentValue(
-		StateCommentValue{}.AttributeTypes(ctx),
+func serializeStateComment(ctx context.Context, state api.StateComment, diags *diag.Diagnostics) resource_image.StateCommentValue {
+	stateCommentValue, diagnostics := resource_image.NewStateCommentValue(
+		resource_image.StateCommentValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"state_code":    types.StringPointerValue(state.StateCode),
 			"state_message": types.StringPointerValue(state.StateMessage),
@@ -343,19 +343,19 @@ func serializeStateComment(ctx context.Context, state numspot.StateComment, diag
 	return stateCommentValue
 }
 
-func serializeBlockDeviceMapping(ctx context.Context, bdm numspot.BlockDeviceMappingImage, diags *diag.Diagnostics) BlockDeviceMappingsValue {
+func serializeBlockDeviceMapping(ctx context.Context, bdm api.BlockDeviceMappingImage, diags *diag.Diagnostics) resource_image.BlockDeviceMappingsValue {
 	bsu := serializeBsu(ctx, bdm.Bsu, diags)
 	if diags.HasError() {
-		return NewBlockDeviceMappingsValueNull()
+		return resource_image.NewBlockDeviceMappingsValueNull()
 	}
 
 	bsuObjectValue, diagnostics := bsu.ToObjectValue(ctx)
 	if diagnostics.HasError() {
-		return NewBlockDeviceMappingsValueNull()
+		return resource_image.NewBlockDeviceMappingsValueNull()
 	}
 
-	blockDeviceMappingValue, diagnostics := NewBlockDeviceMappingsValue(
-		BlockDeviceMappingsValue{}.AttributeTypes(ctx),
+	blockDeviceMappingValue, diagnostics := resource_image.NewBlockDeviceMappingsValue(
+		resource_image.BlockDeviceMappingsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"bsu":                 bsuObjectValue,
 			"device_name":         types.StringPointerValue(bdm.DeviceName),
@@ -366,13 +366,13 @@ func serializeBlockDeviceMapping(ctx context.Context, bdm numspot.BlockDeviceMap
 	return blockDeviceMappingValue
 }
 
-func serializeBsu(ctx context.Context, bsu *numspot.BsuToCreate, diags *diag.Diagnostics) BsuValue {
+func serializeBsu(ctx context.Context, bsu *api.BsuToCreate, diags *diag.Diagnostics) resource_image.BsuValue {
 	if bsu == nil {
-		return NewBsuValueNull()
+		return resource_image.NewBsuValueNull()
 	}
 
-	bsuValue, diagnostics := NewBsuValue(
-		BsuValue{}.AttributeTypes(ctx),
+	bsuValue, diagnostics := resource_image.NewBsuValue(
+		resource_image.BsuValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(bsu.DeleteOnVmDeletion),
 			"iops":                  utils.FromIntPtrToTfInt64(bsu.Iops),
@@ -383,4 +383,19 @@ func serializeBsu(ctx context.Context, bsu *numspot.BsuToCreate, diags *diag.Dia
 	)
 	diags.Append(diagnostics...)
 	return bsuValue
+}
+
+func imageTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_image.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

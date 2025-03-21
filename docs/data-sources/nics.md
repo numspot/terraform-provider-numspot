@@ -67,7 +67,7 @@ resource "null_resource" "print-datasource-id" {
 - `subnet_ids` (List of String) The IDs of the Subnets for the NICs.
 - `tag_keys` (List of String) The keys of the tags associated with the NICs.
 - `tag_values` (List of String) The values of the tags associated with the NICs.
-- `tags` (List of String) The key/value combination of the tags associated with the NICs, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the NICs, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `vpc_ids` (List of String) The IDs of the Vpcs where the NICs are located.
 
 ### Read-Only
@@ -76,10 +76,6 @@ resource "null_resource" "print-datasource-id" {
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
-
-Optional:
-
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
 
 Read-Only:
 
@@ -95,16 +91,8 @@ Read-Only:
 - `security_groups` (Attributes List) One or more IDs of security groups for the NIC. (see [below for nested schema](#nestedatt--items--security_groups))
 - `state` (String) The state of the NIC (`available` \| `attaching` \| `in-use` \| `detaching`).
 - `subnet_id` (String) The ID of the Subnet.
+- `tags` (Attributes List) One or more tags associated with the NIC. (see [below for nested schema](#nestedatt--items--tags))
 - `vpc_id` (String) The ID of the Vpc for the NIC.
-
-<a id="nestedatt--items--tags"></a>
-### Nested Schema for `items.tags`
-
-Required:
-
-- `key` (String) The key of the tag, with a minimum of 1 character.
-- `value` (String) The value of the tag, between 0 and 255 characters.
-
 
 <a id="nestedatt--items--link_nic"></a>
 ### Nested Schema for `items.link_nic`
@@ -135,12 +123,12 @@ Read-Only:
 Read-Only:
 
 - `is_primary` (Boolean) If true, the IP is the primary private IP of the NIC.
-- `link_public_ip` (Attributes) Information about the public IP association. (see [below for nested schema](#nestedatt--items--private_ips--link_public_ip))
+- `link_public_ip_private_ip` (Attributes) Information about the public IP association. (see [below for nested schema](#nestedatt--items--private_ips--link_public_ip_private_ip))
 - `private_dns_name` (String) The name of the private DNS.
 - `private_ip` (String) The private IP of the NIC.
 
-<a id="nestedatt--items--private_ips--link_public_ip"></a>
-### Nested Schema for `items.private_ips.link_public_ip`
+<a id="nestedatt--items--private_ips--link_public_ip_private_ip"></a>
+### Nested Schema for `items.private_ips.link_public_ip_private_ip`
 
 Read-Only:
 
@@ -158,3 +146,12 @@ Read-Only:
 
 - `security_group_id` (String) The ID of the security group.
 - `security_group_name` (String) The name of the security group.
+
+
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
+
+Read-Only:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

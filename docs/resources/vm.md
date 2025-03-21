@@ -86,7 +86,7 @@ resource "numspot_vm" "vm" {
 
 ### Required
 
-- `image_id` (String) The ID of the OMI used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.
+- `image_id` (String) The ID of the Image used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.
 - `subnet_id` (String) The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.
 - `type` (String) The type of VM.
 
@@ -100,7 +100,7 @@ resource "numspot_vm" "vm" {
 - `private_ips` (List of String) One or more private IPs of the VM.
 - `security_group_ids` (List of String) One or more IDs of security group for the VMs.
 - `security_groups` (List of String) One or more names of security groups for the VMs.
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes List) One or more tags associated with the VM. (see [below for nested schema](#nestedatt--tags))
 - `user_data` (String) Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
 
 ### Read-Only
@@ -117,7 +117,7 @@ resource "numspot_vm" "vm" {
 - `os_family` (String) Indicates the operating system (OS) of the VM.
 - `private_dns_name` (String) The name of the private DNS.
 - `private_ip` (String) The primary private IP of the VM.
-- `product_codes` (List of String) The product codes associated with the OMI used to create the VM.
+- `product_codes` (List of String) The product codes associated with the Image used to create the VM.
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP of the VM.
 - `reservation_id` (String) The reservation ID of the VM.
@@ -153,7 +153,7 @@ Read-Only:
 
 - `bsu` (Attributes) Information about the BSU volume to create. (see [below for nested schema](#nestedatt--block_device_mappings--bsu))
 - `device_name` (String) The device name for the volume. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`).
-- `no_device` (String) Removes the device which is included in the block device mapping of the OMI.
+- `no_device` (String) Removes the device which is included in the block device mapping of the Image.
 - `virtual_device_name` (String) The name of the virtual device (`ephemeralN`).
 
 <a id="nestedatt--block_device_mappings--bsu"></a>
@@ -182,12 +182,12 @@ Read-Only:
 - `description` (String) The description of the NIC.
 - `is_source_dest_checked` (Boolean) (Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.
 - `link_nic` (Attributes) Information about the network interface card (NIC). (see [below for nested schema](#nestedatt--nics--link_nic))
-- `link_public_ip` (Attributes) Information about the public IP associated with the NIC. (see [below for nested schema](#nestedatt--nics--link_public_ip))
 - `mac_address` (String) The Media Access Control (MAC) address of the NIC.
 - `nic_id` (String) The ID of the NIC.
+- `nic_link_public_ip` (Attributes) Information about the public IP associated with the NIC. (see [below for nested schema](#nestedatt--nics--nic_link_public_ip))
+- `nic_security_groups` (Attributes List) One or more IDs of security groups for the NIC. (see [below for nested schema](#nestedatt--nics--nic_security_groups))
 - `private_dns_name` (String) The name of the private DNS.
 - `private_ips` (Attributes List) The private IP or IPs of the NIC. (see [below for nested schema](#nestedatt--nics--private_ips))
-- `security_groups` (Attributes List) One or more IDs of security groups for the NIC. (see [below for nested schema](#nestedatt--nics--security_groups))
 - `state` (String) The state of the NIC (`available` \| `attaching` \| `in-use` \| `detaching`).
 - `subnet_id` (String) The ID of the Subnet for the NIC.
 - `vpc_id` (String) The ID of the Vpc for the NIC.
@@ -203,13 +203,22 @@ Read-Only:
 - `state` (String) The state of the attachment (`attaching` \| `attached` \| `detaching` \| `detached`).
 
 
-<a id="nestedatt--nics--link_public_ip"></a>
-### Nested Schema for `nics.link_public_ip`
+<a id="nestedatt--nics--nic_link_public_ip"></a>
+### Nested Schema for `nics.nic_link_public_ip`
 
 Read-Only:
 
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP associated with the NIC.
+
+
+<a id="nestedatt--nics--nic_security_groups"></a>
+### Nested Schema for `nics.nic_security_groups`
+
+Read-Only:
+
+- `security_group_id` (String) The ID of the security group.
+- `security_group_name` (String) The name of the security group.
 
 
 <a id="nestedatt--nics--private_ips"></a>
@@ -218,24 +227,14 @@ Read-Only:
 Read-Only:
 
 - `is_primary` (Boolean) If true, the IP is the primary private IP of the NIC.
-- `link_public_ip` (Attributes) Information about the public IP associated with the NIC. (see [below for nested schema](#nestedatt--nics--private_ips--link_public_ip))
 - `private_dns_name` (String) The name of the private DNS.
 - `private_ip` (String) The private IP.
+- `private_ip_link_public_ip` (Attributes) Information about the public IP associated with the NIC. (see [below for nested schema](#nestedatt--nics--private_ips--private_ip_link_public_ip))
 
-<a id="nestedatt--nics--private_ips--link_public_ip"></a>
-### Nested Schema for `nics.private_ips.link_public_ip`
+<a id="nestedatt--nics--private_ips--private_ip_link_public_ip"></a>
+### Nested Schema for `nics.private_ips.private_ip_link_public_ip`
 
 Read-Only:
 
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP associated with the NIC.
-
-
-
-<a id="nestedatt--nics--security_groups"></a>
-### Nested Schema for `nics.security_groups`
-
-Read-Only:
-
-- `security_group_id` (String) The ID of the security group.
-- `security_group_name` (String) The name of the security group.

@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -15,7 +14,7 @@ var (
 	imageTargetStates  = []string{available}
 )
 
-func CreateImage(ctx context.Context, provider *client.NumSpotSDK, body numspot.CreateImage, tags []numspot.ResourceTag, access *numspot.Access) (*numspot.Image, error) {
+func CreateImage(ctx context.Context, provider *client.NumSpotSDK, body api.CreateImage, tags []api.ResourceTag, access *api.Access) (*api.Image, error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -23,7 +22,7 @@ func CreateImage(ctx context.Context, provider *client.NumSpotSDK, body numspot.
 		return nil, err
 	}
 
-	var retryCreateResponse *numspot.CreateImageResponse
+	var retryCreateResponse *api.CreateImageResponse
 	if retryCreateResponse, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, body, numspotClient.CreateImageWithResponse); err != nil {
 		return nil, err
 	}
@@ -50,27 +49,27 @@ func CreateImage(ctx context.Context, provider *client.NumSpotSDK, body numspot.
 	return image, nil
 }
 
-func UpdateImageAccess(ctx context.Context, provider *client.NumSpotSDK, id string, access numspot.Access) (*numspot.Image, error) {
+func UpdateImageAccess(ctx context.Context, provider *client.NumSpotSDK, id string, access api.Access) (*api.Image, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var body numspot.UpdateImageJSONRequestBody
+	var body api.UpdateImageJSONRequestBody
 	if *access.IsPublic { // If IsPublic is set to True
-		body = numspot.UpdateImageJSONRequestBody{
-			AccessCreation: numspot.AccessCreation{
-				Additions: &numspot.Access{
+		body = api.UpdateImageJSONRequestBody{
+			AccessCreation: api.AccessCreation{
+				Additions: &api.Access{
 					IsPublic: utils.EmptyTrueBoolPointer(),
 				},
 				Removals: nil,
 			},
 		}
 	} else { // If IsPublic is set to False or removed
-		body = numspot.UpdateImageJSONRequestBody{
-			AccessCreation: numspot.AccessCreation{
+		body = api.UpdateImageJSONRequestBody{
+			AccessCreation: api.AccessCreation{
 				Additions: nil,
-				Removals: &numspot.Access{
+				Removals: &api.Access{
 					IsPublic: utils.EmptyTrueBoolPointer(),
 				},
 			},
@@ -89,7 +88,7 @@ func UpdateImageAccess(ctx context.Context, provider *client.NumSpotSDK, id stri
 	return updateImageResponse.JSON200, nil
 }
 
-func UpdateImageTags(ctx context.Context, provider *client.NumSpotSDK, imageID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Image, error) {
+func UpdateImageTags(ctx context.Context, provider *client.NumSpotSDK, imageID string, stateTags []api.ResourceTag, planTags []api.ResourceTag) (*api.Image, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, imageID); err != nil {
 		return nil, err
 	}
@@ -110,7 +109,7 @@ func DeleteImage(ctx context.Context, provider *client.NumSpotSDK, imageID strin
 	return nil
 }
 
-func ReadImageWithID(ctx context.Context, provider *client.NumSpotSDK, imageID string) (numSpotImage *numspot.Image, err error) {
+func ReadImageWithID(ctx context.Context, provider *client.NumSpotSDK, imageID string) (numSpotImage *api.Image, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -126,7 +125,7 @@ func ReadImageWithID(ctx context.Context, provider *client.NumSpotSDK, imageID s
 	return numSpotReadImage.JSON200, err
 }
 
-func RetryReadImage(ctx context.Context, provider *client.NumSpotSDK, imageID string) (*numspot.Image, error) {
+func RetryReadImage(ctx context.Context, provider *client.NumSpotSDK, imageID string) (*api.Image, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -136,7 +135,7 @@ func RetryReadImage(ctx context.Context, provider *client.NumSpotSDK, imageID st
 		return nil, err
 	}
 
-	numSpotImage, assert := read.(*numspot.Image)
+	numSpotImage, assert := read.(*api.Image)
 	if !assert {
 		return nil, fmt.Errorf("invalid image assertion %s", imageID)
 	}

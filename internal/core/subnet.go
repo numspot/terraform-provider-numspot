@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -15,7 +14,7 @@ var (
 	subnetTargetStates  = []string{available}
 )
 
-func CreateSubnet(ctx context.Context, provider *client.NumSpotSDK, payload numspot.CreateSubnet, mapPublicIPOnLaunch bool, tags []numspot.ResourceTag) (*numspot.Subnet, error) {
+func CreateSubnet(ctx context.Context, provider *client.NumSpotSDK, payload api.CreateSubnet, mapPublicIPOnLaunch bool, tags []api.ResourceTag) (*api.Subnet, error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -23,7 +22,7 @@ func CreateSubnet(ctx context.Context, provider *client.NumSpotSDK, payload nums
 		return nil, err
 	}
 
-	var retryCreate *numspot.CreateSubnetResponse
+	var retryCreate *api.CreateSubnetResponse
 	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, payload, numspotClient.CreateSubnetWithResponse); err != nil {
 		return nil, err
 	}
@@ -45,15 +44,15 @@ func CreateSubnet(ctx context.Context, provider *client.NumSpotSDK, payload nums
 	return RetryReadSubnet(ctx, provider, createOp, subnetID)
 }
 
-func UpdateSubnetAttributes(ctx context.Context, provider *client.NumSpotSDK, subnetID string, mapPublicIpOnLaunch bool) (*numspot.Subnet, error) {
+func UpdateSubnetAttributes(ctx context.Context, provider *client.NumSpotSDK, subnetID string, mapPublicIpOnLaunch bool) (*api.Subnet, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var numSpotSubnet *numspot.UpdateSubnetResponse
+	var numSpotSubnet *api.UpdateSubnetResponse
 	if numSpotSubnet, err = numspotClient.UpdateSubnetWithResponse(ctx, provider.SpaceID, subnetID,
-		numspot.UpdateSubnetJSONRequestBody{
+		api.UpdateSubnetJSONRequestBody{
 			MapPublicIpOnLaunch: mapPublicIpOnLaunch,
 		},
 	); err != nil {
@@ -66,7 +65,7 @@ func UpdateSubnetAttributes(ctx context.Context, provider *client.NumSpotSDK, su
 	return RetryReadSubnet(ctx, provider, updateOp, subnetID)
 }
 
-func UpdateSubnetTags(ctx context.Context, provider *client.NumSpotSDK, subnetID string, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag) (*numspot.Subnet, error) {
+func UpdateSubnetTags(ctx context.Context, provider *client.NumSpotSDK, subnetID string, stateTags []api.ResourceTag, planTags []api.ResourceTag) (*api.Subnet, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, subnetID); err != nil {
 		return nil, err
 	}
@@ -82,7 +81,7 @@ func DeleteSubnet(ctx context.Context, provider *client.NumSpotSDK, subnetID str
 	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, subnetID, numspotClient.DeleteSubnetWithResponse)
 }
 
-func ReadSubnet(ctx context.Context, provider *client.NumSpotSDK, subnetID string) (*numspot.Subnet, error) {
+func ReadSubnet(ctx context.Context, provider *client.NumSpotSDK, subnetID string) (*api.Subnet, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -99,7 +98,7 @@ func ReadSubnet(ctx context.Context, provider *client.NumSpotSDK, subnetID strin
 	return numSpotReadSubnet.JSON200, nil
 }
 
-func ReadSubnetsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadSubnetsParams) (*[]numspot.Subnet, error) {
+func ReadSubnetsWithParams(ctx context.Context, provider *client.NumSpotSDK, params api.ReadSubnetsParams) (*[]api.Subnet, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -116,7 +115,7 @@ func ReadSubnetsWithParams(ctx context.Context, provider *client.NumSpotSDK, par
 	return numSpotReadSubnet.JSON200.Items, nil
 }
 
-func RetryReadSubnet(ctx context.Context, provider *client.NumSpotSDK, op, subnetID string) (*numspot.Subnet, error) {
+func RetryReadSubnet(ctx context.Context, provider *client.NumSpotSDK, op, subnetID string) (*api.Subnet, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -127,7 +126,7 @@ func RetryReadSubnet(ctx context.Context, provider *client.NumSpotSDK, op, subne
 		return nil, err
 	}
 
-	numSpotSubnet, assert := read.(*numspot.Subnet)
+	numSpotSubnet, assert := read.(*api.Subnet)
 	if !assert {
 		return nil, fmt.Errorf("invalid client gateway assertion %s: %s", subnetID, op)
 	}

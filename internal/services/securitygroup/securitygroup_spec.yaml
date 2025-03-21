@@ -1,0 +1,29 @@
+provider:
+  name: numspot
+
+resources:
+  security_group:
+    create:
+      method: POST
+      path: /compute/spaces/{spaceId}/securityGroups
+    delete:
+      method: DELETE
+      path: /compute/spaces/{spaceId}/securityGroups/{id}
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/securityGroups/{id}
+    update:
+      method: PUT
+      path: /compute/spaces/{spaceId}/securityGroups/{id}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  security_group:
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/securityGroups
+    schema:
+      ignores:
+        - spaceId

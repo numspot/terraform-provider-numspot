@@ -68,28 +68,27 @@ resource "numspot_image" "image_from_snapshot" {
 ### Optional
 
 - `access` (Attributes) Permissions for the resource. (see [below for nested schema](#nestedatt--access))
-- `architecture` (String) **(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the OMI (`i386` or `x84_64`).
+- `architecture` (String) **(when registering from a snapshot, or from a bucket without using a manifest file)** The architecture of the Image (`i386` or `x84_64`).
 - `block_device_mappings` (Attributes List) **(when registering from a snapshot, or from a bucket without using a manifest file)** One or more block device mappings. (see [below for nested schema](#nestedatt--block_device_mappings))
-- `description` (String) A description for the new OMI.
-- `name` (String) A unique name for the new OMI.<br />
+- `description` (String) A description for the new Image.
+- `name` (String) A unique name for the new Image.<br />
 Constraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), parentheses (`()`), slashes (`/`), periods (`.`), or dashes (`-`).
-- `no_reboot` (Boolean) **(when creating from a VM)** If false, the VM shuts down before creating the OMI and then reboots. If true, the VM does not.
-- `product_codes` (List of String) The product codes associated with the OMI.
-- `root_device_name` (String) **(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new OMI.
-- `source_image_id` (String) **(when copying an OMI)** The ID of the OMI you want to copy.
-- `source_region_name` (String) **(when copying an OMI)** The name of the source Region (always the same as the Region of your account).
-- `space_id` (String) Identifier of the Space
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
-- `vm_id` (String) **(when creating from a VM)** The ID of the VM from which you want to create the OMI.
+- `no_reboot` (Boolean) **(when creating from a VM)** If false, the VM shuts down before creating the Image and then reboots. If true, the VM does not.
+- `product_codes` (List of String) The product codes associated with the Image.
+- `root_device_name` (String) **(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new Image.
+- `source_image_id` (String) **(when copying an Image)** The ID of the Image you want to copy.
+- `source_region_name` (String) **(when copying an Image)** The name of the source Region (always the same as the Region of your account).
+- `tags` (Attributes List) One or more tags associated with the DHCP options set. (see [below for nested schema](#nestedatt--tags))
+- `vm_id` (String) **(when creating from a VM)** The ID of the VM from which you want to create the Image.
 
 ### Read-Only
 
-- `creation_date` (String) The date and time of creation of the OMI, in ISO 8601 date-time format.
-- `id` (String) The ID of the OMI.
-- `root_device_type` (String) The type of root device used by the OMI (always `bsu`).
-- `state` (String) The state of the OMI (`pending` \| `available` \| `failed`).
+- `creation_date` (String) The date and time of creation of the Image, in ISO 8601 date-time format.
+- `id` (String) The ID of the Image.
+- `root_device_type` (String) The type of root device used by the Image (always `bsu`).
+- `state` (String) The state of the Image (`pending` \| `available` \| `failed`).
 - `state_comment` (Attributes) Information about the change of state. (see [below for nested schema](#nestedatt--state_comment))
-- `type` (String) The type of the OMI.
+- `type` (String) The type of the Image.
 
 <a id="nestedatt--access"></a>
 ### Nested Schema for `access`

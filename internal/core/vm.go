@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -15,7 +14,7 @@ var (
 	vmTargetStates  = []string{running, stopped, shutdown, terminated}
 )
 
-func CreateVM(ctx context.Context, provider *client.NumSpotSDK, numSpotVMCreate numspot.CreateVmsJSONRequestBody, tags []numspot.ResourceTag) (numSpotVM *numspot.Vm, err error) {
+func CreateVM(ctx context.Context, provider *client.NumSpotSDK, numSpotVMCreate api.CreateVmsJSONRequestBody, tags []api.ResourceTag) (numSpotVM *api.Vm, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -23,7 +22,7 @@ func CreateVM(ctx context.Context, provider *client.NumSpotSDK, numSpotVMCreate 
 		return nil, err
 	}
 
-	var retryCreate *numspot.CreateVmsResponse
+	var retryCreate *api.CreateVmsResponse
 	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, numSpotVMCreate,
 		numspotClient.CreateVmsWithResponse); err != nil {
 		return nil, err
@@ -40,7 +39,7 @@ func CreateVM(ctx context.Context, provider *client.NumSpotSDK, numSpotVMCreate 
 	return RetryReadVM(ctx, provider, createOp, vmID)
 }
 
-func UpdateVMAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpotVMUpdate numspot.UpdateVmJSONRequestBody, vmID string) (numSpotVM *numspot.Vm, err error) {
+func UpdateVMAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpotVMUpdate api.UpdateVmJSONRequestBody, vmID string) (numSpotVM *api.Vm, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -54,7 +53,7 @@ func UpdateVMAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpo
 
 	numSpotVMUpdate.KeypairName = nil
 
-	var updateVMResponse *numspot.UpdateVmResponse
+	var updateVMResponse *api.UpdateVmResponse
 	if updateVMResponse, err = numspotClient.UpdateVmWithResponse(ctx, spaceID, vmID, numSpotVMUpdate); err != nil {
 		return nil, err
 	}
@@ -69,7 +68,7 @@ func UpdateVMAttributes(ctx context.Context, provider *client.NumSpotSDK, numSpo
 	return RetryReadVM(ctx, provider, createOp, vmID)
 }
 
-func UpdateVMKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotVMUpdate numspot.UpdateVmJSONRequestBody, vmID string) (numSpotVM *numspot.Vm, err error) {
+func UpdateVMKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotVMUpdate api.UpdateVmJSONRequestBody, vmID string) (numSpotVM *api.Vm, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -92,7 +91,7 @@ func UpdateVMKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotVM
 	numSpotVMUpdate.VmInitiatedShutdownBehavior = nil
 	numSpotVMUpdate.NestedVirtualization = nil
 
-	var updateVMResponse *numspot.UpdateVmResponse
+	var updateVMResponse *api.UpdateVmResponse
 	if updateVMResponse, err = numspotClient.UpdateVmWithResponse(ctx, spaceID, vmID, numSpotVMUpdate); err != nil {
 		return nil, err
 	}
@@ -107,7 +106,7 @@ func UpdateVMKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotVM
 	return RetryReadVM(ctx, provider, createOp, vmID)
 }
 
-func UpdateVMTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, vmID string) (numSpotVM *numspot.Vm, err error) {
+func UpdateVMTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []api.ResourceTag, planTags []api.ResourceTag, vmID string) (numSpotVM *api.Vm, err error) {
 	if err = updateResourceTags(ctx, provider, stateTags, planTags, vmID); err != nil {
 		return nil, err
 	}
@@ -128,7 +127,7 @@ func DeleteVM(ctx context.Context, provider *client.NumSpotSDK, vmID string) (er
 	return nil
 }
 
-func RetryReadVM(ctx context.Context, provider *client.NumSpotSDK, op string, vmID string) (*numspot.Vm, error) {
+func RetryReadVM(ctx context.Context, provider *client.NumSpotSDK, op string, vmID string) (*api.Vm, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -138,15 +137,15 @@ func RetryReadVM(ctx context.Context, provider *client.NumSpotSDK, op string, vm
 		return nil, err
 	}
 
-	numSpotVM, assert := read.(*numspot.Vm)
+	numSpotVM, assert := read.(*api.Vm)
 	if !assert {
 		return nil, fmt.Errorf("invalid vm assertion %s: %s", vmID, op)
 	}
 	return numSpotVM, err
 }
 
-func ReadVM(ctx context.Context, provider *client.NumSpotSDK, vmID string) (*numspot.Vm, error) {
-	var numSpotReadVM *numspot.ReadVmsByIdResponse
+func ReadVM(ctx context.Context, provider *client.NumSpotSDK, vmID string) (*api.Vm, error) {
+	var numSpotReadVM *api.ReadVmsByIdResponse
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -162,7 +161,7 @@ func ReadVM(ctx context.Context, provider *client.NumSpotSDK, vmID string) (*num
 	return numSpotReadVM.JSON200, err
 }
 
-func ReadVMsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadVmsParams) (*[]numspot.Vm, error) {
+func ReadVMsWithParams(ctx context.Context, provider *client.NumSpotSDK, params api.ReadVmsParams) (*[]api.Vm, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -192,7 +191,7 @@ func StopVM(ctx context.Context, provider *client.NumSpotSDK, vm string) (err er
 		return err
 	}
 
-	var vmStatus *numspot.ReadVmsByIdResponse
+	var vmStatus *api.ReadVmsByIdResponse
 	if vmStatus, err = numspotClient.ReadVmsByIdWithResponse(ctx, provider.SpaceID, vm); err != nil {
 		return err
 	}
@@ -208,7 +207,7 @@ func StopVM(ctx context.Context, provider *client.NumSpotSDK, vm string) (err er
 	//////////////////
 	forceStop := true
 	// Stop the VM
-	if _, err = numspotClient.StopVmWithResponse(ctx, provider.SpaceID, vm, numspot.StopVm{ForceStop: &forceStop}); err != nil {
+	if _, err = numspotClient.StopVmWithResponse(ctx, provider.SpaceID, vm, api.StopVm{ForceStop: &forceStop}); err != nil {
 		return err
 	}
 
@@ -231,7 +230,7 @@ func StartVM(ctx context.Context, provider *client.NumSpotSDK, vm string) (err e
 		return nil
 	}
 
-	var vmStatus *numspot.ReadVmsByIdResponse
+	var vmStatus *api.ReadVmsByIdResponse
 	if vmStatus, err = numspotClient.ReadVmsByIdWithResponse(ctx, provider.SpaceID, vm); err != nil {
 		return err
 	}

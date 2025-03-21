@@ -8,12 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/internetgateway/resource_internet_gateway"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -57,17 +57,17 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = InternetGatewayResourceSchema(ctx)
+	response.Schema = resource_internet_gateway.InternetGatewayResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan InternetGatewayModel
+	var plan resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	tagsValue := internetGatewayTags(ctx, plan.Tags)
 	vpcId := plan.VpcId.ValueString()
 
 	internetGateway, err := core.CreateInternetGateway(ctx, r.provider, tagsValue, vpcId)
@@ -85,7 +85,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state InternetGatewayModel
+	var state resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -109,8 +109,8 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
-		state, plan            InternetGatewayModel
-		numSpotInternetGateway *numspot.InternetGateway
+		state, plan            resource_internet_gateway.InternetGatewayModel
+		numSpotInternetGateway *api.InternetGateway
 		err                    error
 	)
 
@@ -121,8 +121,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 
 	internetGatewayID := state.Id.ValueString()
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := internetGatewayTags(ctx, plan.Tags)
+	stateTags := internetGatewayTags(ctx, state.Tags)
 
 	if !plan.Tags.Equal(state.Tags) {
 		numSpotInternetGateway, err = core.UpdateInternetGatewayTags(ctx, r.provider, internetGatewayID, stateTags, planTags)
@@ -130,18 +130,18 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 			response.Diagnostics.AddError("unable to update internet gateway tags", err.Error())
 			return
 		}
-	}
 
-	newState := serializeNumSpotInternetGateway(ctx, numSpotInternetGateway, &response.Diagnostics)
-	if response.Diagnostics.HasError() {
-		return
-	}
+		newState := serializeNumSpotInternetGateway(ctx, numSpotInternetGateway, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
+			return
+		}
 
-	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+		response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
+	}
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state InternetGatewayModel
+	var state resource_internet_gateway.InternetGatewayModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -153,7 +153,7 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func serializeNumSpotInternetGateway(ctx context.Context, http *numspot.InternetGateway, diags *diag.Diagnostics) *InternetGatewayModel {
+func serializeNumSpotInternetGateway(ctx context.Context, http *api.InternetGateway, diags *diag.Diagnostics) *resource_internet_gateway.InternetGatewayModel {
 	var tagsTf types.List
 
 	if http.Tags != nil {
@@ -163,10 +163,25 @@ func serializeNumSpotInternetGateway(ctx context.Context, http *numspot.Internet
 		}
 	}
 
-	return &InternetGatewayModel{
+	return &resource_internet_gateway.InternetGatewayModel{
 		Id:    types.StringPointerValue(http.Id),
 		VpcId: types.StringPointerValue(http.VpcId),
 		State: types.StringPointerValue(http.State),
 		Tags:  tagsTf,
 	}
+}
+
+func internetGatewayTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_internet_gateway.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

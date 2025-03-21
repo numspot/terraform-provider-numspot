@@ -83,7 +83,7 @@ resource "null_resource" "print-datasource-id" {
 - `nic_vpc_ids` (List of String) The IDs of the Vpcs where the NICs are located.
 - `platforms` (List of String) The platforms. Use windows if you have Windows VMs. Otherwise, leave this filter blank.
 - `private_ips` (List of String) The private IPs of the VMs.
-- `product_codes` (List of String) The product codes associated with the OMI used to create the VMs.
+- `product_codes` (List of String) The product codes associated with the Image used to create the VMs.
 - `public_ips` (List of String) The public IPs of the VMs.
 - `reservation_ids` (List of String) The IDs of the reservation of the VMs, created every time you launch VMs. These reservation IDs can be associated with several VMs when you lauch a group of VMs using the same launch request.
 - `root_device_names` (List of String) The names of the root devices for the VMs (for example, `/dev/sda1`)
@@ -96,7 +96,7 @@ resource "null_resource" "print-datasource-id" {
 - `subnet_ids` (List of String) The IDs of the Subnets for the VMs.
 - `tag_keys` (List of String) The keys of the tags associated with the VMs.
 - `tag_values` (List of String) The values of the tags associated with the VMs.
-- `tags` (List of String) The key/value combination of the tags associated with the VMs, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the VMs, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `tenancies` (List of String) The tenancies of the VMs (`dedicated` \| `default` \| `host`).
 - `types` (List of String) The NumSpot VM types.
 - `vm_security_group_ids` (List of String) The IDs of the security groups for the VMs.
@@ -112,10 +112,6 @@ resource "null_resource" "print-datasource-id" {
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
-
 Read-Only:
 
 - `architecture` (String) The architecture of the VM (`i386` \| `x86_64`).
@@ -126,7 +122,7 @@ Read-Only:
 - `deletion_protection` (Boolean) If true, you cannot delete the VM unless you change this parameter back to false.
 - `hypervisor` (String) The hypervisor type of the VMs (`ovm` \| `xen`).
 - `id` (String) The ID of the VM.
-- `image_id` (String) The ID of the OMI used to create the VM.
+- `image_id` (String) The ID of the Image used to create the VM.
 - `initiated_shutdown_behavior` (String) The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted.
 - `is_source_dest_checked` (Boolean) (Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.
 - `keypair_name` (String) The name of the keypair used when launching the VM.
@@ -138,7 +134,7 @@ Read-Only:
 - `placement` (Attributes) Information about the placement of the VM. (see [below for nested schema](#nestedatt--items--placement))
 - `private_dns_name` (String) The name of the private DNS.
 - `private_ip` (String) The primary private IP of the VM.
-- `product_codes` (List of String) The product codes associated with the OMI used to create the VM.
+- `product_codes` (List of String) The product codes associated with the Image used to create the VM.
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP of the VM.
 - `reservation_id` (String) The reservation ID of the VM.
@@ -148,18 +144,10 @@ Read-Only:
 - `state` (String) The state of the VM (`pending` \| `running` \| `stopping` \| `stopped` \| `shutting-down` \| `terminated` \| `quarantine`).
 - `state_reason` (String) The reason explaining the current state of the VM.
 - `subnet_id` (String) The ID of the Subnet for the VM.
+- `tags` (Attributes List) One or more tags associated with the VM. (see [below for nested schema](#nestedatt--items--tags))
 - `type` (String) The type of VM.
 - `user_data` (String) The Base64-encoded MIME user data.
 - `vpc_id` (String) The ID of the Vpc in which the VM is running.
-
-<a id="nestedatt--items--tags"></a>
-### Nested Schema for `items.tags`
-
-Required:
-
-- `key` (String) The key of the tag, with a minimum of 1 character.
-- `value` (String) The value of the tag, between 0 and 255 characters.
-
 
 <a id="nestedatt--items--block_device_mappings"></a>
 ### Nested Schema for `items.block_device_mappings`
@@ -189,12 +177,12 @@ Read-Only:
 - `description` (String) The description of the NIC.
 - `is_source_dest_checked` (Boolean) (Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc.
 - `link_nic` (Attributes) Information about the network interface card (NIC). (see [below for nested schema](#nestedatt--items--nics--link_nic))
-- `link_public_ip` (Attributes) Information about the public IP associated with the NIC. (see [below for nested schema](#nestedatt--items--nics--link_public_ip))
 - `mac_address` (String) The Media Access Control (MAC) address of the NIC.
 - `nic_id` (String) The ID of the NIC.
+- `nic_link_public_ip` (Attributes) Information about the public IP associated with the NIC. (see [below for nested schema](#nestedatt--items--nics--nic_link_public_ip))
+- `nic_security_groups` (Attributes List) One or more IDs of security groups for the NIC. (see [below for nested schema](#nestedatt--items--nics--nic_security_groups))
 - `private_dns_name` (String) The name of the private DNS.
 - `private_ips` (Attributes List) The private IP or IPs of the NIC. (see [below for nested schema](#nestedatt--items--nics--private_ips))
-- `security_groups` (Attributes List) One or more IDs of security groups for the NIC. (see [below for nested schema](#nestedatt--items--nics--security_groups))
 - `state` (String) The state of the NIC (`available` \| `attaching` \| `in-use` \| `detaching`).
 - `subnet_id` (String) The ID of the Subnet for the NIC.
 - `vpc_id` (String) The ID of the Vpc for the NIC.
@@ -210,13 +198,22 @@ Read-Only:
 - `state` (String) The state of the attachment (`attaching` \| `attached` \| `detaching` \| `detached`).
 
 
-<a id="nestedatt--items--nics--link_public_ip"></a>
-### Nested Schema for `items.nics.link_public_ip`
+<a id="nestedatt--items--nics--nic_link_public_ip"></a>
+### Nested Schema for `items.nics.nic_link_public_ip`
 
 Read-Only:
 
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP associated with the NIC.
+
+
+<a id="nestedatt--items--nics--nic_security_groups"></a>
+### Nested Schema for `items.nics.nic_security_groups`
+
+Read-Only:
+
+- `security_group_id` (String) The ID of the security group.
+- `security_group_name` (String) The name of the security group.
 
 
 <a id="nestedatt--items--nics--private_ips"></a>
@@ -225,27 +222,18 @@ Read-Only:
 Read-Only:
 
 - `is_primary` (Boolean) If true, the IP is the primary private IP of the NIC.
-- `link_public_ip` (Attributes) Information about the public IP associated with the NIC. (see [below for nested schema](#nestedatt--items--nics--private_ips--link_public_ip))
 - `private_dns_name` (String) The name of the private DNS.
 - `private_ip` (String) The private IP.
+- `private_ip_link_public_ip` (Attributes) Information about the public IP associated with the NIC. (see [below for nested schema](#nestedatt--items--nics--private_ips--private_ip_link_public_ip))
 
-<a id="nestedatt--items--nics--private_ips--link_public_ip"></a>
-### Nested Schema for `items.nics.private_ips.private_ip`
+<a id="nestedatt--items--nics--private_ips--private_ip_link_public_ip"></a>
+### Nested Schema for `items.nics.private_ips.private_ip_link_public_ip`
 
 Read-Only:
 
 - `public_dns_name` (String) The name of the public DNS.
 - `public_ip` (String) The public IP associated with the NIC.
 
-
-
-<a id="nestedatt--items--nics--security_groups"></a>
-### Nested Schema for `items.nics.security_groups`
-
-Read-Only:
-
-- `security_group_id` (String) The ID of the security group.
-- `security_group_name` (String) The name of the security group.
 
 
 
@@ -265,3 +253,12 @@ Read-Only:
 
 - `security_group_id` (String) The ID of the security group.
 - `security_group_name` (String) The name of the security group.
+
+
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
+
+Read-Only:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

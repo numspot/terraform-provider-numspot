@@ -71,7 +71,7 @@ resource "null_resource" "print-datasource-id" {
 - `security_group_names` (List of String) The names of the security groups.
 - `tag_keys` (List of String) The keys of the tags associated with the security groups.
 - `tag_values` (List of String) The values of the tags associated with the security groups.
-- `tags` (List of String) The key/value combination of the tags associated with the security groups, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the security groups, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `vpc_ids` (List of String) The IDs of the Vpcs specified when the security groups were created.
 
 ### Read-Only
@@ -81,35 +81,32 @@ resource "null_resource" "print-datasource-id" {
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `inbound_rules` (Attributes Set) The inbound rules associated with the security group. (see [below for nested schema](#nestedatt--items--inbound_rules))
-- `outbound_rules` (Attributes Set) The outbound rules associated with the security group. (see [below for nested schema](#nestedatt--items--outbound_rules))
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
-
 Read-Only:
 
 - `description` (String) The description of the security group.
 - `id` (String) The ID of the security group.
+- `inbound_rules` (Attributes List) The inbound rules associated with the security group. (see [below for nested schema](#nestedatt--items--inbound_rules))
 - `name` (String) The name of the security group.
+- `outbound_rules` (Attributes List) The outbound rules associated with the security group. (see [below for nested schema](#nestedatt--items--outbound_rules))
+- `tags` (Attributes List) One or more tags associated with the security group. (see [below for nested schema](#nestedatt--items--tags))
 - `vpc_id` (String) The ID of the Vpc for the security group.
 
 <a id="nestedatt--items--inbound_rules"></a>
 ### Nested Schema for `items.inbound_rules`
 
-Optional:
+Read-Only:
 
 - `from_port_range` (Number) The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.
+- `inbound_security_groups_members` (Attributes List) Information about one or more source or destination security groups. (see [below for nested schema](#nestedatt--items--inbound_rules--inbound_security_groups_members))
 - `ip_protocol` (String) The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
 - `ip_ranges` (List of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
-- `security_groups_members` (Attributes List) Information about one or more source or destination security groups. (see [below for nested schema](#nestedatt--items--inbound_rules--security_groups_members))
 - `service_ids` (List of String) One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.
 - `to_port_range` (Number) The end of the port range for the TCP and UDP protocols, or an ICMP code number.
 
-<a id="nestedatt--items--inbound_rules--security_groups_members"></a>
-### Nested Schema for `items.inbound_rules.security_groups_members`
+<a id="nestedatt--items--inbound_rules--inbound_security_groups_members"></a>
+### Nested Schema for `items.inbound_rules.inbound_security_groups_members`
 
-Optional:
+Read-Only:
 
 - `security_group_id` (String) The ID of a source or destination security group that you want to link to the security group of the rule.
 - `security_group_name` (String) (Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.
@@ -119,19 +116,19 @@ Optional:
 <a id="nestedatt--items--outbound_rules"></a>
 ### Nested Schema for `items.outbound_rules`
 
-Optional:
+Read-Only:
 
 - `from_port_range` (Number) The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.
 - `ip_protocol` (String) The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
 - `ip_ranges` (List of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
-- `security_groups_members` (Attributes List) Information about one or more source or destination security groups. (see [below for nested schema](#nestedatt--items--outbound_rules--security_groups_members))
+- `outbound_security_groups_members` (Attributes List) Information about one or more source or destination security groups. (see [below for nested schema](#nestedatt--items--outbound_rules--outbound_security_groups_members))
 - `service_ids` (List of String) One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.
 - `to_port_range` (Number) The end of the port range for the TCP and UDP protocols, or an ICMP code number.
 
-<a id="nestedatt--items--outbound_rules--security_groups_members"></a>
-### Nested Schema for `items.outbound_rules.security_groups_members`
+<a id="nestedatt--items--outbound_rules--outbound_security_groups_members"></a>
+### Nested Schema for `items.outbound_rules.outbound_security_groups_members`
 
-Optional:
+Read-Only:
 
 - `security_group_id` (String) The ID of a source or destination security group that you want to link to the security group of the rule.
 - `security_group_name` (String) (Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.
@@ -141,7 +138,7 @@ Optional:
 <a id="nestedatt--items--tags"></a>
 ### Nested Schema for `items.tags`
 
-Required:
+Read-Only:
 
 - `key` (String) The key of the tag, with a minimum of 1 character.
 - `value` (String) The value of the tag, between 0 and 255 characters.

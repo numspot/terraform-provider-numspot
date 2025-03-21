@@ -10,12 +10,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/services/volume/resource_volume"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -59,19 +59,19 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = VolumeResourceSchema(ctx)
+	response.Schema = resource_volume.VolumeResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan VolumeModel
+	var plan resource_volume.VolumeModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	vmID := plan.LinkVM.VmID.ValueString()
-	deviceName := plan.LinkVM.DeviceName.ValueString()
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	vmID := plan.LinkVm.VmId.ValueString()
+	deviceName := plan.LinkVm.DeviceName.ValueString()
+	tagsValue := volumeTags(ctx, plan.Tags)
 
 	numSpotVolume, err := core.CreateVolume(ctx, r.provider, deserializeCreateNumSpotVolume(plan), tagsValue, vmID, deviceName)
 	if err != nil {
@@ -88,7 +88,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state VolumeModel
+	var state resource_volume.VolumeModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -113,8 +113,8 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err           error
-		numSpotVolume *numspot.Volume
-		state, plan   VolumeModel
+		numSpotVolume *api.Volume
+		state, plan   resource_volume.VolumeModel
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -134,11 +134,11 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 
 	volumeID := state.Id.ValueString()
-	stateVMID := state.LinkVM.VmID.ValueString()
-	planVMID := plan.LinkVM.VmID.ValueString()
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
-	newDeviceName := plan.LinkVM.DeviceName.ValueString()
+	stateVMID := state.LinkVm.VmId.ValueString()
+	planVMID := plan.LinkVm.VmId.ValueString()
+	planTags := volumeTags(ctx, plan.Tags)
+	stateTags := volumeTags(ctx, state.Tags)
+	newDeviceName := plan.LinkVm.DeviceName.ValueString()
 
 	if !plan.Size.Equal(state.Size) || !plan.Type.Equal(state.Type) || (!utils.IsTfValueNull(plan.Iops) && !plan.Iops.Equal(state.Iops)) {
 		numSpotVolume, err = core.UpdateVolumeAttributes(ctx, r.provider, deserializeUpdateNumspotVolume(plan), volumeID, stateVMID)
@@ -148,7 +148,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 		}
 	}
 
-	if !plan.LinkVM.VmID.Equal(state.LinkVM.VmID) || !plan.LinkVM.DeviceName.Equal(state.LinkVM.DeviceName) {
+	if !plan.LinkVm.VmId.Equal(state.LinkVm.VmId) || !plan.LinkVm.DeviceName.Equal(state.LinkVm.DeviceName) {
 		numSpotVolume, err = core.UpdateVolumeLink(ctx, r.provider, volumeID, stateVMID, planVMID, newDeviceName)
 		if err != nil {
 			response.Diagnostics.AddError("unable to update volume link", err.Error())
@@ -164,7 +164,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 		}
 	}
 
-	newState := serializeNumSpotVolume(ctx, numSpotVolume, &response.Diagnostics, plan.ReplaceVolumeOnDownsize)
+	newState := serializeNumSpotVolume(ctx, numSpotVolume, &response.Diagnostics, state.ReplaceVolumeOnDownsize)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -172,24 +172,24 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state VolumeModel
+	var state resource_volume.VolumeModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	if err := core.DeleteVolume(ctx, r.provider, state.Id.ValueString(), state.LinkVM.VmID.ValueString()); err != nil {
+	if err := core.DeleteVolume(ctx, r.provider, state.Id.ValueString(), state.LinkVm.VmId.ValueString()); err != nil {
 		response.Diagnostics.AddError("unable to delete volume", err.Error())
 		return
 	}
 }
 
-func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, diags *diag.Diagnostics, ReplaceVolumeOnDownsize basetypes.BoolValue) VolumeModel {
+func serializeNumSpotVolume(ctx context.Context, http *api.Volume, diags *diag.Diagnostics, ReplaceVolumeOnDownsize basetypes.BoolValue) resource_volume.VolumeModel {
 	var (
-		volumes = types.ListNull(LinkedVolumesValue{}.Type(ctx))
+		volumes = types.ListNull(resource_volume.LinkedVolumesValue{}.Type(ctx))
 		tagsTf  types.List
-		linkVm  LinkVMValue
+		linkVm  resource_volume.LinkVmValue
 	)
 
 	if http.LinkedVolumes != nil {
@@ -203,7 +203,7 @@ func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, diags *di
 		nbLinkedVolumes := len(*http.LinkedVolumes)
 		if nbLinkedVolumes > 0 {
 			var diagnostics diag.Diagnostics
-			linkVm, diagnostics = NewLinkVMValue(LinkVMValue{}.AttributeTypes(ctx),
+			linkVm, diagnostics = resource_volume.NewLinkVmValue(resource_volume.LinkVmValue{}.AttributeTypes(ctx),
 				map[string]attr.Value{
 					"device_name": types.StringPointerValue((*http.LinkedVolumes)[0].DeviceName),
 					"vm_id":       types.StringPointerValue((*http.LinkedVolumes)[0].VmId),
@@ -216,7 +216,7 @@ func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, diags *di
 		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
-	return VolumeModel{
+	return resource_volume.VolumeModel{
 		CreationDate:            types.StringValue(http.CreationDate.String()),
 		Id:                      types.StringPointerValue(http.Id),
 		Iops:                    utils.FromIntPtrToTfInt64(http.Iops),
@@ -227,14 +227,14 @@ func serializeNumSpotVolume(ctx context.Context, http *numspot.Volume, diags *di
 		Type:                    types.StringPointerValue(http.Type),
 		LinkedVolumes:           volumes,
 		Tags:                    tagsTf,
-		LinkVM:                  linkVm,
+		LinkVm:                  linkVm,
 		ReplaceVolumeOnDownsize: ReplaceVolumeOnDownsize,
 	}
 }
 
-func serializeLinkedVolumes(ctx context.Context, http numspot.LinkedVolume, diags *diag.Diagnostics) LinkedVolumesValue {
-	value, diagnostics := NewLinkedVolumesValue(
-		LinkedVolumesValue{}.AttributeTypes(ctx),
+func serializeLinkedVolumes(ctx context.Context, http api.LinkedVolume, diags *diag.Diagnostics) resource_volume.LinkedVolumesValue {
+	value, diagnostics := resource_volume.NewLinkedVolumesValue(
+		resource_volume.LinkedVolumesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(http.DeleteOnVmDeletion),
 			"device_name":           types.StringPointerValue(http.DeviceName),
@@ -246,7 +246,7 @@ func serializeLinkedVolumes(ctx context.Context, http numspot.LinkedVolume, diag
 	return value
 }
 
-func deserializeCreateNumSpotVolume(tf VolumeModel) numspot.CreateVolumeJSONRequestBody {
+func deserializeCreateNumSpotVolume(tf resource_volume.VolumeModel) api.CreateVolumeJSONRequestBody {
 	var (
 		httpIOPS   *int
 		snapshotId *string
@@ -258,7 +258,7 @@ func deserializeCreateNumSpotVolume(tf VolumeModel) numspot.CreateVolumeJSONRequ
 		snapshotId = tf.SnapshotId.ValueStringPointer()
 	}
 
-	return numspot.CreateVolumeJSONRequestBody{
+	return api.CreateVolumeJSONRequestBody{
 		Iops:                 httpIOPS,
 		Size:                 utils.FromTfInt64ToIntPtr(tf.Size),
 		SnapshotId:           snapshotId,
@@ -267,15 +267,30 @@ func deserializeCreateNumSpotVolume(tf VolumeModel) numspot.CreateVolumeJSONRequ
 	}
 }
 
-func deserializeUpdateNumspotVolume(tf VolumeModel) numspot.UpdateVolumeJSONRequestBody {
+func deserializeUpdateNumspotVolume(tf resource_volume.VolumeModel) api.UpdateVolumeJSONRequestBody {
 	var httpIOPS *int
 	if !tf.Iops.IsUnknown() && !tf.Iops.IsNull() {
 		httpIOPS = utils.FromTfInt64ToIntPtr(tf.Iops)
 	}
 
-	return numspot.UpdateVolumeJSONRequestBody{
+	return api.UpdateVolumeJSONRequestBody{
 		Iops:       httpIOPS,
 		Size:       utils.FromTfInt64ToIntPtr(tf.Size),
 		VolumeType: tf.Type.ValueStringPointer(),
 	}
+}
+
+func volumeTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_volume.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

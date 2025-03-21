@@ -11,28 +11,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/clientgateway"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/dhcpoptions"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/flexiblegpu"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/image"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/internetgateway"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/keypair"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/loadbalancer"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/natgateway"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/nic"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/publicip"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/routetable"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/securitygroup"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/snapshot"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/subnet"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/virtualgateway"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/vm"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/volume"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/vpc"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/vpcpeering"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/vpnconnection"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/services/dhcpoptions"
+	"terraform-provider-numspot/internal/services/flexiblegpu"
+	"terraform-provider-numspot/internal/services/image"
+	"terraform-provider-numspot/internal/services/internetgateway"
+	"terraform-provider-numspot/internal/services/keypair"
+	"terraform-provider-numspot/internal/services/loadbalancer"
+	"terraform-provider-numspot/internal/services/natgateway"
+	"terraform-provider-numspot/internal/services/nic"
+	"terraform-provider-numspot/internal/services/publicip"
+	"terraform-provider-numspot/internal/services/routetable"
+	"terraform-provider-numspot/internal/services/securitygroup"
+	"terraform-provider-numspot/internal/services/servercertificate"
+	"terraform-provider-numspot/internal/services/snapshot"
+	"terraform-provider-numspot/internal/services/subnet"
+	"terraform-provider-numspot/internal/services/vm"
+	"terraform-provider-numspot/internal/services/volume"
+	"terraform-provider-numspot/internal/services/vpc"
 )
 
 type NumspotProviderModel struct {
@@ -223,25 +219,21 @@ func (p *numspotProvider) DataSources(_ context.Context) []func() datasource.Dat
 		vpc.NewVPCsDataSource,
 		subnet.NewSubnetsDataSource,
 		publicip.NewPublicIpsDataSource,
-		virtualgateway.NewVirtualGatewaysDataSource,
 		nic.NewNicsDataSource,
 		natgateway.NewNatGatewaysDataSource,
-		vpcpeering.NewVpcPeeringsDataSource,
 		internetgateway.NewInternetGatewaysDataSource,
 		snapshot.NewSnapshotsDataSource,
 		keypair.NewKeypairsDataSource,
-		clientgateway.NewClientGatewaysDataSource,
 		securitygroup.NewSecurityGroupsDataSource,
 		routetable.NewRouteTablesDataSource,
-		vpnconnection.NewVpnConnectionsDataSource,
 		vm.NewVmsDataSource,
 		flexiblegpu.NewFlexibleGpusDataSource,
+		servercertificate.NewServerCertificateDataSource,
 	}
 }
 
 func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		clientgateway.NewClientGatewayResource,
 		flexiblegpu.NewFlexibleGpuResource,
 		image.NewImageResource,
 		internetgateway.NewInternetGatewayResource,
@@ -255,11 +247,9 @@ func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resourc
 		snapshot.NewSnapshotResource,
 		subnet.NewSubnetResource,
 		volume.NewVolumeResource,
-		vpnconnection.NewVpnConnectionResource,
 		vm.NewVmResource,
 		keypair.NewKeyPairResource,
 		dhcpoptions.NewDhcpOptionsResource,
-		virtualgateway.NewVirtualGatewayResource,
-		vpcpeering.NewVpcPeeringResource,
+		servercertificate.NewServerCertificateResource,
 	}
 }

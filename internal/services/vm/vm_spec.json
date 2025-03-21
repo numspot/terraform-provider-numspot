@@ -1,0 +1,1808 @@
+{
+	"datasources": [
+		{
+			"name": "vm",
+			"schema": {
+				"attributes": [
+					{
+						"name": "architectures",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The architectures of the VMs (`i386` \\| `x86_64`)."
+						}
+					},
+					{
+						"name": "block_device_mapping_delete_on_vm_deletion",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "Whether the BSU volumes are deleted when terminating the VMs."
+						}
+					},
+					{
+						"name": "block_device_mapping_device_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The device names for the BSU volumes (in the format `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX`)."
+						}
+					},
+					{
+						"name": "block_device_mapping_states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The states for the BSU volumes (`attaching` \\| `attached` \\| `detaching` \\| `detached`)."
+						}
+					},
+					{
+						"name": "block_device_mapping_volume_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The volume IDs of the BSU volumes."
+						}
+					},
+					{
+						"name": "client_tokens",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The idempotency tokens provided when launching the VMs."
+						}
+					},
+					{
+						"name": "image_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the OMIs used to launch the VMs."
+						}
+					},
+					{
+						"name": "is_source_dest_checked",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "Whether the source/destination checking is enabled (true) or disabled (false)."
+						}
+					},
+					{
+						"name": "keypair_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the keypairs used when launching the VMs."
+						}
+					},
+					{
+						"name": "launch_numbers",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The numbers for the VMs when launching a group of several VMs (for example, `0`, `1`, `2`, and so on)."
+						}
+					},
+					{
+						"name": "lifecycles",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "Whether the VMs are Spot Instances (spot)."
+						}
+					},
+					{
+						"name": "nic_descriptions",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The descriptions of the NICs."
+						}
+					},
+					{
+						"name": "nic_is_source_dest_checked",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "Whether the source/destination checking is enabled (true) or disabled (false)."
+						}
+					},
+					{
+						"name": "nic_link_nic_delete_on_vm_deletion",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "Whether the NICs are deleted when the VMs they are attached to are deleted."
+						}
+					},
+					{
+						"name": "nic_link_nic_device_numbers",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The device numbers the NICs are attached to."
+						}
+					},
+					{
+						"name": "nic_link_nic_link_nic_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the NIC attachments."
+						}
+					},
+					{
+						"name": "nic_link_nic_states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The states of the attachments."
+						}
+					},
+					{
+						"name": "nic_link_nic_vm_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the VMs the NICs are attached to."
+						}
+					},
+					{
+						"name": "nic_link_public_ip_link_public_ip_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The association IDs returned when the public IPs were associated with the NICs."
+						}
+					},
+					{
+						"name": "nic_link_public_ip_public_ip_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The allocation IDs returned when the public IPs were allocated to their accounts."
+						}
+					},
+					{
+						"name": "nic_link_public_ip_public_ips",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The public IPs associated with the NICs."
+						}
+					},
+					{
+						"name": "nic_mac_addresses",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The Media Access Control (MAC) addresses of the NICs."
+						}
+					},
+					{
+						"name": "nic_nic_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the NICs."
+						}
+					},
+					{
+						"name": "nic_private_ips_link_public_ip_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The public IPs associated with the private IPs."
+						}
+					},
+					{
+						"name": "nic_private_ips_primary_ip",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "Whether the private IPs are the primary IPs associated with the NICs."
+						}
+					},
+					{
+						"name": "nic_private_ips_private_ips",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The private IPs of the NICs."
+						}
+					},
+					{
+						"name": "nic_security_group_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the security groups associated with the NICs."
+						}
+					},
+					{
+						"name": "nic_security_group_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the security groups associated with the NICs."
+						}
+					},
+					{
+						"name": "nic_states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The states of the NICs (`available` \\| `in-use`)."
+						}
+					},
+					{
+						"name": "nic_subnet_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Subnets for the NICs."
+						}
+					},
+					{
+						"name": "platforms",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The platforms. Use windows if you have Windows VMs. Otherwise, leave this filter blank."
+						}
+					},
+					{
+						"name": "private_ips",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The private IPs of the VMs."
+						}
+					},
+					{
+						"name": "product_codes",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The product codes associated with the Image used to create the VMs."
+						}
+					},
+					{
+						"name": "public_ips",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The public IPs of the VMs."
+						}
+					},
+					{
+						"name": "reservation_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the reservation of the VMs, created every time you launch VMs. These reservation IDs can be associated with several VMs when you lauch a group of VMs using the same launch request."
+						}
+					},
+					{
+						"name": "root_device_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the root devices for the VMs (for example, `/dev/sda1`)"
+						}
+					},
+					{
+						"name": "root_device_types",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The root devices types used by the VMs (always `ebs`)"
+						}
+					},
+					{
+						"name": "security_group_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the security groups for the VMs (only in the public Cloud)."
+						}
+					},
+					{
+						"name": "security_group_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the security groups for the VMs (only in the public Cloud)."
+						}
+					},
+					{
+						"name": "state_reason_codes",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The reason codes for the state changes."
+						}
+					},
+					{
+						"name": "state_reason_messages",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The messages describing the state changes."
+						}
+					},
+					{
+						"name": "state_reasons",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The reasons explaining the current states of the VMs. This filter is like the `StateReasonCodes` one."
+						}
+					},
+					{
+						"name": "subnet_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Subnets for the VMs."
+						}
+					},
+					{
+						"name": "tag_keys",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The keys of the tags associated with the VMs."
+						}
+					},
+					{
+						"name": "tag_values",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The values of the tags associated with the VMs."
+						}
+					},
+					{
+						"name": "tags",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The key/value combination of the tags associated with the VMs, in the following format: \u0026quot;Filters\u0026quot;:{\u0026quot;Tags\u0026quot;:[\u0026quot;TAGKEY=TAGVALUE\u0026quot;]}."
+						}
+					},
+					{
+						"name": "tenancies",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The tenancies of the VMs (`dedicated` \\| `default` \\| `host`)."
+						}
+					},
+					{
+						"name": "vm_security_group_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the security groups for the VMs."
+						}
+					},
+					{
+						"name": "vm_security_group_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the security group for the VMs."
+						}
+					},
+					{
+						"name": "vm_state_codes",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"int64": {}
+							},
+							"description": "The state codes of the VMs: `-1` (quarantine), `0` (pending), `16` (running), `32` (shutting-down), `48` (terminated), `64` (stopping), and `80` (stopped)."
+						}
+					},
+					{
+						"name": "vm_state_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The state names of the VMs (`pending` \\| `running` \\| `stopping` \\| `stopped` \\| `shutting-down` \\| `terminated` \\| `quarantine`)."
+						}
+					},
+					{
+						"name": "types",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The NumSpot VM types."
+						}
+					},
+					{
+						"name": "vpc_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Vpcs in which the VMs are running."
+						}
+					},
+					{
+						"name": "nic_vpc_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Vpcs where the NICs are located."
+						}
+					},
+					{
+						"name": "nic_availability_zone_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The Subregions where the NICs are located."
+						}
+					},
+					{
+						"name": "availability_zone_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The names of the Subregions of the VMs."
+						}
+					},
+					{
+						"name": "ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more IDs of VMs."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "architecture",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The architecture of the VM (`i386` \\| `x86_64`)."
+										}
+									},
+									{
+										"name": "block_device_mappings",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "bsu",
+														"single_nested": {
+															"computed_optional_required": "computed",
+															"attributes": [
+																{
+																	"name": "delete_on_vm_deletion",
+																	"bool": {
+																		"computed_optional_required": "computed",
+																		"description": "If true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM."
+																	}
+																},
+																{
+																	"name": "link_date",
+																	"string": {
+																		"computed_optional_required": "computed",
+																		"description": "The date and time of attachment of the volume to the VM, in ISO 8601 date-time format."
+																	}
+																},
+																{
+																	"name": "state",
+																	"string": {
+																		"computed_optional_required": "computed",
+																		"description": "The state of the volume."
+																	}
+																},
+																{
+																	"name": "volume_id",
+																	"string": {
+																		"computed_optional_required": "computed",
+																		"description": "The ID of the volume."
+																	}
+																}
+															],
+															"description": "Information about the created BSU volume."
+														}
+													},
+													{
+														"name": "device_name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The name of the device."
+														}
+													}
+												]
+											},
+											"description": "The block device mapping of the VM."
+										}
+									},
+									{
+										"name": "bsu_optimized",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "This parameter is not available. It is present in our API for the sake of historical compatibility with AWS."
+										}
+									},
+									{
+										"name": "client_token",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The idempotency token provided when launching the VM."
+										}
+									},
+									{
+										"name": "creation_date",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The date and time of creation of the VM."
+										}
+									},
+									{
+										"name": "deletion_protection",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "If true, you cannot delete the VM unless you change this parameter back to false."
+										}
+									},
+									{
+										"name": "hypervisor",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The hypervisor type of the VMs (`ovm` \\| `xen`)."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the VM."
+										}
+									},
+									{
+										"name": "image_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Image used to create the VM."
+										}
+									},
+									{
+										"name": "initiated_shutdown_behavior",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted."
+										}
+									},
+									{
+										"name": "is_source_dest_checked",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc."
+										}
+									},
+									{
+										"name": "keypair_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the keypair used when launching the VM."
+										}
+									},
+									{
+										"name": "launch_number",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "The number for the VM when launching a group of several VMs (for example, `0`, `1`, `2`, and so on)."
+										}
+									},
+									{
+										"name": "nested_virtualization",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "If true, nested virtualization is enabled. If false, it is disabled."
+										}
+									},
+									{
+										"name": "nics",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "description",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The description of the NIC."
+														}
+													},
+													{
+														"name": "is_source_dest_checked",
+														"bool": {
+															"computed_optional_required": "computed",
+															"description": "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc."
+														}
+													},
+													{
+														"name": "link_nic",
+														"single_nested": {
+															"computed_optional_required": "computed",
+															"attributes": [
+																{
+																	"name": "delete_on_vm_deletion",
+																	"bool": {
+																		"computed_optional_required": "computed",
+																		"description": "If true, the NIC is deleted when the VM is terminated."
+																	}
+																},
+																{
+																	"name": "device_number",
+																	"int64": {
+																		"computed_optional_required": "computed",
+																		"description": "The device index for the NIC attachment (between `1` and `7`, both included)."
+																	}
+																},
+																{
+																	"name": "link_nic_id",
+																	"string": {
+																		"computed_optional_required": "computed",
+																		"description": "The ID of the NIC to attach."
+																	}
+																},
+																{
+																	"name": "state",
+																	"string": {
+																		"computed_optional_required": "computed",
+																		"description": "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`)."
+																	}
+																}
+															],
+															"description": "Information about the network interface card (NIC)."
+														}
+													},
+													{
+														"name": "nic_link_public_ip",
+														"single_nested": {
+															"computed_optional_required": "computed",
+															"attributes": [
+																{
+																	"name": "public_dns_name",
+																	"string": {
+																		"computed_optional_required": "computed",
+																		"description": "The name of the public DNS."
+																	}
+																},
+																{
+																	"name": "public_ip",
+																	"string": {
+																		"computed_optional_required": "computed",
+																		"description": "The public IP associated with the NIC."
+																	}
+																}
+															],
+															"description": "Information about the public IP associated with the NIC."
+														}
+													},
+													{
+														"name": "mac_address",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The Media Access Control (MAC) address of the NIC."
+														}
+													},
+													{
+														"name": "nic_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the NIC."
+														}
+													},
+													{
+														"name": "private_dns_name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The name of the private DNS."
+														}
+													},
+													{
+														"name": "private_ips",
+														"list_nested": {
+															"computed_optional_required": "computed",
+															"nested_object": {
+																"attributes": [
+																	{
+																		"name": "is_primary",
+																		"bool": {
+																			"computed_optional_required": "computed",
+																			"description": "If true, the IP is the primary private IP of the NIC."
+																		}
+																	},
+																	{
+																		"name": "private_ip_link_public_ip",
+																		"single_nested": {
+																			"computed_optional_required": "computed",
+																			"attributes": [
+																				{
+																					"name": "public_dns_name",
+																					"string": {
+																						"computed_optional_required": "computed",
+																						"description": "The name of the public DNS."
+																					}
+																				},
+																				{
+																					"name": "public_ip",
+																					"string": {
+																						"computed_optional_required": "computed",
+																						"description": "The public IP associated with the NIC."
+																					}
+																				}
+																			],
+																			"description": "Information about the public IP associated with the NIC."
+																		}
+																	},
+																	{
+																		"name": "private_dns_name",
+																		"string": {
+																			"computed_optional_required": "computed",
+																			"description": "The name of the private DNS."
+																		}
+																	},
+																	{
+																		"name": "private_ip",
+																		"string": {
+																			"computed_optional_required": "computed",
+																			"description": "The private IP."
+																		}
+																	}
+																]
+															},
+															"description": "The private IP or IPs of the NIC."
+														}
+													},
+													{
+														"name": "nic_security_groups",
+														"list_nested": {
+															"computed_optional_required": "computed",
+															"nested_object": {
+																"attributes": [
+																	{
+																		"name": "security_group_id",
+																		"string": {
+																			"computed_optional_required": "computed",
+																			"description": "The ID of the security group."
+																		}
+																	},
+																	{
+																		"name": "security_group_name",
+																		"string": {
+																			"computed_optional_required": "computed",
+																			"description": "The name of the security group."
+																		}
+																	}
+																]
+															},
+															"description": "One or more IDs of security groups for the NIC."
+														}
+													},
+													{
+														"name": "state",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The state of the NIC (`available` \\| `attaching` \\| `in-use` \\| `detaching`)."
+														}
+													},
+													{
+														"name": "subnet_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the Subnet for the NIC."
+														}
+													},
+													{
+														"name": "vpc_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the Vpc for the NIC."
+														}
+													}
+												]
+											},
+											"description": "(Vpc only) The network interface cards (NICs) the VMs are attached to."
+										}
+									},
+									{
+										"name": "os_family",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Indicates the operating system (OS) of the VM."
+										}
+									},
+									{
+										"name": "performance",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The performance of the VM (`medium` \\| `high` \\|  `highest`)."
+										}
+									},
+									{
+										"name": "placement",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "availability_zone_name",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter."
+													}
+												},
+												{
+													"name": "tenancy",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID)."
+													}
+												}
+											],
+											"description": "Information about the placement of the VM."
+										}
+									},
+									{
+										"name": "private_dns_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the private DNS."
+										}
+									},
+									{
+										"name": "private_ip",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The primary private IP of the VM."
+										}
+									},
+									{
+										"name": "product_codes",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "The product codes associated with the Image used to create the VM."
+										}
+									},
+									{
+										"name": "public_dns_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the public DNS."
+										}
+									},
+									{
+										"name": "public_ip",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The public IP of the VM."
+										}
+									},
+									{
+										"name": "reservation_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The reservation ID of the VM."
+										}
+									},
+									{
+										"name": "root_device_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the root device for the VM (for example, `/dev/sda1`)."
+										}
+									},
+									{
+										"name": "root_device_type",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The type of root device used by the VM (always `bsu`)."
+										}
+									},
+									{
+										"name": "security_groups",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "security_group_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the security group."
+														}
+													},
+													{
+														"name": "security_group_name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The name of the security group."
+														}
+													}
+												]
+											},
+											"description": "One or more security groups associated with the VM."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the VM (`pending` \\| `running` \\| `stopping` \\| `stopped` \\| `shutting-down` \\| `terminated` \\| `quarantine`)."
+										}
+									},
+									{
+										"name": "state_reason",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The reason explaining the current state of the VM."
+										}
+									},
+									{
+										"name": "subnet_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Subnet for the VM."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the VM."
+										}
+									},
+									{
+										"name": "type",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The type of VM."
+										}
+									},
+									{
+										"name": "user_data",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The Base64-encoded MIME user data."
+										}
+									},
+									{
+										"name": "vpc_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Vpc in which the VM is running."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more VMs."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "vm",
+			"schema": {
+				"attributes": [
+					{
+						"name": "block_device_mappings",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "bsu",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "delete_on_vm_deletion",
+													"bool": {
+														"computed_optional_required": "computed",
+														"description": "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM."
+													}
+												},
+												{
+													"name": "iops",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte."
+													}
+												},
+												{
+													"name": "snapshot_id",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The ID of the snapshot used to create the volume."
+													}
+												},
+												{
+													"name": "volume_size",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The size of the volume, in gibibytes (GiB).\u003cbr /\u003e\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.\u003cbr /\u003e\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one."
+													}
+												},
+												{
+													"name": "volume_type",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The type of the volume (`standard` \\| `io1` \\| `gp2`). If not specified in the request, a `standard` volume is created.\u003cbr /\u003e"
+													}
+												},
+												{
+													"name": "link_date",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The date and time of attachment of the volume to the VM, in ISO 8601 date-time format."
+													}
+												},
+												{
+													"name": "state",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The state of the volume."
+													}
+												},
+												{
+													"name": "volume_id",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The ID of the volume."
+													}
+												}
+											],
+											"description": "Information about the BSU volume to create."
+										}
+									},
+									{
+										"name": "device_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The device name for the volume. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`)."
+										}
+									},
+									{
+										"name": "no_device",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Removes the device which is included in the block device mapping of the Image."
+										}
+									},
+									{
+										"name": "virtual_device_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the virtual device (`ephemeralN`)."
+										}
+									}
+								]
+							},
+							"description": "One or more block device mappings."
+						}
+					},
+					{
+						"name": "client_token",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "A unique identifier which enables you to manage the idempotency."
+						}
+					},
+					{
+						"name": "deletion_protection",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "If true, you cannot delete the VM unless you change this parameter back to false."
+						}
+					},
+					{
+						"name": "image_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The ID of the Image used to create the VM. You can find the list of OMIs by calling the [ReadImages](#readimages) method.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "keypair_name",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The name of the keypair."
+						}
+					},
+					{
+						"name": "nested_virtualization",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"default": {
+								"static": false
+							},
+							"description": "(dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled."
+						}
+					},
+					{
+						"name": "placement",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "availability_zone_name",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "The name of the Subregion. If you specify this parameter, you must not specify the `Nics` parameter.",
+										"plan_modifiers": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+														},
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+														}
+													],
+													"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "tenancy",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "The tenancy of the VM (`default`, `dedicated`, or a dedicated group ID).",
+										"plan_modifiers": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+														},
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+														}
+													],
+													"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Information about the placement of the VM."
+						}
+					},
+					{
+						"name": "private_ips",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more private IPs of the VM.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+											}
+										],
+										"schema_definition": "listplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "security_group_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more IDs of security group for the VMs."
+						}
+					},
+					{
+						"name": "security_groups",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more names of security groups for the VMs.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+											}
+										],
+										"schema_definition": "listplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "subnet_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The ID of the Subnet in which you want to create the VM. If you specify this parameter, you must not specify the `Nics` parameter.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "type",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The type of VM."
+						}
+					},
+					{
+						"name": "user_data",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB)."
+						}
+					},
+					{
+						"name": "vm_initiated_shutdown_behavior",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The VM behavior when you stop it. By default or if set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is terminated."
+						}
+					},
+					{
+						"name": "architecture",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The architecture of the VM (`i386` \\| `x86_64`)."
+						}
+					},
+					{
+						"name": "creation_date",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The date and time of creation of the VM."
+						}
+					},
+					{
+						"name": "hypervisor",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The hypervisor type of the VMs (`ovm` \\| `xen`)."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the VM."
+						}
+					},
+					{
+						"name": "initiated_shutdown_behavior",
+						"string": {
+							"default": {
+								"static": "stop"
+							},
+							"computed_optional_required": "computed_optional",
+							"description": "The VM behavior when you stop it. If set to `stop`, the VM stops. If set to `restart`, the VM stops then automatically restarts. If set to `terminate`, the VM stops and is deleted."
+						}
+					},
+					{
+						"name": "is_source_dest_checked",
+						"bool": {
+							"computed_optional_required": "computed",
+							"description": "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc."
+						}
+					},
+					{
+						"name": "launch_number",
+						"int64": {
+							"computed_optional_required": "computed",
+							"description": "The number for the VM when launching a group of several VMs (for example, `0`, `1`, `2`, and so on)."
+						}
+					},
+					{
+						"name": "nics",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "description",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The description of the NIC."
+										}
+									},
+									{
+										"name": "is_source_dest_checked",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "(Vpc only) If true, the source/destination check is enabled. If false, it is disabled. This value must be false for a NAT VM to perform network address translation (NAT) in a Vpc."
+										}
+									},
+									{
+										"name": "link_nic",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "delete_on_vm_deletion",
+													"bool": {
+														"computed_optional_required": "computed",
+														"description": "If true, the NIC is deleted when the VM is terminated."
+													}
+												},
+												{
+													"name": "device_number",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The device index for the NIC attachment (between `1` and `7`, both included)."
+													}
+												},
+												{
+													"name": "link_nic_id",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The ID of the NIC to attach."
+													}
+												},
+												{
+													"name": "state",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The state of the attachment (`attaching` \\| `attached` \\| `detaching` \\| `detached`)."
+													}
+												}
+											],
+											"description": "Information about the network interface card (NIC)."
+										}
+									},
+									{
+										"name": "nic_link_public_ip",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "public_dns_name",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The name of the public DNS."
+													}
+												},
+												{
+													"name": "public_ip",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The public IP associated with the NIC."
+													}
+												}
+											],
+											"description": "Information about the public IP associated with the NIC."
+										}
+									},
+									{
+										"name": "mac_address",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The Media Access Control (MAC) address of the NIC."
+										}
+									},
+									{
+										"name": "nic_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the NIC."
+										}
+									},
+									{
+										"name": "private_dns_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the private DNS."
+										}
+									},
+									{
+										"name": "private_ips",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "is_primary",
+														"bool": {
+															"computed_optional_required": "computed",
+															"description": "If true, the IP is the primary private IP of the NIC."
+														}
+													},
+													{
+														"name": "private_ip_link_public_ip",
+														"single_nested": {
+															"computed_optional_required": "computed",
+															"attributes": [
+																{
+																	"name": "public_dns_name",
+																	"string": {
+																		"computed_optional_required": "computed",
+																		"description": "The name of the public DNS."
+																	}
+																},
+																{
+																	"name": "public_ip",
+																	"string": {
+																		"computed_optional_required": "computed",
+																		"description": "The public IP associated with the NIC."
+																	}
+																}
+															],
+															"description": "Information about the public IP associated with the NIC."
+														}
+													},
+													{
+														"name": "private_dns_name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The name of the private DNS."
+														}
+													},
+													{
+														"name": "private_ip",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The private IP."
+														}
+													}
+												]
+											},
+											"description": "The private IP or IPs of the NIC."
+										}
+									},
+									{
+										"name": "nic_security_groups",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "security_group_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the security group."
+														}
+													},
+													{
+														"name": "security_group_name",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The name of the security group."
+														}
+													}
+												]
+											},
+											"description": "One or more IDs of security groups for the NIC."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the NIC (`available` \\| `attaching` \\| `in-use` \\| `detaching`)."
+										}
+									},
+									{
+										"name": "subnet_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Subnet for the NIC."
+										}
+									},
+									{
+										"name": "vpc_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Vpc for the NIC."
+										}
+									}
+								]
+							},
+							"description": "(Vpc only) The network interface cards (NICs) the VMs are attached to."
+						}
+					},
+					{
+						"name": "os_family",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Indicates the operating system (OS) of the VM."
+						}
+					},
+					{
+						"name": "private_dns_name",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The name of the private DNS."
+						}
+					},
+					{
+						"name": "private_ip",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The primary private IP of the VM."
+						}
+					},
+					{
+						"name": "product_codes",
+						"list": {
+							"computed_optional_required": "computed",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The product codes associated with the Image used to create the VM."
+						}
+					},
+					{
+						"name": "public_dns_name",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The name of the public DNS."
+						}
+					},
+					{
+						"name": "public_ip",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The public IP of the VM."
+						}
+					},
+					{
+						"name": "reservation_id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The reservation ID of the VM."
+						}
+					},
+					{
+						"name": "root_device_name",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The name of the root device for the VM (for example, `/dev/sda1`)."
+						}
+					},
+					{
+						"name": "root_device_type",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The type of root device used by the VM (always `bsu`)."
+						}
+					},
+					{
+						"name": "state",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The state of the VM (`pending` \\| `running` \\| `stopping` \\| `stopped` \\| `shutting-down` \\| `terminated` \\| `quarantine`)."
+						}
+					},
+					{
+						"name": "state_reason",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The reason explaining the current state of the VM."
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags associated with the VM."
+						}
+					},
+					{
+						"name": "vpc_id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the Vpc in which the VM is running."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

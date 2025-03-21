@@ -30,15 +30,15 @@ resource "numspot_keypair" "keypair_imported" {
 
 ### Required
 
-- `name` (String) A unique name for the keypair, with a maximum length of 255 [ASCII printable characters](https://en.wikipedia.org/wiki/ASCII#Printable_characters).
+- `name` (String) A unique name for the keypair, with a maximum length of 32 alphanumeric characters and dashes (-).
 
 ### Optional
 
+- `id` (String) ID for ReadKeypairs
 - `public_key` (String) The public key to import in your account, if you are importing an existing keypair. This value must be Base64-encoded.
 
 ### Read-Only
 
 - `fingerprint` (String) The MD5 public key fingerprint, as specified in section 4 of RFC 4716.
-- `id` (String) ID for ReadKeypairs
 - `private_key` (String) The private key, returned only if you are creating a keypair (not if you are importing). When you save this private key in a .rsa file, make sure you replace the `\n` escape sequences with real line breaks.
 - `type` (String) The type of the keypair (`ssh-rsa`, `ssh-ed25519`, `ecdsa-sha2-nistp256`, `ecdsa-sha2-nistp384`, or `ecdsa-sha2-nistp521`).

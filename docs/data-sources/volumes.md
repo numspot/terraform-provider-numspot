@@ -45,7 +45,7 @@ resource "null_resource" "print-datasource-id" {
 - `snapshot_ids` (List of String) The snapshots from which the volumes were created.
 - `tag_keys` (List of String) The keys of the tags associated with the volumes.
 - `tag_values` (List of String) The values of the tags associated with the volumes.
-- `tags` (List of String) The key/value combination of the tags associated with the volumes, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the volumes, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `volume_sizes` (List of Number) The sizes of the volumes, in gibibytes (GiB).
 - `volume_states` (List of String) The states of the volumes (`creating` \| `available` \| `in-use` \| `updating` \| `deleting` \| `error`).
 - `volume_types` (List of String) The types of the volumes (`standard` \| `gp2` \| `io1`).
@@ -56,11 +56,6 @@ resource "null_resource" "print-datasource-id" {
 
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
-
-Optional:
-
-- `link_vm` (Attributes) VM the Volume will be linked to. To unlink a Volume from a VM, the VM will need to be restarded. (see [below for nested schema](#nestedatt--items--link_vm))
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
 
 Read-Only:
 
@@ -74,25 +69,8 @@ Read-Only:
 - `size` (Number) The size of the volume, in gibibytes (GiB).
 - `snapshot_id` (String) The snapshot from which the volume was created.
 - `state` (String) The state of the volume (`creating` \| `available` \| `in-use` \| `updating` \| `deleting` \| `error`).
+- `tags` (Attributes List) One or more tags associated with the volume. (see [below for nested schema](#nestedatt--items--tags))
 - `type` (String) The type of the volume (`standard` \| `gp2` \| `io1`).
-
-<a id="nestedatt--items--link_vm"></a>
-### Nested Schema for `items.link_vm`
-
-Optional:
-
-- `device_name` (String) The name of the device. For a root device, you must use /dev/sda1. For other volumes, you must use /dev/sdX, /dev/sdXX, /dev/xvdX, or /dev/xvdXX (where the first X is a letter between b and z, and the second X is a letter between a and z).
-- `vm_id` (String) The ID of the VM you want to attach the volume to.
-
-
-<a id="nestedatt--items--tags"></a>
-### Nested Schema for `items.tags`
-
-Required:
-
-- `key` (String) The key of the tag, with a minimum of 1 character.
-- `value` (String) The value of the tag, between 0 and 255 characters.
-
 
 <a id="nestedatt--items--linked_volumes"></a>
 ### Nested Schema for `items.linked_volumes`
@@ -104,3 +82,12 @@ Read-Only:
 - `id` (String) The ID of the volume.
 - `state` (String) The state of the attachment of the volume (`attaching` \| `detaching` \| `attached` \| `detached`).
 - `vm_id` (String) The ID of the VM.
+
+
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
+
+Read-Only:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

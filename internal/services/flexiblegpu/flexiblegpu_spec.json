@@ -1,0 +1,203 @@
+{
+	"datasources": [
+		{
+			"name": "flexible_gpu",
+			"schema": {
+				"attributes": [
+					{
+						"name": "delete_on_vm_deletion",
+						"bool": {
+							"computed_optional_required": "computed",
+							"description": "Indicates whether the fGPU is deleted when terminating the VM."
+						}
+					},
+					{
+						"name": "generations",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The processor generations that the fGPUs are compatible with."
+						}
+					},
+					{
+						"name": "model_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more models of fGPUs."
+						}
+					},
+					{
+						"name": "states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The states of the fGPUs (`allocated` \\| `attaching` \\| `attached` \\| `detaching`)."
+						}
+					},
+					{
+						"name": "vm_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more IDs of VMs."
+						}
+					},
+					{
+						"name": "availability_zone_names",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The Subregions where the fGPUs are located."
+						}
+					},
+					{
+						"name": "ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "One or more IDs of fGPUs."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "availability_zone_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The Subregion where the fGPU is located."
+										}
+									},
+									{
+										"name": "delete_on_vm_deletion",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "If true, the fGPU is deleted when the VM is terminated."
+										}
+									},
+									{
+										"name": "generation",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The compatible processor generation."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the fGPU."
+										}
+									},
+									{
+										"name": "model_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The model of fGPU."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the fGPU (`allocated` \\| `attaching` \\| `attached` \\| `detaching`)."
+										}
+									},
+									{
+										"name": "vm_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the VM the fGPU is attached to, if any."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more fGPUs."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "flexible_gpu",
+			"schema": {
+				"attributes": [
+					{
+						"name": "availability_zone_name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The Subregion in which you want to create the fGPU."
+						}
+					},
+					{
+						"name": "delete_on_vm_deletion",
+						"bool": {
+							"computed_optional_required": "computed",
+							"default": {
+								"static": false
+							},
+							"description": "If true, the fGPU is deleted when the VM is terminated."
+						}
+					},
+					{
+						"name": "generation",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The processor generation that the fGPU must be compatible with. If not specified, the oldest possible processor generation is selected (as provided by [ReadFlexibleGpuCatalog](#readflexiblegpucatalog) for the specified model of fGPU)."
+						}
+					},
+					{
+						"name": "model_name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The model of fGPU you want to allocate."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the fGPU."
+						}
+					},
+					{
+						"name": "state",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The state of the fGPU (`allocated` \\| `attaching` \\| `attached` \\| `detaching`)."
+						}
+					},
+					{
+						"name": "vm_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The ID of the VM the fGPU is attached to, if any."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

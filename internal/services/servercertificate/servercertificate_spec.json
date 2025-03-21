@@ -1,0 +1,161 @@
+{
+	"datasources": [
+		{
+			"name": "server_certificate",
+			"schema": {
+				"attributes": [
+					{
+						"name": "paths",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The paths to the server certificates."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "expiration_date",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The date on which the server certificate expires."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the server certificate."
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the server certificate."
+										}
+									},
+									{
+										"name": "path",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The path to the server certificate."
+										}
+									},
+									{
+										"name": "upload_date",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The date on which the server certificate has been uploaded."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more Server certificates."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "server_certificate",
+			"schema": {
+				"attributes": [
+					{
+						"name": "body",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The PEM-encoded X509 certificate."
+						}
+					},
+					{
+						"name": "chain",
+						"string": {
+							"computed_optional_required": "optional",
+							"description": "The PEM-encoded intermediate certification authorities."
+						}
+					},
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "A unique name for the certificate, with a maximum length of 32 alphanumeric characters and dashes (-)",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthAtMost(32)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9-]+$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "path",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The path to the server certificate, set to a slash (/) if not specified."
+						}
+					},
+					{
+						"name": "private_key",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The PEM-encoded private key matching the certificate."
+						}
+					},
+					{
+						"name": "expiration_date",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The date on which the server certificate expires."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the server certificate."
+						}
+					},
+					{
+						"name": "upload_date",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The date on which the server certificate has been uploaded."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

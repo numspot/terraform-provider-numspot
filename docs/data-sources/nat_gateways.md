@@ -69,7 +69,7 @@ resource "null_resource" "print-datasource-id" {
 - `subnet_ids` (List of String) The IDs of the Subnets in which the NAT gateways are.
 - `tag_keys` (List of String) The keys of the tags associated with the NAT gateways.
 - `tag_values` (List of String) The values of the tags associated with the NAT gateways.
-- `tags` (List of String) The key/value combination of the tags associated with the NAT gateways, in the following format: "Filters":{"Tags":["TAGKEY=TAGVALUE"]}.
+- `tags` (List of String) The key/value combination of the tags associated with the NAT gateways, in the following format: &quot;Filters&quot;:{&quot;Tags&quot;:[&quot;TAGKEY=TAGVALUE&quot;]}.
 - `vpc_ids` (List of String) The IDs of the Vpcs in which the NAT gateways are.
 
 ### Read-Only
@@ -79,26 +79,14 @@ resource "null_resource" "print-datasource-id" {
 <a id="nestedatt--items"></a>
 ### Nested Schema for `items`
 
-Optional:
-
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--items--tags))
-
 Read-Only:
 
 - `id` (String) The ID of the NAT gateway.
 - `public_ips` (Attributes List) Information about the public IP or IPs associated with the NAT gateway. (see [below for nested schema](#nestedatt--items--public_ips))
 - `state` (String) The state of the NAT gateway (`pending` \| `available` \| `deleting` \| `deleted`).
 - `subnet_id` (String) The ID of the Subnet in which the NAT gateway is.
+- `tags` (Attributes List) One or more tags associated with the NAT gateway. (see [below for nested schema](#nestedatt--items--tags))
 - `vpc_id` (String) The ID of the Vpc in which the NAT gateway is.
-
-<a id="nestedatt--items--tags"></a>
-### Nested Schema for `items.tags`
-
-Required:
-
-- `key` (String) The key of the tag, with a minimum of 1 character.
-- `value` (String) The value of the tag, between 0 and 255 characters.
-
 
 <a id="nestedatt--items--public_ips"></a>
 ### Nested Schema for `items.public_ips`
@@ -107,3 +95,12 @@ Read-Only:
 
 - `public_ip` (String) The public IP associated with the NAT gateway.
 - `public_ip_id` (String) The allocation ID of the public IP associated with the NAT gateway.
+
+
+<a id="nestedatt--items--tags"></a>
+### Nested Schema for `items.tags`
+
+Read-Only:
+
+- `key` (String) The key of the tag, with a minimum of 1 character.
+- `value` (String) The value of the tag, between 0 and 255 characters.

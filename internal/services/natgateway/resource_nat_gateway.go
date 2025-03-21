@@ -9,12 +9,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/natgateway/resource_nat_gateway"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -58,18 +58,18 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = NatGatewayResourceSchema(ctx)
+	response.Schema = resource_nat_gateway.NatGatewayResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan NatGatewayModel
+	var plan resource_nat_gateway.NatGatewayModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	tagsValue := natGatewayTags(ctx, plan.Tags)
 
 	natGateway, err := core.CreateNATGateway(ctx, r.provider, tagsValue, deserializeCreateNATGateway(plan))
 	if err != nil {
@@ -86,7 +86,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state NatGatewayModel
+	var state resource_nat_gateway.NatGatewayModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -111,8 +111,8 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
-		state, plan       NatGatewayModel
-		numSpotNatGateway *numspot.NatGateway
+		state, plan       resource_nat_gateway.NatGatewayModel
+		numSpotNatGateway *api.NatGateway
 		err               error
 	)
 
@@ -127,8 +127,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 
 	natGatewayID := state.Id.ValueString()
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := natGatewayTags(ctx, plan.Tags)
+	stateTags := natGatewayTags(ctx, state.Tags)
 
 	if !state.Tags.Equal(plan.Tags) {
 		numSpotNatGateway, err = core.UpdateNATGatewayTags(ctx, r.provider, stateTags, planTags, natGatewayID)
@@ -147,7 +147,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state NatGatewayModel
+	var state resource_nat_gateway.NatGatewayModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -162,16 +162,16 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func deserializeCreateNATGateway(tf NatGatewayModel) numspot.CreateNatGatewayJSONRequestBody {
-	return numspot.CreateNatGatewayJSONRequestBody{
+func deserializeCreateNATGateway(tf resource_nat_gateway.NatGatewayModel) api.CreateNatGatewayJSONRequestBody {
+	return api.CreateNatGatewayJSONRequestBody{
 		PublicIpId: tf.PublicIpId.ValueString(),
 		SubnetId:   tf.SubnetId.ValueString(),
 	}
 }
 
-func serializePublicIp(ctx context.Context, elt numspot.PublicIpLight, diags *diag.Diagnostics) PublicIpsValue {
-	value, diagnostics := NewPublicIpsValue(
-		PublicIpsValue{}.AttributeTypes(ctx),
+func serializePublicIp(ctx context.Context, elt api.PublicIpLight, diags *diag.Diagnostics) resource_nat_gateway.PublicIpsValue {
+	value, diagnostics := resource_nat_gateway.NewPublicIpsValue(
+		resource_nat_gateway.PublicIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"public_ip":    types.StringPointerValue(elt.PublicIp),
 			"public_ip_id": types.StringPointerValue(elt.PublicIpId),
@@ -181,10 +181,10 @@ func serializePublicIp(ctx context.Context, elt numspot.PublicIpLight, diags *di
 	return value
 }
 
-func serializeNATGateway(ctx context.Context, http *numspot.NatGateway, diags *diag.Diagnostics) NatGatewayModel {
+func serializeNATGateway(ctx context.Context, http *api.NatGateway, diags *diag.Diagnostics) resource_nat_gateway.NatGatewayModel {
 	var tagsTf types.List
 
-	var publicIp []numspot.PublicIpLight
+	var publicIp []api.PublicIpLight
 	if http.PublicIps != nil {
 		publicIp = *http.PublicIps
 	}
@@ -196,7 +196,7 @@ func serializeNATGateway(ctx context.Context, http *numspot.NatGateway, diags *d
 		diags,
 	)
 	if diags.HasError() {
-		return NatGatewayModel{}
+		return resource_nat_gateway.NatGatewayModel{}
 	}
 
 	// PublicIpId must be the id of the first public io
@@ -210,11 +210,11 @@ func serializeNATGateway(ctx context.Context, http *numspot.NatGateway, diags *d
 	if http.Tags != nil {
 		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
-			return NatGatewayModel{}
+			return resource_nat_gateway.NatGatewayModel{}
 		}
 	}
 
-	return NatGatewayModel{
+	return resource_nat_gateway.NatGatewayModel{
 		Id:         types.StringPointerValue(http.Id),
 		PublicIps:  publicIpsTf,
 		State:      types.StringPointerValue(http.State),
@@ -223,4 +223,19 @@ func serializeNATGateway(ctx context.Context, http *numspot.NatGateway, diags *d
 		Tags:       tagsTf,
 		PublicIpId: types.StringPointerValue(publicIpId),
 	}
+}
+
+func natGatewayTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_nat_gateway.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

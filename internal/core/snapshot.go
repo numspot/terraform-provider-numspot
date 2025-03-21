@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -15,7 +14,7 @@ var (
 	snapshotTargetStates  = []string{completed}
 )
 
-func CreateSnapshot(ctx context.Context, provider *client.NumSpotSDK, tags []numspot.ResourceTag, body numspot.CreateSnapshotJSONRequestBody) (numSpotSnapshot *numspot.Snapshot, err error) {
+func CreateSnapshot(ctx context.Context, provider *client.NumSpotSDK, tags []api.ResourceTag, body api.CreateSnapshotJSONRequestBody) (numSpotSnapshot *api.Snapshot, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -23,7 +22,7 @@ func CreateSnapshot(ctx context.Context, provider *client.NumSpotSDK, tags []num
 		return nil, err
 	}
 
-	var retryCreate *numspot.CreateSnapshotResponse
+	var retryCreate *api.CreateSnapshotResponse
 	if retryCreate, err = utils.RetryCreateUntilResourceAvailableWithBody(ctx, spaceID, body, numspotClient.CreateSnapshotWithResponse); err != nil {
 		return nil, err
 	}
@@ -39,7 +38,7 @@ func CreateSnapshot(ctx context.Context, provider *client.NumSpotSDK, tags []num
 	return RetryReadSnapshot(ctx, provider, createdId)
 }
 
-func UpdateSnapshotTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, snapshotID string) (*numspot.Snapshot, error) {
+func UpdateSnapshotTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []api.ResourceTag, planTags []api.ResourceTag, snapshotID string) (*api.Snapshot, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, snapshotID); err != nil {
 		return nil, err
 	}
@@ -59,7 +58,7 @@ func DeleteSnapshot(ctx context.Context, provider *client.NumSpotSDK, snapshotID
 	return nil
 }
 
-func ReadSnapshot(ctx context.Context, provider *client.NumSpotSDK, snapshotID string) (*numspot.Snapshot, error) {
+func ReadSnapshot(ctx context.Context, provider *client.NumSpotSDK, snapshotID string) (*api.Snapshot, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -76,7 +75,7 @@ func ReadSnapshot(ctx context.Context, provider *client.NumSpotSDK, snapshotID s
 	return numSpotSnapshot.JSON200, nil
 }
 
-func RetryReadSnapshot(ctx context.Context, provider *client.NumSpotSDK, snapshotID string) (*numspot.Snapshot, error) {
+func RetryReadSnapshot(ctx context.Context, provider *client.NumSpotSDK, snapshotID string) (*api.Snapshot, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -87,14 +86,14 @@ func RetryReadSnapshot(ctx context.Context, provider *client.NumSpotSDK, snapsho
 		return nil, err
 	}
 
-	numSpotSnapshot, assert := read.(*numspot.Snapshot)
+	numSpotSnapshot, assert := read.(*api.Snapshot)
 	if !assert {
 		return nil, fmt.Errorf("invalid nat gateway assertion %s", snapshotID)
 	}
 	return numSpotSnapshot, nil
 }
 
-func ReadSnapshotsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadSnapshotsParams) (numSpotSnapshot *[]numspot.Snapshot, err error) {
+func ReadSnapshotsWithParams(ctx context.Context, provider *client.NumSpotSDK, params api.ReadSnapshotsParams) (numSpotSnapshot *[]api.Snapshot, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

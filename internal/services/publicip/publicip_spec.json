@@ -1,0 +1,306 @@
+{
+	"datasources": [
+		{
+			"name": "public_ip",
+			"schema": {
+				"attributes": [
+					{
+						"name": "link_public_ip_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs representing the associations of public IPs with VMs or NICs."
+						}
+					},
+					{
+						"name": "nic_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the NICs."
+						}
+					},
+					{
+						"name": "private_ips",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The private IPs associated with the public IPs."
+						}
+					},
+					{
+						"name": "tag_keys",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The keys of the tags associated with the public IPs."
+						}
+					},
+					{
+						"name": "tag_values",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The values of the tags associated with the public IPs."
+						}
+					},
+					{
+						"name": "tags",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The key/value combination of the tags associated with the public IPs, in the following format: \u0026quot;Filters\u0026quot;:{\u0026quot;Tags\u0026quot;:[\u0026quot;TAGKEY=TAGVALUE\u0026quot;]}."
+						}
+					},
+					{
+						"name": "vm_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the VMs."
+						}
+					},
+					{
+						"name": "ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the public IPs."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The allocation ID of the public IP."
+										}
+									},
+									{
+										"name": "link_public_ip_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC."
+										}
+									},
+									{
+										"name": "nic_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the NIC the public IP is associated with (if any)."
+										}
+									},
+									{
+										"name": "private_ip",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The private IP associated with the public IP."
+										}
+									},
+									{
+										"name": "public_ip",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The public IP."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the public IP."
+										}
+									},
+									{
+										"name": "vm_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the VM the public IP is associated with (if any)."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more public IPs."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "public_ip",
+			"schema": {
+				"attributes": [
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The allocation ID of the public IP."
+						}
+					},
+					{
+						"name": "nic_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "The ID of the NIC the public IP is associated with (if any).",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/path"
+											}
+										],
+										"schema_definition": "stringvalidator.ConflictsWith(path.MatchRoot(\"vm_id\"))"
+									}
+								}
+							],
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "private_ip",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The private IP associated with the public IP."
+						}
+					},
+					{
+						"name": "public_ip",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The public IP."
+						}
+					},
+					{
+						"name": "vm_id",
+						"string": {
+							"computed_optional_required": "optional",
+							"description": "The ID of the VM the public IP is associated with (if any).",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.ConflictsWith(path.MatchRoot(\"nic_id\"))"
+									}
+								}
+							],
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "link_public_ip_id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "(Required in a Vpc) The ID representing the association of the public IP with the VM or the NIC."
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags associated with the Vpc."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

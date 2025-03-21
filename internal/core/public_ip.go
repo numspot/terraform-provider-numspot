@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/utils"
 )
 
-func CreatePublicIp(ctx context.Context, provider *client.NumSpotSDK, tags []numspot.ResourceTag, vmId, nicId string) (numSpotPublicIp *numspot.PublicIp, err error) {
+func CreatePublicIp(ctx context.Context, provider *client.NumSpotSDK, tags []api.ResourceTag, vmId, nicId string) (numSpotPublicIp *api.PublicIp, err error) {
 	spaceID := provider.SpaceID
 
 	numspotClient, err := provider.GetClient(ctx)
@@ -18,7 +17,7 @@ func CreatePublicIp(ctx context.Context, provider *client.NumSpotSDK, tags []num
 		return nil, err
 	}
 
-	var retryCreate *numspot.CreatePublicIpResponse
+	var retryCreate *api.CreatePublicIpResponse
 	if retryCreate, err = utils.RetryCreateUntilResourceAvailable(ctx, spaceID, numspotClient.CreatePublicIpWithResponse); err != nil {
 		return nil, err
 	}
@@ -45,16 +44,16 @@ func CreatePublicIp(ctx context.Context, provider *client.NumSpotSDK, tags []num
 }
 
 func linkPublicIP(ctx context.Context, provider *client.NumSpotSDK, publicIpId, vmId, nicId string) (*string, error) {
-	var payload numspot.LinkPublicIpJSONRequestBody
+	var payload api.LinkPublicIpJSONRequestBody
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	if vmId != "" {
-		payload = numspot.LinkPublicIpJSONRequestBody{VmId: &vmId}
+		payload = api.LinkPublicIpJSONRequestBody{VmId: &vmId}
 	} else {
-		payload = numspot.LinkPublicIpJSONRequestBody{NicId: &nicId}
+		payload = api.LinkPublicIpJSONRequestBody{NicId: &nicId}
 	}
 	linkPublicIPResponse, err := numspotClient.LinkPublicIpWithResponse(ctx, provider.SpaceID, publicIpId, payload)
 	if err != nil {
@@ -67,7 +66,7 @@ func linkPublicIP(ctx context.Context, provider *client.NumSpotSDK, publicIpId, 
 	return linkPublicIPResponse.JSON200.LinkPublicIpId, nil
 }
 
-func UpdatePublicIpTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []numspot.ResourceTag, planTags []numspot.ResourceTag, publicIpID string) (*numspot.PublicIp, error) {
+func UpdatePublicIpTags(ctx context.Context, provider *client.NumSpotSDK, stateTags []api.ResourceTag, planTags []api.ResourceTag, publicIpID string) (*api.PublicIp, error) {
 	if err := updateResourceTags(ctx, provider, stateTags, planTags, publicIpID); err != nil {
 		return nil, err
 	}
@@ -82,7 +81,7 @@ func DeletePublicIp(ctx context.Context, provider *client.NumSpotSDK, publicIpID
 	}
 
 	if linkPublicIpID != "" {
-		if _, err = utils.RetryDeleteUntilWithBody(ctx, spaceID, publicIpID, numspot.UnlinkPublicIpJSONRequestBody{LinkPublicIpId: &linkPublicIpID}, numspotClient.UnlinkPublicIpWithResponse); err != nil {
+		if _, err = utils.RetryDeleteUntilWithBody(ctx, spaceID, publicIpID, api.UnlinkPublicIpJSONRequestBody{LinkPublicIpId: &linkPublicIpID}, numspotClient.UnlinkPublicIpWithResponse); err != nil {
 			return err
 		}
 	}
@@ -90,7 +89,7 @@ func DeletePublicIp(ctx context.Context, provider *client.NumSpotSDK, publicIpID
 	return utils.RetryDeleteUntilResourceAvailable(ctx, provider.SpaceID, publicIpID, numspotClient.DeletePublicIpWithResponse)
 }
 
-func ReadPublicIp(ctx context.Context, provider *client.NumSpotSDK, publicIpID string) (*numspot.PublicIp, error) {
+func ReadPublicIp(ctx context.Context, provider *client.NumSpotSDK, publicIpID string) (*api.PublicIp, error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err
@@ -107,7 +106,7 @@ func ReadPublicIp(ctx context.Context, provider *client.NumSpotSDK, publicIpID s
 	return numSpotPublicIp.JSON200, nil
 }
 
-func ReadPublicIpsWithParams(ctx context.Context, provider *client.NumSpotSDK, params numspot.ReadPublicIpsParams) (numSpotPublicIp *[]numspot.PublicIp, err error) {
+func ReadPublicIpsWithParams(ctx context.Context, provider *client.NumSpotSDK, params api.ReadPublicIpsParams) (numSpotPublicIp *[]api.PublicIp, err error) {
 	numspotClient, err := provider.GetClient(ctx)
 	if err != nil {
 		return nil, err

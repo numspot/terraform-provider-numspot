@@ -1,0 +1,29 @@
+provider:
+  name: numspot
+
+resources:
+  load_balancer:
+    create:
+      method: POST
+      path: /compute/spaces/{spaceId}/loadBalancers
+    delete:
+      method: DELETE
+      path: /compute/spaces/{spaceId}/loadBalancers/{id}
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/loadBalancers/{id}
+    update:
+      method: PUT
+      path: /compute/spaces/{spaceId}/loadBalancers/{id}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  load_balancer:
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/loadBalancers
+    schema:
+      ignores:
+        - spaceId

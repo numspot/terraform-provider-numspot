@@ -33,7 +33,7 @@ resource "numspot_internet_gateway" "internet_gateway" {
 
 ### Optional
 
-- `tags` (Attributes List) One or more tags associated with the resource. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes List) One or more tags associated with the Vpc. (see [below for nested schema](#nestedatt--tags))
 - `vpc_id` (String) The ID of the Vpc attached to the Internet gateway.
 
 ### Read-Only

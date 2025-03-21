@@ -11,12 +11,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/nic/resource_nic"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -60,18 +60,18 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = NicResourceSchema(ctx)
+	response.Schema = resource_nic.NicResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan NicModel
-	var linkNicBody *numspot.LinkNicJSONRequestBody
+	var plan resource_nic.NicModel
+	var linkNicBody *api.LinkNicJSONRequestBody
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	tagsValue := nicTags(ctx, plan.Tags)
 	body := deserializeCreateNumSpotNic(ctx, plan, &response.Diagnostics)
 
 	if !utils.IsTfValueNull(plan.LinkNic) {
@@ -93,7 +93,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state NicModel
+	var state resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
 	if response.Diagnostics.HasError() {
@@ -117,8 +117,8 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
-		state, plan NicModel
-		numspotNic  *numspot.Nic
+		state, plan resource_nic.NicModel
+		numspotNic  *api.Nic
 		err         error
 	)
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -128,8 +128,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 
 	nicId := state.Id.ValueString()
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := nicTags(ctx, plan.Tags)
+	stateTags := nicTags(ctx, state.Tags)
 
 	// Update tags
 	if !state.Tags.Equal(plan.Tags) {
@@ -171,7 +171,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state NicModel
+	var state resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -183,13 +183,13 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func deserializeCreateNumSpotNic(ctx context.Context, tf NicModel, diags *diag.Diagnostics) numspot.CreateNicJSONRequestBody {
-	var privateIpsPtr *[]numspot.PrivateIpLight
+func deserializeCreateNumSpotNic(ctx context.Context, tf resource_nic.NicModel, diags *diag.Diagnostics) api.CreateNicJSONRequestBody {
+	var privateIpsPtr *[]api.PrivateIpLight
 	var securityGroupIdsPtr *[]string
 
 	if !(tf.PrivateIps.IsNull() || tf.PrivateIps.IsUnknown()) {
-		privateIps := utils.TfSetToGenericSet(func(a PrivateIpsValue) numspot.PrivateIpLight {
-			return numspot.PrivateIpLight{
+		privateIps := utils.TfSetToGenericSet(func(a resource_nic.PrivateIpsValue) api.PrivateIpLight {
+			return api.PrivateIpLight{
 				IsPrimary: a.IsPrimary.ValueBoolPointer(),
 				PrivateIp: a.PrivateIp.ValueStringPointer(),
 			}
@@ -201,7 +201,7 @@ func deserializeCreateNumSpotNic(ctx context.Context, tf NicModel, diags *diag.D
 		securityGroupIds := utils.TfStringListToStringList(ctx, tf.SecurityGroupIds, diags)
 		securityGroupIdsPtr = &securityGroupIds
 	}
-	return numspot.CreateNicJSONRequestBody{
+	return api.CreateNicJSONRequestBody{
 		Description:      tf.Description.ValueStringPointer(),
 		PrivateIps:       privateIpsPtr,
 		SecurityGroupIds: securityGroupIdsPtr,
@@ -209,44 +209,44 @@ func deserializeCreateNumSpotNic(ctx context.Context, tf NicModel, diags *diag.D
 	}
 }
 
-func deserializeUpdateNumSpotNic(ctx context.Context, tf NicModel, diags *diag.Diagnostics) numspot.UpdateNicJSONRequestBody {
-	linkNic := numspot.LinkNicToUpdate{
+func deserializeUpdateNumSpotNic(ctx context.Context, tf resource_nic.NicModel, diags *diag.Diagnostics) api.UpdateNicJSONRequestBody {
+	linkNic := api.LinkNicToUpdate{
 		DeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(tf.LinkNic.DeleteOnVmDeletion),
 		LinkNicId:          utils.FromTfStringToStringPtr(tf.LinkNic.Id),
 	}
 
-	return numspot.UpdateNicJSONRequestBody{
+	return api.UpdateNicJSONRequestBody{
 		SecurityGroupIds: utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
 		Description:      utils.FromTfStringToStringPtr(tf.Description),
 		LinkNic:          &linkNic,
 	}
 }
 
-func deserializeLinkNic(tf LinkNicValue) *numspot.LinkNicJSONRequestBody {
+func deserializeLinkNic(tf resource_nic.LinkNicValue) *api.LinkNicJSONRequestBody {
 	if utils.IsTfValueNull(tf) {
 		return nil
 	}
 
-	return &numspot.LinkNicJSONRequestBody{
+	return &api.LinkNicJSONRequestBody{
 		DeviceNumber: utils.FromTfInt64ToInt(tf.DeviceNumber),
 		VmId:         tf.VmId.ValueString(),
 	}
 }
 
-func deserializeUnlinkNic(tf LinkNicValue) *numspot.UnlinkNicJSONRequestBody {
+func deserializeUnlinkNic(tf resource_nic.LinkNicValue) *api.UnlinkNicJSONRequestBody {
 	if utils.IsTfValueNull(tf) {
 		return nil
 	}
 
-	return &numspot.UnlinkNicJSONRequestBody{
+	return &api.UnlinkNicJSONRequestBody{
 		LinkNicId: tf.Id.ValueString(),
 	}
 }
 
-func serializeNumSpotNic(ctx context.Context, http *numspot.Nic, diags *diag.Diagnostics) *NicModel {
+func serializeNumSpotNic(ctx context.Context, http *api.Nic, diags *diag.Diagnostics) *resource_nic.NicModel {
 	var (
-		linkPublicIpTf LinkPublicIpValue
-		linkNicTf      LinkNicValue
+		linkPublicIpTf resource_nic.LinkPublicIpValue
+		linkNicTf      resource_nic.LinkNicValue
 		tagsTf         types.List
 	)
 	// Private IPs
@@ -285,7 +285,7 @@ func serializeNumSpotNic(ctx context.Context, http *numspot.Nic, diags *diag.Dia
 			return nil
 		}
 	} else {
-		linkPublicIpTf = NewLinkPublicIpValueNull()
+		linkPublicIpTf = resource_nic.NewLinkPublicIpValueNull()
 	}
 
 	// Link NIC
@@ -295,7 +295,7 @@ func serializeNumSpotNic(ctx context.Context, http *numspot.Nic, diags *diag.Dia
 			return nil
 		}
 	} else {
-		linkNicTf = NewLinkNicValueNull()
+		linkNicTf = resource_nic.NewLinkNicValueNull()
 	}
 
 	var macAddress *string
@@ -311,7 +311,7 @@ func serializeNumSpotNic(ctx context.Context, http *numspot.Nic, diags *diag.Dia
 		}
 	}
 
-	return &NicModel{
+	return &resource_nic.NicModel{
 		LinkNic:              linkNicTf,
 		Description:          types.StringPointerValue(http.Description),
 		Id:                   types.StringPointerValue(http.Id),
@@ -330,9 +330,9 @@ func serializeNumSpotNic(ctx context.Context, http *numspot.Nic, diags *diag.Dia
 	}
 }
 
-func serializeNumspotLinkNic(ctx context.Context, http numspot.LinkNic, diags *diag.Diagnostics) LinkNicValue {
-	value, diagnostics := NewLinkNicValue(
-		LinkNicValue{}.AttributeTypes(ctx),
+func serializeNumspotLinkNic(ctx context.Context, http api.LinkNic, diags *diag.Diagnostics) resource_nic.LinkNicValue {
+	value, diagnostics := resource_nic.NewLinkNicValue(
+		resource_nic.LinkNicValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"id":                    types.StringPointerValue(http.Id),
 			"delete_on_vm_deletion": types.BoolPointerValue(http.DeleteOnVmDeletion),
@@ -344,50 +344,53 @@ func serializeNumspotLinkNic(ctx context.Context, http numspot.LinkNic, diags *d
 	return value
 }
 
-func serializeNumspotPrivateIps(ctx context.Context, elt numspot.PrivateIp, diags *diag.Diagnostics) PrivateIpsValue {
+func serializeNumspotPrivateIps(ctx context.Context, elt api.PrivateIp, diags *diag.Diagnostics) resource_nic.PrivateIpsValue {
 	var (
-		linkPublicIpTf  LinkPublicIpValue
+		linkPublicIpTf  resource_nic.LinkPublicIpPrivateIpValue
 		linkPublicIpObj basetypes.ObjectValue
 	)
 
 	if elt.LinkPublicIp != nil {
-		linkPublicIpTf = serializeLinkPublicIp(ctx, *elt.LinkPublicIp, diags)
+		linkPublicIpTf = serializeLinkPublicIpPrivateIp(ctx, *elt.LinkPublicIp, diags)
 		if diags.HasError() {
-			return PrivateIpsValue{}
+			return resource_nic.PrivateIpsValue{}
 		}
 
 		var diagnostics diag.Diagnostics
 		linkPublicIpObj, diagnostics = linkPublicIpTf.ToObjectValue(ctx)
 		diags.Append(diagnostics...)
 		if diags.HasError() {
-			return PrivateIpsValue{}
+			return resource_nic.PrivateIpsValue{}
 		}
 	} else {
-		linkPublicIpTf = NewLinkPublicIpValueNull()
+		linkPublicIpTf = resource_nic.NewLinkPublicIpPrivateIpValueNull()
 		var diagnostics diag.Diagnostics
 		linkPublicIpObj, diagnostics = linkPublicIpTf.ToObjectValue(ctx)
 		diags.Append(diagnostics...)
 		if diagnostics.HasError() {
-			return PrivateIpsValue{}
+			return resource_nic.PrivateIpsValue{}
 		}
 	}
 
-	value, diagnostics := NewPrivateIpsValue(
-		PrivateIpsValue{}.AttributeTypes(ctx),
+	value, diagnostics := resource_nic.NewPrivateIpsValue(
+		resource_nic.PrivateIpsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"is_primary":       types.BoolPointerValue(elt.IsPrimary),
-			"link_public_ip":   linkPublicIpObj,
-			"private_dns_name": types.StringPointerValue(elt.PrivateDnsName),
-			"private_ip":       types.StringPointerValue(elt.PrivateIp),
+			"is_primary":                types.BoolPointerValue(elt.IsPrimary),
+			"link_public_ip_private_ip": linkPublicIpObj,
+			"private_dns_name":          types.StringPointerValue(elt.PrivateDnsName),
+			"private_ip":                types.StringPointerValue(elt.PrivateIp),
 		},
 	)
 	diags.Append(diagnostics...)
+	if diagnostics.HasError() {
+		return resource_nic.PrivateIpsValue{}
+	}
 	return value
 }
 
-func serializeNumspotSecurityGroups(ctx context.Context, elt numspot.SecurityGroupLight, diags *diag.Diagnostics) SecurityGroupsValue {
-	value, diagnostics := NewSecurityGroupsValue(
-		SecurityGroupsValue{}.AttributeTypes(ctx),
+func serializeNumspotSecurityGroups(ctx context.Context, elt api.SecurityGroupLight, diags *diag.Diagnostics) resource_nic.SecurityGroupsValue {
+	value, diagnostics := resource_nic.NewSecurityGroupsValue(
+		resource_nic.SecurityGroupsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"security_group_id":   types.StringPointerValue(elt.SecurityGroupId),
 			"security_group_name": types.StringPointerValue(elt.SecurityGroupName),
@@ -397,9 +400,9 @@ func serializeNumspotSecurityGroups(ctx context.Context, elt numspot.SecurityGro
 	return value
 }
 
-func serializeLinkPublicIp(ctx context.Context, elt numspot.LinkPublicIp, diags *diag.Diagnostics) LinkPublicIpValue {
-	value, diagnostics := NewLinkPublicIpValue(
-		LinkPublicIpValue{}.AttributeTypes(ctx),
+func serializeLinkPublicIp(ctx context.Context, elt api.LinkPublicIp, diags *diag.Diagnostics) resource_nic.LinkPublicIpValue {
+	value, diagnostics := resource_nic.NewLinkPublicIpValue(
+		resource_nic.LinkPublicIpValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
 			"id":              types.StringPointerValue(elt.Id),
 			"public_dns_name": types.StringPointerValue(elt.PublicDnsName),
@@ -409,4 +412,33 @@ func serializeLinkPublicIp(ctx context.Context, elt numspot.LinkPublicIp, diags 
 	)
 	diags.Append(diagnostics...)
 	return value
+}
+
+func serializeLinkPublicIpPrivateIp(ctx context.Context, elt api.LinkPublicIp, diags *diag.Diagnostics) resource_nic.LinkPublicIpPrivateIpValue {
+	value, diagnostics := resource_nic.NewLinkPublicIpPrivateIpValue(
+		resource_nic.LinkPublicIpValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"id":              types.StringPointerValue(elt.Id),
+			"public_dns_name": types.StringPointerValue(elt.PublicDnsName),
+			"public_ip":       types.StringPointerValue(elt.PublicIp),
+			"public_ip_id":    types.StringPointerValue(elt.PublicIpId),
+		},
+	)
+	diags.Append(diagnostics...)
+	return value
+}
+
+func nicTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_nic.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

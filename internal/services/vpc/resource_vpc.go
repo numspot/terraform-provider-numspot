@@ -8,12 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/services/tags"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/tags"
+	"terraform-provider-numspot/internal/services/vpc/resource_vpc"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -57,18 +57,18 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = VpcResourceSchema(ctx)
+	response.Schema = resource_vpc.VpcResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan VpcModel
+	var plan resource_vpc.VpcModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
-	tagsValue := tags.TfTagsToApiTags(ctx, plan.Tags)
+	tagsValue := vpcTags(ctx, plan.Tags)
 	dhcpOptionsSet := plan.DhcpOptionsSetId.ValueString()
 
 	numSpotVPC, err := core.CreateVPC(ctx, r.provider, deserializeCreateVPCRequest(plan), dhcpOptionsSet, tagsValue)
@@ -86,7 +86,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state VpcModel
+	var state resource_vpc.VpcModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -112,8 +112,8 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err         error
-		state, plan VpcModel
-		numSpotVPC  *numspot.Vpc
+		state, plan resource_vpc.VpcModel
+		numSpotVPC  *api.Vpc
 	)
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -127,8 +127,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 
 	vpcID := state.Id.ValueString()
-	planTags := tags.TfTagsToApiTags(ctx, plan.Tags)
-	stateTags := tags.TfTagsToApiTags(ctx, state.Tags)
+	planTags := vpcTags(ctx, plan.Tags)
+	stateTags := vpcTags(ctx, state.Tags)
 
 	if !plan.Tags.Equal(state.Tags) {
 		numSpotVPC, err = core.UpdateVPCTags(ctx, r.provider, vpcID, stateTags, planTags)
@@ -147,7 +147,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state VpcModel
+	var state resource_vpc.VpcModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -160,14 +160,14 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func serializeVPC(ctx context.Context, http *numspot.Vpc, diags *diag.Diagnostics) VpcModel {
+func serializeVPC(ctx context.Context, http *api.Vpc, diags *diag.Diagnostics) resource_vpc.VpcModel {
 	var tagsTf types.List
 
 	if http.Tags != nil {
 		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
-	return VpcModel{
+	return resource_vpc.VpcModel{
 		DhcpOptionsSetId: types.StringPointerValue(http.DhcpOptionsSetId),
 		Id:               types.StringPointerValue(http.Id),
 		IpRange:          types.StringPointerValue(http.IpRange),
@@ -177,9 +177,24 @@ func serializeVPC(ctx context.Context, http *numspot.Vpc, diags *diag.Diagnostic
 	}
 }
 
-func deserializeCreateVPCRequest(tf VpcModel) numspot.CreateVpcJSONRequestBody {
-	return numspot.CreateVpcJSONRequestBody{
+func deserializeCreateVPCRequest(tf resource_vpc.VpcModel) api.CreateVpcJSONRequestBody {
+	return api.CreateVpcJSONRequestBody{
 		IpRange: tf.IpRange.ValueString(),
 		Tenancy: tf.Tenancy.ValueStringPointer(),
 	}
+}
+
+func vpcTags(ctx context.Context, tags types.List) []api.ResourceTag {
+	tfTags := make([]resource_vpc.TagsValue, 0, len(tags.Elements()))
+	tags.ElementsAs(ctx, &tfTags, false)
+
+	apiTags := make([]api.ResourceTag, 0, len(tfTags))
+	for _, tfTag := range tfTags {
+		apiTags = append(apiTags, api.ResourceTag{
+			Key:   tfTag.Key.ValueString(),
+			Value: tfTag.Value.ValueString(),
+		})
+	}
+
+	return apiTags
 }

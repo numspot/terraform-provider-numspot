@@ -1,0 +1,649 @@
+{
+	"datasources": [
+		{
+			"name": "route_table",
+			"schema": {
+				"attributes": [
+					{
+						"name": "link_route_table_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the route tables involved in the associations."
+						}
+					},
+					{
+						"name": "link_route_table_link_route_table_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the associations between the route tables and the Subnets."
+						}
+					},
+					{
+						"name": "link_route_table_main",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "If true, the route tables are the main ones for their Vpcs."
+						}
+					},
+					{
+						"name": "link_subnet_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Subnets involved in the associations."
+						}
+					},
+					{
+						"name": "route_creation_methods",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The methods used to create a route."
+						}
+					},
+					{
+						"name": "route_destination_ip_ranges",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IP ranges specified in routes in the tables."
+						}
+					},
+					{
+						"name": "route_destination_service_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The service IDs specified in routes in the tables."
+						}
+					},
+					{
+						"name": "route_gateway_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the gateways specified in routes in the tables."
+						}
+					},
+					{
+						"name": "route_states",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The states of routes in the route tables (always `active`)."
+						}
+					},
+					{
+						"name": "route_vm_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the VMs specified in routes in the tables."
+						}
+					},
+					{
+						"name": "tag_keys",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The keys of the tags associated with the route tables."
+						}
+					},
+					{
+						"name": "tag_values",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The values of the tags associated with the route tables."
+						}
+					},
+					{
+						"name": "tags",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The key/value combination of the tags associated with the route tables, in the following format: \u0026quot;Filters\u0026quot;:{\u0026quot;Tags\u0026quot;:[\u0026quot;TAGKEY=TAGVALUE\u0026quot;]}."
+						}
+					},
+					{
+						"name": "vpc_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Vpcs for the route tables."
+						}
+					},
+					{
+						"name": "route_nat_gateway_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the NAT gateways specified in routes in the tables."
+						}
+					},
+					{
+						"name": "route_vpc_peering_ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the Vpc peerings specified in routes in the tables."
+						}
+					},
+					{
+						"name": "ids",
+						"list": {
+							"computed_optional_required": "computed_optional",
+							"element_type": {
+								"string": {}
+							},
+							"description": "The IDs of the route tables."
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the route table."
+										}
+									},
+									{
+										"name": "link_route_tables",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the association between the route table and the Subnet."
+														}
+													},
+													{
+														"name": "main",
+														"bool": {
+															"computed_optional_required": "computed",
+															"description": "If true, the route table is the main one."
+														}
+													},
+													{
+														"name": "route_table_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the route table."
+														}
+													},
+													{
+														"name": "subnet_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the Subnet."
+														}
+													},
+													{
+														"name": "vpc_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the Vpc."
+														}
+													}
+												]
+											},
+											"description": "One or more associations between the route table and Subnets."
+										}
+									},
+									{
+										"name": "route_propagating_virtual_gateways",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "virtual_gateway_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the virtual gateway."
+														}
+													}
+												]
+											},
+											"description": "Information about virtual gateways propagating routes."
+										}
+									},
+									{
+										"name": "routes",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "creation_method",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The method used to create the route."
+														}
+													},
+													{
+														"name": "destination_ip_range",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`)."
+														}
+													},
+													{
+														"name": "destination_service_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the NumSpot service."
+														}
+													},
+													{
+														"name": "gateway_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the Internet gateway or virtual gateway attached to the Vpc."
+														}
+													},
+													{
+														"name": "nat_gateway_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of a NAT gateway attached to the Vpc."
+														}
+													},
+													{
+														"name": "nic_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the NIC."
+														}
+													},
+													{
+														"name": "state",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The state of a route in the route table (always `active`). "
+														}
+													},
+													{
+														"name": "vm_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of a VM specified in a route in the table."
+														}
+													},
+													{
+														"name": "vpc_peering_id",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The ID of the Vpc peering."
+														}
+													}
+												]
+											},
+											"description": "One or more routes in the route table."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key of the tag, with a minimum of 1 character."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value of the tag, between 0 and 255 characters."
+														}
+													}
+												]
+											},
+											"description": "One or more tags associated with the route table."
+										}
+									},
+									{
+										"name": "vpc_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Vpc for the route table."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more route tables."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "route_table",
+			"schema": {
+				"attributes": [
+					{
+						"name": "vpc_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The ID of the Vpc for which you want to create a route table."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the route table."
+						}
+					},
+					{
+						"name": "link_route_tables",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the association between the route table and the Subnet."
+										}
+									},
+									{
+										"name": "main",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "If true, the route table is the main one."
+										}
+									},
+									{
+										"name": "route_table_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the route table."
+										}
+									},
+									{
+										"name": "subnet_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Subnet."
+										}
+									},
+									{
+										"name": "vpc_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the Vpc."
+										}
+									}
+								]
+							},
+							"description": "One or more associations between the route table and Subnets."
+						}
+					},
+					{
+						"name": "route_propagating_virtual_gateways",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "virtual_gateway_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the virtual gateway."
+										}
+									}
+								]
+							},
+							"description": "Information about virtual gateways propagating routes."
+						}
+					},
+					{
+						"name": "routes",
+						"set_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "creation_method",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The method used to create the route."
+										}
+									},
+									{
+										"name": "destination_ip_range",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`)."
+										}
+									},
+									{
+										"name": "destination_service_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the NumSpot service."
+										}
+									},
+									{
+										"name": "gateway_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of the Internet gateway or virtual gateway attached to the Vpc."
+										}
+									},
+									{
+										"name": "nat_gateway_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of a NAT gateway attached to the Vpc."
+										}
+									},
+									{
+										"name": "nic_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of the NIC."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of a route in the route table (always `active`). "
+										}
+									},
+									{
+										"name": "vm_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of a VM specified in a route in the table."
+										}
+									},
+									{
+										"name": "vpc_peering_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of the Vpc peering."
+										}
+									}
+								]
+							},
+							"description": "One or more routes in the route table."
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key of the tag, with a minimum of 1 character."
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value of the tag, between 0 and 255 characters."
+										}
+									}
+								]
+							},
+							"description": "One or more tags associated with the DHCP options set."
+						}
+					},
+					{
+						"name": "subnet_id",
+						"string": {
+							"computed_optional_required": "optional",
+							"description": "The state of the Subnet (`pending` \\| `available` \\| `deleted`).",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "local_route",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+									{
+										"name": "creation_method",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The method used to create the route."
+										}
+									},
+									{
+										"name": "destination_ip_range",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`)."
+										}
+									},
+									{
+										"name": "destination_service_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the NumSpot service."
+										}
+									},
+									{
+										"name": "gateway_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of the Internet gateway or virtual gateway attached to the Vpc."
+										}
+									},
+									{
+										"name": "nat_gateway_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of a NAT gateway attached to the Vpc."
+										}
+									},
+									{
+										"name": "nic_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of the NIC."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of a route in the route table (always `active`). "
+										}
+									},
+									{
+										"name": "vm_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of a VM specified in a route in the table."
+										}
+									},
+									{
+										"name": "vpc_peering_id",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The ID of the Vpc peering."
+										}
+									}
+							]
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

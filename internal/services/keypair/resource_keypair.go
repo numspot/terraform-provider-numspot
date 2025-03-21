@@ -7,11 +7,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud-sdk/numspot-sdk-go/pkg/numspot"
-
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/client"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/core"
-	"gitlab.tooling.cloudgouv-eu-west-1.numspot.internal/cloud/terraform-provider-numspot/internal/utils"
+	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services/keypair/resource_keypair"
+	"terraform-provider-numspot/internal/utils"
 )
 
 var (
@@ -55,11 +55,11 @@ func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest,
 }
 
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
-	response.Schema = KeyPairResourceSchema(ctx)
+	response.Schema = resource_keypair.KeypairResourceSchema(ctx)
 }
 
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	var plan KeyPairModel
+	var plan resource_keypair.KeypairModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -80,7 +80,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 }
 
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	var state KeyPairModel
+	var state resource_keypair.KeypairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -110,7 +110,7 @@ func (r *Resource) Update(_ context.Context, _ resource.UpdateRequest, _ *resour
 }
 
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	var state KeyPairModel
+	var state resource_keypair.KeypairModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
 		return
@@ -121,8 +121,8 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
-func serializeNumSpotCreateKeypair(http *numspot.CreateKeypair) KeyPairModel {
-	return KeyPairModel{
+func serializeNumSpotCreateKeypair(http *api.CreateKeypair) resource_keypair.KeypairModel {
+	return resource_keypair.KeypairModel{
 		Fingerprint: types.StringPointerValue(http.Fingerprint),
 		Id:          types.StringPointerValue(http.Name),
 		Name:        types.StringPointerValue(http.Name),
@@ -130,16 +130,16 @@ func serializeNumSpotCreateKeypair(http *numspot.CreateKeypair) KeyPairModel {
 	}
 }
 
-func serializeNumSpotKeypair(http *numspot.Keypair) KeyPairModel {
-	return KeyPairModel{
+func serializeNumSpotKeypair(http *api.Keypair) resource_keypair.KeypairModel {
+	return resource_keypair.KeypairModel{
 		Fingerprint: types.StringPointerValue(http.Fingerprint),
 		Id:          types.StringPointerValue(http.Name),
 		Name:        types.StringPointerValue(http.Name),
 	}
 }
 
-func deserializeCreateNumSpotKeypair(tf KeyPairModel) numspot.CreateKeypairJSONRequestBody {
-	return numspot.CreateKeypairJSONRequestBody{
+func deserializeCreateNumSpotKeypair(tf resource_keypair.KeypairModel) api.CreateKeypairJSONRequestBody {
+	return api.CreateKeypairJSONRequestBody{
 		Name:      tf.Name.ValueString(),
 		PublicKey: tf.PublicKey.ValueStringPointer(),
 	}
