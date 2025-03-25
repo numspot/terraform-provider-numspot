@@ -20,7 +20,7 @@ resource "numspot_vpc" "vpc" {
 resource "numspot_subnet" "subnet" {
   vpc_id                 = numspot_vpc.vpc.id
   ip_range               = "10.101.1.0/24"
-  availability_zone_name = "cloudgouv-eu-west-1a"
+  availability_zone_name = "eu-west-2a"
 }
 
 resource "numspot_security_group" "sg" {
@@ -66,7 +66,7 @@ resource "numspot_vm" "vm" {
 
   placement = {
     tenancy                = "default"
-    availability_zone_name = "cloudgouv-eu-west-1a"
+    availability_zone_name = "eu-west-2a"
   }
 
   subnet_id          = numspot_subnet.subnet.id

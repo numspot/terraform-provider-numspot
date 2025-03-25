@@ -17,7 +17,7 @@ description: |-
 resource "numspot_image" "image_from_image" {
   name               = "image-from-image"
   source_image_id    = "ami-foobar"
-  source_region_name = "cloudgouv-eu-west-1"
+  source_region_name = "eu-west-2"
   access = {
     is_public = "false"
   }

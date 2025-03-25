@@ -16,7 +16,7 @@ description: |-
 resource "numspot_flexible_gpu" "test" {
   model_name             = "nvidia-p100"
   generation             = "v5"
-  availability_zone_name = "cloudgouv-eu-west-1a"
+  availability_zone_name = "eu-west-2a"
 }
 
 data "numspot_flexible_gpus" "testdata" {

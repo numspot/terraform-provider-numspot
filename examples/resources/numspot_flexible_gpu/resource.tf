@@ -16,6 +16,6 @@ resource "numspot_vm" "test" {
 resource "numspot_flexible_gpu" "gpu" {
   model_name             = "nvidia-a100-80"
   generation             = "v6"
-  availability_zone_name = "cloudgouv-eu-west-1a"
+  availability_zone_name = "eu-west-2a"
   vm_id                  = numspot_vm.test.id
 }

@@ -1,0 +1,567 @@
+openapi: 3.1.0
+info:
+  contact:
+    email: support@numspot.eu
+    name: Numspot
+    url: 'https://numspot.com/contact/'
+  description: Numspot Public Object Storage API
+  license:
+    name: BSD 3 Clause
+    url: 'https://opensource.org/licenses/BSD-3-Clause'
+  termsOfService: 'https://numspot.com/'
+  title: Numspot Public Object Storage API
+  version: 1.4.4
+servers:
+  - url: 'https://objectstorage.{region}.numspot.com'
+    variables:
+      region:
+        default: cloudgouv-eu-west-1
+        description: Region
+        enum:
+          - eu-west-2
+          - cloudgouv-eu-west-1
+paths:
+  '/spaces/{spaceId}':
+    get:
+      operationId: ListBuckets
+      description: Returns a list of all buckets owned by the authenticated sender of the request.
+      responses:
+        '200':
+          $ref: '#/components/responses/ListBuckets200Response'
+      security:
+        - AwsSigV4: []
+      tags:
+        - Bucket
+    parameters:
+      - $ref: '#/components/parameters/SpaceId'
+  '/spaces/{spaceId}/{bucket}':
+    get:
+      operationId: ListObjects
+      description: 'Returns some or all (up to 1,000) of the objects in a bucket with each request.'
+      parameters:
+        - name: bucket
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/ListObjects200Response'
+        '404':
+          description: NoSuchBucket
+          content:
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/NoSuchBucket'
+      security:
+        - AwsSigV4: []
+      tags:
+        - Object
+    put:
+      operationId: CreateBucket
+      description: Creates a new bucket.
+      parameters:
+        - name: bucket
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/CreateBucket200Response'
+        '404':
+          description: BucketAlreadyExists
+          content:
+            text/problem+xml:
+              schema:
+                $ref: '#/components/schemas/BucketAlreadyExists'
+        '409':
+          description: BucketAlreadyOwnedByYou
+          content:
+            text/problem+xml:
+              schema:
+                $ref: '#/components/schemas/BucketAlreadyOwnedByYou'
+      security:
+        - AwsSigV4: []
+      tags:
+        - Bucket
+    delete:
+      operationId: DeleteBucket
+      description: Deletes a bucket.
+      parameters:
+        - name: bucket
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Success
+      security:
+        - AwsSigV4: []
+      tags:
+        - Bucket
+    parameters:
+      - $ref: '#/components/parameters/SpaceId'
+  '/spaces/{spaceId}/{bucket}/{key...}':
+    get:
+      operationId: GetObject
+      description: Retrieves an object or corresponding presigned URL
+      parameters:
+        - name: bucket
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: key...
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: expires
+          in: query
+          description: Optional parameter to generate a presigned URL
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/GetObject200Response'
+        '404':
+          description: NoSuchKey
+          content:
+            text/xml:
+              schema:
+                $ref: '#/components/schemas/NoSuchKey'
+      security:
+        - AwsSigV4: []
+      tags:
+        - Object
+    put:
+      operationId: PutObject
+      description: Adds an object to a bucket.
+      parameters:
+        - name: bucket
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: key...
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/PutObject200Response'
+      security:
+        - AwsSigV4: []
+      tags:
+        - Object
+    delete:
+      operationId: DeleteObject
+      description: Removes an object from a bucket.
+      parameters:
+        - name: bucket
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: key...
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '204':
+          $ref: '#/components/responses/DeleteObject204Response'
+      security:
+        - AwsSigV4: []
+      tags:
+        - Object
+    parameters:
+      - $ref: '#/components/parameters/SpaceId'
+  '/spaces/{spaceId}/{bucket}/{multipartKey...}':
+    post:
+      operationId: CreateMultipartUpload
+      description: This action initiates a multipart upload and returns an upload ID.
+      parameters:
+        - $ref: '#/components/parameters/SpaceId'
+        - name: bucket
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: multipartKey...
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/CreateMultipartUpload200Response'
+      security:
+        - AwsSigV4: []
+      tags:
+        - Multipart
+components:
+  parameters:
+    SpaceId:
+      name: spaceId
+      description: Identifier of the Space
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    MetadataValue:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: MetadataValue
+    CreateBucketOutput:
+      type: object
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      examples:
+        - Object:
+            Location: /examplebucket
+      title: CreateBucketOutput
+    BucketAlreadyExists:
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: BucketAlreadyExists
+    BucketAlreadyOwnedByYou:
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: BucketAlreadyOwnedByYou
+    CreateMultipartUploadOutput:
+      type: object
+      properties:
+        bucket:
+          $ref: '#/components/schemas/BucketName'
+        key:
+          $ref: '#/components/schemas/ObjectKey'
+        uploadId:
+          $ref: '#/components/schemas/MultipartUploadId'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      examples:
+        - Object:
+            Bucket: examplebucket
+            Key: largeobject
+            UploadId: ibZBv_75gd9r8lH_gqXatLdxMVpAlj6ZQjEs.OwyF3953YdwbcQnMA2BLGn8Lx12fQNICtMw5KyteFeHw.Sjng--
+      title: CreateMultipartUploadOutput
+    DeleteObjectOutput:
+      type: object
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      examples:
+        - {}
+      title: DeleteObjectOutput
+    GetObjectOutput:
+      type: object
+      properties:
+        body:
+          $ref: '#/components/schemas/Body'
+        metadata:
+          allOf:
+            - $ref: '#/components/schemas/Metadata'
+            - xml:
+                name: x-amz-meta-
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      examples:
+        - Object:
+            AcceptRanges: bytes
+            ContentLength: '3191'
+            ContentType: image/jpeg
+            ETag: '"6805f2cfc46c0f04559748bb039d69ae"'
+            LastModified: 'Thu, 15 Dec 2016 01:19:41 GMT'
+            Metadata: {}
+            TagCount: 2
+            VersionId: 'null'
+      title: GetObjectOutput
+    NoSuchKey:
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: NoSuckKey
+    NoSuchBucket:
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: NoSuchBucket
+    ListBucketsOutput:
+      type: object
+      properties:
+        buckets:
+          $ref: '#/components/schemas/Buckets'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      examples:
+        - Buckets:
+            - CreationDate: '2012-02-15T21:03:02.000Z'
+              Name: examplebucket
+            - CreationDate: '2011-07-24T19:33:50.000Z'
+              Name: examplebucket2
+            - CreationDate: '2010-12-17T00:56:49.000Z'
+              Name: examplebucket3
+      title: ListBucketsOutput
+    ListObjectsOutput:
+      type: object
+      properties:
+        isTruncated:
+          $ref: '#/components/schemas/IsTruncated'
+        marker:
+          $ref: '#/components/schemas/Marker'
+        nextMarker:
+          $ref: '#/components/schemas/NextMarker'
+        contents:
+          $ref: '#/components/schemas/ObjectList'
+        name:
+          $ref: '#/components/schemas/BucketName'
+        prefix:
+          $ref: '#/components/schemas/Prefix'
+        delimiter:
+          $ref: '#/components/schemas/Delimiter'
+        maxKeys:
+          $ref: '#/components/schemas/MaxKeys'
+        commonPrefixes:
+          $ref: '#/components/schemas/CommonPrefixList'
+        encodingType:
+          $ref: '#/components/schemas/EncodingType'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: ListObjectOutput
+    PutObjectOutput:
+      type: object
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      examples:
+        - Object: null
+          ETag: '"6805f2cfc46c0f04559748bb039d69ae"'
+          VersionId: Kirh.unyZwjQ69YxcQLA8z4F5j3kJJKr
+      title: PutObjectOutput
+    BucketName:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: BucketName
+    ObjectKey:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      minLength: 1
+      title: ObjectKey
+    MultipartUploadId:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: MultipartUploadId
+    Prefix:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: Prefix
+    Body:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: Body
+    CreationDate:
+      type: string
+      format: date-time
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: CreationDate
+    Bucket:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/BucketName'
+        creationDate:
+          $ref: '#/components/schemas/CreationDate'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: Bucket
+    Buckets:
+      type: array
+      items:
+        allOf:
+          - $ref: '#/components/schemas/Bucket'
+          - xml:
+              name: Bucket
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: Buckets
+    ChecksumAlgorithm:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      enum:
+        - CRC32
+        - CRC32C
+        - SHA1
+        - SHA256
+      title: ChecksumAlgorithm
+    ChecksumAlgorithmList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ChecksumAlgorithm'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: ChecksumAlgorithmList
+    CommonPrefix:
+      type: object
+      properties:
+        prefix:
+          $ref: '#/components/schemas/Prefix'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: CommonPrefix
+    CommonPrefixList:
+      type: array
+      items:
+        $ref: '#/components/schemas/CommonPrefix'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: CommonPrefixList
+    ETag:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: ETag
+    Metadata:
+      type: object
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      additionalProperties:
+        $ref: '#/components/schemas/MetadataValue'
+      title: Metadata
+    LastModified:
+      type: string
+      format: date-time
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: LastModified
+    Delimiter:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: Delimiter
+    EncodingType:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      enum:
+        - url
+      title: EncodingType
+    IsTruncated:
+      type: boolean
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: IsTruncated
+    IsRestoreInProgress:
+      type: boolean
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: IsRestoreInProgress
+    MaxKeys:
+      type: integer
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: MaxKeys
+    Marker:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: Marker
+    NextMarker:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: NextMarker
+    ObjectList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Object'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: ObjectList
+    Size:
+      type: integer
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: Size
+    ObjectStorageClass:
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      enum:
+        - STANDARD
+        - REDUCED_REDUNDANCY
+        - GLACIER
+        - STANDARD_IA
+        - ONEZONE_IA
+        - INTELLIGENT_TIERING
+        - DEEP_ARCHIVE
+        - OUTPOSTS
+        - GLACIER_IR
+        - SNOW
+      title: ObjectStorageClass
+    RestoreStatus:
+      type: object
+      properties:
+        isRestoreInProgress:
+          $ref: '#/components/schemas/IsRestoreInProgress'
+        restoreExpiryDate:
+          $ref: '#/components/schemas/RestoreExpiryDate'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: RestoreStatus
+    Object:
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/ObjectKey'
+        lastModified:
+          $ref: '#/components/schemas/LastModified'
+        eTag:
+          $ref: '#/components/schemas/ETag'
+        checksumAlgorithm:
+          $ref: '#/components/schemas/ChecksumAlgorithmList'
+        size:
+          $ref: '#/components/schemas/Size'
+        storageClass:
+          $ref: '#/components/schemas/ObjectStorageClass'
+        restoreStatus:
+          $ref: '#/components/schemas/RestoreStatus'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: Object
+    RestoreExpiryDate:
+      type: string
+      format: date-time
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: RestoreExpiryDate
+  responses:
+    ListBuckets200Response:
+      description: Success
+      content:
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/ListBucketsOutput'
+    CreateBucket200Response:
+      description: Success
+      content:
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/CreateBucketOutput'
+    ListObjects200Response:
+      description: Success
+      content:
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/ListObjectsOutput'
+    DeleteObject204Response:
+      description: Success
+      content:
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/DeleteObjectOutput'
+    GetObject200Response:
+      description: Success
+      content:
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/GetObjectOutput'
+    PutObject200Response:
+      description: Success
+      content:
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/PutObjectOutput'
+    CreateMultipartUpload200Response:
+      description: Success
+      content:
+        text/xml:
+          schema:
+            $ref: '#/components/schemas/CreateMultipartUploadOutput'
+  securitySchemes:
+    AwsSigV4:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: AWS V4 signature authorization header
+tags:
+  - name: Bucket
+    description: Bucket operation
+  - name: Object
+    description: Object operation
+  - name: Multipart
+    description: Multipart operation

@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"terraform-provider-numspot/internal/client"
+	"terraform-provider-numspot/internal/services/bucket"
 	"terraform-provider-numspot/internal/services/dhcpoptions"
 	"terraform-provider-numspot/internal/services/flexiblegpu"
 	"terraform-provider-numspot/internal/services/image"
@@ -32,10 +33,11 @@ import (
 )
 
 type NumspotProviderModel struct {
-	NumSpotHost  types.String `tfsdk:"numspot_host"`
-	ClientId     types.String `tfsdk:"client_id"`
-	ClientSecret types.String `tfsdk:"client_secret"`
-	SpaceId      types.String `tfsdk:"space_id"`
+	NumSpotHost   types.String `tfsdk:"numspot_host"`
+	ClientId      types.String `tfsdk:"client_id"`
+	ClientSecret  types.String `tfsdk:"client_secret"`
+	SpaceId       types.String `tfsdk:"space_id"`
+	NumSpotHostOs types.String `tfsdk:"numspot_host_os"`
 }
 
 var _ provider.Provider = (*numspotProvider)(nil)
@@ -74,6 +76,10 @@ func (p *numspotProvider) Schema(_ context.Context, _ provider.SchemaRequest, re
 			},
 			"space_id": schema.StringAttribute{
 				MarkdownDescription: "Space ID.",
+				Optional:            true,
+			},
+			"numspot_host_os": schema.StringAttribute{
+				MarkdownDescription: "Numspot API Host of Object Storage.",
 				Optional:            true,
 			},
 		},
@@ -119,6 +125,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	clientID := os.Getenv("NUMSPOT_CLIENT_ID")
 	clientSecret := os.Getenv("NUMSPOT_CLIENT_SECRET")
 	spaceId := os.Getenv("NUMSPOT_SPACE_ID")
+	numSpotHostOs := os.Getenv("NUMSPOT_HOST_OS")
 
 	if !config.NumSpotHost.IsNull() {
 		numSpotHost = config.NumSpotHost.ValueString()
@@ -134,6 +141,10 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	if !config.SpaceId.IsNull() {
 		spaceId = config.SpaceId.ValueString()
+	}
+
+	if !config.NumSpotHostOs.IsNull() {
+		numSpotHostOs = config.NumSpotHostOs.ValueString()
 	}
 
 	// If any of the expected configurations are missing, return
@@ -178,6 +189,16 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 	}
 
+	if numSpotHostOs == "" {
+		resp.Diagnostics.AddAttributeWarning(
+			path.Root("numspot_host_os"),
+			"Missing Numspot API Host Object Storage",
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the NumSpot host. "+
+				"Set the host value in the configuration or use the NUMSPOT_HOST_OS environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -185,12 +206,14 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	config.NumSpotHost = types.StringValue(numSpotHost)
 	config.ClientId = types.StringValue(clientID)
 	config.ClientSecret = types.StringValue(clientSecret)
+	config.NumSpotHostOs = types.StringValue(numSpotHostOs)
 
 	options := []client.Option{
 		client.WithHost(config.NumSpotHost.ValueString()),
 		client.WithSpaceID(spaceId),
 		client.WithClientID(config.ClientId.ValueString()),
 		client.WithClientSecret(config.ClientSecret.ValueString()),
+		client.WithHostOs(config.NumSpotHostOs.ValueString()),
 	}
 
 	if p.httpClient != nil {
@@ -228,6 +251,7 @@ func (p *numspotProvider) DataSources(_ context.Context) []func() datasource.Dat
 		routetable.NewRouteTablesDataSource,
 		vm.NewVmsDataSource,
 		flexiblegpu.NewFlexibleGpusDataSource,
+		bucket.NewBucketsDataSource,
 		servercertificate.NewServerCertificateDataSource,
 	}
 }
@@ -251,5 +275,6 @@ func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resourc
 		keypair.NewKeyPairResource,
 		dhcpoptions.NewDhcpOptionsResource,
 		servercertificate.NewServerCertificateResource,
+		bucket.NewBucketResource,
 	}
 }

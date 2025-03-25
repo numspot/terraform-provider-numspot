@@ -220,6 +220,7 @@ const (
 	PostgresBackupStatusDELETING PostgresBackupStatus = "DELETING"
 	PostgresBackupStatusERROR    PostgresBackupStatus = "ERROR"
 	PostgresBackupStatusFAILED   PostgresBackupStatus = "FAILED"
+	PostgresBackupStatusPENDING  PostgresBackupStatus = "PENDING"
 )
 
 // Defines values for PostgresClusterCatalogItemType.
@@ -257,6 +258,16 @@ const (
 	PostgresClusterStatusERROR       PostgresClusterStatus = "ERROR"
 	PostgresClusterStatusFAILED      PostgresClusterStatus = "FAILED"
 	PostgresClusterStatusREADY       PostgresClusterStatus = "READY"
+)
+
+// Defines values for PostgresDuplicatedResourceProblemType.
+const (
+	UrnNumspotErrorsDuplicatedResource PostgresDuplicatedResourceProblemType = "urn:numspot:errors#duplicated_resource"
+)
+
+// Defines values for PostgresInvalidRequestProblemType.
+const (
+	UrnNumspotErrorsInvalidRequest PostgresInvalidRequestProblemType = "urn:numspot:errors#invalid_request"
 )
 
 // Defines values for PostgresNodeConfigurationPerformanceLevel.
@@ -3253,7 +3264,7 @@ type Placement struct {
 }
 
 // PostgresAllowedIpRanges defines model for PostgresAllowedIpRanges.
-type PostgresAllowedIpRanges = []string
+type PostgresAllowedIpRanges = []Cidr
 
 // PostgresBackupDeleteOption What to do with existing backups, if any, of the cluster upon deleting it.
 type PostgresBackupDeleteOption string
@@ -3263,12 +3274,27 @@ type PostgresBackupId = openapi_types.UUID
 
 // PostgresBackupStatus The last known status of a backup.
 //
+// - PENDING: means the backup is scheduled for creation.
 // - CREATING: means the backup is being created.
 // - CREATED: means the backup is created.
 // - DELETING: means the backup has been marked for deletion, it will be deleted soon.
 // - FAILED: means that an operation went wrong during creation of the backup, see errorMessage for details.
 // - ERROR: means that an operation went wrong when tried to update backup, See errorMessage for details
 type PostgresBackupStatus string
+
+// PostgresBackups defines model for PostgresBackups.
+type PostgresBackups struct {
+	Items []PostgresClusterBackup `json:"items"`
+
+	// NextToken Token to provide in order to get the next page. Absent when the last page has been reached.
+	NextToken *string `json:"nextToken,omitempty"`
+
+	// PageNumber The page number.
+	PageNumber int32 `json:"pageNumber"`
+
+	// TotalItems The total number of items that match the request.
+	TotalItems int32 `json:"totalItems"`
+}
 
 // PostgresBaseVolume Common properties to all volume types.
 type PostgresBaseVolume struct {
@@ -3280,7 +3306,7 @@ type PostgresBaseVolume struct {
 type PostgresCluster struct {
 	AllowedIpRanges PostgresAllowedIpRanges `json:"allowedIpRanges"`
 
-	// AutomaticBackup Whether automatic backups are enabled for this cluster
+	// AutomaticBackup Whether automatic backups are enabled for this cluster.
 	AutomaticBackup PostgresClusterAutomaticBackup `json:"automaticBackup"`
 
 	// AvailableOperations List of operation names
@@ -3292,7 +3318,7 @@ type PostgresCluster struct {
 	// ErrorReason Detailed information regarding what went wrong, available when status is Error.
 	ErrorReason *string `json:"errorReason,omitempty"`
 
-	// Host Where connexions to the cluster must be made to.
+	// Host Where connections to the cluster must be made to.
 	Host *string `json:"host,omitempty"`
 
 	// Id A cluster unique identifier.
@@ -3308,17 +3334,29 @@ type PostgresCluster struct {
 	MaintenanceSchedule *PostgresClusterMaintenanceSchedule `json:"maintenanceSchedule,omitempty"`
 	Name                StrictSlugMax63                     `json:"name"`
 
+	// NetCidr The CIDR of the network where the cluster will be created.
+	//
+	// **Warning**: The CIDR must be in the following three blocks:
+	// - 10.*.0.0/16
+	// - 172.(16-31).0.0/16
+	// - 192.168.0.0/16
+	// The mask mut not be greater than /24.
+	NetCidr *PostgresClusterNetCIDR `json:"netCidr,omitempty"`
+
 	// NodeConfiguration The configuration used to provision the cluster nodes.
 	NodeConfiguration PostgresNodeConfiguration `json:"nodeConfiguration"`
 
-	// Port On which port connexions to the host must be made.
+	// Port On which port connections to the host must be made.
 	Port *int `json:"port,omitempty"`
+
+	// PrivateHost Where connections to the cluster must be made for interconnected services.
+	PrivateHost *string `json:"privateHost,omitempty"`
 
 	// Status The last known status of a cluster.
 	//
 	// - CREATING: means the cluster is being created.
 	// - CONFIGURING: means the cluster is being configured according to requested changes.
-	// - READY: means the cluster is available and accepts connexions.
+	// - READY: means the cluster is available and accepts connections.
 	// - FAILED: means that the cluster creation has failed, see errorMessage for details.
 	// - DELETING: means the cluster has been marked for deletion, it will be deleted soon.
 	// - DELETED: means the cluster has been deleted successfully, it will disappear from query and search results soon.
@@ -3335,7 +3373,7 @@ type PostgresCluster struct {
 	Volume PostgresVolume `json:"volume"`
 }
 
-// PostgresClusterAutomaticBackup Whether automatic backups are enabled for this cluster
+// PostgresClusterAutomaticBackup Whether automatic backups are enabled for this cluster.
 type PostgresClusterAutomaticBackup = bool
 
 // PostgresClusterBackup defines model for PostgresClusterBackup.
@@ -3355,6 +3393,7 @@ type PostgresClusterBackup struct {
 
 	// Status The last known status of a backup.
 	//
+	// - PENDING: means the backup is scheduled for creation.
 	// - CREATING: means the backup is being created.
 	// - CREATED: means the backup is created.
 	// - DELETING: means the backup has been marked for deletion, it will be deleted soon.
@@ -3369,6 +3408,11 @@ type PostgresClusterBackup struct {
 	Tags PostgresTags `json:"tags"`
 }
 
+// PostgresClusterBackups defines model for PostgresClusterBackups.
+type PostgresClusterBackups struct {
+	Items []PostgresClusterBackup `json:"items"`
+}
+
 // PostgresClusterCatalogItem defines model for PostgresClusterCatalogItem.
 type PostgresClusterCatalogItem struct {
 	Description string                         `json:"description"`
@@ -3381,6 +3425,42 @@ type PostgresClusterCatalogItem struct {
 
 // PostgresClusterCatalogItemType defines model for PostgresClusterCatalogItem.Type.
 type PostgresClusterCatalogItemType string
+
+// PostgresClusterCreationRequest defines model for PostgresClusterCreationRequest.
+type PostgresClusterCreationRequest struct {
+	AllowedIpRanges PostgresAllowedIpRanges `json:"allowedIpRanges"`
+
+	// AutomaticBackup Whether automatic backup is enabled for this cluster.
+	AutomaticBackup *bool `json:"automaticBackup"`
+
+	// IsPublic Whether public exposition is enabled for this cluster.
+	IsPublic *bool           `json:"isPublic"`
+	Name     StrictSlugMax63 `json:"name"`
+
+	// NetCidr The CIDR of the network where the cluster will be created.
+	//
+	// **Warning**: The CIDR must be in the following three blocks:
+	// - 10.*.0.0/16
+	// - 172.(16-31).0.0/16
+	// - 192.168.0.0/16
+	// The mask mut not be greater than /24.
+	NetCidr *PostgresClusterNetCIDR `json:"netCidr,omitempty"`
+
+	// NodeConfiguration The configuration used to provision the cluster nodes.
+	NodeConfiguration PostgresNodeConfiguration `json:"nodeConfiguration"`
+
+	// SourceBackupId A backup unique identifier.
+	SourceBackupId *PostgresBackupId `json:"sourceBackupId,omitempty"`
+
+	// Tags Tags to identify resources
+	Tags *PostgresTags `json:"tags,omitempty"`
+
+	// User The name of the user with administration privileges on the cluster.
+	User PostgresUser `json:"user"`
+
+	// Volume The configuration for a data storage volume.
+	Volume PostgresVolume `json:"volume"`
+}
 
 // PostgresClusterId A cluster unique identifier.
 type PostgresClusterId = openapi_types.UUID
@@ -3403,6 +3483,15 @@ type PostgresClusterMaintenanceSchedule struct {
 // PostgresClusterMaintenanceScheduleType The type of maintenance operation being performed (e.g., software upgrade, hardware replacement).
 type PostgresClusterMaintenanceScheduleType string
 
+// PostgresClusterNetCIDR The CIDR of the network where the cluster will be created.
+//
+// **Warning**: The CIDR must be in the following three blocks:
+// - 10.*.0.0/16
+// - 172.(16-31).0.0/16
+// - 192.168.0.0/16
+// The mask mut not be greater than /24.
+type PostgresClusterNetCIDR = string
+
 // PostgresClusterOperationName Name of an operation
 type PostgresClusterOperationName string
 
@@ -3416,7 +3505,7 @@ type PostgresClusterOperationResult string
 //
 // - CREATING: means the cluster is being created.
 // - CONFIGURING: means the cluster is being configured according to requested changes.
-// - READY: means the cluster is available and accepts connexions.
+// - READY: means the cluster is available and accepts connections.
 // - FAILED: means that the cluster creation has failed, see errorMessage for details.
 // - DELETING: means the cluster has been marked for deletion, it will be deleted soon.
 // - DELETED: means the cluster has been deleted successfully, it will disappear from query and search results soon.
@@ -3427,7 +3516,7 @@ type PostgresClusterStatus string
 type PostgresClusterWithPassword struct {
 	AllowedIpRanges PostgresAllowedIpRanges `json:"allowedIpRanges"`
 
-	// AutomaticBackup Whether automatic backups are enabled for this cluster
+	// AutomaticBackup Whether automatic backups are enabled for this cluster.
 	AutomaticBackup PostgresClusterAutomaticBackup `json:"automaticBackup"`
 
 	// AvailableOperations List of operation names
@@ -3439,7 +3528,7 @@ type PostgresClusterWithPassword struct {
 	// ErrorReason Detailed information regarding what went wrong, available when status is Error.
 	ErrorReason *string `json:"errorReason,omitempty"`
 
-	// Host Where connexions to the cluster must be made to.
+	// Host Where connections to the cluster must be made to.
 	Host *string `json:"host,omitempty"`
 
 	// Id A cluster unique identifier.
@@ -3455,6 +3544,15 @@ type PostgresClusterWithPassword struct {
 	MaintenanceSchedule *PostgresClusterMaintenanceSchedule `json:"maintenanceSchedule,omitempty"`
 	Name                StrictSlugMax63                     `json:"name"`
 
+	// NetCidr The CIDR of the network where the cluster will be created.
+	//
+	// **Warning**: The CIDR must be in the following three blocks:
+	// - 10.*.0.0/16
+	// - 172.(16-31).0.0/16
+	// - 192.168.0.0/16
+	// The mask mut not be greater than /24.
+	NetCidr *PostgresClusterNetCIDR `json:"netCidr,omitempty"`
+
 	// NodeConfiguration The configuration used to provision the cluster nodes.
 	NodeConfiguration PostgresNodeConfiguration `json:"nodeConfiguration"`
 
@@ -3463,14 +3561,17 @@ type PostgresClusterWithPassword struct {
 	// **Warning**: Keep it safely, we don't store it in any retrievable way.
 	Password string `json:"password"`
 
-	// Port On which port connexions to the host must be made.
+	// Port On which port connections to the host must be made.
 	Port *int `json:"port,omitempty"`
+
+	// PrivateHost Where connections to the cluster must be made for interconnected services.
+	PrivateHost *string `json:"privateHost,omitempty"`
 
 	// Status The last known status of a cluster.
 	//
 	// - CREATING: means the cluster is being created.
 	// - CONFIGURING: means the cluster is being configured according to requested changes.
-	// - READY: means the cluster is available and accepts connexions.
+	// - READY: means the cluster is available and accepts connections.
 	// - FAILED: means that the cluster creation has failed, see errorMessage for details.
 	// - DELETING: means the cluster has been marked for deletion, it will be deleted soon.
 	// - DELETED: means the cluster has been deleted successfully, it will disappear from query and search results soon.
@@ -3487,11 +3588,36 @@ type PostgresClusterWithPassword struct {
 	Volume PostgresVolume `json:"volume"`
 }
 
-// PostgresDuplicatedResourceProblem A problem, compatible with [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457#name-members-of-a-problem-detail).
-type PostgresDuplicatedResourceProblem = PostgresProblem
+// PostgresClusters defines model for PostgresClusters.
+type PostgresClusters struct {
+	Items []PostgresCluster `json:"items"`
+}
 
-// PostgresInvalidParameterProblem A problem, compatible with [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457#name-members-of-a-problem-detail).
-type PostgresInvalidParameterProblem = PostgresProblem
+// PostgresDuplicatedResourceProblem defines model for PostgresDuplicatedResourceProblem.
+type PostgresDuplicatedResourceProblem struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Title Short, human-readable summary of the problem type.
+	Title string                                `json:"title"`
+	Type  PostgresDuplicatedResourceProblemType `json:"type"`
+}
+
+// PostgresDuplicatedResourceProblemType defines model for PostgresDuplicatedResourceProblem.Type.
+type PostgresDuplicatedResourceProblemType string
+
+// PostgresInvalidRequestProblem defines model for PostgresInvalidRequestProblem.
+type PostgresInvalidRequestProblem struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Title Short, human-readable summary of the problem type.
+	Title string                            `json:"title"`
+	Type  PostgresInvalidRequestProblemType `json:"type"`
+}
+
+// PostgresInvalidRequestProblemType defines model for PostgresInvalidRequestProblem.Type.
+type PostgresInvalidRequestProblemType string
 
 // PostgresNodeConfiguration The configuration used to provision the cluster nodes.
 type PostgresNodeConfiguration struct {
@@ -3516,6 +3642,15 @@ type PostgresNodeConfiguration struct {
 // - MEDIUM: the performance level may fluctuate moderately over time
 type PostgresNodeConfigurationPerformanceLevel string
 
+// PostgresPageParameter defines model for PostgresPageParameter.
+type PostgresPageParameter struct {
+	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
+	NextToken *string `json:"nextToken,omitempty"`
+
+	// Size The maximum number of items to return. The service may return fewer than this value.
+	Size *int32 `json:"size,omitempty"`
+}
+
 // PostgresProblem A problem, compatible with [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457#name-members-of-a-problem-detail).
 type PostgresProblem struct {
 	// Detail Human-readable explanation specific to this occurrence of the problem.
@@ -3524,8 +3659,18 @@ type PostgresProblem struct {
 	// Title Short, human-readable summary of the problem type.
 	Title string `json:"title"`
 
-	// Type Identifier of the problem.
+	// Type Identifier of the problem, in the form of a urn.
 	Type string `json:"type"`
+}
+
+// PostgresServiceCatalogClusterAutomaticBackupConfiguration defines model for PostgresServiceCatalogClusterAutomaticBackupConfiguration.
+type PostgresServiceCatalogClusterAutomaticBackupConfiguration struct {
+	StartTimeSlot PostgresTimeSlot `json:"startTimeSlot"`
+}
+
+// PostgresServiceCatalogConfiguration defines model for PostgresServiceCatalogConfiguration.
+type PostgresServiceCatalogConfiguration struct {
+	Items []PostgresClusterCatalogItem `json:"items"`
 }
 
 // PostgresTag A key-value tag.
@@ -5814,15 +5959,6 @@ type PostgresBackupIdParameter = openapi_types.UUID
 // PostgresClusterIdParameter defines model for PostgresClusterIdParameter.
 type PostgresClusterIdParameter = openapi_types.UUID
 
-// PostgresPageParameter defines model for PostgresPageParameter.
-type PostgresPageParameter struct {
-	// NextToken A page token received from a previous call. Provide this to retrieve the subsequent page.
-	NextToken *string `json:"nextToken,omitempty"`
-
-	// Size The maximum number of items to return. The service may return fewer than this value.
-	Size *int32 `json:"size,omitempty"`
-}
-
 // PostgresTagsParameter A map of tags.
 type PostgresTagsParameter = PostgresTagParameter
 
@@ -6170,35 +6306,47 @@ type PostgresDeleteCluster202Response = PostgresCluster
 // PostgresGetCluster200Response defines model for PostgresGetCluster200Response.
 type PostgresGetCluster200Response = PostgresCluster
 
-// PostgresIncompatibleStatusProblem A problem, compatible with [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457#name-members-of-a-problem-detail).
-type PostgresIncompatibleStatusProblem = PostgresProblem
+// PostgresIncompatibleStatusDeleteProblem409Response defines model for PostgresIncompatibleStatusDeleteProblem409Response.
+type PostgresIncompatibleStatusDeleteProblem409Response struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
 
-// PostgresInvalidAuthenticationProblem A problem, compatible with [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457#name-members-of-a-problem-detail).
-type PostgresInvalidAuthenticationProblem = PostgresProblem
+	// Title Short, human-readable summary of the problem type.
+	Title string                                                 `json:"title"`
+	Type  PostgresIncompatibleStatusDeleteProblem409ResponseType `json:"type"`
+}
+
+// PostgresIncompatibleStatusProblem409Response defines model for PostgresIncompatibleStatusProblem409Response.
+type PostgresIncompatibleStatusProblem409Response struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Title Short, human-readable summary of the problem type.
+	Title string                                           `json:"title"`
+	Type  PostgresIncompatibleStatusProblem409ResponseType `json:"type"`
+}
+
+// PostgresInvalidAuthenticationProblem403Response defines model for PostgresInvalidAuthenticationProblem403Response.
+type PostgresInvalidAuthenticationProblem403Response struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Title Short, human-readable summary of the problem type.
+	Title string                                              `json:"title"`
+	Type  PostgresInvalidAuthenticationProblem403ResponseType `json:"type"`
+}
+
+// PostgresInvalidRequestProblem400Response Some of the parameters you have provided are invalid.
+type PostgresInvalidRequestProblem400Response = PostgresInvalidRequestProblem
 
 // PostgresListBackups200Response defines model for PostgresListBackups200Response.
-type PostgresListBackups200Response struct {
-	Items []PostgresClusterBackup `json:"items"`
-
-	// NextToken Token to provide in order to get the next page. Absent when the last page has been reached.
-	NextToken *string `json:"nextToken,omitempty"`
-
-	// PageNumber The page number.
-	PageNumber int32 `json:"pageNumber"`
-
-	// TotalItems The total number of items that match the request.
-	TotalItems int32 `json:"totalItems"`
-}
+type PostgresListBackups200Response = PostgresBackups
 
 // PostgresListClusterBackups200Response defines model for PostgresListClusterBackups200Response.
-type PostgresListClusterBackups200Response struct {
-	Items []PostgresClusterBackup `json:"items"`
-}
+type PostgresListClusterBackups200Response = PostgresClusterBackups
 
 // PostgresListClusters200Response defines model for PostgresListClusters200Response.
-type PostgresListClusters200Response struct {
-	Items []PostgresCluster `json:"items"`
-}
+type PostgresListClusters200Response = PostgresClusters
 
 // PostgresPatchCluster200Response defines model for PostgresPatchCluster200Response.
 type PostgresPatchCluster200Response = PostgresCluster
@@ -6206,21 +6354,31 @@ type PostgresPatchCluster200Response = PostgresCluster
 // PostgresResetPassword202Response defines model for PostgresResetPassword202Response.
 type PostgresResetPassword202Response = PostgresClusterWithPassword
 
-// PostgresResourceNotFoundProblem A problem, compatible with [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457#name-members-of-a-problem-detail).
-type PostgresResourceNotFoundProblem = PostgresProblem
+// PostgresResourceNotFoundProblem404Response defines model for PostgresResourceNotFoundProblem404Response.
+type PostgresResourceNotFoundProblem404Response struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Title Short, human-readable summary of the problem type.
+	Title string                                         `json:"title"`
+	Type  PostgresResourceNotFoundProblem404ResponseType `json:"type"`
+}
 
 // PostgresServiceCatalogClustersAutomaticBackup200Response defines model for PostgresServiceCatalogClustersAutomaticBackup200Response.
-type PostgresServiceCatalogClustersAutomaticBackup200Response struct {
-	StartTimeSlot PostgresTimeSlot `json:"startTimeSlot"`
-}
+type PostgresServiceCatalogClustersAutomaticBackup200Response = PostgresServiceCatalogClusterAutomaticBackupConfiguration
 
 // PostgresServiceCatalogClustersConfiguration200Response defines model for PostgresServiceCatalogClustersConfiguration200Response.
-type PostgresServiceCatalogClustersConfiguration200Response struct {
-	Items []PostgresClusterCatalogItem `json:"items"`
-}
+type PostgresServiceCatalogClustersConfiguration200Response = PostgresServiceCatalogConfiguration
 
-// PostgresServiceMalfunctionProblem A problem, compatible with [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457#name-members-of-a-problem-detail).
-type PostgresServiceMalfunctionProblem = PostgresProblem
+// PostgresServiceMalfunctionProblem500Response defines model for PostgresServiceMalfunctionProblem500Response.
+type PostgresServiceMalfunctionProblem500Response struct {
+	// Detail Human-readable explanation specific to this occurrence of the problem.
+	Detail *string `json:"detail,omitempty"`
+
+	// Title Short, human-readable summary of the problem type.
+	Title string                                           `json:"title"`
+	Type  PostgresServiceMalfunctionProblem500ResponseType `json:"type"`
+}
 
 // ReadAdminPassword200Response defines model for ReadAdminPassword200Response.
 type ReadAdminPassword200Response = ReadAdminPassword
@@ -6626,30 +6784,6 @@ type MasterUpgradeRequest = KubernetesMasterUpgrade
 // PatchUserStateRequest defines model for PatchUserStateRequest.
 type PatchUserStateRequest = UserState
 
-// PostgresClusterCreationRequest defines model for PostgresClusterCreationRequest.
-type PostgresClusterCreationRequest struct {
-	AllowedIpRanges PostgresAllowedIpRanges `json:"allowedIpRanges"`
-
-	// AutomaticBackup Whether automatic backup is enabled for this cluster.
-	AutomaticBackup *bool           `json:"automaticBackup"`
-	Name            StrictSlugMax63 `json:"name"`
-
-	// NodeConfiguration The configuration used to provision the cluster nodes.
-	NodeConfiguration PostgresNodeConfiguration `json:"nodeConfiguration"`
-
-	// SourceBackupId A backup unique identifier.
-	SourceBackupId *PostgresBackupId `json:"sourceBackupId,omitempty"`
-
-	// Tags Tags to identify resources
-	Tags *PostgresTags `json:"tags,omitempty"`
-
-	// User The name of the user with administration privileges on the cluster.
-	User PostgresUser `json:"user"`
-
-	// Volume The configuration for a data storage volume.
-	Volume PostgresVolume `json:"volume"`
-}
-
 // PostgresClusterDeleteRequest defines model for PostgresClusterDeleteRequest.
 type PostgresClusterDeleteRequest struct {
 	// Backups What to do with existing backups, if any, of the cluster upon deleting it.
@@ -6660,7 +6794,7 @@ type PostgresClusterDeleteRequest struct {
 type PostgresClusterModificationRequest struct {
 	AllowedIpRanges *PostgresAllowedIpRanges `json:"allowedIpRanges,omitempty"`
 
-	// AutomaticBackup Whether automatic backups are enabled for this cluster
+	// AutomaticBackup Whether automatic backups are enabled for this cluster.
 	AutomaticBackup *PostgresClusterAutomaticBackup `json:"automaticBackup,omitempty"`
 
 	// NodeConfiguration The configuration used to provision the cluster nodes.
@@ -8108,30 +8242,6 @@ type PostgreSQLListBackupsParams struct {
 	Page *PostgresPageParameter `json:"page,omitempty"`
 }
 
-// PostgreSQLCreateClusterJSONBody defines parameters for PostgreSQLCreateCluster.
-type PostgreSQLCreateClusterJSONBody struct {
-	AllowedIpRanges PostgresAllowedIpRanges `json:"allowedIpRanges"`
-
-	// AutomaticBackup Whether automatic backup is enabled for this cluster.
-	AutomaticBackup *bool           `json:"automaticBackup"`
-	Name            StrictSlugMax63 `json:"name"`
-
-	// NodeConfiguration The configuration used to provision the cluster nodes.
-	NodeConfiguration PostgresNodeConfiguration `json:"nodeConfiguration"`
-
-	// SourceBackupId A backup unique identifier.
-	SourceBackupId *PostgresBackupId `json:"sourceBackupId,omitempty"`
-
-	// Tags Tags to identify resources
-	Tags *PostgresTags `json:"tags,omitempty"`
-
-	// User The name of the user with administration privileges on the cluster.
-	User PostgresUser `json:"user"`
-
-	// Volume The configuration for a data storage volume.
-	Volume PostgresVolume `json:"volume"`
-}
-
 // PostgreSQLDeleteClusterJSONBody defines parameters for PostgreSQLDeleteCluster.
 type PostgreSQLDeleteClusterJSONBody struct {
 	// Backups What to do with existing backups, if any, of the cluster upon deleting it.
@@ -8142,7 +8252,7 @@ type PostgreSQLDeleteClusterJSONBody struct {
 type PostgreSQLModifyClusterJSONBody struct {
 	AllowedIpRanges *PostgresAllowedIpRanges `json:"allowedIpRanges,omitempty"`
 
-	// AutomaticBackup Whether automatic backups are enabled for this cluster
+	// AutomaticBackup Whether automatic backups are enabled for this cluster.
 	AutomaticBackup *PostgresClusterAutomaticBackup `json:"automaticBackup,omitempty"`
 
 	// NodeConfiguration The configuration used to provision the cluster nodes.
@@ -8486,7 +8596,7 @@ type CreateSpaceJSONRequestBody = CreateSpace
 type UpdateSpaceJSONRequestBody = MutableSpace
 
 // PostgreSQLCreateClusterJSONRequestBody defines body for PostgreSQLCreateCluster for application/json ContentType.
-type PostgreSQLCreateClusterJSONRequestBody PostgreSQLCreateClusterJSONBody
+type PostgreSQLCreateClusterJSONRequestBody = PostgresClusterCreationRequest
 
 // PostgreSQLDeleteClusterJSONRequestBody defines body for PostgreSQLDeleteCluster for application/json ContentType.
 type PostgreSQLDeleteClusterJSONRequestBody PostgreSQLDeleteClusterJSONBody
@@ -9360,22 +9470,22 @@ func (t *UpdateSettingsFlowBody) UnmarshalJSON(b []byte) error {
 	return err
 }
 
-// AsPostgresInvalidParameterProblem returns the union data inside the PostgresCreateCluster400Response as a PostgresInvalidParameterProblem
-func (t PostgresCreateCluster400Response) AsPostgresInvalidParameterProblem() (PostgresInvalidParameterProblem, error) {
-	var body PostgresInvalidParameterProblem
+// AsPostgresInvalidRequestProblem returns the union data inside the PostgresCreateCluster400Response as a PostgresInvalidRequestProblem
+func (t PostgresCreateCluster400Response) AsPostgresInvalidRequestProblem() (PostgresInvalidRequestProblem, error) {
+	var body PostgresInvalidRequestProblem
 	err := json.Unmarshal(t.union, &body)
 	return body, err
 }
 
-// FromPostgresInvalidParameterProblem overwrites any union data inside the PostgresCreateCluster400Response as the provided PostgresInvalidParameterProblem
-func (t *PostgresCreateCluster400Response) FromPostgresInvalidParameterProblem(v PostgresInvalidParameterProblem) error {
+// FromPostgresInvalidRequestProblem overwrites any union data inside the PostgresCreateCluster400Response as the provided PostgresInvalidRequestProblem
+func (t *PostgresCreateCluster400Response) FromPostgresInvalidRequestProblem(v PostgresInvalidRequestProblem) error {
 	b, err := json.Marshal(v)
 	t.union = b
 	return err
 }
 
-// MergePostgresInvalidParameterProblem performs a merge with any union data inside the PostgresCreateCluster400Response, using the provided PostgresInvalidParameterProblem
-func (t *PostgresCreateCluster400Response) MergePostgresInvalidParameterProblem(v PostgresInvalidParameterProblem) error {
+// MergePostgresInvalidRequestProblem performs a merge with any union data inside the PostgresCreateCluster400Response, using the provided PostgresInvalidRequestProblem
+func (t *PostgresCreateCluster400Response) MergePostgresInvalidRequestProblem(v PostgresInvalidRequestProblem) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -10579,9 +10689,6 @@ type ClientInterface interface {
 
 	// PostgreSQLListClusterBackups request
 	PostgreSQLListClusterBackups(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// OldPostgreSQLResetClusterAdministrationPassword request
-	OldPostgreSQLResetClusterAdministrationPassword(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostgreSQLResetClusterAdministrationPassword request
 	PostgreSQLResetClusterAdministrationPassword(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -15377,18 +15484,6 @@ func (c *Client) PostgreSQLModifyCluster(ctx context.Context, spaceId SpaceId, c
 
 func (c *Client) PostgreSQLListClusterBackups(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostgreSQLListClusterBackupsRequest(c.Server, spaceId, clusterId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) OldPostgreSQLResetClusterAdministrationPassword(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewOldPostgreSQLResetClusterAdministrationPasswordRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
 	}
@@ -33245,47 +33340,6 @@ func NewPostgreSQLListClusterBackupsRequest(server string, spaceId SpaceId, clus
 	return req, nil
 }
 
-// NewOldPostgreSQLResetClusterAdministrationPasswordRequest generates requests for OldPostgreSQLResetClusterAdministrationPassword
-func NewOldPostgreSQLResetClusterAdministrationPasswordRequest(server string, spaceId SpaceId, clusterId PostgresClusterIdParameter) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "clusterId", runtime.ParamLocationPath, clusterId)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/postgresql/spaces/%s/clusters/%s/password/reset", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewPostgreSQLResetClusterAdministrationPasswordRequest generates requests for PostgreSQLResetClusterAdministrationPassword
 func NewPostgreSQLResetClusterAdministrationPasswordRequest(server string, spaceId SpaceId, clusterId PostgresClusterIdParameter) (*http.Request, error) {
 	var err error
@@ -34454,9 +34508,6 @@ type ClientWithResponsesInterface interface {
 
 	// PostgreSQLListClusterBackupsWithResponse request
 	PostgreSQLListClusterBackupsWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLListClusterBackupsResponse, error)
-
-	// OldPostgreSQLResetClusterAdministrationPasswordWithResponse request
-	OldPostgreSQLResetClusterAdministrationPasswordWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*OldPostgreSQLResetClusterAdministrationPasswordResponse, error)
 
 	// PostgreSQLResetClusterAdministrationPasswordWithResponse request
 	PostgreSQLResetClusterAdministrationPasswordWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*PostgreSQLResetClusterAdministrationPasswordResponse, error)
@@ -41787,10 +41838,12 @@ type PostgreSQLListBackupsResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *PostgresListBackups200Response
-	ApplicationproblemJSON400 *PostgresInvalidParameterProblem
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
+	ApplicationproblemJSON400 *PostgresInvalidRequestProblem400Response
+	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem403Response
+	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem500Response
 }
+type PostgreSQLListBackups403Type string
+type PostgreSQLListBackups500Type string
 
 // Status returns HTTPResponse.Status
 func (r PostgreSQLListBackupsResponse) Status() string {
@@ -41812,11 +41865,14 @@ type PostgreSQLDeleteBackupResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON202                   *PostgresDeleteBackup202Response
-	ApplicationproblemJSON400 *PostgresInvalidParameterProblem
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
+	ApplicationproblemJSON400 *PostgresInvalidRequestProblem400Response
+	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem403Response
+	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem404Response
+	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem500Response
 }
+type PostgreSQLDeleteBackup403Type string
+type PostgreSQLDeleteBackup404Type string
+type PostgreSQLDeleteBackup500Type string
 
 // Status returns HTTPResponse.Status
 func (r PostgreSQLDeleteBackupResponse) Status() string {
@@ -41838,10 +41894,12 @@ type PostgreSQLListClustersResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *PostgresListClusters200Response
-	ApplicationproblemJSON400 *PostgresInvalidParameterProblem
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
+	ApplicationproblemJSON400 *PostgresInvalidRequestProblem400Response
+	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem403Response
+	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem500Response
 }
+type PostgreSQLListClusters403Type string
+type PostgreSQLListClusters500Type string
 
 // Status returns HTTPResponse.Status
 func (r PostgreSQLListClustersResponse) Status() string {
@@ -41864,9 +41922,11 @@ type PostgreSQLCreateClusterResponse struct {
 	HTTPResponse              *http.Response
 	JSON201                   *PostgresCreateCluster201Response
 	ApplicationproblemJSON400 *PostgresCreateCluster400Response
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
+	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem403Response
+	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem500Response
 }
+type PostgreSQLCreateCluster403Type string
+type PostgreSQLCreateCluster500Type string
 
 // Status returns HTTPResponse.Status
 func (r PostgreSQLCreateClusterResponse) Status() string {
@@ -41888,12 +41948,16 @@ type PostgreSQLDeleteClusterResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON202                   *PostgresDeleteCluster202Response
-	ApplicationproblemJSON400 *PostgresInvalidParameterProblem
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem
-	ApplicationproblemJSON409 *PostgresIncompatibleStatusProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
+	ApplicationproblemJSON400 *PostgresInvalidRequestProblem400Response
+	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem403Response
+	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem404Response
+	ApplicationproblemJSON409 *PostgresIncompatibleStatusDeleteProblem409Response
+	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem500Response
 }
+type PostgreSQLDeleteCluster403Type string
+type PostgreSQLDeleteCluster404Type string
+type PostgreSQLDeleteCluster409Type string
+type PostgreSQLDeleteCluster500Type string
 
 // Status returns HTTPResponse.Status
 func (r PostgreSQLDeleteClusterResponse) Status() string {
@@ -41915,11 +41979,14 @@ type PostgreSQLGetClusterResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *PostgresGetCluster200Response
-	ApplicationproblemJSON400 *PostgresInvalidParameterProblem
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
+	ApplicationproblemJSON400 *PostgresInvalidRequestProblem400Response
+	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem403Response
+	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem404Response
+	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem500Response
 }
+type PostgreSQLGetCluster403Type string
+type PostgreSQLGetCluster404Type string
+type PostgreSQLGetCluster500Type string
 
 // Status returns HTTPResponse.Status
 func (r PostgreSQLGetClusterResponse) Status() string {
@@ -41941,12 +42008,16 @@ type PostgreSQLModifyClusterResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *PostgresPatchCluster200Response
-	ApplicationproblemJSON400 *PostgresInvalidParameterProblem
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem
-	ApplicationproblemJSON409 *PostgresIncompatibleStatusProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
+	ApplicationproblemJSON400 *PostgresInvalidRequestProblem400Response
+	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem403Response
+	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem404Response
+	ApplicationproblemJSON409 *PostgresIncompatibleStatusProblem409Response
+	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem500Response
 }
+type PostgreSQLModifyCluster403Type string
+type PostgreSQLModifyCluster404Type string
+type PostgreSQLModifyCluster409Type string
+type PostgreSQLModifyCluster500Type string
 
 // Status returns HTTPResponse.Status
 func (r PostgreSQLModifyClusterResponse) Status() string {
@@ -41968,10 +42039,12 @@ type PostgreSQLListClusterBackupsResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON200                   *PostgresListClusterBackups200Response
-	ApplicationproblemJSON400 *PostgresInvalidParameterProblem
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
+	ApplicationproblemJSON400 *PostgresInvalidRequestProblem400Response
+	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem403Response
+	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem500Response
 }
+type PostgreSQLListClusterBackups403Type string
+type PostgreSQLListClusterBackups500Type string
 
 // Status returns HTTPResponse.Status
 func (r PostgreSQLListClusterBackupsResponse) Status() string {
@@ -41989,43 +42062,20 @@ func (r PostgreSQLListClusterBackupsResponse) StatusCode() int {
 	return 0
 }
 
-type OldPostgreSQLResetClusterAdministrationPasswordResponse struct {
-	Body                      []byte
-	HTTPResponse              *http.Response
-	JSON202                   *PostgresResetPassword202Response
-	ApplicationproblemJSON400 *PostgresInvalidParameterProblem
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem
-	ApplicationproblemJSON409 *PostgresIncompatibleStatusProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
-}
-
-// Status returns HTTPResponse.Status
-func (r OldPostgreSQLResetClusterAdministrationPasswordResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r OldPostgreSQLResetClusterAdministrationPasswordResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type PostgreSQLResetClusterAdministrationPasswordResponse struct {
 	Body                      []byte
 	HTTPResponse              *http.Response
 	JSON202                   *PostgresResetPassword202Response
-	ApplicationproblemJSON400 *PostgresInvalidParameterProblem
-	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem
-	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem
-	ApplicationproblemJSON409 *PostgresIncompatibleStatusProblem
-	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem
+	ApplicationproblemJSON400 *PostgresInvalidRequestProblem400Response
+	ApplicationproblemJSON403 *PostgresInvalidAuthenticationProblem403Response
+	ApplicationproblemJSON404 *PostgresResourceNotFoundProblem404Response
+	ApplicationproblemJSON409 *PostgresIncompatibleStatusProblem409Response
+	ApplicationproblemJSON500 *PostgresServiceMalfunctionProblem500Response
 }
+type PostgreSQLResetClusterAdministrationPassword403Type string
+type PostgreSQLResetClusterAdministrationPassword404Type string
+type PostgreSQLResetClusterAdministrationPassword409Type string
+type PostgreSQLResetClusterAdministrationPassword500Type string
 
 // Status returns HTTPResponse.Status
 func (r PostgreSQLResetClusterAdministrationPasswordResponse) Status() string {
@@ -45526,15 +45576,6 @@ func (c *ClientWithResponses) PostgreSQLListClusterBackupsWithResponse(ctx conte
 		return nil, err
 	}
 	return ParsePostgreSQLListClusterBackupsResponse(rsp)
-}
-
-// OldPostgreSQLResetClusterAdministrationPasswordWithResponse request returning *OldPostgreSQLResetClusterAdministrationPasswordResponse
-func (c *ClientWithResponses) OldPostgreSQLResetClusterAdministrationPasswordWithResponse(ctx context.Context, spaceId SpaceId, clusterId PostgresClusterIdParameter, reqEditors ...RequestEditorFn) (*OldPostgreSQLResetClusterAdministrationPasswordResponse, error) {
-	rsp, err := c.OldPostgreSQLResetClusterAdministrationPassword(ctx, spaceId, clusterId, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseOldPostgreSQLResetClusterAdministrationPasswordResponse(rsp)
 }
 
 // PostgreSQLResetClusterAdministrationPasswordWithResponse request returning *PostgreSQLResetClusterAdministrationPasswordResponse
@@ -61356,21 +61397,21 @@ func ParsePostgreSQLListBackupsResponse(rsp *http.Response) (*PostgreSQLListBack
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresInvalidParameterProblem
+		var dest PostgresInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
+		var dest PostgresInvalidAuthenticationProblem403Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
+		var dest PostgresServiceMalfunctionProblem500Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61403,28 +61444,28 @@ func ParsePostgreSQLDeleteBackupResponse(rsp *http.Response) (*PostgreSQLDeleteB
 		response.JSON202 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresInvalidParameterProblem
+		var dest PostgresInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
+		var dest PostgresInvalidAuthenticationProblem403Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresResourceNotFoundProblem
+		var dest PostgresResourceNotFoundProblem404Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
+		var dest PostgresServiceMalfunctionProblem500Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61457,21 +61498,21 @@ func ParsePostgreSQLListClustersResponse(rsp *http.Response) (*PostgreSQLListClu
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresInvalidParameterProblem
+		var dest PostgresInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
+		var dest PostgresInvalidAuthenticationProblem403Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
+		var dest PostgresServiceMalfunctionProblem500Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61511,14 +61552,14 @@ func ParsePostgreSQLCreateClusterResponse(rsp *http.Response) (*PostgreSQLCreate
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
+		var dest PostgresInvalidAuthenticationProblem403Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
+		var dest PostgresServiceMalfunctionProblem500Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61551,35 +61592,35 @@ func ParsePostgreSQLDeleteClusterResponse(rsp *http.Response) (*PostgreSQLDelete
 		response.JSON202 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresInvalidParameterProblem
+		var dest PostgresInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
+		var dest PostgresInvalidAuthenticationProblem403Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresResourceNotFoundProblem
+		var dest PostgresResourceNotFoundProblem404Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest PostgresIncompatibleStatusProblem
+		var dest PostgresIncompatibleStatusDeleteProblem409Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON409 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
+		var dest PostgresServiceMalfunctionProblem500Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61612,28 +61653,28 @@ func ParsePostgreSQLGetClusterResponse(rsp *http.Response) (*PostgreSQLGetCluste
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresInvalidParameterProblem
+		var dest PostgresInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
+		var dest PostgresInvalidAuthenticationProblem403Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresResourceNotFoundProblem
+		var dest PostgresResourceNotFoundProblem404Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
+		var dest PostgresServiceMalfunctionProblem500Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61666,35 +61707,35 @@ func ParsePostgreSQLModifyClusterResponse(rsp *http.Response) (*PostgreSQLModify
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresInvalidParameterProblem
+		var dest PostgresInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
+		var dest PostgresInvalidAuthenticationProblem403Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresResourceNotFoundProblem
+		var dest PostgresResourceNotFoundProblem404Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest PostgresIncompatibleStatusProblem
+		var dest PostgresIncompatibleStatusProblem409Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON409 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
+		var dest PostgresServiceMalfunctionProblem500Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61727,82 +61768,21 @@ func ParsePostgreSQLListClusterBackupsResponse(rsp *http.Response) (*PostgreSQLL
 		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresInvalidParameterProblem
+		var dest PostgresInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
+		var dest PostgresInvalidAuthenticationProblem403Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON500 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseOldPostgreSQLResetClusterAdministrationPasswordResponse parses an HTTP response from a OldPostgreSQLResetClusterAdministrationPasswordWithResponse call
-func ParseOldPostgreSQLResetClusterAdministrationPasswordResponse(rsp *http.Response) (*OldPostgreSQLResetClusterAdministrationPasswordResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &OldPostgreSQLResetClusterAdministrationPasswordResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
-		var dest PostgresResetPassword202Response
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON202 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresInvalidParameterProblem
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON400 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON403 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresResourceNotFoundProblem
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON404 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest PostgresIncompatibleStatusProblem
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.ApplicationproblemJSON409 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
+		var dest PostgresServiceMalfunctionProblem500Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -61835,35 +61815,35 @@ func ParsePostgreSQLResetClusterAdministrationPasswordResponse(rsp *http.Respons
 		response.JSON202 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
-		var dest PostgresInvalidParameterProblem
+		var dest PostgresInvalidRequestProblem400Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
-		var dest PostgresInvalidAuthenticationProblem
+		var dest PostgresInvalidAuthenticationProblem403Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON403 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
-		var dest PostgresResourceNotFoundProblem
+		var dest PostgresResourceNotFoundProblem404Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON404 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
-		var dest PostgresIncompatibleStatusProblem
+		var dest PostgresIncompatibleStatusProblem409Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
 		response.ApplicationproblemJSON409 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
-		var dest PostgresServiceMalfunctionProblem
+		var dest PostgresServiceMalfunctionProblem500Response
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

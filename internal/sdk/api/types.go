@@ -1,0 +1,11 @@
+package api
+
+type PostgresIncompatibleStatusDeleteProblem409ResponseType = PostgresProblem
+
+type PostgresIncompatibleStatusProblem409ResponseType = PostgresProblem
+
+type PostgresInvalidAuthenticationProblem403ResponseType = PostgresProblem
+
+type PostgresResourceNotFoundProblem404ResponseType = PostgresProblem
+
+type PostgresServiceMalfunctionProblem500ResponseType = PostgresProblem

@@ -1,7 +1,7 @@
 resource "numspot_volume" "test" {
   type                   = "standard"
   size                   = 11
-  availability_zone_name = "cloudgouv-eu-west-1a"
+  availability_zone_name = "eu-west-2a"
 }
 
 resource "numspot_snapshot" "test" {

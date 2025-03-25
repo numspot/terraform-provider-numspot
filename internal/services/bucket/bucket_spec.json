@@ -1,0 +1,56 @@
+{
+	"datasources": [
+		{
+			"name": "bucket",
+			"schema": {
+				"attributes": [
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "creation_date",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The creation date of the Bucket."
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the Bucket."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more Bucket."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "bucket",
+			"schema": {
+				"attributes": [
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The name of the Bucket."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

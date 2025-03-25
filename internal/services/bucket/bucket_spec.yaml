@@ -1,0 +1,26 @@
+provider:
+  name: numspot
+
+resources:
+  bucket:
+    create:
+      method: PUT
+      path: /spaces/{spaceId}/{bucket}
+    delete:
+      method: DELETE
+      path:  /spaces/{spaceId}/{bucket}
+    read:
+      method: GET
+      path: /spaces/{spaceId}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  bucket:
+    read:
+      method: GET
+      path: /spaces/{spaceId}
+    schema:
+      ignores:
+        - spaceId

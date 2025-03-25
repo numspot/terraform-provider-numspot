@@ -10,7 +10,7 @@ info:
     url: 'https://opensource.org/licenses/BSD-3-Clause'
   termsOfService: 'https://numspot.com/'
   title: Numspot Public API
-  version: european-20250317
+  version: egyptian-20250324
 servers:
   - url: 'https://api.{region}.numspot.com'
     variables:
@@ -9114,11 +9114,11 @@ paths:
         '200':
           $ref: '#/components/responses/PostgresListBackups200Response'
         '400':
-          $ref: '#/components/responses/PostgresInvalidParameterProblem'
+          $ref: '#/components/responses/PostgresInvalidRequestProblem400Response'
         '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
+          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem403Response'
         '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
+          $ref: '#/components/responses/PostgresServiceMalfunctionProblem500Response'
       security:
         - BearerAuth: []
       tags:
@@ -9137,9 +9137,9 @@ paths:
         '400':
           $ref: '#/components/responses/PostgresCreateCluster400Response'
         '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
+          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem403Response'
         '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
+          $ref: '#/components/responses/PostgresServiceMalfunctionProblem500Response'
       security:
         - BearerAuth: []
       tags:
@@ -9151,11 +9151,11 @@ paths:
         '200':
           $ref: '#/components/responses/PostgresListClusters200Response'
         '400':
-          $ref: '#/components/responses/PostgresInvalidParameterProblem'
+          $ref: '#/components/responses/PostgresInvalidRequestProblem400Response'
         '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
+          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem403Response'
         '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
+          $ref: '#/components/responses/PostgresServiceMalfunctionProblem500Response'
       security:
         - BearerAuth: []
       tags:
@@ -9171,13 +9171,13 @@ paths:
         '200':
           $ref: '#/components/responses/PostgresGetCluster200Response'
         '400':
-          $ref: '#/components/responses/PostgresInvalidParameterProblem'
+          $ref: '#/components/responses/PostgresInvalidRequestProblem400Response'
         '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
+          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem403Response'
         '404':
-          $ref: '#/components/responses/PostgresResourceNotFoundProblem'
+          $ref: '#/components/responses/PostgresResourceNotFoundProblem404Response'
         '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
+          $ref: '#/components/responses/PostgresServiceMalfunctionProblem500Response'
       security:
         - BearerAuth: []
       tags:
@@ -9191,15 +9191,15 @@ paths:
         '200':
           $ref: '#/components/responses/PostgresPatchCluster200Response'
         '400':
-          $ref: '#/components/responses/PostgresInvalidParameterProblem'
+          $ref: '#/components/responses/PostgresInvalidRequestProblem400Response'
         '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
+          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem403Response'
         '404':
-          $ref: '#/components/responses/PostgresResourceNotFoundProblem'
+          $ref: '#/components/responses/PostgresResourceNotFoundProblem404Response'
         '409':
-          $ref: '#/components/responses/PostgresIncompatibleStatusProblem'
+          $ref: '#/components/responses/PostgresIncompatibleStatusProblem409Response'
         '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
+          $ref: '#/components/responses/PostgresServiceMalfunctionProblem500Response'
       security:
         - BearerAuth: []
       tags:
@@ -9214,15 +9214,15 @@ paths:
         '202':
           $ref: '#/components/responses/PostgresDeleteCluster202Response'
         '400':
-          $ref: '#/components/responses/PostgresInvalidParameterProblem'
+          $ref: '#/components/responses/PostgresInvalidRequestProblem400Response'
         '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
+          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem403Response'
         '404':
-          $ref: '#/components/responses/PostgresResourceNotFoundProblem'
+          $ref: '#/components/responses/PostgresResourceNotFoundProblem404Response'
         '409':
-          $ref: '#/components/responses/PostgresIncompatibleStatusProblem'
+          $ref: '#/components/responses/PostgresIncompatibleStatusDeleteProblem409Response'
         '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
+          $ref: '#/components/responses/PostgresServiceMalfunctionProblem500Response'
       security:
         - BearerAuth: []
       tags:
@@ -9238,11 +9238,11 @@ paths:
         '200':
           $ref: '#/components/responses/PostgresListClusterBackups200Response'
         '400':
-          $ref: '#/components/responses/PostgresInvalidParameterProblem'
+          $ref: '#/components/responses/PostgresInvalidRequestProblem400Response'
         '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
+          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem403Response'
         '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
+          $ref: '#/components/responses/PostgresServiceMalfunctionProblem500Response'
       security:
         - BearerAuth: []
       tags:
@@ -9258,13 +9258,13 @@ paths:
         '202':
           $ref: '#/components/responses/PostgresDeleteBackup202Response'
         '400':
-          $ref: '#/components/responses/PostgresInvalidParameterProblem'
+          $ref: '#/components/responses/PostgresInvalidRequestProblem400Response'
         '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
+          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem403Response'
         '404':
-          $ref: '#/components/responses/PostgresResourceNotFoundProblem'
+          $ref: '#/components/responses/PostgresResourceNotFoundProblem404Response'
         '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
+          $ref: '#/components/responses/PostgresServiceMalfunctionProblem500Response'
       security:
         - BearerAuth: []
       tags:
@@ -9280,36 +9280,15 @@ paths:
         '202':
           $ref: '#/components/responses/PostgresResetPassword202Response'
         '400':
-          $ref: '#/components/responses/PostgresInvalidParameterProblem'
+          $ref: '#/components/responses/PostgresInvalidRequestProblem400Response'
         '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
+          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem403Response'
         '404':
-          $ref: '#/components/responses/PostgresResourceNotFoundProblem'
+          $ref: '#/components/responses/PostgresResourceNotFoundProblem404Response'
         '409':
-          $ref: '#/components/responses/PostgresIncompatibleStatusProblem'
+          $ref: '#/components/responses/PostgresIncompatibleStatusProblem409Response'
         '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
-      security:
-        - BearerAuth: []
-      tags:
-        - PostgreSQL
-    post:
-      operationId: OldPostgreSQLResetClusterAdministrationPassword
-      description: Reset the password associated with the cluster administration user.
-      responses:
-        '202':
-          $ref: '#/components/responses/PostgresResetPassword202Response'
-        '400':
-          $ref: '#/components/responses/PostgresInvalidParameterProblem'
-        '403':
-          $ref: '#/components/responses/PostgresInvalidAuthenticationProblem'
-        '404':
-          $ref: '#/components/responses/PostgresResourceNotFoundProblem'
-        '409':
-          $ref: '#/components/responses/PostgresIncompatibleStatusProblem'
-        '500':
-          $ref: '#/components/responses/PostgresServiceMalfunctionProblem'
-      deprecated: true
+          $ref: '#/components/responses/PostgresServiceMalfunctionProblem500Response'
       security:
         - BearerAuth: []
       tags:
@@ -14603,18 +14582,7 @@ components:
       required: false
       style: deepObject
       schema:
-        type: object
-        properties:
-          size:
-            description: The maximum number of items to return. The service may return fewer than this value.
-            type: integer
-            format: int32
-            default: 50
-            maximum: 50
-            minimum: 1
-          nextToken:
-            description: A page token received from a previous call. Provide this to retrieve the subsequent page.
-            type: string
+        $ref: '#/components/schemas/PostgresPageParameter'
     PostgresTagsParameter:
       name: tag
       in: query
@@ -19060,8 +19028,7 @@ components:
     PostgresAllowedIpRanges:
       type: array
       items:
-        type: string
-        format: cidr
+        $ref: '#/components/schemas/Cidr'
         description: |-
           An IPv4 CIDR representing a network.
 
@@ -19096,10 +19063,13 @@ components:
         status:
           $ref: '#/components/schemas/PostgresClusterStatus'
         host:
-          description: Where connexions to the cluster must be made to.
+          description: Where connections to the cluster must be made to.
+          type: string
+        privateHost:
+          description: Where connections to the cluster must be made for interconnected services.
           type: string
         port:
-          description: On which port connexions to the host must be made.
+          description: On which port connections to the host must be made.
           type: integer
         errorReason:
           description: 'Detailed information regarding what went wrong, available when status is Error.'
@@ -19124,6 +19094,8 @@ components:
           $ref: '#/components/schemas/PostgresClusterMaintenanceSchedule'
         availableOperations:
           $ref: '#/components/schemas/PostgresClusterOperationNames'
+        netCidr:
+          $ref: '#/components/schemas/PostgresClusterNetCIDR'
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       required:
         - id
@@ -19140,8 +19112,84 @@ components:
         - lastOperationResult
         - availableOperations
       title: PostgresCluster
+    PostgresBackups:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostgresClusterBackup'
+        pageNumber:
+          description: The page number.
+          type: integer
+          format: int32
+        totalItems:
+          description: The total number of items that match the request.
+          type: integer
+          format: int32
+        nextToken:
+          description: Token to provide in order to get the next page. Absent when the last page has been reached.
+          type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      required:
+        - items
+        - pageNumber
+        - totalItems
+      title: PostgresBackups
+    PostgresClusterCreationRequest:
+      type: object
+      properties:
+        name:
+          description: The cluster's name. It **MUST** be unique amongst all your clusters.
+          $ref: '#/components/schemas/StrictSlugMax63'
+        user:
+          description: The name of the user to be created with administration privileges for the cluster.
+          $ref: '#/components/schemas/PostgresUser'
+        nodeConfiguration:
+          $ref: '#/components/schemas/PostgresNodeConfiguration'
+        volume:
+          $ref: '#/components/schemas/PostgresVolume'
+        tags:
+          description: Tags to identify resources
+          $ref: '#/components/schemas/PostgresTags'
+        allowedIpRanges:
+          description: List of unique IPv4 ranges allowed.
+          $ref: '#/components/schemas/PostgresAllowedIpRanges'
+        automaticBackup:
+          description: Whether automatic backup is enabled for this cluster.
+          type: boolean
+          nullable: true
+        isPublic:
+          description: Whether public exposition is enabled for this cluster.
+          type: boolean
+          nullable: true
+        sourceBackupId:
+          description: Initialize the cluster with data from this backup.
+          $ref: '#/components/schemas/PostgresBackupId'
+        netCidr:
+          $ref: '#/components/schemas/PostgresClusterNetCIDR'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      required:
+        - name
+        - user
+        - nodeConfiguration
+        - allowedIpRanges
+        - automaticBackup
+        - volume
+      title: PostgresClusterCreationRequest
+    PostgresClusters:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostgresCluster'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      required:
+        - items
+      title: PostgresClusters
     PostgresClusterAutomaticBackup:
-      description: Whether automatic backups are enabled for this cluster
+      description: Whether automatic backups are enabled for this cluster.
       type: boolean
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       title: PostgresClusterAutomaticBackup
@@ -19219,6 +19267,17 @@ components:
         - tags
         - status
       title: PostgresClusterBackup
+    PostgresClusterBackups:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostgresClusterBackup'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      required:
+        - items
+      title: PostgresClusterBackups
     PostgresClusterId:
       description: A cluster unique identifier.
       type: string
@@ -19285,7 +19344,7 @@ components:
 
         - CREATING: means the cluster is being created.
         - CONFIGURING: means the cluster is being configured according to requested changes.
-        - READY: means the cluster is available and accepts connexions.
+        - READY: means the cluster is available and accepts connections.
         - FAILED: means that the cluster creation has failed, see errorMessage for details.
         - DELETING: means the cluster has been marked for deletion, it will be deleted soon.
         - DELETED: means the cluster has been deleted successfully, it will disappear from query and search results soon.
@@ -19301,6 +19360,21 @@ components:
         - DELETED
         - ERROR
       title: PostgresClusterStatus
+    PostgresClusterNetCIDR:
+      description: |-
+        The CIDR of the network where the cluster will be created.
+
+        **Warning**: The CIDR must be in the following three blocks:
+        - 10.*.0.0/16
+        - 172.(16-31).0.0/16
+        - 192.168.0.0/16
+        The mask mut not be greater than /24.
+      type: string
+      example: 10.10.0.0/16
+      default: 10.10.0.0/16
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      pattern: '^(?:10\.(?:25[0-5]|2[0-4]\d|1?\d\d?)\.(?:25[0-5]|2[0-4]\d|1?\d\d?)|172\.(?:1[6-9]|2\d|3[01])\.(?:25[0-5]|2[0-4]\d|1?\d\d?)|192\.168\.(?:25[0-5]|2[0-4]\d|1?\d\d?))\.0/(?:1[6-9]|2[0-4])$'
+      title: PostgresClusterNetCIDR
     PostgresBackupId:
       description: A backup unique identifier.
       type: string
@@ -19312,6 +19386,7 @@ components:
       description: |-
         The last known status of a backup.
 
+        - PENDING: means the backup is scheduled for creation.
         - CREATING: means the backup is being created.
         - CREATED: means the backup is created.
         - DELETING: means the backup has been marked for deletion, it will be deleted soon.
@@ -19320,6 +19395,7 @@ components:
       type: string
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       enum:
+        - PENDING
         - CREATING
         - CREATED
         - DELETING
@@ -19328,20 +19404,32 @@ components:
       title: PostgresBackupStatus
     PostgresDuplicatedResourceProblem:
       description: The resource you tried to create already exists.
-      properties:
-        type:
-          type: string
-          enum:
-            - 'https://portal.api.numspot.com/errors#duplicate_resource'
-      $ref: '#/components/schemas/PostgresProblem'
-    PostgresInvalidParameterProblem:
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      allOf:
+        - $ref: '#/components/schemas/PostgresProblem'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - 'urn:numspot:errors#duplicated_resource'
+          required:
+            - type
+      title: PostgresDuplicatedResourceProblem
+    PostgresInvalidRequestProblem:
       description: Some of the parameters you have provided are invalid.
-      properties:
-        type:
-          type: string
-          enum:
-            - 'https://portal.api.numspot.com/errors#invalid_parameter'
-      $ref: '#/components/schemas/PostgresProblem'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      allOf:
+        - $ref: '#/components/schemas/PostgresProblem'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - 'urn:numspot:errors#invalid_request'
+          required:
+            - type
+      title: PostgresInvalidRequestProblem
     PostgresNodeConfiguration:
       description: The configuration used to provision the cluster nodes.
       type: object
@@ -19374,6 +19462,27 @@ components:
         - performanceLevel
         - memorySizeGiB
       title: PostgresNodeConfiguration
+    PostgresServiceCatalogClusterAutomaticBackupConfiguration:
+      type: object
+      properties:
+        startTimeSlot:
+          description: The time slot during which automatic backup of clusters are started.
+          $ref: '#/components/schemas/PostgresTimeSlot'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      required:
+        - startTimeSlot
+      title: PostgresServiceCatalogClusterAutomaticBackupConfiguration
+    PostgresServiceCatalogConfiguration:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostgresClusterCatalogItem'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      required:
+        - items
+      title: PostgresServiceCatalogConfiguration
     PostgresTimeSlot:
       type: object
       properties:
@@ -19452,14 +19561,28 @@ components:
                 - GP2
         - $ref: '#/components/schemas/PostgresBaseVolume'
       title: PostgresVolumeGp2
+    PostgresPageParameter:
+      type: object
+      properties:
+        size:
+          description: The maximum number of items to return. The service may return fewer than this value.
+          type: integer
+          format: int32
+          default: 50
+          maximum: 50
+          minimum: 1
+        nextToken:
+          description: A page token received from a previous call. Provide this to retrieve the subsequent page.
+          type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: PostgresPageParameter
     PostgresProblem:
       description: 'A problem, compatible with [RFC 9457](https://datatracker.ietf.org/doc/html/rfc9457#name-members-of-a-problem-detail).'
       type: object
       properties:
         type:
-          description: Identifier of the problem.
+          description: 'Identifier of the problem, in the form of a urn.'
           type: string
-          format: uri
         title:
           description: 'Short, human-readable summary of the problem type.'
           type: string
@@ -19512,6 +19635,18 @@ components:
         $ref: '#/components/schemas/PostgresTag'
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       title: PostgresTags
+    Cidr:
+      description: Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      examples:
+        - 192.168.1.1/24
+        - 10.0.0.5/8
+        - 172.16.0.0/16
+        - 255.255.255.0/32
+        - 0.0.0.0/0
+      pattern: '^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\/(3[0-2]|[12]?[0-9])$'
+      title: Cidr
     CreateComputeBridge:
       description: Schema request to bridge two compute VPCs.
       type: object
@@ -20316,18 +20451,6 @@ components:
         - locationCode
         - locationName
       title: Locations
-    Cidr:
-      description: Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632
-      type: string
-      $schema: 'https://json-schema.org/draft/2020-12/schema'
-      examples:
-        - 192.168.1.1/24
-        - 10.0.0.5/8
-        - 172.16.0.0/16
-        - 255.255.255.0/32
-        - 0.0.0.0/0
-      pattern: '^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\/(3[0-2]|[12]?[0-9])$'
-      title: Cidr
     Token:
       type: object
       properties:
@@ -23563,38 +23686,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              name:
-                description: The cluster's name. It **MUST** be unique amongst all your clusters.
-                $ref: '#/components/schemas/StrictSlugMax63'
-              user:
-                description: The name of the user to be created with administration privileges for the cluster.
-                $ref: '#/components/schemas/PostgresUser'
-              nodeConfiguration:
-                $ref: '#/components/schemas/PostgresNodeConfiguration'
-              volume:
-                $ref: '#/components/schemas/PostgresVolume'
-              tags:
-                description: Tags to identify resources
-                $ref: '#/components/schemas/PostgresTags'
-              allowedIpRanges:
-                description: List of unique IPv4 ranges allowed.
-                $ref: '#/components/schemas/PostgresAllowedIpRanges'
-              automaticBackup:
-                description: Whether automatic backup is enabled for this cluster.
-                type: boolean
-                nullable: true
-              sourceBackupId:
-                description: Initialize the cluster with data from this backup.
-                $ref: '#/components/schemas/PostgresBackupId'
-            required:
-              - name
-              - user
-              - nodeConfiguration
-              - allowedIpRanges
-              - automaticBackup
-              - volume
+            $ref: '#/components/schemas/PostgresClusterCreationRequest'
     PostgresClusterDeleteRequest:
       description: Options to customise the cluster deletion operation.
       content:
@@ -24457,27 +24549,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PostgresClusterBackup'
-              pageNumber:
-                description: The page number.
-                type: integer
-                format: int32
-              totalItems:
-                description: The total number of items that match the request.
-                type: integer
-                format: int32
-              nextToken:
-                description: Token to provide in order to get the next page. Absent when the last page has been reached.
-                type: string
-            required:
-              - items
-              - pageNumber
-              - totalItems
+            $ref: '#/components/schemas/PostgresBackups'
     PostgresGetCluster200Response:
       description: The cluster has been found.
       content:
@@ -24495,27 +24567,13 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PostgresCluster'
-            required:
-              - items
+            $ref: '#/components/schemas/PostgresClusters'
     PostgresListClusterBackups200Response:
       description: The cluster backups have been listed.
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PostgresClusterBackup'
-            required:
-              - items
+            $ref: '#/components/schemas/PostgresClusterBackups'
     PostgresCreateCluster201Response:
       description: The cluster is being created.
       content:
@@ -24528,7 +24586,7 @@ components:
         application/problem+json:
           schema:
             anyOf:
-              - $ref: '#/components/schemas/PostgresInvalidParameterProblem'
+              - $ref: '#/components/schemas/PostgresInvalidRequestProblem'
               - $ref: '#/components/schemas/PostgresDuplicatedResourceProblem'
     PostgresResetPassword202Response:
       description: The password is being reset.
@@ -24536,81 +24594,100 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/PostgresClusterWithPassword'
-    PostgresIncompatibleStatusProblem:
+    PostgresIncompatibleStatusDeleteProblem409Response:
       description: This resource is currently in a status that is incompatible with the requested operation.
       content:
         application/problem+json:
           schema:
-            properties:
-              type:
-                type: string
-                enum:
-                  - 'https://portal.api.numspot.com/errors#incompatible_status'
-            $ref: '#/components/schemas/PostgresProblem'
-    PostgresInvalidAuthenticationProblem:
+            allOf:
+              - $ref: '#/components/schemas/PostgresProblem'
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - 'urn:numspot:errors#incompatible_status'
+                      - 'urn:numspot:errors#blocking_dependencies'
+                required:
+                  - type
+    PostgresIncompatibleStatusProblem409Response:
+      description: This resource is currently in a status that is incompatible with the requested operation.
+      content:
+        application/problem+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/PostgresProblem'
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - 'urn:numspot:errors#incompatible_status'
+                required:
+                  - type
+    PostgresInvalidAuthenticationProblem403Response:
       description: Access to this resource is refused.
       content:
         application/problem+json:
           schema:
-            properties:
-              type:
-                type: string
-                enum:
-                  - 'https://portal.api.numspot.com/errors#forbidden_access'
-            $ref: '#/components/schemas/PostgresProblem'
-    PostgresInvalidParameterProblem:
+            allOf:
+              - $ref: '#/components/schemas/PostgresProblem'
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - 'urn:numspot:errors#forbidden_access'
+                required:
+                  - type
+    PostgresInvalidRequestProblem400Response:
       description: The request you provided is invalid.
       content:
         application/problem+json:
           schema:
-            $ref: '#/components/schemas/PostgresInvalidParameterProblem'
-    PostgresResourceNotFoundProblem:
+            $ref: '#/components/schemas/PostgresInvalidRequestProblem'
+    PostgresResourceNotFoundProblem404Response:
       description: The requested resource was not found.
       content:
         application/problem+json:
           schema:
-            properties:
-              type:
-                type: string
-                enum:
-                  - 'https://portal.api.numspot.com/errors#resource_not_found'
-            $ref: '#/components/schemas/PostgresProblem'
-    PostgresServiceMalfunctionProblem:
+            allOf:
+              - $ref: '#/components/schemas/PostgresProblem'
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - 'urn:numspot:errors#resource_not_found'
+                required:
+                  - type
+    PostgresServiceMalfunctionProblem500Response:
       description: Something went wrong on our side.
       content:
         application/problem+json:
           schema:
-            properties:
-              type:
-                type: string
-                enum:
-                  - 'https://portal.api.numspot.com/errors#internal_server_error'
-            $ref: '#/components/schemas/PostgresProblem'
+            allOf:
+              - $ref: '#/components/schemas/PostgresProblem'
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - 'urn:numspot:errors#internal_error'
+                required:
+                  - type
     PostgresServiceCatalogClustersAutomaticBackup200Response:
       description: Service characteristics of the cluster automatic backups
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              startTimeSlot:
-                description: The time slot during which automatic backup of clusters are started.
-                $ref: '#/components/schemas/PostgresTimeSlot'
-            required:
-              - startTimeSlot
+            $ref: '#/components/schemas/PostgresServiceCatalogClusterAutomaticBackupConfiguration'
     PostgresServiceCatalogClustersConfiguration200Response:
       description: The list of available configurations for clusters.
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              items:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PostgresClusterCatalogItem'
-            required:
-              - items
+            $ref: '#/components/schemas/PostgresServiceCatalogConfiguration'
     ListComputeBridges200Response:
       description: List of compute bridges 200 response.
       content:

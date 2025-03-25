@@ -11,6 +11,7 @@ import (
 	"github.com/deepmap/oapi-codegen/pkg/securityprovider"
 	"github.com/google/uuid"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/sdk/objectstorage"
 	"terraform-provider-numspot/internal/utils"
 )
 
@@ -32,11 +33,14 @@ type S3Client struct {
 type NumSpotSDK struct {
 	ID                    string
 	Client                *api.ClientWithResponses
+	OsClient              *objectstorage.ClientWithResponses
+	S3Creds               *S3Client
 	HTTPClient            *http.Client
 	SpaceID               api.SpaceId
 	ClientID              uuid.UUID
 	ClientSecret          string
 	Host                  string
+	HostOs                string
 	AccessTokenExpiration time.Time
 }
 
@@ -81,6 +85,13 @@ func WithClientSecret(clientSecret string) Option {
 func WithHTTPClient(client *http.Client) Option {
 	return func(s *NumSpotSDK) error {
 		s.HTTPClient = client
+		return nil
+	}
+}
+
+func WithHostOs(hostOs string) Option {
+	return func(s *NumSpotSDK) error {
+		s.HostOs = hostOs
 		return nil
 	}
 }
@@ -131,12 +142,33 @@ func (s *NumSpotSDK) AuthenticateUser(ctx context.Context) error {
 		return nil
 	}
 
+	newTransportOs := func(c *objectstorage.Client) error {
+		if s.HTTPClient != nil {
+			c.Client = s.HTTPClient
+		} else {
+			c.Client = &http.Client{
+				Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
+			}
+		}
+		return nil
+	}
+
 	requestEditor := api.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
 		req.Header.Add(UserAgentHeader, TerraformUserAgent)
 		return nil
 	})
 
+	requestEditorOs := objectstorage.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
+		req.Header.Add(UserAgentHeader, TerraformUserAgent)
+		return nil
+	})
+
 	numSpotClient, err := api.NewClientWithResponses(s.Host, newTransport, requestEditor)
+	if err != nil {
+		return err
+	}
+
+	s.OsClient, err = objectstorage.NewClientWithResponses(s.HostOs, newTransportOs, requestEditorOs)
 	if err != nil {
 		return err
 	}
@@ -178,7 +210,28 @@ func (s *NumSpotSDK) AuthenticateUser(ctx context.Context) error {
 		return err
 	}
 
+	err = s.setupS3Client(ctx, response)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func (s *NumSpotSDK) setupS3Client(ctx context.Context, response *api.TokenResponse) error {
+	res, err := s.Client.ConvertTokenWithResponse(ctx, api.ConvertTokenJSONRequestBody{Token: response.JSON200.AccessToken})
+	if err != nil || res.StatusCode() != 200 {
+		return err
+	}
+
+	s.S3Creds = &S3Client{
+		Ak:      res.JSON200.Ak,
+		Sk:      res.JSON200.Sk,
+		Service: ServiceS3,
+		Region:  RegionS3,
+	}
+
+	return err
 }
 
 func buildBasicAuth(username, password string) string {
