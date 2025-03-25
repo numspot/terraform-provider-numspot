@@ -193,7 +193,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		resp.Diagnostics.AddAttributeWarning(
 			path.Root("numspot_host_os"),
 			"Missing Numspot API Host Object Storage",
-			"The provider cannot create the Numspot API provider as there is a missing or empty value for the NumSpot host. "+
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the NumSpot object storage host. "+
 				"Set the host value in the configuration or use the NUMSPOT_HOST_OS environment variable. "+
 				"If either is already set, ensure the value is not empty.",
 		)
