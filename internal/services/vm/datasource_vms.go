@@ -76,13 +76,18 @@ func (d *vmsDataSource) Read(ctx context.Context, request datasource.ReadRequest
 		return
 	}
 
-	objectItems := serializeVms(ctx, numspotVm, &response.Diagnostics)
+	objectItems := utils.SerializeDatasourceItemsWithDiags(ctx, *numspotVm, &response.Diagnostics, mappingItemsValue)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
@@ -135,15 +140,14 @@ func deserializeVmParams(ctx context.Context, tf datasource_vm.VmModel, diags *d
 		Types:                                utils.ConvertTfListToArrayOfString(ctx, tf.Types, diags),
 		VpcIds:                               utils.ConvertTfListToArrayOfString(ctx, tf.VpcIds, diags),
 		NicVpcIds:                            utils.ConvertTfListToArrayOfString(ctx, tf.NicVpcIds, diags),
-		AvailabilityZoneNames:                utils.ConvertTfListToArrayOfString(ctx, tf.AvailabilityZoneNames, diags),
+		AvailabilityZoneNames:                utils.ConvertTfListToArrayOfAzName(ctx, tf.AvailabilityZoneNames, diags),
 	}
 }
 
-func serializeVms(ctx context.Context, vms *[]api.Vm, diags *diag.Diagnostics) datasource_vm.VmModel {
-	var vmsList types.List
+func mappingItemsValue(ctx context.Context, vm api.Vm, diags *diag.Diagnostics) (datasource_vm.ItemsValue, diag.Diagnostics) {
 	var serializeDiags diag.Diagnostics
 
-	tagsList := types.List{}
+	tagsList := types.ListNull(datasource_vm.ItemsValue{}.Type(ctx))
 	blockDeviceMappingsList := types.List{}
 	nicsList := types.ListNull(datasource_vm.NicsValue{}.Type(ctx))
 	securityGroupsList := types.List{}
@@ -151,143 +155,116 @@ func serializeVms(ctx context.Context, vms *[]api.Vm, diags *diag.Diagnostics) d
 	creationDateTf := types.String{}
 	placement := basetypes.ObjectValue{}
 
-	if len(*vms) != 0 {
-		ll := len(*vms)
-		itemsValue := make([]datasource_vm.ItemsValue, ll)
-		for i := 0; ll > i; i++ {
-			if (*vms)[i].Tags != nil {
-				tagsList, serializeDiags = mappingVmTags(ctx, vms, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*vms)[i].BlockDeviceMappings != nil {
-				blockDeviceMappingsList, serializeDiags = mappingBlockDeviceMappings(ctx, vms, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*vms)[i].Nics != nil {
-				nicsList, serializeDiags = mappingNics(ctx, vms, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*vms)[i].SecurityGroups != nil {
-				securityGroupsList, serializeDiags = mappingSecurityGroups(ctx, (*vms)[i].SecurityGroups, diags)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*vms)[i].CreationDate != nil {
-				creationDate := (*vms)[i].CreationDate.String()
-				creationDateTf = types.StringPointerValue(&creationDate)
-			}
-
-			if (*vms)[i].ProductCodes != nil {
-				productCodesList, serializeDiags = types.ListValueFrom(ctx, types.StringType, (*vms)[i].ProductCodes)
-				diags.Append(serializeDiags...)
-			}
-
-			if (*vms)[i].Placement != nil {
-				placementValue, serializePlacementDiags := mappingPlacement(ctx, (*vms)[i].Placement, diags)
-				if serializePlacementDiags.HasError() {
-					diags.Append(serializePlacementDiags...)
-				}
-
-				placement, serializeDiags = placementValue.ToObjectValue(ctx)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			itemsValue[i], serializeDiags = datasource_vm.NewItemsValue(datasource_vm.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"architecture":                types.StringValue(utils.ConvertStringPtrToString((*vms)[i].Architecture)),
-				"block_device_mappings":       blockDeviceMappingsList,
-				"bsu_optimized":               types.BoolPointerValue((*vms)[i].BsuOptimized),
-				"client_token":                types.StringValue(utils.ConvertStringPtrToString((*vms)[i].ClientToken)),
-				"creation_date":               creationDateTf,
-				"deletion_protection":         types.BoolPointerValue((*vms)[i].DeletionProtection),
-				"hypervisor":                  types.StringValue(utils.ConvertStringPtrToString((*vms)[i].Hypervisor)),
-				"id":                          types.StringValue(utils.ConvertStringPtrToString((*vms)[i].Id)),
-				"image_id":                    types.StringValue(utils.ConvertStringPtrToString((*vms)[i].ImageId)),
-				"initiated_shutdown_behavior": types.StringValue(utils.ConvertStringPtrToString((*vms)[i].InitiatedShutdownBehavior)),
-				"is_source_dest_checked":      types.BoolPointerValue((*vms)[i].IsSourceDestChecked),
-				"keypair_name":                types.StringValue(utils.ConvertStringPtrToString((*vms)[i].KeypairName)),
-				"launch_number":               types.Int64Value(utils.ConvertIntPtrToInt64((*vms)[i].LaunchNumber)),
-				"nested_virtualization":       types.BoolPointerValue((*vms)[i].NestedVirtualization),
-				"nics":                        nicsList,
-				"os_family":                   types.StringValue(utils.ConvertStringPtrToString((*vms)[i].OsFamily)),
-				"performance":                 types.StringValue(utils.ConvertStringPtrToString((*vms)[i].Performance)),
-				"placement":                   placement,
-				"private_dns_name":            types.StringValue(utils.ConvertStringPtrToString((*vms)[i].PrivateDnsName)),
-				"private_ip":                  types.StringValue(utils.ConvertStringPtrToString((*vms)[i].PrivateIp)),
-				"product_codes":               productCodesList,
-				"public_dns_name":             types.StringValue(utils.ConvertStringPtrToString((*vms)[i].PublicDnsName)),
-				"public_ip":                   types.StringValue(utils.ConvertStringPtrToString((*vms)[i].PublicIp)),
-				"reservation_id":              types.StringValue(utils.ConvertStringPtrToString((*vms)[i].ReservationId)),
-				"root_device_name":            types.StringValue(utils.ConvertStringPtrToString((*vms)[i].RootDeviceName)),
-				"root_device_type":            types.StringValue(utils.ConvertStringPtrToString((*vms)[i].RootDeviceType)),
-				"security_groups":             securityGroupsList,
-				"state":                       types.StringValue(utils.ConvertStringPtrToString((*vms)[i].State)),
-				"state_reason":                types.StringValue(utils.ConvertStringPtrToString((*vms)[i].StateReason)),
-				"subnet_id":                   types.StringValue(utils.ConvertStringPtrToString((*vms)[i].SubnetId)),
-				"tags":                        tagsList,
-				"type":                        types.StringValue(utils.ConvertStringPtrToString((*vms)[i].Type)),
-				"user_data":                   types.StringValue(utils.ConvertStringPtrToString((*vms)[i].UserData)),
-				"vpc_id":                      types.StringValue(utils.ConvertStringPtrToString((*vms)[i].VpcId)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
+	if vm.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *vm.Tags, mappingTags)
+		if serializeDiags.HasError() {
+			return datasource_vm.ItemsValue{}, serializeDiags
 		}
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_vm.ItemsValue{}, serializeDiags
+		}
+	}
 
-		vmsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_vm.ItemsValue).Type(ctx), itemsValue)
+	if vm.BlockDeviceMappings != nil {
+		blockDeviceMappingsList, serializeDiags = mappingBlockDeviceMappings(ctx, vm, diags)
 		if serializeDiags.HasError() {
 			diags.Append(serializeDiags...)
 		}
-	} else {
-		vmsList = types.ListNull(new(datasource_vm.ItemsValue).Type(ctx))
 	}
 
-	return datasource_vm.VmModel{
-		Items: vmsList,
-	}
-}
-
-func mappingVmTags(ctx context.Context, vms *[]api.Vm, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*vms)[i].Tags)
-	elementValue := make([]datasource_vm.TagsValue, lt)
-	for y, tag := range *(*vms)[i].Tags {
-		elementValue[y], *diags = datasource_vm.NewTagsValue(datasource_vm.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
+	if vm.Nics != nil {
+		nicsList, serializeDiags = mappingNics(ctx, vm, diags)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
 		}
 	}
 
-	return types.ListValueFrom(ctx, new(datasource_vm.TagsValue).Type(ctx), elementValue)
+	if vm.SecurityGroups != nil {
+		securityGroupsList, serializeDiags = mappingSecurityGroups(ctx, *vm.SecurityGroups, diags)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
+	}
+
+	if vm.CreationDate != nil {
+		creationDate := vm.CreationDate.String()
+		creationDateTf = types.StringPointerValue(&creationDate)
+	}
+
+	if vm.ProductCodes != nil {
+		productCodesList, serializeDiags = types.ListValueFrom(ctx, types.StringType, vm.ProductCodes)
+		diags.Append(serializeDiags...)
+	}
+
+	if vm.Placement != nil {
+		placementValue, serializePlacementDiags := mappingPlacement(ctx, vm.Placement, diags)
+		if serializePlacementDiags.HasError() {
+			diags.Append(serializePlacementDiags...)
+		}
+
+		placement, serializeDiags = placementValue.ToObjectValue(ctx)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
+	}
+
+	return datasource_vm.NewItemsValue(datasource_vm.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"architecture":                types.StringValue(utils.ConvertStringPtrToString(vm.Architecture)),
+		"block_device_mappings":       blockDeviceMappingsList,
+		"bsu_optimized":               types.BoolPointerValue(vm.BsuOptimized),
+		"client_token":                types.StringValue(utils.ConvertStringPtrToString(vm.ClientToken)),
+		"creation_date":               creationDateTf,
+		"deletion_protection":         types.BoolPointerValue(vm.DeletionProtection),
+		"hypervisor":                  types.StringValue(utils.ConvertStringPtrToString(vm.Hypervisor)),
+		"id":                          types.StringValue(utils.ConvertStringPtrToString(vm.Id)),
+		"image_id":                    types.StringValue(utils.ConvertStringPtrToString(vm.ImageId)),
+		"initiated_shutdown_behavior": types.StringValue(utils.ConvertStringPtrToString(vm.InitiatedShutdownBehavior)),
+		"is_source_dest_checked":      types.BoolPointerValue(vm.IsSourceDestChecked),
+		"keypair_name":                types.StringValue(utils.ConvertStringPtrToString(vm.KeypairName)),
+		"launch_number":               types.Int64Value(utils.ConvertIntPtrToInt64(vm.LaunchNumber)),
+		"nested_virtualization":       types.BoolPointerValue(vm.NestedVirtualization),
+		"nics":                        nicsList,
+		"os_family":                   types.StringValue(utils.ConvertStringPtrToString(vm.OsFamily)),
+		"performance":                 types.StringValue(utils.ConvertStringPtrToString(vm.Performance)),
+		"placement":                   placement,
+		"private_dns_name":            types.StringValue(utils.ConvertStringPtrToString(vm.PrivateDnsName)),
+		"private_ip":                  types.StringValue(utils.ConvertStringPtrToString(vm.PrivateIp)),
+		"product_codes":               productCodesList,
+		"public_dns_name":             types.StringValue(utils.ConvertStringPtrToString(vm.PublicDnsName)),
+		"public_ip":                   types.StringValue(utils.ConvertStringPtrToString(vm.PublicIp)),
+		"reservation_id":              types.StringValue(utils.ConvertStringPtrToString(vm.ReservationId)),
+		"root_device_name":            types.StringValue(utils.ConvertStringPtrToString(vm.RootDeviceName)),
+		"root_device_type":            types.StringValue(utils.ConvertStringPtrToString(vm.RootDeviceType)),
+		"security_groups":             securityGroupsList,
+		"state":                       types.StringValue(utils.ConvertStringPtrToString(vm.State)),
+		"state_reason":                types.StringValue(utils.ConvertStringPtrToString(vm.StateReason)),
+		"subnet_id":                   types.StringValue(utils.ConvertStringPtrToString(vm.SubnetId)),
+		"tags":                        tagsList,
+		"type":                        types.StringValue(utils.ConvertStringPtrToString(vm.Type)),
+		"user_data":                   types.StringValue(utils.ConvertStringPtrToString(vm.UserData)),
+		"vpc_id":                      types.StringValue(utils.ConvertStringPtrToString(vm.VpcId)),
+	})
 }
 
-func mappingNics(ctx context.Context, vms *[]api.Vm, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_vm.TagsValue, diag.Diagnostics) {
+	return datasource_vm.NewTagsValue(datasource_vm.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
+}
+
+func mappingNics(ctx context.Context, vm api.Vm, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
 	var mappingDiags diag.Diagnostics
 	var linkPublicIp basetypes.ObjectValue
 	var nicLink basetypes.ObjectValue
 
-	ln := len(*(*vms)[i].Nics)
+	ln := len(*vm.Nics)
 	elementValue := make([]datasource_vm.NicsValue, ln)
 	securityGroupsList := types.ListNull(new(datasource_vm.NicSecurityGroupsValue).Type(ctx))
 	privateIpsList := types.ListNull(datasource_vm.PrivateIpsValue{}.Type(ctx))
 
-	for y, nic := range *(*vms)[i].Nics {
+	for y, nic := range *vm.Nics {
 		if nic.LinkNic != nil {
 			nicLinkValue, mappingNicLinkDiags := mappingNicLink(ctx, nic.LinkNic, diags)
 			if mappingNicLinkDiags.HasError() {
@@ -385,11 +362,11 @@ func mappingLinkPublicIp(ctx context.Context, publicIpLightForVm *api.LinkPublic
 	return elementValue, mappingDiags
 }
 
-func mappingSecurityGroups(ctx context.Context, securityGroups *[]api.SecurityGroupLight, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
-	ls := len(*securityGroups)
+func mappingSecurityGroups(ctx context.Context, securityGroups []api.SecurityGroupLight, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
+	ls := len(securityGroups)
 	elementValue := make([]datasource_vm.SecurityGroupsValue, ls)
 
-	for y, securityGroup := range *securityGroups {
+	for y, securityGroup := range securityGroups {
 		elementValue[y], *diags = datasource_vm.NewSecurityGroupsValue(datasource_vm.SecurityGroupsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 			"security_group_id":   types.StringPointerValue(securityGroup.SecurityGroupId),
 			"security_group_name": types.StringPointerValue(securityGroup.SecurityGroupName),
@@ -461,14 +438,14 @@ func mappingPrivateIps(ctx context.Context, privateIpLight *[]api.PrivateIpLight
 	return types.ListValueFrom(ctx, new(datasource_vm.PrivateIpsValue).Type(ctx), elementValue)
 }
 
-func mappingBlockDeviceMappings(ctx context.Context, vms *[]api.Vm, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+func mappingBlockDeviceMappings(ctx context.Context, vm api.Vm, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
 	var mappingDiags diag.Diagnostics
 
-	lb := len(*(*vms)[i].BlockDeviceMappings)
+	lb := len(*vm.BlockDeviceMappings)
 	elementValue := make([]datasource_vm.BlockDeviceMappingsValue, lb)
 	bsu := basetypes.ObjectValue{}
 
-	for y, blockDeviceMapping := range *(*vms)[i].BlockDeviceMappings {
+	for y, blockDeviceMapping := range *vm.BlockDeviceMappings {
 		if blockDeviceMapping.Bsu != nil {
 			bsuValue, serializeBsuDiags := mappingBsu(ctx, blockDeviceMapping, diags)
 			if serializeBsuDiags.HasError() {
@@ -516,7 +493,7 @@ func mappingBsu(ctx context.Context, blockDeviceMappingCreated api.BlockDeviceMa
 
 func mappingPlacement(ctx context.Context, placement *api.Placement, diags *diag.Diagnostics) (datasource_vm.PlacementValue, diag.Diagnostics) {
 	elementValue, mappingDiags := datasource_vm.NewPlacementValue(datasource_vm.PlacementValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"availability_zone_name": types.StringPointerValue(placement.AvailabilityZoneName),
+		"availability_zone_name": types.StringValue(utils.ConvertAzNamePtrToString(placement.AvailabilityZoneName)),
 		"tenancy":                types.StringPointerValue(placement.Tenancy),
 	})
 	if mappingDiags.HasError() {

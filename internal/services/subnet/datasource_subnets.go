@@ -75,13 +75,19 @@ func (d *subnetsDataSource) Read(ctx context.Context, request datasource.ReadReq
 		return
 	}
 
-	objectItems := serializeSubnets(ctx, numspotSubnet, &response.Diagnostics)
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *numspotSubnet, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
@@ -93,70 +99,39 @@ func deserializeParams(ctx context.Context, tf datasource_subnet.SubnetModel, di
 		States:                utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
 		VpcIds:                utils.ConvertTfListToArrayOfString(ctx, tf.VpcIds, diags),
 		Ids:                   utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
-		AvailabilityZoneNames: utils.ConvertTfListToArrayOfString(ctx, tf.AvailabilityZoneNames, diags),
+		AvailabilityZoneNames: utils.ConvertTfListToArrayOfAzName(ctx, tf.AvailabilityZoneNames, diags),
 	}
 }
 
-func serializeSubnets(ctx context.Context, subnets *[]api.Subnet, diags *diag.Diagnostics) datasource_subnet.SubnetModel {
-	var serializeDiags diag.Diagnostics
-	var subnetsList types.List
-	tagsList := types.List{}
+func mappingItemsValue(ctx context.Context, subnet api.Subnet) (datasource_subnet.ItemsValue, diag.Diagnostics) {
+	tagsList := types.ListNull(datasource_subnet.ItemsValue{}.Type(ctx))
 
-	if len(*subnets) != 0 {
-		ll := len(*subnets)
-		itemsValue := make([]datasource_subnet.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			if (*subnets)[i].Tags != nil {
-
-				tagsList, serializeDiags = mappingSubnetTags(ctx, subnets, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			itemsValue[i], serializeDiags = datasource_subnet.NewItemsValue(datasource_subnet.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"availability_zone_name":  types.StringValue(utils.ConvertStringPtrToString((*subnets)[i].AvailabilityZoneName)),
-				"available_ips_count":     types.Int64Value(utils.ConvertIntPtrToInt64((*subnets)[i].AvailableIpsCount)),
-				"id":                      types.StringValue(utils.ConvertStringPtrToString((*subnets)[i].Id)),
-				"ip_range":                types.StringValue(utils.ConvertStringPtrToString((*subnets)[i].IpRange)),
-				"map_public_ip_on_launch": types.BoolPointerValue((*subnets)[i].MapPublicIpOnLaunch),
-				"state":                   types.StringValue(utils.ConvertStringPtrToString((*subnets)[i].State)),
-				"tags":                    tagsList,
-				"vpc_id":                  types.StringValue(utils.ConvertStringPtrToString((*subnets)[i].VpcId)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
-		}
-
-		subnetsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_subnet.ItemsValue).Type(ctx), itemsValue)
+	if subnet.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *subnet.Tags, mappingTags)
 		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
+			return datasource_subnet.ItemsValue{}, serializeDiags
 		}
-	} else {
-		subnetsList = types.ListNull(new(datasource_subnet.ItemsValue).Type(ctx))
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_subnet.ItemsValue{}, serializeDiags
+		}
 	}
 
-	return datasource_subnet.SubnetModel{
-		Items: subnetsList,
-	}
+	return datasource_subnet.NewItemsValue(datasource_subnet.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"availability_zone_name":  types.StringValue(utils.ConvertAzNamePtrToString(subnet.AvailabilityZoneName)),
+		"available_ips_count":     types.Int64Value(utils.ConvertIntPtrToInt64(subnet.AvailableIpsCount)),
+		"id":                      types.StringValue(utils.ConvertStringPtrToString(subnet.Id)),
+		"ip_range":                types.StringValue(utils.ConvertStringPtrToString(subnet.IpRange)),
+		"map_public_ip_on_launch": types.BoolPointerValue(subnet.MapPublicIpOnLaunch),
+		"state":                   types.StringValue(utils.ConvertStringPtrToString(subnet.State)),
+		"tags":                    tagsList,
+		"vpc_id":                  types.StringValue(utils.ConvertStringPtrToString(subnet.VpcId)),
+	})
 }
 
-func mappingSubnetTags(ctx context.Context, subnets *[]api.Subnet, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*subnets)[i].Tags)
-	elementValue := make([]datasource_subnet.TagsValue, lt)
-	for y, tag := range *(*subnets)[i].Tags {
-		elementValue[y], *diags = datasource_subnet.NewTagsValue(datasource_subnet.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
-
-	return types.ListValueFrom(ctx, new(datasource_subnet.TagsValue).Type(ctx), elementValue)
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_subnet.TagsValue, diag.Diagnostics) {
+	return datasource_subnet.NewTagsValue(datasource_subnet.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
 }

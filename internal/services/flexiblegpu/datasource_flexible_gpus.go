@@ -82,13 +82,19 @@ func (d *flexibleGpusDataSource) Read(ctx context.Context, request datasource.Re
 		return
 	}
 
-	objectItems := serializeFlexibleGPUDataSource(ctx, res.JSON200.Items, &response.Diagnostics)
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *res.JSON200.Items, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
@@ -97,7 +103,7 @@ func deserializeFlexibleGPUDataSource(ctx context.Context, tf datasource_flexibl
 	return api.ReadFlexibleGpusParams{
 		States:                utils.ConvertTfListToArrayOfString(ctx, tf.States, diags),
 		Ids:                   utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
-		AvailabilityZoneNames: utils.ConvertTfListToArrayOfString(ctx, tf.AvailabilityZoneNames, diags),
+		AvailabilityZoneNames: utils.ConvertTfListToArrayOfAzName(ctx, tf.AvailabilityZoneNames, diags),
 		DeleteOnVmDeletion:    tf.DeleteOnVmDeletion.ValueBoolPointer(),
 		Generations:           utils.ConvertTfListToArrayOfString(ctx, tf.Generations, diags),
 		ModelNames:            utils.ConvertTfListToArrayOfString(ctx, tf.ModelNames, diags),
@@ -105,39 +111,14 @@ func deserializeFlexibleGPUDataSource(ctx context.Context, tf datasource_flexibl
 	}
 }
 
-func serializeFlexibleGPUDataSource(ctx context.Context, flexiblGpus *[]api.FlexibleGpu, diags *diag.Diagnostics) datasource_flexible_gpu.FlexibleGpuModel {
-	var flexibleGpusList types.List
-	var serializeDiags diag.Diagnostics
-
-	if len(*flexiblGpus) != 0 {
-		ll := len(*flexiblGpus)
-		itemsValue := make([]datasource_flexible_gpu.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			itemsValue[i], serializeDiags = datasource_flexible_gpu.NewItemsValue(datasource_flexible_gpu.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"availability_zone_name": types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].AvailabilityZoneName)),
-				"delete_on_vm_deletion":  types.BoolPointerValue((*flexiblGpus)[i].DeleteOnVmDeletion),
-				"generation":             types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].Generation)),
-				"id":                     types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].Id)),
-				"model_name":             types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].ModelName)),
-				"state":                  types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].State)),
-				"vm_id":                  types.StringValue(utils.ConvertStringPtrToString((*flexiblGpus)[i].VmId)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
-		}
-
-		flexibleGpusList, serializeDiags = types.ListValueFrom(ctx, new(datasource_flexible_gpu.ItemsValue).Type(ctx), itemsValue)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	} else {
-		flexibleGpusList = types.ListNull(new(datasource_flexible_gpu.ItemsValue).Type(ctx))
-	}
-
-	return datasource_flexible_gpu.FlexibleGpuModel{
-		Items: flexibleGpusList,
-	}
+func mappingItemsValue(ctx context.Context, flexiblGpus api.FlexibleGpu) (datasource_flexible_gpu.ItemsValue, diag.Diagnostics) {
+	return datasource_flexible_gpu.NewItemsValue(datasource_flexible_gpu.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"availability_zone_name": types.StringValue(utils.ConvertAzNamePtrToString(flexiblGpus.AvailabilityZoneName)),
+		"delete_on_vm_deletion":  types.BoolPointerValue(flexiblGpus.DeleteOnVmDeletion),
+		"generation":             types.StringValue(utils.ConvertStringPtrToString(flexiblGpus.Generation)),
+		"id":                     types.StringValue(utils.ConvertStringPtrToString(flexiblGpus.Id)),
+		"model_name":             types.StringValue(utils.ConvertStringPtrToString(flexiblGpus.ModelName)),
+		"state":                  types.StringValue(utils.ConvertStringPtrToString(flexiblGpus.State)),
+		"vm_id":                  types.StringValue(utils.ConvertStringPtrToString(flexiblGpus.VmId)),
+	})
 }

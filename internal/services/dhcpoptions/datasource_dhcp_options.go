@@ -76,13 +76,18 @@ func (d *dhcpOptionsDataSource) Read(ctx context.Context, request datasource.Rea
 		return
 	}
 
-	dhcpOptionItems := serializeDHCPOptions(ctx, dhcpOptions, &response.Diagnostics)
+	dhcpOptionItems := utils.SerializeDatasourceItemsWithDiags(ctx, *dhcpOptions, &response.Diagnostics, mappingItemsValue)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, dhcpOptionItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = dhcpOptionItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
@@ -101,83 +106,53 @@ func deserializeReadDHCPOptions(ctx context.Context, tf datasource_dhcp_options.
 	}
 }
 
-func serializeDHCPOptions(ctx context.Context, dhcpOptions *[]api.DhcpOptionsSet, diags *diag.Diagnostics) datasource_dhcp_options.DhcpOptionsModel {
-	var dhcpOptionsList types.List
+func mappingItemsValue(ctx context.Context, dhcpOption api.DhcpOptionsSet, diags *diag.Diagnostics) (datasource_dhcp_options.ItemsValue, diag.Diagnostics) {
+	var serializeDiags diag.Diagnostics
 	domainNameServersList := types.List{}
 	logServersList := types.List{}
 	ntpServersList := types.List{}
-	tagsList := types.List{}
+	tagsList := types.ListNull(datasource_dhcp_options.ItemsValue{}.Type(ctx))
 
-	var serializeDiags diag.Diagnostics
-
-	if len(*dhcpOptions) != 0 {
-		ll := len(*dhcpOptions)
-		itemsValue := make([]datasource_dhcp_options.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			if (*dhcpOptions)[i].Tags != nil {
-				tagsList, serializeDiags = mappingDhcpOptionsTags(ctx, dhcpOptions, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*dhcpOptions)[i].DomainNameServers != nil {
-				domainNameServersList, serializeDiags = types.ListValueFrom(ctx, types.StringType, (*dhcpOptions)[i].DomainNameServers)
-				diags.Append(serializeDiags...)
-			}
-
-			if (*dhcpOptions)[i].LogServers != nil {
-				logServersList, serializeDiags = types.ListValueFrom(ctx, types.StringType, (*dhcpOptions)[i].LogServers)
-				diags.Append(serializeDiags...)
-			}
-
-			if (*dhcpOptions)[i].NtpServers != nil {
-				ntpServersList, serializeDiags = types.ListValueFrom(ctx, types.StringType, (*dhcpOptions)[i].NtpServers)
-				diags.Append(serializeDiags...)
-			}
-
-			itemsValue[i], serializeDiags = datasource_dhcp_options.NewItemsValue(datasource_dhcp_options.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"default":             types.BoolPointerValue((*dhcpOptions)[i].Default),
-				"domain_name":         types.StringValue(utils.ConvertStringPtrToString((*dhcpOptions)[i].DomainName)),
-				"domain_name_servers": domainNameServersList,
-				"id":                  types.StringValue(utils.ConvertStringPtrToString((*dhcpOptions)[i].Id)),
-				"log_servers":         logServersList,
-				"ntp_servers":         ntpServersList,
-				"tags":                tagsList,
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
-		}
-
-		dhcpOptionsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_dhcp_options.ItemsValue).Type(ctx), itemsValue)
+	if dhcpOption.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *dhcpOption.Tags, mappingTags)
 		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
+			return datasource_dhcp_options.ItemsValue{}, serializeDiags
 		}
-	} else {
-		dhcpOptionsList = types.ListNull(new(datasource_dhcp_options.ItemsValue).Type(ctx))
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_dhcp_options.ItemsValue{}, serializeDiags
+		}
 	}
 
-	return datasource_dhcp_options.DhcpOptionsModel{
-		Items: dhcpOptionsList,
+	if dhcpOption.DomainNameServers != nil {
+		domainNameServersList, serializeDiags = types.ListValueFrom(ctx, types.StringType, dhcpOption.DomainNameServers)
+		diags.Append(serializeDiags...)
 	}
+
+	if dhcpOption.LogServers != nil {
+		logServersList, serializeDiags = types.ListValueFrom(ctx, types.StringType, dhcpOption.LogServers)
+		diags.Append(serializeDiags...)
+	}
+
+	if dhcpOption.NtpServers != nil {
+		ntpServersList, serializeDiags = types.ListValueFrom(ctx, types.StringType, dhcpOption.NtpServers)
+		diags.Append(serializeDiags...)
+	}
+
+	return datasource_dhcp_options.NewItemsValue(datasource_dhcp_options.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"default":             types.BoolPointerValue(dhcpOption.Default),
+		"domain_name":         types.StringValue(utils.ConvertStringPtrToString(dhcpOption.DomainName)),
+		"domain_name_servers": domainNameServersList,
+		"id":                  types.StringValue(utils.ConvertStringPtrToString(dhcpOption.Id)),
+		"log_servers":         logServersList,
+		"ntp_servers":         ntpServersList,
+		"tags":                tagsList,
+	})
 }
 
-func mappingDhcpOptionsTags(ctx context.Context, dhcpOptions *[]api.DhcpOptionsSet, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*dhcpOptions)[i].Tags)
-	elementValue := make([]datasource_dhcp_options.TagsValue, lt)
-	for y, tag := range *(*dhcpOptions)[i].Tags {
-		elementValue[y], *diags = datasource_dhcp_options.NewTagsValue(datasource_dhcp_options.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
-
-	return types.ListValueFrom(ctx, new(datasource_dhcp_options.TagsValue).Type(ctx), elementValue)
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_dhcp_options.TagsValue, diag.Diagnostics) {
+	return datasource_dhcp_options.NewTagsValue(datasource_dhcp_options.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
 }

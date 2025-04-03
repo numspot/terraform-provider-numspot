@@ -1,5 +1,5 @@
 # Create key pair
-resource "numspot_kepair" "keypair" {
+resource "numspot_keypair" "keypair" {
   name = "keypair-example"
 }
 

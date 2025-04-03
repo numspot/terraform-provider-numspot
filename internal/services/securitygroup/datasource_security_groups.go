@@ -80,13 +80,18 @@ func (d *securityGroupsDataSource) Read(ctx context.Context, request datasource.
 		return
 	}
 
-	objectItems := serializeSecurityGroupsDatasource(ctx, res, &response.Diagnostics)
+	objectItems := utils.SerializeDatasourceItemsWithDiags(ctx, *res, &response.Diagnostics, mappingItemsValue)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
@@ -113,93 +118,64 @@ func deserializeSecurityGroupsDatasourceParams(ctx context.Context, tf datasourc
 	}
 }
 
-func serializeSecurityGroupsDatasource(ctx context.Context, securityGroups *[]api.SecurityGroup, diags *diag.Diagnostics) datasource_security_group.SecurityGroupModel {
-	var securityGroupsList types.List
-	tagsList := types.List{}
+func mappingItemsValue(ctx context.Context, securityGroup api.SecurityGroup, diags *diag.Diagnostics) (datasource_security_group.ItemsValue, diag.Diagnostics) {
+	var serializeDiags diag.Diagnostics
+
+	tagsList := types.ListNull(datasource_security_group.ItemsValue{}.Type(ctx))
 	inboundRulesList := types.List{}
 	outboundRulesList := types.List{}
 
-	var serializeDiags diag.Diagnostics
-
-	if len(*securityGroups) != 0 {
-		ll := len(*securityGroups)
-		itemsValue := make([]datasource_security_group.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			if (*securityGroups)[i].Tags != nil {
-				tagsList, serializeDiags = mappingSecurityGroupTags(ctx, securityGroups, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*securityGroups)[i].InboundRules != nil {
-				inboundRulesList, serializeDiags = mappingInboundRules(ctx, securityGroups, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*securityGroups)[i].OutboundRules != nil {
-				outboundRulesList, serializeDiags = mappingOutboundRules(ctx, securityGroups, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			itemsValue[i], serializeDiags = datasource_security_group.NewItemsValue(datasource_security_group.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"description":    types.StringValue(utils.ConvertStringPtrToString((*securityGroups)[i].Description)),
-				"id":             types.StringValue(utils.ConvertStringPtrToString((*securityGroups)[i].Id)),
-				"inbound_rules":  inboundRulesList,
-				"name":           types.StringValue(utils.ConvertStringPtrToString((*securityGroups)[i].Name)),
-				"outbound_rules": outboundRulesList,
-				"tags":           tagsList,
-				"vpc_id":         types.StringValue(utils.ConvertStringPtrToString((*securityGroups)[i].VpcId)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
+	if securityGroup.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *securityGroup.Tags, mappingTags)
+		if serializeDiags.HasError() {
+			return datasource_security_group.ItemsValue{}, serializeDiags
 		}
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_security_group.ItemsValue{}, serializeDiags
+		}
+	}
 
-		securityGroupsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_security_group.ItemsValue).Type(ctx), itemsValue)
+	if securityGroup.InboundRules != nil {
+		inboundRulesList, serializeDiags = mappingInboundRules(ctx, securityGroup, diags)
 		if serializeDiags.HasError() {
 			diags.Append(serializeDiags...)
 		}
-	} else {
-		securityGroupsList = types.ListNull(new(datasource_security_group.ItemsValue).Type(ctx))
 	}
 
-	return datasource_security_group.SecurityGroupModel{
-		Items: securityGroupsList,
-	}
-}
-
-func mappingSecurityGroupTags(ctx context.Context, securityGroups *[]api.SecurityGroup, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*securityGroups)[i].Tags)
-	elementValue := make([]datasource_security_group.TagsValue, lt)
-	for y, tag := range *(*securityGroups)[i].Tags {
-		elementValue[y], *diags = datasource_security_group.NewTagsValue(datasource_security_group.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
+	if securityGroup.OutboundRules != nil {
+		outboundRulesList, serializeDiags = mappingOutboundRules(ctx, securityGroup, diags)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
 		}
 	}
 
-	return types.ListValueFrom(ctx, new(datasource_security_group.TagsValue).Type(ctx), elementValue)
+	return datasource_security_group.NewItemsValue(datasource_security_group.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"description":    types.StringValue(utils.ConvertStringPtrToString(securityGroup.Description)),
+		"id":             types.StringValue(utils.ConvertStringPtrToString(securityGroup.Id)),
+		"inbound_rules":  inboundRulesList,
+		"name":           types.StringValue(utils.ConvertStringPtrToString(securityGroup.Name)),
+		"outbound_rules": outboundRulesList,
+		"tags":           tagsList,
+		"vpc_id":         types.StringValue(utils.ConvertStringPtrToString(securityGroup.VpcId)),
+	})
 }
 
-func mappingInboundRules(ctx context.Context, securityGroups *[]api.SecurityGroup, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_security_group.TagsValue, diag.Diagnostics) {
+	return datasource_security_group.NewTagsValue(datasource_security_group.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
+}
+
+func mappingInboundRules(ctx context.Context, securityGroup api.SecurityGroup, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
 	var mappingDiags diag.Diagnostics
 	var ipRangesList types.List
 	var serviceIdsList types.List
 
-	lt := len(*(*securityGroups)[i].InboundRules)
+	lt := len(*securityGroup.InboundRules)
 	elementValue := make([]datasource_security_group.InboundRulesValue, lt)
-	for y, rule := range *(*securityGroups)[i].InboundRules {
+	for y, rule := range *securityGroup.InboundRules {
 
 		ipRangesList, mappingDiags = types.ListValueFrom(ctx, types.StringType, rule.IpRanges)
 		diags.Append(mappingDiags...)
@@ -229,14 +205,14 @@ func mappingInboundRules(ctx context.Context, securityGroups *[]api.SecurityGrou
 	return types.ListValueFrom(ctx, new(datasource_security_group.InboundRulesValue).Type(ctx), elementValue)
 }
 
-func mappingOutboundRules(ctx context.Context, securityGroups *[]api.SecurityGroup, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+func mappingOutboundRules(ctx context.Context, securityGroup api.SecurityGroup, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
 	var mappingDiags diag.Diagnostics
 	var ipRangesList types.List
 	var serviceIdsList types.List
 
-	lt := len(*(*securityGroups)[i].OutboundRules)
+	lt := len(*securityGroup.OutboundRules)
 	elementValue := make([]datasource_security_group.OutboundRulesValue, lt)
-	for y, rule := range *(*securityGroups)[i].OutboundRules {
+	for y, rule := range *securityGroup.OutboundRules {
 
 		ipRangesList, mappingDiags = types.ListValueFrom(ctx, types.StringType, rule.IpRanges)
 		diags.Append(mappingDiags...)

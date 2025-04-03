@@ -76,48 +76,29 @@ func (d *keypairsDataSource) Read(ctx context.Context, request datasource.ReadRe
 		return
 	}
 
-	keypairItems := serializeKeypairs(ctx, keypair, &response.Diagnostics)
+	keypairItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *keypair, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, keypairItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = keypairItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func serializeKeypairs(ctx context.Context, keypairs *[]api.Keypair, diags *diag.Diagnostics) datasource_keypair.KeypairModel {
-	var keypairsList types.List
-	var serializeDiags diag.Diagnostics
-
-	if len(*keypairs) != 0 {
-		ll := len(*keypairs)
-		itemsValue := make([]datasource_keypair.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			itemsValue[i], serializeDiags = datasource_keypair.NewItemsValue(datasource_keypair.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"name":        types.StringValue(utils.ConvertStringPtrToString((*keypairs)[i].Name)),
-				"fingerprint": types.StringValue(utils.ConvertStringPtrToString((*keypairs)[i].Fingerprint)),
-				"type":        types.StringValue(utils.ConvertStringPtrToString((*keypairs)[i].Type)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
-		}
-
-		keypairsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_keypair.ItemsValue).Type(ctx), itemsValue)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	} else {
-		keypairsList = types.ListNull(new(datasource_keypair.ItemsValue).Type(ctx))
-	}
-
-	return datasource_keypair.KeypairModel{
-		Items: keypairsList,
-	}
+func mappingItemsValue(ctx context.Context, keypair api.Keypair) (datasource_keypair.ItemsValue, diag.Diagnostics) {
+	return datasource_keypair.NewItemsValue(datasource_keypair.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"name":        types.StringValue(utils.ConvertStringPtrToString(keypair.Name)),
+		"fingerprint": types.StringValue(utils.ConvertStringPtrToString(keypair.Fingerprint)),
+		"type":        types.StringValue(utils.ConvertStringPtrToString(keypair.Type)),
+	})
 }
 
 func deserializeReadKeypairs(ctx context.Context, tf datasource_keypair.KeypairModel, diags *diag.Diagnostics) api.ReadKeypairsParams {

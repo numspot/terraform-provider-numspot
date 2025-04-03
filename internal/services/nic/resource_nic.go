@@ -325,7 +325,7 @@ func serializeNumSpotNic(ctx context.Context, http *api.Nic, diags *diag.Diagnos
 		SecurityGroups:       securityGroupsTf,
 		State:                types.StringPointerValue(http.State),
 		SubnetId:             types.StringPointerValue(http.SubnetId),
-		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
+		AvailabilityZoneName: types.StringValue(utils.ConvertAzNamePtrToString(http.AvailabilityZoneName)),
 		Tags:                 tagsTf,
 	}
 }

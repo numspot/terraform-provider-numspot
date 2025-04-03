@@ -12,6 +12,7 @@ import (
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services/internetgateway/datasource_internet_gateway"
+	"terraform-provider-numspot/internal/services/vpc/datasource_vpc"
 	"terraform-provider-numspot/internal/utils"
 )
 
@@ -69,64 +70,26 @@ func (d *internetGatewaysDataSource) Read(ctx context.Context, request datasourc
 		return
 	}
 
-	internetGateway, err := core.ReadInternetGatewaysWithParams(ctx, d.provider, internetGatewayParams)
+	internetGateways, err := core.ReadInternetGatewaysWithParams(ctx, d.provider, internetGatewayParams)
 	if err != nil {
 		response.Diagnostics.AddError("unable to read internet gateway", err.Error())
 		return
 	}
 
-	internetGatewayItems := serializeInternetGateways(ctx, internetGateway, &response.Diagnostics)
+	internetGatewayItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *internetGateways, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
+		return
+	}
+	listValueItems := utils.CreateListValueItems(ctx, internetGatewayItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = internetGatewayItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
-}
-
-func serializeInternetGateways(ctx context.Context, internetGateways *[]api.InternetGateway, diags *diag.Diagnostics) datasource_internet_gateway.InternetGatewayModel {
-	var internetGatewaysList types.List
-	var serializeDiags diag.Diagnostics
-	tagsList := types.List{}
-
-	if len(*internetGateways) != 0 {
-		ll := len(*internetGateways)
-		itemsValue := make([]datasource_internet_gateway.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			if (*internetGateways)[i].Tags != nil {
-
-				tagsList, serializeDiags = mappingInternetGatewayTags(ctx, internetGateways, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			itemsValue[i], serializeDiags = datasource_internet_gateway.NewItemsValue(datasource_internet_gateway.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"id":     types.StringValue(utils.ConvertStringPtrToString((*internetGateways)[i].Id)),
-				"state":  types.StringValue(utils.ConvertStringPtrToString((*internetGateways)[i].State)),
-				"tags":   tagsList,
-				"vpc_id": types.StringValue(utils.ConvertStringPtrToString((*internetGateways)[i].VpcId)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
-		}
-
-		internetGatewaysList, serializeDiags = types.ListValueFrom(ctx, new(datasource_internet_gateway.ItemsValue).Type(ctx), itemsValue)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	} else {
-		internetGatewaysList = types.ListNull(new(datasource_internet_gateway.ItemsValue).Type(ctx))
-	}
-
-	return datasource_internet_gateway.InternetGatewayModel{
-		Items: internetGatewaysList,
-	}
 }
 
 func deserializeReadInternetGateway(ctx context.Context, tf datasource_internet_gateway.InternetGatewayModel, diags *diag.Diagnostics) api.ReadInternetGatewaysParams {
@@ -140,19 +103,31 @@ func deserializeReadInternetGateway(ctx context.Context, tf datasource_internet_
 	}
 }
 
-func mappingInternetGatewayTags(ctx context.Context, internetGateways *[]api.InternetGateway, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*internetGateways)[i].Tags)
-	elementValue := make([]datasource_internet_gateway.TagsValue, lt)
-	for y, tag := range *(*internetGateways)[i].Tags {
-		elementValue[y], *diags = datasource_internet_gateway.NewTagsValue(datasource_internet_gateway.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
+func mappingItemsValue(ctx context.Context, internetGateway api.InternetGateway) (datasource_internet_gateway.ItemsValue, diag.Diagnostics) {
+	tagsList := types.ListNull(datasource_vpc.ItemsValue{}.Type(ctx))
+
+	if internetGateway.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *internetGateway.Tags, mappingTags)
+		if serializeDiags.HasError() {
+			return datasource_internet_gateway.ItemsValue{}, serializeDiags
+		}
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_internet_gateway.ItemsValue{}, serializeDiags
 		}
 	}
 
-	return types.ListValueFrom(ctx, new(datasource_internet_gateway.TagsValue).Type(ctx), elementValue)
+	return datasource_internet_gateway.NewItemsValue(datasource_internet_gateway.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"id":     types.StringValue(utils.ConvertStringPtrToString(internetGateway.Id)),
+		"state":  types.StringValue(utils.ConvertStringPtrToString(internetGateway.State)),
+		"tags":   tagsList,
+		"vpc_id": types.StringValue(utils.ConvertStringPtrToString(internetGateway.VpcId)),
+	})
+}
+
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_internet_gateway.TagsValue, diag.Diagnostics) {
+	return datasource_internet_gateway.NewTagsValue(datasource_internet_gateway.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
 }

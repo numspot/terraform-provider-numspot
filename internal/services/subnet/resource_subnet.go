@@ -166,7 +166,7 @@ func deserializeCreateSubnet(tf resource_subnet.SubnetModel) api.CreateSubnetJSO
 	return api.CreateSubnetJSONRequestBody{
 		IpRange:              tf.IpRange.ValueString(),
 		VpcId:                tf.VpcId.ValueString(),
-		AvailabilityZoneName: tf.AvailabilityZoneName.ValueStringPointer(),
+		AvailabilityZoneName: utils.FromTfStringToAzNamePtr(tf.AvailabilityZoneName),
 	}
 }
 
@@ -186,7 +186,7 @@ func serializeSubnet(ctx context.Context, http *api.Subnet, diags *diag.Diagnost
 		MapPublicIpOnLaunch:  types.BoolPointerValue(http.MapPublicIpOnLaunch),
 		VpcId:                types.StringPointerValue(http.VpcId),
 		State:                types.StringPointerValue(http.State),
-		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
+		AvailabilityZoneName: types.StringValue(utils.ConvertAzNamePtrToString(http.AvailabilityZoneName)),
 		Tags:                 tagsList,
 	}
 }

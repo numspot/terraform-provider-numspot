@@ -77,13 +77,18 @@ func (d *snapshotsDataSource) Read(ctx context.Context, request datasource.ReadR
 		return
 	}
 
-	objectItems := serializeSnapshots(ctx, numSpotSnapshot, &response.Diagnostics)
+	objectItems := utils.SerializeDatasourceItemsWithDiags(ctx, *numSpotSnapshot, &response.Diagnostics, mappingItemsValue)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
@@ -105,105 +110,75 @@ func deserializeSnapshotsParams(ctx context.Context, tf datasource_snapshot.Snap
 	}
 }
 
-func serializeSnapshots(ctx context.Context, snapshots *[]api.Snapshot, diags *diag.Diagnostics) datasource_snapshot.SnapshotModel {
-	var snapshotList types.List
+func mappingItemsValue(ctx context.Context, snapshot api.Snapshot, diags *diag.Diagnostics) (datasource_snapshot.ItemsValue, diag.Diagnostics) {
 	var serializeDiags diag.Diagnostics
 
-	tagsList := types.List{}
+	tagsList := types.ListNull(datasource_snapshot.ItemsValue{}.Type(ctx))
 	accessObject := basetypes.ObjectValue{}
 	creationDateTf := basetypes.StringValue{}
 	progressTf := basetypes.Int64Value{}
 	volumeSizeTf := basetypes.Int64Value{}
 
-	if len(*snapshots) != 0 {
-		ll := len(*snapshots)
-		itemsValue := make([]datasource_snapshot.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-
-			if (*snapshots)[i].Access != nil {
-				accessObject, serializeDiags = mappingAccess(ctx, snapshots, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*snapshots)[i].Tags != nil {
-				tagsList, serializeDiags = mappingSnapshotTags(ctx, snapshots, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*snapshots)[i].CreationDate != nil {
-				date := *(*snapshots)[i].CreationDate
-				creationDateTf = types.StringValue(date.Format(time.RFC3339))
-			}
-
-			if (*snapshots)[i].Progress != nil {
-				progress := int64(*(*snapshots)[i].Progress)
-				progressTf = types.Int64PointerValue(&progress)
-			}
-
-			if (*snapshots)[i].VolumeSize != nil {
-				volumeSize := int64(*(*snapshots)[i].VolumeSize)
-				volumeSizeTf = types.Int64PointerValue(&volumeSize)
-			}
-
-			itemsValue[i], serializeDiags = datasource_snapshot.NewItemsValue(datasource_snapshot.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"access":        accessObject,
-				"creation_date": creationDateTf,
-				"description":   types.StringValue(utils.ConvertStringPtrToString((*snapshots)[i].Description)),
-				"id":            types.StringValue(utils.ConvertStringPtrToString((*snapshots)[i].Id)),
-				"progress":      progressTf,
-				"state":         types.StringValue(utils.ConvertStringPtrToString((*snapshots)[i].State)),
-				"tags":          tagsList,
-				"volume_id":     types.StringValue(utils.ConvertStringPtrToString((*snapshots)[i].VolumeId)),
-				"volume_size":   volumeSizeTf,
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
-		}
-
-		snapshotList, serializeDiags = types.ListValueFrom(ctx, new(datasource_snapshot.ItemsValue).Type(ctx), itemsValue)
+	if snapshot.Access != nil {
+		accessObject, serializeDiags = mappingAccess(ctx, snapshot, diags)
 		if serializeDiags.HasError() {
 			diags.Append(serializeDiags...)
 		}
-	} else {
-		snapshotList = types.ListNull(new(datasource_snapshot.ItemsValue).Type(ctx))
 	}
 
-	return datasource_snapshot.SnapshotModel{
-		Items: snapshotList,
-	}
-}
-
-func mappingSnapshotTags(ctx context.Context, snapshots *[]api.Snapshot, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*snapshots)[i].Tags)
-	elementValue := make([]datasource_snapshot.TagsValue, lt)
-	for y, tag := range *(*snapshots)[i].Tags {
-		elementValue[y], *diags = datasource_snapshot.NewTagsValue(datasource_snapshot.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
+	if snapshot.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *snapshot.Tags, mappingTags)
+		if serializeDiags.HasError() {
+			return datasource_snapshot.ItemsValue{}, serializeDiags
+		}
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_snapshot.ItemsValue{}, serializeDiags
 		}
 	}
 
-	return types.ListValueFrom(ctx, new(datasource_snapshot.TagsValue).Type(ctx), elementValue)
+	if snapshot.CreationDate != nil {
+		date := *snapshot.CreationDate
+		creationDateTf = types.StringValue(date.Format(time.RFC3339))
+	}
+
+	if snapshot.Progress != nil {
+		progress := int64(*snapshot.Progress)
+		progressTf = types.Int64PointerValue(&progress)
+	}
+
+	if snapshot.VolumeSize != nil {
+		volumeSize := int64(*snapshot.VolumeSize)
+		volumeSizeTf = types.Int64PointerValue(&volumeSize)
+	}
+
+	return datasource_snapshot.NewItemsValue(datasource_snapshot.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"access":        accessObject,
+		"creation_date": creationDateTf,
+		"description":   types.StringValue(utils.ConvertStringPtrToString(snapshot.Description)),
+		"id":            types.StringValue(utils.ConvertStringPtrToString(snapshot.Id)),
+		"progress":      progressTf,
+		"state":         types.StringValue(utils.ConvertStringPtrToString(snapshot.State)),
+		"tags":          tagsList,
+		"volume_id":     types.StringValue(utils.ConvertStringPtrToString(snapshot.VolumeId)),
+		"volume_size":   volumeSizeTf,
+	})
 }
 
-func mappingAccess(ctx context.Context, snapshots *[]api.Snapshot, diags *diag.Diagnostics, i int) (basetypes.ObjectValue, diag.Diagnostics) {
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_snapshot.TagsValue, diag.Diagnostics) {
+	return datasource_snapshot.NewTagsValue(datasource_snapshot.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
+}
+
+func mappingAccess(ctx context.Context, snapshot api.Snapshot, diags *diag.Diagnostics) (basetypes.ObjectValue, diag.Diagnostics) {
 	var mappingDiags diag.Diagnostics
 	var accessValue datasource_snapshot.AccessValue
 
 	accessValue, mappingDiags = datasource_snapshot.NewAccessValue(datasource_snapshot.AccessValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"is_public": types.BoolPointerValue((*snapshots)[i].Access.IsPublic),
+			"is_public": types.BoolPointerValue(snapshot.Access.IsPublic),
 		})
 	if mappingDiags.HasError() {
 		diags.Append(mappingDiags...)

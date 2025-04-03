@@ -348,7 +348,7 @@ func serializeFlexibleGPU(http *api.FlexibleGpu) resource_flexible_gpu.FlexibleG
 		Id:                   types.StringPointerValue(http.Id),
 		ModelName:            types.StringPointerValue(http.ModelName),
 		State:                types.StringPointerValue(http.State),
-		AvailabilityZoneName: types.StringPointerValue(http.AvailabilityZoneName),
+		AvailabilityZoneName: types.StringValue(utils.ConvertAzNamePtrToString(http.AvailabilityZoneName)),
 		VmId:                 types.StringPointerValue(http.VmId),
 	}
 }
@@ -365,7 +365,7 @@ func deserializeCreateFlexibleGPU(tf *resource_flexible_gpu.FlexibleGpuModel) ap
 		DeleteOnVmDeletion:   tf.DeleteOnVmDeletion.ValueBoolPointer(),
 		Generation:           tf.Generation.ValueStringPointer(),
 		ModelName:            tf.ModelName.ValueString(),
-		AvailabilityZoneName: tf.AvailabilityZoneName.ValueString(),
+		AvailabilityZoneName: api.AvailabilityZoneName(tf.AvailabilityZoneName.ValueString()),
 	}
 }
 

@@ -75,13 +75,19 @@ func (d *vpcsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		return
 	}
 
-	objectItems := serializeVPCs(ctx, numSpotVpc, &response.Diagnostics)
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *numSpotVpc, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
@@ -99,65 +105,33 @@ func deserializeVPCParams(ctx context.Context, tf datasource_vpc.VpcModel, diags
 	}
 }
 
-func serializeVPCs(ctx context.Context, vpcs *[]api.Vpc, diags *diag.Diagnostics) datasource_vpc.VpcModel {
-	var vpcsList types.List
-	var serializeDiags diag.Diagnostics
+func mappingItemsValue(ctx context.Context, vpc api.Vpc) (datasource_vpc.ItemsValue, diag.Diagnostics) {
+	tagsList := types.ListNull(datasource_vpc.ItemsValue{}.Type(ctx))
 
-	tagsList := types.List{}
-
-	if len(*vpcs) != 0 {
-		ll := len(*vpcs)
-		itemsValue := make([]datasource_vpc.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			if (*vpcs)[i].Tags != nil {
-
-				tagsList, serializeDiags = mappingVpcTags(ctx, vpcs, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			itemsValue[i], serializeDiags = datasource_vpc.NewItemsValue(datasource_vpc.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"dhcp_options_set_id": types.StringValue(utils.ConvertStringPtrToString((*vpcs)[i].DhcpOptionsSetId)),
-				"id":                  types.StringValue(utils.ConvertStringPtrToString((*vpcs)[i].Id)),
-				"ip_range":            types.StringValue(utils.ConvertStringPtrToString((*vpcs)[i].IpRange)),
-				"state":               types.StringValue(utils.ConvertStringPtrToString((*vpcs)[i].State)),
-				"tags":                tagsList,
-				"tenancy":             types.StringValue(utils.ConvertStringPtrToString((*vpcs)[i].Tenancy)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
-		}
-
-		vpcsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_vpc.ItemsValue).Type(ctx), itemsValue)
+	if vpc.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *vpc.Tags, mappingTags)
 		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
+			return datasource_vpc.ItemsValue{}, serializeDiags
 		}
-	} else {
-		vpcsList = types.ListNull(new(datasource_vpc.ItemsValue).Type(ctx))
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_vpc.ItemsValue{}, serializeDiags
+		}
 	}
 
-	return datasource_vpc.VpcModel{
-		Items: vpcsList,
-	}
+	return datasource_vpc.NewItemsValue(datasource_vpc.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"dhcp_options_set_id": types.StringValue(utils.ConvertStringPtrToString(vpc.DhcpOptionsSetId)),
+		"id":                  types.StringValue(utils.ConvertStringPtrToString(vpc.Id)),
+		"ip_range":            types.StringValue(utils.ConvertStringPtrToString(vpc.IpRange)),
+		"state":               types.StringValue(utils.ConvertStringPtrToString(vpc.State)),
+		"tags":                tagsList,
+		"tenancy":             types.StringValue(utils.ConvertStringPtrToString(vpc.Tenancy)),
+	})
 }
 
-func mappingVpcTags(ctx context.Context, vpcs *[]api.Vpc, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*vpcs)[i].Tags)
-	elementValue := make([]datasource_vpc.TagsValue, lt)
-	for y, tag := range *(*vpcs)[i].Tags {
-		elementValue[y], *diags = datasource_vpc.NewTagsValue(datasource_vpc.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
-
-	return types.ListValueFrom(ctx, new(datasource_vpc.TagsValue).Type(ctx), elementValue)
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_vpc.TagsValue, diag.Diagnostics) {
+	return datasource_vpc.NewTagsValue(datasource_vpc.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"terraform-provider-numspot/internal/sdk/api"
 )
 
 type (
@@ -37,6 +38,15 @@ func FromTfStringToStringPtr(str types.String) *string {
 	}
 
 	return str.ValueStringPointer()
+}
+
+func FromTfStringToAzNamePtr(str types.String) *api.AvailabilityZoneName {
+	if str.IsUnknown() || str.IsNull() {
+		return nil
+	}
+
+	ret := api.AvailabilityZoneName(str.ValueString())
+	return &ret
 }
 
 func FromTfBoolToBoolPtr(bl types.Bool) *bool {
@@ -319,6 +329,15 @@ func ConvertTfListToArrayOfString(ctx context.Context, list types.List, diags *d
 	return slice
 }
 
+func ConvertTfListToArrayOfAzName(ctx context.Context, list types.List, diags *diag.Diagnostics) *[]api.AvailabilityZoneName {
+	if list.IsNull() || list.IsUnknown() {
+		return nil
+	}
+
+	slice := tfListToArrayOfAzName(ctx, list, diags)
+	return slice
+}
+
 func tfListToArrayOfString(ctx context.Context, tfList types.List, diags *diag.Diagnostics) *[]string {
 	elements := tfList.Elements()
 	res := make([]string, 0, len(elements))
@@ -331,6 +350,24 @@ func tfListToArrayOfString(ctx context.Context, tfList types.List, diags *diag.D
 
 		for _, e := range tempList {
 			res = append(res, e.ValueString())
+		}
+	}
+
+	return &res
+}
+
+func tfListToArrayOfAzName(ctx context.Context, tfList types.List, diags *diag.Diagnostics) *[]api.AvailabilityZoneName {
+	elements := tfList.Elements()
+	res := make([]api.AvailabilityZoneName, 0, len(elements))
+
+	if len(elements) == 0 {
+		res = []api.AvailabilityZoneName{}
+	} else {
+		tempList := make([]types.String, 0, len(elements))
+		diags.Append(tfList.ElementsAs(ctx, &tempList, false)...)
+
+		for _, e := range tempList {
+			res = append(res, api.AvailabilityZoneName(e.ValueString()))
 		}
 	}
 
@@ -450,4 +487,70 @@ func ConvertIntPtrToInt64(value *int) int64 {
 		return int64(*value)
 	}
 	return 0
+}
+
+// CreateListValueItems Convert list with any items type of datasource
+func CreateListValueItems[T ITFValue](ctx context.Context, items []T, diags *diag.Diagnostics) basetypes.ListValue {
+	var serializeDiags diag.Diagnostics
+	emptyT := new(T)
+
+	list := types.ListNull((*emptyT).Type(ctx))
+
+	if len(items) > 0 {
+		list, serializeDiags = types.ListValueFrom(ctx, (*emptyT).Type(ctx), items)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
+	}
+
+	return list
+}
+
+// SerializeDatasourceItemsWithDiags Serialize Any Datasource Items With mapping fonction
+func SerializeDatasourceItemsWithDiags[In any, Out any](ctx context.Context, http []In, diags *diag.Diagnostics, mapping func(context.Context, In, *diag.Diagnostics) (Out, diag.Diagnostics)) []Out {
+	var serializeDiags diag.Diagnostics
+	itemsValue := make([]Out, len(http))
+
+	if len(http) > 0 {
+		ll := len(http)
+
+		for i := 0; ll > i; i++ {
+			itemsValue[i], serializeDiags = mapping(ctx, http[i], diags)
+			if serializeDiags.HasError() {
+				diags.Append(serializeDiags...)
+				continue
+			}
+		}
+	}
+
+	return itemsValue
+}
+
+// SerializeDatasourceItems Serialize Any Datasource Items With mapping fonction
+func SerializeDatasourceItems[In any, Out any](ctx context.Context, http []In, mapping func(context.Context, In) (Out, diag.Diagnostics)) ([]Out, diag.Diagnostics) {
+	serializeDiags := diag.Diagnostics{}
+	itemsValue := make([]Out, len(http))
+
+	if len(http) > 0 {
+		ll := len(http)
+
+		for i := 0; ll > i; i++ {
+			var tmpDiags diag.Diagnostics
+			itemsValue[i], tmpDiags = mapping(ctx, http[i])
+			if tmpDiags.HasError() {
+				serializeDiags.Append(tmpDiags...)
+				continue
+			}
+		}
+	}
+
+	return itemsValue, serializeDiags
+}
+
+// ConvertAzNamePtrToString Convert string ptr to AzName
+func ConvertAzNamePtrToString(value *api.AvailabilityZoneName) string {
+	if value != nil {
+		return string(*value)
+	}
+	return ""
 }

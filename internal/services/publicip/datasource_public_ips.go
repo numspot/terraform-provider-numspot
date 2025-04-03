@@ -75,13 +75,19 @@ func (d *publicIpsDataSource) Read(ctx context.Context, request datasource.ReadR
 		return
 	}
 
-	objectItems := serializePublicIps(ctx, numSpotPublicIp, &response.Diagnostics)
+	objectItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *numSpotPublicIp, mappingItemsValue)
+	if serializeDiags.HasError() {
+		response.Diagnostics.Append(serializeDiags...)
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
@@ -99,66 +105,34 @@ func deserializePublicIpParams(ctx context.Context, tf datasource_public_ip.Publ
 	}
 }
 
-func serializePublicIps(ctx context.Context, publicIp *[]api.PublicIp, diags *diag.Diagnostics) datasource_public_ip.PublicIpModel {
-	var publicIpsList types.List
-	var serializeDiags diag.Diagnostics
+func mappingItemsValue(ctx context.Context, publicIp api.PublicIp) (datasource_public_ip.ItemsValue, diag.Diagnostics) {
+	tagsList := types.ListNull(datasource_public_ip.ItemsValue{}.Type(ctx))
 
-	tagsList := types.List{}
-
-	if len(*publicIp) != 0 {
-		ll := len(*publicIp)
-		itemsValue := make([]datasource_public_ip.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			if (*publicIp)[i].Tags != nil {
-
-				tagsList, serializeDiags = mappingPublicIpTags(ctx, publicIp, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			itemsValue[i], serializeDiags = datasource_public_ip.NewItemsValue(datasource_public_ip.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"id":                types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].Id)),
-				"link_public_ip_id": types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].LinkPublicIpId)),
-				"nic_id":            types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].NicId)),
-				"private_ip":        types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].PrivateIp)),
-				"public_ip":         types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].PublicIp)),
-				"tags":              tagsList,
-				"vm_id":             types.StringValue(utils.ConvertStringPtrToString((*publicIp)[i].VmId)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
-		}
-
-		publicIpsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_public_ip.ItemsValue).Type(ctx), itemsValue)
+	if publicIp.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *publicIp.Tags, mappingTags)
 		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
+			return datasource_public_ip.ItemsValue{}, serializeDiags
 		}
-	} else {
-		publicIpsList = types.ListNull(new(datasource_public_ip.ItemsValue).Type(ctx))
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_public_ip.ItemsValue{}, serializeDiags
+		}
 	}
 
-	return datasource_public_ip.PublicIpModel{
-		Items: publicIpsList,
-	}
+	return datasource_public_ip.NewItemsValue(datasource_public_ip.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"id":                types.StringValue(utils.ConvertStringPtrToString(publicIp.Id)),
+		"link_public_ip_id": types.StringValue(utils.ConvertStringPtrToString(publicIp.LinkPublicIpId)),
+		"nic_id":            types.StringValue(utils.ConvertStringPtrToString(publicIp.NicId)),
+		"private_ip":        types.StringValue(utils.ConvertStringPtrToString(publicIp.PrivateIp)),
+		"public_ip":         types.StringValue(utils.ConvertStringPtrToString(publicIp.PublicIp)),
+		"tags":              tagsList,
+		"vm_id":             types.StringValue(utils.ConvertStringPtrToString(publicIp.VmId)),
+	})
 }
 
-func mappingPublicIpTags(ctx context.Context, publicIps *[]api.PublicIp, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*publicIps)[i].Tags)
-	elementValue := make([]datasource_public_ip.TagsValue, lt)
-	for y, tag := range *(*publicIps)[i].Tags {
-		elementValue[y], *diags = datasource_public_ip.NewTagsValue(datasource_public_ip.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
-
-	return types.ListValueFrom(ctx, new(datasource_public_ip.TagsValue).Type(ctx), elementValue)
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_public_ip.TagsValue, diag.Diagnostics) {
+	return datasource_public_ip.NewTagsValue(datasource_public_ip.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
 }

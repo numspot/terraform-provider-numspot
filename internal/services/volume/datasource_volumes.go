@@ -75,13 +75,19 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 		return
 	}
 
-	objectItems := serializeVolumes(ctx, volumes, &response.Diagnostics)
+	objectItems := utils.SerializeDatasourceItemsWithDiags(ctx, *volumes, &response.Diagnostics, mappingItemsValue)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
 
 	state = plan
-	state.Items = objectItems.Items
+	state.Items = listValueItems
+
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
@@ -116,89 +122,60 @@ func deserializeVolumeParams(ctx context.Context, tf datasource_volume.VolumeMod
 		VolumeSizes:                  volumeSizesPtr,
 		VolumeStates:                 utils.ConvertTfListToArrayOfString(ctx, tf.VolumeStates, diags),
 		VolumeTypes:                  utils.ConvertTfListToArrayOfString(ctx, tf.VolumeTypes, diags),
-		AvailabilityZoneNames:        utils.ConvertTfListToArrayOfString(ctx, tf.AvailabilityZoneNames, diags),
+		AvailabilityZoneNames:        utils.ConvertTfListToArrayOfAzName(ctx, tf.AvailabilityZoneNames, diags),
 		Ids:                          utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
 	}
 }
 
-func serializeVolumes(ctx context.Context, volumes *[]api.Volume, diags *diag.Diagnostics) datasource_volume.VolumeModel {
-	var volumesList types.List
-	var serializeDiags diag.Diagnostics
-
-	tagsList := types.List{}
+func mappingItemsValue(ctx context.Context, volume api.Volume, diags *diag.Diagnostics) (datasource_volume.ItemsValue, diag.Diagnostics) {
+	tagsList := types.ListNull(datasource_volume.ItemsValue{}.Type(ctx))
 	linkedVolumesList := types.List{}
 
-	if len(*volumes) != 0 {
-		ll := len(*volumes)
-		itemsValue := make([]datasource_volume.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			if (*volumes)[i].Tags != nil {
-				tagsList, serializeDiags = mappingVolumeTags(ctx, volumes, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*volumes)[i].LinkedVolumes != nil {
-				linkedVolumesList, serializeDiags = mappingLinkedVolumes(ctx, volumes, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			itemsValue[i], serializeDiags = datasource_volume.NewItemsValue(datasource_volume.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"availability_zone_name": types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].AvailabilityZoneName)),
-				"creation_date":          types.StringValue((*volumes)[i].CreationDate.String()),
-				"id":                     types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].Id)),
-				"iops":                   types.Int64Value(utils.ConvertIntPtrToInt64((*volumes)[i].Iops)),
-				"linked_volumes":         linkedVolumesList,
-				"size":                   types.Int64Value(utils.ConvertIntPtrToInt64((*volumes)[i].Size)),
-				"snapshot_id":            types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].SnapshotId)),
-				"state":                  types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].State)),
-				"tags":                   tagsList,
-				"type":                   types.StringValue(utils.ConvertStringPtrToString((*volumes)[i].Type)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
+	if volume.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *volume.Tags, mappingTags)
+		if serializeDiags.HasError() {
+			return datasource_volume.ItemsValue{}, serializeDiags
 		}
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_volume.ItemsValue{}, serializeDiags
+		}
+	}
 
-		volumesList, serializeDiags = types.ListValueFrom(ctx, new(datasource_volume.ItemsValue).Type(ctx), itemsValue)
+	if volume.LinkedVolumes != nil {
+		var serializeDiags diag.Diagnostics
+
+		linkedVolumesList, serializeDiags = mappingLinkedVolumes(ctx, volume, diags)
 		if serializeDiags.HasError() {
 			diags.Append(serializeDiags...)
 		}
-	} else {
-		volumesList = types.ListNull(new(datasource_volume.ItemsValue).Type(ctx))
 	}
 
-	return datasource_volume.VolumeModel{
-		Items: volumesList,
-	}
+	return datasource_volume.NewItemsValue(datasource_volume.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"availability_zone_name": types.StringValue(utils.ConvertAzNamePtrToString(volume.AvailabilityZoneName)),
+		"creation_date":          types.StringValue(volume.CreationDate.String()),
+		"id":                     types.StringValue(utils.ConvertStringPtrToString(volume.Id)),
+		"iops":                   types.Int64Value(utils.ConvertIntPtrToInt64(volume.Iops)),
+		"linked_volumes":         linkedVolumesList,
+		"size":                   types.Int64Value(utils.ConvertIntPtrToInt64(volume.Size)),
+		"snapshot_id":            types.StringValue(utils.ConvertStringPtrToString(volume.SnapshotId)),
+		"state":                  types.StringValue(utils.ConvertStringPtrToString(volume.State)),
+		"tags":                   tagsList,
+		"type":                   types.StringValue(utils.ConvertStringPtrToString(volume.Type)),
+	})
 }
 
-func mappingVolumeTags(ctx context.Context, volumes *[]api.Volume, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*volumes)[i].Tags)
-	elementValue := make([]datasource_volume.TagsValue, lt)
-	for y, tag := range *(*volumes)[i].Tags {
-		elementValue[y], *diags = datasource_volume.NewTagsValue(datasource_volume.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
-
-	return types.ListValueFrom(ctx, new(datasource_volume.TagsValue).Type(ctx), elementValue)
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_volume.TagsValue, diag.Diagnostics) {
+	return datasource_volume.NewTagsValue(datasource_volume.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
 }
 
-func mappingLinkedVolumes(ctx context.Context, volumes *[]api.Volume, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	ll := len(*(*volumes)[i].LinkedVolumes)
+func mappingLinkedVolumes(ctx context.Context, volumes api.Volume, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
+	ll := len(*volumes.LinkedVolumes)
 	elementValue := make([]datasource_volume.LinkedVolumesValue, ll)
-	for y, lv := range *(*volumes)[i].LinkedVolumes {
+	for y, lv := range *volumes.LinkedVolumes {
 		elementValue[y], *diags = datasource_volume.NewLinkedVolumesValue(datasource_volume.LinkedVolumesValue{}.AttributeTypes(ctx), map[string]attr.Value{
 			"delete_on_vm_deletion": types.BoolPointerValue(lv.DeleteOnVmDeletion),
 			"device_name":           types.StringPointerValue(lv.DeviceName),

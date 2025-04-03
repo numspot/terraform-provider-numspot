@@ -199,7 +199,7 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, dia
 
 	if !(tf.Placement.IsNull() || tf.Placement.IsUnknown()) {
 		placement = &api.Placement{
-			AvailabilityZoneName: utils.FromTfStringToStringPtr(tf.Placement.AvailabilityZoneName),
+			AvailabilityZoneName: utils.FromTfStringToAzNamePtr(tf.Placement.AvailabilityZoneName),
 			Tenancy:              utils.FromTfStringToStringPtr(tf.Placement.Tenancy),
 		}
 	}
@@ -294,7 +294,7 @@ func placementFromHTTP(ctx context.Context, elt *api.Placement, diags *diag.Diag
 	value, diagnostics := resource_vm.NewPlacementValue(
 		resource_vm.PlacementValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"availability_zone_name": types.StringPointerValue(elt.AvailabilityZoneName),
+			"availability_zone_name": types.StringValue(utils.ConvertAzNamePtrToString(elt.AvailabilityZoneName)),
 			"tenancy":                types.StringPointerValue(elt.Tenancy),
 		})
 	diags.Append(diagnostics...)

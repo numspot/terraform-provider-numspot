@@ -223,7 +223,7 @@ func serializeNumSpotVolume(ctx context.Context, http *api.Volume, diags *diag.D
 		Size:                    utils.FromIntPtrToTfInt64(http.Size),
 		SnapshotId:              types.StringPointerValue(http.SnapshotId),
 		State:                   types.StringPointerValue(http.State),
-		AvailabilityZoneName:    types.StringPointerValue(http.AvailabilityZoneName),
+		AvailabilityZoneName:    types.StringValue(utils.ConvertAzNamePtrToString(http.AvailabilityZoneName)),
 		Type:                    types.StringPointerValue(http.Type),
 		LinkedVolumes:           volumes,
 		Tags:                    tagsTf,
@@ -262,7 +262,7 @@ func deserializeCreateNumSpotVolume(tf resource_volume.VolumeModel) api.CreateVo
 		Iops:                 httpIOPS,
 		Size:                 utils.FromTfInt64ToIntPtr(tf.Size),
 		SnapshotId:           snapshotId,
-		AvailabilityZoneName: tf.AvailabilityZoneName.ValueString(),
+		AvailabilityZoneName: api.AvailabilityZoneName(tf.AvailabilityZoneName.ValueString()),
 		Type:                 tf.Type.ValueStringPointer(),
 	}
 }

@@ -76,13 +76,18 @@ func (d *nicsDataSource) Read(ctx context.Context, request datasource.ReadReques
 		return
 	}
 
-	objectItems := serializeNicDatasource(ctx, nics, &response.Diagnostics)
-
+	objectItems := utils.SerializeDatasourceItemsWithDiags(ctx, *nics, &response.Diagnostics, mappingItemsValue)
 	if response.Diagnostics.HasError() {
 		return
 	}
+
+	listValueItems := utils.CreateListValueItems(ctx, objectItems, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
 	state = plan
-	state.Items = objectItems.Items
+	state.Items = listValueItems
 
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
@@ -110,114 +115,95 @@ func deserializeReadParams(ctx context.Context, tf datasource_nic.NicModel, diag
 		SubnetIds:                       utils.ConvertTfListToArrayOfString(ctx, tf.SubnetIds, diags),
 		VpcIds:                          utils.ConvertTfListToArrayOfString(ctx, tf.VpcIds, diags),
 		Ids:                             utils.ConvertTfListToArrayOfString(ctx, tf.Ids, diags),
-		AvailabilityZoneNames:           utils.ConvertTfListToArrayOfString(ctx, tf.AvailabilityZoneNames, diags),
+		AvailabilityZoneNames:           utils.ConvertTfListToArrayOfAzName(ctx, tf.AvailabilityZoneNames, diags),
 		Tags:                            utils.ConvertTfListToArrayOfString(ctx, tf.Tags, diags),
 		TagKeys:                         utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
 		TagValues:                       utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
 	}
 }
 
-func serializeNicDatasource(ctx context.Context, nics *[]api.Nic, diags *diag.Diagnostics) datasource_nic.NicModel {
+func mappingItemsValue(ctx context.Context, nic api.Nic, diags *diag.Diagnostics) (datasource_nic.ItemsValue, diag.Diagnostics) {
 	var serializeDiags diag.Diagnostics
-	var nicsList types.List
 	var linkNic basetypes.ObjectValue
 	var linkPublicIp basetypes.ObjectValue
 
-	tagsList := types.List{}
+	tagsList := types.ListNull(datasource_nic.ItemsValue{}.Type(ctx))
 	securityGroupsList := types.List{}
 	privateIpsList := types.List{}
 
-	if len(*nics) != 0 {
-		ll := len(*nics)
-		itemsValue := make([]datasource_nic.ItemsValue, ll)
-
-		for i := 0; ll > i; i++ {
-			if (*nics)[i].Tags != nil {
-				tagsList, serializeDiags = mappingNicTags(ctx, nics, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*nics)[i].SecurityGroups != nil {
-				securityGroupsList, serializeDiags = mappingSecurityGroups(ctx, nics, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*nics)[i].PrivateIps != nil {
-				privateIpsList, serializeDiags = mappingPrivateIps(ctx, nics, diags, i)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*nics)[i].LinkNic != nil {
-				linkNicValue, linkNicDiags := mappingLinkNic(ctx, (*nics)[i].LinkNic, diags)
-				if linkNicDiags.HasError() {
-					diags.Append(linkNicDiags...)
-				}
-				linkNic, serializeDiags = linkNicValue.ToObjectValue(ctx)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			} else {
-				linkNic, serializeDiags = datasource_nic.NewLinkNicValueNull().ToObjectValue(ctx)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			if (*nics)[i].LinkPublicIp != nil {
-				linkPublicIpValue, linkPublicIpDiags := mappingLinkPublicIp(ctx, (*nics)[i].LinkPublicIp, diags)
-				if linkPublicIpDiags.HasError() {
-					diags.Append(linkPublicIpDiags...)
-				}
-				linkPublicIp, serializeDiags = linkPublicIpValue.ToObjectValue(ctx)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			} else {
-				linkPublicIp, serializeDiags = datasource_nic.NewLinkPublicIpValueNull().ToObjectValue(ctx)
-				if serializeDiags.HasError() {
-					diags.Append(serializeDiags...)
-				}
-			}
-
-			itemsValue[i], serializeDiags = datasource_nic.NewItemsValue(datasource_nic.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-				"availability_zone_name": types.StringValue(utils.ConvertStringPtrToString((*nics)[i].AvailabilityZoneName)),
-				"description":            types.StringValue(utils.ConvertStringPtrToString((*nics)[i].Description)),
-				"id":                     types.StringValue(utils.ConvertStringPtrToString((*nics)[i].Id)),
-				"is_source_dest_checked": types.BoolPointerValue((*nics)[i].IsSourceDestChecked),
-				"link_nic":               linkNic,
-				"link_public_ip":         linkPublicIp,
-				"mac_address":            types.StringValue(utils.ConvertStringPtrToString((*nics)[i].MacAddress)),
-				"private_dns_name":       types.StringValue(utils.ConvertStringPtrToString((*nics)[i].PrivateDnsName)),
-				"private_ips":            privateIpsList,
-				"security_groups":        securityGroupsList,
-				"state":                  types.StringValue(utils.ConvertStringPtrToString((*nics)[i].State)),
-				"subnet_id":              types.StringValue(utils.ConvertStringPtrToString((*nics)[i].SubnetId)),
-				"tags":                   tagsList,
-				"vpc_id":                 types.StringValue(utils.ConvertStringPtrToString((*nics)[i].VpcId)),
-			})
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
-			}
+	if nic.Tags != nil {
+		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *nic.Tags, mappingTags)
+		if serializeDiags.HasError() {
+			return datasource_nic.ItemsValue{}, serializeDiags
 		}
+		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		if serializeDiags.HasError() {
+			return datasource_nic.ItemsValue{}, serializeDiags
+		}
+	}
 
-		nicsList, serializeDiags = types.ListValueFrom(ctx, new(datasource_nic.ItemsValue).Type(ctx), itemsValue)
+	if nic.SecurityGroups != nil {
+		securityGroupsList, serializeDiags = mappingSecurityGroups(ctx, nic, diags)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
+	}
+
+	if nic.PrivateIps != nil {
+		privateIpsList, serializeDiags = mappingPrivateIps(ctx, nic, diags)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
+	}
+
+	if nic.LinkNic != nil {
+		linkNicValue, linkNicDiags := mappingLinkNic(ctx, nic.LinkNic, diags)
+		if linkNicDiags.HasError() {
+			diags.Append(linkNicDiags...)
+		}
+		linkNic, serializeDiags = linkNicValue.ToObjectValue(ctx)
 		if serializeDiags.HasError() {
 			diags.Append(serializeDiags...)
 		}
 	} else {
-		nicsList = types.ListNull(new(datasource_nic.ItemsValue).Type(ctx))
+		linkNic, serializeDiags = datasource_nic.NewLinkNicValueNull().ToObjectValue(ctx)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
 	}
 
-	return datasource_nic.NicModel{
-		Items: nicsList,
+	if nic.LinkPublicIp != nil {
+		linkPublicIpValue, linkPublicIpDiags := mappingLinkPublicIp(ctx, nic.LinkPublicIp, diags)
+		if linkPublicIpDiags.HasError() {
+			diags.Append(linkPublicIpDiags...)
+		}
+		linkPublicIp, serializeDiags = linkPublicIpValue.ToObjectValue(ctx)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
+	} else {
+		linkPublicIp, serializeDiags = datasource_nic.NewLinkPublicIpValueNull().ToObjectValue(ctx)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+		}
 	}
+
+	return datasource_nic.NewItemsValue(datasource_nic.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"availability_zone_name": types.StringValue(utils.ConvertAzNamePtrToString(nic.AvailabilityZoneName)),
+		"description":            types.StringValue(utils.ConvertStringPtrToString(nic.Description)),
+		"id":                     types.StringValue(utils.ConvertStringPtrToString(nic.Id)),
+		"is_source_dest_checked": types.BoolPointerValue(nic.IsSourceDestChecked),
+		"link_nic":               linkNic,
+		"link_public_ip":         linkPublicIp,
+		"mac_address":            types.StringValue(utils.ConvertStringPtrToString(nic.MacAddress)),
+		"private_dns_name":       types.StringValue(utils.ConvertStringPtrToString(nic.PrivateDnsName)),
+		"private_ips":            privateIpsList,
+		"security_groups":        securityGroupsList,
+		"state":                  types.StringValue(utils.ConvertStringPtrToString(nic.State)),
+		"subnet_id":              types.StringValue(utils.ConvertStringPtrToString(nic.SubnetId)),
+		"tags":                   tagsList,
+		"vpc_id":                 types.StringValue(utils.ConvertStringPtrToString(nic.VpcId)),
+	})
 }
 
 func mappingLinkNic(ctx context.Context, linkNic *api.LinkNic, diags *diag.Diagnostics) (datasource_nic.LinkNicValue, diag.Diagnostics) {
@@ -235,14 +221,14 @@ func mappingLinkNic(ctx context.Context, linkNic *api.LinkNic, diags *diag.Diagn
 	return elementValue, mappingDiags
 }
 
-func mappingPrivateIps(ctx context.Context, nics *[]api.Nic, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
+func mappingPrivateIps(ctx context.Context, nic api.Nic, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
 	var mappingDiags diag.Diagnostics
 	var linkPublicIpPrivateIp basetypes.ObjectValue
 
-	lp := len(*(*nics)[i].PrivateIps)
+	lp := len(*nic.PrivateIps)
 	elementValue := make([]datasource_nic.PrivateIpsValue, lp)
 
-	for y, privateIp := range *(*nics)[i].PrivateIps {
+	for y, privateIp := range *nic.PrivateIps {
 
 		if privateIp.LinkPublicIp != nil {
 			linkPublicValue, serializeLinkPublicDiags := mappingLinkPublicIp(ctx, privateIp.LinkPublicIp, diags)
@@ -289,10 +275,10 @@ func mappingLinkPublicIp(ctx context.Context, linkPublicIp *api.LinkPublicIp, di
 	return elementValue, mappingDiags
 }
 
-func mappingSecurityGroups(ctx context.Context, nics *[]api.Nic, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	ls := len(*(*nics)[i].SecurityGroups)
+func mappingSecurityGroups(ctx context.Context, nic api.Nic, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
+	ls := len(*nic.SecurityGroups)
 	elementValue := make([]datasource_nic.SecurityGroupsValue, ls)
-	for y, securityGroup := range *(*nics)[i].SecurityGroups {
+	for y, securityGroup := range *nic.SecurityGroups {
 		elementValue[y], *diags = datasource_nic.NewSecurityGroupsValue(datasource_nic.SecurityGroupsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 			"security_group_id":   types.StringPointerValue(securityGroup.SecurityGroupId),
 			"security_group_name": types.StringPointerValue(securityGroup.SecurityGroupName),
@@ -306,19 +292,9 @@ func mappingSecurityGroups(ctx context.Context, nics *[]api.Nic, diags *diag.Dia
 	return types.ListValueFrom(ctx, new(datasource_nic.SecurityGroupsValue).Type(ctx), elementValue)
 }
 
-func mappingNicTags(ctx context.Context, nics *[]api.Nic, diags *diag.Diagnostics, i int) (types.List, diag.Diagnostics) {
-	lt := len(*(*nics)[i].Tags)
-	elementValue := make([]datasource_nic.TagsValue, lt)
-	for y, tag := range *(*nics)[i].Tags {
-		elementValue[y], *diags = datasource_nic.NewTagsValue(datasource_nic.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"key":   types.StringValue(tag.Key),
-			"value": types.StringValue(tag.Value),
-		})
-		if diags.HasError() {
-			diags.Append(*diags...)
-			continue
-		}
-	}
-
-	return types.ListValueFrom(ctx, new(datasource_nic.TagsValue).Type(ctx), elementValue)
+func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_nic.TagsValue, diag.Diagnostics) {
+	return datasource_nic.NewTagsValue(datasource_nic.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"key":   types.StringValue(tag.Key),
+		"value": types.StringValue(tag.Value),
+	})
 }
