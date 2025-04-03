@@ -1,0 +1,100 @@
+{
+	"datasources": [
+		{
+			"name": "compute_bridge",
+			"schema": {
+				"attributes": [
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "destination_ip_range",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
+										}
+									},
+									{
+										"name": "gateway_id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "source_ip_range",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "compute_bridge",
+			"schema": {
+				"attributes": [
+					{
+						"name": "destination_vpc_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Destination VPC identifier."
+						}
+					},
+					{
+						"name": "source_vpc_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Source VPC identifier."
+						}
+					},
+					{
+						"name": "destination_ip_range",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
+						}
+					},
+					{
+						"name": "gateway_id",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed"
+						}
+					},
+					{
+						"name": "source_ip_range",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

@@ -1,8 +1,8 @@
-resource "numspot_vpc" "test" {
+resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
-resource "numspot_security_group" "test" {
+resource "numspot_security_group" "security-group" {
   vpc_id      = numspot_vpc.vpc.id
   name        = "name"
   description = "description"

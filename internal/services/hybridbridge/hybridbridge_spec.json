@@ -1,0 +1,102 @@
+{
+	"datasources": [
+		{
+			"name": "hybrid_bridge",
+			"schema": {
+				"attributes": [
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									},
+									{
+										"name": "route",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "destination_ip_range",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												},
+												{
+													"name": "gateway_id",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												}
+											],
+											"description": "The route object representation."
+										}
+									}
+								]
+							},
+							"description": "List of bridges."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "hybrid_bridge",
+			"schema": {
+				"attributes": [
+					{
+						"name": "managed_service_id",
+						"string": {
+							"computed_optional_required": "required"
+						}
+					},
+					{
+						"name": "vpc_id",
+						"string": {
+							"computed_optional_required": "required"
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The bridge identifier"
+						}
+					},
+					{
+						"name": "route",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+								{
+									"name": "destination_ip_range",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								},
+								{
+									"name": "gateway_id",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								}
+							],
+							"description": "The route object representation."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

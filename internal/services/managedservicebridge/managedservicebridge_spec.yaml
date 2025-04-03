@@ -1,0 +1,26 @@
+provider:
+  name: numspot
+
+resources:
+  managed_service_bridges:
+    create:
+      method: POST
+      path: /connectivity/spaces/{spaceId}/managedServiceBridges
+    delete:
+      method: DELETE
+      path: /connectivity/spaces/{spaceId}/managedServiceBridges/{id}
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/managedServiceBridges/{id}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  managed_service_bridges:
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/managedServiceBridges
+    schema:
+      ignores:
+        - spaceId

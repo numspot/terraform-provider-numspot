@@ -1,9 +1,9 @@
-resource "numspot_dhcp_options" "test" {
+resource "numspot_dhcp_options" "dhcp" {
   domain_name = "the_domain_name"
 }
 
-data "numspot_dhcp_options" "testdata" {
-  domain_names = [numspot_dhcp_options.test.domain_name]
+data "numspot_dhcp_options" "datasource-dhcp-options" {
+  domain_names = [numspot_dhcp_options.dhcp.domain_name]
 }
 
 resource "null_resource" "print-datasource-id" {

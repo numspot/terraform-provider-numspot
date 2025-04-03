@@ -1,0 +1,26 @@
+provider:
+  name: numspot
+
+resources:
+  compute_bridge:
+    create:
+      method: POST
+      path: /connectivity/spaces/{spaceId}/computeBridges
+    delete:
+      method: DELETE
+      path: /connectivity/spaces/{spaceId}/computeBridges/{id}
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/computeBridges/{id}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  compute_bridge:
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/computeBridges
+    schema:
+      ignores:
+        - spaceId

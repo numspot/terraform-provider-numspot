@@ -13,12 +13,12 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource "numspot_vpc" "net" {
+resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
-resource "numspot_security_group" "test" {
-  net_id      = numspot_vpc.net.id
+resource "numspot_security_group" "security-group" {
+  net_id      = numspot_vpc.vpc.id
   name        = "group name"
   description = "this is a security group"
   outbound_rules = [
@@ -37,14 +37,14 @@ resource "numspot_security_group" "test" {
   ]
 }
 
-data "numspot_security_groups" "testdata" {
-  security_group_ids = [numspot_security_group.test.id]
+data "numspot_security_groups" "datasource-security-group" {
+  security_group_ids = [numspot_security_group.security-group.id]
 }
 
 # How to use the datasource in another field
 resource "null_resource" "print-datasource-id" {
   provisioner "local-exec" {
-    command = "echo data.numspot_security_groups.testdata.items.0.id"
+    command = "echo data.numspot_security_groups.datasource-security-group.items.0.id"
   }
 }
 ```

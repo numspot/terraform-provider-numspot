@@ -23,21 +23,21 @@ resource "numspot_subnet" "subnet" {
   availability_zone_name = "eu-west-2a"
 }
 
-resource "numspot_vm" "test" {
+resource "numspot_vm" "vm" {
   image_id  = "ami-0b7df82c"
-  vm_type   = "ns-cus6-2c4r"
+  type      = "ns-cus6-2c4r"
   subnet_id = numspot_subnet.subnet.id
 
 }
 
-data "numspot_vms" "testdata" {
-  ids = [numspot_vm.test.id]
+data "numspot_vms" "datasource-vm" {
+  ids = [numspot_vm.vm.id]
 }
 
 # How to use the datasource in another field
 resource "null_resource" "print-datasource-id" {
   provisioner "local-exec" {
-    command = "echo data.numspot_vms.testdata.items.0.id"
+    command = "echo data.numspot_vms.datasource-vm.items.0.id"
   }
 }
 ```

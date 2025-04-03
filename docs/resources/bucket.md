@@ -13,7 +13,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource "numspot_bucket" "test" {
+resource "numspot_bucket" "bucket" {
   name = "bucket-name"
 }
 ```

@@ -29,11 +29,11 @@ resource "numspot_vm" "vm" {
   subnet_id = numspot_subnet.subnet.id
 }
 
-resource "numspot_internet_gateway" "ig" {
+resource "numspot_internet_gateway" "internet-gateway" {
   vpc_id = numspot_vpc.vpc.id
 }
 
-resource "numspot_public_ip" "public_ip" {
+resource "numspot_public_ip" "public-ip" {
   vm_id = numspot_vm.vm.id
   tags = [
     {
@@ -41,7 +41,7 @@ resource "numspot_public_ip" "public_ip" {
       value = "Terraform-Test-PublicIp"
     }
   ]
-  depends_on = [numspot_internet_gateway.ig]
+  depends_on = [numspot_internet_gateway.internet-gateway]
 }
 ```
 

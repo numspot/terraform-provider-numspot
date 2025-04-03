@@ -102,17 +102,17 @@ func checkRetryCondition(res TfRequestResp, err error, stopRetryCodes []int, ret
 	}
 }
 
-func RetryDeleteUntilResourceAvailable[R TfRequestResp](
+func RetryDeleteUntilResourceAvailable[R TfRequestResp, id string | api.ResourceIdentifier](
 	ctx context.Context,
 	spaceID api.SpaceId,
-	id string,
-	fun func(context.Context, api.SpaceId, string, ...api.RequestEditorFn) (R, error),
+	deleteId id,
+	fun func(context.Context, api.SpaceId, id, ...api.RequestEditorFn) (R, error),
 ) error {
 	var res R
 	return retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		var err error
-		tflog.Debug(ctx, fmt.Sprintf("Retry delete on resource: %s", id))
-		res, err = fun(ctx, spaceID, id)
+		// tflog.Debug(ctx, fmt.Sprintf("Retry delete on resource: %s", id))
+		res, err = fun(ctx, spaceID, deleteId)
 		tflog.Debug(ctx, fmt.Sprintf("Retry delete got response: %d", res.StatusCode()))
 
 		return checkRetryCondition(res, err, StatusCodeStopRetryOnCreate, StatusCodeRetryOnCreate)
@@ -128,23 +128,6 @@ func RetryCreateUntilResourceAvailable[R TfRequestResp](
 	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
 		var err error
 		res, err = fun(ctx, spaceID)
-
-		return checkRetryCondition(res, err, []int{http.StatusCreated}, []int{http.StatusConflict, http.StatusFailedDependency})
-	})
-
-	return res, retryError
-}
-
-func RetryCreateUntilResourceAvailableWithParameter[R TfRequestResp](
-	ctx context.Context,
-	spaceID string,
-	parameter string,
-	fun func(context.Context, string, string, ...api.RequestEditorFn) (R, error),
-) (R, error) {
-	var res R
-	retryError := retry.RetryContext(ctx, TfRequestRetryTimeout, func() *retry.RetryError {
-		var err error
-		res, err = fun(ctx, spaceID, parameter)
 
 		return checkRetryCondition(res, err, []int{http.StatusCreated}, []int{http.StatusConflict, http.StatusFailedDependency})
 	})
@@ -225,11 +208,11 @@ func getFieldFromReflectStructPtr(structPtr reflect.Value, fieldName string) (re
 	return fieldValue, nil
 }
 
-func ReadResourceUtils[R TfRequestResp](
+func ReadResourceUtils[R TfRequestResp, id string | api.ResourceIdentifier](
 	ctx context.Context,
-	createdId string,
+	createdId id,
 	spaceID api.SpaceId,
-	readFunction func(context.Context, api.SpaceId, string, ...api.RequestEditorFn) (*R, error),
+	readFunction func(context.Context, api.SpaceId, id, ...api.RequestEditorFn) (*R, error),
 ) (interface{}, string, error) {
 	readRes, err := readFunction(ctx, spaceID, createdId)
 	if err != nil {
@@ -246,14 +229,18 @@ func ReadResourceUtils[R TfRequestResp](
 		return nil, "", err
 	}
 
-	if stateValuePtr.Kind() != reflect.Ptr {
-		return nil, "", fmt.Errorf("expected a pointer but found %v", stateValuePtr)
-	}
+	var stateValue reflect.Value
+	if stateValuePtr.Kind() == reflect.Ptr {
+		stateValue = stateValuePtr.Elem()
 
-	stateValue := stateValuePtr.Elem()
+		if stateValue.Type().String() != "string" {
+			return nil, "", fmt.Errorf("field 'State' was expected to be a string but %v found", stateValue.Type())
+		}
 
-	if stateValue.Type().String() != "string" {
-		return nil, "", fmt.Errorf("field 'State' was expected to be a string but %v found", stateValue.Type())
+	} else if stateValuePtr.Kind() == reflect.String {
+		stateValue = reflect.ValueOf(stateValuePtr.Interface())
+	} else {
+		return nil, "", fmt.Errorf("expected a pointer or a string but found %v", stateValuePtr)
 	}
 
 	data := json200ValuePtr.Interface()
@@ -262,13 +249,13 @@ func ReadResourceUtils[R TfRequestResp](
 	return data, stateValueStr, nil
 }
 
-func RetryReadUntilStateValid[R TfRequestResp](
+func RetryReadUntilStateValid[R TfRequestResp, ID string | api.ResourceIdentifier](
 	ctx context.Context,
-	createdId string,
+	createdId ID,
 	spaceID api.SpaceId,
 	pendingStates []string,
 	targetStates []string,
-	readFunction func(context.Context, api.SpaceId, string, ...api.RequestEditorFn) (*R, error),
+	readFunction func(context.Context, api.SpaceId, ID, ...api.RequestEditorFn) (*R, error),
 ) (interface{}, error) {
 	createStateConf := &retry.StateChangeConf{
 		Pending: pendingStates,

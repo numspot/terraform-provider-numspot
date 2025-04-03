@@ -1,0 +1,26 @@
+provider:
+  name: numspot
+
+resources:
+  hybrid_bridge:
+    create:
+      method: POST
+      path: /connectivity/spaces/{spaceId}/hybridBridges
+    delete:
+      method: DELETE
+      path: /connectivity/spaces/{spaceId}/hybridBridges/{id}
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/hybridBridges/{id}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  hybrid_bridge:
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/hybridBridges
+    schema:
+      ignores:
+        - spaceId

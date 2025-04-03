@@ -1,0 +1,26 @@
+provider:
+  name: numspot
+
+resources:
+  virtual_gateway:
+    create:
+      method: POST
+      path: /connectivity/spaces/{spaceId}/virtualGateways
+    delete:
+      method: DELETE
+      path: /connectivity/spaces/{spaceId}/virtualGateways/{id}
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/virtualGateways/{id}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  virtual_gateway:
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/virtualGateways
+    schema:
+      ignores:
+        - spaceId

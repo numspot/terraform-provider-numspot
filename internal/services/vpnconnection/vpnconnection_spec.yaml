@@ -1,0 +1,26 @@
+provider:
+  name: numspot
+
+resources:
+  vpn_connection:
+    create:
+      method: POST
+      path: /connectivity/spaces/{spaceId}/vpnConnections
+    delete:
+      method: DELETE
+      path: /connectivity/spaces/{spaceId}/vpnConnection/{id}
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/vpnConnection/{id}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  vpn_connection:
+    read:
+      method: GET
+      path: /connectivity/spaces/{spaceId}/vpnConnections
+    schema:
+      ignores:
+        - spaceId

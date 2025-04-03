@@ -13,14 +13,14 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource "numspot_volume" "test" {
+resource "numspot_volume" "volume" {
   type                   = "standard"
   size                   = 11
   availability_zone_name = "eu-west-2a"
 }
 
-resource "numspot_snapshot" "test" {
-  volume_id   = numspot_volume.test.id
+resource "numspot_snapshot" "snapshot" {
+  volume_id   = numspot_volume.volume.id
   description = "A beautiful snapshot"
   tags = [
     {

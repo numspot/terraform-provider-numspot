@@ -13,7 +13,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource "numspot_dhcp_options" "test" {
+resource "numspot_dhcp_options" "dhcp-options" {
   domain_name = "foo.bar"
   tags = [
     {

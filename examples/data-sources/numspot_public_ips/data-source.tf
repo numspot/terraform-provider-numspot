@@ -2,7 +2,7 @@ resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
-resource "numspot_internet_gateway" "internet_gateway" {
+resource "numspot_internet_gateway" "internet-gateway" {
   vpc_id     = numspot_vpc.vpc.id
   depends_on = [numspot_nic.nic]
 }
@@ -16,11 +16,11 @@ resource "numspot_nic" "nic" {
   subnet_id = numspot_subnet.subnet.id
 }
 
-resource "numspot_public_ip" "public_ip" {
+resource "numspot_public_ip" "public-ip" {
   nic_id     = numspot_nic.nic.id
-  depends_on = [numspot_internet_gateway.internet_gateway]
+  depends_on = [numspot_internet_gateway.internet-gateway]
 }
 
-data "numspot_public_ips" "public_ip_data_source" {
-  ids = [numspot_public_ip.public_ip.id]
+data "numspot_public_ips" "datasource-public-ip" {
+  ids = [numspot_public_ip.public-ip.id]
 }

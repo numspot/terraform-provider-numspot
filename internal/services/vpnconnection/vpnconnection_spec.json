@@ -1,0 +1,657 @@
+{
+	"datasources": [
+		{
+			"name": "vpn_connection",
+			"schema": {
+				"attributes": [
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "client_gateway_configuration",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Example configuration for the client gateway."
+										}
+									},
+									{
+										"name": "client_gateway_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the client gateway."
+										}
+									},
+									{
+										"name": "connection_type",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The type of VPN connection (always `ipsec.1`)."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the VPN connection."
+										}
+									},
+									{
+										"name": "routes",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "destination_ip_range",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`)."
+														}
+													},
+													{
+														"name": "route_type",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The type of route (always `static`)."
+														}
+													},
+													{
+														"name": "state",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The current state of the static route (`pending` \\| `available` \\| `deleting` \\| `deleted`)."
+														}
+													}
+												]
+											},
+											"description": "Information about one or more static routes associated with the VPN connection, if any."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the VPN connection (`pending` \\| `available` \\| `deleting` \\| `deleted`)."
+										}
+									},
+									{
+										"name": "static_routes_only",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "If false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute)."
+										}
+									},
+									{
+										"name": "vgw_telemetries",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "accepted_route_count",
+														"int64": {
+															"computed_optional_required": "computed",
+															"description": "The number of routes accepted through BGP (Border Gateway Protocol) route exchanges."
+														}
+													},
+													{
+														"name": "last_state_change_date",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The date and time (UTC) of the latest state update."
+														}
+													},
+													{
+														"name": "outside_ip_address",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The IP on the NumSpot side of the tunnel."
+														}
+													},
+													{
+														"name": "state",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The state of the IPSEC tunnel (`UP` \\| `DOWN`)."
+														}
+													},
+													{
+														"name": "state_description",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "A description of the current state of the tunnel."
+														}
+													}
+												]
+											},
+											"description": "Information about the current state of one or more of the VPN tunnels."
+										}
+									},
+									{
+										"name": "virtual_gateway_id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The ID of the virtual gateway."
+										}
+									},
+									{
+										"name": "vpn_options",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "phase1options",
+													"single_nested": {
+														"computed_optional_required": "computed",
+														"attributes": [
+															{
+																"name": "dpd_timeout_action",
+																"string": {
+																	"computed_optional_required": "computed",
+																	"description": "The action to carry out after a Dead Peer Detection (DPD) timeout occurs."
+																}
+															},
+															{
+																"name": "dpd_timeout_seconds",
+																"int64": {
+																	"computed_optional_required": "computed",
+																	"description": "The maximum waiting time for a Dead Peer Detection (DPD) response before considering the peer as dead, in seconds."
+																}
+															},
+															{
+																"name": "ike_versions",
+																"list": {
+																	"computed_optional_required": "computed",
+																	"element_type": {
+																		"string": {}
+																	},
+																	"description": "The Internet Key Exchange (IKE) versions allowed for the VPN tunnel."
+																}
+															},
+															{
+																"name": "phase1dh_group_numbers",
+																"list": {
+																	"computed_optional_required": "computed",
+																	"element_type": {
+																		"int64": {}
+																	},
+																	"description": "The Diffie-Hellman (DH) group numbers allowed for the VPN tunnel for phase 1."
+																}
+															},
+															{
+																"name": "phase1encryption_algorithms",
+																"list": {
+																	"computed_optional_required": "computed",
+																	"element_type": {
+																		"string": {}
+																	},
+																	"description": "The encryption algorithms allowed for the VPN tunnel for phase 1."
+																}
+															},
+															{
+																"name": "phase1integrity_algorithms",
+																"list": {
+																	"computed_optional_required": "computed",
+																	"element_type": {
+																		"string": {}
+																	},
+																	"description": "The integrity algorithms allowed for the VPN tunnel for phase 1."
+																}
+															},
+															{
+																"name": "phase1lifetime_seconds",
+																"int64": {
+																	"computed_optional_required": "computed",
+																	"description": "The lifetime for phase 1 of the IKE negotiation process, in seconds."
+																}
+															},
+															{
+																"name": "replay_window_size",
+																"int64": {
+																	"computed_optional_required": "computed",
+																	"description": "The number of packets in an IKE replay window."
+																}
+															},
+															{
+																"name": "startup_action",
+																"string": {
+																	"computed_optional_required": "computed",
+																	"description": "The action to carry out when establishing tunnels for a VPN connection."
+																}
+															}
+														],
+														"description": "Information about Phase 1 of the Internet Key Exchange (IKE) negotiation. When Phase 1 finishes successfully, peers proceed to Phase 2 negotiations. "
+													}
+												},
+												{
+													"name": "phase2options",
+													"single_nested": {
+														"computed_optional_required": "computed",
+														"attributes": [
+															{
+																"name": "phase2dh_group_numbers",
+																"list": {
+																	"computed_optional_required": "computed",
+																	"element_type": {
+																		"int64": {}
+																	},
+																	"description": "The Diffie-Hellman (DH) group numbers allowed for the VPN tunnel for phase 2."
+																}
+															},
+															{
+																"name": "phase2encryption_algorithms",
+																"list": {
+																	"computed_optional_required": "computed",
+																	"element_type": {
+																		"string": {}
+																	},
+																	"description": "The encryption algorithms allowed for the VPN tunnel for phase 2."
+																}
+															},
+															{
+																"name": "phase2integrity_algorithms",
+																"list": {
+																	"computed_optional_required": "computed",
+																	"element_type": {
+																		"string": {}
+																	},
+																	"description": "The integrity algorithms allowed for the VPN tunnel for phase 2."
+																}
+															},
+															{
+																"name": "phase2lifetime_seconds",
+																"int64": {
+																	"computed_optional_required": "computed",
+																	"description": "The lifetime for phase 2 of the Internet Key Exchange (IKE) negociation process, in seconds."
+																}
+															},
+															{
+																"name": "pre_shared_key",
+																"string": {
+																	"computed_optional_required": "computed",
+																	"description": "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\u0026quot;)."
+																}
+															}
+														],
+														"description": "Information about Phase 2 of the Internet Key Exchange (IKE) negotiation. "
+													}
+												},
+												{
+													"name": "tunnel_inside_ip_range",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The range of inside IPs for the tunnel. This must be a /30 CIDR block from the 169.254.254.0/24 range."
+													}
+												}
+											],
+											"description": "Information about the VPN options."
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "vpn_connection",
+			"schema": {
+				"attributes": [
+					{
+						"name": "client_gateway_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The ID of the client gateway.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+
+						}
+					},
+					{
+						"name": "connection_type",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The type of VPN connection (only `ipsec.1` is supported).",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+
+						}
+					},
+					{
+						"name": "static_routes_only",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "By default or if false, the VPN connection uses dynamic routing with Border Gateway Protocol (BGP). If true, routing is controlled using static routes. For more information about how to create and delete static routes, see [CreateVpnConnectionRoute](#createvpnconnectionroute) and [DeleteVpnConnectionRoute](#deletevpnconnectionroute).",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+											}
+										],
+										"schema_definition": "boolplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+
+						}
+					},
+					{
+						"name": "virtual_gateway_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The ID of the virtual gateway.",
+							"plan_modifiers": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+											}
+										],
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "client_gateway_configuration",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Example configuration for the client gateway."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The ID of the VPN connection."
+						}
+					},
+					{
+						"name": "routes",
+						"set_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "destination_ip_range",
+										"string": {
+											"computed_optional_required": "computed_optional",
+											"description": "The IP range used for the destination match, in CIDR notation (for example, `10.0.0.0/24`)."
+										}
+									},
+									{
+										"name": "route_type",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The type of route (always `static`)."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The current state of the static route (`pending` \\| `available` \\| `deleting` \\| `deleted`)."
+										}
+									}
+								]
+							},
+							"description": "Information about one or more static routes associated with the VPN connection, if any."
+						}
+					},
+					{
+						"name": "state",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The state of the VPN connection (`pending` \\| `available` \\| `deleting` \\| `deleted`)."
+						}
+					},
+					{
+						"name": "vgw_telemetries",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "accepted_route_count",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "The number of routes accepted through BGP (Border Gateway Protocol) route exchanges."
+										}
+									},
+									{
+										"name": "last_state_change_date",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The date and time (UTC) of the latest state update."
+										}
+									},
+									{
+										"name": "outside_ip_address",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The IP on the NumSpot side of the tunnel."
+										}
+									},
+									{
+										"name": "state",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The state of the IPSEC tunnel (`UP` \\| `DOWN`)."
+										}
+									},
+									{
+										"name": "state_description",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A description of the current state of the tunnel."
+										}
+									}
+								]
+							},
+							"description": "Information about the current state of one or more of the VPN tunnels."
+						}
+					},
+					{
+						"name": "vpn_options",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "phase1options",
+									"single_nested": {
+										"computed_optional_required": "computed",
+										"attributes": [
+											{
+												"name": "dpd_timeout_action",
+												"string": {
+													"computed_optional_required": "computed",
+													"description": "The action to carry out after a Dead Peer Detection (DPD) timeout occurs."
+												}
+											},
+											{
+												"name": "dpd_timeout_seconds",
+												"int64": {
+													"computed_optional_required": "computed",
+													"description": "The maximum waiting time for a Dead Peer Detection (DPD) response before considering the peer as dead, in seconds."
+												}
+											},
+											{
+												"name": "ike_versions",
+												"list": {
+													"computed_optional_required": "computed",
+													"element_type": {
+														"string": {}
+													},
+													"description": "The Internet Key Exchange (IKE) versions allowed for the VPN tunnel."
+												}
+											},
+											{
+												"name": "phase1dh_group_numbers",
+												"list": {
+													"computed_optional_required": "computed",
+													"element_type": {
+														"int64": {}
+													},
+													"description": "The Diffie-Hellman (DH) group numbers allowed for the VPN tunnel for phase 1."
+												}
+											},
+											{
+												"name": "phase1encryption_algorithms",
+												"list": {
+													"computed_optional_required": "computed",
+													"element_type": {
+														"string": {}
+													},
+													"description": "The encryption algorithms allowed for the VPN tunnel for phase 1."
+												}
+											},
+											{
+												"name": "phase1integrity_algorithms",
+												"list": {
+													"computed_optional_required": "computed",
+													"element_type": {
+														"string": {}
+													},
+													"description": "The integrity algorithms allowed for the VPN tunnel for phase 1."
+												}
+											},
+											{
+												"name": "phase1lifetime_seconds",
+												"int64": {
+													"computed_optional_required": "computed",
+													"description": "The lifetime for phase 1 of the IKE negotiation process, in seconds."
+												}
+											},
+											{
+												"name": "replay_window_size",
+												"int64": {
+													"computed_optional_required": "computed",
+													"description": "The number of packets in an IKE replay window."
+												}
+											},
+											{
+												"name": "startup_action",
+												"string": {
+													"computed_optional_required": "computed",
+													"description": "The action to carry out when establishing tunnels for a VPN connection."
+												}
+											}
+										],
+										"description": "Information about Phase 1 of the Internet Key Exchange (IKE) negotiation. When Phase 1 finishes successfully, peers proceed to Phase 2 negotiations. "
+									}
+								},
+								{
+									"name": "phase2options",
+									"single_nested": {
+										"computed_optional_required": "computed",
+										"attributes": [
+											{
+												"name": "phase2dh_group_numbers",
+												"list": {
+													"computed_optional_required": "computed_optional",
+													"element_type": {
+														"int64": {}
+													},
+													"description": "The Diffie-Hellman (DH) group numbers allowed for the VPN tunnel for phase 2."
+												}
+											},
+											{
+												"name": "phase2encryption_algorithms",
+												"list": {
+													"computed_optional_required": "computed",
+													"element_type": {
+														"string": {}
+													},
+													"description": "The encryption algorithms allowed for the VPN tunnel for phase 2."
+												}
+											},
+											{
+												"name": "phase2integrity_algorithms",
+												"list": {
+													"computed_optional_required": "computed",
+													"element_type": {
+														"string": {}
+													},
+													"description": "The integrity algorithms allowed for the VPN tunnel for phase 2."
+												}
+											},
+											{
+												"name": "phase2lifetime_seconds",
+												"int64": {
+													"computed_optional_required": "computed",
+													"description": "The lifetime for phase 2 of the Internet Key Exchange (IKE) negociation process, in seconds."
+												}
+											},
+											{
+												"name": "pre_shared_key",
+												"string": {
+													"computed_optional_required": "computed_optional",
+													"description": "The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (\u0026quot;)."
+												}
+											}
+										],
+										"description": "Information about Phase 2 of the Internet Key Exchange (IKE) negotiation. "
+									}
+								},
+								{
+									"name": "tunnel_inside_ip_range",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "The range of inside IPs for the tunnel. This must be a /30 CIDR block from the 169.254.254.0/24 range."
+									}
+								}
+							],
+							"description": "Information about the VPN options."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

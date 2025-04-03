@@ -24,7 +24,7 @@ resource "numspot_subnet" "subnet" {
   ip_range = "10.101.1.0/24"
 }
 
-resource "numspot_security_group" "sg" {
+resource "numspot_security_group" "security-group" {
   net_id      = numspot_vpc.vpc.id
   name        = "My SG Group"
   description = "terraform-vm-tests-sg-description"
@@ -53,7 +53,7 @@ resource "numspot_vm" "vm" {
   subnet_id = numspot_subnet.subnet.id
 }
 
-resource "numspot_load_balancer" "testlb" {
+resource "numspot_load_balancer" "load-balancer" {
   name = "load-balancer"
   type = "internal"
 
@@ -94,7 +94,7 @@ resource "numspot_vpc" "vpc" {
   ip_range = "10.101.0.0/16"
 }
 
-resource "numspot_internet_gateway" "ig" {
+resource "numspot_internet_gateway" "internet-gateway" {
   vpc_id = numspot_vpc.vpc.id
 }
 
@@ -104,7 +104,7 @@ resource "numspot_subnet" "subnet" {
   map_public_ip_on_launch = true
 }
 
-resource "numspot_security_group" "sg" {
+resource "numspot_security_group" "security-group" {
   vpc_id      = numspot_vpc.vpc.id
   name        = "group name"
   description = "this is a security group"
@@ -133,7 +133,7 @@ resource "numspot_route_table" "route_table" {
   routes = [
     {
       destination_ip_range = "0.0.0.0/0"
-      gateway_id           = numspot_internet_gateway.ig.id
+      gateway_id           = numspot_internet_gateway.internet-gateway.id
     }
   ]
 }
@@ -145,7 +145,7 @@ resource "numspot_vm" "vm" {
   subnet_id = numspot_subnet.subnet.id
 }
 
-resource "numspot_load_balancer" "lb" {
+resource "numspot_load_balancer" "load-balancer" {
   name = "elb-terraform-test-updated"
   listeners = [
     {
@@ -161,7 +161,7 @@ resource "numspot_load_balancer" "lb" {
   ]
 
   subnets         = [numspot_subnet.subnet.id]
-  security_groups = [numspot_security_group.sg.id]
+  security_groups = [numspot_security_group.security-group.id]
   backend_vm_ids  = [numspot_vm.vm.id]
 
   type = "internet-facing"
@@ -176,7 +176,7 @@ resource "numspot_load_balancer" "lb" {
     unhealthy_threshold = 5
   }
 
-  depends_on = [numspot_internet_gateway.ig]
+  depends_on = [numspot_internet_gateway.internet-gateway]
 }
 ```
 

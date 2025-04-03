@@ -116,6 +116,17 @@ func FromStringListPointerToTfStringList(ctx context.Context, arr *[]string, dia
 	return listValue
 }
 
+func FromStringListToTfStringList(ctx context.Context, arr []string, diags *diag.Diagnostics) types.List {
+	if arr == nil {
+		listValue, diagnostics := types.ListValueFrom(ctx, types.StringType, []string{})
+		diags.Append(diagnostics...)
+		return listValue
+	}
+	listValue, diagnostics := types.ListValueFrom(ctx, types.StringType, arr)
+	diags.Append(diagnostics...)
+	return listValue
+}
+
 func FromIntListPointerToTfInt64List(ctx context.Context, arr *[]int, diags *diag.Diagnostics) types.List {
 	if arr == nil {
 		listValue, diagnostics := types.ListValueFrom(ctx, types.Int64Type, []int{})
@@ -123,6 +134,17 @@ func FromIntListPointerToTfInt64List(ctx context.Context, arr *[]int, diags *dia
 		return listValue
 	}
 	listValue, diagnostics := types.ListValueFrom(ctx, types.Int64Type, *arr)
+	diags.Append(diagnostics...)
+	return listValue
+}
+
+func FromIntListToTfInt64List(ctx context.Context, arr []int, diags *diag.Diagnostics) types.List {
+	if arr == nil {
+		listValue, diagnostics := types.ListValueFrom(ctx, types.Int64Type, []int{})
+		diags.Append(diagnostics...)
+		return listValue
+	}
+	listValue, diagnostics := types.ListValueFrom(ctx, types.Int64Type, arr)
 	diags.Append(diagnostics...)
 	return listValue
 }

@@ -1,0 +1,62 @@
+{
+	"datasources": [
+		{
+			"name": "managed_service_bridges",
+			"schema": {
+				"attributes": [
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed"
+										}
+									}
+								]
+							},
+							"description": "List of bridges."
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "managed_service_bridges",
+			"schema": {
+				"attributes": [
+					{
+						"name": "destination_managed_service_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Managed service destination identifier"
+						}
+					},
+					{
+						"name": "source_managed_service_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Managed service source identifier"
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The bridge identifier"
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

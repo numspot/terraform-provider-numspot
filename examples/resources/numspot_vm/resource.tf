@@ -8,7 +8,7 @@ resource "numspot_subnet" "subnet" {
   availability_zone_name = "eu-west-2a"
 }
 
-resource "numspot_security_group" "sg" {
+resource "numspot_security_group" "security-group" {
   vpc_id      = numspot_vpc.vpc.id
   name        = "terraform-vm-tests-sg-name"
   description = "terraform-vm-tests-sg-description"
@@ -23,29 +23,29 @@ resource "numspot_security_group" "sg" {
   ]
 }
 
-resource "numspot_internet_gateway" "igw" {
-  vpc_id = numspot_vpc.net.id
+resource "numspot_internet_gateway" "internet-gateway" {
+  vpc_id = numspot_vpc.vpc.id
 }
 
-resource "numspot_route_table" "rt" {
+resource "numspot_route_table" "route-table" {
   vpc_id    = numspot_vpc.vpc.id
   subnet_id = numspot_subnet.subnet.id
 
   routes = [
     {
       destination_ip_range = "0.0.0.0/0"
-      gateway_id           = numspot_internet_gateway.igw.id
+      gateway_id           = numspot_internet_gateway.internet-gateway.id
     }
   ]
 }
 
 resource "numspot_public_ip" "public_ip" {
   vm_id      = numspot_vm.vm.id
-  depends_on = [numspot_route_table.rt]
+  depends_on = [numspot_route_table.route-table]
 }
 
 resource "numspot_vm" "vm" {
-  image_id                       = "ami-0987a84b"
+  image_id                       = "image-id"
   type                           = "ns-eco6-2c8r"
   vm_initiated_shutdown_behavior = "stop"
 
@@ -55,7 +55,7 @@ resource "numspot_vm" "vm" {
   }
 
   subnet_id          = numspot_subnet.subnet.id
-  security_group_ids = [numspot_security_group.sg.id]
+  security_group_ids = [numspot_security_group.security-group.id]
 
   tags = [
     {

@@ -1,3 +1,7 @@
+// Package vpc provides the implementation of the VPC (Virtual Private Cloud) resource
+// for the NumSpot provider. It handles the creation, reading, updating, and deletion
+// of VPCs in NumSpot, including managing VPC attributes such as IP ranges, tenancy,
+// DHCP options, and tags.
 package vpc
 
 import (
@@ -22,14 +26,21 @@ var (
 	_ resource.ResourceWithImportState = &Resource{}
 )
 
+// Resource represents the VPC resource implementation.
+// It implements the Terraform resource.Resource interface and provides
+// CRUD operations for VPCs in NumSpot.
 type Resource struct {
 	provider *client.NumSpotSDK
 }
 
+// NewNetResource creates a new instance of the VPC resource.
+// This is the factory function used by the provider to create new VPC resource instances.
 func NewNetResource() resource.Resource {
 	return &Resource{}
 }
 
+// Configure implements the resource.ResourceWithConfigure interface.
+// It configures the resource with the provider's SDK client.
 func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
@@ -48,18 +59,31 @@ func (r *Resource) Configure(_ context.Context, request resource.ConfigureReques
 	r.provider = provider
 }
 
+// ImportState implements the resource.ResourceWithImportState interface.
+// It allows importing existing VPCs into Terraform state using their ID.
 func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
+// Metadata implements the resource.Resource interface.
+// It sets the resource type name for the VPC resource.
 func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_vpc"
 }
 
+// Schema implements the resource.Resource interface.
+// It defines the schema for the VPC resource, including all its attributes
+// and their types.
 func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_vpc.VpcResourceSchema(ctx)
 }
 
+// Create implements the resource.Resource interface.
+// It creates a new VPC in NumSpot with the specified configuration.
+// The function handles:
+// - Setting up the VPC with the specified IP range and tenancy
+// - Configuring DHCP options if specified
+// - Applying any provided tags
 func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_vpc.VpcModel
 
@@ -85,6 +109,10 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
+// Read implements the resource.Resource interface.
+// It reads the current state of an existing VPC from NumSpot.
+// The function retrieves all VPC attributes including its configuration,
+// DHCP options, and tags.
 func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_vpc.VpcModel
 
@@ -109,6 +137,10 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Update implements the resource.Resource interface.
+// It updates an existing VPC in NumSpot.
+// Currently, it only supports updating tags, as other VPC attributes
+// are immutable after creation.
 func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err         error
@@ -146,6 +178,10 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
+// Delete implements the resource.Resource interface.
+// It deletes an existing VPC from NumSpot.
+// The deletion is asynchronous and the function will wait for
+// the deletion to complete before returning.
 func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_vpc.VpcModel
 
@@ -160,6 +196,9 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
+// serializeVPC converts a NumSpot API VPC response into the Terraform
+// resource model. It handles all VPC attributes including DHCP options,
+// IP range, state, tenancy, and tags.
 func serializeVPC(ctx context.Context, http *api.Vpc, diags *diag.Diagnostics) resource_vpc.VpcModel {
 	var tagsTf types.List
 
@@ -177,6 +216,10 @@ func serializeVPC(ctx context.Context, http *api.Vpc, diags *diag.Diagnostics) r
 	}
 }
 
+// deserializeCreateVPCRequest converts the Terraform resource model
+// into the NumSpot API request format for VPC creation.
+// It handles the required fields for VPC creation including IP range
+// and tenancy configuration.
 func deserializeCreateVPCRequest(tf resource_vpc.VpcModel) api.CreateVpcJSONRequestBody {
 	return api.CreateVpcJSONRequestBody{
 		IpRange: tf.IpRange.ValueString(),

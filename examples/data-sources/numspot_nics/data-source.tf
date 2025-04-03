@@ -8,17 +8,17 @@ resource "numspot_subnet" "subnet" {
 }
 
 
-resource "numspot_nic" "test" {
+resource "numspot_nic" "nic" {
   subnet_id = numspot_subnet.subnet.id
 }
 
-data "numspot_nics" "testdata" {
-  ids = [numspot_nic.test.id]
+data "numspot_nics" "datasource-nic" {
+  ids = [numspot_nic.nic.id]
 }
 
 # How to use the datasource in another field
 resource "null_resource" "print-datasource-id" {
   provisioner "local-exec" {
-    command = "echo data.numspot_nics.testdata.items.0.id"
+    command = "echo data.numspot_nics.datasource-nic.items.0.id"
   }
 }

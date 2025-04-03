@@ -25,7 +25,7 @@ func (d *servercertificateDataSource) Configure(_ context.Context, request datas
 	provider, ok := request.ProviderData.(*client.NumSpotSDK)
 	if !ok {
 		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
+			"Unexpected Datasource Configure Type",
 			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
 		)
 

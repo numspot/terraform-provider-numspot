@@ -13,12 +13,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/services/bucket"
+	"terraform-provider-numspot/internal/services/clientgateway"
+	"terraform-provider-numspot/internal/services/computebridge"
 	"terraform-provider-numspot/internal/services/dhcpoptions"
 	"terraform-provider-numspot/internal/services/flexiblegpu"
+	"terraform-provider-numspot/internal/services/hybridbridge"
 	"terraform-provider-numspot/internal/services/image"
 	"terraform-provider-numspot/internal/services/internetgateway"
 	"terraform-provider-numspot/internal/services/keypair"
 	"terraform-provider-numspot/internal/services/loadbalancer"
+	"terraform-provider-numspot/internal/services/managedservicebridge"
 	"terraform-provider-numspot/internal/services/natgateway"
 	"terraform-provider-numspot/internal/services/nic"
 	"terraform-provider-numspot/internal/services/publicip"
@@ -27,9 +31,11 @@ import (
 	"terraform-provider-numspot/internal/services/servercertificate"
 	"terraform-provider-numspot/internal/services/snapshot"
 	"terraform-provider-numspot/internal/services/subnet"
+	"terraform-provider-numspot/internal/services/virtualgateway"
 	"terraform-provider-numspot/internal/services/vm"
 	"terraform-provider-numspot/internal/services/volume"
 	"terraform-provider-numspot/internal/services/vpc"
+	"terraform-provider-numspot/internal/services/vpnconnection"
 )
 
 type NumspotProviderModel struct {
@@ -219,6 +225,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	if p.httpClient != nil {
 		options = append(options, client.WithHTTPClient(p.httpClient))
 	}
+
 	numSpotSDK, err := client.NewNumSpotSDK(ctx, options...)
 	if err != nil {
 		resp.Diagnostics.AddError("Error initializing Numspot SDK", err.Error())
@@ -253,6 +260,12 @@ func (p *numspotProvider) DataSources(_ context.Context) []func() datasource.Dat
 		flexiblegpu.NewFlexibleGpusDataSource,
 		bucket.NewBucketsDataSource,
 		servercertificate.NewServerCertificateDataSource,
+		clientgateway.NewClientGatewaysDataSource,
+		virtualgateway.NewVirtualGatewaysDataSource,
+		vpnconnection.NewVpnConnectionsDataSource,
+		computebridge.NewComputeBridgeDataSource,
+		hybridbridge.NewHybridBridgeDataSource,
+		managedservicebridge.NewManagedServiceBridgeDataSource,
 	}
 }
 
@@ -276,5 +289,11 @@ func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resourc
 		dhcpoptions.NewDhcpOptionsResource,
 		servercertificate.NewServerCertificateResource,
 		bucket.NewBucketResource,
+		clientgateway.NewClientGatewayResource,
+		virtualgateway.NewVirtualGatewayResource,
+		vpnconnection.NewVpnConnectionResource,
+		computebridge.NewComputeBridgeResource,
+		hybridbridge.NewHybridBridgeResource,
+		managedservicebridge.NewManagedServiceBridgeResource,
 	}
 }
