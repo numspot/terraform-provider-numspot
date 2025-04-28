@@ -2,7 +2,6 @@ package publicip
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -11,56 +10,48 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/publicip/resource_public_ip"
 	"terraform-provider-numspot/internal/services/tags"
 	"terraform-provider-numspot/internal/utils"
 )
 
 var (
-	_ resource.Resource                = &Resource{}
-	_ resource.ResourceWithConfigure   = &Resource{}
-	_ resource.ResourceWithImportState = &Resource{}
+	_ resource.Resource                = &publicIpResource{}
+	_ resource.ResourceWithConfigure   = &publicIpResource{}
+	_ resource.ResourceWithImportState = &publicIpResource{}
 )
 
-type Resource struct {
+type publicIpResource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewPublicIpResource() resource.Resource {
-	return &Resource{}
+	return &publicIpResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *publicIpResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
 	if request.ProviderData == nil {
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = provider
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *publicIpResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *publicIpResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_public_ip"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *publicIpResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_public_ip.PublicIpResourceSchema(ctx)
 }
 
-func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *publicIpResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_public_ip.PublicIpModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -86,7 +77,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *publicIpResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_public_ip.PublicIpModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -110,7 +101,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, newState)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *publicIpResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var plan, state resource_public_ip.PublicIpModel
 	var numSpotPublicIp *api.PublicIp
 	var err error
@@ -144,7 +135,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *publicIpResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_public_ip.PublicIpModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 

@@ -2,7 +2,6 @@ package vpnconnection
 
 import (
 	"context"
-	"fmt"
 	"slices"
 
 	"github.com/google/uuid"
@@ -14,55 +13,46 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/vpnconnection/resource_vpn_connection"
 	"terraform-provider-numspot/internal/utils"
 )
 
 var (
-	_ resource.Resource                = &Resource{}
-	_ resource.ResourceWithConfigure   = &Resource{}
-	_ resource.ResourceWithImportState = &Resource{}
+	_ resource.Resource                = &vpnConnectionResource{}
+	_ resource.ResourceWithConfigure   = &vpnConnectionResource{}
+	_ resource.ResourceWithImportState = &vpnConnectionResource{}
 )
 
-type Resource struct {
+type vpnConnectionResource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewVpnConnectionResource() resource.Resource {
-	return &Resource{}
+	return &vpnConnectionResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *vpnConnectionResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
 
-	numSpotClient, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = numSpotClient
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *vpnConnectionResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *vpnConnectionResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_vpn_connection"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *vpnConnectionResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_vpn_connection.VpnConnectionResourceSchema(ctx)
 }
 
-func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *vpnConnectionResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -88,7 +78,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *vpnConnectionResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -115,7 +105,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, newState)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *vpnConnectionResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var state, plan resource_vpn_connection.VpnConnectionModel
 	var vpnConnection *api.VPNConnection
 	var err error
@@ -159,7 +149,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *vpnConnectionResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -195,31 +185,6 @@ func deserializeCreateVpnConnection(tf resource_vpn_connection.VpnConnectionMode
 		VirtualGatewayId: uuid.MustParse(tf.VirtualGatewayId.ValueString()),
 	}
 }
-
-//func deserializeUpdateVpnOptions(ctx context.Context, tf resource_vpn_connection.VpnConnectionModel) *api.VpnOptionsToUpdate {
-//	var vpnOptions *api.VpnOptionsToUpdate
-//
-//	phase2Options := deserializeUpdatePhase2Options(ctx, tf.VpnOptions)
-//	if phase2Options != nil || tf.VpnOptions.TunnelInsideIpRange.ValueStringPointer() != nil {
-//		vpnOptions = &api.VpnOptionsToUpdate{}
-//		vpnOptions.Phase2Options = phase2Options
-//		vpnOptions.TunnelInsideIpRange = tf.VpnOptions.TunnelInsideIpRange.ValueStringPointer()
-//	}
-//
-//	return vpnOptions
-//}
-
-//func deserializeUpdatePhase2Options(ctx context.Context, vpnOptions resource_vpn_connection.VpnOptionsValue) *api.Phase2OptionsToUpdate {
-//	attrtypes := vpnOptions.Phase2options.AttributeTypes(ctx)
-//	attrVals := vpnOptions.Phase2options.Attributes()
-//
-//	phase2OptionsTf, diagnostics := resource_vpn_connection.NewPhase2optionsValue(attrtypes, attrVals)
-//	if diagnostics.HasError() {
-//		return &api.Phase2OptionsToUpdate{}
-//	}
-//
-//	return &api.Phase2OptionsToUpdate{PreSharedKey: phase2OptionsTf.PreSharedKey.ValueStringPointer()}
-//}
 
 func deserializeCreateRoutes(tfRoutes []resource_vpn_connection.RoutesValue) []api.CreateVPNConnectionRoute {
 	routes := make([]api.CreateVPNConnectionRoute, len(tfRoutes))
@@ -303,7 +268,6 @@ func serializeVpnOptions(ctx context.Context, elt *api.VpnOptions, diags *diag.D
 		})
 	diags.Append(diagnostics...)
 
-	// if elt.Phase1Options != nil {
 	phase1Options := serializePhase1Options(ctx, &elt.Phase1Options, diags)
 	if diags.HasError() {
 		return resource_vpn_connection.VpnOptionsValue{}
@@ -312,15 +276,12 @@ func serializeVpnOptions(ctx context.Context, elt *api.VpnOptions, diags *diag.D
 	diags.Append(diagnostics...)
 
 	vpnOptions.Phase1options = ph1OptsObj
-	//}
 
-	// if elt.Phase2Options != nil {
 	phase2Options := serializePhase2Options(ctx, &elt.Phase2Options, diags)
 	ph2OptsObj, diagnostics := phase2Options.ToObjectValue(ctx)
 	diags.Append(diagnostics...)
 
 	vpnOptions.Phase2options = ph2OptsObj
-	//}
 
 	return vpnOptions
 }

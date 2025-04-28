@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/flexiblegpu/resource_flexible_gpu"
 	"terraform-provider-numspot/internal/utils"
 )
@@ -33,17 +34,7 @@ func (r *Resource) Configure(_ context.Context, request resource.ConfigureReques
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = provider
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
 func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
@@ -135,7 +126,6 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 		return
 	}
 
-	// Retries create until request response is OK
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
 		r.provider.SpaceID,
@@ -148,7 +138,6 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 
 	createdId := *res.JSON201.Id
 
-	// Link GPU to VM
 	if !(data.VmId.IsNull() || data.VmId.IsUnknown()) {
 		r.linkVm(ctx, createdId, data, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
@@ -229,6 +218,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 		return
 	}
 
+	// Handle changes in VM association
 	if plan.VmId.ValueString() != state.VmId.ValueString() {
 		if state.VmId.IsNull() || state.VmId.IsUnknown() { // If GPU is not linked to any VM, we want to link it
 			r.linkVm(ctx, state.Id.ValueString(), plan, &response.Diagnostics)
@@ -277,6 +267,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 		}
 	}
 
+	// Update delete_on_vm_deletion flag if changed
 	if plan.DeleteOnVmDeletion != state.DeleteOnVmDeletion {
 		body := deserializeUpdateFlexibleGPU(&plan)
 
@@ -314,6 +305,7 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 		return
 	}
 
+	// Unlink GPU from VM if it's attached
 	if !(data.VmId.IsNull() || data.VmId.IsUnknown()) {
 		var diagnostics diag.Diagnostics // Use a temporary diag because some errors might be ok here
 		r.unlinkVm(ctx, data.Id.ValueString(), data, &diagnostics)

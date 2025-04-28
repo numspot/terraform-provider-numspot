@@ -2,7 +2,6 @@ package vpnconnection
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -11,6 +10,7 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/vpnconnection/datasource_vpn_connection"
 	"terraform-provider-numspot/internal/utils"
 )
@@ -20,43 +20,45 @@ var (
 	_ datasource.DataSource = &vpnConnectionsDataSource{}
 )
 
-func (d *vpnConnectionsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
-}
-
-func NewVpnConnectionsDataSource() datasource.DataSource {
-	return &vpnConnectionsDataSource{}
-}
-
+// vpnConnectionsDataSource represents the VPN Connection data source implementation.
+// It implements the Terraform datasource.DataSource interface and provides
+// read operations for VPN Connections in NumSpot.
 type vpnConnectionsDataSource struct {
 	provider *client.NumSpotSDK
 }
 
-// Metadata returns the data source type name.
+// NewVpnConnectionsDataSource creates a new instance of the VPN Connection data source.
+// This is the factory function used by the provider to create new VPN Connection data source instances.
+func NewVpnConnectionsDataSource() datasource.DataSource {
+	return &vpnConnectionsDataSource{}
+}
+
+// Configure implements the datasource.DataSource interface.
+// It configures the data source with the provider's SDK client.
+func (d *vpnConnectionsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if request.ProviderData == nil {
+		return
+	}
+
+	d.provider = services.ConfigureProviderDatasource(request, response)
+}
+
+// Metadata implements the datasource.DataSource interface.
+// It sets the data source type name for the VPN Connection data source.
 func (d *vpnConnectionsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_vpn_connections"
 }
 
-// Schema defines the schema for the data source.
+// Schema implements the datasource.DataSource interface.
+// It defines the schema for the VPN Connection data source, including all its attributes
+// and their types.
 func (d *vpnConnectionsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_vpn_connection.VpnConnectionDataSourceSchema(ctx)
 }
 
-// Read refreshes the Terraform state with the latest data.
+// Read implements the datasource.DataSource interface.
+// It reads the current state of VPN Connections from NumSpot.
 func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)

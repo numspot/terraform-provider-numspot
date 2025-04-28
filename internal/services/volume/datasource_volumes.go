@@ -2,7 +2,6 @@ package volume
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -12,52 +11,64 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/volume/datasource_volume"
 	"terraform-provider-numspot/internal/utils"
 )
+
+// Package volume provides the implementation of the Volumes data source
+// for the NumSpot provider. It handles reading and listing volumes from NumSpot,
+// including managing volume attributes such as size, type, state, and tags.
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
 	_ datasource.DataSource = &volumesDataSource{}
 )
 
-func (d *volumesDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
-}
-
-func NewVolumesDataSource() datasource.DataSource {
-	return &volumesDataSource{}
-}
-
+// volumesDataSource represents the Volumes data source implementation.
+// It implements the Terraform datasource.DataSource interface and provides
+// read operations for volumes in NumSpot.
 type volumesDataSource struct {
 	provider *client.NumSpotSDK
 }
 
-// Metadata returns the data source type name.
+// NewVolumesDataSource creates a new instance of the Volumes data source.
+// This is the factory function used by the provider to create new volume data source instances.
+func NewVolumesDataSource() datasource.DataSource {
+	return &volumesDataSource{}
+}
+
+// Configure implements the datasource.DataSource interface.
+// It configures the data source with the provider's SDK client.
+func (d *volumesDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if request.ProviderData == nil {
+		return
+	}
+
+	d.provider = services.ConfigureProviderDatasource(request, response)
+}
+
+// Metadata implements the datasource.DataSource interface.
+// It sets the data source type name for the Volumes data source.
 func (d *volumesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_volumes"
 }
 
-// Schema defines the schema for the data source.
+// Schema implements the datasource.DataSource interface.
+// It defines the schema for the Volumes data source, including all its attributes
+// and their types.
 func (d *volumesDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_volume.VolumeDataSourceSchema(ctx)
 }
 
-// Read refreshes the Terraform state with the latest data.
+// Read implements the datasource.DataSource interface.
+// It reads the current state of volumes from NumSpot based on the provided filters.
+// The function handles:
+// - Converting Terraform configuration to NumSpot API parameters
+// - Querying volumes from NumSpot
+// - Converting the API response to Terraform state format
+// - Updating the Terraform state with the retrieved data
 func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_volume.VolumeModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
@@ -91,6 +102,15 @@ func (d *volumesDataSource) Read(ctx context.Context, request datasource.ReadReq
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
+// deserializeVolumeParams converts the Terraform data source model
+// into the NumSpot API parameters format for querying volumes.
+// It handles all filter parameters including:
+// - Volume IDs and types
+// - Creation dates
+// - Volume sizes
+// - Link volume parameters
+// - Snapshot IDs
+// - Availability zones
 func deserializeVolumeParams(ctx context.Context, tf datasource_volume.VolumeModel, diags *diag.Diagnostics) api.ReadVolumesParams {
 	var creationDatesPtr *[]time.Time
 	var linkVolumeLinkDatesPtr *[]time.Time
@@ -127,6 +147,12 @@ func deserializeVolumeParams(ctx context.Context, tf datasource_volume.VolumeMod
 	}
 }
 
+// mappingItemsValue converts a NumSpot API volume response into the Terraform
+// data source model. It handles all volume attributes including:
+// - Basic attributes (ID, size, type, state, etc.)
+// - IOPS configuration
+// - Linked volumes
+// - Tags
 func mappingItemsValue(ctx context.Context, volume api.Volume, diags *diag.Diagnostics) (datasource_volume.ItemsValue, diag.Diagnostics) {
 	tagsList := types.ListNull(datasource_volume.ItemsValue{}.Type(ctx))
 	linkedVolumesList := types.List{}
@@ -165,6 +191,8 @@ func mappingItemsValue(ctx context.Context, volume api.Volume, diags *diag.Diagn
 	})
 }
 
+// mappingTags converts a NumSpot API tag response into the Terraform
+// data source tag model.
 func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_volume.TagsValue, diag.Diagnostics) {
 	return datasource_volume.NewTagsValue(datasource_volume.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"key":   types.StringValue(tag.Key),
@@ -172,6 +200,12 @@ func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_volume.Ta
 	})
 }
 
+// mappingLinkedVolumes converts NumSpot API linked volume data into the Terraform
+// data source linked volume model. It handles:
+// - Volume attachment attributes
+// - Device names
+// - VM associations
+// - Deletion policies
 func mappingLinkedVolumes(ctx context.Context, volumes api.Volume, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
 	ll := len(*volumes.LinkedVolumes)
 	elementValue := make([]datasource_volume.LinkedVolumesValue, ll)

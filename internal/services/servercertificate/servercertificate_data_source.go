@@ -2,7 +2,6 @@ package servercertificate
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -11,6 +10,7 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/servercertificate/datasource_server_certificate"
 	"terraform-provider-numspot/internal/utils"
 )
@@ -22,17 +22,7 @@ func (d *servercertificateDataSource) Configure(_ context.Context, request datas
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
+	d.provider = services.ConfigureProviderDatasource(request, response)
 }
 
 func NewServerCertificateDataSource() datasource.DataSource {

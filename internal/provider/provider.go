@@ -121,6 +121,36 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 	}
 
+	if config.NumSpotHost.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("numspot_host"),
+			"Unknown Numspot API Host",
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the NumSpot host. "+
+				"Set the host value in the configuration or use the NUMSPOT_HOST environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
+	if config.NumSpotHostOs.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("numspot_host_os"),
+			"Missing Numspot API Host Object Storage",
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the NumSpot object storage host. "+
+				"Set the host value in the configuration or use the NUMSPOT_HOST_OS environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
+	if config.SpaceId.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("space_id"),
+			"Missing Numspot Space ID",
+			"The provider cannot create the Numspot API provider as there is a missing or empty value for the Numspot Space ID. "+
+				"Set the space_id value in the configuration or use the NUMSPOT_SPACE_ID environment variable. "+
+				"If either is already set, ensure the value is not empty.",
+		)
+	}
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -196,7 +226,7 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	}
 
 	if numSpotHostOs == "" {
-		resp.Diagnostics.AddAttributeWarning(
+		resp.Diagnostics.AddAttributeError(
 			path.Root("numspot_host_os"),
 			"Missing Numspot API Host Object Storage",
 			"The provider cannot create the Numspot API provider as there is a missing or empty value for the NumSpot object storage host. "+
@@ -212,11 +242,12 @@ func (p *numspotProvider) Configure(ctx context.Context, req provider.ConfigureR
 	config.NumSpotHost = types.StringValue(numSpotHost)
 	config.ClientId = types.StringValue(clientID)
 	config.ClientSecret = types.StringValue(clientSecret)
+	config.SpaceId = types.StringValue(spaceId)
 	config.NumSpotHostOs = types.StringValue(numSpotHostOs)
 
 	options := []client.Option{
 		client.WithHost(config.NumSpotHost.ValueString()),
-		client.WithSpaceID(spaceId),
+		client.WithSpaceID(config.SpaceId.ValueString()),
 		client.WithClientID(config.ClientId.ValueString()),
 		client.WithClientSecret(config.ClientSecret.ValueString()),
 		client.WithHostOs(config.NumSpotHostOs.ValueString()),
@@ -276,7 +307,7 @@ func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resourc
 		internetgateway.NewInternetGatewayResource,
 		loadbalancer.NewLoadBalancerResource,
 		natgateway.NewNatGatewayResource,
-		vpc.NewNetResource,
+		vpc.NewVPCResource,
 		nic.NewNicResource,
 		publicip.NewPublicIpResource,
 		routetable.NewRouteTableResource,

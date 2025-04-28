@@ -2,7 +2,6 @@ package bucket
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/resourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -10,54 +9,45 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/bucket/resource_bucket"
 )
 
 var (
-	_ resource.Resource                = &Resource{}
-	_ resource.ResourceWithConfigure   = &Resource{}
-	_ resource.ResourceWithImportState = &Resource{}
+	_ resource.Resource                = &bucketResource{}
+	_ resource.ResourceWithConfigure   = &bucketResource{}
+	_ resource.ResourceWithImportState = &bucketResource{}
 )
 
-type Resource struct {
+type bucketResource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewBucketResource() resource.Resource {
-	return &Resource{}
+	return &bucketResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *bucketResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = provider
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *bucketResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("name"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *bucketResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_bucket"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *bucketResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_bucket.BucketResourceSchema(ctx)
 }
 
-func (r *Resource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
+func (r *bucketResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
 	return []resource.ConfigValidator{
 		resourcevalidator.AtLeastOneOf(
 			path.Root("name").Expression(),
@@ -65,7 +55,7 @@ func (r *Resource) ConfigValidators(_ context.Context) []resource.ConfigValidato
 	}
 }
 
-func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, response *resource.CreateResponse) {
+func (r *bucketResource) Create(ctx context.Context, req resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_bucket.BucketModel
 
 	response.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
@@ -86,7 +76,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, response *resource.ReadResponse) {
+func (r *bucketResource) Read(ctx context.Context, req resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_bucket.BucketModel
 
 	response.Diagnostics.Append(req.State.Get(ctx, &state)...)
@@ -106,10 +96,10 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, response 
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *bucketResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *bucketResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_bucket.BucketModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)

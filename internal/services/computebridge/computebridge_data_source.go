@@ -2,7 +2,6 @@ package computebridge
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -11,10 +10,15 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/computebridge/datasource_compute_bridge"
 )
 
 var _ datasource.DataSource = &computeBridgeDataSource{}
+
+type computeBridgeDataSource struct {
+	provider *client.NumSpotSDK
+}
 
 func NewComputeBridgeDataSource() datasource.DataSource {
 	return &computeBridgeDataSource{}
@@ -25,21 +29,7 @@ func (d *computeBridgeDataSource) Configure(_ context.Context, request datasourc
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
-}
-
-type computeBridgeDataSource struct {
-	provider *client.NumSpotSDK
+	d.provider = services.ConfigureProviderDatasource(request, response)
 }
 
 func (d *computeBridgeDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {

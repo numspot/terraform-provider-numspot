@@ -13,56 +13,64 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/tags"
 	"terraform-provider-numspot/internal/services/volume/resource_volume"
 	"terraform-provider-numspot/internal/utils"
 )
 
 var (
-	_ resource.Resource                = &Resource{}
-	_ resource.ResourceWithConfigure   = &Resource{}
-	_ resource.ResourceWithImportState = &Resource{}
+	_ resource.Resource                = &volumeResource{}
+	_ resource.ResourceWithConfigure   = &volumeResource{}
+	_ resource.ResourceWithImportState = &volumeResource{}
 )
 
-type Resource struct {
+// Package volume provides the implementation of the Volume resource
+// for the NumSpot provider. It handles the creation, reading, updating, and
+// deletion of volumes, along with their attachment to VMs and management
+// of volume attributes like size, type, and IOPS.
+
+// volumeResource represents the Volume resource implementation.
+// It implements the Terraform resource.Resource interface and provides
+// methods for managing the lifecycle of volumes.
+type volumeResource struct {
 	provider *client.NumSpotSDK
 }
 
+// NewVolumeResource creates a new instance of the Volume resource.
 func NewVolumeResource() resource.Resource {
-	return &Resource{}
+	return &volumeResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+// Configure sets up the provider client for the Volume resource.
+func (r *volumeResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
 	if request.ProviderData == nil {
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = provider
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+// ImportState handles importing an existing Volume into Terraform state.
+func (r *volumeResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+// Metadata sets the resource type name for the Volume resource.
+func (r *volumeResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_volume"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+// Schema returns the Terraform schema for the Volume resource.
+func (r *volumeResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_volume.VolumeResourceSchema(ctx)
 }
 
-func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+// Create handles the creation of a new Volume.
+// It deserializes the plan into a NumSpot Volume creation request,
+// creates the Volume, and updates the state with the created Volume's details.
+func (r *volumeResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_volume.VolumeModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -87,7 +95,8 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+// Read retrieves the current state of a Volume and updates the Terraform state.
+func (r *volumeResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_volume.VolumeModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -110,7 +119,14 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+// Update handles updates to an existing Volume.
+// It supports updating various Volume attributes including:
+// - Size (with downsize protection)
+// - Type
+// - IOPS
+// - VM attachment
+// - Tags
+func (r *volumeResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err           error
 		numSpotVolume *api.Volume
@@ -171,7 +187,8 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+// Delete handles the deletion of a Volume.
+func (r *volumeResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_volume.VolumeModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -185,6 +202,12 @@ func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, r
 	}
 }
 
+// serializeNumSpotVolume converts NumSpot API Volume data to Terraform Volume model.
+// It handles the conversion of all Volume attributes including:
+// - Basic Volume information
+// - Linked volumes
+// - VM attachments
+// - Tags
 func serializeNumSpotVolume(ctx context.Context, http *api.Volume, diags *diag.Diagnostics, ReplaceVolumeOnDownsize basetypes.BoolValue) resource_volume.VolumeModel {
 	var (
 		volumes = types.ListNull(resource_volume.LinkedVolumesValue{}.Type(ctx))
@@ -232,6 +255,7 @@ func serializeNumSpotVolume(ctx context.Context, http *api.Volume, diags *diag.D
 	}
 }
 
+// serializeLinkedVolumes converts NumSpot API LinkedVolume data to Terraform model.
 func serializeLinkedVolumes(ctx context.Context, http api.LinkedVolume, diags *diag.Diagnostics) resource_volume.LinkedVolumesValue {
 	value, diagnostics := resource_volume.NewLinkedVolumesValue(
 		resource_volume.LinkedVolumesValue{}.AttributeTypes(ctx),
@@ -246,6 +270,12 @@ func serializeLinkedVolumes(ctx context.Context, http api.LinkedVolume, diags *d
 	return value
 }
 
+// deserializeCreateNumSpotVolume converts Terraform Volume model to NumSpot API request.
+// It handles the conversion of Volume creation attributes including:
+// - Size
+// - Type
+// - IOPS
+// - Snapshot ID
 func deserializeCreateNumSpotVolume(tf resource_volume.VolumeModel) api.CreateVolumeJSONRequestBody {
 	var (
 		httpIOPS   *int
@@ -267,6 +297,7 @@ func deserializeCreateNumSpotVolume(tf resource_volume.VolumeModel) api.CreateVo
 	}
 }
 
+// deserializeUpdateNumspotVolume converts Terraform Volume model to NumSpot API update request.
 func deserializeUpdateNumspotVolume(tf resource_volume.VolumeModel) api.UpdateVolumeJSONRequestBody {
 	var httpIOPS *int
 	if !tf.Iops.IsUnknown() && !tf.Iops.IsNull() {
@@ -280,6 +311,7 @@ func deserializeUpdateNumspotVolume(tf resource_volume.VolumeModel) api.UpdateVo
 	}
 }
 
+// volumeTags converts Terraform tags to NumSpot API format.
 func volumeTags(ctx context.Context, tags types.List) []api.ResourceTag {
 	tfTags := make([]resource_volume.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)

@@ -2,7 +2,6 @@ package bucket
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -11,51 +10,37 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/bucket/datasource_bucket"
 )
 
-// Ensure the implementation satisfies the expected interfaces.
-var (
-	_ datasource.DataSource = &bucketsDataSource{}
-)
+var _ datasource.DataSource = &bucketsDataSource{}
 
-func (d *bucketsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
+type bucketsDataSource struct {
+	provider *client.NumSpotSDK
 }
 
 func NewBucketsDataSource() datasource.DataSource {
 	return &bucketsDataSource{}
 }
 
-type bucketsDataSource struct {
-	provider *client.NumSpotSDK
+func (d *bucketsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if request.ProviderData == nil {
+		return
+	}
+
+	d.provider = services.ConfigureProviderDatasource(request, response)
 }
 
-// Metadata returns the data source type name.
 func (d *bucketsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_buckets"
 }
 
-// Schema defines the schema for the data source.
 func (d *bucketsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_bucket.BucketDataSourceSchema(ctx)
 }
 
-// Read refreshes the Terraform state with the latest data.
 func (d *bucketsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_bucket.BucketModel
 

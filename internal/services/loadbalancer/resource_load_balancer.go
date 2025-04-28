@@ -2,7 +2,6 @@ package loadbalancer
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -12,56 +11,48 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/loadbalancer/resource_load_balancer"
 	"terraform-provider-numspot/internal/services/tags"
 	"terraform-provider-numspot/internal/utils"
 )
 
 var (
-	_ resource.Resource                = &Resource{}
-	_ resource.ResourceWithConfigure   = &Resource{}
-	_ resource.ResourceWithImportState = &Resource{}
+	_ resource.Resource                = &loadBalancerResource{}
+	_ resource.ResourceWithConfigure   = &loadBalancerResource{}
+	_ resource.ResourceWithImportState = &loadBalancerResource{}
 )
 
-type Resource struct {
+type loadBalancerResource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewLoadBalancerResource() resource.Resource {
-	return &Resource{}
+	return &loadBalancerResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *loadBalancerResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
 	if request.ProviderData == nil {
 		return
 	}
 
-	numSpotClient, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = numSpotClient
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *loadBalancerResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("name"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *loadBalancerResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_load_balancer"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *loadBalancerResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_load_balancer.LoadBalancerResourceSchema(ctx)
 }
 
-func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *loadBalancerResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_load_balancer.LoadBalancerModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -103,7 +94,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *loadBalancerResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_load_balancer.LoadBalancerModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -127,7 +118,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *loadBalancerResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan         resource_load_balancer.LoadBalancerModel
 		numSpotLoadBalancer *api.LoadBalancer
@@ -212,7 +203,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *loadBalancerResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_load_balancer.LoadBalancerModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)

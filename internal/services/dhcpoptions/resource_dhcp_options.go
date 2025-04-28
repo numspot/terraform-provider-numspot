@@ -2,7 +2,6 @@ package dhcpoptions
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/resourcevalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -12,57 +11,48 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/dhcpoptions/resource_dhcp_options"
 	"terraform-provider-numspot/internal/services/tags"
 	"terraform-provider-numspot/internal/utils"
 )
 
 var (
-	_ resource.Resource                     = &Resource{}
-	_ resource.ResourceWithConfigure        = &Resource{}
-	_ resource.ResourceWithImportState      = &Resource{}
-	_ resource.ResourceWithConfigValidators = &Resource{}
+	_ resource.Resource                     = &dhcpOptionsResource{}
+	_ resource.ResourceWithConfigure        = &dhcpOptionsResource{}
+	_ resource.ResourceWithImportState      = &dhcpOptionsResource{}
+	_ resource.ResourceWithConfigValidators = &dhcpOptionsResource{}
 )
 
-type Resource struct {
+type dhcpOptionsResource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewDhcpOptionsResource() resource.Resource {
-	return &Resource{}
+	return &dhcpOptionsResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *dhcpOptionsResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = provider
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *dhcpOptionsResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *dhcpOptionsResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_dhcp_options"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *dhcpOptionsResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_dhcp_options.DhcpOptionsResourceSchema(ctx)
 }
 
-func (r *Resource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
+func (r *dhcpOptionsResource) ConfigValidators(_ context.Context) []resource.ConfigValidator {
 	return []resource.ConfigValidator{
 		resourcevalidator.AtLeastOneOf(
 			path.Root("domain_name").Expression(),
@@ -73,7 +63,7 @@ func (r *Resource) ConfigValidators(_ context.Context) []resource.ConfigValidato
 	}
 }
 
-func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *dhcpOptionsResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -96,7 +86,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *dhcpOptionsResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -119,7 +109,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *dhcpOptionsResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		err                error
 		numSpotDHCPOptions *api.DhcpOptionsSet
@@ -156,7 +146,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	}
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *dhcpOptionsResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_dhcp_options.DhcpOptionsModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {

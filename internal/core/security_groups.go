@@ -58,6 +58,10 @@ func CreateSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, paylo
 			Flow:  outboundRules.Flow,
 		},
 	); err != nil {
+		errDelete := DeleteSecurityGroup(ctx, provider, securityGroupID)
+		if errDelete != nil {
+			return nil, errDelete
+		}
 		return nil, err
 	}
 

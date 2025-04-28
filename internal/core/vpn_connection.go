@@ -44,7 +44,7 @@ func retryCreateVpnCondition(
 			time.Sleep(5 * time.Second)
 			_, err := RetryReadVpnConnection(ctx, provider, (*res.JSON201).Id.String())
 			if err != nil {
-				return retry.RetryableError(fmt.Errorf("error : retry timeout reached (%v). Error message : %v.", utils.TfRequestRetryTimeout, err))
+				return retry.RetryableError(fmt.Errorf("error : retry timeout reached (%v). Error message : %v", utils.TfRequestRetryTimeout, err))
 			} else {
 				return nil
 			}
@@ -181,7 +181,7 @@ func addRoutes(ctx context.Context, provider *client.NumSpotSDK, vpnID api.Resou
 
 		apiError := utils.HandleError(res.Body)
 		if apiError.Error() != "" {
-			return fmt.Errorf("Error while adding route %v : %v", route, apiError)
+			return fmt.Errorf("error while adding route %v : %v", route, apiError)
 		}
 	}
 	return nil
@@ -201,7 +201,7 @@ func deleteRoutes(ctx context.Context, provider *client.NumSpotSDK, vpnID api.Re
 
 		apiError := utils.HandleError(res.Body)
 		if apiError.Error() != "" {
-			return fmt.Errorf("Error while deleting route %v : %v", route, apiError)
+			return fmt.Errorf("error while deleting route %v : %v", route, apiError)
 		}
 	}
 	return nil

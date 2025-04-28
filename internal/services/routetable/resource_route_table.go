@@ -2,7 +2,6 @@ package routetable
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -12,56 +11,47 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/routetable/resource_route_table"
 	"terraform-provider-numspot/internal/services/tags"
 	"terraform-provider-numspot/internal/utils"
 )
 
 var (
-	_ resource.Resource                = &Resource{}
-	_ resource.ResourceWithConfigure   = &Resource{}
-	_ resource.ResourceWithImportState = &Resource{}
+	_ resource.Resource                = &routeTableResource{}
+	_ resource.ResourceWithConfigure   = &routeTableResource{}
+	_ resource.ResourceWithImportState = &routeTableResource{}
 )
 
-type Resource struct {
+type routeTableResource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewRouteTableResource() resource.Resource {
-	return &Resource{}
+	return &routeTableResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *routeTableResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
 
-	numSpotClient, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = numSpotClient
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *routeTableResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *routeTableResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_route_table"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *routeTableResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_route_table.RouteTableResourceSchema(ctx)
 }
 
-func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *routeTableResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_route_table.RouteTableModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -87,7 +77,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *routeTableResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_route_table.RouteTableModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -113,7 +103,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *routeTableResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan resource_route_table.RouteTableModel
 		routeTable  *api.RouteTable
@@ -157,7 +147,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &tf)...)
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *routeTableResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var data resource_route_table.RouteTableModel
 	response.Diagnostics.Append(request.State.Get(ctx, &data)...)
 
@@ -243,19 +233,16 @@ func serializeRouteTable(ctx context.Context, http *api.RouteTable, diags *diag.
 		}
 	}
 
-	// Routes
 	tfRoutes := utils.GenericSetToTfSetValue(ctx, serializeRoute, routes, diags)
 	if diags.HasError() {
 		return nil
 	}
 
-	// Links
 	tfLinks := utils.GenericListToTfListValue(ctx, serializeRouteTableLink, *http.LinkRouteTables, diags)
 	if diags.HasError() {
 		return nil
 	}
 
-	// Retrieve Subnet Id:
 	var subnetId *string
 	for _, assoc := range *http.LinkRouteTables {
 		if assoc.SubnetId != nil {

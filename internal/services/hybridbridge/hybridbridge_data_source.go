@@ -2,7 +2,6 @@ package hybridbridge
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -11,6 +10,7 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/hybridbridge/datasource_hybrid_bridge"
 )
 
@@ -25,17 +25,7 @@ func (d *hybridBridgeDataSource) Configure(_ context.Context, request datasource
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
+	d.provider = services.ConfigureProviderDatasource(request, response)
 }
 
 type hybridBridgeDataSource struct {
@@ -105,7 +95,6 @@ func serializeHybridBridges(ctx context.Context, hybridBridges []api.HybridBridg
 			if serializeDiags.HasError() {
 				diags.Append(serializeDiags...)
 			}
-
 		}
 	} else {
 		hybridBridgeList = types.ListNull(new(datasource_hybrid_bridge.ItemsValue).Type(ctx))

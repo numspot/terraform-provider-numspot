@@ -2,7 +2,6 @@ package image
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -13,56 +12,47 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/image/resource_image"
 	"terraform-provider-numspot/internal/services/tags"
 	"terraform-provider-numspot/internal/utils"
 )
 
 var (
-	_ resource.Resource                = &Resource{}
-	_ resource.ResourceWithConfigure   = &Resource{}
-	_ resource.ResourceWithImportState = &Resource{}
+	_ resource.Resource                = &imageResource{}
+	_ resource.ResourceWithConfigure   = &imageResource{}
+	_ resource.ResourceWithImportState = &imageResource{}
 )
 
-type Resource struct {
+type imageResource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewImageResource() resource.Resource {
-	return &Resource{}
+	return &imageResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *imageResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = provider
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *imageResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *imageResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_image"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *imageResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_image.ImageResourceSchema(ctx)
 }
 
-func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *imageResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_image.ImageModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
 	if response.Diagnostics.HasError() {
@@ -88,7 +78,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *imageResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_image.ImageModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -112,7 +102,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *imageResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan  resource_image.ImageModel
 		err          error
@@ -148,7 +138,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *imageResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_image.ImageModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -249,13 +239,11 @@ func serializeNumSpotImage(ctx context.Context, plan resource_image.ImageModel, 
 		tagsTf                types.List
 	)
 
-	// Creation Date
 	if image.CreationDate != nil {
 		date := *image.CreationDate
 		creationDateTf = types.StringValue(date.Format(time.RFC3339))
 	}
 
-	// Block Device Mapping
 	if image.BlockDeviceMappings != nil {
 		blockDeviceMappingsTf = utils.GenericListToTfListValue(
 			ctx,
@@ -270,7 +258,6 @@ func serializeNumSpotImage(ctx context.Context, plan resource_image.ImageModel, 
 		blockDeviceMappingsTf = types.ListNull(resource_image.BlockDeviceMappingsValue{}.Type(ctx))
 	}
 
-	// Product Codes
 	if image.ProductCodes != nil {
 		productCodesTf = utils.StringListToTfListValue(ctx, *image.ProductCodes, diags)
 		if diags.HasError() {
@@ -280,7 +267,6 @@ func serializeNumSpotImage(ctx context.Context, plan resource_image.ImageModel, 
 		productCodesTf = types.ListNull(types.StringType)
 	}
 
-	// State Comment
 	if image.StateComment != nil {
 		stateCommentTf = serializeStateComment(ctx, *image.StateComment, diags)
 		if diags.HasError() {
@@ -290,7 +276,6 @@ func serializeNumSpotImage(ctx context.Context, plan resource_image.ImageModel, 
 		stateCommentTf = resource_image.NewStateCommentValueNull()
 	}
 
-	// Tags
 	if image.Tags != nil {
 		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *image.Tags, diags)
 		if diags.HasError() {

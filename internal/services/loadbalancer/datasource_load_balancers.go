@@ -2,7 +2,6 @@ package loadbalancer
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -12,52 +11,38 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/loadbalancer/datasource_load_balancer"
 	"terraform-provider-numspot/internal/utils"
 )
 
-// Ensure the implementation satisfies the expected interfaces.
-var (
-	_ datasource.DataSource = &loadBalancersDataSource{}
-)
+var _ datasource.DataSource = &loadBalancersDataSource{}
 
-func (d *loadBalancersDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
+type loadBalancersDataSource struct {
+	provider *client.NumSpotSDK
 }
 
 func NewLoadBalancersDataSource() datasource.DataSource {
 	return &loadBalancersDataSource{}
 }
 
-type loadBalancersDataSource struct {
-	provider *client.NumSpotSDK
+func (d *loadBalancersDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if request.ProviderData == nil {
+		return
+	}
+
+	d.provider = services.ConfigureProviderDatasource(request, response)
 }
 
-// Metadata returns the data source type name.
 func (d *loadBalancersDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_load_balancers"
 }
 
-// Schema defines the schema for the data source.
 func (d *loadBalancersDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_load_balancer.LoadBalancerDataSourceSchema(ctx)
 }
 
-// Read refreshes the Terraform state with the latest data.
 func (d *loadBalancersDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_load_balancer.LoadBalancerModel
 
@@ -235,6 +220,7 @@ func mappingHealthCheck(ctx context.Context, loadBalancer api.LoadBalancer, diag
 	return elementValue, mappingDiags
 }
 
+// mappingTags converts NumSpot API tags into the Terraform data source model format.
 func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_load_balancer.TagsValue, diag.Diagnostics) {
 	return datasource_load_balancer.NewTagsValue(datasource_load_balancer.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"key":   types.StringValue(tag.Key),

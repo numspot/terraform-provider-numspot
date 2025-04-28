@@ -2,7 +2,6 @@ package vm
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -12,52 +11,37 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/vm/datasource_vm"
 	"terraform-provider-numspot/internal/utils"
 )
 
-// Ensure the implementation satisfies the expected interfaces.
-var (
-	_ datasource.DataSource = &vmsDataSource{}
-)
+var _ datasource.DataSource = &vmsDataSource{}
 
-func (d *vmsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
+type vmsDataSource struct {
+	provider *client.NumSpotSDK
 }
 
 func NewVmsDataSource() datasource.DataSource {
 	return &vmsDataSource{}
 }
 
-type vmsDataSource struct {
-	provider *client.NumSpotSDK
+func (d *vmsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
+	if request.ProviderData == nil {
+		return
+	}
+
+	d.provider = services.ConfigureProviderDatasource(request, response)
 }
 
-// Metadata returns the data source type name.
 func (d *vmsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_vms"
 }
 
-// Schema defines the schema for the data source.
 func (d *vmsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_vm.VmDataSourceSchema(ctx)
 }
 
-// Read refreshes the Terraform state with the latest data.
 func (d *vmsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_vm.VmModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)

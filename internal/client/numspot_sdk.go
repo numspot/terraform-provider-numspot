@@ -107,7 +107,18 @@ func NewNumSpotSDK(ctx context.Context, options ...Option) (*NumSpotSDK, error) 
 		}
 	}
 
-	if err := sdk.AuthenticateUser(ctx); err != nil {
+	err := sdk.createClientAPI()
+	if err != nil {
+		return nil, err
+	}
+
+	err = sdk.createClientOs()
+	if err != nil {
+		return nil, err
+	}
+
+	err = sdk.authenticateUser(ctx)
+	if err != nil {
 		return nil, err
 	}
 
@@ -120,7 +131,7 @@ func isTokenExpired(expirationTime time.Time) bool {
 
 func (s *NumSpotSDK) GetClient(ctx context.Context) (*api.ClientWithResponses, error) {
 	if isTokenExpired(s.AccessTokenExpiration) {
-		if err := s.AuthenticateUser(ctx); err != nil {
+		if err := s.authenticateUser(ctx); err != nil {
 			return nil, fmt.Errorf("error while refreshing access token : %v", err)
 		}
 		s.AccessTokenExpiration = time.Now()
@@ -128,20 +139,22 @@ func (s *NumSpotSDK) GetClient(ctx context.Context) (*api.ClientWithResponses, e
 	return s.Client, nil
 }
 
-func (s *NumSpotSDK) AuthenticateUser(ctx context.Context) error {
-	var err error
-	// TODO can we activate secure transport ?
-	newTransport := func(c *api.Client) error {
-		if s.HTTPClient != nil {
-			c.Client = s.HTTPClient
-		} else {
-			c.Client = &http.Client{
-				Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
-			}
-		}
+func (s *NumSpotSDK) createClientAPI() error {
+	requestEditor := api.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
+		req.Header.Add(UserAgentHeader, TerraformUserAgent)
 		return nil
+	})
+
+	var err error
+	s.Client, err = api.NewClientWithResponses(s.Host, s.newApiTransport(), requestEditor)
+	if err != nil {
+		return err
 	}
 
+	return nil
+}
+
+func (s *NumSpotSDK) createClientOs() error {
 	newTransportOs := func(c *objectstorage.Client) error {
 		if s.HTTPClient != nil {
 			c.Client = s.HTTPClient
@@ -153,29 +166,24 @@ func (s *NumSpotSDK) AuthenticateUser(ctx context.Context) error {
 		return nil
 	}
 
-	requestEditor := api.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
-		req.Header.Add(UserAgentHeader, TerraformUserAgent)
-		return nil
-	})
-
 	requestEditorOs := objectstorage.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
 		req.Header.Add(UserAgentHeader, TerraformUserAgent)
 		return nil
 	})
 
-	numSpotClient, err := api.NewClientWithResponses(s.Host, newTransport, requestEditor)
-	if err != nil {
-		return err
-	}
-
+	var err error
 	s.OsClient, err = objectstorage.NewClientWithResponses(s.HostOs, newTransportOs, requestEditorOs)
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func (s *NumSpotSDK) authenticateUser(ctx context.Context) error {
 	basicAuth := buildBasicAuth(s.ClientID.String(), s.ClientSecret)
 
-	response, err := numSpotClient.TokenWithFormdataBodyWithResponse(ctx, &api.TokenParams{Authorization: &basicAuth},
+	response, err := s.Client.TokenWithFormdataBodyWithResponse(ctx, &api.TokenParams{Authorization: &basicAuth},
 		api.TokenReq{
 			GrantType:    Credentials,
 			ClientId:     &s.ClientID,
@@ -205,7 +213,7 @@ func (s *NumSpotSDK) AuthenticateUser(ctx context.Context) error {
 		return err
 	}
 
-	s.Client, err = api.NewClientWithResponses(s.Host, newTransport, api.WithRequestEditorFn(bearerProvider.Intercept))
+	s.Client, err = api.NewClientWithResponses(s.Host, s.newApiTransport(), api.WithRequestEditorFn(bearerProvider.Intercept))
 	if err != nil {
 		return err
 	}
@@ -237,4 +245,17 @@ func (s *NumSpotSDK) setupS3Client(ctx context.Context, response *api.TokenRespo
 func buildBasicAuth(username, password string) string {
 	auth := username + ":" + password
 	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+}
+
+func (s *NumSpotSDK) newApiTransport() func(c *api.Client) error {
+	return func(c *api.Client) error {
+		if s.HTTPClient != nil {
+			c.Client = s.HTTPClient
+		} else {
+			c.Client = &http.Client{
+				Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
+			}
+		}
+		return nil
+	}
 }

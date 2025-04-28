@@ -2,7 +2,6 @@ package managedservicebridge
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -11,6 +10,7 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/managedservicebridge/datasource_managed_service_bridges"
 )
 
@@ -25,17 +25,7 @@ func (d *managedServiceBridgeDataSource) Configure(_ context.Context, request da
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
+	d.provider = services.ConfigureProviderDatasource(request, response)
 }
 
 type managedServiceBridgeDataSource struct {
@@ -96,7 +86,6 @@ func serializeServiceManagedBridges(ctx context.Context, serviceManagedBridges [
 		if serializeDiags.HasError() {
 			diags.Append(serializeDiags...)
 		}
-
 	}
 
 	return datasource_managed_service_bridges.ManagedServiceBridgesModel{

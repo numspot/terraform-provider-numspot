@@ -2,7 +2,6 @@ package virtualgateway
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -11,51 +10,36 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/virtualgateway/datasource_virtual_gateway"
 )
 
-// Ensure the implementation satisfies the expected interfaces.
-var (
-	_ datasource.DataSource = &virtualGatewaysDataSource{}
-)
+var _ datasource.DataSource = &virtualGatewaysDataSource{}
 
-func (d *virtualGatewaysDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
-	if request.ProviderData == nil {
-		return
-	}
-
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Datasource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	d.provider = provider
+type virtualGatewaysDataSource struct {
+	provider *client.NumSpotSDK
 }
 
 func NewVirtualGatewaysDataSource() datasource.DataSource {
 	return &virtualGatewaysDataSource{}
 }
 
-type virtualGatewaysDataSource struct {
-	provider *client.NumSpotSDK
+func (d *virtualGatewaysDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
+	if request.ProviderData == nil {
+		return
+	}
+
+	d.provider = services.ConfigureProviderDatasource(request, response)
 }
 
-// Metadata returns the data source type name.
 func (d *virtualGatewaysDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_virtual_gateways"
 }
 
-// Schema defines the schema for the data source.
 func (d *virtualGatewaysDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_virtual_gateway.VirtualGatewayDataSourceSchema(ctx)
 }
 
-// Read refreshes the Terraform state with the latest data.
 func (d *virtualGatewaysDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_virtual_gateway.VirtualGatewayModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
@@ -107,7 +91,6 @@ func serializeVirtualGatewayDatasource(ctx context.Context, virtualGateways []ap
 		if serializeDiags.HasError() {
 			diags.Append(serializeDiags...)
 		}
-
 	}
 
 	return datasource_virtual_gateway.VirtualGatewayModel{
@@ -132,14 +115,12 @@ func serializeVirtualGatewayLinksValue(ctx context.Context, virtualGatewayLinks 
 				diags.Append(serializeDiags...)
 				continue
 			}
-
 		}
 
 		linkList, serializeDiags = types.ListValueFrom(ctx, new(datasource_virtual_gateway.VpcToVirtualGatewayLinksValue).Type(ctx), linksValue)
 		if serializeDiags.HasError() {
 			diags.Append(serializeDiags...)
 		}
-
 	}
 
 	return linkList

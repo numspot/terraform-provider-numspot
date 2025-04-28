@@ -2,7 +2,6 @@ package natgateway
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -12,56 +11,47 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/natgateway/resource_nat_gateway"
 	"terraform-provider-numspot/internal/services/tags"
 	"terraform-provider-numspot/internal/utils"
 )
 
 var (
-	_ resource.Resource                = &Resource{}
-	_ resource.ResourceWithConfigure   = &Resource{}
-	_ resource.ResourceWithImportState = &Resource{}
+	_ resource.Resource                = &natGatewayResource{}
+	_ resource.ResourceWithConfigure   = &natGatewayResource{}
+	_ resource.ResourceWithImportState = &natGatewayResource{}
 )
 
-type Resource struct {
+type natGatewayResource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewNatGatewayResource() resource.Resource {
-	return &Resource{}
+	return &natGatewayResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *natGatewayResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
 
-	numSpotClient, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = numSpotClient
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *natGatewayResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *natGatewayResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_nat_gateway"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *natGatewayResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_nat_gateway.NatGatewayResourceSchema(ctx)
 }
 
-func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *natGatewayResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_nat_gateway.NatGatewayModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -85,7 +75,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
-func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *natGatewayResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_nat_gateway.NatGatewayModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -109,7 +99,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *natGatewayResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan       resource_nat_gateway.NatGatewayModel
 		numSpotNatGateway *api.NatGateway
@@ -146,7 +136,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *natGatewayResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_nat_gateway.NatGatewayModel
 
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
@@ -188,7 +178,6 @@ func serializeNATGateway(ctx context.Context, http *api.NatGateway, diags *diag.
 	if http.PublicIps != nil {
 		publicIp = *http.PublicIps
 	}
-	// Public Ips
 	publicIpsTf := utils.GenericListToTfListValue(
 		ctx,
 		serializePublicIp,
@@ -199,7 +188,6 @@ func serializeNATGateway(ctx context.Context, http *api.NatGateway, diags *diag.
 		return resource_nat_gateway.NatGatewayModel{}
 	}
 
-	// PublicIpId must be the id of the first public io
 	var publicIpId *string
 	if len(publicIp) > 0 {
 		publicIpId = publicIp[0].PublicIpId

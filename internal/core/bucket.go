@@ -37,7 +37,7 @@ func CreateBucket(ctx context.Context, provider *client.NumSpotSDK, bucketName s
 		return err
 	}
 	if res.StatusCode != http.StatusCreated {
-		return fmt.Errorf("Failed to create Bucket %d \n", res.StatusCode)
+		return fmt.Errorf("failed to create Bucket %d", res.StatusCode)
 	}
 
 	return nil
@@ -56,7 +56,7 @@ func DeleteBucket(ctx context.Context, provider *client.NumSpotSDK, bucketName s
 		return err
 	}
 	if res.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("Failed to create Bucket %d\n", res.StatusCode)
+		return fmt.Errorf("failed to create Bucket %d", res.StatusCode)
 	}
 
 	return nil
@@ -97,6 +97,10 @@ func ReadBuckets(ctx context.Context, provider *client.NumSpotSDK) (*ListBuckets
 	res, err := provider.OsClient.ListBuckets(ctx, provider.SpaceID, signFn)
 	if err != nil {
 		return nil, err
+	}
+
+	if http.StatusOK != res.StatusCode {
+		return nil, fmt.Errorf("failed to list buckets: %d", res.StatusCode)
 	}
 
 	decoder := xml.NewDecoder(res.Body)

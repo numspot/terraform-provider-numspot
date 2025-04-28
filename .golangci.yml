@@ -1,31 +1,26 @@
+version: "2"
+
 issues:
   max-same-issues: 0
 
 linters:
-  disable-all: true
+  disable:
+    - staticcheck
   enable:
     - durationcheck
     - errcheck
-    - exportloopref
     - forcetypeassert
-    - gofmt
-    - gosimple
     - ineffassign
     - makezero
     - misspell
     - nilerr
-    - paralleltest
     - predeclared
-    - staticcheck
-    - tenv
     - unconvert
     - unparam
     - unused
-    - vet
+  exclusions:
+    generated: strict
 
-linters-settings:
-  paralleltest:
-    ignore-missing: true
 run:
   # Prevent false positive timeouts in CI
   timeout: 5m

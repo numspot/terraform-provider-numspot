@@ -2,7 +2,6 @@ package nic
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -14,56 +13,47 @@ import (
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
+	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/nic/resource_nic"
 	"terraform-provider-numspot/internal/services/tags"
 	"terraform-provider-numspot/internal/utils"
 )
 
 var (
-	_ resource.Resource                = &Resource{}
-	_ resource.ResourceWithConfigure   = &Resource{}
-	_ resource.ResourceWithImportState = &Resource{}
+	_ resource.Resource                = &nicResource{}
+	_ resource.ResourceWithConfigure   = &nicResource{}
+	_ resource.ResourceWithImportState = &nicResource{}
 )
 
-type Resource struct {
+type nicResource struct {
 	provider *client.NumSpotSDK
 }
 
 func NewNicResource() resource.Resource {
-	return &Resource{}
+	return &nicResource{}
 }
 
-func (r *Resource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
+func (r *nicResource) Configure(_ context.Context, request resource.ConfigureRequest, response *resource.ConfigureResponse) {
 	if request.ProviderData == nil {
 		return
 	}
 
-	provider, ok := request.ProviderData.(*client.NumSpotSDK)
-	if !ok {
-		response.Diagnostics.AddError(
-			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *http.Client, got: %T. Please report this issue to the provider developers.", request.ProviderData),
-		)
-
-		return
-	}
-
-	r.provider = provider
+	r.provider = services.ConfigureProviderResource(request, response)
 }
 
-func (r *Resource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
+func (r *nicResource) ImportState(ctx context.Context, request resource.ImportStateRequest, response *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), request, response)
 }
 
-func (r *Resource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
+func (r *nicResource) Metadata(_ context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_nic"
 }
 
-func (r *Resource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
+func (r *nicResource) Schema(ctx context.Context, _ resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = resource_nic.NicResourceSchema(ctx)
 }
 
-func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (r *nicResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	var plan resource_nic.NicModel
 	var linkNicBody *api.LinkNicJSONRequestBody
 	response.Diagnostics.Append(request.Plan.Get(ctx, &plan)...)
@@ -92,7 +82,7 @@ func (r *Resource) Create(ctx context.Context, request resource.CreateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, state)...)
 }
 
-func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+func (r *nicResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
 	var state resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 
@@ -115,7 +105,7 @@ func (r *Resource) Read(ctx context.Context, request resource.ReadRequest, respo
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (r *nicResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 	var (
 		state, plan resource_nic.NicModel
 		numspotNic  *api.Nic
@@ -131,7 +121,6 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	planTags := nicTags(ctx, plan.Tags)
 	stateTags := nicTags(ctx, state.Tags)
 
-	// Update tags
 	if !state.Tags.Equal(plan.Tags) {
 		numspotNic, err = core.UpdateNicTags(ctx, r.provider, nicId, stateTags, planTags)
 		if err != nil {
@@ -140,7 +129,6 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 		}
 	}
 
-	// Update link
 	if !utils.IsTfValueNull(plan.LinkNic) || !utils.IsTfValueNull(state.LinkNic) {
 		numspotNic, err = core.UpdateNicLink(ctx, r.provider, nicId, deserializeUnlinkNic(state.LinkNic), deserializeLinkNic(plan.LinkNic))
 		if err != nil {
@@ -149,7 +137,6 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 		}
 	}
 
-	// Update Nic
 	if !utils.IsTfValueNull(plan.Description) && !plan.Description.Equal(state.Description) {
 		body := deserializeUpdateNumSpotNic(ctx, plan, &response.Diagnostics)
 		if response.Diagnostics.HasError() {
@@ -170,7 +157,7 @@ func (r *Resource) Update(ctx context.Context, request resource.UpdateRequest, r
 	response.Diagnostics.Append(response.State.Set(ctx, &newState)...)
 }
 
-func (r *Resource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (r *nicResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	var state resource_nic.NicModel
 	response.Diagnostics.Append(request.State.Get(ctx, &state)...)
 	if response.Diagnostics.HasError() {
@@ -249,7 +236,7 @@ func serializeNumSpotNic(ctx context.Context, http *api.Nic, diags *diag.Diagnos
 		linkNicTf      resource_nic.LinkNicValue
 		tagsTf         types.List
 	)
-	// Private IPs
+
 	privateIps := utils.GenericSetToTfSetValue(ctx, serializeNumspotPrivateIps, utils.GetPtrValue(http.PrivateIps), diags)
 	if diags.HasError() {
 		return nil
@@ -258,7 +245,7 @@ func serializeNumSpotNic(ctx context.Context, http *api.Nic, diags *diag.Diagnos
 	if http.SecurityGroups == nil {
 		return nil
 	}
-	// Retrieve security groups id
+
 	securityGroupIds := make([]string, 0, len(*http.SecurityGroups))
 	for _, e := range *http.SecurityGroups {
 		if e.SecurityGroupId != nil {
@@ -266,19 +253,16 @@ func serializeNumSpotNic(ctx context.Context, http *api.Nic, diags *diag.Diagnos
 		}
 	}
 
-	// Security Group Ids
 	securityGroupsIdTf := utils.StringListToTfListValue(ctx, securityGroupIds, diags)
 	if diags.HasError() {
 		return nil
 	}
 
-	// Security Groups
 	securityGroupsTf := utils.GenericListToTfListValue(ctx, serializeNumspotSecurityGroups, utils.GetPtrValue(http.SecurityGroups), diags)
 	if diags.HasError() {
 		return nil
 	}
 
-	// Link Public Ip
 	if http.LinkPublicIp != nil {
 		linkPublicIpTf = serializeLinkPublicIp(ctx, *http.LinkPublicIp, diags)
 		if diags.HasError() {
@@ -288,7 +272,6 @@ func serializeNumSpotNic(ctx context.Context, http *api.Nic, diags *diag.Diagnos
 		linkPublicIpTf = resource_nic.NewLinkPublicIpValueNull()
 	}
 
-	// Link NIC
 	if http.LinkNic != nil {
 		linkNicTf = serializeNumspotLinkNic(ctx, *http.LinkNic, diags)
 		if diags.HasError() {
