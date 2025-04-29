@@ -160,7 +160,10 @@ func (s *NumSpotSDK) createClientOs() error {
 			c.Client = s.HTTPClient
 		} else {
 			c.Client = &http.Client{
-				Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+					Proxy:           http.ProxyFromEnvironment,
+				},
 			}
 		}
 		return nil
@@ -253,7 +256,10 @@ func (s *NumSpotSDK) newApiTransport() func(c *api.Client) error {
 			c.Client = s.HTTPClient
 		} else {
 			c.Client = &http.Client{
-				Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+					Proxy:           http.ProxyFromEnvironment,
+				},
 			}
 		}
 		return nil
