@@ -1,0 +1,659 @@
+{
+	"datasources": [
+		{
+			"name": "postgres_cluster",
+			"schema": {
+				"attributes": [
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "allowed_ip_ranges",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											}
+										}
+									},
+									{
+										"name": "automatic_backup",
+										"bool": {
+											"computed_optional_required": "computed",
+											"description": "Whether automatic backups are enabled for this cluster."
+										}
+									},
+									{
+										"name": "available_operations",
+										"list": {
+											"computed_optional_required": "computed",
+											"element_type": {
+												"string": {}
+											},
+											"description": "List of operation names"
+										}
+									},
+									{
+										"name": "created_on",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "When the cluster has been created."
+										}
+									},
+									{
+										"name": "error_reason",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Detailed information regarding what went wrong, available when status is Error."
+										}
+									},
+									{
+										"name": "host",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Where connections to the cluster must be made to."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A cluster unique identifier."
+										}
+									},
+									{
+										"name": "last_operation_name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Name of an operation"
+										}
+									},
+									{
+										"name": "last_operation_result",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Result of an operation"
+										}
+									},
+									{
+										"name": "maintenance_schedule",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "begin_at",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The start date and time of the maintenance window, in ISO 8601 format."
+													}
+												},
+												{
+													"name": "end_at",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The end date and time of the maintenance window, in ISO 8601 format."
+													}
+												},
+												{
+													"name": "potential_impact",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "A description of the potential impact on the cluster's availability and performance during the maintenance window."
+													}
+												},
+												{
+													"name": "type",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The type of maintenance operation being performed (e.g., software upgrade, hardware replacement)."
+													}
+												}
+											],
+											"description": "Postgres maintenance schedule object. It describes the upcoming maintenance operation for a PostgreSQL cluster, including its timing, type, and potential impact."
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A strict slug: starts and ends with an alphanumeric character, allows hyphens or underscores in between but not consecutively or at the edges."
+										}
+									},
+									{
+										"name": "vpc_cidr",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The CIDR of the network where the cluster will be created.\n\n**Warning**: The CIDR must be in the following three blocks:\n- 10.*.0.0/16\n- 172.(16-31).0.0/16\n- 192.168.0.0/16\nThe mask mut not be greater than /24."
+										}
+									},
+									{
+										"name": "node_configuration",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "memory_size_gi_b",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The allocated memory size, in GiB."
+													}
+												},
+												{
+													"name": "performance_level",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The performance level of the VCPUs.\n\n- HIGHEST: for computationally intensive applications\n- HIGH: the performance level may fluctuate slightly over time\n- MEDIUM: the performance level may fluctuate moderately over time"
+													}
+												},
+												{
+													"name": "vcpu_count",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The number of Virtual CPU provisioned."
+													}
+												}
+											],
+											"description": "The configuration used to provision the cluster nodes."
+										}
+									},
+									{
+										"name": "port",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "On which port connections to the host must be made."
+										}
+									},
+									{
+										"name": "private_host",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Where connections to the cluster must be made for interconnected services."
+										}
+									},
+									{
+										"name": "status",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The last known status of a cluster.\n\n- CREATING: means the cluster is being created.\n- CONFIGURING: means the cluster is being configured according to requested changes.\n- READY: means the cluster is available and accepts connections.\n- FAILED: means that the cluster creation has failed, see errorMessage for details.\n- DELETING: means the cluster has been marked for deletion, it will be deleted soon.\n- DELETED: means the cluster has been deleted successfully, it will disappear from query and search results soon.\n- ERROR: means that an operation went wrong on the cluster, see errorMessage for details."
+										}
+									},
+									{
+										"name": "tags",
+										"list_nested": {
+											"computed_optional_required": "computed",
+											"nested_object": {
+												"attributes": [
+													{
+														"name": "key",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The key for the tag, must be unique amongst all tags associated with a given resource."
+														}
+													},
+													{
+														"name": "value",
+														"string": {
+															"computed_optional_required": "computed",
+															"description": "The value associated with the tag."
+														}
+													}
+												]
+											},
+											"description": "Tags to identify resources"
+										}
+									},
+									{
+										"name": "user",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "The name of the user with administration privileges on the cluster."
+										}
+									},
+									{
+										"name": "volume",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "size_gi_b",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The size of the volume in GiB."
+													}
+												},
+												{
+													"name": "iops",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The number of IOPS to allocate to the volume."
+													}
+												},
+												{
+													"name": "type",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "The type of the volume."
+													}
+												}
+											],
+											"description": "Common properties to all volume types."
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "postgres_cluster",
+			"schema": {
+				"attributes": [
+					{
+						"name": "allowed_ip_ranges",
+						"list": {
+							"computed_optional_required": "required",
+							"element_type": {
+								"string": {}
+							},
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+											}
+										],
+										"schema_definition": "listvalidator.SizeBetween(1, 50)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "automatic_backup",
+						"bool": {
+							"computed_optional_required": "required",
+							"description": "Whether automatic backup is enabled for this cluster."
+						}
+					},
+					{
+						"name": "is_public",
+						"bool": {
+							"computed_optional_required": "computed_optional",
+							"description": "Whether public exposition is enabled for this cluster."
+						}
+					},
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "A strict slug: starts and ends with an alphanumeric character, allows hyphens or underscores in between but not consecutively or at the edges.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "vpc_cidr",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"default": {
+								"static": "10.10.0.0/16"
+							},
+							"description": "The CIDR of the network where the cluster will be created.\n\n**Warning**: The CIDR must be in the following three blocks:\n- 10.*.0.0/16\n- 172.(16-31).0.0/16\n- 192.168.0.0/16\nThe mask mut not be greater than /24.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^(?:10\\\\.(?:25[0-5]|2[0-4]\\\\d|1?\\\\d\\\\d?)\\\\.(?:25[0-5]|2[0-4]\\\\d|1?\\\\d\\\\d?)|172\\\\.(?:1[6-9]|2\\\\d|3[01])\\\\.(?:25[0-5]|2[0-4]\\\\d|1?\\\\d\\\\d?)|192\\\\.168\\\\.(?:25[0-5]|2[0-4]\\\\d|1?\\\\d\\\\d?))\\\\.0/(?:1[6-9]|2[0-4])$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "node_configuration",
+						"single_nested": {
+							"computed_optional_required": "required",
+							"attributes": [
+								{
+									"name": "memory_size_gi_b",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "The allocated memory size, in GiB.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 1039)"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "performance_level",
+									"string": {
+										"computed_optional_required": "required",
+										"description": "The performance level of the VCPUs.\n\n- HIGHEST: for computationally intensive applications\n- HIGH: the performance level may fluctuate slightly over time\n- MEDIUM: the performance level may fluctuate moderately over time",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+														}
+													],
+													"schema_definition": "stringvalidator.OneOf(\n\"HIGHEST\",\n\"HIGH\",\n\"MEDIUM\",\n)"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "vcpu_count",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "The number of Virtual CPU provisioned.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 78)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "The configuration used to provision the cluster nodes."
+						}
+					},
+					{
+						"name": "source_backup_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "A backup unique identifier."
+						}
+					},
+					{
+						"name": "tags",
+						"list_nested": {
+							"computed_optional_required": "computed_optional",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "key",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The key for the tag, must be unique amongst all tags associated with a given resource.",
+											"validators": [
+												{
+													"custom": {
+														"imports": [
+															{
+																"path": "regexp"
+															},
+															{
+																"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+															}
+														],
+														"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[-_a-zA-Z0-9]{1,40}$\"), \"\")"
+													}
+												}
+											]
+										}
+									},
+									{
+										"name": "value",
+										"string": {
+											"computed_optional_required": "required",
+											"description": "The value associated with the tag.",
+											"validators": [
+												{
+													"custom": {
+														"imports": [
+															{
+																"path": "regexp"
+															},
+															{
+																"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+															}
+														],
+														"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[-_a-zA-Z0-9]{1,40}$\"), \"\")"
+													}
+												}
+											]
+										}
+									}
+								]
+							},
+							"description": "Tags to identify resources"
+						}
+					},
+					{
+						"name": "user",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "The name of the user with administration privileges on the cluster."
+						}
+					},
+					{
+						"name": "volume",
+						"single_nested": {
+							"computed_optional_required": "required",
+							"attributes": [
+								{
+									"name": "size_gi_b",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "The size of the volume in GiB.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(10, 500)"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "iops",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The number of IOPS to allocate to the volume.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(100, 13000)"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "type",
+									"string": {
+										"computed_optional_required": "required",
+										"description": "The type of the volume.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+														}
+													],
+													"schema_definition": "stringvalidator.OneOf(\n\"IO1\",\n\"GP2\",\n)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Common properties to all volume types."
+						}
+					},
+					{
+						"name": "available_operations",
+						"list": {
+							"computed_optional_required": "computed",
+							"element_type": {
+								"string": {}
+							},
+							"description": "List of operation names"
+						}
+					},
+					{
+						"name": "created_on",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "When the cluster has been created."
+						}
+					},
+					{
+						"name": "error_reason",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Detailed information regarding what went wrong, available when status is Error."
+						}
+					},
+					{
+						"name": "host",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Where connections to the cluster must be made to."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "A cluster unique identifier."
+						}
+					},
+					{
+						"name": "last_operation_name",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Name of an operation"
+						}
+					},
+					{
+						"name": "last_operation_result",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Result of an operation"
+						}
+					},
+					{
+						"name": "maintenance_schedule",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+								{
+									"name": "begin_at",
+									"string": {
+										"computed_optional_required": "computed",
+										"description": "The start date and time of the maintenance window, in ISO 8601 format."
+									}
+								},
+								{
+									"name": "end_at",
+									"string": {
+										"computed_optional_required": "computed",
+										"description": "The end date and time of the maintenance window, in ISO 8601 format."
+									}
+								},
+								{
+									"name": "potential_impact",
+									"string": {
+										"computed_optional_required": "computed",
+										"description": "A description of the potential impact on the cluster's availability and performance during the maintenance window."
+									}
+								},
+								{
+									"name": "type",
+									"string": {
+										"computed_optional_required": "computed",
+										"description": "The type of maintenance operation being performed (e.g., software upgrade, hardware replacement)."
+									}
+								}
+							],
+							"description": "Postgres maintenance schedule object. It describes the upcoming maintenance operation for a PostgreSQL cluster, including its timing, type, and potential impact."
+						}
+					},
+					{
+						"name": "port",
+						"int64": {
+							"computed_optional_required": "computed",
+							"description": "On which port connections to the host must be made."
+						}
+					},
+					{
+						"name": "private_host",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Where connections to the cluster must be made for interconnected services."
+						}
+					},
+					{
+						"name": "status",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "The last known status of a cluster.\n\n- CREATING: means the cluster is being created.\n- CONFIGURING: means the cluster is being configured according to requested changes.\n- READY: means the cluster is available and accepts connections.\n- FAILED: means that the cluster creation has failed, see errorMessage for details.\n- DELETING: means the cluster has been marked for deletion, it will be deleted soon.\n- DELETED: means the cluster has been deleted successfully, it will disappear from query and search results soon.\n- ERROR: means that an operation went wrong on the cluster, see errorMessage for details."
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

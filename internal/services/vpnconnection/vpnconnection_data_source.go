@@ -15,26 +15,16 @@ import (
 	"terraform-provider-numspot/internal/utils"
 )
 
-// Ensure the implementation satisfies the expected interfaces.
-var (
-	_ datasource.DataSource = &vpnConnectionsDataSource{}
-)
+var _ datasource.DataSource = &vpnConnectionsDataSource{}
 
-// vpnConnectionsDataSource represents the VPN Connection data source implementation.
-// It implements the Terraform datasource.DataSource interface and provides
-// read operations for VPN Connections in NumSpot.
 type vpnConnectionsDataSource struct {
 	provider *client.NumSpotSDK
 }
 
-// NewVpnConnectionsDataSource creates a new instance of the VPN Connection data source.
-// This is the factory function used by the provider to create new VPN Connection data source instances.
 func NewVpnConnectionsDataSource() datasource.DataSource {
 	return &vpnConnectionsDataSource{}
 }
 
-// Configure implements the datasource.DataSource interface.
-// It configures the data source with the provider's SDK client.
 func (d *vpnConnectionsDataSource) Configure(_ context.Context, request datasource.ConfigureRequest, response *datasource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if request.ProviderData == nil {
@@ -44,21 +34,14 @@ func (d *vpnConnectionsDataSource) Configure(_ context.Context, request datasour
 	d.provider = services.ConfigureProviderDatasource(request, response)
 }
 
-// Metadata implements the datasource.DataSource interface.
-// It sets the data source type name for the VPN Connection data source.
 func (d *vpnConnectionsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_vpn_connections"
 }
 
-// Schema implements the datasource.DataSource interface.
-// It defines the schema for the VPN Connection data source, including all its attributes
-// and their types.
 func (d *vpnConnectionsDataSource) Schema(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = datasource_vpn_connection.VpnConnectionDataSourceSchema(ctx)
 }
 
-// Read implements the datasource.DataSource interface.
-// It reads the current state of VPN Connections from NumSpot.
 func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.ReadRequest, response *datasource.ReadResponse) {
 	var state, plan datasource_vpn_connection.VpnConnectionModel
 	response.Diagnostics.Append(request.Config.Get(ctx, &plan)...)
@@ -86,9 +69,9 @@ func (d *vpnConnectionsDataSource) Read(ctx context.Context, request datasource.
 func serializeVpnConnections(ctx context.Context, vpnConnections []api.VPNConnection, diags *diag.Diagnostics) datasource_vpn_connection.VpnConnectionModel {
 	vpnConnectionsList := types.ListNull(new(datasource_vpn_connection.ItemsValue).Type(ctx))
 	var serializeDiags diag.Diagnostics
+	ll := len(vpnConnections)
 
-	if len(vpnConnections) > 0 {
-		ll := len(vpnConnections)
+	if ll > 0 {
 		itemsValue := make([]datasource_vpn_connection.ItemsValue, ll)
 
 		for i := 0; i < ll; i++ {
@@ -96,10 +79,12 @@ func serializeVpnConnections(ctx context.Context, vpnConnections []api.VPNConnec
 			telemetryList := types.ListNull(new(datasource_vpn_connection.VgwTelemetriesValue).Type(ctx))
 			var options types.Object
 
-			options, serializeDiags = mappingOptions(ctx, vpnConnections[i].VpnOptions)
-			if serializeDiags.HasError() {
-				diags.Append(serializeDiags...)
-				continue
+			if vpnConnections[i].VpnOptions != nil {
+				options, serializeDiags = mappingOptions(ctx, *vpnConnections[i].VpnOptions)
+				if serializeDiags.HasError() {
+					diags.Append(serializeDiags...)
+					continue
+				}
 			}
 
 			if vpnConnections[i].Routes != nil {
@@ -152,20 +137,26 @@ func mappingOptions(ctx context.Context, opt api.VpnOptions) (types.Object, diag
 		return ret, diags
 	}
 
-	phase1, diags := mappingPhase1(ctx, opt.Phase1Options)
-	if diags.HasError() {
-		return ret, diags
+	var phase1 types.Object
+	var phase2 types.Object
+	if opt.Phase1Options != nil {
+		phase1, diags = mappingPhase1(ctx, *opt.Phase1Options)
+		if diags.HasError() {
+			return ret, diags
+		}
 	}
 
-	phase2, diags := mappingPhase2(ctx, opt.Phase2Options)
-	if diags.HasError() {
-		return ret, diags
+	if opt.Phase1Options != nil {
+		phase2, diags = mappingPhase2(ctx, *opt.Phase2Options)
+		if diags.HasError() {
+			return ret, diags
+		}
 	}
 
 	options, diags := datasource_vpn_connection.NewVpnOptionsValue(datasource_vpn_connection.VpnOptionsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"phase1options":          phase1,
 		"phase2options":          phase2,
-		"tunnel_inside_ip_range": types.StringValue(opt.TunnelInsideIpRange),
+		"tunnel_inside_ip_range": types.StringPointerValue(opt.TunnelInsideIpRange),
 	})
 	if diags.HasError() {
 		return ret, diags
@@ -180,36 +171,36 @@ func mappingPhase1(ctx context.Context, phase1 api.Phase1Options) (types.Object,
 		return ret, diags
 	}
 
-	ike := utils.FromStringListToTfStringList(ctx, phase1.IkeVersions, &diags)
+	ike := utils.FromStringListPointerToTfStringList(ctx, phase1.IkeVersions, &diags)
 	if diags.HasError() {
 		return ret, diags
 	}
 
-	dhGroup := utils.FromIntListToTfInt64List(ctx, phase1.Phase1DhGroupNumbers, &diags)
+	dhGroup := utils.FromIntListPointerToTfInt64List(ctx, phase1.Phase1DhGroupNumbers, &diags)
 	if diags.HasError() {
 		return ret, diags
 	}
 
-	encryption := utils.FromStringListToTfStringList(ctx, phase1.Phase1EncryptionAlgorithms, &diags)
+	encryption := utils.FromStringListPointerToTfStringList(ctx, phase1.Phase1EncryptionAlgorithms, &diags)
 	if diags.HasError() {
 		return ret, diags
 	}
 
-	integrity := utils.FromStringListToTfStringList(ctx, phase1.Phase1IntegrityAlgorithms, &diags)
+	integrity := utils.FromStringListPointerToTfStringList(ctx, phase1.Phase1IntegrityAlgorithms, &diags)
 	if diags.HasError() {
 		return ret, diags
 	}
 
 	tmp, diags := datasource_vpn_connection.NewPhase1optionsValue(datasource_vpn_connection.Phase1optionsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"dpd_timeout_action":          types.StringValue(phase1.DpdTimeoutAction),
-		"dpd_timeout_seconds":         types.Int64Value(int64(phase1.DpdTimeoutSeconds)),
+		"dpd_timeout_action":          types.StringPointerValue(phase1.DpdTimeoutAction),
+		"dpd_timeout_seconds":         types.Int64Value(utils.ConvertIntPtrToInt64(phase1.DpdTimeoutSeconds)),
 		"ike_versions":                ike,
 		"phase1dh_group_numbers":      dhGroup,
 		"phase1encryption_algorithms": encryption,
 		"phase1integrity_algorithms":  integrity,
-		"phase1lifetime_seconds":      types.Int64Value(int64(phase1.Phase1LifetimeSeconds)),
-		"replay_window_size":          types.Int64Value(int64(phase1.ReplayWindowSize)),
-		"startup_action":              types.StringValue(phase1.StartupAction),
+		"phase1lifetime_seconds":      types.Int64Value(utils.ConvertIntPtrToInt64(phase1.Phase1LifetimeSeconds)),
+		"replay_window_size":          types.Int64Value(utils.ConvertIntPtrToInt64(phase1.ReplayWindowSize)),
+		"startup_action":              types.StringPointerValue(phase1.StartupAction),
 	})
 
 	ret, diags = tmp.ToObjectValue(ctx)
@@ -225,17 +216,17 @@ func mappingPhase2(ctx context.Context, phase2 api.Phase2Options) (types.Object,
 		return ret, diags
 	}
 
-	dhGroup := utils.FromIntListToTfInt64List(ctx, phase2.Phase2DhGroupNumbers, &diags)
+	dhGroup := utils.FromIntListPointerToTfInt64List(ctx, phase2.Phase2DhGroupNumbers, &diags)
 	if diags.HasError() {
 		return ret, diags
 	}
 
-	encryption := utils.FromStringListToTfStringList(ctx, phase2.Phase2EncryptionAlgorithms, &diags)
+	encryption := utils.FromStringListPointerToTfStringList(ctx, phase2.Phase2EncryptionAlgorithms, &diags)
 	if diags.HasError() {
 		return ret, diags
 	}
 
-	integrity := utils.FromStringListToTfStringList(ctx, phase2.Phase2IntegrityAlgorithms, &diags)
+	integrity := utils.FromStringListPointerToTfStringList(ctx, phase2.Phase2IntegrityAlgorithms, &diags)
 	if diags.HasError() {
 		return ret, diags
 	}
@@ -244,8 +235,8 @@ func mappingPhase2(ctx context.Context, phase2 api.Phase2Options) (types.Object,
 		"phase2dh_group_numbers":      dhGroup,
 		"phase2encryption_algorithms": encryption,
 		"phase2integrity_algorithms":  integrity,
-		"phase2lifetime_seconds":      types.Int64Value(int64(phase2.Phase2LifetimeSeconds)),
-		"pre_shared_key":              types.StringValue(phase2.PreSharedKey),
+		"phase2lifetime_seconds":      types.Int64Value(utils.ConvertIntPtrToInt64(phase2.Phase2LifetimeSeconds)),
+		"pre_shared_key":              types.StringPointerValue(phase2.PreSharedKey),
 	})
 
 	ret, diags = tmp.ToObjectValue(ctx)

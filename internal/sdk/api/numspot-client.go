@@ -3200,49 +3200,49 @@ type PermissionsPaginatedList struct {
 // Phase1Options Information about Phase 1 of the Internet Key Exchange (IKE) negotiation. When Phase 1 finishes successfully, peers proceed to Phase 2 negotiations.
 type Phase1Options struct {
 	// DpdTimeoutAction The action to carry out after a Dead Peer Detection (DPD) timeout occurs.
-	DpdTimeoutAction string `json:"dpdTimeoutAction"`
+	DpdTimeoutAction *string `json:"dpdTimeoutAction,omitempty"`
 
 	// DpdTimeoutSeconds The maximum waiting time for a Dead Peer Detection (DPD) response before considering the peer as dead, in seconds.
-	DpdTimeoutSeconds int `json:"dpdTimeoutSeconds"`
+	DpdTimeoutSeconds *int `json:"dpdTimeoutSeconds,omitempty"`
 
 	// IkeVersions The Internet Key Exchange (IKE) versions allowed for the VPN tunnel.
-	IkeVersions []string `json:"ikeVersions"`
+	IkeVersions *[]string `json:"ikeVersions,omitempty"`
 
 	// Phase1DhGroupNumbers The Diffie-Hellman (DH) group numbers allowed for the VPN tunnel for phase 1.
-	Phase1DhGroupNumbers []int `json:"phase1DhGroupNumbers"`
+	Phase1DhGroupNumbers *[]int `json:"phase1DhGroupNumbers,omitempty"`
 
 	// Phase1EncryptionAlgorithms The encryption algorithms allowed for the VPN tunnel for phase 1.
-	Phase1EncryptionAlgorithms []string `json:"phase1EncryptionAlgorithms"`
+	Phase1EncryptionAlgorithms *[]string `json:"phase1EncryptionAlgorithms,omitempty"`
 
 	// Phase1IntegrityAlgorithms The integrity algorithms allowed for the VPN tunnel for phase 1.
-	Phase1IntegrityAlgorithms []string `json:"phase1IntegrityAlgorithms"`
+	Phase1IntegrityAlgorithms *[]string `json:"phase1IntegrityAlgorithms,omitempty"`
 
 	// Phase1LifetimeSeconds The lifetime for phase 1 of the IKE negotiation process, in seconds.
-	Phase1LifetimeSeconds int `json:"phase1LifetimeSeconds"`
+	Phase1LifetimeSeconds *int `json:"phase1LifetimeSeconds,omitempty"`
 
 	// ReplayWindowSize The number of packets in an IKE replay window.
-	ReplayWindowSize int `json:"replayWindowSize"`
+	ReplayWindowSize *int `json:"replayWindowSize,omitempty"`
 
 	// StartupAction The action to carry out when establishing tunnels for a VPN connection.
-	StartupAction string `json:"startupAction"`
+	StartupAction *string `json:"startupAction,omitempty"`
 }
 
 // Phase2Options Information about Phase 2 of the Internet Key Exchange (IKE) negotiation.
 type Phase2Options struct {
 	// Phase2DhGroupNumbers The Diffie-Hellman (DH) group numbers allowed for the VPN tunnel for phase 2.
-	Phase2DhGroupNumbers []int `json:"phase2DhGroupNumbers"`
+	Phase2DhGroupNumbers *[]int `json:"phase2DhGroupNumbers,omitempty"`
 
 	// Phase2EncryptionAlgorithms The encryption algorithms allowed for the VPN tunnel for phase 2.
-	Phase2EncryptionAlgorithms []string `json:"phase2EncryptionAlgorithms"`
+	Phase2EncryptionAlgorithms *[]string `json:"phase2EncryptionAlgorithms,omitempty"`
 
 	// Phase2IntegrityAlgorithms The integrity algorithms allowed for the VPN tunnel for phase 2.
-	Phase2IntegrityAlgorithms []string `json:"phase2IntegrityAlgorithms"`
+	Phase2IntegrityAlgorithms *[]string `json:"phase2IntegrityAlgorithms,omitempty"`
 
 	// Phase2LifetimeSeconds The lifetime for phase 2 of the Internet Key Exchange (IKE) negociation process, in seconds.
-	Phase2LifetimeSeconds int `json:"phase2LifetimeSeconds"`
+	Phase2LifetimeSeconds *int `json:"phase2LifetimeSeconds,omitempty"`
 
 	// PreSharedKey The pre-shared key to establish the initial authentication between the client gateway and the virtual gateway. This key can contain any character except line breaks and double quotes (&quot;).
-	PreSharedKey string `json:"preSharedKey"`
+	PreSharedKey *string `json:"preSharedKey,omitempty"`
 }
 
 // Placement Information about the placement of the VM.
@@ -5356,6 +5356,12 @@ type UpdateSubnet struct {
 	MapPublicIpOnLaunch bool `json:"mapPublicIpOnLaunch"`
 }
 
+// UpdateVPNConnection Update a VPN Connection.
+type UpdateVPNConnection struct {
+	// VpnOptions Information about the VPN options.
+	VpnOptions *VpnOptions `json:"vpnOptions,omitempty"`
+}
+
 // UpdateVm defines model for UpdateVm.
 type UpdateVm struct {
 	// BlockDeviceMappings One or more block device mappings of the VM.
@@ -5555,7 +5561,7 @@ type VPNConnection struct {
 	VirtualGatewayId Uuid           `json:"virtualGatewayId"`
 
 	// VpnOptions Information about the VPN options.
-	VpnOptions VpnOptions `json:"vpnOptions"`
+	VpnOptions *VpnOptions `json:"vpnOptions,omitempty"`
 }
 
 // VPNConnections Information about one or more VPNConnections.
@@ -5840,13 +5846,13 @@ type VpcToVirtualGatewayLink struct {
 // VpnOptions Information about the VPN options.
 type VpnOptions struct {
 	// Phase1Options Information about Phase 1 of the Internet Key Exchange (IKE) negotiation. When Phase 1 finishes successfully, peers proceed to Phase 2 negotiations.
-	Phase1Options Phase1Options `json:"phase1Options"`
+	Phase1Options *Phase1Options `json:"phase1Options,omitempty"`
 
 	// Phase2Options Information about Phase 2 of the Internet Key Exchange (IKE) negotiation.
-	Phase2Options Phase2Options `json:"phase2Options"`
+	Phase2Options *Phase2Options `json:"phase2Options,omitempty"`
 
 	// TunnelInsideIpRange The range of inside IPs for the tunnel. This must be a /30 CIDR block from the 169.254.254.0/24 range.
-	TunnelInsideIpRange string `json:"tunnelInsideIpRange"`
+	TunnelInsideIpRange *string `json:"tunnelInsideIpRange,omitempty"`
 }
 
 // WebAuthnJavaScript defines model for WebAuthnJavaScript.
@@ -5863,6 +5869,9 @@ type Action = string
 
 // Authorization defines model for Authorization.
 type Authorization = string
+
+// ClusterId defines model for ClusterId.
+type ClusterId = openapi_types.UUID
 
 // ConsentChallenge defines model for ConsentChallenge.
 type ConsentChallenge = string
@@ -6632,6 +6641,9 @@ type UpdateSubnet200Response = Subnet
 // UpdateUser200Response defines model for UpdateUser200Response.
 type UpdateUser200Response = UserModified
 
+// UpdateVPNConnection200Response Information about the vpn connection.
+type UpdateVPNConnection200Response = VPNConnection
+
 // UpdateVm200Response Information about the VM.
 type UpdateVm200Response = Vm
 
@@ -6944,6 +6956,9 @@ type UpdateSubnetRequest = UpdateSubnet
 
 // UpdateUserRequest defines model for UpdateUserRequest.
 type UpdateUserRequest = UserUpdate
+
+// UpdateVPNConnectionRequest Update a VPN Connection.
+type UpdateVPNConnectionRequest = UpdateVPNConnection
 
 // UpdateVmRequest defines model for UpdateVmRequest.
 type UpdateVmRequest = UpdateVm
@@ -8513,6 +8528,9 @@ type LinkVirtualGatewayJSONRequestBody = LinkUnlinkVirtualGateway
 
 // CreateVPNConnectionJSONRequestBody defines body for CreateVPNConnection for application/json ContentType.
 type CreateVPNConnectionJSONRequestBody = CreateVPNConnection
+
+// UpdateVPNConnectionJSONRequestBody defines body for UpdateVPNConnection for application/json ContentType.
+type UpdateVPNConnectionJSONRequestBody = UpdateVPNConnection
 
 // DeleteVPNConnectionRouteJSONRequestBody defines body for DeleteVPNConnectionRoute for application/json ContentType.
 type DeleteVPNConnectionRouteJSONRequestBody = DeleteVPNConnectionRoute
@@ -10257,6 +10275,11 @@ type ClientInterface interface {
 	// ReadVPNConnection request
 	ReadVPNConnection(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// UpdateVPNConnectionWithBody request with any body
+	UpdateVPNConnectionWithBody(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateVPNConnection(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, body UpdateVPNConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// DeleteVPNConnectionRouteWithBody request with any body
 	DeleteVPNConnectionRouteWithBody(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -10596,42 +10619,42 @@ type ClientInterface interface {
 	CreateKubernetesCluster(ctx context.Context, spaceId SpaceId, body CreateKubernetesClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteKubernetesCluster request
-	DeleteKubernetesCluster(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteKubernetesCluster(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetKubernetesClusterInfo request
-	GetKubernetesClusterInfo(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetKubernetesClusterInfo(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetKubernetesKubeConfig request
-	GetKubernetesKubeConfig(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetKubernetesKubeConfig(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpgradeKubernetesMastersWithBody request with any body
-	UpgradeKubernetesMastersWithBody(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpgradeKubernetesMastersWithBody(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpgradeKubernetesMasters(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesMastersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpgradeKubernetesMasters(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesMastersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListClusterOperations request
 	ListClusterOperations(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetKubernetesPrivateKey request
-	GetKubernetesPrivateKey(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetKubernetesPrivateKey(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetKubernetesClusterState request
-	GetKubernetesClusterState(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetKubernetesClusterState(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AddKubernetesWorkersWithBody request with any body
-	AddKubernetesWorkersWithBody(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AddKubernetesWorkersWithBody(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	AddKubernetesWorkers(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body AddKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AddKubernetesWorkers(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body AddKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RemoveKubernetesWorkerWithBody request with any body
-	RemoveKubernetesWorkerWithBody(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RemoveKubernetesWorkerWithBody(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	RemoveKubernetesWorker(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body RemoveKubernetesWorkerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RemoveKubernetesWorker(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body RemoveKubernetesWorkerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// UpgradeKubernetesWorkersWithBody request with any body
-	UpgradeKubernetesWorkersWithBody(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpgradeKubernetesWorkersWithBody(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpgradeKubernetesWorkers(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpgradeKubernetesWorkers(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListKubernetesSupportedVersions request
 	ListKubernetesSupportedVersions(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -13415,6 +13438,30 @@ func (c *Client) ReadVPNConnection(ctx context.Context, spaceId SpaceId, id Reso
 	return c.Client.Do(req)
 }
 
+func (c *Client) UpdateVPNConnectionWithBody(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVPNConnectionRequestWithBody(c.Server, spaceId, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateVPNConnection(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, body UpdateVPNConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateVPNConnectionRequest(c.Server, spaceId, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) DeleteVPNConnectionRouteWithBody(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteVPNConnectionRouteRequestWithBody(c.Server, spaceId, id, contentType, body)
 	if err != nil {
@@ -14903,7 +14950,7 @@ func (c *Client) CreateKubernetesCluster(ctx context.Context, spaceId SpaceId, b
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteKubernetesCluster(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteKubernetesCluster(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteKubernetesClusterRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
@@ -14915,7 +14962,7 @@ func (c *Client) DeleteKubernetesCluster(ctx context.Context, spaceId SpaceId, c
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetKubernetesClusterInfo(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetKubernetesClusterInfo(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetKubernetesClusterInfoRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
@@ -14927,7 +14974,7 @@ func (c *Client) GetKubernetesClusterInfo(ctx context.Context, spaceId SpaceId, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetKubernetesKubeConfig(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetKubernetesKubeConfig(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetKubernetesKubeConfigRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
@@ -14939,7 +14986,7 @@ func (c *Client) GetKubernetesKubeConfig(ctx context.Context, spaceId SpaceId, c
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpgradeKubernetesMastersWithBody(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpgradeKubernetesMastersWithBody(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpgradeKubernetesMastersRequestWithBody(c.Server, spaceId, clusterId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -14951,7 +14998,7 @@ func (c *Client) UpgradeKubernetesMastersWithBody(ctx context.Context, spaceId S
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpgradeKubernetesMasters(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesMastersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpgradeKubernetesMasters(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesMastersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpgradeKubernetesMastersRequest(c.Server, spaceId, clusterId, body)
 	if err != nil {
 		return nil, err
@@ -14975,7 +15022,7 @@ func (c *Client) ListClusterOperations(ctx context.Context, spaceId SpaceId, clu
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetKubernetesPrivateKey(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetKubernetesPrivateKey(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetKubernetesPrivateKeyRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
@@ -14987,7 +15034,7 @@ func (c *Client) GetKubernetesPrivateKey(ctx context.Context, spaceId SpaceId, c
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetKubernetesClusterState(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetKubernetesClusterState(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetKubernetesClusterStateRequest(c.Server, spaceId, clusterId)
 	if err != nil {
 		return nil, err
@@ -14999,7 +15046,7 @@ func (c *Client) GetKubernetesClusterState(ctx context.Context, spaceId SpaceId,
 	return c.Client.Do(req)
 }
 
-func (c *Client) AddKubernetesWorkersWithBody(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddKubernetesWorkersWithBody(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddKubernetesWorkersRequestWithBody(c.Server, spaceId, clusterId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -15011,7 +15058,7 @@ func (c *Client) AddKubernetesWorkersWithBody(ctx context.Context, spaceId Space
 	return c.Client.Do(req)
 }
 
-func (c *Client) AddKubernetesWorkers(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body AddKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddKubernetesWorkers(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body AddKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddKubernetesWorkersRequest(c.Server, spaceId, clusterId, body)
 	if err != nil {
 		return nil, err
@@ -15023,7 +15070,7 @@ func (c *Client) AddKubernetesWorkers(ctx context.Context, spaceId SpaceId, clus
 	return c.Client.Do(req)
 }
 
-func (c *Client) RemoveKubernetesWorkerWithBody(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemoveKubernetesWorkerWithBody(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveKubernetesWorkerRequestWithBody(c.Server, spaceId, clusterId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -15035,7 +15082,7 @@ func (c *Client) RemoveKubernetesWorkerWithBody(ctx context.Context, spaceId Spa
 	return c.Client.Do(req)
 }
 
-func (c *Client) RemoveKubernetesWorker(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body RemoveKubernetesWorkerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemoveKubernetesWorker(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body RemoveKubernetesWorkerJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveKubernetesWorkerRequest(c.Server, spaceId, clusterId, body)
 	if err != nil {
 		return nil, err
@@ -15047,7 +15094,7 @@ func (c *Client) RemoveKubernetesWorker(ctx context.Context, spaceId SpaceId, cl
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpgradeKubernetesWorkersWithBody(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpgradeKubernetesWorkersWithBody(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpgradeKubernetesWorkersRequestWithBody(c.Server, spaceId, clusterId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -15059,7 +15106,7 @@ func (c *Client) UpgradeKubernetesWorkersWithBody(ctx context.Context, spaceId S
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpgradeKubernetesWorkers(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpgradeKubernetesWorkers(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpgradeKubernetesWorkersRequest(c.Server, spaceId, clusterId, body)
 	if err != nil {
 		return nil, err
@@ -26322,6 +26369,60 @@ func NewReadVPNConnectionRequest(server string, spaceId SpaceId, id ResourceIden
 	return req, nil
 }
 
+// NewUpdateVPNConnectionRequest calls the generic UpdateVPNConnection builder with application/json body
+func NewUpdateVPNConnectionRequest(server string, spaceId SpaceId, id ResourceIdentifier, body UpdateVPNConnectionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateVPNConnectionRequestWithBody(server, spaceId, id, "application/json", bodyReader)
+}
+
+// NewUpdateVPNConnectionRequestWithBody generates requests for UpdateVPNConnection with any type of body
+func NewUpdateVPNConnectionRequestWithBody(server string, spaceId SpaceId, id ResourceIdentifier, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "spaceId", runtime.ParamLocationPath, spaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/connectivity/spaces/%s/vpnConnections/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewDeleteVPNConnectionRouteRequest calls the generic DeleteVPNConnectionRoute builder with application/json body
 func NewDeleteVPNConnectionRouteRequest(server string, spaceId SpaceId, id ResourceIdentifier, body DeleteVPNConnectionRouteJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -31495,7 +31596,7 @@ func NewCreateKubernetesClusterRequestWithBody(server string, spaceId SpaceId, c
 }
 
 // NewDeleteKubernetesClusterRequest generates requests for DeleteKubernetesCluster
-func NewDeleteKubernetesClusterRequest(server string, spaceId SpaceId, clusterId KubernetesClusterId) (*http.Request, error) {
+func NewDeleteKubernetesClusterRequest(server string, spaceId SpaceId, clusterId ClusterId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -31536,7 +31637,7 @@ func NewDeleteKubernetesClusterRequest(server string, spaceId SpaceId, clusterId
 }
 
 // NewGetKubernetesClusterInfoRequest generates requests for GetKubernetesClusterInfo
-func NewGetKubernetesClusterInfoRequest(server string, spaceId SpaceId, clusterId KubernetesClusterId) (*http.Request, error) {
+func NewGetKubernetesClusterInfoRequest(server string, spaceId SpaceId, clusterId ClusterId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -31577,7 +31678,7 @@ func NewGetKubernetesClusterInfoRequest(server string, spaceId SpaceId, clusterI
 }
 
 // NewGetKubernetesKubeConfigRequest generates requests for GetKubernetesKubeConfig
-func NewGetKubernetesKubeConfigRequest(server string, spaceId SpaceId, clusterId KubernetesClusterId) (*http.Request, error) {
+func NewGetKubernetesKubeConfigRequest(server string, spaceId SpaceId, clusterId ClusterId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -31618,7 +31719,7 @@ func NewGetKubernetesKubeConfigRequest(server string, spaceId SpaceId, clusterId
 }
 
 // NewUpgradeKubernetesMastersRequest calls the generic UpgradeKubernetesMasters builder with application/json body
-func NewUpgradeKubernetesMastersRequest(server string, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesMastersJSONRequestBody) (*http.Request, error) {
+func NewUpgradeKubernetesMastersRequest(server string, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesMastersJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -31629,7 +31730,7 @@ func NewUpgradeKubernetesMastersRequest(server string, spaceId SpaceId, clusterI
 }
 
 // NewUpgradeKubernetesMastersRequestWithBody generates requests for UpgradeKubernetesMasters with any type of body
-func NewUpgradeKubernetesMastersRequestWithBody(server string, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpgradeKubernetesMastersRequestWithBody(server string, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -31713,7 +31814,7 @@ func NewListClusterOperationsRequest(server string, spaceId SpaceId, clusterId K
 }
 
 // NewGetKubernetesPrivateKeyRequest generates requests for GetKubernetesPrivateKey
-func NewGetKubernetesPrivateKeyRequest(server string, spaceId SpaceId, clusterId KubernetesClusterId) (*http.Request, error) {
+func NewGetKubernetesPrivateKeyRequest(server string, spaceId SpaceId, clusterId ClusterId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -31754,7 +31855,7 @@ func NewGetKubernetesPrivateKeyRequest(server string, spaceId SpaceId, clusterId
 }
 
 // NewGetKubernetesClusterStateRequest generates requests for GetKubernetesClusterState
-func NewGetKubernetesClusterStateRequest(server string, spaceId SpaceId, clusterId KubernetesClusterId) (*http.Request, error) {
+func NewGetKubernetesClusterStateRequest(server string, spaceId SpaceId, clusterId ClusterId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -31795,7 +31896,7 @@ func NewGetKubernetesClusterStateRequest(server string, spaceId SpaceId, cluster
 }
 
 // NewAddKubernetesWorkersRequest calls the generic AddKubernetesWorkers builder with application/json body
-func NewAddKubernetesWorkersRequest(server string, spaceId SpaceId, clusterId KubernetesClusterId, body AddKubernetesWorkersJSONRequestBody) (*http.Request, error) {
+func NewAddKubernetesWorkersRequest(server string, spaceId SpaceId, clusterId ClusterId, body AddKubernetesWorkersJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -31806,7 +31907,7 @@ func NewAddKubernetesWorkersRequest(server string, spaceId SpaceId, clusterId Ku
 }
 
 // NewAddKubernetesWorkersRequestWithBody generates requests for AddKubernetesWorkers with any type of body
-func NewAddKubernetesWorkersRequestWithBody(server string, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader) (*http.Request, error) {
+func NewAddKubernetesWorkersRequestWithBody(server string, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -31849,7 +31950,7 @@ func NewAddKubernetesWorkersRequestWithBody(server string, spaceId SpaceId, clus
 }
 
 // NewRemoveKubernetesWorkerRequest calls the generic RemoveKubernetesWorker builder with application/json body
-func NewRemoveKubernetesWorkerRequest(server string, spaceId SpaceId, clusterId KubernetesClusterId, body RemoveKubernetesWorkerJSONRequestBody) (*http.Request, error) {
+func NewRemoveKubernetesWorkerRequest(server string, spaceId SpaceId, clusterId ClusterId, body RemoveKubernetesWorkerJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -31860,7 +31961,7 @@ func NewRemoveKubernetesWorkerRequest(server string, spaceId SpaceId, clusterId 
 }
 
 // NewRemoveKubernetesWorkerRequestWithBody generates requests for RemoveKubernetesWorker with any type of body
-func NewRemoveKubernetesWorkerRequestWithBody(server string, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader) (*http.Request, error) {
+func NewRemoveKubernetesWorkerRequestWithBody(server string, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -31903,7 +32004,7 @@ func NewRemoveKubernetesWorkerRequestWithBody(server string, spaceId SpaceId, cl
 }
 
 // NewUpgradeKubernetesWorkersRequest calls the generic UpgradeKubernetesWorkers builder with application/json body
-func NewUpgradeKubernetesWorkersRequest(server string, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesWorkersJSONRequestBody) (*http.Request, error) {
+func NewUpgradeKubernetesWorkersRequest(server string, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesWorkersJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
@@ -31914,7 +32015,7 @@ func NewUpgradeKubernetesWorkersRequest(server string, spaceId SpaceId, clusterI
 }
 
 // NewUpgradeKubernetesWorkersRequestWithBody generates requests for UpgradeKubernetesWorkers with any type of body
-func NewUpgradeKubernetesWorkersRequestWithBody(server string, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpgradeKubernetesWorkersRequestWithBody(server string, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -33951,6 +34052,11 @@ type ClientWithResponsesInterface interface {
 	// ReadVPNConnectionWithResponse request
 	ReadVPNConnectionWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, reqEditors ...RequestEditorFn) (*ReadVPNConnectionResponse, error)
 
+	// UpdateVPNConnectionWithBodyWithResponse request with any body
+	UpdateVPNConnectionWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVPNConnectionResponse, error)
+
+	UpdateVPNConnectionWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, body UpdateVPNConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVPNConnectionResponse, error)
+
 	// DeleteVPNConnectionRouteWithBodyWithResponse request with any body
 	DeleteVPNConnectionRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVPNConnectionRouteResponse, error)
 
@@ -34290,42 +34396,42 @@ type ClientWithResponsesInterface interface {
 	CreateKubernetesClusterWithResponse(ctx context.Context, spaceId SpaceId, body CreateKubernetesClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKubernetesClusterResponse, error)
 
 	// DeleteKubernetesClusterWithResponse request
-	DeleteKubernetesClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*DeleteKubernetesClusterResponse, error)
+	DeleteKubernetesClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*DeleteKubernetesClusterResponse, error)
 
 	// GetKubernetesClusterInfoWithResponse request
-	GetKubernetesClusterInfoWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesClusterInfoResponse, error)
+	GetKubernetesClusterInfoWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesClusterInfoResponse, error)
 
 	// GetKubernetesKubeConfigWithResponse request
-	GetKubernetesKubeConfigWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesKubeConfigResponse, error)
+	GetKubernetesKubeConfigWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesKubeConfigResponse, error)
 
 	// UpgradeKubernetesMastersWithBodyWithResponse request with any body
-	UpgradeKubernetesMastersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpgradeKubernetesMastersResponse, error)
+	UpgradeKubernetesMastersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpgradeKubernetesMastersResponse, error)
 
-	UpgradeKubernetesMastersWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesMastersJSONRequestBody, reqEditors ...RequestEditorFn) (*UpgradeKubernetesMastersResponse, error)
+	UpgradeKubernetesMastersWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesMastersJSONRequestBody, reqEditors ...RequestEditorFn) (*UpgradeKubernetesMastersResponse, error)
 
 	// ListClusterOperationsWithResponse request
 	ListClusterOperationsWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*ListClusterOperationsResponse, error)
 
 	// GetKubernetesPrivateKeyWithResponse request
-	GetKubernetesPrivateKeyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesPrivateKeyResponse, error)
+	GetKubernetesPrivateKeyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesPrivateKeyResponse, error)
 
 	// GetKubernetesClusterStateWithResponse request
-	GetKubernetesClusterStateWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesClusterStateResponse, error)
+	GetKubernetesClusterStateWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesClusterStateResponse, error)
 
 	// AddKubernetesWorkersWithBodyWithResponse request with any body
-	AddKubernetesWorkersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddKubernetesWorkersResponse, error)
+	AddKubernetesWorkersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddKubernetesWorkersResponse, error)
 
-	AddKubernetesWorkersWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body AddKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*AddKubernetesWorkersResponse, error)
+	AddKubernetesWorkersWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body AddKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*AddKubernetesWorkersResponse, error)
 
 	// RemoveKubernetesWorkerWithBodyWithResponse request with any body
-	RemoveKubernetesWorkerWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveKubernetesWorkerResponse, error)
+	RemoveKubernetesWorkerWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveKubernetesWorkerResponse, error)
 
-	RemoveKubernetesWorkerWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body RemoveKubernetesWorkerJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveKubernetesWorkerResponse, error)
+	RemoveKubernetesWorkerWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body RemoveKubernetesWorkerJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveKubernetesWorkerResponse, error)
 
 	// UpgradeKubernetesWorkersWithBodyWithResponse request with any body
-	UpgradeKubernetesWorkersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpgradeKubernetesWorkersResponse, error)
+	UpgradeKubernetesWorkersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpgradeKubernetesWorkersResponse, error)
 
-	UpgradeKubernetesWorkersWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*UpgradeKubernetesWorkersResponse, error)
+	UpgradeKubernetesWorkersWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*UpgradeKubernetesWorkersResponse, error)
 
 	// ListKubernetesSupportedVersionsWithResponse request
 	ListKubernetesSupportedVersionsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListKubernetesSupportedVersionsResponse, error)
@@ -38649,6 +38755,34 @@ func (r ReadVPNConnectionResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ReadVPNConnectionResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateVPNConnectionResponse struct {
+	Body                      []byte
+	HTTPResponse              *http.Response
+	JSON200                   *UpdateVPNConnection200Response
+	ApplicationproblemJSON400 *Error400
+	ApplicationproblemJSON401 *Error401
+	ApplicationproblemJSON404 *Error404
+	ApplicationproblemJSON409 *Error409
+	ApplicationproblemJSON429 *Error429
+	ApplicationproblemJSON500 *Error500
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateVPNConnectionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateVPNConnectionResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -43910,6 +44044,23 @@ func (c *ClientWithResponses) ReadVPNConnectionWithResponse(ctx context.Context,
 	return ParseReadVPNConnectionResponse(rsp)
 }
 
+// UpdateVPNConnectionWithBodyWithResponse request with arbitrary body returning *UpdateVPNConnectionResponse
+func (c *ClientWithResponses) UpdateVPNConnectionWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateVPNConnectionResponse, error) {
+	rsp, err := c.UpdateVPNConnectionWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateVPNConnectionResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateVPNConnectionWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, body UpdateVPNConnectionJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateVPNConnectionResponse, error) {
+	rsp, err := c.UpdateVPNConnection(ctx, spaceId, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateVPNConnectionResponse(rsp)
+}
+
 // DeleteVPNConnectionRouteWithBodyWithResponse request with arbitrary body returning *DeleteVPNConnectionRouteResponse
 func (c *ClientWithResponses) DeleteVPNConnectionRouteWithBodyWithResponse(ctx context.Context, spaceId SpaceId, id ResourceIdentifier, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DeleteVPNConnectionRouteResponse, error) {
 	rsp, err := c.DeleteVPNConnectionRouteWithBody(ctx, spaceId, id, contentType, body, reqEditors...)
@@ -44993,7 +45144,7 @@ func (c *ClientWithResponses) CreateKubernetesClusterWithResponse(ctx context.Co
 }
 
 // DeleteKubernetesClusterWithResponse request returning *DeleteKubernetesClusterResponse
-func (c *ClientWithResponses) DeleteKubernetesClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*DeleteKubernetesClusterResponse, error) {
+func (c *ClientWithResponses) DeleteKubernetesClusterWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*DeleteKubernetesClusterResponse, error) {
 	rsp, err := c.DeleteKubernetesCluster(ctx, spaceId, clusterId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45002,7 +45153,7 @@ func (c *ClientWithResponses) DeleteKubernetesClusterWithResponse(ctx context.Co
 }
 
 // GetKubernetesClusterInfoWithResponse request returning *GetKubernetesClusterInfoResponse
-func (c *ClientWithResponses) GetKubernetesClusterInfoWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesClusterInfoResponse, error) {
+func (c *ClientWithResponses) GetKubernetesClusterInfoWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesClusterInfoResponse, error) {
 	rsp, err := c.GetKubernetesClusterInfo(ctx, spaceId, clusterId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45011,7 +45162,7 @@ func (c *ClientWithResponses) GetKubernetesClusterInfoWithResponse(ctx context.C
 }
 
 // GetKubernetesKubeConfigWithResponse request returning *GetKubernetesKubeConfigResponse
-func (c *ClientWithResponses) GetKubernetesKubeConfigWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesKubeConfigResponse, error) {
+func (c *ClientWithResponses) GetKubernetesKubeConfigWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesKubeConfigResponse, error) {
 	rsp, err := c.GetKubernetesKubeConfig(ctx, spaceId, clusterId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45020,7 +45171,7 @@ func (c *ClientWithResponses) GetKubernetesKubeConfigWithResponse(ctx context.Co
 }
 
 // UpgradeKubernetesMastersWithBodyWithResponse request with arbitrary body returning *UpgradeKubernetesMastersResponse
-func (c *ClientWithResponses) UpgradeKubernetesMastersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpgradeKubernetesMastersResponse, error) {
+func (c *ClientWithResponses) UpgradeKubernetesMastersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpgradeKubernetesMastersResponse, error) {
 	rsp, err := c.UpgradeKubernetesMastersWithBody(ctx, spaceId, clusterId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45028,7 +45179,7 @@ func (c *ClientWithResponses) UpgradeKubernetesMastersWithBodyWithResponse(ctx c
 	return ParseUpgradeKubernetesMastersResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpgradeKubernetesMastersWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesMastersJSONRequestBody, reqEditors ...RequestEditorFn) (*UpgradeKubernetesMastersResponse, error) {
+func (c *ClientWithResponses) UpgradeKubernetesMastersWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesMastersJSONRequestBody, reqEditors ...RequestEditorFn) (*UpgradeKubernetesMastersResponse, error) {
 	rsp, err := c.UpgradeKubernetesMasters(ctx, spaceId, clusterId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45046,7 +45197,7 @@ func (c *ClientWithResponses) ListClusterOperationsWithResponse(ctx context.Cont
 }
 
 // GetKubernetesPrivateKeyWithResponse request returning *GetKubernetesPrivateKeyResponse
-func (c *ClientWithResponses) GetKubernetesPrivateKeyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesPrivateKeyResponse, error) {
+func (c *ClientWithResponses) GetKubernetesPrivateKeyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesPrivateKeyResponse, error) {
 	rsp, err := c.GetKubernetesPrivateKey(ctx, spaceId, clusterId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45055,7 +45206,7 @@ func (c *ClientWithResponses) GetKubernetesPrivateKeyWithResponse(ctx context.Co
 }
 
 // GetKubernetesClusterStateWithResponse request returning *GetKubernetesClusterStateResponse
-func (c *ClientWithResponses) GetKubernetesClusterStateWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesClusterStateResponse, error) {
+func (c *ClientWithResponses) GetKubernetesClusterStateWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, reqEditors ...RequestEditorFn) (*GetKubernetesClusterStateResponse, error) {
 	rsp, err := c.GetKubernetesClusterState(ctx, spaceId, clusterId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45064,7 +45215,7 @@ func (c *ClientWithResponses) GetKubernetesClusterStateWithResponse(ctx context.
 }
 
 // AddKubernetesWorkersWithBodyWithResponse request with arbitrary body returning *AddKubernetesWorkersResponse
-func (c *ClientWithResponses) AddKubernetesWorkersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddKubernetesWorkersResponse, error) {
+func (c *ClientWithResponses) AddKubernetesWorkersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddKubernetesWorkersResponse, error) {
 	rsp, err := c.AddKubernetesWorkersWithBody(ctx, spaceId, clusterId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45072,7 +45223,7 @@ func (c *ClientWithResponses) AddKubernetesWorkersWithBodyWithResponse(ctx conte
 	return ParseAddKubernetesWorkersResponse(rsp)
 }
 
-func (c *ClientWithResponses) AddKubernetesWorkersWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body AddKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*AddKubernetesWorkersResponse, error) {
+func (c *ClientWithResponses) AddKubernetesWorkersWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body AddKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*AddKubernetesWorkersResponse, error) {
 	rsp, err := c.AddKubernetesWorkers(ctx, spaceId, clusterId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45081,7 +45232,7 @@ func (c *ClientWithResponses) AddKubernetesWorkersWithResponse(ctx context.Conte
 }
 
 // RemoveKubernetesWorkerWithBodyWithResponse request with arbitrary body returning *RemoveKubernetesWorkerResponse
-func (c *ClientWithResponses) RemoveKubernetesWorkerWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveKubernetesWorkerResponse, error) {
+func (c *ClientWithResponses) RemoveKubernetesWorkerWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveKubernetesWorkerResponse, error) {
 	rsp, err := c.RemoveKubernetesWorkerWithBody(ctx, spaceId, clusterId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45089,7 +45240,7 @@ func (c *ClientWithResponses) RemoveKubernetesWorkerWithBodyWithResponse(ctx con
 	return ParseRemoveKubernetesWorkerResponse(rsp)
 }
 
-func (c *ClientWithResponses) RemoveKubernetesWorkerWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body RemoveKubernetesWorkerJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveKubernetesWorkerResponse, error) {
+func (c *ClientWithResponses) RemoveKubernetesWorkerWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body RemoveKubernetesWorkerJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveKubernetesWorkerResponse, error) {
 	rsp, err := c.RemoveKubernetesWorker(ctx, spaceId, clusterId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45098,7 +45249,7 @@ func (c *ClientWithResponses) RemoveKubernetesWorkerWithResponse(ctx context.Con
 }
 
 // UpgradeKubernetesWorkersWithBodyWithResponse request with arbitrary body returning *UpgradeKubernetesWorkersResponse
-func (c *ClientWithResponses) UpgradeKubernetesWorkersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpgradeKubernetesWorkersResponse, error) {
+func (c *ClientWithResponses) UpgradeKubernetesWorkersWithBodyWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpgradeKubernetesWorkersResponse, error) {
 	rsp, err := c.UpgradeKubernetesWorkersWithBody(ctx, spaceId, clusterId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -45106,7 +45257,7 @@ func (c *ClientWithResponses) UpgradeKubernetesWorkersWithBodyWithResponse(ctx c
 	return ParseUpgradeKubernetesWorkersResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpgradeKubernetesWorkersWithResponse(ctx context.Context, spaceId SpaceId, clusterId KubernetesClusterId, body UpgradeKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*UpgradeKubernetesWorkersResponse, error) {
+func (c *ClientWithResponses) UpgradeKubernetesWorkersWithResponse(ctx context.Context, spaceId SpaceId, clusterId ClusterId, body UpgradeKubernetesWorkersJSONRequestBody, reqEditors ...RequestEditorFn) (*UpgradeKubernetesWorkersResponse, error) {
 	rsp, err := c.UpgradeKubernetesWorkers(ctx, spaceId, clusterId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -55148,6 +55299,74 @@ func ParseReadVPNConnectionResponse(rsp *http.Response) (*ReadVPNConnectionRespo
 			return nil, err
 		}
 		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error500
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateVPNConnectionResponse parses an HTTP response from a UpdateVPNConnectionWithResponse call
+func ParseUpdateVPNConnectionResponse(rsp *http.Response) (*UpdateVPNConnectionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateVPNConnectionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest UpdateVPNConnection200Response
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Error400
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Error401
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error404
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest Error409
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 429:
+		var dest Error429
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON429 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest Error500

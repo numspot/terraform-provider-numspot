@@ -10,7 +10,7 @@ info:
     url: 'https://opensource.org/licenses/BSD-3-Clause'
   termsOfService: 'https://numspot.com/'
   title: Numspot Public API
-  version: european-20250331
+  version: european-20250505
 servers:
   - url: 'https://api.{region}.numspot.com'
     variables:
@@ -5734,8 +5734,7 @@ paths:
           $ref: '#/components/responses/Error400'
         '500':
           $ref: '#/components/responses/Error500'
-      security:
-        - BearerAuth: []
+      security: []
       tags:
         - Kubernetes
   /kubernetes/nodeprofiles:
@@ -5800,7 +5799,7 @@ paths:
       description: retrieve cluster information by it's ID
       parameters:
         - $ref: '#/components/parameters/SpaceId'
-        - $ref: '#/components/parameters/KubernetesClusterId'
+        - $ref: '#/components/parameters/ClusterId'
       responses:
         '200':
           $ref: '#/components/responses/Cluster200Response'
@@ -5818,7 +5817,7 @@ paths:
       description: ordered the deletion of a cluster by using his name with them dependancies
       parameters:
         - $ref: '#/components/parameters/SpaceId'
-        - $ref: '#/components/parameters/KubernetesClusterId'
+        - $ref: '#/components/parameters/ClusterId'
       responses:
         '202':
           $ref: '#/components/responses/Operation202Response'
@@ -5841,7 +5840,7 @@ paths:
       description: retrieve cluster credentials on hex encoded format
       parameters:
         - $ref: '#/components/parameters/SpaceId'
-        - $ref: '#/components/parameters/KubernetesClusterId'
+        - $ref: '#/components/parameters/ClusterId'
       responses:
         '200':
           $ref: '#/components/responses/FileContent200Response'
@@ -5860,7 +5859,7 @@ paths:
       description: retrieve cluster private key on hex encoded format
       parameters:
         - $ref: '#/components/parameters/SpaceId'
-        - $ref: '#/components/parameters/KubernetesClusterId'
+        - $ref: '#/components/parameters/ClusterId'
       responses:
         '200':
           $ref: '#/components/responses/FileContent200Response'
@@ -5879,7 +5878,7 @@ paths:
       description: retrieve cluster state by it's id
       parameters:
         - $ref: '#/components/parameters/SpaceId'
-        - $ref: '#/components/parameters/KubernetesClusterId'
+        - $ref: '#/components/parameters/ClusterId'
       responses:
         '501':
           $ref: '#/components/responses/Error501'
@@ -5894,7 +5893,7 @@ paths:
       description: Instanciate workers and add it in a spacified cluster
       parameters:
         - $ref: '#/components/parameters/SpaceId'
-        - $ref: '#/components/parameters/KubernetesClusterId'
+        - $ref: '#/components/parameters/ClusterId'
       requestBody:
         $ref: '#/components/requestBodies/WorkersAdditionRequest'
       responses:
@@ -5917,7 +5916,7 @@ paths:
       description: Remove and destroy hasard workers in a spacified cluster
       parameters:
         - $ref: '#/components/parameters/SpaceId'
-        - $ref: '#/components/parameters/KubernetesClusterId'
+        - $ref: '#/components/parameters/ClusterId'
       requestBody:
         $ref: '#/components/requestBodies/WorkerRemoveRequest'
       responses:
@@ -5940,7 +5939,7 @@ paths:
       description: Upgrade kubernetes version of workers using masters kubernetes version
       parameters:
         - $ref: '#/components/parameters/SpaceId'
-        - $ref: '#/components/parameters/KubernetesClusterId'
+        - $ref: '#/components/parameters/ClusterId'
       requestBody:
         $ref: '#/components/requestBodies/WorkerUpgradeRequest'
       responses:
@@ -5957,7 +5956,7 @@ paths:
       description: Upgrade kubernetes version of master nodes
       parameters:
         - $ref: '#/components/parameters/SpaceId'
-        - $ref: '#/components/parameters/KubernetesClusterId'
+        - $ref: '#/components/parameters/ClusterId'
       requestBody:
         $ref: '#/components/requestBodies/MasterUpgradeRequest'
       responses:
@@ -7135,6 +7134,30 @@ paths:
           $ref: '#/components/responses/Error401'
         '409':
           $ref: '#/components/responses/Error409'
+        '500':
+          $ref: '#/components/responses/Error500'
+      security:
+        - BearerAuth: []
+      tags:
+        - Connectivity
+    put:
+      operationId: UpdateVPNConnection
+      description: Updates the specified attributes of a VPN connection
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateVPNConnectionRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/UpdateVPNConnection200Response'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '429':
+          $ref: '#/components/responses/Error429'
         '500':
           $ref: '#/components/responses/Error500'
       security:
@@ -11415,6 +11438,14 @@ components:
         type: string
         format: uuid
       description: The client identifier.
+    ClusterId:
+      name: clusterId
+      description: Identifier of the Cluster
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     CodeChallenge:
       name: code_challenge
       description: The code challenge generated.
@@ -15434,6 +15465,18 @@ components:
         - version
         - status
       title: Healthcheck
+    Cidr:
+      description: Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632
+      type: string
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      examples:
+        - 192.168.1.1/24
+        - 10.0.0.5/8
+        - 172.16.0.0/16
+        - 255.255.255.0/32
+        - 0.0.0.0/0
+      pattern: '^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\/(3[0-2]|[12]?[0-9])$'
+      title: Cidr
     KubernetesVersions:
       type: object
       properties:
@@ -15491,6 +15534,7 @@ components:
       pattern: '^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$'
       title: StrictSlug
     StrictSlugMax63:
+      type: string
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       allOf:
         - $ref: '#/components/schemas/StrictSlug'
@@ -15651,6 +15695,7 @@ components:
           description: The IP network mask handling by the cluster
           type: string
           format: cidr
+          pattern: '^10\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)\.0\.0/16$'
         tags:
           description: tags associated to the resource
           type: array
@@ -15721,7 +15766,7 @@ components:
           $ref: '#/components/schemas/SemanticVersion'
         cidr:
           type: string
-          format: cidr
+          pattern: '^10\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)\.0\.0/16$'
         nodeProfile:
           $ref: '#/components/schemas/KubernetesNodeProfileName'
         nodeCount:
@@ -15892,6 +15937,7 @@ components:
       pattern: '^[a-z0-9]+(?:[-_][a-z0-9]+)*$'
       title: StrictLowerCaseSlug
     StrictLowerCaseSlugMax63:
+      type: string
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       allOf:
         - $ref: '#/components/schemas/StrictLowerCaseSlug'
@@ -15970,6 +16016,7 @@ components:
             -"CREATING": Cluster is being created
             -"DELETING": Cluster is being terminated
             -"ACTIVE": Cluster is up and healthy
+            -"FAILED": Cluster has failed and is not healthy
           example: CREATING
           default: CREATING
           $ref: '#/components/schemas/State'
@@ -16789,18 +16836,6 @@ components:
         $ref: '#/components/schemas/PostgresTag'
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       title: PostgresTags
-    Cidr:
-      description: Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632
-      type: string
-      $schema: 'https://json-schema.org/draft/2020-12/schema'
-      examples:
-        - 192.168.1.1/24
-        - 10.0.0.5/8
-        - 172.16.0.0/16
-        - 255.255.255.0/32
-        - 0.0.0.0/0
-      pattern: '^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\/(3[0-2]|[12]?[0-9])$'
-      title: Cidr
     CreateComputeBridge:
       description: Schema request to bridge two compute VPCs.
       type: object
@@ -17377,6 +17412,14 @@ components:
         - connectionType
         - virtualGatewayId
       title: CreateVPNConnection
+    UpdateVPNConnection:
+      description: Update a VPN Connection.
+      type: object
+      properties:
+        vpnOptions:
+          $ref: '#/components/schemas/VpnOptions'
+      $schema: 'https://json-schema.org/draft/2020-12/schema'
+      title: UpdateVPNConnection
     VPNConnections:
       description: Information about one or more VPNConnections.
       type: object
@@ -17444,7 +17487,6 @@ components:
         - staticRoutesOnly
         - vgwTelemetries
         - virtualGatewayId
-        - vpnOptions
       title: VPNConnection
     RouteLight:
       description: Information about the route.
@@ -17517,10 +17559,6 @@ components:
           example: 169.254.254.0/26
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       additionalProperties: false
-      required:
-        - phase1Options
-        - phase2Options
-        - tunnelInsideIpRange
       title: VpnOptions
     Phase1Options:
       description: 'Information about Phase 1 of the Internet Key Exchange (IKE) negotiation. When Phase 1 finishes successfully, peers proceed to Phase 2 negotiations. '
@@ -17576,16 +17614,6 @@ components:
           example: string
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       additionalProperties: false
-      required:
-        - dpdTimeoutAction
-        - dpdTimeoutSeconds
-        - ikeVersions
-        - phase1DhGroupNumbers
-        - phase1EncryptionAlgorithms
-        - phase1IntegrityAlgorithms
-        - phase1LifetimeSeconds
-        - replayWindowSize
-        - startupAction
       title: Phase1Options
     Phase2Options:
       description: 'Information about Phase 2 of the Internet Key Exchange (IKE) negotiation. '
@@ -17622,12 +17650,6 @@ components:
           example: string
       $schema: 'https://json-schema.org/draft/2020-12/schema'
       additionalProperties: false
-      required:
-        - phase2DhGroupNumbers
-        - phase2EncryptionAlgorithms
-        - phase2IntegrityAlgorithms
-        - phase2LifetimeSeconds
-        - preSharedKey
       title: Phase2Options
     CreateVPNConnectionRoute:
       description: Create a VPN Connection Route.
@@ -21084,6 +21106,11 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/CreateVPNConnection'
+    UpdateVPNConnectionRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateVPNConnection'
     CreateVPNConnectionRouteRequest:
       content:
         application/json:
@@ -22154,6 +22181,12 @@ components:
             $ref: '#/components/schemas/VirtualGateway'
     CreateVPNConnection201Response:
       description: Response payload for CreateVPNConnection
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/VPNConnection'
+    UpdateVPNConnection200Response:
+      description: Response payload for UpdateVPNConnection
       content:
         application/json:
           schema:

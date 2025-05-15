@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"terraform-provider-numspot/internal/client"
-	"terraform-provider-numspot/internal/utils"
 )
 
 type ListBucketsOutput struct {
@@ -30,9 +29,7 @@ func CreateBucket(ctx context.Context, provider *client.NumSpotSDK, bucketName s
 		return err
 	}
 
-	signFn := utils.SignRequest(provider.S3Creds.Service, provider.S3Creds.Region, provider.S3Creds.Ak, provider.S3Creds.Sk)
-
-	res, err := provider.OsClient.CreateBucket(ctx, provider.SpaceID, bucketName, signFn)
+	res, err := provider.OsClient.CreateBucket(ctx, provider.SpaceID, bucketName, provider.SignFunc)
 	if err != nil {
 		return err
 	}
@@ -49,9 +46,7 @@ func DeleteBucket(ctx context.Context, provider *client.NumSpotSDK, bucketName s
 		return err
 	}
 
-	signFn := utils.SignRequest(provider.S3Creds.Service, provider.S3Creds.Region, provider.S3Creds.Ak, provider.S3Creds.Sk)
-
-	res, err := provider.OsClient.DeleteBucket(ctx, provider.SpaceID, bucketName, signFn)
+	res, err := provider.OsClient.DeleteBucket(ctx, provider.SpaceID, bucketName, provider.SignFunc)
 	if err != nil {
 		return err
 	}
@@ -92,9 +87,7 @@ func ReadBuckets(ctx context.Context, provider *client.NumSpotSDK) (*ListBuckets
 		return nil, err
 	}
 
-	signFn := utils.SignRequest(provider.S3Creds.Service, provider.S3Creds.Region, provider.S3Creds.Ak, provider.S3Creds.Sk)
-
-	res, err := provider.OsClient.ListBuckets(ctx, provider.SpaceID, signFn)
+	res, err := provider.OsClient.ListBuckets(ctx, provider.SpaceID, provider.SignFunc)
 	if err != nil {
 		return nil, err
 	}

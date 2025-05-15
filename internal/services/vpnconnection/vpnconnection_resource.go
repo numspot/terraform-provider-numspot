@@ -217,7 +217,7 @@ func serializeVpnConnection(ctx context.Context, http *api.VPNConnection, diags 
 		State:                      types.StringValue(http.State),
 		StaticRoutesOnly:           types.BoolValue(http.StaticRoutesOnly),
 		VirtualGatewayId:           types.StringValue(http.VirtualGatewayId.String()),
-		VpnOptions:                 serializeVpnOptions(ctx, &http.VpnOptions, diags),
+		VpnOptions:                 serializeVpnOptions(ctx, http.VpnOptions, diags),
 	}
 
 	if http.Routes != nil {
@@ -264,11 +264,11 @@ func serializeVpnOptions(ctx context.Context, elt *api.VpnOptions, diags *diag.D
 		map[string]attr.Value{
 			"phase1options":          phase1OptionsNull,
 			"phase2options":          phase2OptionsNull,
-			"tunnel_inside_ip_range": types.StringValue(elt.TunnelInsideIpRange),
+			"tunnel_inside_ip_range": types.StringPointerValue(elt.TunnelInsideIpRange),
 		})
 	diags.Append(diagnostics...)
 
-	phase1Options := serializePhase1Options(ctx, &elt.Phase1Options, diags)
+	phase1Options := serializePhase1Options(ctx, elt.Phase1Options, diags)
 	if diags.HasError() {
 		return resource_vpn_connection.VpnOptionsValue{}
 	}
@@ -277,7 +277,7 @@ func serializeVpnOptions(ctx context.Context, elt *api.VpnOptions, diags *diag.D
 
 	vpnOptions.Phase1options = ph1OptsObj
 
-	phase2Options := serializePhase2Options(ctx, &elt.Phase2Options, diags)
+	phase2Options := serializePhase2Options(ctx, elt.Phase2Options, diags)
 	ph2OptsObj, diagnostics := phase2Options.ToObjectValue(ctx)
 	diags.Append(diagnostics...)
 
@@ -287,19 +287,19 @@ func serializeVpnOptions(ctx context.Context, elt *api.VpnOptions, diags *diag.D
 }
 
 func serializePhase1Options(ctx context.Context, elt *api.Phase1Options, diags *diag.Diagnostics) resource_vpn_connection.Phase1optionsValue {
-	phase1IntegrityAlgorithms := utils.FromStringListToTfStringList(ctx, elt.Phase1IntegrityAlgorithms, diags)
+	phase1IntegrityAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1IntegrityAlgorithms, diags)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase1optionsValue{}
 	}
-	phase1EncryptionAlgorithms := utils.FromStringListToTfStringList(ctx, elt.Phase1EncryptionAlgorithms, diags)
+	phase1EncryptionAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase1EncryptionAlgorithms, diags)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase1optionsValue{}
 	}
-	phase1DHGroupNumbers := utils.FromIntListToTfInt64List(ctx, elt.Phase1DhGroupNumbers, diags)
+	phase1DHGroupNumbers := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase1DhGroupNumbers, diags)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase1optionsValue{}
 	}
-	ikeVersions := utils.FromStringListToTfStringList(ctx, elt.IkeVersions, diags)
+	ikeVersions := utils.FromStringListPointerToTfStringList(ctx, elt.IkeVersions, diags)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase1optionsValue{}
 	}
@@ -307,30 +307,30 @@ func serializePhase1Options(ctx context.Context, elt *api.Phase1Options, diags *
 	value, diagnostics := resource_vpn_connection.NewPhase1optionsValue(
 		resource_vpn_connection.Phase1optionsValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"dpd_timeout_action":          types.StringValue(elt.DpdTimeoutAction),
-			"dpd_timeout_seconds":         types.Int64Value(int64(elt.DpdTimeoutSeconds)),
+			"dpd_timeout_action":          types.StringPointerValue(elt.DpdTimeoutAction),
+			"dpd_timeout_seconds":         types.Int64Value(utils.ConvertIntPtrToInt64(elt.DpdTimeoutSeconds)),
 			"ike_versions":                ikeVersions,
 			"phase1dh_group_numbers":      phase1DHGroupNumbers,
 			"phase1encryption_algorithms": phase1EncryptionAlgorithms,
 			"phase1integrity_algorithms":  phase1IntegrityAlgorithms,
-			"phase1lifetime_seconds":      types.Int64Value(int64(elt.Phase1LifetimeSeconds)),
-			"replay_window_size":          types.Int64Value(int64(elt.ReplayWindowSize)),
-			"startup_action":              types.StringValue(elt.StartupAction),
+			"phase1lifetime_seconds":      types.Int64Value(utils.ConvertIntPtrToInt64(elt.Phase1LifetimeSeconds)),
+			"replay_window_size":          types.Int64Value(utils.ConvertIntPtrToInt64(elt.ReplayWindowSize)),
+			"startup_action":              types.StringPointerValue(elt.StartupAction),
 		})
 	diags.Append(diagnostics...)
 	return value
 }
 
 func serializePhase2Options(ctx context.Context, elt *api.Phase2Options, diags *diag.Diagnostics) resource_vpn_connection.Phase2optionsValue {
-	phase2IntegrityAlgorithms := utils.FromStringListToTfStringList(ctx, elt.Phase2IntegrityAlgorithms, diags)
+	phase2IntegrityAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2IntegrityAlgorithms, diags)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase2optionsValue{}
 	}
-	phase2EncryptionAlgorithms := utils.FromStringListToTfStringList(ctx, elt.Phase2EncryptionAlgorithms, diags)
+	phase2EncryptionAlgorithms := utils.FromStringListPointerToTfStringList(ctx, elt.Phase2EncryptionAlgorithms, diags)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase2optionsValue{}
 	}
-	phase2DHGroupNumbers := utils.FromIntListToTfInt64List(ctx, elt.Phase2DhGroupNumbers, diags)
+	phase2DHGroupNumbers := utils.FromIntListPointerToTfInt64List(ctx, elt.Phase2DhGroupNumbers, diags)
 	if diags.HasError() {
 		return resource_vpn_connection.Phase2optionsValue{}
 	}
@@ -341,8 +341,8 @@ func serializePhase2Options(ctx context.Context, elt *api.Phase2Options, diags *
 			"phase2dh_group_numbers":      phase2DHGroupNumbers,
 			"phase2encryption_algorithms": phase2EncryptionAlgorithms,
 			"phase2integrity_algorithms":  phase2IntegrityAlgorithms,
-			"phase2lifetime_seconds":      types.Int64Value(int64(elt.Phase2LifetimeSeconds)),
-			"pre_shared_key":              types.StringValue(elt.PreSharedKey),
+			"phase2lifetime_seconds":      types.Int64Value(utils.ConvertIntPtrToInt64(elt.Phase2LifetimeSeconds)),
+			"pre_shared_key":              types.StringPointerValue(elt.PreSharedKey),
 		})
 
 	diags.Append(diagnostics...)

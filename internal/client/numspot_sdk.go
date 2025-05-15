@@ -19,22 +19,15 @@ const (
 	UserAgentHeader    = "User-Agent"
 	TerraformUserAgent = "TERRAFORM-NUMSPOT"
 	Credentials        = "client_credentials"
-	ServiceS3          = "s3"
-	RegionS3           = "eu-west-2"
+	serviceS3          = "s3"
+	regionS3           = "eu-west-2"
 )
-
-type S3Client struct {
-	Service string
-	Region  string
-	Ak      string
-	Sk      string
-}
 
 type NumSpotSDK struct {
 	ID                    string
 	Client                *api.ClientWithResponses
 	OsClient              *objectstorage.ClientWithResponses
-	S3Creds               *S3Client
+	SignFunc              objectstorage.RequestEditorFn
 	HTTPClient            *http.Client
 	SpaceID               api.SpaceId
 	ClientID              uuid.UUID
@@ -235,12 +228,7 @@ func (s *NumSpotSDK) setupS3Client(ctx context.Context, response *api.TokenRespo
 		return err
 	}
 
-	s.S3Creds = &S3Client{
-		Ak:      res.JSON200.Ak,
-		Sk:      res.JSON200.Sk,
-		Service: ServiceS3,
-		Region:  RegionS3,
-	}
+	s.SignFunc = utils.SignRequest(serviceS3, regionS3, res.JSON200.Ak, res.JSON200.Sk)
 
 	return err
 }

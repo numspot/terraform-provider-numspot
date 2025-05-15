@@ -1,0 +1,29 @@
+provider:
+  name: numspot
+
+resources:
+  postgres_cluster:
+    create:
+      method: POST
+      path: /postgresql/spaces/{spaceId}/clusters
+    delete:
+      method: DELETE
+      path: /postgresql/spaces/{spaceId}/clusters/{clusterId}
+    read:
+      method: GET
+      path: /postgresql/spaces/{spaceId}/clusters/{clusterId}
+    update:
+      method: PATCH
+      path: /postgresql/spaces/{spaceId}/clusters/{clusterId}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  postgres_cluster:
+    read:
+      method: GET
+      path: /postgresql/spaces/{spaceId}/clusters
+    schema:
+      ignores:
+        - spaceId
