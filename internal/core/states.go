@@ -14,6 +14,7 @@ const (
 	deleting      = "deleting"
 	deleted       = "deleted"
 	detaching     = "detaching"
+	done          = "done"
 	updating      = "updating"
 	pending       = "pending"
 	pendingQueued = "pending/queued"

@@ -1,0 +1,29 @@
+provider:
+  name: numspot
+
+resources:
+  cluster:
+    create:
+      method: POST
+      path: /openshift/spaces/{spaceId}/clusters
+    update:
+      method: POST
+      path: /openshift/spaces/{spaceId}/clusters/{clusterId}
+    delete:
+      method: DELETE
+      path: /openshift/spaces/{spaceId}/clusters/{clusterId}
+    read:
+      method: GET
+      path: /openshift/spaces/{spaceId}/clusters/{clusterId}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  cluster:
+    read:
+      method: GET
+      path: /openshift/spaces/{spaceId}/clusters
+    schema:
+      ignores:
+        - spaceId

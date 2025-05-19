@@ -25,6 +25,7 @@ import (
 	"terraform-provider-numspot/internal/services/managedservicebridge"
 	"terraform-provider-numspot/internal/services/natgateway"
 	"terraform-provider-numspot/internal/services/nic"
+	"terraform-provider-numspot/internal/services/openshift_cluster"
 	"terraform-provider-numspot/internal/services/postgres_cluster"
 	"terraform-provider-numspot/internal/services/publicip"
 	"terraform-provider-numspot/internal/services/routetable"
@@ -299,6 +300,7 @@ func (p *numspotProvider) DataSources(_ context.Context) []func() datasource.Dat
 		hybridbridge.NewHybridBridgeDataSource,
 		managedservicebridge.NewManagedServiceBridgeDataSource,
 		postgres_cluster.NewPostgresClusterDataSource,
+		openshift_cluster.NewClustersDataSource,
 	}
 }
 
@@ -329,5 +331,6 @@ func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resourc
 		hybridbridge.NewHybridBridgeResource,
 		managedservicebridge.NewManagedServiceBridgeResource,
 		postgres_cluster.NewPostgresClusterResource,
+		openshift_cluster.NewClusterResource,
 	}
 }
