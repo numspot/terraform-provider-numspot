@@ -236,7 +236,7 @@
 													},
 													{
 														"name": "ip_ranges",
-														"list": {
+														"set": {
 															"computed_optional_required": "computed",
 															"element_type": {
 																"string": {}
@@ -320,7 +320,7 @@
 													},
 													{
 														"name": "ip_ranges",
-														"list": {
+														"set": {
 															"computed_optional_required": "computed",
 															"element_type": {
 																"string": {}
@@ -504,7 +504,7 @@
 									},
 									{
 										"name": "ip_ranges",
-										"list": {
+										"set": {
 											"computed_optional_required": "computed_optional",
 											"element_type": {
 												"string": {}
@@ -581,7 +581,7 @@
 									},
 									{
 										"name": "ip_ranges",
-										"list": {
+										"set": {
 											"computed_optional_required": "computed_optional",
 											"element_type": {
 												"string": {}

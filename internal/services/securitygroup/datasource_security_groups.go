@@ -154,14 +154,14 @@ func mappingTags(ctx context.Context, tag api.ResourceTag) (datasource_security_
 
 func mappingInboundRules(ctx context.Context, securityGroup api.SecurityGroup, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
 	var mappingDiags diag.Diagnostics
-	var ipRangesList types.List
+	var ipRangesList types.Set
 	var serviceIdsList types.List
 
 	lt := len(*securityGroup.InboundRules)
 	elementValue := make([]datasource_security_group.InboundRulesValue, lt)
 	for y, rule := range *securityGroup.InboundRules {
 
-		ipRangesList, mappingDiags = types.ListValueFrom(ctx, types.StringType, rule.IpRanges)
+		ipRangesList, mappingDiags = types.SetValueFrom(ctx, types.StringType, rule.IpRanges)
 		diags.Append(mappingDiags...)
 
 		serviceIdsList, mappingDiags = types.ListValueFrom(ctx, types.StringType, rule.ServiceIds)
@@ -191,14 +191,14 @@ func mappingInboundRules(ctx context.Context, securityGroup api.SecurityGroup, d
 
 func mappingOutboundRules(ctx context.Context, securityGroup api.SecurityGroup, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
 	var mappingDiags diag.Diagnostics
-	var ipRangesList types.List
+	var ipRangesList types.Set
 	var serviceIdsList types.List
 
 	lt := len(*securityGroup.OutboundRules)
 	elementValue := make([]datasource_security_group.OutboundRulesValue, lt)
 	for y, rule := range *securityGroup.OutboundRules {
 
-		ipRangesList, mappingDiags = types.ListValueFrom(ctx, types.StringType, rule.IpRanges)
+		ipRangesList, mappingDiags = types.SetValueFrom(ctx, types.StringType, rule.IpRanges)
 		diags.Append(mappingDiags...)
 
 		serviceIdsList, mappingDiags = types.ListValueFrom(ctx, types.StringType, rule.ServiceIds)

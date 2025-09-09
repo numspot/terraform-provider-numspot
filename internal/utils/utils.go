@@ -339,7 +339,7 @@ func FromHttpGenericListToTfList[httpType any, tfType any](
 func Diff[A basetypes.ObjectValuable](current, desired []A) (toCreate, toDelete []A) {
 	toCreate = diff(desired, current)
 	toDelete = diff(current, desired)
-	return
+	return toCreate, toDelete
 }
 
 func ConvertTfListToArrayOfString(ctx context.Context, list types.List, diags *diag.Diagnostics) *[]string {
@@ -476,7 +476,7 @@ func diff[A basetypes.ObjectValuable](slice1, slice2 []A) []A {
 func DiffComparable[A comparable](current, desired []A) (toCreate, toDelete []A) {
 	toCreate = diffComparable(desired, current)
 	toDelete = diffComparable(current, desired)
-	return
+	return toCreate, toDelete
 }
 
 // Return the subset of slice1 elements that are not in slice2

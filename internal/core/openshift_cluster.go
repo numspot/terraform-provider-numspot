@@ -144,7 +144,7 @@ func DeleteOpenshiftCluster(ctx context.Context, provider *client.NumSpotSDK, cl
 
 	_, err = getOpenshiftOperationStateAfterDeletion(ctx, provider, res.JSON202)
 	if err != nil {
-		return
+		return numspotCluster, err
 	}
 
 	return res.JSON202, nil

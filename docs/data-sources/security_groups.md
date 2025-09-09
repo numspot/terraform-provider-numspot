@@ -99,7 +99,7 @@ Read-Only:
 - `from_port_range` (Number) The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.
 - `inbound_security_groups_members` (Attributes List) Information about one or more source or destination security groups. (see [below for nested schema](#nestedatt--items--inbound_rules--inbound_security_groups_members))
 - `ip_protocol` (String) The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
-- `ip_ranges` (List of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
+- `ip_ranges` (Set of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
 - `service_ids` (List of String) One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.
 - `to_port_range` (Number) The end of the port range for the TCP and UDP protocols, or an ICMP code number.
 
@@ -120,7 +120,7 @@ Read-Only:
 
 - `from_port_range` (Number) The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.
 - `ip_protocol` (String) The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).
-- `ip_ranges` (List of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
+- `ip_ranges` (Set of String) One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).
 - `outbound_security_groups_members` (Attributes List) Information about one or more source or destination security groups. (see [below for nested schema](#nestedatt--items--outbound_rules--outbound_security_groups_members))
 - `service_ids` (List of String) One or more service IDs to allow traffic from a Vpc to access the corresponding NumSpot services.
 - `to_port_range` (Number) The end of the port range for the TCP and UDP protocols, or an ICMP code number.

@@ -329,7 +329,7 @@ func deserializeOutboundRules(ctx context.Context, outboundRules types.Set) []ap
 }
 
 func serializeInboundRule(ctx context.Context, rules api.SecurityGroupRule) resource_security_group.InboundRulesValue {
-	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
+	ipRanges, diags := types.SetValueFrom(ctx, types.StringType, rules.IpRanges)
 	if diags.HasError() {
 		return resource_security_group.InboundRulesValue{}
 	}
@@ -362,7 +362,7 @@ func serializeInboundRule(ctx context.Context, rules api.SecurityGroupRule) reso
 }
 
 func serializeOutboundRule(ctx context.Context, rules api.SecurityGroupRule) resource_security_group.OutboundRulesValue {
-	ipRanges, diags := types.ListValueFrom(ctx, types.StringType, rules.IpRanges)
+	ipRanges, diags := types.SetValueFrom(ctx, types.StringType, rules.IpRanges)
 	if diags.HasError() {
 		return resource_security_group.OutboundRulesValue{}
 	}
