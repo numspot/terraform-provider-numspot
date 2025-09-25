@@ -58,7 +58,7 @@ func SubnetResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the Subnet (`pending` \\| `available` \\| `deleted`).",
 				MarkdownDescription: "The state of the Subnet (`pending` \\| `available` \\| `deleted`).",
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -102,7 +102,7 @@ type SubnetModel struct {
 	IpRange              types.String `tfsdk:"ip_range"`
 	MapPublicIpOnLaunch  types.Bool   `tfsdk:"map_public_ip_on_launch"`
 	State                types.String `tfsdk:"state"`
-	Tags                 types.List   `tfsdk:"tags"`
+	Tags                 types.Set    `tfsdk:"tags"`
 	VpcId                types.String `tfsdk:"vpc_id"`
 }
 

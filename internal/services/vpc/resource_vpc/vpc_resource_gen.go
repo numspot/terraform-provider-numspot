@@ -44,7 +44,7 @@ func VpcResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the Vpc (`pending` \\| `available` \\| `deleting`).",
 				MarkdownDescription: "The state of the Vpc (`pending` \\| `available` \\| `deleting`).",
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -84,7 +84,7 @@ type VpcModel struct {
 	Id               types.String `tfsdk:"id"`
 	IpRange          types.String `tfsdk:"ip_range"`
 	State            types.String `tfsdk:"state"`
-	Tags             types.List   `tfsdk:"tags"`
+	Tags             types.Set    `tfsdk:"tags"`
 	Tenancy          types.String `tfsdk:"tenancy"`
 }
 

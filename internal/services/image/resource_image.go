@@ -236,7 +236,7 @@ func serializeNumSpotImage(ctx context.Context, plan resource_image.ImageModel, 
 		blockDeviceMappingsTf types.List
 		productCodesTf        types.List
 		stateCommentTf        resource_image.StateCommentValue
-		tagsTf                types.List
+		tagsTf                types.Set
 	)
 
 	if image.CreationDate != nil {
@@ -277,7 +277,7 @@ func serializeNumSpotImage(ctx context.Context, plan resource_image.ImageModel, 
 	}
 
 	if image.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *image.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *image.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -370,7 +370,7 @@ func serializeBsu(ctx context.Context, bsu *api.BsuToCreate, diags *diag.Diagnos
 	return bsuValue
 }
 
-func imageTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func imageTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_image.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

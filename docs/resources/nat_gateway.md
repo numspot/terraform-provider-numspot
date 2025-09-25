@@ -65,7 +65,7 @@ If the public IP is already associated with another resource, you must first dis
 
 ### Optional
 
-- `tags` (Attributes List) One or more tags associated with the NAT gateway. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes Set) One or more tags associated with the NAT gateway. (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only
 

@@ -171,7 +171,7 @@
 					},
 					{
 						"name": "tags",
-						"list_nested": {
+						"set_nested": {
 							"computed_optional_required": "computed_optional",
 							"nested_object": {
 								"attributes": [

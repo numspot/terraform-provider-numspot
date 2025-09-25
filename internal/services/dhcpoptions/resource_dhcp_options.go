@@ -182,7 +182,8 @@ func deserializeDHCPOption(ctx context.Context, tf resource_dhcp_options.DhcpOpt
 }
 
 func serializeNumSpotDHCPOption(ctx context.Context, http *api.DhcpOptionsSet, diags *diag.Diagnostics) resource_dhcp_options.DhcpOptionsModel {
-	var domainNameServersTf, logServersTf, ntpServersTf, tagsTf types.List
+	var domainNameServersTf, logServersTf, ntpServersTf types.List
+	var tagsTf types.Set
 
 	if http.DomainNameServers != nil {
 		domainNameServersTf = utils.StringListToTfListValue(ctx, *http.DomainNameServers, diags)
@@ -206,7 +207,7 @@ func serializeNumSpotDHCPOption(ctx context.Context, http *api.DhcpOptionsSet, d
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return resource_dhcp_options.DhcpOptionsModel{}
 		}
@@ -223,7 +224,7 @@ func serializeNumSpotDHCPOption(ctx context.Context, http *api.DhcpOptionsSet, d
 	}
 }
 
-func dhcpTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func dhcpTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_dhcp_options.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

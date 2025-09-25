@@ -238,7 +238,7 @@ func LoadBalancerResourceSchema(ctx context.Context) schema.Schema {
 					listplanmodifier.RequiresReplace(),
 				},
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -295,7 +295,7 @@ type LoadBalancerModel struct {
 	SecurityGroups                  types.List       `tfsdk:"security_groups"`
 	StickyCookiePolicies            types.List       `tfsdk:"sticky_cookie_policies"`
 	Subnets                         types.List       `tfsdk:"subnets"`
-	Tags                            types.List       `tfsdk:"tags"`
+	Tags                            types.Set        `tfsdk:"tags"`
 	Type                            types.String     `tfsdk:"type"`
 	VpcId                           types.String     `tfsdk:"vpc_id"`
 }

@@ -478,7 +478,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -559,7 +559,7 @@ type VmModel struct {
 	State                       types.String   `tfsdk:"state"`
 	StateReason                 types.String   `tfsdk:"state_reason"`
 	SubnetId                    types.String   `tfsdk:"subnet_id"`
-	Tags                        types.List     `tfsdk:"tags"`
+	Tags                        types.Set      `tfsdk:"tags"`
 	Type                        types.String   `tfsdk:"type"`
 	UserData                    types.String   `tfsdk:"user_data"`
 	VmInitiatedShutdownBehavior types.String   `tfsdk:"vm_initiated_shutdown_behavior"`

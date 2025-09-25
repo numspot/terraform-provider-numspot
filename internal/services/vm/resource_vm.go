@@ -294,7 +294,7 @@ func placementFromHTTP(ctx context.Context, elt *api.Placement, diags *diag.Diag
 
 func serializeNumSpotVM(ctx context.Context, http *api.Vm, diags *diag.Diagnostics) *resource_vm.VmModel {
 	var (
-		tagsTf types.List
+		tagsTf types.Set
 		nics   = types.ListNull(resource_vm.NicsValue{}.Type(ctx))
 	)
 
@@ -346,7 +346,7 @@ func serializeNumSpotVM(ctx context.Context, http *api.Vm, diags *diag.Diagnosti
 
 	// Tags
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	if http.Nics != nil {
@@ -595,7 +595,7 @@ func bsuFromTf(bsu resource_vm.BsuValue) *api.BsuToUpdateVm {
 	}
 }
 
-func vmTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func vmTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_vm.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

@@ -234,7 +234,7 @@ func serializeNumSpotNic(ctx context.Context, http *api.Nic, diags *diag.Diagnos
 	var (
 		linkPublicIpTf resource_nic.LinkPublicIpValue
 		linkNicTf      resource_nic.LinkNicValue
-		tagsTf         types.List
+		tagsTf         types.Set
 	)
 
 	privateIps := utils.GenericSetToTfSetValue(ctx, serializeNumspotPrivateIps, utils.GetPtrValue(http.PrivateIps), diags)
@@ -288,7 +288,7 @@ func serializeNumSpotNic(ctx context.Context, http *api.Nic, diags *diag.Diagnos
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -411,7 +411,7 @@ func serializeLinkPublicIpPrivateIp(ctx context.Context, elt api.LinkPublicIp, d
 	return value
 }
 
-func nicTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func nicTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_nic.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

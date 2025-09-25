@@ -70,7 +70,7 @@ func DhcpOptionsResourceSchema(ctx context.Context) schema.Schema {
 					listplanmodifier.RequiresReplaceIfConfigured(),
 				},
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -106,7 +106,7 @@ type DhcpOptionsModel struct {
 	Id                types.String `tfsdk:"id"`
 	LogServers        types.List   `tfsdk:"log_servers"`
 	NtpServers        types.List   `tfsdk:"ntp_servers"`
-	Tags              types.List   `tfsdk:"tags"`
+	Tags              types.Set    `tfsdk:"tags"`
 }
 
 var _ basetypes.ObjectTypable = TagsType{}

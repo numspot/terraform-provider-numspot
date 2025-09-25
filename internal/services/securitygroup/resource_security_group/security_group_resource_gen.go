@@ -186,7 +186,7 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The outbound rules associated with the security group.",
 				MarkdownDescription: "The outbound rules associated with the security group.",
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -229,7 +229,7 @@ type SecurityGroupModel struct {
 	InboundRules  types.Set    `tfsdk:"inbound_rules"`
 	Name          types.String `tfsdk:"name"`
 	OutboundRules types.Set    `tfsdk:"outbound_rules"`
-	Tags          types.List   `tfsdk:"tags"`
+	Tags          types.Set    `tfsdk:"tags"`
 	VpcId         types.String `tfsdk:"vpc_id"`
 }
 

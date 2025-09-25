@@ -161,9 +161,9 @@ func deserializeCreateSubnet(tf resource_subnet.SubnetModel) api.CreateSubnetJSO
 }
 
 func serializeSubnet(ctx context.Context, http *api.Subnet, diags *diag.Diagnostics) *resource_subnet.SubnetModel {
-	var tagsList types.List
+	var tagsList types.Set
 	if http.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsList = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -181,7 +181,7 @@ func serializeSubnet(ctx context.Context, http *api.Subnet, diags *diag.Diagnost
 	}
 }
 
-func subnetTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func subnetTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_subnet.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

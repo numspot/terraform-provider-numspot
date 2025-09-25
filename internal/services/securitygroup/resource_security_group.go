@@ -165,7 +165,7 @@ func (r *securityGroupResource) Delete(ctx context.Context, request resource.Del
 }
 
 func serializeSecurityGroup(ctx context.Context, http *api.SecurityGroup, diags *diag.Diagnostics) *resource_security_group.SecurityGroupModel {
-	var tagsTf types.List
+	var tagsTf types.Set
 
 	if http.InboundRules == nil {
 		return nil
@@ -206,7 +206,7 @@ func serializeSecurityGroup(ctx context.Context, http *api.SecurityGroup, diags 
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -394,7 +394,7 @@ func serializeOutboundRule(ctx context.Context, rules api.SecurityGroupRule) res
 	return value
 }
 
-func securityGroupTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func securityGroupTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_security_group.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

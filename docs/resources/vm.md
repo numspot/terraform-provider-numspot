@@ -100,7 +100,7 @@ resource "numspot_vm" "vm" {
 - `private_ips` (List of String) One or more private IPs of the VM.
 - `security_group_ids` (List of String) One or more IDs of security group for the VMs.
 - `security_groups` (List of String) One or more names of security groups for the VMs.
-- `tags` (Attributes List) One or more tags associated with the VM. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes Set) One or more tags associated with the VM. (see [below for nested schema](#nestedatt--tags))
 - `user_data` (String) Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
 
 ### Read-Only

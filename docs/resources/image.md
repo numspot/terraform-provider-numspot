@@ -78,7 +78,7 @@ Constraints: 3-128 alphanumeric characters, underscores (`_`), spaces (` `), par
 - `root_device_name` (String) **(when registering from a snapshot, or from a bucket without using a manifest file)** The name of the root device for the new Image.
 - `source_image_id` (String) **(when copying an Image)** The ID of the Image you want to copy.
 - `source_region_name` (String) **(when copying an Image)** The name of the source Region (always the same as the Region of your account).
-- `tags` (Attributes List) One or more tags associated with the DHCP options set. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes Set) One or more tags associated with the DHCP options set. (see [below for nested schema](#nestedatt--tags))
 - `vm_id` (String) **(when creating from a VM)** The ID of the VM from which you want to create the Image.
 
 ### Read-Only

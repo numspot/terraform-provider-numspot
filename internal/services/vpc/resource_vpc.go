@@ -151,10 +151,10 @@ func (r *vpcResource) Delete(ctx context.Context, request resource.DeleteRequest
 }
 
 func serializeVPC(ctx context.Context, http *api.Vpc, diags *diag.Diagnostics) resource_vpc.VpcModel {
-	var tagsTf types.List
+	var tagsTf types.Set
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return resource_vpc.VpcModel{
@@ -174,7 +174,7 @@ func deserializeCreateVPCRequest(tf resource_vpc.VpcModel) api.CreateVpcJSONRequ
 	}
 }
 
-func vpcTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func vpcTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_vpc.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

@@ -49,7 +49,7 @@ resource "numspot_route_table" "route-table" {
 
 - `routes` (Attributes Set) One or more routes in the route table. (see [below for nested schema](#nestedatt--routes))
 - `subnet_id` (String) The state of the Subnet (`pending` \| `available` \| `deleted`).
-- `tags` (Attributes List) One or more tags associated with the DHCP options set. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes Set) One or more tags associated with the DHCP options set. (see [below for nested schema](#nestedatt--tags))
 
 ### Read-Only
 

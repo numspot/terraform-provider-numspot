@@ -216,7 +216,7 @@ func serializeRouteTable(ctx context.Context, http *api.RouteTable, diags *diag.
 	var (
 		localRoute resource_route_table.LocalRouteValue
 		routes     []api.Route
-		tagsTf     types.List
+		tagsTf     types.Set
 	)
 
 	if http.Routes == nil {
@@ -252,7 +252,7 @@ func serializeRouteTable(ctx context.Context, http *api.RouteTable, diags *diag.
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -296,7 +296,7 @@ func deserializeRoutes(ctx context.Context, tfRoutes types.Set) []api.Route {
 	return routes
 }
 
-func routeTableTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func routeTableTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_route_table.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

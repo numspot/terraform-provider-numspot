@@ -172,7 +172,7 @@ func serializePublicIp(ctx context.Context, elt api.PublicIpLight, diags *diag.D
 }
 
 func serializeNATGateway(ctx context.Context, http *api.NatGateway, diags *diag.Diagnostics) resource_nat_gateway.NatGatewayModel {
-	var tagsTf types.List
+	var tagsTf types.Set
 
 	var publicIp []api.PublicIpLight
 	if http.PublicIps != nil {
@@ -196,7 +196,7 @@ func serializeNATGateway(ctx context.Context, http *api.NatGateway, diags *diag.
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return resource_nat_gateway.NatGatewayModel{}
 		}
@@ -213,7 +213,7 @@ func serializeNATGateway(ctx context.Context, http *api.NatGateway, diags *diag.
 	}
 }
 
-func natGatewayTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func natGatewayTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_nat_gateway.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

@@ -247,7 +247,7 @@ func NicResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -295,7 +295,7 @@ type NicModel struct {
 	SecurityGroups       types.List        `tfsdk:"security_groups"`
 	State                types.String      `tfsdk:"state"`
 	SubnetId             types.String      `tfsdk:"subnet_id"`
-	Tags                 types.List        `tfsdk:"tags"`
+	Tags                 types.Set         `tfsdk:"tags"`
 	VpcId                types.String      `tfsdk:"vpc_id"`
 }
 

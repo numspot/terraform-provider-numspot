@@ -196,7 +196,7 @@ resource "numspot_load_balancer" "load-balancer" {
 - `health_check` (Attributes) Information about the health check configuration. (see [below for nested schema](#nestedatt--health_check))
 - `public_ip` (String) (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by NumSpot is associated.
 - `security_groups` (List of String) (Vpc only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Vpc is assigned to the load balancer.
-- `tags` (Attributes List) One or more tags assigned to the load balancer. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes Set) One or more tags assigned to the load balancer. (see [below for nested schema](#nestedatt--tags))
 - `type` (String) The type of load balancer: `internet-facing` or `internal`. Use this parameter only for load balancers in a Vpc.
 
 ### Read-Only

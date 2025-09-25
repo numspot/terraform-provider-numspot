@@ -67,7 +67,7 @@ func NatGatewayResourceSchema(ctx context.Context) schema.Schema {
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -107,7 +107,7 @@ type NatGatewayModel struct {
 	PublicIps  types.List   `tfsdk:"public_ips"`
 	State      types.String `tfsdk:"state"`
 	SubnetId   types.String `tfsdk:"subnet_id"`
-	Tags       types.List   `tfsdk:"tags"`
+	Tags       types.Set    `tfsdk:"tags"`
 	VpcId      types.String `tfsdk:"vpc_id"`
 }
 

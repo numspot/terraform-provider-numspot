@@ -145,10 +145,10 @@ func (r *internetGatewayResource) Delete(ctx context.Context, request resource.D
 }
 
 func serializeNumSpotInternetGateway(ctx context.Context, http *api.InternetGateway, diags *diag.Diagnostics) *resource_internet_gateway.InternetGatewayModel {
-	var tagsTf types.List
+	var tagsTf types.Set
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -162,7 +162,7 @@ func serializeNumSpotInternetGateway(ctx context.Context, http *api.InternetGate
 	}
 }
 
-func internetGatewayTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func internetGatewayTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_internet_gateway.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

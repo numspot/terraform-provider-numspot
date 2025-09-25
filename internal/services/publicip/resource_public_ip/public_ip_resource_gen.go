@@ -55,7 +55,7 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The public IP.",
 				MarkdownDescription: "The public IP.",
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -101,7 +101,7 @@ type PublicIpModel struct {
 	NicId          types.String `tfsdk:"nic_id"`
 	PrivateIp      types.String `tfsdk:"private_ip"`
 	PublicIp       types.String `tfsdk:"public_ip"`
-	Tags           types.List   `tfsdk:"tags"`
+	Tags           types.Set    `tfsdk:"tags"`
 	VmId           types.String `tfsdk:"vm_id"`
 }
 

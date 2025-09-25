@@ -211,7 +211,7 @@ func (r *volumeResource) Delete(ctx context.Context, request resource.DeleteRequ
 func serializeNumSpotVolume(ctx context.Context, http *api.Volume, diags *diag.Diagnostics, ReplaceVolumeOnDownsize basetypes.BoolValue) resource_volume.VolumeModel {
 	var (
 		volumes = types.ListNull(resource_volume.LinkedVolumesValue{}.Type(ctx))
-		tagsTf  types.List
+		tagsTf  types.Set
 		linkVm  resource_volume.LinkVmValue
 	)
 
@@ -236,7 +236,7 @@ func serializeNumSpotVolume(ctx context.Context, http *api.Volume, diags *diag.D
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 	}
 
 	return resource_volume.VolumeModel{
@@ -312,7 +312,7 @@ func deserializeUpdateNumspotVolume(tf resource_volume.VolumeModel) api.UpdateVo
 }
 
 // volumeTags converts Terraform tags to NumSpot API format.
-func volumeTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func volumeTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_volume.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

@@ -246,7 +246,7 @@ func ImageResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "Information about the change of state.",
 				MarkdownDescription: "Information about the change of state.",
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -305,7 +305,7 @@ type ImageModel struct {
 	SourceRegionName    types.String      `tfsdk:"source_region_name"`
 	State               types.String      `tfsdk:"state"`
 	StateComment        StateCommentValue `tfsdk:"state_comment"`
-	Tags                types.List        `tfsdk:"tags"`
+	Tags                types.Set         `tfsdk:"tags"`
 	Type                types.String      `tfsdk:"type"`
 	VmId                types.String      `tfsdk:"vm_id"`
 }

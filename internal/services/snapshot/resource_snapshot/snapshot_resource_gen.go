@@ -87,7 +87,7 @@ func SnapshotResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the snapshot (`in-queue` \\| `completed` \\| `error`).",
 				MarkdownDescription: "The state of the snapshot (`in-queue` \\| `completed` \\| `error`).",
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -139,7 +139,7 @@ type SnapshotModel struct {
 	SourceRegionName types.String `tfsdk:"source_region_name"`
 	SourceSnapshotId types.String `tfsdk:"source_snapshot_id"`
 	State            types.String `tfsdk:"state"`
-	Tags             types.List   `tfsdk:"tags"`
+	Tags             types.Set    `tfsdk:"tags"`
 	VolumeId         types.String `tfsdk:"volume_id"`
 	VolumeSize       types.Int64  `tfsdk:"volume_size"`
 }

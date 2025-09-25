@@ -158,7 +158,7 @@ func deserializeCreateSnapshot(tf resource_snapshot.SnapshotModel) api.CreateSna
 
 func serializeSnapshot(ctx context.Context, http *api.Snapshot, model resource_snapshot.SnapshotModel, diags *diag.Diagnostics) *resource_snapshot.SnapshotModel {
 	var (
-		tagsTf          types.List
+		tagsTf          types.Set
 		creationDateStr *string
 	)
 
@@ -168,7 +168,7 @@ func serializeSnapshot(ctx context.Context, http *api.Snapshot, model resource_s
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return nil
 		}
@@ -200,7 +200,7 @@ func serializeSnapshot(ctx context.Context, http *api.Snapshot, model resource_s
 	return &snapshot
 }
 
-func snapshotTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func snapshotTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_snapshot.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

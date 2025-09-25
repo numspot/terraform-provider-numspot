@@ -317,7 +317,7 @@ func deserializeUpdateNumSpotLoadBalancer(ctx context.Context, tf resource_load_
 }
 
 func serializeNumSpotLoadBalancer(ctx context.Context, http *api.LoadBalancer, diags *diag.Diagnostics) resource_load_balancer.LoadBalancerModel {
-	var tagsTf types.List
+	var tagsTf types.Set
 
 	applicationStickyCookiePoliciesTypes := utils.GenericListToTfListValue(ctx, applicationStickyCookiePoliciesFromHTTP, *http.ApplicationStickyCookiePolicies, diags)
 	if diags.HasError() {
@@ -345,7 +345,7 @@ func serializeNumSpotLoadBalancer(ctx context.Context, http *api.LoadBalancer, d
 	}
 
 	if http.Tags != nil {
-		tagsTf = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
+		tagsTf = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *http.Tags, diags)
 		if diags.HasError() {
 			return resource_load_balancer.LoadBalancerModel{}
 		}
@@ -396,7 +396,7 @@ func serializeNumSpotLoadBalancer(ctx context.Context, http *api.LoadBalancer, d
 	}
 }
 
-func deserializeTagsToDelete(ctx context.Context, t types.List) []api.ResourceLoadBalancerTag {
+func deserializeTagsToDelete(ctx context.Context, t types.Set) []api.ResourceLoadBalancerTag {
 	lbTags := make([]api.ResourceLoadBalancerTag, len(t.Elements()))
 	stateTags := loadBalancerTags(ctx, t)
 	for idx, tag := range stateTags {
@@ -449,7 +449,7 @@ func stickyCookiePoliciesFromHTTP(ctx context.Context, elt api.LoadBalancerStick
 	return value
 }
 
-func loadBalancerTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func loadBalancerTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_load_balancer.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 

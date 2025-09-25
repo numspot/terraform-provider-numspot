@@ -66,7 +66,7 @@ resource "numspot_volume" "volume" {
 - `replace_volume_on_downsize` (Boolean) If replace_volume_on_downsize is set to 'true' and volume size is reduced, the volume will be deleted and recreated.  WARNING : All data on the volume will be lost. Default is false
 - `size` (Number) The size of the volume, in gibibytes (GiB). The maximum allowed size for a volume is 14901 GiB. This parameter is required if the volume is not created from a snapshot (`SnapshotId` unspecified).
 - `snapshot_id` (String) The ID of the snapshot from which you want to create the volume.
-- `tags` (Attributes List) One or more tags associated with the volume. (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes Set) One or more tags associated with the volume. (see [below for nested schema](#nestedatt--tags))
 - `type` (String) The type of volume you want to create (`io1` \| `gp2` \ | `standard`). If not specified, a `standard` volume is created.<br />
 
 ### Read-Only

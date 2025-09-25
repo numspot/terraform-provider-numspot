@@ -136,7 +136,7 @@ func VolumeResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 				MarkdownDescription: "The state of the volume (`creating` \\| `available` \\| `in-use` \\| `updating` \\| `deleting` \\| `error`).",
 			},
-			"tags": schema.ListNestedAttribute{
+			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"key": schema.StringAttribute{
@@ -183,7 +183,7 @@ type VolumeModel struct {
 	Size                    types.Int64  `tfsdk:"size"`
 	SnapshotId              types.String `tfsdk:"snapshot_id"`
 	State                   types.String `tfsdk:"state"`
-	Tags                    types.List   `tfsdk:"tags"`
+	Tags                    types.Set    `tfsdk:"tags"`
 	Type                    types.String `tfsdk:"type"`
 }
 

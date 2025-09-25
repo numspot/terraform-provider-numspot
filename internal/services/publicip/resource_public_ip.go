@@ -153,10 +153,10 @@ func (r *publicIpResource) Delete(ctx context.Context, request resource.DeleteRe
 }
 
 func serializePublicIp(ctx context.Context, elt *api.PublicIp, diags *diag.Diagnostics) resource_public_ip.PublicIpModel {
-	var tagsList types.List
+	var tagsList types.Set
 
 	if elt.Tags != nil {
-		tagsList = utils.GenericListToTfListValue(ctx, tags.ResourceTagFromAPI, *elt.Tags, diags)
+		tagsList = utils.GenericSetToTfSetValue(ctx, tags.ResourceTagFromAPI, *elt.Tags, diags)
 		if diags.HasError() {
 			return resource_public_ip.PublicIpModel{}
 		}
@@ -173,7 +173,7 @@ func serializePublicIp(ctx context.Context, elt *api.PublicIp, diags *diag.Diagn
 	}
 }
 
-func publicIpTags(ctx context.Context, tags types.List) []api.ResourceTag {
+func publicIpTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	tfTags := make([]resource_public_ip.TagsValue, 0, len(tags.Elements()))
 	tags.ElementsAs(ctx, &tfTags, false)
 
