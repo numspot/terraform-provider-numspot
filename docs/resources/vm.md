@@ -60,9 +60,9 @@ resource "numspot_public_ip" "public_ip" {
 }
 
 resource "numspot_vm" "vm" {
-  image_id                       = "image-id"
-  type                           = "ns-eco6-2c8r"
-  vm_initiated_shutdown_behavior = "stop"
+  image_id                    = "image-id"
+  type                        = "ns-eco6-2c8r"
+  initiated_shutdown_behavior = "stop"
 
   placement = {
     tenancy                = "default"
