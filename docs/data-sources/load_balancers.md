@@ -28,6 +28,7 @@ resource "numspot_load_balancer" "load-balancer" {
     {
       backend_port           = 80
       load_balancer_port     = 80
+      backend_protocol       = "TCP"
       load_balancer_protocol = "TCP"
 
     }

@@ -173,12 +173,11 @@ func mappingInboundRules(ctx context.Context, securityGroup api.SecurityGroup, d
 		}
 
 		elementValue[y], *diags = datasource_security_group.NewInboundRulesValue(datasource_security_group.InboundRulesValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"from_port_range":                 types.Int64Value(utils.ConvertIntPtrToInt64(rule.FromPortRange)),
-			"inbound_security_groups_members": types.ListNull(datasource_security_group.InboundSecurityGroupsMembersValue{}.Type(ctx)),
-			"ip_protocol":                     types.StringValue(utils.ConvertStringPtrToString(rule.IpProtocol)),
-			"ip_ranges":                       ipRangesList,
-			"service_ids":                     serviceIdsList,
-			"to_port_range":                   types.Int64Value(utils.ConvertIntPtrToInt64(rule.ToPortRange)),
+			"from_port_range": types.Int64Value(utils.ConvertIntPtrToInt64(rule.FromPortRange)),
+			"ip_protocol":     types.StringValue(utils.ConvertStringPtrToString(rule.IpProtocol)),
+			"ip_ranges":       ipRangesList,
+			"service_ids":     serviceIdsList,
+			"to_port_range":   types.Int64Value(utils.ConvertIntPtrToInt64(rule.ToPortRange)),
 		})
 		if diags.HasError() {
 			diags.Append(*diags...)
@@ -210,12 +209,11 @@ func mappingOutboundRules(ctx context.Context, securityGroup api.SecurityGroup, 
 		}
 
 		elementValue[y], *diags = datasource_security_group.NewOutboundRulesValue(datasource_security_group.OutboundRulesValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"from_port_range":                  types.Int64Value(utils.ConvertIntPtrToInt64(rule.FromPortRange)),
-			"ip_protocol":                      types.StringValue(utils.ConvertStringPtrToString(rule.IpProtocol)),
-			"ip_ranges":                        ipRangesList,
-			"outbound_security_groups_members": types.ListNull(datasource_security_group.OutboundSecurityGroupsMembersValue{}.Type(ctx)),
-			"service_ids":                      serviceIdsList,
-			"to_port_range":                    types.Int64Value(utils.ConvertIntPtrToInt64(rule.ToPortRange)),
+			"from_port_range": types.Int64Value(utils.ConvertIntPtrToInt64(rule.FromPortRange)),
+			"ip_protocol":     types.StringValue(utils.ConvertStringPtrToString(rule.IpProtocol)),
+			"ip_ranges":       ipRangesList,
+			"service_ids":     serviceIdsList,
+			"to_port_range":   types.Int64Value(utils.ConvertIntPtrToInt64(rule.ToPortRange)),
 		})
 		if diags.HasError() {
 			diags.Append(*diags...)

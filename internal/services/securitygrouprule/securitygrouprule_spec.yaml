@@ -1,0 +1,17 @@
+provider:
+  name: numspot
+
+resources:
+  security_group_rule:
+    create:
+      method: POST
+      path: /compute/spaces/{spaceId}/securityGroups/{id}/rules
+    delete:
+      method: DELETE
+      path: /compute/spaces/{spaceId}/securityGroups/{id}/rules
+    read:
+      method: GET
+      path: /compute/spaces/{spaceId}/securityGroups/{id}
+    schema:
+      ignores:
+        - spaceId

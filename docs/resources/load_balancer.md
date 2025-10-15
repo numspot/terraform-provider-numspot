@@ -61,13 +61,16 @@ resource "numspot_load_balancer" "load-balancer" {
     {
       backend_port           = 80
       load_balancer_port     = 80
+      backend_protocol       = "TCP"
       load_balancer_protocol = "TCP"
     }
   ]
 
   subnets         = [numspot_subnet.subnet.id]
-  security_groups = [numspot_security_group.sg.id]
+  security_groups = [numspot_security_group.security-group.id]
   backend_vm_ids  = [numspot_vm.vm.id]
+  backend_ips     = ["192.0.2.0"]
+
 
   health_check = {
     check_interval      = 30

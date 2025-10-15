@@ -282,17 +282,9 @@ func deserializeInboundRules(ctx context.Context, inboundRules types.Set) []api.
 		fpr := int(e.FromPortRange.ValueInt64())
 		tpr := int(e.ToPortRange.ValueInt64())
 
-		tfIpRange := make([]types.String, 0, len(e.IpRanges.Elements()))
-		e.IpRanges.ElementsAs(ctx, &tfIpRange, false)
-		var ipRanges []string
-		for _, ip := range tfIpRange {
-			ipRanges = append(ipRanges, ip.ValueString())
-		}
-
 		rules = append(rules, api.SecurityGroupRule{
 			FromPortRange: &fpr,
 			IpProtocol:    e.IpProtocol.ValueStringPointer(),
-			IpRanges:      &ipRanges,
 			ToPortRange:   &tpr,
 		})
 	}
@@ -310,17 +302,9 @@ func deserializeOutboundRules(ctx context.Context, outboundRules types.Set) []ap
 		fpr := int(e.FromPortRange.ValueInt64())
 		tpr := int(e.ToPortRange.ValueInt64())
 
-		tfIpRange := make([]types.String, 0, len(e.IpRanges.Elements()))
-		e.IpRanges.ElementsAs(ctx, &tfIpRange, false)
-		var ipRanges []string
-		for _, ip := range tfIpRange {
-			ipRanges = append(ipRanges, ip.ValueString())
-		}
-
 		rules = append(rules, api.SecurityGroupRule{
 			FromPortRange: &fpr,
 			IpProtocol:    e.IpProtocol.ValueStringPointer(),
-			IpRanges:      &ipRanges,
 			ToPortRange:   &tpr,
 		})
 	}
@@ -329,11 +313,6 @@ func deserializeOutboundRules(ctx context.Context, outboundRules types.Set) []ap
 }
 
 func serializeInboundRule(ctx context.Context, rules api.SecurityGroupRule) resource_security_group.InboundRulesValue {
-	ipRanges, diags := types.SetValueFrom(ctx, types.StringType, rules.IpRanges)
-	if diags.HasError() {
-		return resource_security_group.InboundRulesValue{}
-	}
-
 	serviceIds, diags := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
 	if diags.HasError() {
 		return resource_security_group.InboundRulesValue{}
@@ -349,12 +328,10 @@ func serializeInboundRule(ctx context.Context, rules api.SecurityGroupRule) reso
 	value, diagnostics := resource_security_group.NewInboundRulesValue(
 		resource_security_group.InboundRulesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"from_port_range":                 utils.FromIntPtrToTfInt64(rules.FromPortRange),
-			"to_port_range":                   utils.FromIntPtrToTfInt64(rules.ToPortRange),
-			"ip_protocol":                     types.StringPointerValue(rules.IpProtocol),
-			"ip_ranges":                       ipRanges,
-			"inbound_security_groups_members": types.ListNull(resource_security_group.InboundSecurityGroupsMembersValue{}.Type(ctx)),
-			"service_ids":                     serviceIds,
+			"from_port_range": utils.FromIntPtrToTfInt64(rules.FromPortRange),
+			"to_port_range":   utils.FromIntPtrToTfInt64(rules.ToPortRange),
+			"ip_protocol":     types.StringPointerValue(rules.IpProtocol),
+			"service_ids":     serviceIds,
 		},
 	)
 	diags.Append(diagnostics...)
@@ -362,11 +339,6 @@ func serializeInboundRule(ctx context.Context, rules api.SecurityGroupRule) reso
 }
 
 func serializeOutboundRule(ctx context.Context, rules api.SecurityGroupRule) resource_security_group.OutboundRulesValue {
-	ipRanges, diags := types.SetValueFrom(ctx, types.StringType, rules.IpRanges)
-	if diags.HasError() {
-		return resource_security_group.OutboundRulesValue{}
-	}
-
 	serviceIds, diags := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
 	if diags.HasError() {
 		return resource_security_group.OutboundRulesValue{}
@@ -382,12 +354,10 @@ func serializeOutboundRule(ctx context.Context, rules api.SecurityGroupRule) res
 	value, diagnostics := resource_security_group.NewOutboundRulesValue(
 		resource_security_group.OutboundRulesValue{}.AttributeTypes(ctx),
 		map[string]attr.Value{
-			"from_port_range":                  utils.FromIntPtrToTfInt64(rules.FromPortRange),
-			"to_port_range":                    utils.FromIntPtrToTfInt64(rules.ToPortRange),
-			"ip_protocol":                      types.StringPointerValue(rules.IpProtocol),
-			"ip_ranges":                        ipRanges,
-			"outbound_security_groups_members": types.ListNull(resource_security_group.OutboundSecurityGroupsMembersValue{}.Type(ctx)),
-			"service_ids":                      serviceIds,
+			"from_port_range": utils.FromIntPtrToTfInt64(rules.FromPortRange),
+			"to_port_range":   utils.FromIntPtrToTfInt64(rules.ToPortRange),
+			"ip_protocol":     types.StringPointerValue(rules.IpProtocol),
+			"service_ids":     serviceIds,
 		},
 	)
 	diags.Append(diagnostics...)

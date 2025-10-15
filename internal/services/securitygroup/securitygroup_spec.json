@@ -55,16 +55,6 @@
 						}
 					},
 					{
-						"name": "inbound_rule_security_group_names",
-						"list": {
-							"computed_optional_required": "computed_optional",
-							"element_type": {
-								"string": {}
-							},
-							"description": "The names of the security groups that have been granted permissions."
-						}
-					},
-					{
 						"name": "inbound_rule_to_port_ranges",
 						"list": {
 							"computed_optional_required": "computed_optional",
@@ -112,16 +102,6 @@
 								"string": {}
 							},
 							"description": "The IDs of the security groups that have been granted permissions."
-						}
-					},
-					{
-						"name": "outbound_rule_security_group_names",
-						"list": {
-							"computed_optional_required": "computed_optional",
-							"element_type": {
-								"string": {}
-							},
-							"description": "The names of the security groups that have been granted permissions."
 						}
 					},
 					{
@@ -245,31 +225,6 @@
 														}
 													},
 													{
-														"name": "inbound_security_groups_members",
-														"list_nested": {
-															"computed_optional_required": "computed",
-															"nested_object": {
-																"attributes": [
-																	{
-																		"name": "security_group_id",
-																		"string": {
-																			"computed_optional_required": "computed",
-																			"description": "The ID of a source or destination security group that you want to link to the security group of the rule."
-																		}
-																	},
-																	{
-																		"name": "security_group_name",
-																		"string": {
-																			"computed_optional_required": "computed",
-																			"description": "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule."
-																		}
-																	}
-																]
-															},
-															"description": "Information about one or more source or destination security groups."
-														}
-													},
-													{
 														"name": "service_ids",
 														"list": {
 															"computed_optional_required": "computed",
@@ -326,31 +281,6 @@
 																"string": {}
 															},
 															"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
-														}
-													},
-													{
-														"name": "outbound_security_groups_members",
-														"list_nested": {
-															"computed_optional_required": "computed",
-															"nested_object": {
-																"attributes": [
-																	{
-																		"name": "security_group_id",
-																		"string": {
-																			"computed_optional_required": "computed",
-																			"description": "The ID of a source or destination security group that you want to link to the security group of the rule."
-																		}
-																	},
-																	{
-																		"name": "security_group_name",
-																		"string": {
-																			"computed_optional_required": "computed",
-																			"description": "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule."
-																		}
-																	}
-																]
-															},
-															"description": "Information about one or more source or destination security groups."
 														}
 													},
 													{
@@ -503,41 +433,6 @@
 										}
 									},
 									{
-										"name": "ip_ranges",
-										"set": {
-											"computed_optional_required": "computed_optional",
-											"element_type": {
-												"string": {}
-											},
-											"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
-										}
-									},
-									{
-										"name": "inbound_security_groups_members",
-										"list_nested": {
-											"computed_optional_required": "computed_optional",
-											"nested_object": {
-												"attributes": [
-													{
-														"name": "security_group_id",
-														"string": {
-															"computed_optional_required": "computed_optional",
-															"description": "The ID of a source or destination security group that you want to link to the security group of the rule."
-														}
-													},
-													{
-														"name": "security_group_name",
-														"string": {
-															"computed_optional_required": "computed_optional",
-															"description": "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule."
-														}
-													}
-												]
-											},
-											"description": "Information about one or more source or destination security groups."
-										}
-									},
-									{
 										"name": "service_ids",
 										"list": {
 											"computed_optional_required": "computed_optional",
@@ -577,41 +472,6 @@
 										"string": {
 											"computed_optional_required": "computed_optional",
 											"description": "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)."
-										}
-									},
-									{
-										"name": "ip_ranges",
-										"set": {
-											"computed_optional_required": "computed_optional",
-											"element_type": {
-												"string": {}
-											},
-											"description": "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`)."
-										}
-									},
-									{
-										"name": "outbound_security_groups_members",
-										"list_nested": {
-											"computed_optional_required": "computed_optional",
-											"nested_object": {
-												"attributes": [
-													{
-														"name": "security_group_id",
-														"string": {
-															"computed_optional_required": "computed_optional",
-															"description": "The ID of a source or destination security group that you want to link to the security group of the rule."
-														}
-													},
-													{
-														"name": "security_group_name",
-														"string": {
-															"computed_optional_required": "computed_optional",
-															"description": "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule."
-														}
-													}
-												]
-											},
-											"description": "Information about one or more source or destination security groups."
 										}
 									},
 									{

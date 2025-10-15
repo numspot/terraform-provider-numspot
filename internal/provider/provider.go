@@ -30,6 +30,7 @@ import (
 	"terraform-provider-numspot/internal/services/publicip"
 	"terraform-provider-numspot/internal/services/routetable"
 	"terraform-provider-numspot/internal/services/securitygroup"
+	"terraform-provider-numspot/internal/services/securitygrouprule"
 	"terraform-provider-numspot/internal/services/servercertificate"
 	"terraform-provider-numspot/internal/services/snapshot"
 	"terraform-provider-numspot/internal/services/subnet"
@@ -316,6 +317,7 @@ func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resourc
 		publicip.NewPublicIpResource,
 		routetable.NewRouteTableResource,
 		securitygroup.NewSecurityGroupResource,
+		securitygrouprule.NewSecurityGroupRuleResource,
 		snapshot.NewSnapshotResource,
 		subnet.NewSubnetResource,
 		volume.NewVolumeResource,

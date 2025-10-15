@@ -53,13 +53,6 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the security groups that have been granted permissions.",
 				MarkdownDescription: "The IDs of the security groups that have been granted permissions.",
 			},
-			"inbound_rule_security_group_names": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Computed:            true,
-				Description:         "The names of the security groups that have been granted permissions.",
-				MarkdownDescription: "The names of the security groups that have been granted permissions.",
-			},
 			"inbound_rule_to_port_ranges": schema.ListAttribute{
 				ElementType:         types.Int64Type,
 				Optional:            true,
@@ -87,30 +80,6 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 										Computed:            true,
 										Description:         "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
 										MarkdownDescription: "The beginning of the port range for the TCP and UDP protocols, or an ICMP type number.",
-									},
-									"inbound_security_groups_members": schema.ListNestedAttribute{
-										NestedObject: schema.NestedAttributeObject{
-											Attributes: map[string]schema.Attribute{
-												"security_group_id": schema.StringAttribute{
-													Computed:            true,
-													Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
-													MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
-												},
-												"security_group_name": schema.StringAttribute{
-													Computed:            true,
-													Description:         "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
-													MarkdownDescription: "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
-												},
-											},
-											CustomType: InboundSecurityGroupsMembersType{
-												ObjectType: types.ObjectType{
-													AttrTypes: InboundSecurityGroupsMembersValue{}.AttributeTypes(ctx),
-												},
-											},
-										},
-										Computed:            true,
-										Description:         "Information about one or more source or destination security groups.",
-										MarkdownDescription: "Information about one or more source or destination security groups.",
 									},
 									"ip_protocol": schema.StringAttribute{
 										Computed:            true,
@@ -168,30 +137,6 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 										Computed:            true,
 										Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 										MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
-									},
-									"outbound_security_groups_members": schema.ListNestedAttribute{
-										NestedObject: schema.NestedAttributeObject{
-											Attributes: map[string]schema.Attribute{
-												"security_group_id": schema.StringAttribute{
-													Computed:            true,
-													Description:         "The ID of a source or destination security group that you want to link to the security group of the rule.",
-													MarkdownDescription: "The ID of a source or destination security group that you want to link to the security group of the rule.",
-												},
-												"security_group_name": schema.StringAttribute{
-													Computed:            true,
-													Description:         "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
-													MarkdownDescription: "(Public Cloud only) The name of a source or destination security group that you want to link to the security group of the rule.",
-												},
-											},
-											CustomType: OutboundSecurityGroupsMembersType{
-												ObjectType: types.ObjectType{
-													AttrTypes: OutboundSecurityGroupsMembersValue{}.AttributeTypes(ctx),
-												},
-											},
-										},
-										Computed:            true,
-										Description:         "Information about one or more source or destination security groups.",
-										MarkdownDescription: "Information about one or more source or destination security groups.",
 									},
 									"service_ids": schema.ListAttribute{
 										ElementType:         types.StringType,
@@ -283,13 +228,6 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The IDs of the security groups that have been granted permissions.",
 				MarkdownDescription: "The IDs of the security groups that have been granted permissions.",
 			},
-			"outbound_rule_security_group_names": schema.ListAttribute{
-				ElementType:         types.StringType,
-				Optional:            true,
-				Computed:            true,
-				Description:         "The names of the security groups that have been granted permissions.",
-				MarkdownDescription: "The names of the security groups that have been granted permissions.",
-			},
 			"outbound_rule_to_port_ranges": schema.ListAttribute{
 				ElementType:         types.Int64Type,
 				Optional:            true,
@@ -344,26 +282,24 @@ func SecurityGroupDataSourceSchema(ctx context.Context) schema.Schema {
 }
 
 type SecurityGroupModel struct {
-	Descriptions                   types.List `tfsdk:"descriptions"`
-	InboundRuleFromPortRanges      types.List `tfsdk:"inbound_rule_from_port_ranges"`
-	InboundRuleIpRanges            types.List `tfsdk:"inbound_rule_ip_ranges"`
-	InboundRuleProtocols           types.List `tfsdk:"inbound_rule_protocols"`
-	InboundRuleSecurityGroupIds    types.List `tfsdk:"inbound_rule_security_group_ids"`
-	InboundRuleSecurityGroupNames  types.List `tfsdk:"inbound_rule_security_group_names"`
-	InboundRuleToPortRanges        types.List `tfsdk:"inbound_rule_to_port_ranges"`
-	Items                          types.List `tfsdk:"items"`
-	OutboundRuleFromPortRanges     types.List `tfsdk:"outbound_rule_from_port_ranges"`
-	OutboundRuleIpRanges           types.List `tfsdk:"outbound_rule_ip_ranges"`
-	OutboundRuleProtocols          types.List `tfsdk:"outbound_rule_protocols"`
-	OutboundRuleSecurityGroupIds   types.List `tfsdk:"outbound_rule_security_group_ids"`
-	OutboundRuleSecurityGroupNames types.List `tfsdk:"outbound_rule_security_group_names"`
-	OutboundRuleToPortRanges       types.List `tfsdk:"outbound_rule_to_port_ranges"`
-	SecurityGroupIds               types.List `tfsdk:"security_group_ids"`
-	SecurityGroupNames             types.List `tfsdk:"security_group_names"`
-	TagKeys                        types.List `tfsdk:"tag_keys"`
-	TagValues                      types.List `tfsdk:"tag_values"`
-	Tags                           types.List `tfsdk:"tags"`
-	VpcIds                         types.List `tfsdk:"vpc_ids"`
+	Descriptions                 types.List `tfsdk:"descriptions"`
+	InboundRuleFromPortRanges    types.List `tfsdk:"inbound_rule_from_port_ranges"`
+	InboundRuleIpRanges          types.List `tfsdk:"inbound_rule_ip_ranges"`
+	InboundRuleProtocols         types.List `tfsdk:"inbound_rule_protocols"`
+	InboundRuleSecurityGroupIds  types.List `tfsdk:"inbound_rule_security_group_ids"`
+	InboundRuleToPortRanges      types.List `tfsdk:"inbound_rule_to_port_ranges"`
+	Items                        types.List `tfsdk:"items"`
+	OutboundRuleFromPortRanges   types.List `tfsdk:"outbound_rule_from_port_ranges"`
+	OutboundRuleIpRanges         types.List `tfsdk:"outbound_rule_ip_ranges"`
+	OutboundRuleProtocols        types.List `tfsdk:"outbound_rule_protocols"`
+	OutboundRuleSecurityGroupIds types.List `tfsdk:"outbound_rule_security_group_ids"`
+	OutboundRuleToPortRanges     types.List `tfsdk:"outbound_rule_to_port_ranges"`
+	SecurityGroupIds             types.List `tfsdk:"security_group_ids"`
+	SecurityGroupNames           types.List `tfsdk:"security_group_names"`
+	TagKeys                      types.List `tfsdk:"tag_keys"`
+	TagValues                    types.List `tfsdk:"tag_values"`
+	Tags                         types.List `tfsdk:"tags"`
+	VpcIds                       types.List `tfsdk:"vpc_ids"`
 }
 
 var _ basetypes.ObjectTypable = ItemsType{}
@@ -1168,24 +1104,6 @@ func (t InboundRulesType) ValueFromObject(ctx context.Context, in basetypes.Obje
 			fmt.Sprintf(`from_port_range expected to be basetypes.Int64Value, was: %T`, fromPortRangeAttribute))
 	}
 
-	inboundSecurityGroupsMembersAttribute, ok := attributes["inbound_security_groups_members"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`inbound_security_groups_members is missing from object`)
-
-		return nil, diags
-	}
-
-	inboundSecurityGroupsMembersVal, ok := inboundSecurityGroupsMembersAttribute.(basetypes.ListValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`inbound_security_groups_members expected to be basetypes.ListValue, was: %T`, inboundSecurityGroupsMembersAttribute))
-	}
-
 	ipProtocolAttribute, ok := attributes["ip_protocol"]
 
 	if !ok {
@@ -1263,13 +1181,12 @@ func (t InboundRulesType) ValueFromObject(ctx context.Context, in basetypes.Obje
 	}
 
 	return InboundRulesValue{
-		FromPortRange:                fromPortRangeVal,
-		InboundSecurityGroupsMembers: inboundSecurityGroupsMembersVal,
-		IpProtocol:                   ipProtocolVal,
-		IpRanges:                     ipRangesVal,
-		ServiceIds:                   serviceIdsVal,
-		ToPortRange:                  toPortRangeVal,
-		state:                        attr.ValueStateKnown,
+		FromPortRange: fromPortRangeVal,
+		IpProtocol:    ipProtocolVal,
+		IpRanges:      ipRangesVal,
+		ServiceIds:    serviceIdsVal,
+		ToPortRange:   toPortRangeVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1354,24 +1271,6 @@ func NewInboundRulesValue(attributeTypes map[string]attr.Type, attributes map[st
 			fmt.Sprintf(`from_port_range expected to be basetypes.Int64Value, was: %T`, fromPortRangeAttribute))
 	}
 
-	inboundSecurityGroupsMembersAttribute, ok := attributes["inbound_security_groups_members"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`inbound_security_groups_members is missing from object`)
-
-		return NewInboundRulesValueUnknown(), diags
-	}
-
-	inboundSecurityGroupsMembersVal, ok := inboundSecurityGroupsMembersAttribute.(basetypes.ListValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`inbound_security_groups_members expected to be basetypes.ListValue, was: %T`, inboundSecurityGroupsMembersAttribute))
-	}
-
 	ipProtocolAttribute, ok := attributes["ip_protocol"]
 
 	if !ok {
@@ -1449,13 +1348,12 @@ func NewInboundRulesValue(attributeTypes map[string]attr.Type, attributes map[st
 	}
 
 	return InboundRulesValue{
-		FromPortRange:                fromPortRangeVal,
-		InboundSecurityGroupsMembers: inboundSecurityGroupsMembersVal,
-		IpProtocol:                   ipProtocolVal,
-		IpRanges:                     ipRangesVal,
-		ServiceIds:                   serviceIdsVal,
-		ToPortRange:                  toPortRangeVal,
-		state:                        attr.ValueStateKnown,
+		FromPortRange: fromPortRangeVal,
+		IpProtocol:    ipProtocolVal,
+		IpRanges:      ipRangesVal,
+		ServiceIds:    serviceIdsVal,
+		ToPortRange:   toPortRangeVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1527,25 +1425,21 @@ func (t InboundRulesType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = InboundRulesValue{}
 
 type InboundRulesValue struct {
-	FromPortRange                basetypes.Int64Value  `tfsdk:"from_port_range"`
-	InboundSecurityGroupsMembers basetypes.ListValue   `tfsdk:"inbound_security_groups_members"`
-	IpProtocol                   basetypes.StringValue `tfsdk:"ip_protocol"`
-	IpRanges                     basetypes.SetValue    `tfsdk:"ip_ranges"`
-	ServiceIds                   basetypes.ListValue   `tfsdk:"service_ids"`
-	ToPortRange                  basetypes.Int64Value  `tfsdk:"to_port_range"`
-	state                        attr.ValueState
+	FromPortRange basetypes.Int64Value  `tfsdk:"from_port_range"`
+	IpProtocol    basetypes.StringValue `tfsdk:"ip_protocol"`
+	IpRanges      basetypes.SetValue    `tfsdk:"ip_ranges"`
+	ServiceIds    basetypes.ListValue   `tfsdk:"service_ids"`
+	ToPortRange   basetypes.Int64Value  `tfsdk:"to_port_range"`
+	state         attr.ValueState
 }
 
 func (v InboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 6)
+	attrTypes := make(map[string]tftypes.Type, 5)
 
 	var val tftypes.Value
 	var err error
 
 	attrTypes["from_port_range"] = basetypes.Int64Type{}.TerraformType(ctx)
-	attrTypes["inbound_security_groups_members"] = basetypes.ListType{
-		ElemType: InboundSecurityGroupsMembersValue{}.Type(ctx),
-	}.TerraformType(ctx)
 	attrTypes["ip_protocol"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["ip_ranges"] = basetypes.SetType{
 		ElemType: types.StringType,
@@ -1559,7 +1453,7 @@ func (v InboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value,
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 6)
+		vals := make(map[string]tftypes.Value, 5)
 
 		val, err = v.FromPortRange.ToTerraformValue(ctx)
 
@@ -1568,14 +1462,6 @@ func (v InboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value,
 		}
 
 		vals["from_port_range"] = val
-
-		val, err = v.InboundSecurityGroupsMembers.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["inbound_security_groups_members"] = val
 
 		val, err = v.IpProtocol.ToTerraformValue(ctx)
 
@@ -1638,35 +1524,6 @@ func (v InboundRulesValue) String() string {
 func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	inboundSecurityGroupsMembers := types.ListValueMust(
-		InboundSecurityGroupsMembersType{
-			basetypes.ObjectType{
-				AttrTypes: InboundSecurityGroupsMembersValue{}.AttributeTypes(ctx),
-			},
-		},
-		v.InboundSecurityGroupsMembers.Elements(),
-	)
-
-	if v.InboundSecurityGroupsMembers.IsNull() {
-		inboundSecurityGroupsMembers = types.ListNull(
-			InboundSecurityGroupsMembersType{
-				basetypes.ObjectType{
-					AttrTypes: InboundSecurityGroupsMembersValue{}.AttributeTypes(ctx),
-				},
-			},
-		)
-	}
-
-	if v.InboundSecurityGroupsMembers.IsUnknown() {
-		inboundSecurityGroupsMembers = types.ListUnknown(
-			InboundSecurityGroupsMembersType{
-				basetypes.ObjectType{
-					AttrTypes: InboundSecurityGroupsMembersValue{}.AttributeTypes(ctx),
-				},
-			},
-		)
-	}
-
 	var ipRangesVal basetypes.SetValue
 	switch {
 	case v.IpRanges.IsUnknown():
@@ -1682,10 +1539,7 @@ func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 	if diags.HasError() {
 		return types.ObjectUnknown(map[string]attr.Type{
 			"from_port_range": basetypes.Int64Type{},
-			"inbound_security_groups_members": basetypes.ListType{
-				ElemType: InboundSecurityGroupsMembersValue{}.Type(ctx),
-			},
-			"ip_protocol": basetypes.StringType{},
+			"ip_protocol":     basetypes.StringType{},
 			"ip_ranges": basetypes.SetType{
 				ElemType: types.StringType,
 			},
@@ -1711,10 +1565,7 @@ func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 	if diags.HasError() {
 		return types.ObjectUnknown(map[string]attr.Type{
 			"from_port_range": basetypes.Int64Type{},
-			"inbound_security_groups_members": basetypes.ListType{
-				ElemType: InboundSecurityGroupsMembersValue{}.Type(ctx),
-			},
-			"ip_protocol": basetypes.StringType{},
+			"ip_protocol":     basetypes.StringType{},
 			"ip_ranges": basetypes.SetType{
 				ElemType: types.StringType,
 			},
@@ -1727,10 +1578,7 @@ func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 
 	attributeTypes := map[string]attr.Type{
 		"from_port_range": basetypes.Int64Type{},
-		"inbound_security_groups_members": basetypes.ListType{
-			ElemType: InboundSecurityGroupsMembersValue{}.Type(ctx),
-		},
-		"ip_protocol": basetypes.StringType{},
+		"ip_protocol":     basetypes.StringType{},
 		"ip_ranges": basetypes.SetType{
 			ElemType: types.StringType,
 		},
@@ -1751,12 +1599,11 @@ func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"from_port_range":                 v.FromPortRange,
-			"inbound_security_groups_members": inboundSecurityGroupsMembers,
-			"ip_protocol":                     v.IpProtocol,
-			"ip_ranges":                       ipRangesVal,
-			"service_ids":                     serviceIdsVal,
-			"to_port_range":                   v.ToPortRange,
+			"from_port_range": v.FromPortRange,
+			"ip_protocol":     v.IpProtocol,
+			"ip_ranges":       ipRangesVal,
+			"service_ids":     serviceIdsVal,
+			"to_port_range":   v.ToPortRange,
 		})
 
 	return objVal, diags
@@ -1778,10 +1625,6 @@ func (v InboundRulesValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.FromPortRange.Equal(other.FromPortRange) {
-		return false
-	}
-
-	if !v.InboundSecurityGroupsMembers.Equal(other.InboundSecurityGroupsMembers) {
 		return false
 	}
 
@@ -1815,10 +1658,7 @@ func (v InboundRulesValue) Type(ctx context.Context) attr.Type {
 func (v InboundRulesValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
 		"from_port_range": basetypes.Int64Type{},
-		"inbound_security_groups_members": basetypes.ListType{
-			ElemType: InboundSecurityGroupsMembersValue{}.Type(ctx),
-		},
-		"ip_protocol": basetypes.StringType{},
+		"ip_protocol":     basetypes.StringType{},
 		"ip_ranges": basetypes.SetType{
 			ElemType: types.StringType,
 		},
@@ -1826,385 +1666,6 @@ func (v InboundRulesValue) AttributeTypes(ctx context.Context) map[string]attr.T
 			ElemType: types.StringType,
 		},
 		"to_port_range": basetypes.Int64Type{},
-	}
-}
-
-var _ basetypes.ObjectTypable = InboundSecurityGroupsMembersType{}
-
-type InboundSecurityGroupsMembersType struct {
-	basetypes.ObjectType
-}
-
-func (t InboundSecurityGroupsMembersType) Equal(o attr.Type) bool {
-	other, ok := o.(InboundSecurityGroupsMembersType)
-
-	if !ok {
-		return false
-	}
-
-	return t.ObjectType.Equal(other.ObjectType)
-}
-
-func (t InboundSecurityGroupsMembersType) String() string {
-	return "InboundSecurityGroupsMembersType"
-}
-
-func (t InboundSecurityGroupsMembersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributes := in.Attributes()
-
-	securityGroupIdAttribute, ok := attributes["security_group_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_id is missing from object`)
-
-		return nil, diags
-	}
-
-	securityGroupIdVal, ok := securityGroupIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_id expected to be basetypes.StringValue, was: %T`, securityGroupIdAttribute))
-	}
-
-	securityGroupNameAttribute, ok := attributes["security_group_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_name is missing from object`)
-
-		return nil, diags
-	}
-
-	securityGroupNameVal, ok := securityGroupNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_name expected to be basetypes.StringValue, was: %T`, securityGroupNameAttribute))
-	}
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	return InboundSecurityGroupsMembersValue{
-		SecurityGroupId:   securityGroupIdVal,
-		SecurityGroupName: securityGroupNameVal,
-		state:             attr.ValueStateKnown,
-	}, diags
-}
-
-func NewInboundSecurityGroupsMembersValueNull() InboundSecurityGroupsMembersValue {
-	return InboundSecurityGroupsMembersValue{
-		state: attr.ValueStateNull,
-	}
-}
-
-func NewInboundSecurityGroupsMembersValueUnknown() InboundSecurityGroupsMembersValue {
-	return InboundSecurityGroupsMembersValue{
-		state: attr.ValueStateUnknown,
-	}
-}
-
-func NewInboundSecurityGroupsMembersValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (InboundSecurityGroupsMembersValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
-	ctx := context.Background()
-
-	for name, attributeType := range attributeTypes {
-		attribute, ok := attributes[name]
-
-		if !ok {
-			diags.AddError(
-				"Missing InboundSecurityGroupsMembersValue Attribute Value",
-				"While creating a InboundSecurityGroupsMembersValue value, a missing attribute value was detected. "+
-					"A InboundSecurityGroupsMembersValue must contain values for all attributes, even if null or unknown. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("InboundSecurityGroupsMembersValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
-			)
-
-			continue
-		}
-
-		if !attributeType.Equal(attribute.Type(ctx)) {
-			diags.AddError(
-				"Invalid InboundSecurityGroupsMembersValue Attribute Type",
-				"While creating a InboundSecurityGroupsMembersValue value, an invalid attribute value was detected. "+
-					"A InboundSecurityGroupsMembersValue must use a matching attribute type for the value. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("InboundSecurityGroupsMembersValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
-					fmt.Sprintf("InboundSecurityGroupsMembersValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
-			)
-		}
-	}
-
-	for name := range attributes {
-		_, ok := attributeTypes[name]
-
-		if !ok {
-			diags.AddError(
-				"Extra InboundSecurityGroupsMembersValue Attribute Value",
-				"While creating a InboundSecurityGroupsMembersValue value, an extra attribute value was detected. "+
-					"A InboundSecurityGroupsMembersValue must not contain values beyond the expected attribute types. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("Extra InboundSecurityGroupsMembersValue Attribute Name: %s", name),
-			)
-		}
-	}
-
-	if diags.HasError() {
-		return NewInboundSecurityGroupsMembersValueUnknown(), diags
-	}
-
-	securityGroupIdAttribute, ok := attributes["security_group_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_id is missing from object`)
-
-		return NewInboundSecurityGroupsMembersValueUnknown(), diags
-	}
-
-	securityGroupIdVal, ok := securityGroupIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_id expected to be basetypes.StringValue, was: %T`, securityGroupIdAttribute))
-	}
-
-	securityGroupNameAttribute, ok := attributes["security_group_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_name is missing from object`)
-
-		return NewInboundSecurityGroupsMembersValueUnknown(), diags
-	}
-
-	securityGroupNameVal, ok := securityGroupNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_name expected to be basetypes.StringValue, was: %T`, securityGroupNameAttribute))
-	}
-
-	if diags.HasError() {
-		return NewInboundSecurityGroupsMembersValueUnknown(), diags
-	}
-
-	return InboundSecurityGroupsMembersValue{
-		SecurityGroupId:   securityGroupIdVal,
-		SecurityGroupName: securityGroupNameVal,
-		state:             attr.ValueStateKnown,
-	}, diags
-}
-
-func NewInboundSecurityGroupsMembersValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) InboundSecurityGroupsMembersValue {
-	object, diags := NewInboundSecurityGroupsMembersValue(attributeTypes, attributes)
-
-	if diags.HasError() {
-		// This could potentially be added to the diag package.
-		diagsStrings := make([]string, 0, len(diags))
-
-		for _, diagnostic := range diags {
-			diagsStrings = append(diagsStrings, fmt.Sprintf(
-				"%s | %s | %s",
-				diagnostic.Severity(),
-				diagnostic.Summary(),
-				diagnostic.Detail()))
-		}
-
-		panic("NewInboundSecurityGroupsMembersValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
-	}
-
-	return object
-}
-
-func (t InboundSecurityGroupsMembersType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
-	if in.Type() == nil {
-		return NewInboundSecurityGroupsMembersValueNull(), nil
-	}
-
-	if !in.Type().Equal(t.TerraformType(ctx)) {
-		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
-	}
-
-	if !in.IsKnown() {
-		return NewInboundSecurityGroupsMembersValueUnknown(), nil
-	}
-
-	if in.IsNull() {
-		return NewInboundSecurityGroupsMembersValueNull(), nil
-	}
-
-	attributes := map[string]attr.Value{}
-
-	val := map[string]tftypes.Value{}
-
-	err := in.As(&val)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for k, v := range val {
-		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
-		if err != nil {
-			return nil, err
-		}
-
-		attributes[k] = a
-	}
-
-	return NewInboundSecurityGroupsMembersValueMust(InboundSecurityGroupsMembersValue{}.AttributeTypes(ctx), attributes), nil
-}
-
-func (t InboundSecurityGroupsMembersType) ValueType(ctx context.Context) attr.Value {
-	return InboundSecurityGroupsMembersValue{}
-}
-
-var _ basetypes.ObjectValuable = InboundSecurityGroupsMembersValue{}
-
-type InboundSecurityGroupsMembersValue struct {
-	SecurityGroupId   basetypes.StringValue `tfsdk:"security_group_id"`
-	SecurityGroupName basetypes.StringValue `tfsdk:"security_group_name"`
-	state             attr.ValueState
-}
-
-func (v InboundSecurityGroupsMembersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 2)
-
-	var val tftypes.Value
-	var err error
-
-	attrTypes["security_group_id"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["security_group_name"] = basetypes.StringType{}.TerraformType(ctx)
-
-	objectType := tftypes.Object{AttributeTypes: attrTypes}
-
-	switch v.state {
-	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 2)
-
-		val, err = v.SecurityGroupId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["security_group_id"] = val
-
-		val, err = v.SecurityGroupName.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["security_group_name"] = val
-
-		if err := tftypes.ValidateValue(objectType, vals); err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		return tftypes.NewValue(objectType, vals), nil
-	case attr.ValueStateNull:
-		return tftypes.NewValue(objectType, nil), nil
-	case attr.ValueStateUnknown:
-		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
-	default:
-		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
-	}
-}
-
-func (v InboundSecurityGroupsMembersValue) IsNull() bool {
-	return v.state == attr.ValueStateNull
-}
-
-func (v InboundSecurityGroupsMembersValue) IsUnknown() bool {
-	return v.state == attr.ValueStateUnknown
-}
-
-func (v InboundSecurityGroupsMembersValue) String() string {
-	return "InboundSecurityGroupsMembersValue"
-}
-
-func (v InboundSecurityGroupsMembersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributeTypes := map[string]attr.Type{
-		"security_group_id":   basetypes.StringType{},
-		"security_group_name": basetypes.StringType{},
-	}
-
-	if v.IsNull() {
-		return types.ObjectNull(attributeTypes), diags
-	}
-
-	if v.IsUnknown() {
-		return types.ObjectUnknown(attributeTypes), diags
-	}
-
-	objVal, diags := types.ObjectValue(
-		attributeTypes,
-		map[string]attr.Value{
-			"security_group_id":   v.SecurityGroupId,
-			"security_group_name": v.SecurityGroupName,
-		})
-
-	return objVal, diags
-}
-
-func (v InboundSecurityGroupsMembersValue) Equal(o attr.Value) bool {
-	other, ok := o.(InboundSecurityGroupsMembersValue)
-
-	if !ok {
-		return false
-	}
-
-	if v.state != other.state {
-		return false
-	}
-
-	if v.state != attr.ValueStateKnown {
-		return true
-	}
-
-	if !v.SecurityGroupId.Equal(other.SecurityGroupId) {
-		return false
-	}
-
-	if !v.SecurityGroupName.Equal(other.SecurityGroupName) {
-		return false
-	}
-
-	return true
-}
-
-func (v InboundSecurityGroupsMembersValue) Type(ctx context.Context) attr.Type {
-	return InboundSecurityGroupsMembersType{
-		basetypes.ObjectType{
-			AttrTypes: v.AttributeTypes(ctx),
-		},
-	}
-}
-
-func (v InboundSecurityGroupsMembersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
-	return map[string]attr.Type{
-		"security_group_id":   basetypes.StringType{},
-		"security_group_name": basetypes.StringType{},
 	}
 }
 
@@ -2287,24 +1748,6 @@ func (t OutboundRulesType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`ip_ranges expected to be basetypes.SetValue, was: %T`, ipRangesAttribute))
 	}
 
-	outboundSecurityGroupsMembersAttribute, ok := attributes["outbound_security_groups_members"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`outbound_security_groups_members is missing from object`)
-
-		return nil, diags
-	}
-
-	outboundSecurityGroupsMembersVal, ok := outboundSecurityGroupsMembersAttribute.(basetypes.ListValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`outbound_security_groups_members expected to be basetypes.ListValue, was: %T`, outboundSecurityGroupsMembersAttribute))
-	}
-
 	serviceIdsAttribute, ok := attributes["service_ids"]
 
 	if !ok {
@@ -2346,13 +1789,12 @@ func (t OutboundRulesType) ValueFromObject(ctx context.Context, in basetypes.Obj
 	}
 
 	return OutboundRulesValue{
-		FromPortRange:                 fromPortRangeVal,
-		IpProtocol:                    ipProtocolVal,
-		IpRanges:                      ipRangesVal,
-		OutboundSecurityGroupsMembers: outboundSecurityGroupsMembersVal,
-		ServiceIds:                    serviceIdsVal,
-		ToPortRange:                   toPortRangeVal,
-		state:                         attr.ValueStateKnown,
+		FromPortRange: fromPortRangeVal,
+		IpProtocol:    ipProtocolVal,
+		IpRanges:      ipRangesVal,
+		ServiceIds:    serviceIdsVal,
+		ToPortRange:   toPortRangeVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -2473,24 +1915,6 @@ func NewOutboundRulesValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`ip_ranges expected to be basetypes.SetValue, was: %T`, ipRangesAttribute))
 	}
 
-	outboundSecurityGroupsMembersAttribute, ok := attributes["outbound_security_groups_members"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`outbound_security_groups_members is missing from object`)
-
-		return NewOutboundRulesValueUnknown(), diags
-	}
-
-	outboundSecurityGroupsMembersVal, ok := outboundSecurityGroupsMembersAttribute.(basetypes.ListValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`outbound_security_groups_members expected to be basetypes.ListValue, was: %T`, outboundSecurityGroupsMembersAttribute))
-	}
-
 	serviceIdsAttribute, ok := attributes["service_ids"]
 
 	if !ok {
@@ -2532,13 +1956,12 @@ func NewOutboundRulesValue(attributeTypes map[string]attr.Type, attributes map[s
 	}
 
 	return OutboundRulesValue{
-		FromPortRange:                 fromPortRangeVal,
-		IpProtocol:                    ipProtocolVal,
-		IpRanges:                      ipRangesVal,
-		OutboundSecurityGroupsMembers: outboundSecurityGroupsMembersVal,
-		ServiceIds:                    serviceIdsVal,
-		ToPortRange:                   toPortRangeVal,
-		state:                         attr.ValueStateKnown,
+		FromPortRange: fromPortRangeVal,
+		IpProtocol:    ipProtocolVal,
+		IpRanges:      ipRangesVal,
+		ServiceIds:    serviceIdsVal,
+		ToPortRange:   toPortRangeVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -2610,17 +2033,16 @@ func (t OutboundRulesType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = OutboundRulesValue{}
 
 type OutboundRulesValue struct {
-	FromPortRange                 basetypes.Int64Value  `tfsdk:"from_port_range"`
-	IpProtocol                    basetypes.StringValue `tfsdk:"ip_protocol"`
-	IpRanges                      basetypes.SetValue    `tfsdk:"ip_ranges"`
-	OutboundSecurityGroupsMembers basetypes.ListValue   `tfsdk:"outbound_security_groups_members"`
-	ServiceIds                    basetypes.ListValue   `tfsdk:"service_ids"`
-	ToPortRange                   basetypes.Int64Value  `tfsdk:"to_port_range"`
-	state                         attr.ValueState
+	FromPortRange basetypes.Int64Value  `tfsdk:"from_port_range"`
+	IpProtocol    basetypes.StringValue `tfsdk:"ip_protocol"`
+	IpRanges      basetypes.SetValue    `tfsdk:"ip_ranges"`
+	ServiceIds    basetypes.ListValue   `tfsdk:"service_ids"`
+	ToPortRange   basetypes.Int64Value  `tfsdk:"to_port_range"`
+	state         attr.ValueState
 }
 
 func (v OutboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 6)
+	attrTypes := make(map[string]tftypes.Type, 5)
 
 	var val tftypes.Value
 	var err error
@@ -2629,9 +2051,6 @@ func (v OutboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 	attrTypes["ip_protocol"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["ip_ranges"] = basetypes.SetType{
 		ElemType: types.StringType,
-	}.TerraformType(ctx)
-	attrTypes["outbound_security_groups_members"] = basetypes.ListType{
-		ElemType: OutboundSecurityGroupsMembersValue{}.Type(ctx),
 	}.TerraformType(ctx)
 	attrTypes["service_ids"] = basetypes.ListType{
 		ElemType: types.StringType,
@@ -2642,7 +2061,7 @@ func (v OutboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 6)
+		vals := make(map[string]tftypes.Value, 5)
 
 		val, err = v.FromPortRange.ToTerraformValue(ctx)
 
@@ -2667,14 +2086,6 @@ func (v OutboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["ip_ranges"] = val
-
-		val, err = v.OutboundSecurityGroupsMembers.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["outbound_security_groups_members"] = val
 
 		val, err = v.ServiceIds.ToTerraformValue(ctx)
 
@@ -2721,35 +2132,6 @@ func (v OutboundRulesValue) String() string {
 func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	outboundSecurityGroupsMembers := types.ListValueMust(
-		OutboundSecurityGroupsMembersType{
-			basetypes.ObjectType{
-				AttrTypes: OutboundSecurityGroupsMembersValue{}.AttributeTypes(ctx),
-			},
-		},
-		v.OutboundSecurityGroupsMembers.Elements(),
-	)
-
-	if v.OutboundSecurityGroupsMembers.IsNull() {
-		outboundSecurityGroupsMembers = types.ListNull(
-			OutboundSecurityGroupsMembersType{
-				basetypes.ObjectType{
-					AttrTypes: OutboundSecurityGroupsMembersValue{}.AttributeTypes(ctx),
-				},
-			},
-		)
-	}
-
-	if v.OutboundSecurityGroupsMembers.IsUnknown() {
-		outboundSecurityGroupsMembers = types.ListUnknown(
-			OutboundSecurityGroupsMembersType{
-				basetypes.ObjectType{
-					AttrTypes: OutboundSecurityGroupsMembersValue{}.AttributeTypes(ctx),
-				},
-			},
-		)
-	}
-
 	var ipRangesVal basetypes.SetValue
 	switch {
 	case v.IpRanges.IsUnknown():
@@ -2768,9 +2150,6 @@ func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"ip_protocol":     basetypes.StringType{},
 			"ip_ranges": basetypes.SetType{
 				ElemType: types.StringType,
-			},
-			"outbound_security_groups_members": basetypes.ListType{
-				ElemType: OutboundSecurityGroupsMembersValue{}.Type(ctx),
 			},
 			"service_ids": basetypes.ListType{
 				ElemType: types.StringType,
@@ -2798,9 +2177,6 @@ func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.Object
 			"ip_ranges": basetypes.SetType{
 				ElemType: types.StringType,
 			},
-			"outbound_security_groups_members": basetypes.ListType{
-				ElemType: OutboundSecurityGroupsMembersValue{}.Type(ctx),
-			},
 			"service_ids": basetypes.ListType{
 				ElemType: types.StringType,
 			},
@@ -2813,9 +2189,6 @@ func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		"ip_protocol":     basetypes.StringType{},
 		"ip_ranges": basetypes.SetType{
 			ElemType: types.StringType,
-		},
-		"outbound_security_groups_members": basetypes.ListType{
-			ElemType: OutboundSecurityGroupsMembersValue{}.Type(ctx),
 		},
 		"service_ids": basetypes.ListType{
 			ElemType: types.StringType,
@@ -2834,12 +2207,11 @@ func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.Object
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"from_port_range":                  v.FromPortRange,
-			"ip_protocol":                      v.IpProtocol,
-			"ip_ranges":                        ipRangesVal,
-			"outbound_security_groups_members": outboundSecurityGroupsMembers,
-			"service_ids":                      serviceIdsVal,
-			"to_port_range":                    v.ToPortRange,
+			"from_port_range": v.FromPortRange,
+			"ip_protocol":     v.IpProtocol,
+			"ip_ranges":       ipRangesVal,
+			"service_ids":     serviceIdsVal,
+			"to_port_range":   v.ToPortRange,
 		})
 
 	return objVal, diags
@@ -2872,10 +2244,6 @@ func (v OutboundRulesValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.OutboundSecurityGroupsMembers.Equal(other.OutboundSecurityGroupsMembers) {
-		return false
-	}
-
 	if !v.ServiceIds.Equal(other.ServiceIds) {
 		return false
 	}
@@ -2902,392 +2270,10 @@ func (v OutboundRulesValue) AttributeTypes(ctx context.Context) map[string]attr.
 		"ip_ranges": basetypes.SetType{
 			ElemType: types.StringType,
 		},
-		"outbound_security_groups_members": basetypes.ListType{
-			ElemType: OutboundSecurityGroupsMembersValue{}.Type(ctx),
-		},
 		"service_ids": basetypes.ListType{
 			ElemType: types.StringType,
 		},
 		"to_port_range": basetypes.Int64Type{},
-	}
-}
-
-var _ basetypes.ObjectTypable = OutboundSecurityGroupsMembersType{}
-
-type OutboundSecurityGroupsMembersType struct {
-	basetypes.ObjectType
-}
-
-func (t OutboundSecurityGroupsMembersType) Equal(o attr.Type) bool {
-	other, ok := o.(OutboundSecurityGroupsMembersType)
-
-	if !ok {
-		return false
-	}
-
-	return t.ObjectType.Equal(other.ObjectType)
-}
-
-func (t OutboundSecurityGroupsMembersType) String() string {
-	return "OutboundSecurityGroupsMembersType"
-}
-
-func (t OutboundSecurityGroupsMembersType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributes := in.Attributes()
-
-	securityGroupIdAttribute, ok := attributes["security_group_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_id is missing from object`)
-
-		return nil, diags
-	}
-
-	securityGroupIdVal, ok := securityGroupIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_id expected to be basetypes.StringValue, was: %T`, securityGroupIdAttribute))
-	}
-
-	securityGroupNameAttribute, ok := attributes["security_group_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_name is missing from object`)
-
-		return nil, diags
-	}
-
-	securityGroupNameVal, ok := securityGroupNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_name expected to be basetypes.StringValue, was: %T`, securityGroupNameAttribute))
-	}
-
-	if diags.HasError() {
-		return nil, diags
-	}
-
-	return OutboundSecurityGroupsMembersValue{
-		SecurityGroupId:   securityGroupIdVal,
-		SecurityGroupName: securityGroupNameVal,
-		state:             attr.ValueStateKnown,
-	}, diags
-}
-
-func NewOutboundSecurityGroupsMembersValueNull() OutboundSecurityGroupsMembersValue {
-	return OutboundSecurityGroupsMembersValue{
-		state: attr.ValueStateNull,
-	}
-}
-
-func NewOutboundSecurityGroupsMembersValueUnknown() OutboundSecurityGroupsMembersValue {
-	return OutboundSecurityGroupsMembersValue{
-		state: attr.ValueStateUnknown,
-	}
-}
-
-func NewOutboundSecurityGroupsMembersValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (OutboundSecurityGroupsMembersValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
-	ctx := context.Background()
-
-	for name, attributeType := range attributeTypes {
-		attribute, ok := attributes[name]
-
-		if !ok {
-			diags.AddError(
-				"Missing OutboundSecurityGroupsMembersValue Attribute Value",
-				"While creating a OutboundSecurityGroupsMembersValue value, a missing attribute value was detected. "+
-					"A OutboundSecurityGroupsMembersValue must contain values for all attributes, even if null or unknown. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("OutboundSecurityGroupsMembersValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
-			)
-
-			continue
-		}
-
-		if !attributeType.Equal(attribute.Type(ctx)) {
-			diags.AddError(
-				"Invalid OutboundSecurityGroupsMembersValue Attribute Type",
-				"While creating a OutboundSecurityGroupsMembersValue value, an invalid attribute value was detected. "+
-					"A OutboundSecurityGroupsMembersValue must use a matching attribute type for the value. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("OutboundSecurityGroupsMembersValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
-					fmt.Sprintf("OutboundSecurityGroupsMembersValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
-			)
-		}
-	}
-
-	for name := range attributes {
-		_, ok := attributeTypes[name]
-
-		if !ok {
-			diags.AddError(
-				"Extra OutboundSecurityGroupsMembersValue Attribute Value",
-				"While creating a OutboundSecurityGroupsMembersValue value, an extra attribute value was detected. "+
-					"A OutboundSecurityGroupsMembersValue must not contain values beyond the expected attribute types. "+
-					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("Extra OutboundSecurityGroupsMembersValue Attribute Name: %s", name),
-			)
-		}
-	}
-
-	if diags.HasError() {
-		return NewOutboundSecurityGroupsMembersValueUnknown(), diags
-	}
-
-	securityGroupIdAttribute, ok := attributes["security_group_id"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_id is missing from object`)
-
-		return NewOutboundSecurityGroupsMembersValueUnknown(), diags
-	}
-
-	securityGroupIdVal, ok := securityGroupIdAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_id expected to be basetypes.StringValue, was: %T`, securityGroupIdAttribute))
-	}
-
-	securityGroupNameAttribute, ok := attributes["security_group_name"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`security_group_name is missing from object`)
-
-		return NewOutboundSecurityGroupsMembersValueUnknown(), diags
-	}
-
-	securityGroupNameVal, ok := securityGroupNameAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`security_group_name expected to be basetypes.StringValue, was: %T`, securityGroupNameAttribute))
-	}
-
-	if diags.HasError() {
-		return NewOutboundSecurityGroupsMembersValueUnknown(), diags
-	}
-
-	return OutboundSecurityGroupsMembersValue{
-		SecurityGroupId:   securityGroupIdVal,
-		SecurityGroupName: securityGroupNameVal,
-		state:             attr.ValueStateKnown,
-	}, diags
-}
-
-func NewOutboundSecurityGroupsMembersValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) OutboundSecurityGroupsMembersValue {
-	object, diags := NewOutboundSecurityGroupsMembersValue(attributeTypes, attributes)
-
-	if diags.HasError() {
-		// This could potentially be added to the diag package.
-		diagsStrings := make([]string, 0, len(diags))
-
-		for _, diagnostic := range diags {
-			diagsStrings = append(diagsStrings, fmt.Sprintf(
-				"%s | %s | %s",
-				diagnostic.Severity(),
-				diagnostic.Summary(),
-				diagnostic.Detail()))
-		}
-
-		panic("NewOutboundSecurityGroupsMembersValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
-	}
-
-	return object
-}
-
-func (t OutboundSecurityGroupsMembersType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
-	if in.Type() == nil {
-		return NewOutboundSecurityGroupsMembersValueNull(), nil
-	}
-
-	if !in.Type().Equal(t.TerraformType(ctx)) {
-		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
-	}
-
-	if !in.IsKnown() {
-		return NewOutboundSecurityGroupsMembersValueUnknown(), nil
-	}
-
-	if in.IsNull() {
-		return NewOutboundSecurityGroupsMembersValueNull(), nil
-	}
-
-	attributes := map[string]attr.Value{}
-
-	val := map[string]tftypes.Value{}
-
-	err := in.As(&val)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for k, v := range val {
-		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
-
-		if err != nil {
-			return nil, err
-		}
-
-		attributes[k] = a
-	}
-
-	return NewOutboundSecurityGroupsMembersValueMust(OutboundSecurityGroupsMembersValue{}.AttributeTypes(ctx), attributes), nil
-}
-
-func (t OutboundSecurityGroupsMembersType) ValueType(ctx context.Context) attr.Value {
-	return OutboundSecurityGroupsMembersValue{}
-}
-
-var _ basetypes.ObjectValuable = OutboundSecurityGroupsMembersValue{}
-
-type OutboundSecurityGroupsMembersValue struct {
-	SecurityGroupId   basetypes.StringValue `tfsdk:"security_group_id"`
-	SecurityGroupName basetypes.StringValue `tfsdk:"security_group_name"`
-	state             attr.ValueState
-}
-
-func (v OutboundSecurityGroupsMembersValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 2)
-
-	var val tftypes.Value
-	var err error
-
-	attrTypes["security_group_id"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["security_group_name"] = basetypes.StringType{}.TerraformType(ctx)
-
-	objectType := tftypes.Object{AttributeTypes: attrTypes}
-
-	switch v.state {
-	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 2)
-
-		val, err = v.SecurityGroupId.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["security_group_id"] = val
-
-		val, err = v.SecurityGroupName.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["security_group_name"] = val
-
-		if err := tftypes.ValidateValue(objectType, vals); err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		return tftypes.NewValue(objectType, vals), nil
-	case attr.ValueStateNull:
-		return tftypes.NewValue(objectType, nil), nil
-	case attr.ValueStateUnknown:
-		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
-	default:
-		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
-	}
-}
-
-func (v OutboundSecurityGroupsMembersValue) IsNull() bool {
-	return v.state == attr.ValueStateNull
-}
-
-func (v OutboundSecurityGroupsMembersValue) IsUnknown() bool {
-	return v.state == attr.ValueStateUnknown
-}
-
-func (v OutboundSecurityGroupsMembersValue) String() string {
-	return "OutboundSecurityGroupsMembersValue"
-}
-
-func (v OutboundSecurityGroupsMembersValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	attributeTypes := map[string]attr.Type{
-		"security_group_id":   basetypes.StringType{},
-		"security_group_name": basetypes.StringType{},
-	}
-
-	if v.IsNull() {
-		return types.ObjectNull(attributeTypes), diags
-	}
-
-	if v.IsUnknown() {
-		return types.ObjectUnknown(attributeTypes), diags
-	}
-
-	objVal, diags := types.ObjectValue(
-		attributeTypes,
-		map[string]attr.Value{
-			"security_group_id":   v.SecurityGroupId,
-			"security_group_name": v.SecurityGroupName,
-		})
-
-	return objVal, diags
-}
-
-func (v OutboundSecurityGroupsMembersValue) Equal(o attr.Value) bool {
-	other, ok := o.(OutboundSecurityGroupsMembersValue)
-
-	if !ok {
-		return false
-	}
-
-	if v.state != other.state {
-		return false
-	}
-
-	if v.state != attr.ValueStateKnown {
-		return true
-	}
-
-	if !v.SecurityGroupId.Equal(other.SecurityGroupId) {
-		return false
-	}
-
-	if !v.SecurityGroupName.Equal(other.SecurityGroupName) {
-		return false
-	}
-
-	return true
-}
-
-func (v OutboundSecurityGroupsMembersValue) Type(ctx context.Context) attr.Type {
-	return OutboundSecurityGroupsMembersType{
-		basetypes.ObjectType{
-			AttrTypes: v.AttributeTypes(ctx),
-		},
-	}
-}
-
-func (v OutboundSecurityGroupsMembersValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
-	return map[string]attr.Type{
-		"security_group_id":   basetypes.StringType{},
-		"security_group_name": basetypes.StringType{},
 	}
 }
 
