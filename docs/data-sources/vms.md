@@ -88,7 +88,7 @@ resource "null_resource" "print-datasource-id" {
 - `reservation_ids` (List of String) The IDs of the reservation of the VMs, created every time you launch VMs. These reservation IDs can be associated with several VMs when you lauch a group of VMs using the same launch request.
 - `root_device_names` (List of String) The names of the root devices for the VMs (for example, `/dev/sda1`)
 - `root_device_types` (List of String) The root devices types used by the VMs (always `ebs`)
-- `security_group_ids` (List of String) The IDs of the security groups for the VMs (only in the public Cloud).
+- `security_group_ids` (Set of String) The IDs of the security groups for the VMs (only in the public Cloud).
 - `security_group_names` (List of String) The names of the security groups for the VMs (only in the public Cloud).
 - `state_reason_codes` (List of Number) The reason codes for the state changes.
 - `state_reason_messages` (List of String) The messages describing the state changes.
@@ -140,7 +140,7 @@ Read-Only:
 - `reservation_id` (String) The reservation ID of the VM.
 - `root_device_name` (String) The name of the root device for the VM (for example, `/dev/sda1`).
 - `root_device_type` (String) The type of root device used by the VM (always `bsu`).
-- `security_groups` (Attributes List) One or more security groups associated with the VM. (see [below for nested schema](#nestedatt--items--security_groups))
+- `security_groups` (Attributes Set) One or more security groups associated with the VM. (see [below for nested schema](#nestedatt--items--security_groups))
 - `state` (String) The state of the VM (`pending` \| `running` \| `stopping` \| `stopped` \| `shutting-down` \| `terminated` \| `quarantine`).
 - `state_reason` (String) The reason explaining the current state of the VM.
 - `subnet_id` (String) The ID of the Subnet for the VM.

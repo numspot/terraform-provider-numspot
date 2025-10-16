@@ -77,6 +77,14 @@ func (d *vmsDataSource) Read(ctx context.Context, request datasource.ReadRequest
 }
 
 func deserializeVmParams(ctx context.Context, tf datasource_vm.VmModel, diags *diag.Diagnostics) api.ReadVmsParams {
+	var securityGroupIds *[]string
+
+	if !tf.SecurityGroupIds.IsNull() && !tf.SecurityGroupIds.IsUnknown() {
+		var sgIdsList []string
+		diags.Append(tf.SecurityGroupIds.ElementsAs(ctx, &sgIdsList, false)...)
+		securityGroupIds = &sgIdsList
+	}
+
 	return api.ReadVmsParams{
 		TagKeys:                              utils.ConvertTfListToArrayOfString(ctx, tf.TagKeys, diags),
 		TagValues:                            utils.ConvertTfListToArrayOfString(ctx, tf.TagValues, diags),
@@ -115,7 +123,7 @@ func deserializeVmParams(ctx context.Context, tf datasource_vm.VmModel, diags *d
 		ReservationIds:                       utils.ConvertTfListToArrayOfString(ctx, tf.ReservationIds, diags),
 		RootDeviceNames:                      utils.ConvertTfListToArrayOfString(ctx, tf.RootDeviceNames, diags),
 		RootDeviceTypes:                      utils.ConvertTfListToArrayOfString(ctx, tf.RootDeviceTypes, diags),
-		SecurityGroupIds:                     utils.ConvertTfListToArrayOfString(ctx, tf.SecurityGroupIds, diags),
+		SecurityGroupIds:                     securityGroupIds,
 		SecurityGroupNames:                   utils.ConvertTfListToArrayOfString(ctx, tf.SecurityGroupNames, diags),
 		StateReasonMessages:                  utils.ConvertTfListToArrayOfString(ctx, tf.StateReasonMessages, diags),
 		SubnetIds:                            utils.ConvertTfListToArrayOfString(ctx, tf.SubnetIds, diags),
@@ -134,7 +142,7 @@ func mappingItemsValue(ctx context.Context, vm api.Vm, diags *diag.Diagnostics) 
 	tagsList := types.ListNull(datasource_vm.ItemsValue{}.Type(ctx))
 	blockDeviceMappingsList := types.List{}
 	nicsList := types.ListNull(datasource_vm.NicsValue{}.Type(ctx))
-	securityGroupsList := types.List{}
+	securityGroupsSet := types.Set{}
 	productCodesList := types.ListNull(types.String{}.Type(ctx))
 	creationDateTf := types.String{}
 	placement := basetypes.ObjectValue{}
@@ -165,7 +173,7 @@ func mappingItemsValue(ctx context.Context, vm api.Vm, diags *diag.Diagnostics) 
 	}
 
 	if vm.SecurityGroups != nil {
-		securityGroupsList, serializeDiags = mappingSecurityGroups(ctx, *vm.SecurityGroups, diags)
+		securityGroupsSet, serializeDiags = mappingSecurityGroups(ctx, *vm.SecurityGroups, diags)
 		if serializeDiags.HasError() {
 			diags.Append(serializeDiags...)
 		}
@@ -220,7 +228,7 @@ func mappingItemsValue(ctx context.Context, vm api.Vm, diags *diag.Diagnostics) 
 		"reservation_id":              types.StringValue(utils.ConvertStringPtrToString(vm.ReservationId)),
 		"root_device_name":            types.StringValue(utils.ConvertStringPtrToString(vm.RootDeviceName)),
 		"root_device_type":            types.StringValue(utils.ConvertStringPtrToString(vm.RootDeviceType)),
-		"security_groups":             securityGroupsList,
+		"security_groups":             securityGroupsSet,
 		"state":                       types.StringValue(utils.ConvertStringPtrToString(vm.State)),
 		"state_reason":                types.StringValue(utils.ConvertStringPtrToString(vm.StateReason)),
 		"subnet_id":                   types.StringValue(utils.ConvertStringPtrToString(vm.SubnetId)),
@@ -346,7 +354,7 @@ func mappingLinkPublicIp(ctx context.Context, publicIpLightForVm *api.LinkPublic
 	return elementValue, mappingDiags
 }
 
-func mappingSecurityGroups(ctx context.Context, securityGroups []api.SecurityGroupLight, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {
+func mappingSecurityGroups(ctx context.Context, securityGroups []api.SecurityGroupLight, diags *diag.Diagnostics) (types.Set, diag.Diagnostics) {
 	ls := len(securityGroups)
 	elementValue := make([]datasource_vm.SecurityGroupsValue, ls)
 
@@ -361,7 +369,7 @@ func mappingSecurityGroups(ctx context.Context, securityGroups []api.SecurityGro
 		}
 	}
 
-	return types.ListValueFrom(ctx, new(datasource_vm.SecurityGroupsValue).Type(ctx), elementValue)
+	return types.SetValueFrom(ctx, new(datasource_vm.SecurityGroupsValue).Type(ctx), elementValue)
 }
 
 func mappingNicSecurityGroups(ctx context.Context, securityGroups *[]api.SecurityGroupLight, diags *diag.Diagnostics) (types.List, diag.Diagnostics) {

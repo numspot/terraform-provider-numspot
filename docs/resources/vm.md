@@ -98,8 +98,8 @@ resource "numspot_vm" "vm" {
 - `nested_virtualization` (Boolean) (dedicated tenancy only) If true, nested virtualization is enabled. If false, it is disabled.
 - `placement` (Attributes) Information about the placement of the VM. (see [below for nested schema](#nestedatt--placement))
 - `private_ips` (List of String) One or more private IPs of the VM.
-- `security_group_ids` (List of String) One or more IDs of security group for the VMs.
-- `security_groups` (List of String) One or more names of security groups for the VMs.
+- `security_group_ids` (Set of String) One or more IDs of security group for the VMs.
+- `security_groups` (Set of String) One or more names of security groups for the VMs.
 - `tags` (Attributes Set) One or more tags associated with the VM. (see [below for nested schema](#nestedatt--tags))
 - `user_data` (String) Data or script used to add a specific configuration to the VM. It must be Base64-encoded and is limited to 500 kibibytes (KiB).
 

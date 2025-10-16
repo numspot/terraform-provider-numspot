@@ -461,7 +461,7 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The type of root device used by the VM (always `bsu`).",
 							MarkdownDescription: "The type of root device used by the VM (always `bsu`).",
 						},
-						"security_groups": schema.ListNestedAttribute{
+						"security_groups": schema.SetNestedAttribute{
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"security_group_id": schema.StringAttribute{
@@ -764,7 +764,7 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The root devices types used by the VMs (always `ebs`)",
 				MarkdownDescription: "The root devices types used by the VMs (always `ebs`)",
 			},
-			"security_group_ids": schema.ListAttribute{
+			"security_group_ids": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
@@ -923,7 +923,7 @@ type VmModel struct {
 	ReservationIds                       types.List `tfsdk:"reservation_ids"`
 	RootDeviceNames                      types.List `tfsdk:"root_device_names"`
 	RootDeviceTypes                      types.List `tfsdk:"root_device_types"`
-	SecurityGroupIds                     types.List `tfsdk:"security_group_ids"`
+	SecurityGroupIds                     types.Set  `tfsdk:"security_group_ids"`
 	SecurityGroupNames                   types.List `tfsdk:"security_group_names"`
 	StateReasonCodes                     types.List `tfsdk:"state_reason_codes"`
 	StateReasonMessages                  types.List `tfsdk:"state_reason_messages"`
@@ -1444,12 +1444,12 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 		return nil, diags
 	}
 
-	securityGroupsVal, ok := securityGroupsAttribute.(basetypes.ListValue)
+	securityGroupsVal, ok := securityGroupsAttribute.(basetypes.SetValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`security_groups expected to be basetypes.ListValue, was: %T`, securityGroupsAttribute))
+			fmt.Sprintf(`security_groups expected to be basetypes.SetValue, was: %T`, securityGroupsAttribute))
 	}
 
 	stateAttribute, ok := attributes["state"]
@@ -2162,12 +2162,12 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 		return NewItemsValueUnknown(), diags
 	}
 
-	securityGroupsVal, ok := securityGroupsAttribute.(basetypes.ListValue)
+	securityGroupsVal, ok := securityGroupsAttribute.(basetypes.SetValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`security_groups expected to be basetypes.ListValue, was: %T`, securityGroupsAttribute))
+			fmt.Sprintf(`security_groups expected to be basetypes.SetValue, was: %T`, securityGroupsAttribute))
 	}
 
 	stateAttribute, ok := attributes["state"]
@@ -2433,7 +2433,7 @@ type ItemsValue struct {
 	ReservationId             basetypes.StringValue `tfsdk:"reservation_id"`
 	RootDeviceName            basetypes.StringValue `tfsdk:"root_device_name"`
 	RootDeviceType            basetypes.StringValue `tfsdk:"root_device_type"`
-	SecurityGroups            basetypes.ListValue   `tfsdk:"security_groups"`
+	SecurityGroups            basetypes.SetValue    `tfsdk:"security_groups"`
 	State                     basetypes.StringValue `tfsdk:"state"`
 	StateReason               basetypes.StringValue `tfsdk:"state_reason"`
 	SubnetId                  basetypes.StringValue `tfsdk:"subnet_id"`
@@ -2484,7 +2484,7 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 	attrTypes["reservation_id"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["root_device_name"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["root_device_type"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["security_groups"] = basetypes.ListType{
+	attrTypes["security_groups"] = basetypes.SetType{
 		ElemType: SecurityGroupsValue{}.Type(ctx),
 	}.TerraformType(ctx)
 	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
@@ -2883,7 +2883,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		)
 	}
 
-	securityGroups := types.ListValueMust(
+	securityGroups := types.SetValueMust(
 		SecurityGroupsType{
 			basetypes.ObjectType{
 				AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
@@ -2893,7 +2893,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 	)
 
 	if v.SecurityGroups.IsNull() {
-		securityGroups = types.ListNull(
+		securityGroups = types.SetNull(
 			SecurityGroupsType{
 				basetypes.ObjectType{
 					AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
@@ -2903,7 +2903,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 	}
 
 	if v.SecurityGroups.IsUnknown() {
-		securityGroups = types.ListUnknown(
+		securityGroups = types.SetUnknown(
 			SecurityGroupsType{
 				basetypes.ObjectType{
 					AttrTypes: SecurityGroupsValue{}.AttributeTypes(ctx),
@@ -2989,7 +2989,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"reservation_id":   basetypes.StringType{},
 			"root_device_name": basetypes.StringType{},
 			"root_device_type": basetypes.StringType{},
-			"security_groups": basetypes.ListType{
+			"security_groups": basetypes.SetType{
 				ElemType: SecurityGroupsValue{}.Type(ctx),
 			},
 			"state":        basetypes.StringType{},
@@ -3039,7 +3039,7 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		"reservation_id":   basetypes.StringType{},
 		"root_device_name": basetypes.StringType{},
 		"root_device_type": basetypes.StringType{},
-		"security_groups": basetypes.ListType{
+		"security_groups": basetypes.SetType{
 			ElemType: SecurityGroupsValue{}.Type(ctx),
 		},
 		"state":        basetypes.StringType{},
@@ -3301,7 +3301,7 @@ func (v ItemsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"reservation_id":   basetypes.StringType{},
 		"root_device_name": basetypes.StringType{},
 		"root_device_type": basetypes.StringType{},
-		"security_groups": basetypes.ListType{
+		"security_groups": basetypes.SetType{
 			ElemType: SecurityGroupsValue{}.Type(ctx),
 		},
 		"state":        basetypes.StringType{},

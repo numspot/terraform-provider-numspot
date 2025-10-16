@@ -181,6 +181,8 @@ func (r *vmResource) Delete(ctx context.Context, request resource.DeleteRequest,
 func deserializeCreateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, diags *diag.Diagnostics) api.CreateVmsJSONRequestBody {
 	var blockDeviceMappingPtr *[]api.BlockDeviceMappingVmCreation
 	var placement *api.Placement
+	var securityGroups *[]string
+	var securityGroupIds *[]string
 
 	if !(tf.BlockDeviceMappings.IsNull() || tf.BlockDeviceMappings.IsUnknown()) {
 		blockDeviceMapping := make([]api.BlockDeviceMappingVmCreation, 0, len(tf.BlockDeviceMappings.Elements()))
@@ -195,6 +197,18 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, dia
 		}
 	}
 
+	if !tf.SecurityGroupIds.IsNull() && !tf.SecurityGroupIds.IsUnknown() {
+		var sgIdsList []string
+		diags.Append(tf.SecurityGroupIds.ElementsAs(ctx, &sgIdsList, false)...)
+		securityGroupIds = &sgIdsList
+	}
+
+	if !tf.SecurityGroups.IsNull() && !tf.SecurityGroups.IsUnknown() {
+		var sgList []string
+		diags.Append(tf.SecurityGroups.ElementsAs(ctx, &sgList, false)...)
+		securityGroups = &sgList
+	}
+
 	bootOnCreation := true
 	return api.CreateVmsJSONRequestBody{
 		BootOnCreation:              &bootOnCreation,
@@ -205,8 +219,8 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, dia
 		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
 		Placement:                   placement,
 		PrivateIps:                  utils.TfStringListToStringPtrList(ctx, tf.PrivateIps, diags),
-		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
-		SecurityGroups:              utils.TfStringListToStringPtrList(ctx, tf.SecurityGroups, diags),
+		SecurityGroupIds:            securityGroupIds,
+		SecurityGroups:              securityGroups,
 		SubnetId:                    tf.SubnetId.ValueString(),
 		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
 		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.InitiatedShutdownBehavior),
@@ -388,8 +402,8 @@ func serializeNumSpotVM(ctx context.Context, http *api.Vm, diags *diag.Diagnosti
 		ReservationId:               types.StringPointerValue(http.ReservationId),
 		RootDeviceName:              types.StringPointerValue(http.RootDeviceName),
 		RootDeviceType:              types.StringPointerValue(http.RootDeviceType),
-		SecurityGroupIds:            utils.StringListToTfListValue(ctx, securityGroupIds, diags),
-		SecurityGroups:              utils.StringListToTfListValue(ctx, securityGroupNames, diags),
+		SecurityGroupIds:            utils.FromStringListPointerToTfStringSet(ctx, &securityGroupIds, diags),
+		SecurityGroups:              utils.FromStringListPointerToTfStringSet(ctx, &securityGroupNames, diags),
 		State:                       types.StringPointerValue(http.State),
 		StateReason:                 types.StringPointerValue(http.StateReason),
 		SubnetId:                    types.StringPointerValue(http.SubnetId),
@@ -410,8 +424,8 @@ func serializeNumSpotVM(ctx context.Context, http *api.Vm, diags *diag.Diagnosti
 		}
 	}
 	if http.SecurityGroups != nil {
-		listValue, _ := types.ListValueFrom(ctx, types.StringType, securityGroups)
-		r.SecurityGroupIds = listValue
+		setValue, _ := types.SetValueFrom(ctx, types.StringType, securityGroups)
+		r.SecurityGroupIds = setValue
 	}
 
 	return &r
@@ -543,6 +557,7 @@ func vmBsuFromApi(ctx context.Context, elt api.BsuCreated, diags *diag.Diagnosti
 
 func deserializeUpdateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, diags *diag.Diagnostics) api.UpdateVmJSONRequestBody {
 	blockDeviceMapping := make([]api.BlockDeviceMappingVmUpdate, 0, len(tf.BlockDeviceMappings.Elements()))
+	var securityGroupIds *[]string
 
 	for _, bdmTf := range tf.BlockDeviceMappings.Elements() {
 		bdmTfRes, ok := bdmTf.(resource_vm.BlockDeviceMappingsValue)
@@ -555,11 +570,17 @@ func deserializeUpdateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, dia
 		blockDeviceMapping = append(blockDeviceMapping, bdmApi)
 	}
 
+	if !tf.SecurityGroupIds.IsNull() && !tf.SecurityGroupIds.IsUnknown() {
+		var sgIdsList []string
+		diags.Append(tf.SecurityGroupIds.ElementsAs(ctx, &sgIdsList, false)...)
+		securityGroupIds = &sgIdsList
+	}
+
 	return api.UpdateVmJSONRequestBody{
 		DeletionProtection:          utils.FromTfBoolToBoolPtr(tf.DeletionProtection),
 		KeypairName:                 utils.FromTfStringToStringPtr(tf.KeypairName),
 		NestedVirtualization:        utils.FromTfBoolToBoolPtr(tf.NestedVirtualization),
-		SecurityGroupIds:            utils.TfStringListToStringPtrList(ctx, tf.SecurityGroupIds, diags),
+		SecurityGroupIds:            securityGroupIds,
 		UserData:                    utils.FromTfStringToStringPtr(tf.UserData),
 		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.InitiatedShutdownBehavior),
 		Type:                        utils.FromTfStringToStringPtr(tf.Type),

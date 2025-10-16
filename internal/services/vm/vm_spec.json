@@ -361,7 +361,7 @@
 					},
 					{
 						"name": "security_group_ids",
-						"list": {
+						"set": {
 							"computed_optional_required": "computed_optional",
 							"element_type": {
 								"string": {}
@@ -1016,7 +1016,7 @@
 									},
 									{
 										"name": "security_groups",
-										"list_nested": {
+										"set_nested": {
 											"computed_optional_required": "computed",
 											"nested_object": {
 												"attributes": [
@@ -1353,7 +1353,7 @@
 					},
 					{
 						"name": "security_group_ids",
-						"list": {
+						"set": {
 							"computed_optional_required": "computed_optional",
 							"element_type": {
 								"string": {}
@@ -1363,7 +1363,7 @@
 					},
 					{
 						"name": "security_groups",
-						"list": {
+						"set": {
 							"computed_optional_required": "computed_optional",
 							"element_type": {
 								"string": {}
@@ -1380,7 +1380,7 @@
 												"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 											}
 										],
-										"schema_definition": "listplanmodifier.RequiresReplaceIfConfigured()"
+										"schema_definition": "setplanmodifier.RequiresReplaceIfConfigured()"
 									}
 								}
 							]

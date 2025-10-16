@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -443,21 +444,21 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 				Description:         "The type of root device used by the VM (always `bsu`).",
 				MarkdownDescription: "The type of root device used by the VM (always `bsu`).",
 			},
-			"security_group_ids": schema.ListAttribute{
+			"security_group_ids": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
 				Description:         "One or more IDs of security group for the VMs.",
 				MarkdownDescription: "One or more IDs of security group for the VMs.",
 			},
-			"security_groups": schema.ListAttribute{
+			"security_groups": schema.SetAttribute{
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
 				Description:         "One or more names of security groups for the VMs.",
 				MarkdownDescription: "One or more names of security groups for the VMs.",
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(),
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.RequiresReplaceIfConfigured(),
 				},
 			},
 			"state": schema.StringAttribute{
@@ -554,8 +555,8 @@ type VmModel struct {
 	ReservationId               types.String   `tfsdk:"reservation_id"`
 	RootDeviceName              types.String   `tfsdk:"root_device_name"`
 	RootDeviceType              types.String   `tfsdk:"root_device_type"`
-	SecurityGroupIds            types.List     `tfsdk:"security_group_ids"`
-	SecurityGroups              types.List     `tfsdk:"security_groups"`
+	SecurityGroupIds            types.Set      `tfsdk:"security_group_ids"`
+	SecurityGroups              types.Set      `tfsdk:"security_groups"`
 	State                       types.String   `tfsdk:"state"`
 	StateReason                 types.String   `tfsdk:"state_reason"`
 	SubnetId                    types.String   `tfsdk:"subnet_id"`
