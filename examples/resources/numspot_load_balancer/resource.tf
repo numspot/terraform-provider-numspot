@@ -10,7 +10,7 @@ resource "numspot_subnet" "subnet" {
 }
 
 resource "numspot_security_group" "security-group" {
-  net_id      = numspot_vpc.vpc.id
+  vpc_id      = numspot_vpc.vpc.id
   name        = "My SG Group"
   description = "terraform-vm-tests-sg-description"
 
@@ -18,7 +18,6 @@ resource "numspot_security_group" "security-group" {
     {
       from_port_range = 80
       to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     }
   ]
@@ -26,15 +25,14 @@ resource "numspot_security_group" "security-group" {
     {
       from_port_range = 80
       to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     },
   ]
 }
 
 resource "numspot_vm" "vm" {
-  image_id  = "ami-0b7df82c"
-  vm_type   = "ns-cus6-4c8r"
+  image_id  = "ami-42e5719f"
+  type      = "ns-cus6-4c8r"
   subnet_id = numspot_subnet.subnet.id
 }
 
@@ -75,7 +73,6 @@ resource "numspot_load_balancer" "load-balancer" {
   ]
 }
 
-
 ## Public Load Balancer
 
 resource "numspot_vpc" "vpc" {
@@ -100,7 +97,6 @@ resource "numspot_security_group" "security-group" {
     {
       from_port_range = 80
       to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     }
   ]
@@ -108,7 +104,6 @@ resource "numspot_security_group" "security-group" {
     {
       from_port_range = 80
       to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     }
   ]

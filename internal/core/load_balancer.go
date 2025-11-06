@@ -212,19 +212,19 @@ func linkBackend(ctx context.Context, provider *client.NumSpotSDK, loadBalancerN
 		return err
 	}
 
-	bVM := make([]string, 0)
-	if backendVM != nil {
-		bVM = backendVM
+	var bVM *[]string
+	if backendVM != nil && len(backendVM) > 0 {
+		bVM = &backendVM
 	}
 
-	bIP := make([]string, 0)
-	if backendIP != nil {
-		bIP = backendIP
+	var bIP *[]string
+	if backendIP != nil && len(backendIP) > 0 {
+		bIP = &backendIP
 	}
 
 	linkLB := api.LinkLoadBalancerBackendMachinesJSONRequestBody{
-		BackendIps:   &bIP,
-		BackendVmIds: &bVM,
+		BackendIps:   bIP,
+		BackendVmIds: bVM,
 	}
 
 	linkLoadBalancerBackendResponse, err := numspotClient.LinkLoadBalancerBackendMachinesWithResponse(ctx, spaceID, loadBalancerName, linkLB)

@@ -17,7 +17,6 @@ resource "numspot_security_group" "security-group" {
     {
       from_port_range = 80
       to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     }
   ]

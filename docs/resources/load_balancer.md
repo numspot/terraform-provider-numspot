@@ -25,7 +25,7 @@ resource "numspot_subnet" "subnet" {
 }
 
 resource "numspot_security_group" "security-group" {
-  net_id      = numspot_vpc.vpc.id
+  vpc_id      = numspot_vpc.vpc.id
   name        = "My SG Group"
   description = "terraform-vm-tests-sg-description"
 
@@ -33,7 +33,6 @@ resource "numspot_security_group" "security-group" {
     {
       from_port_range = 80
       to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     }
   ]
@@ -41,15 +40,14 @@ resource "numspot_security_group" "security-group" {
     {
       from_port_range = 80
       to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     },
   ]
 }
 
 resource "numspot_vm" "vm" {
-  image_id  = "ami-0b7df82c"
-  vm_type   = "ns-cus6-4c8r"
+  image_id  = "ami-42e5719f"
+  type      = "ns-cus6-4c8r"
   subnet_id = numspot_subnet.subnet.id
 }
 
@@ -90,7 +88,6 @@ resource "numspot_load_balancer" "load-balancer" {
   ]
 }
 
-
 ## Public Load Balancer
 
 resource "numspot_vpc" "vpc" {
@@ -115,7 +112,6 @@ resource "numspot_security_group" "security-group" {
     {
       from_port_range = 80
       to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     }
   ]
@@ -123,7 +119,6 @@ resource "numspot_security_group" "security-group" {
     {
       from_port_range = 80
       to_port_range   = 80
-      ip_ranges       = ["0.0.0.0/0"]
       ip_protocol     = "tcp"
     }
   ]
@@ -194,8 +189,8 @@ resource "numspot_load_balancer" "load-balancer" {
 
 ### Optional
 
-- `backend_ips` (Set of String) One or more public IPs of back-end VMs.
-- `backend_vm_ids` (Set of String) One or more IDs of back-end VMs for the load balancer.
+- `backend_ips` (Set of String) List of private or public IP addresses used as load balancer backends. Can be used together with 'backend_vm_ids' to include both external and internal targets. Typically used when backends are not managed as VMs within this infrastructure.
+- `backend_vm_ids` (Set of String) List of VM IDs used as load balancer backends. Recommended for internal resources, as it ensures dynamic management of IP addresses. Can be combined with 'backend_ips' if the VM has multiple NICs or IP addresses, to ensure a single response to the query.
 - `health_check` (Attributes) Information about the health check configuration. (see [below for nested schema](#nestedatt--health_check))
 - `public_ip` (String) (internet-facing only) The public IP you want to associate with the load balancer. If not specified, a public IP owned by NumSpot is associated.
 - `security_groups` (List of String) (Vpc only) One or more IDs of security groups you want to assign to the load balancer. If not specified, the default security group of the Vpc is assigned to the load balancer.

@@ -227,11 +227,23 @@ func deserializeCreateNumSpotLoadBalancer(ctx context.Context, tf resource_load_
 	}
 	subnets := utils.TfStringListToStringList(ctx, tf.Subnets, diags)
 	listeners := utils.TfSetToGenericList(func(a resource_load_balancer.ListenersValue) api.ListenerForCreation {
+		var backendProtocol *string
+		if !a.BackendProtocol.IsNull() && a.BackendProtocol.ValueString() != "" {
+			bp := a.BackendProtocol.ValueString()
+			backendProtocol = &bp
+		}
+
+		var serverCertificateId *string
+		if !a.ServerCertificateId.IsNull() && a.ServerCertificateId.ValueString() != "" {
+			sc := a.ServerCertificateId.ValueString()
+			serverCertificateId = &sc
+		}
 		return api.ListenerForCreation{
 			BackendPort:          utils.FromTfInt64ToInt(a.BackendPort),
-			BackendProtocol:      a.BackendProtocol.ValueStringPointer(),
+			BackendProtocol:      backendProtocol,
 			LoadBalancerPort:     utils.FromTfInt64ToInt(a.LoadBalancerPort),
 			LoadBalancerProtocol: a.LoadBalancerProtocol.ValueString(),
+			ServerCertificateId:  serverCertificateId,
 		}
 	}, ctx, tf.Listeners, diags)
 
@@ -432,7 +444,7 @@ func listenersFromHTTP(ctx context.Context, elt api.Listener, diags *diag.Diagno
 			"load_balancer_port":     utils.FromIntPtrToTfInt64(elt.LoadBalancerPort),
 			"load_balancer_protocol": types.StringPointerValue(elt.BackendProtocol),
 			"policy_names":           tfPolicyNames,
-			"server_certificate_id":  types.StringPointerValue(elt.BackendProtocol),
+			"server_certificate_id":  types.StringPointerValue(elt.ServerCertificateId),
 		})
 	diags.Append(diagnostics...)
 	return value

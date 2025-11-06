@@ -185,7 +185,7 @@
 						"name": "nic_id",
 						"string": {
 							"computed_optional_required": "computed_optional",
-							"description": "The ID of the NIC the public IP is associated with (if any).",
+							"description": "The ID of the NIC the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
 							"validators": [
 								{
 									"custom": {
@@ -236,7 +236,7 @@
 						"name": "vm_id",
 						"string": {
 							"computed_optional_required": "optional",
-							"description": "The ID of the VM the public IP is associated with (if any).",
+							"description": "The ID of the VM the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
 							"validators": [
 								{
 									"custom": {

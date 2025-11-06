@@ -71,6 +71,8 @@ resource "numspot_vm" "vm-1" {
     key   = "name"
     value = "terraform-demo"
   }]
+  
+  depends_on = [numspot_subnet.subnet, numspot_security_group.sg]
 }
 
 resource "numspot_vm" "vm-2" {
@@ -82,6 +84,8 @@ resource "numspot_vm" "vm-2" {
     key   = "name"
     value = "terraform-demo"
   }]
+  
+  depends_on = [numspot_subnet.subnet, numspot_security_group.sg]
 }
 
 resource "numspot_internet_gateway" "igw" {
@@ -91,6 +95,8 @@ resource "numspot_internet_gateway" "igw" {
     key   = "name"
     value = "terraform-demo"
   }]
+
+  depends_on = [numspot_vpc.vpc]
 }
 
 resource "numspot_route_table" "rt" {
@@ -106,6 +112,8 @@ resource "numspot_route_table" "rt" {
     key   = "name"
     value = "terraform-demo"
   }]
+
+  depends_on = [numspot_internet_gateway.igw]
 }
 
 resource "numspot_security_group" "sg" {
@@ -117,20 +125,20 @@ resource "numspot_security_group" "sg" {
     from_port_range = 3000
     to_port_range   = 3000
     ip_protocol     = "tcp"
-    ip_ranges       = ["0.0.0.0/0"]
   }]
 
   outbound_rules = [{
     from_port_range = -1
     to_port_range   = -1
     ip_protocol     = "Any"
-    ip_ranges       = ["0.0.0.0/0"]
   }]
 
   tags = [{
     key   = "name"
     value = "terraform-demo"
   }]
+
+  depends_on = [numspot_subnet.subnet]
 }
 
 resource "numspot_load_balancer" "lbu" {
@@ -161,6 +169,8 @@ resource "numspot_load_balancer" "lbu" {
     key   = "name"
     value = "terraform-demo"
   }]
+
+  depends_on = [numspot_vm.vm-1, numspot_vm.vm-2]
 }
 ```
 

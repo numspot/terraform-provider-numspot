@@ -527,7 +527,7 @@
 							"element_type": {
 								"string": {}
 							},
-							"description": "One or more public IPs of back-end VMs."
+							"description": "List of private or public IP addresses used as load balancer backends. Can be used together with 'backend_vm_ids' to include both external and internal targets. Typically used when backends are not managed as VMs within this infrastructure."
 						}
 					},
 					{
@@ -537,7 +537,7 @@
 							"element_type": {
 								"string": {}
 							},
-							"description": "One or more IDs of back-end VMs for the load balancer."
+							"description": "List of VM IDs used as load balancer backends. Recommended for internal resources, as it ensures dynamic management of IP addresses. Can be combined with 'backend_ips' if the VM has multiple NICs or IP addresses, to ensure a single response to the query."
 						}
 					},
 					{

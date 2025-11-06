@@ -24,8 +24,8 @@ resource "numspot_image" "image_from_vm" {
   vm_id = numspot_vm.vm.id
 }
 
-# Image from Snapshot 
-data "numspot_snapshot" "test" {
+# Image from Snapshot
+data "numspot_snapshot" "snapshot" {
   # ...
 }
 
@@ -36,7 +36,7 @@ resource "numspot_image" "image_from_snapshot" {
     {
       device_name = "/dev/sda1"
       bsu = {
-        snapshot_id           = numspot_snapshot.test.id
+        snapshot_id           = numspot_snapshot.snapshot.id
         volume_size           = 120
         volume_type           = "io1"
         iops                  = 150

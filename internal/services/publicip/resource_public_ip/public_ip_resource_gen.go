@@ -36,8 +36,8 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 			"nic_id": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "The ID of the NIC the public IP is associated with (if any).",
-				MarkdownDescription: "The ID of the NIC the public IP is associated with (if any).",
+				Description:         "The ID of the NIC the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
+				MarkdownDescription: "The ID of the NIC the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
@@ -82,8 +82,8 @@ func PublicIpResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"vm_id": schema.StringAttribute{
 				Optional:            true,
-				Description:         "The ID of the VM the public IP is associated with (if any).",
-				MarkdownDescription: "The ID of the VM the public IP is associated with (if any).",
+				Description:         "The ID of the VM the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
+				MarkdownDescription: "The ID of the VM the public IP is associated with (if any).\n**Note:** Exactly one of `nic_id` or `vm_id` must be set.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
