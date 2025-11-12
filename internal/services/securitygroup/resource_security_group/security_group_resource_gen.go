@@ -45,6 +45,13 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 							MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 						},
+						"ip_ranges": schema.SetAttribute{
+							ElementType:         types.StringType,
+							Optional:            true,
+							Computed:            true,
+							Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
+							MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
+						},
 						"service_ids": schema.ListAttribute{
 							ElementType:         types.StringType,
 							Optional:            true,
@@ -92,6 +99,13 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 							MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
+						},
+						"ip_ranges": schema.SetAttribute{
+							ElementType:         types.StringType,
+							Optional:            true,
+							Computed:            true,
+							Description:         "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
+							MarkdownDescription: "One or more IP ranges for the security group rules, in CIDR notation (for example, `10.0.0.0/16`).",
 						},
 						"service_ids": schema.ListAttribute{
 							ElementType:         types.StringType,
@@ -226,6 +240,24 @@ func (t InboundRulesType) ValueFromObject(ctx context.Context, in basetypes.Obje
 			fmt.Sprintf(`ip_protocol expected to be basetypes.StringValue, was: %T`, ipProtocolAttribute))
 	}
 
+	ipRangesAttribute, ok := attributes["ip_ranges"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`ip_ranges is missing from object`)
+
+		return nil, diags
+	}
+
+	ipRangesVal, ok := ipRangesAttribute.(basetypes.SetValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`ip_ranges expected to be basetypes.SetValue, was: %T`, ipRangesAttribute))
+	}
+
 	serviceIdsAttribute, ok := attributes["service_ids"]
 
 	if !ok {
@@ -269,6 +301,7 @@ func (t InboundRulesType) ValueFromObject(ctx context.Context, in basetypes.Obje
 	return InboundRulesValue{
 		FromPortRange: fromPortRangeVal,
 		IpProtocol:    ipProtocolVal,
+		IpRanges:      ipRangesVal,
 		ServiceIds:    serviceIdsVal,
 		ToPortRange:   toPortRangeVal,
 		state:         attr.ValueStateKnown,
@@ -374,6 +407,24 @@ func NewInboundRulesValue(attributeTypes map[string]attr.Type, attributes map[st
 			fmt.Sprintf(`ip_protocol expected to be basetypes.StringValue, was: %T`, ipProtocolAttribute))
 	}
 
+	ipRangesAttribute, ok := attributes["ip_ranges"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`ip_ranges is missing from object`)
+
+		return NewInboundRulesValueUnknown(), diags
+	}
+
+	ipRangesVal, ok := ipRangesAttribute.(basetypes.SetValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`ip_ranges expected to be basetypes.SetValue, was: %T`, ipRangesAttribute))
+	}
+
 	serviceIdsAttribute, ok := attributes["service_ids"]
 
 	if !ok {
@@ -417,6 +468,7 @@ func NewInboundRulesValue(attributeTypes map[string]attr.Type, attributes map[st
 	return InboundRulesValue{
 		FromPortRange: fromPortRangeVal,
 		IpProtocol:    ipProtocolVal,
+		IpRanges:      ipRangesVal,
 		ServiceIds:    serviceIdsVal,
 		ToPortRange:   toPortRangeVal,
 		state:         attr.ValueStateKnown,
@@ -493,19 +545,23 @@ var _ basetypes.ObjectValuable = InboundRulesValue{}
 type InboundRulesValue struct {
 	FromPortRange basetypes.Int64Value  `tfsdk:"from_port_range"`
 	IpProtocol    basetypes.StringValue `tfsdk:"ip_protocol"`
+	IpRanges      basetypes.SetValue    `tfsdk:"ip_ranges"`
 	ServiceIds    basetypes.ListValue   `tfsdk:"service_ids"`
 	ToPortRange   basetypes.Int64Value  `tfsdk:"to_port_range"`
 	state         attr.ValueState
 }
 
 func (v InboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 4)
+	attrTypes := make(map[string]tftypes.Type, 5)
 
 	var val tftypes.Value
 	var err error
 
 	attrTypes["from_port_range"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["ip_protocol"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["ip_ranges"] = basetypes.SetType{
+		ElemType: types.StringType,
+	}.TerraformType(ctx)
 	attrTypes["service_ids"] = basetypes.ListType{
 		ElemType: types.StringType,
 	}.TerraformType(ctx)
@@ -515,7 +571,7 @@ func (v InboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value,
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 4)
+		vals := make(map[string]tftypes.Value, 5)
 
 		val, err = v.FromPortRange.ToTerraformValue(ctx)
 
@@ -532,6 +588,14 @@ func (v InboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value,
 		}
 
 		vals["ip_protocol"] = val
+
+		val, err = v.IpRanges.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["ip_ranges"] = val
 
 		val, err = v.ServiceIds.ToTerraformValue(ctx)
 
@@ -578,6 +642,32 @@ func (v InboundRulesValue) String() string {
 func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var ipRangesVal basetypes.SetValue
+	switch {
+	case v.IpRanges.IsUnknown():
+		ipRangesVal = types.SetUnknown(types.StringType)
+	case v.IpRanges.IsNull():
+		ipRangesVal = types.SetNull(types.StringType)
+	default:
+		var d diag.Diagnostics
+		ipRangesVal, d = types.SetValue(types.StringType, v.IpRanges.Elements())
+		diags.Append(d...)
+	}
+
+	if diags.HasError() {
+		return types.ObjectUnknown(map[string]attr.Type{
+			"from_port_range": basetypes.Int64Type{},
+			"ip_protocol":     basetypes.StringType{},
+			"ip_ranges": basetypes.SetType{
+				ElemType: types.StringType,
+			},
+			"service_ids": basetypes.ListType{
+				ElemType: types.StringType,
+			},
+			"to_port_range": basetypes.Int64Type{},
+		}), diags
+	}
+
 	var serviceIdsVal basetypes.ListValue
 	switch {
 	case v.ServiceIds.IsUnknown():
@@ -594,6 +684,9 @@ func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 		return types.ObjectUnknown(map[string]attr.Type{
 			"from_port_range": basetypes.Int64Type{},
 			"ip_protocol":     basetypes.StringType{},
+			"ip_ranges": basetypes.SetType{
+				ElemType: types.StringType,
+			},
 			"service_ids": basetypes.ListType{
 				ElemType: types.StringType,
 			},
@@ -604,6 +697,9 @@ func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 	attributeTypes := map[string]attr.Type{
 		"from_port_range": basetypes.Int64Type{},
 		"ip_protocol":     basetypes.StringType{},
+		"ip_ranges": basetypes.SetType{
+			ElemType: types.StringType,
+		},
 		"service_ids": basetypes.ListType{
 			ElemType: types.StringType,
 		},
@@ -623,6 +719,7 @@ func (v InboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectV
 		map[string]attr.Value{
 			"from_port_range": v.FromPortRange,
 			"ip_protocol":     v.IpProtocol,
+			"ip_ranges":       ipRangesVal,
 			"service_ids":     serviceIdsVal,
 			"to_port_range":   v.ToPortRange,
 		})
@@ -653,6 +750,10 @@ func (v InboundRulesValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.IpRanges.Equal(other.IpRanges) {
+		return false
+	}
+
 	if !v.ServiceIds.Equal(other.ServiceIds) {
 		return false
 	}
@@ -676,6 +777,9 @@ func (v InboundRulesValue) AttributeTypes(ctx context.Context) map[string]attr.T
 	return map[string]attr.Type{
 		"from_port_range": basetypes.Int64Type{},
 		"ip_protocol":     basetypes.StringType{},
+		"ip_ranges": basetypes.SetType{
+			ElemType: types.StringType,
+		},
 		"service_ids": basetypes.ListType{
 			ElemType: types.StringType,
 		},
@@ -744,6 +848,24 @@ func (t OutboundRulesType) ValueFromObject(ctx context.Context, in basetypes.Obj
 			fmt.Sprintf(`ip_protocol expected to be basetypes.StringValue, was: %T`, ipProtocolAttribute))
 	}
 
+	ipRangesAttribute, ok := attributes["ip_ranges"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`ip_ranges is missing from object`)
+
+		return nil, diags
+	}
+
+	ipRangesVal, ok := ipRangesAttribute.(basetypes.SetValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`ip_ranges expected to be basetypes.SetValue, was: %T`, ipRangesAttribute))
+	}
+
 	serviceIdsAttribute, ok := attributes["service_ids"]
 
 	if !ok {
@@ -787,6 +909,7 @@ func (t OutboundRulesType) ValueFromObject(ctx context.Context, in basetypes.Obj
 	return OutboundRulesValue{
 		FromPortRange: fromPortRangeVal,
 		IpProtocol:    ipProtocolVal,
+		IpRanges:      ipRangesVal,
 		ServiceIds:    serviceIdsVal,
 		ToPortRange:   toPortRangeVal,
 		state:         attr.ValueStateKnown,
@@ -892,6 +1015,24 @@ func NewOutboundRulesValue(attributeTypes map[string]attr.Type, attributes map[s
 			fmt.Sprintf(`ip_protocol expected to be basetypes.StringValue, was: %T`, ipProtocolAttribute))
 	}
 
+	ipRangesAttribute, ok := attributes["ip_ranges"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`ip_ranges is missing from object`)
+
+		return NewOutboundRulesValueUnknown(), diags
+	}
+
+	ipRangesVal, ok := ipRangesAttribute.(basetypes.SetValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`ip_ranges expected to be basetypes.SetValue, was: %T`, ipRangesAttribute))
+	}
+
 	serviceIdsAttribute, ok := attributes["service_ids"]
 
 	if !ok {
@@ -935,6 +1076,7 @@ func NewOutboundRulesValue(attributeTypes map[string]attr.Type, attributes map[s
 	return OutboundRulesValue{
 		FromPortRange: fromPortRangeVal,
 		IpProtocol:    ipProtocolVal,
+		IpRanges:      ipRangesVal,
 		ServiceIds:    serviceIdsVal,
 		ToPortRange:   toPortRangeVal,
 		state:         attr.ValueStateKnown,
@@ -1011,19 +1153,23 @@ var _ basetypes.ObjectValuable = OutboundRulesValue{}
 type OutboundRulesValue struct {
 	FromPortRange basetypes.Int64Value  `tfsdk:"from_port_range"`
 	IpProtocol    basetypes.StringValue `tfsdk:"ip_protocol"`
+	IpRanges      basetypes.SetValue    `tfsdk:"ip_ranges"`
 	ServiceIds    basetypes.ListValue   `tfsdk:"service_ids"`
 	ToPortRange   basetypes.Int64Value  `tfsdk:"to_port_range"`
 	state         attr.ValueState
 }
 
 func (v OutboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 4)
+	attrTypes := make(map[string]tftypes.Type, 5)
 
 	var val tftypes.Value
 	var err error
 
 	attrTypes["from_port_range"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["ip_protocol"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["ip_ranges"] = basetypes.SetType{
+		ElemType: types.StringType,
+	}.TerraformType(ctx)
 	attrTypes["service_ids"] = basetypes.ListType{
 		ElemType: types.StringType,
 	}.TerraformType(ctx)
@@ -1033,7 +1179,7 @@ func (v OutboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 4)
+		vals := make(map[string]tftypes.Value, 5)
 
 		val, err = v.FromPortRange.ToTerraformValue(ctx)
 
@@ -1050,6 +1196,14 @@ func (v OutboundRulesValue) ToTerraformValue(ctx context.Context) (tftypes.Value
 		}
 
 		vals["ip_protocol"] = val
+
+		val, err = v.IpRanges.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["ip_ranges"] = val
 
 		val, err = v.ServiceIds.ToTerraformValue(ctx)
 
@@ -1096,6 +1250,32 @@ func (v OutboundRulesValue) String() string {
 func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
+	var ipRangesVal basetypes.SetValue
+	switch {
+	case v.IpRanges.IsUnknown():
+		ipRangesVal = types.SetUnknown(types.StringType)
+	case v.IpRanges.IsNull():
+		ipRangesVal = types.SetNull(types.StringType)
+	default:
+		var d diag.Diagnostics
+		ipRangesVal, d = types.SetValue(types.StringType, v.IpRanges.Elements())
+		diags.Append(d...)
+	}
+
+	if diags.HasError() {
+		return types.ObjectUnknown(map[string]attr.Type{
+			"from_port_range": basetypes.Int64Type{},
+			"ip_protocol":     basetypes.StringType{},
+			"ip_ranges": basetypes.SetType{
+				ElemType: types.StringType,
+			},
+			"service_ids": basetypes.ListType{
+				ElemType: types.StringType,
+			},
+			"to_port_range": basetypes.Int64Type{},
+		}), diags
+	}
+
 	var serviceIdsVal basetypes.ListValue
 	switch {
 	case v.ServiceIds.IsUnknown():
@@ -1112,6 +1292,9 @@ func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		return types.ObjectUnknown(map[string]attr.Type{
 			"from_port_range": basetypes.Int64Type{},
 			"ip_protocol":     basetypes.StringType{},
+			"ip_ranges": basetypes.SetType{
+				ElemType: types.StringType,
+			},
 			"service_ids": basetypes.ListType{
 				ElemType: types.StringType,
 			},
@@ -1122,6 +1305,9 @@ func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.Object
 	attributeTypes := map[string]attr.Type{
 		"from_port_range": basetypes.Int64Type{},
 		"ip_protocol":     basetypes.StringType{},
+		"ip_ranges": basetypes.SetType{
+			ElemType: types.StringType,
+		},
 		"service_ids": basetypes.ListType{
 			ElemType: types.StringType,
 		},
@@ -1141,6 +1327,7 @@ func (v OutboundRulesValue) ToObjectValue(ctx context.Context) (basetypes.Object
 		map[string]attr.Value{
 			"from_port_range": v.FromPortRange,
 			"ip_protocol":     v.IpProtocol,
+			"ip_ranges":       ipRangesVal,
 			"service_ids":     serviceIdsVal,
 			"to_port_range":   v.ToPortRange,
 		})
@@ -1171,6 +1358,10 @@ func (v OutboundRulesValue) Equal(o attr.Value) bool {
 		return false
 	}
 
+	if !v.IpRanges.Equal(other.IpRanges) {
+		return false
+	}
+
 	if !v.ServiceIds.Equal(other.ServiceIds) {
 		return false
 	}
@@ -1194,6 +1385,9 @@ func (v OutboundRulesValue) AttributeTypes(ctx context.Context) map[string]attr.
 	return map[string]attr.Type{
 		"from_port_range": basetypes.Int64Type{},
 		"ip_protocol":     basetypes.StringType{},
+		"ip_ranges": basetypes.SetType{
+			ElemType: types.StringType,
+		},
 		"service_ids": basetypes.ListType{
 			ElemType: types.StringType,
 		},

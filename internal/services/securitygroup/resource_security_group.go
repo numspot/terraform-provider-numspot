@@ -282,10 +282,24 @@ func deserializeInboundRules(ctx context.Context, inboundRules types.Set) []api.
 		fpr := int(e.FromPortRange.ValueInt64())
 		tpr := int(e.ToPortRange.ValueInt64())
 
+		tfIpRange := make([]types.String, 0, len(e.IpRanges.Elements()))
+		e.IpRanges.ElementsAs(ctx, &tfIpRange, false)
+		var ipRanges *[]string
+		if len(tfIpRange) > 0 {
+			tmp := make([]string, len(tfIpRange))
+			for i, ip := range tfIpRange {
+				tmp[i] = ip.ValueString()
+			}
+			ipRanges = &tmp
+		} else {
+			ipRanges = nil
+		}
+
 		rules = append(rules, api.SecurityGroupRule{
 			FromPortRange: &fpr,
 			IpProtocol:    e.IpProtocol.ValueStringPointer(),
 			ToPortRange:   &tpr,
+			IpRanges:      ipRanges,
 		})
 	}
 
@@ -302,10 +316,24 @@ func deserializeOutboundRules(ctx context.Context, outboundRules types.Set) []ap
 		fpr := int(e.FromPortRange.ValueInt64())
 		tpr := int(e.ToPortRange.ValueInt64())
 
+		tfIpRange := make([]types.String, 0, len(e.IpRanges.Elements()))
+		e.IpRanges.ElementsAs(ctx, &tfIpRange, false)
+		var ipRanges *[]string
+		if len(tfIpRange) > 0 {
+			tmp := make([]string, len(tfIpRange))
+			for i, ip := range tfIpRange {
+				tmp[i] = ip.ValueString()
+			}
+			ipRanges = &tmp
+		} else {
+			ipRanges = nil
+		}
+
 		rules = append(rules, api.SecurityGroupRule{
 			FromPortRange: &fpr,
 			IpProtocol:    e.IpProtocol.ValueStringPointer(),
 			ToPortRange:   &tpr,
+			IpRanges:      ipRanges,
 		})
 	}
 
@@ -313,6 +341,11 @@ func deserializeOutboundRules(ctx context.Context, outboundRules types.Set) []ap
 }
 
 func serializeInboundRule(ctx context.Context, rules api.SecurityGroupRule) resource_security_group.InboundRulesValue {
+	ipRanges, diags := types.SetValueFrom(ctx, types.StringType, rules.IpRanges)
+	if diags.HasError() {
+		return resource_security_group.InboundRulesValue{}
+	}
+
 	serviceIds, diags := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
 	if diags.HasError() {
 		return resource_security_group.InboundRulesValue{}
@@ -332,6 +365,7 @@ func serializeInboundRule(ctx context.Context, rules api.SecurityGroupRule) reso
 			"to_port_range":   utils.FromIntPtrToTfInt64(rules.ToPortRange),
 			"ip_protocol":     types.StringPointerValue(rules.IpProtocol),
 			"service_ids":     serviceIds,
+			"ip_ranges":       ipRanges,
 		},
 	)
 	diags.Append(diagnostics...)
@@ -339,6 +373,11 @@ func serializeInboundRule(ctx context.Context, rules api.SecurityGroupRule) reso
 }
 
 func serializeOutboundRule(ctx context.Context, rules api.SecurityGroupRule) resource_security_group.OutboundRulesValue {
+	ipRanges, diags := types.SetValueFrom(ctx, types.StringType, rules.IpRanges)
+	if diags.HasError() {
+		return resource_security_group.OutboundRulesValue{}
+	}
+
 	serviceIds, diags := types.ListValueFrom(ctx, types.StringType, rules.ServiceIds)
 	if diags.HasError() {
 		return resource_security_group.OutboundRulesValue{}
@@ -358,6 +397,7 @@ func serializeOutboundRule(ctx context.Context, rules api.SecurityGroupRule) res
 			"to_port_range":   utils.FromIntPtrToTfInt64(rules.ToPortRange),
 			"ip_protocol":     types.StringPointerValue(rules.IpProtocol),
 			"service_ids":     serviceIds,
+			"ip_ranges":       ipRanges,
 		},
 	)
 	diags.Append(diagnostics...)
