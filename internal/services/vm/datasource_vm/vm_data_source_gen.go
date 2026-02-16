@@ -145,11 +145,6 @@ func VmDataSourceSchema(ctx context.Context) schema.Schema {
 							Description:         "The block device mapping of the VM.",
 							MarkdownDescription: "The block device mapping of the VM.",
 						},
-						"bsu_optimized": schema.BoolAttribute{
-							Computed:            true,
-							Description:         "This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.",
-							MarkdownDescription: "This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.",
-						},
 						"client_token": schema.StringAttribute{
 							Computed:            true,
 							Description:         "The idempotency token provided when launching the VM.",
@@ -1002,24 +997,6 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 			fmt.Sprintf(`block_device_mappings expected to be basetypes.ListValue, was: %T`, blockDeviceMappingsAttribute))
 	}
 
-	bsuOptimizedAttribute, ok := attributes["bsu_optimized"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`bsu_optimized is missing from object`)
-
-		return nil, diags
-	}
-
-	bsuOptimizedVal, ok := bsuOptimizedAttribute.(basetypes.BoolValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`bsu_optimized expected to be basetypes.BoolValue, was: %T`, bsuOptimizedAttribute))
-	}
-
 	clientTokenAttribute, ok := attributes["client_token"]
 
 	if !ok {
@@ -1585,7 +1562,6 @@ func (t ItemsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue
 	return ItemsValue{
 		Architecture:              architectureVal,
 		BlockDeviceMappings:       blockDeviceMappingsVal,
-		BsuOptimized:              bsuOptimizedVal,
 		ClientToken:               clientTokenVal,
 		CreationDate:              creationDateVal,
 		DeletionProtection:        deletionProtectionVal,
@@ -1720,24 +1696,6 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 			fmt.Sprintf(`block_device_mappings expected to be basetypes.ListValue, was: %T`, blockDeviceMappingsAttribute))
 	}
 
-	bsuOptimizedAttribute, ok := attributes["bsu_optimized"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`bsu_optimized is missing from object`)
-
-		return NewItemsValueUnknown(), diags
-	}
-
-	bsuOptimizedVal, ok := bsuOptimizedAttribute.(basetypes.BoolValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`bsu_optimized expected to be basetypes.BoolValue, was: %T`, bsuOptimizedAttribute))
-	}
-
 	clientTokenAttribute, ok := attributes["client_token"]
 
 	if !ok {
@@ -2303,7 +2261,6 @@ func NewItemsValue(attributeTypes map[string]attr.Type, attributes map[string]at
 	return ItemsValue{
 		Architecture:              architectureVal,
 		BlockDeviceMappings:       blockDeviceMappingsVal,
-		BsuOptimized:              bsuOptimizedVal,
 		ClientToken:               clientTokenVal,
 		CreationDate:              creationDateVal,
 		DeletionProtection:        deletionProtectionVal,
@@ -2409,7 +2366,6 @@ var _ basetypes.ObjectValuable = ItemsValue{}
 type ItemsValue struct {
 	Architecture              basetypes.StringValue `tfsdk:"architecture"`
 	BlockDeviceMappings       basetypes.ListValue   `tfsdk:"block_device_mappings"`
-	BsuOptimized              basetypes.BoolValue   `tfsdk:"bsu_optimized"`
 	ClientToken               basetypes.StringValue `tfsdk:"client_token"`
 	CreationDate              basetypes.StringValue `tfsdk:"creation_date"`
 	DeletionProtection        basetypes.BoolValue   `tfsdk:"deletion_protection"`
@@ -2445,7 +2401,7 @@ type ItemsValue struct {
 }
 
 func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 34)
+	attrTypes := make(map[string]tftypes.Type, 33)
 
 	var val tftypes.Value
 	var err error
@@ -2454,7 +2410,6 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 	attrTypes["block_device_mappings"] = basetypes.ListType{
 		ElemType: BlockDeviceMappingsValue{}.Type(ctx),
 	}.TerraformType(ctx)
-	attrTypes["bsu_optimized"] = basetypes.BoolType{}.TerraformType(ctx)
 	attrTypes["client_token"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["creation_date"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["deletion_protection"] = basetypes.BoolType{}.TerraformType(ctx)
@@ -2501,7 +2456,7 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 34)
+		vals := make(map[string]tftypes.Value, 33)
 
 		val, err = v.Architecture.ToTerraformValue(ctx)
 
@@ -2518,14 +2473,6 @@ func (v ItemsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error)
 		}
 
 		vals["block_device_mappings"] = val
-
-		val, err = v.BsuOptimized.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["bsu_optimized"] = val
 
 		val, err = v.ClientToken.ToTerraformValue(ctx)
 
@@ -2959,7 +2906,6 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 			"block_device_mappings": basetypes.ListType{
 				ElemType: BlockDeviceMappingsValue{}.Type(ctx),
 			},
-			"bsu_optimized":               basetypes.BoolType{},
 			"client_token":                basetypes.StringType{},
 			"creation_date":               basetypes.StringType{},
 			"deletion_protection":         basetypes.BoolType{},
@@ -3009,7 +2955,6 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		"block_device_mappings": basetypes.ListType{
 			ElemType: BlockDeviceMappingsValue{}.Type(ctx),
 		},
-		"bsu_optimized":               basetypes.BoolType{},
 		"client_token":                basetypes.StringType{},
 		"creation_date":               basetypes.StringType{},
 		"deletion_protection":         basetypes.BoolType{},
@@ -3066,7 +3011,6 @@ func (v ItemsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, d
 		map[string]attr.Value{
 			"architecture":                v.Architecture,
 			"block_device_mappings":       blockDeviceMappings,
-			"bsu_optimized":               v.BsuOptimized,
 			"client_token":                v.ClientToken,
 			"creation_date":               v.CreationDate,
 			"deletion_protection":         v.DeletionProtection,
@@ -3123,10 +3067,6 @@ func (v ItemsValue) Equal(o attr.Value) bool {
 	}
 
 	if !v.BlockDeviceMappings.Equal(other.BlockDeviceMappings) {
-		return false
-	}
-
-	if !v.BsuOptimized.Equal(other.BsuOptimized) {
 		return false
 	}
 
@@ -3271,7 +3211,6 @@ func (v ItemsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 		"block_device_mappings": basetypes.ListType{
 			ElemType: BlockDeviceMappingsValue{}.Type(ctx),
 		},
-		"bsu_optimized":               basetypes.BoolType{},
 		"client_token":                basetypes.StringType{},
 		"creation_date":               basetypes.StringType{},
 		"deletion_protection":         basetypes.BoolType{},

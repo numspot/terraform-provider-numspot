@@ -2,6 +2,7 @@ package postgres_cluster
 
 import (
 	"context"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -74,49 +75,20 @@ func (d *postgresClusterDataSource) Read(ctx context.Context, req datasource.Rea
 
 func mappingItemsValue(ctx context.Context, cluster api.PostgresCluster, diags *diag.Diagnostics) (datasource_postgres_cluster.ItemsValue, diag.Diagnostics) {
 	var serializeDiags diag.Diagnostics
-	var maintenanceSchedule basetypes.ObjectValue
 	var nodeConfiguration basetypes.ObjectValue
 	var volume basetypes.ObjectValue
+	var status basetypes.ObjectValue
 
-	tagsList := types.ListNull(datasource_postgres_cluster.ItemsValue{}.Type(ctx))
-	allowedIpRangesList := types.ListNull(types.String{}.Type(ctx))
-	availableOperationsList := types.ListNull(types.String{}.Type(ctx))
+	extensionList := types.ListNull(datasource_postgres_cluster.ExtensionsValue{}.Type(ctx))
 
-	if cluster.Tags != nil {
-		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, cluster.Tags, mappingDatasourceTags)
+	if cluster.Extensions != nil {
+		extensionItems, serializeDiags := utils.SerializeDatasourceItems(ctx, *cluster.Extensions, mappingDatasourceExtensions)
 		if serializeDiags.HasError() {
 			return datasource_postgres_cluster.ItemsValue{}, serializeDiags
 		}
-		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
+		extensionList = utils.CreateListValueItems(ctx, extensionItems, &serializeDiags)
 		if serializeDiags.HasError() {
 			return datasource_postgres_cluster.ItemsValue{}, serializeDiags
-		}
-	}
-
-	if cluster.AllowedIpRanges != nil {
-		allowedIpRangesList, serializeDiags = types.ListValueFrom(ctx, types.StringType, cluster.AllowedIpRanges)
-		diags.Append(serializeDiags...)
-	}
-
-	if cluster.AvailableOperations != nil {
-		availableOperationsList, serializeDiags = types.ListValueFrom(ctx, types.StringType, cluster.AvailableOperations)
-		diags.Append(serializeDiags...)
-	}
-
-	if cluster.MaintenanceSchedule != nil {
-		maintenanceScheduleValue, serializePlacementDiags := mappingMaintenanceSchedule(ctx, cluster.MaintenanceSchedule, diags)
-		if serializePlacementDiags.HasError() {
-			diags.Append(serializePlacementDiags...)
-		}
-
-		maintenanceSchedule, serializeDiags = maintenanceScheduleValue.ToObjectValue(ctx)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
-		}
-	} else {
-		maintenanceSchedule, serializeDiags = datasource_postgres_cluster.NewMaintenanceScheduleValueNull().ToObjectValue(ctx)
-		if serializeDiags.HasError() {
-			diags.Append(serializeDiags...)
 		}
 	}
 
@@ -140,55 +112,58 @@ func mappingItemsValue(ctx context.Context, cluster api.PostgresCluster, diags *
 		diags.Append(serializeDiags...)
 	}
 
-	return datasource_postgres_cluster.NewItemsValue(datasource_postgres_cluster.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"allowed_ip_ranges":     allowedIpRangesList,
-		"automatic_backup":      types.BoolValue(cluster.AutomaticBackup),
-		"available_operations":  availableOperationsList,
-		"created_on":            types.StringValue(cluster.CreatedOn),
-		"error_reason":          types.StringPointerValue(cluster.ErrorReason),
-		"host":                  types.StringPointerValue(cluster.Host),
-		"id":                    types.StringValue(cluster.Id.String()),
-		"last_operation_name":   types.StringValue(string(cluster.LastOperationName)),
-		"last_operation_result": types.StringValue(string(cluster.LastOperationResult)),
-		"maintenance_schedule":  maintenanceSchedule,
-		"name":                  types.StringValue(cluster.Name),
-		"node_configuration":    nodeConfiguration,
-		"port":                  types.Int64Value(utils.ConvertIntPtrToInt64(cluster.Port)),
-		"private_host":          types.StringPointerValue(cluster.PrivateHost),
-		"status":                types.StringValue(string(cluster.Status)),
-		"tags":                  tagsList,
-		"user":                  types.StringValue(cluster.User),
-		"vpc_cidr":              types.StringPointerValue(cluster.NetCidr),
-		"volume":                volume,
-	})
-}
-
-func mappingDatasourceTags(ctx context.Context, tag api.PostgresTag) (datasource_postgres_cluster.TagsValue, diag.Diagnostics) {
-	return datasource_postgres_cluster.NewTagsValue(datasource_postgres_cluster.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"key":   types.StringValue(tag.Key),
-		"value": types.StringValue(tag.Value),
-	})
-}
-
-func mappingMaintenanceSchedule(ctx context.Context, maintenanceSchedule *api.PostgresClusterMaintenanceSchedule, diags *diag.Diagnostics) (datasource_postgres_cluster.MaintenanceScheduleValue, diag.Diagnostics) {
-	elementValue, mappingDiags := datasource_postgres_cluster.NewMaintenanceScheduleValue(datasource_postgres_cluster.MaintenanceScheduleValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"begin_at":         types.StringValue(maintenanceSchedule.BeginAt),
-		"end_at":           types.StringValue(maintenanceSchedule.EndAt),
-		"potential_impact": types.StringValue(maintenanceSchedule.PotentialImpact),
-		"type":             types.StringValue(string(maintenanceSchedule.Type)),
-	})
-	if mappingDiags.HasError() {
-		diags.Append(mappingDiags...)
+	var portValue types.Int64
+	if cluster.Port != nil {
+		portValue = types.Int64Value(int64(*cluster.Port))
+	} else {
+		portValue = types.Int64Value(0)
 	}
 
-	return elementValue, mappingDiags
+	var majorVersion types.String
+	if cluster.MajorVersion != nil {
+		majorVersion = types.StringValue(string(*cluster.MajorVersion))
+	} else {
+		majorVersion = types.StringNull()
+	}
+
+	statusValue, serializeDiags := mappingStatus(ctx, cluster.Status, diags)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+	}
+
+	status, serializeDiags = statusValue.ToObjectValue(ctx)
+	if serializeDiags.HasError() {
+		diags.Append(serializeDiags...)
+	}
+
+	return datasource_postgres_cluster.NewItemsValue(datasource_postgres_cluster.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"created_on":         types.StringValue(cluster.CreatedOn.Format(time.RFC3339)),
+		"extensions":         extensionList,
+		"full_version":       types.StringPointerValue(cluster.FullVersion),
+		"host":               types.StringPointerValue(cluster.Host),
+		"id":                 types.StringValue(cluster.Id.String()),
+		"major_version":      majorVersion,
+		"name":               types.StringValue(cluster.Name),
+		"node_configuration": nodeConfiguration,
+		"port":               portValue,
+		"replica_count":      types.Int64Value(int64(cluster.ReplicaCount)),
+		"status":             status,
+		"user":               types.StringValue(cluster.User),
+		"visibility":         types.StringValue(string(cluster.Visibility)),
+		"volume":             volume,
+	})
+}
+
+func mappingDatasourceExtensions(ctx context.Context, ext api.PostgresExtension) (datasource_postgres_cluster.ExtensionsValue, diag.Diagnostics) {
+	return datasource_postgres_cluster.NewExtensionsValue(datasource_postgres_cluster.ExtensionsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"name": types.StringValue(string(ext.Name)),
+	})
 }
 
 func mappingNodeConfiguration(ctx context.Context, nodeConfiguration api.PostgresNodeConfiguration, diags *diag.Diagnostics) (datasource_postgres_cluster.NodeConfigurationValue, diag.Diagnostics) {
 	elementValue, mappingDiags := datasource_postgres_cluster.NewNodeConfigurationValue(datasource_postgres_cluster.NodeConfigurationValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"memory_size_gi_b":  types.Int64Value(utils.ConvertIntPtrToInt64(&nodeConfiguration.MemorySizeGiB)),
-		"performance_level": types.StringValue(string(nodeConfiguration.PerformanceLevel)),
-		"vcpu_count":        types.Int64Value(utils.ConvertIntPtrToInt64(&nodeConfiguration.VcpuCount)),
+		"memory_size_gi_b": types.Int64Value(int64(nodeConfiguration.MemorySizeGiB)),
+		"vcpu_count":       types.Int64Value(int64(nodeConfiguration.VcpuCount)),
 	})
 	if mappingDiags.HasError() {
 		diags.Append(mappingDiags...)
@@ -198,33 +173,25 @@ func mappingNodeConfiguration(ctx context.Context, nodeConfiguration api.Postgre
 }
 
 func mappingVolume(ctx context.Context, volume api.PostgresVolume, diags *diag.Diagnostics) (datasource_postgres_cluster.VolumeValue, diag.Diagnostics) {
-	var elementValue datasource_postgres_cluster.VolumeValue
-	var mappingDiags diag.Diagnostics
-	valueD, err := volume.ValueByDiscriminator()
-	if err != nil {
-		return datasource_postgres_cluster.VolumeValue{}, nil
-	}
-
-	switch v := valueD.(type) {
-	case api.PostgresVolumeGp2:
-		elementValue, mappingDiags = datasource_postgres_cluster.NewVolumeValue(datasource_postgres_cluster.VolumeValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"size_gi_b": types.Int64Value(utils.ConvertIntPtrToInt64(&v.SizeGiB)),
-			"type":      types.StringValue(string(v.Type)),
-		})
-		if mappingDiags.HasError() {
-			diags.Append(mappingDiags...)
-		}
-	case api.PostgresVolumeIo1:
-		elementValue, mappingDiags = datasource_postgres_cluster.NewVolumeValue(datasource_postgres_cluster.VolumeValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"size_gi_b": types.Int64Value(utils.ConvertIntPtrToInt64(&v.SizeGiB)),
-			"iops":      types.Int64Value(utils.ConvertIntPtrToInt64(&v.Iops)),
-			"type":      types.StringValue(string(v.Type)),
-		})
-		if mappingDiags.HasError() {
-			diags.AddError("Unsupported volume type", "Type: "+string(v.Type)+" is not recognized.")
-		}
-	default:
+	elementValue, mappingDiags := datasource_postgres_cluster.NewVolumeValue(datasource_postgres_cluster.VolumeValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"size_gi_b": types.Int64Value(int64(volume.SizeGiB)),
+		"type":      types.StringValue(string(volume.Type)),
+	})
+	if mappingDiags.HasError() {
 		diags.Append(mappingDiags...)
 	}
+
+	return elementValue, mappingDiags
+}
+
+func mappingStatus(ctx context.Context, status api.PostgresStatus, diags *diag.Diagnostics) (datasource_postgres_cluster.StatusValue, diag.Diagnostics) {
+	elementValue, mappingDiags := datasource_postgres_cluster.NewStatusValue(datasource_postgres_cluster.StatusValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"message": types.StringValue(status.Message),
+		"state":   types.StringValue(string(status.State)),
+	})
+	if mappingDiags.HasError() {
+		diags.Append(mappingDiags...)
+	}
+
 	return elementValue, mappingDiags
 }

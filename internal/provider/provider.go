@@ -21,11 +21,11 @@ import (
 	"terraform-provider-numspot/internal/services/image"
 	"terraform-provider-numspot/internal/services/internetgateway"
 	"terraform-provider-numspot/internal/services/keypair"
+	"terraform-provider-numspot/internal/services/kubernetes_cluster"
+	"terraform-provider-numspot/internal/services/kubernetes_nodepool"
 	"terraform-provider-numspot/internal/services/loadbalancer"
-	"terraform-provider-numspot/internal/services/managedservicebridge"
 	"terraform-provider-numspot/internal/services/natgateway"
 	"terraform-provider-numspot/internal/services/nic"
-	"terraform-provider-numspot/internal/services/openshift_cluster"
 	"terraform-provider-numspot/internal/services/postgres_cluster"
 	"terraform-provider-numspot/internal/services/publicip"
 	"terraform-provider-numspot/internal/services/routetable"
@@ -299,9 +299,9 @@ func (p *numspotProvider) DataSources(_ context.Context) []func() datasource.Dat
 		vpnconnection.NewVpnConnectionsDataSource,
 		computebridge.NewComputeBridgeDataSource,
 		hybridbridge.NewHybridBridgeDataSource,
-		managedservicebridge.NewManagedServiceBridgeDataSource,
+		kubernetes_cluster.NewKubernetesClusterDataSource,
+		kubernetes_nodepool.NewKubernetesNodepoolDataSource,
 		postgres_cluster.NewPostgresClusterDataSource,
-		openshift_cluster.NewClustersDataSource,
 	}
 }
 
@@ -331,8 +331,8 @@ func (p *numspotProvider) Resources(_ context.Context) []func() resource.Resourc
 		vpnconnection.NewVpnConnectionResource,
 		computebridge.NewComputeBridgeResource,
 		hybridbridge.NewHybridBridgeResource,
-		managedservicebridge.NewManagedServiceBridgeResource,
+		kubernetes_cluster.NewKubernetesClusterResource,
+		kubernetes_nodepool.NewKubernetesNodepoolResource,
 		postgres_cluster.NewPostgresClusterResource,
-		openshift_cluster.NewClusterResource,
 	}
 }

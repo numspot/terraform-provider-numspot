@@ -1,0 +1,304 @@
+{
+	"datasources": [
+		{
+			"name": "kubernetes_cluster",
+			"schema": {
+				"attributes": [
+					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(0, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "cidr",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632"
+										}
+									},
+									{
+										"name": "created_on",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster creation date."
+										}
+									},
+									{
+										"name": "full_version",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster Kubernetes patch version."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A string representing uuid."
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit."
+										}
+									},
+									{
+										"name": "profile",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster profile."
+										}
+									},
+									{
+										"name": "status",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "message",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												},
+												{
+													"name": "state",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												}
+											]
+										}
+									},
+									{
+										"name": "version",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster Kubernetes version."
+										}
+									},
+									{
+										"name": "visibility",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "Cluster exposition method."
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "kubernetes_cluster",
+			"schema": {
+				"attributes": [
+					{
+						"name": "cidr",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\\\\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)/(3[0-2]|[12]?[0-9])$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthBetween(3, 63)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "profile",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Profile of the cluster.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"xsmall\",\n\"small\",\n\"medium\",\n\"large\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "version",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Kubernetes version of the cluster.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"1.31\",\n\"1.32\",\n\"1.33\",\n\"1.34\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "visibility",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Cluster exposition method.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"EXTERNAL\",\n\"INTERNAL\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "created_on",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Cluster creation date."
+						}
+					},
+					{
+						"name": "full_version",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "Cluster Kubernetes patch version."
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "A string representing uuid."
+						}
+					},
+					{
+						"name": "status",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+								{
+									"name": "message",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								},
+								{
+									"name": "state",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "cluster_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "Identifier of the Cluster"
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

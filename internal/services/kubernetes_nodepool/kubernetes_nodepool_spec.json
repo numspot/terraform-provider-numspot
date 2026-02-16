@@ -1,0 +1,375 @@
+{
+	"datasources": [
+		{
+			"name": "kubernetes_nodepool",
+			"schema": {
+				"attributes": [
+					{
+						"name": "cluster_id",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "Identifier of the Cluster"
+						}
+					},
+					{
+						"name": "page",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "next_token",
+									"string": {
+										"computed_optional_required": "computed_optional",
+										"description": "A page token received from a previous call. Provide this to retrieve the subsequent page."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "computed_optional",
+										"description": "The maximum number of items to return. The service may return fewer than this value.",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(0, 50)"
+												}
+											}
+										]
+									}
+								}
+							],
+							"description": "Paginated request"
+						}
+					},
+					{
+						"name": "items",
+						"list_nested": {
+							"computed_optional_required": "computed",
+							"nested_object": {
+								"attributes": [
+									{
+										"name": "availability_zone",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "List of all Availability Zones name."
+										}
+									},
+									{
+										"name": "id",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A string representing uuid."
+										}
+									},
+									{
+										"name": "name",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit."
+										}
+									},
+									{
+										"name": "node_profile",
+										"string": {
+											"computed_optional_required": "computed",
+											"description": "List of worker node profile names."
+										}
+									},
+									{
+										"name": "replicas",
+										"int64": {
+											"computed_optional_required": "computed",
+											"description": "Desired number of this node replicas."
+										}
+									},
+									{
+										"name": "root_disk",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "iops",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "The number of IOPS to allocate to the volume."
+													}
+												},
+												{
+													"name": "size",
+													"int64": {
+														"computed_optional_required": "computed",
+														"description": "A volume size in GiB"
+													}
+												},
+												{
+													"name": "type",
+													"string": {
+														"computed_optional_required": "computed",
+														"description": "Types of storage volumes available"
+													}
+												}
+											]
+										}
+									},
+									{
+										"name": "status",
+										"single_nested": {
+											"computed_optional_required": "computed",
+											"attributes": [
+												{
+													"name": "message",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												},
+												{
+													"name": "state",
+													"string": {
+														"computed_optional_required": "computed"
+													}
+												}
+											]
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		}
+	],
+	"provider": {
+		"name": "numspot"
+	},
+	"resources": [
+		{
+			"name": "kubernetes_nodepool",
+			"schema": {
+				"attributes": [
+					{
+						"name": "autoscaling",
+						"single_nested": {
+							"computed_optional_required": "computed_optional",
+							"attributes": [
+								{
+									"name": "max",
+									"int64": {
+										"computed_optional_required": "required",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 20)"
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "min",
+									"int64": {
+										"computed_optional_required": "required",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+														}
+													],
+													"schema_definition": "int64validator.Between(1, 20)"
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "availability_zone",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "List of all Availability Zones name.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"eu-west-2a\",\n\"eu-west-2b\",\n\"eu-west-2c\",\n\"cloudgouv-eu-west-1a\",\n\"cloudgouv-eu-west-1b\",\n\"cloudgouv-eu-west-1c\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "name",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.LengthBetween(3, 63)"
+									}
+								},
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "regexp"
+											},
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$\"), \"\")"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "node_profile",
+						"string": {
+							"computed_optional_required": "required",
+							"description": "List of worker node profile names.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+											}
+										],
+										"schema_definition": "stringvalidator.OneOf(\n\"small\",\n\"medium\",\n\"large\",\n\"xlarge\",\n\"gpu_xsmall_l40\",\n\"gpu_small_l40\",\n\"gpu_medium_h100\",\n\"gpu_large_h100\",\n\"gpu_xlarge_h200\",\n)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "replicas",
+						"int64": {
+							"computed_optional_required": "computed_optional",
+							"description": "Desired number of this node replicas.",
+							"validators": [
+								{
+									"custom": {
+										"imports": [
+											{
+												"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+											}
+										],
+										"schema_definition": "int64validator.Between(1, 20)"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "root_disk",
+						"single_nested": {
+							"computed_optional_required": "required",
+							"attributes": [
+								{
+									"name": "iops",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "The number of IOPS to allocate to the volume."
+									}
+								},
+								{
+									"name": "size",
+									"int64": {
+										"computed_optional_required": "required",
+										"description": "A volume size in GiB"
+									}
+								},
+								{
+									"name": "type",
+									"string": {
+										"computed_optional_required": "required",
+										"description": "Types of storage volumes available",
+										"validators": [
+											{
+												"custom": {
+													"imports": [
+														{
+															"path": "github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+														}
+													],
+													"schema_definition": "stringvalidator.OneOf(\n\"performance\",\n\"magnetic\",\n\"enterprise\",\n)"
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "id",
+						"string": {
+							"computed_optional_required": "computed",
+							"description": "A string representing uuid."
+						}
+					},
+					{
+						"name": "status",
+						"single_nested": {
+							"computed_optional_required": "computed",
+							"attributes": [
+								{
+									"name": "message",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								},
+								{
+									"name": "state",
+									"string": {
+										"computed_optional_required": "computed"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "cluster_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "Identifier of the Cluster"
+						}
+					},
+					{
+						"name": "node_pool_id",
+						"string": {
+							"computed_optional_required": "computed_optional",
+							"description": "Identifier of the Cluster"
+						}
+					}
+				]
+			}
+		}
+	],
+	"version": "0.1"
+}

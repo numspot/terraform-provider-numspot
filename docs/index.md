@@ -187,7 +187,7 @@ resource "numspot_load_balancer" "lbu" {
 
 ## Authentication
 
-In order to authenticate to the Numspot terraform provider you need to provider a service account ID, service account secret and a space ID.
+In order to authenticate to the Numspot terraform provider you need to provide a service account ID, service account secret and a space ID.
 
 The Numspot provider offers two ways of providing these credentials.
 The following methods are supported, in this priority order:
@@ -297,6 +297,4 @@ In order to be able to [debug](https://developer.hashicorp.com/terraform/interna
 
 ### Submitting a bug report or a feature request
 
-In case you find something wrong with the numspot provider, please submit a bug report on the [Terraform provider repository](https://github.com/numspot/terraform-provider-numspot/issues/new/choose).
-If it is a bug report, please include a **minimal** snippet of the Terraform configuration that triggered the error.
-This helps a lot to debug the issue.
+In case you find something wrong with the numspot provider, please submit a bug report on the [Support](https://support.numspot.com/front/central.php).

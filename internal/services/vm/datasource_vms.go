@@ -142,7 +142,7 @@ func mappingItemsValue(ctx context.Context, vm api.Vm, diags *diag.Diagnostics) 
 	tagsList := types.ListNull(datasource_vm.ItemsValue{}.Type(ctx))
 	blockDeviceMappingsList := types.List{}
 	nicsList := types.ListNull(datasource_vm.NicsValue{}.Type(ctx))
-	securityGroupsSet := types.Set{}
+	securityGroupsSet := types.SetNull(datasource_vm.SecurityGroupsValue{}.Type(ctx))
 	productCodesList := types.ListNull(types.String{}.Type(ctx))
 	creationDateTf := types.String{}
 	placement := basetypes.ObjectValue{}
@@ -204,7 +204,6 @@ func mappingItemsValue(ctx context.Context, vm api.Vm, diags *diag.Diagnostics) 
 	return datasource_vm.NewItemsValue(datasource_vm.ItemsValue{}.AttributeTypes(ctx), map[string]attr.Value{
 		"architecture":                types.StringValue(utils.ConvertStringPtrToString(vm.Architecture)),
 		"block_device_mappings":       blockDeviceMappingsList,
-		"bsu_optimized":               types.BoolPointerValue(vm.BsuOptimized),
 		"client_token":                types.StringValue(utils.ConvertStringPtrToString(vm.ClientToken)),
 		"creation_date":               creationDateTf,
 		"deletion_protection":         types.BoolPointerValue(vm.DeletionProtection),

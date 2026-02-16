@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -24,97 +25,82 @@ import (
 func PostgresClusterResourceSchema(ctx context.Context) schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
-			"allowed_ip_ranges": schema.ListAttribute{
-				ElementType: types.StringType,
-				Required:    true,
-				Validators: []validator.List{
-					listvalidator.SizeBetween(1, 50),
-				},
-			},
-			"automatic_backup": schema.BoolAttribute{
-				Required:            true,
-				Description:         "Whether automatic backup is enabled for this cluster.",
-				MarkdownDescription: "Whether automatic backup is enabled for this cluster.",
-			},
-			"available_operations": schema.ListAttribute{
-				ElementType:         types.StringType,
+			"cluster_id": schema.StringAttribute{
+				Optional:            true,
 				Computed:            true,
-				Description:         "List of operation names",
-				MarkdownDescription: "List of operation names",
+				Description:         "The unique identifier of a cluster.",
+				MarkdownDescription: "The unique identifier of a cluster.",
 			},
 			"created_on": schema.StringAttribute{
 				Computed:            true,
 				Description:         "When the cluster has been created.",
 				MarkdownDescription: "When the cluster has been created.",
 			},
-			"error_reason": schema.StringAttribute{
+			"extensions": schema.ListNestedAttribute{
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							Required:            true,
+							Description:         "The name of the extension.",
+							MarkdownDescription: "The name of the extension.",
+							Validators: []validator.String{
+								stringvalidator.OneOf(
+									"TIMESCALEDB",
+									"VECTOR",
+								),
+							},
+						},
+					},
+					CustomType: ExtensionsType{
+						ObjectType: types.ObjectType{
+							AttrTypes: ExtensionsValue{}.AttributeTypes(ctx),
+						},
+					},
+				},
+				Optional:            true,
 				Computed:            true,
-				Description:         "Detailed information regarding what went wrong, available when status is Error.",
-				MarkdownDescription: "Detailed information regarding what went wrong, available when status is Error.",
+				Description:         "List of extensions on the cluster.",
+				MarkdownDescription: "List of extensions on the cluster.",
+				Validators: []validator.List{
+					listvalidator.SizeAtMost(50),
+					listvalidator.UniqueValues(),
+				},
+			},
+			"full_version": schema.StringAttribute{
+				Computed:            true,
+				Description:         "The version of postgresql.",
+				MarkdownDescription: "The version of postgresql.",
 			},
 			"host": schema.StringAttribute{
 				Computed:            true,
-				Description:         "Where connections to the cluster must be made to.",
-				MarkdownDescription: "Where connections to the cluster must be made to.",
+				Description:         "Public address to be used for connecting to the PostgreSQL cluster from outside or by external clients.",
+				MarkdownDescription: "Public address to be used for connecting to the PostgreSQL cluster from outside or by external clients.",
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
 				Description:         "A cluster unique identifier.",
 				MarkdownDescription: "A cluster unique identifier.",
 			},
-			"is_public": schema.BoolAttribute{
+			"major_version": schema.StringAttribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "Whether public exposition is enabled for this cluster.",
-				MarkdownDescription: "Whether public exposition is enabled for this cluster.",
-			},
-			"last_operation_name": schema.StringAttribute{
-				Computed:            true,
-				Description:         "Name of an operation",
-				MarkdownDescription: "Name of an operation",
-			},
-			"last_operation_result": schema.StringAttribute{
-				Computed:            true,
-				Description:         "Result of an operation",
-				MarkdownDescription: "Result of an operation",
-			},
-			"maintenance_schedule": schema.SingleNestedAttribute{
-				Attributes: map[string]schema.Attribute{
-					"begin_at": schema.StringAttribute{
-						Computed:            true,
-						Description:         "The start date and time of the maintenance window, in ISO 8601 format.",
-						MarkdownDescription: "The start date and time of the maintenance window, in ISO 8601 format.",
-					},
-					"end_at": schema.StringAttribute{
-						Computed:            true,
-						Description:         "The end date and time of the maintenance window, in ISO 8601 format.",
-						MarkdownDescription: "The end date and time of the maintenance window, in ISO 8601 format.",
-					},
-					"potential_impact": schema.StringAttribute{
-						Computed:            true,
-						Description:         "A description of the potential impact on the cluster's availability and performance during the maintenance window.",
-						MarkdownDescription: "A description of the potential impact on the cluster's availability and performance during the maintenance window.",
-					},
-					"type": schema.StringAttribute{
-						Computed:            true,
-						Description:         "The type of maintenance operation being performed (e.g., software upgrade, hardware replacement).",
-						MarkdownDescription: "The type of maintenance operation being performed (e.g., software upgrade, hardware replacement).",
-					},
+				Description:         "The version of postgresql to create a cluster.",
+				MarkdownDescription: "The version of postgresql to create a cluster.",
+				Validators: []validator.String{
+					stringvalidator.OneOf(
+						"16",
+						"17",
+						"18",
+					),
 				},
-				CustomType: MaintenanceScheduleType{
-					ObjectType: types.ObjectType{
-						AttrTypes: MaintenanceScheduleValue{}.AttributeTypes(ctx),
-					},
-				},
-				Computed:            true,
-				Description:         "Postgres maintenance schedule object. It describes the upcoming maintenance operation for a PostgreSQL cluster, including its timing, type, and potential impact.",
-				MarkdownDescription: "Postgres maintenance schedule object. It describes the upcoming maintenance operation for a PostgreSQL cluster, including its timing, type, and potential impact.",
+				Default: stringdefault.StaticString("18"),
 			},
 			"name": schema.StringAttribute{
 				Required:            true,
-				Description:         "A strict slug: starts and ends with an alphanumeric character, allows hyphens or underscores in between but not consecutively or at the edges.",
-				MarkdownDescription: "A strict slug: starts and ends with an alphanumeric character, allows hyphens or underscores in between but not consecutively or at the edges.",
+				Description:         "A PostgreSQL cluster name.",
+				MarkdownDescription: "A PostgreSQL cluster name.",
 				Validators: []validator.String{
+					stringvalidator.LengthBetween(3, 63),
 					stringvalidator.RegexMatches(regexp.MustCompile("^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$"), ""),
 				},
 			},
@@ -125,19 +111,7 @@ func PostgresClusterResourceSchema(ctx context.Context) schema.Schema {
 						Description:         "The allocated memory size, in GiB.",
 						MarkdownDescription: "The allocated memory size, in GiB.",
 						Validators: []validator.Int64{
-							int64validator.Between(1, 1039),
-						},
-					},
-					"performance_level": schema.StringAttribute{
-						Required:            true,
-						Description:         "The performance level of the VCPUs.\n\n- HIGHEST: for computationally intensive applications\n- HIGH: the performance level may fluctuate slightly over time\n- MEDIUM: the performance level may fluctuate moderately over time",
-						MarkdownDescription: "The performance level of the VCPUs.\n\n- HIGHEST: for computationally intensive applications\n- HIGH: the performance level may fluctuate slightly over time\n- MEDIUM: the performance level may fluctuate moderately over time",
-						Validators: []validator.String{
-							stringvalidator.OneOf(
-								"HIGHEST",
-								"HIGH",
-								"MEDIUM",
-							),
+							int64validator.Between(1, 3),
 						},
 					},
 					"vcpu_count": schema.Int64Attribute{
@@ -145,7 +119,7 @@ func PostgresClusterResourceSchema(ctx context.Context) schema.Schema {
 						Description:         "The number of Virtual CPU provisioned.",
 						MarkdownDescription: "The number of Virtual CPU provisioned.",
 						Validators: []validator.Int64{
-							int64validator.Between(1, 78),
+							int64validator.Between(1, 3),
 						},
 					},
 				},
@@ -160,88 +134,80 @@ func PostgresClusterResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"port": schema.Int64Attribute{
 				Computed:            true,
-				Description:         "On which port connections to the host must be made.",
-				MarkdownDescription: "On which port connections to the host must be made.",
+				Description:         "TCP port on which the PostgreSQL server is exposed for connections",
+				MarkdownDescription: "TCP port on which the PostgreSQL server is exposed for connections",
 			},
-			"private_host": schema.StringAttribute{
-				Computed:            true,
-				Description:         "Where connections to the cluster must be made for interconnected services.",
-				MarkdownDescription: "Where connections to the cluster must be made for interconnected services.",
-			},
-			"source_backup_id": schema.StringAttribute{
+			"replica_count": schema.Int64Attribute{
 				Optional:            true,
 				Computed:            true,
-				Description:         "A backup unique identifier.",
-				MarkdownDescription: "A backup unique identifier.",
+				Description:         "Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.",
+				MarkdownDescription: "Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.",
+				Validators: []validator.Int64{
+					int64validator.Between(0, 2),
+				},
+				Default: int64default.StaticInt64(0),
 			},
-			"status": schema.StringAttribute{
-				Computed:            true,
-				Description:         "The last known status of a cluster.\n\n- CREATING: means the cluster is being created.\n- CONFIGURING: means the cluster is being configured according to requested changes.\n- READY: means the cluster is available and accepts connections.\n- FAILED: means that the cluster creation has failed, see errorMessage for details.\n- DELETING: means the cluster has been marked for deletion, it will be deleted soon.\n- DELETED: means the cluster has been deleted successfully, it will disappear from query and search results soon.\n- ERROR: means that an operation went wrong on the cluster, see errorMessage for details.",
-				MarkdownDescription: "The last known status of a cluster.\n\n- CREATING: means the cluster is being created.\n- CONFIGURING: means the cluster is being configured according to requested changes.\n- READY: means the cluster is available and accepts connections.\n- FAILED: means that the cluster creation has failed, see errorMessage for details.\n- DELETING: means the cluster has been marked for deletion, it will be deleted soon.\n- DELETED: means the cluster has been deleted successfully, it will disappear from query and search results soon.\n- ERROR: means that an operation went wrong on the cluster, see errorMessage for details.",
-			},
-			"tags": schema.ListNestedAttribute{
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"key": schema.StringAttribute{
-							Required:            true,
-							Description:         "The key for the tag, must be unique amongst all tags associated with a given resource.",
-							MarkdownDescription: "The key for the tag, must be unique amongst all tags associated with a given resource.",
-							Validators: []validator.String{
-								stringvalidator.RegexMatches(regexp.MustCompile("^[-_a-zA-Z0-9]{1,40}$"), ""),
-							},
-						},
-						"value": schema.StringAttribute{
-							Required:            true,
-							Description:         "The value associated with the tag.",
-							MarkdownDescription: "The value associated with the tag.",
-							Validators: []validator.String{
-								stringvalidator.RegexMatches(regexp.MustCompile("^[-_a-zA-Z0-9]{1,40}$"), ""),
-							},
-						},
+			"status": schema.SingleNestedAttribute{
+				Attributes: map[string]schema.Attribute{
+					"message": schema.StringAttribute{
+						Computed:            true,
+						Description:         "Detailed information regarding the current state of the cluster.",
+						MarkdownDescription: "Detailed information regarding the current state of the cluster.",
 					},
-					CustomType: TagsType{
-						ObjectType: types.ObjectType{
-							AttrTypes: TagsValue{}.AttributeTypes(ctx),
-						},
+					"state": schema.StringAttribute{
+						Computed:            true,
+						Description:         "The current state of the cluster.",
+						MarkdownDescription: "The current state of the cluster.",
 					},
 				},
-				Optional:            true,
+				CustomType: StatusType{
+					ObjectType: types.ObjectType{
+						AttrTypes: StatusValue{}.AttributeTypes(ctx),
+					},
+				},
 				Computed:            true,
-				Description:         "Tags to identify resources",
-				MarkdownDescription: "Tags to identify resources",
+				Description:         "The status of the cluster.",
+				MarkdownDescription: "The status of the cluster.",
 			},
 			"user": schema.StringAttribute{
 				Required:            true,
-				Description:         "The name of the user with administration privileges on the cluster.",
-				MarkdownDescription: "The name of the user with administration privileges on the cluster.",
+				Description:         "The name of the user on the cluster.",
+				MarkdownDescription: "The name of the user on the cluster.",
+				Validators: []validator.String{
+					stringvalidator.LengthBetween(3, 63),
+					stringvalidator.RegexMatches(regexp.MustCompile("^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$"), ""),
+				},
+			},
+			"visibility": schema.StringAttribute{
+				Required:            true,
+				Description:         "Cluster exposition method.",
+				MarkdownDescription: "Cluster exposition method.",
+				Validators: []validator.String{
+					stringvalidator.OneOf(
+						"EXTERNAL",
+						"INTERNAL",
+					),
+				},
 			},
 			"volume": schema.SingleNestedAttribute{
 				Attributes: map[string]schema.Attribute{
-					"iops": schema.Int64Attribute{
-						Optional:            true,
-						Computed:            true,
-						Description:         "The number of IOPS to allocate to the volume.",
-						MarkdownDescription: "The number of IOPS to allocate to the volume.",
-						Validators: []validator.Int64{
-							int64validator.Between(100, 13000),
-						},
-					},
 					"size_gi_b": schema.Int64Attribute{
 						Required:            true,
 						Description:         "The size of the volume in GiB.",
 						MarkdownDescription: "The size of the volume in GiB.",
 						Validators: []validator.Int64{
-							int64validator.Between(10, 500),
+							int64validator.Between(1, 14901),
 						},
 					},
 					"type": schema.StringAttribute{
 						Required:            true,
-						Description:         "The type of the volume.",
-						MarkdownDescription: "The type of the volume.",
+						Description:         "The storage volume type.",
+						MarkdownDescription: "The storage volume type.",
 						Validators: []validator.String{
 							stringvalidator.OneOf(
-								"IO1",
 								"GP2",
+								"IO1",
+								"STANDARD",
 							),
 						},
 					},
@@ -252,55 +218,39 @@ func PostgresClusterResourceSchema(ctx context.Context) schema.Schema {
 					},
 				},
 				Required:            true,
-				Description:         "Common properties to all volume types.",
-				MarkdownDescription: "Common properties to all volume types.",
-			},
-			"vpc_cidr": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
-				Description:         "The CIDR of the network where the cluster will be created.\n\n**Warning**: The CIDR must be in the following three blocks:\n- 10.*.0.0/16\n- 172.(16-31).0.0/16\n- 192.168.0.0/16\nThe mask mut not be greater than /24.",
-				MarkdownDescription: "The CIDR of the network where the cluster will be created.\n\n**Warning**: The CIDR must be in the following three blocks:\n- 10.*.0.0/16\n- 172.(16-31).0.0/16\n- 192.168.0.0/16\nThe mask mut not be greater than /24.",
-				Validators: []validator.String{
-					stringvalidator.RegexMatches(regexp.MustCompile("^(?:10\\.(?:25[0-5]|2[0-4]\\d|1?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|1?\\d\\d?)|172\\.(?:1[6-9]|2\\d|3[01])\\.(?:25[0-5]|2[0-4]\\d|1?\\d\\d?)|192\\.168\\.(?:25[0-5]|2[0-4]\\d|1?\\d\\d?))\\.0/(?:1[6-9]|2[0-4])$"), ""),
-				},
-				Default: stringdefault.StaticString("10.10.0.0/16"),
+				Description:         "Configuration for a PostgreSQL storage volume.",
+				MarkdownDescription: "Configuration for a PostgreSQL storage volume.",
 			},
 		},
 	}
 }
 
 type PostgresClusterModel struct {
-	AllowedIpRanges     types.List               `tfsdk:"allowed_ip_ranges"`
-	AutomaticBackup     types.Bool               `tfsdk:"automatic_backup"`
-	AvailableOperations types.List               `tfsdk:"available_operations"`
-	CreatedOn           types.String             `tfsdk:"created_on"`
-	ErrorReason         types.String             `tfsdk:"error_reason"`
-	Host                types.String             `tfsdk:"host"`
-	Id                  types.String             `tfsdk:"id"`
-	IsPublic            types.Bool               `tfsdk:"is_public"`
-	LastOperationName   types.String             `tfsdk:"last_operation_name"`
-	LastOperationResult types.String             `tfsdk:"last_operation_result"`
-	MaintenanceSchedule MaintenanceScheduleValue `tfsdk:"maintenance_schedule"`
-	Name                types.String             `tfsdk:"name"`
-	NodeConfiguration   NodeConfigurationValue   `tfsdk:"node_configuration"`
-	Port                types.Int64              `tfsdk:"port"`
-	PrivateHost         types.String             `tfsdk:"private_host"`
-	SourceBackupId      types.String             `tfsdk:"source_backup_id"`
-	Status              types.String             `tfsdk:"status"`
-	Tags                types.List               `tfsdk:"tags"`
-	User                types.String             `tfsdk:"user"`
-	Volume              VolumeValue              `tfsdk:"volume"`
-	VpcCidr             types.String             `tfsdk:"vpc_cidr"`
+	ClusterId         types.String           `tfsdk:"cluster_id"`
+	CreatedOn         types.String           `tfsdk:"created_on"`
+	Extensions        types.List             `tfsdk:"extensions"`
+	FullVersion       types.String           `tfsdk:"full_version"`
+	Host              types.String           `tfsdk:"host"`
+	Id                types.String           `tfsdk:"id"`
+	MajorVersion      types.String           `tfsdk:"major_version"`
+	Name              types.String           `tfsdk:"name"`
+	NodeConfiguration NodeConfigurationValue `tfsdk:"node_configuration"`
+	Port              types.Int64            `tfsdk:"port"`
+	ReplicaCount      types.Int64            `tfsdk:"replica_count"`
+	Status            StatusValue            `tfsdk:"status"`
+	User              types.String           `tfsdk:"user"`
+	Visibility        types.String           `tfsdk:"visibility"`
+	Volume            VolumeValue            `tfsdk:"volume"`
 }
 
-var _ basetypes.ObjectTypable = MaintenanceScheduleType{}
+var _ basetypes.ObjectTypable = ExtensionsType{}
 
-type MaintenanceScheduleType struct {
+type ExtensionsType struct {
 	basetypes.ObjectType
 }
 
-func (t MaintenanceScheduleType) Equal(o attr.Type) bool {
-	other, ok := o.(MaintenanceScheduleType)
+func (t ExtensionsType) Equal(o attr.Type) bool {
+	other, ok := o.(ExtensionsType)
 
 	if !ok {
 		return false
@@ -309,113 +259,56 @@ func (t MaintenanceScheduleType) Equal(o attr.Type) bool {
 	return t.ObjectType.Equal(other.ObjectType)
 }
 
-func (t MaintenanceScheduleType) String() string {
-	return "MaintenanceScheduleType"
+func (t ExtensionsType) String() string {
+	return "ExtensionsType"
 }
 
-func (t MaintenanceScheduleType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+func (t ExtensionsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	attributes := in.Attributes()
 
-	beginAtAttribute, ok := attributes["begin_at"]
+	nameAttribute, ok := attributes["name"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`begin_at is missing from object`)
+			`name is missing from object`)
 
 		return nil, diags
 	}
 
-	beginAtVal, ok := beginAtAttribute.(basetypes.StringValue)
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`begin_at expected to be basetypes.StringValue, was: %T`, beginAtAttribute))
-	}
-
-	endAtAttribute, ok := attributes["end_at"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`end_at is missing from object`)
-
-		return nil, diags
-	}
-
-	endAtVal, ok := endAtAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`end_at expected to be basetypes.StringValue, was: %T`, endAtAttribute))
-	}
-
-	potentialImpactAttribute, ok := attributes["potential_impact"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`potential_impact is missing from object`)
-
-		return nil, diags
-	}
-
-	potentialImpactVal, ok := potentialImpactAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`potential_impact expected to be basetypes.StringValue, was: %T`, potentialImpactAttribute))
-	}
-
-	typeAttribute, ok := attributes["type"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`type is missing from object`)
-
-		return nil, diags
-	}
-
-	typeVal, ok := typeAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`type expected to be basetypes.StringValue, was: %T`, typeAttribute))
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
 	}
 
 	if diags.HasError() {
 		return nil, diags
 	}
 
-	return MaintenanceScheduleValue{
-		BeginAt:                 beginAtVal,
-		EndAt:                   endAtVal,
-		PotentialImpact:         potentialImpactVal,
-		MaintenanceScheduleType: typeVal,
-		state:                   attr.ValueStateKnown,
+	return ExtensionsValue{
+		Name:  nameVal,
+		state: attr.ValueStateKnown,
 	}, diags
 }
 
-func NewMaintenanceScheduleValueNull() MaintenanceScheduleValue {
-	return MaintenanceScheduleValue{
+func NewExtensionsValueNull() ExtensionsValue {
+	return ExtensionsValue{
 		state: attr.ValueStateNull,
 	}
 }
 
-func NewMaintenanceScheduleValueUnknown() MaintenanceScheduleValue {
-	return MaintenanceScheduleValue{
+func NewExtensionsValueUnknown() ExtensionsValue {
+	return ExtensionsValue{
 		state: attr.ValueStateUnknown,
 	}
 }
 
-func NewMaintenanceScheduleValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (MaintenanceScheduleValue, diag.Diagnostics) {
+func NewExtensionsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (ExtensionsValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
@@ -426,11 +319,11 @@ func NewMaintenanceScheduleValue(attributeTypes map[string]attr.Type, attributes
 
 		if !ok {
 			diags.AddError(
-				"Missing MaintenanceScheduleValue Attribute Value",
-				"While creating a MaintenanceScheduleValue value, a missing attribute value was detected. "+
-					"A MaintenanceScheduleValue must contain values for all attributes, even if null or unknown. "+
+				"Missing ExtensionsValue Attribute Value",
+				"While creating a ExtensionsValue value, a missing attribute value was detected. "+
+					"A ExtensionsValue must contain values for all attributes, even if null or unknown. "+
 					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("MaintenanceScheduleValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+					fmt.Sprintf("ExtensionsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
 			)
 
 			continue
@@ -438,12 +331,12 @@ func NewMaintenanceScheduleValue(attributeTypes map[string]attr.Type, attributes
 
 		if !attributeType.Equal(attribute.Type(ctx)) {
 			diags.AddError(
-				"Invalid MaintenanceScheduleValue Attribute Type",
-				"While creating a MaintenanceScheduleValue value, an invalid attribute value was detected. "+
-					"A MaintenanceScheduleValue must use a matching attribute type for the value. "+
+				"Invalid ExtensionsValue Attribute Type",
+				"While creating a ExtensionsValue value, an invalid attribute value was detected. "+
+					"A ExtensionsValue must use a matching attribute type for the value. "+
 					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("MaintenanceScheduleValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
-					fmt.Sprintf("MaintenanceScheduleValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+					fmt.Sprintf("ExtensionsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("ExtensionsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
 			)
 		}
 	}
@@ -453,106 +346,49 @@ func NewMaintenanceScheduleValue(attributeTypes map[string]attr.Type, attributes
 
 		if !ok {
 			diags.AddError(
-				"Extra MaintenanceScheduleValue Attribute Value",
-				"While creating a MaintenanceScheduleValue value, an extra attribute value was detected. "+
-					"A MaintenanceScheduleValue must not contain values beyond the expected attribute types. "+
+				"Extra ExtensionsValue Attribute Value",
+				"While creating a ExtensionsValue value, an extra attribute value was detected. "+
+					"A ExtensionsValue must not contain values beyond the expected attribute types. "+
 					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("Extra MaintenanceScheduleValue Attribute Name: %s", name),
+					fmt.Sprintf("Extra ExtensionsValue Attribute Name: %s", name),
 			)
 		}
 	}
 
 	if diags.HasError() {
-		return NewMaintenanceScheduleValueUnknown(), diags
+		return NewExtensionsValueUnknown(), diags
 	}
 
-	beginAtAttribute, ok := attributes["begin_at"]
+	nameAttribute, ok := attributes["name"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`begin_at is missing from object`)
+			`name is missing from object`)
 
-		return NewMaintenanceScheduleValueUnknown(), diags
+		return NewExtensionsValueUnknown(), diags
 	}
 
-	beginAtVal, ok := beginAtAttribute.(basetypes.StringValue)
+	nameVal, ok := nameAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`begin_at expected to be basetypes.StringValue, was: %T`, beginAtAttribute))
-	}
-
-	endAtAttribute, ok := attributes["end_at"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`end_at is missing from object`)
-
-		return NewMaintenanceScheduleValueUnknown(), diags
-	}
-
-	endAtVal, ok := endAtAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`end_at expected to be basetypes.StringValue, was: %T`, endAtAttribute))
-	}
-
-	potentialImpactAttribute, ok := attributes["potential_impact"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`potential_impact is missing from object`)
-
-		return NewMaintenanceScheduleValueUnknown(), diags
-	}
-
-	potentialImpactVal, ok := potentialImpactAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`potential_impact expected to be basetypes.StringValue, was: %T`, potentialImpactAttribute))
-	}
-
-	typeAttribute, ok := attributes["type"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`type is missing from object`)
-
-		return NewMaintenanceScheduleValueUnknown(), diags
-	}
-
-	typeVal, ok := typeAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`type expected to be basetypes.StringValue, was: %T`, typeAttribute))
+			fmt.Sprintf(`name expected to be basetypes.StringValue, was: %T`, nameAttribute))
 	}
 
 	if diags.HasError() {
-		return NewMaintenanceScheduleValueUnknown(), diags
+		return NewExtensionsValueUnknown(), diags
 	}
 
-	return MaintenanceScheduleValue{
-		BeginAt:                 beginAtVal,
-		EndAt:                   endAtVal,
-		PotentialImpact:         potentialImpactVal,
-		MaintenanceScheduleType: typeVal,
-		state:                   attr.ValueStateKnown,
+	return ExtensionsValue{
+		Name:  nameVal,
+		state: attr.ValueStateKnown,
 	}, diags
 }
 
-func NewMaintenanceScheduleValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) MaintenanceScheduleValue {
-	object, diags := NewMaintenanceScheduleValue(attributeTypes, attributes)
+func NewExtensionsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) ExtensionsValue {
+	object, diags := NewExtensionsValue(attributeTypes, attributes)
 
 	if diags.HasError() {
 		// This could potentially be added to the diag package.
@@ -566,15 +402,15 @@ func NewMaintenanceScheduleValueMust(attributeTypes map[string]attr.Type, attrib
 				diagnostic.Detail()))
 		}
 
-		panic("NewMaintenanceScheduleValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+		panic("NewExtensionsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
 	}
 
 	return object
 }
 
-func (t MaintenanceScheduleType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+func (t ExtensionsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
 	if in.Type() == nil {
-		return NewMaintenanceScheduleValueNull(), nil
+		return NewExtensionsValueNull(), nil
 	}
 
 	if !in.Type().Equal(t.TerraformType(ctx)) {
@@ -582,11 +418,11 @@ func (t MaintenanceScheduleType) ValueFromTerraform(ctx context.Context, in tfty
 	}
 
 	if !in.IsKnown() {
-		return NewMaintenanceScheduleValueUnknown(), nil
+		return NewExtensionsValueUnknown(), nil
 	}
 
 	if in.IsNull() {
-		return NewMaintenanceScheduleValueNull(), nil
+		return NewExtensionsValueNull(), nil
 	}
 
 	attributes := map[string]attr.Value{}
@@ -609,71 +445,41 @@ func (t MaintenanceScheduleType) ValueFromTerraform(ctx context.Context, in tfty
 		attributes[k] = a
 	}
 
-	return NewMaintenanceScheduleValueMust(MaintenanceScheduleValue{}.AttributeTypes(ctx), attributes), nil
+	return NewExtensionsValueMust(ExtensionsValue{}.AttributeTypes(ctx), attributes), nil
 }
 
-func (t MaintenanceScheduleType) ValueType(ctx context.Context) attr.Value {
-	return MaintenanceScheduleValue{}
+func (t ExtensionsType) ValueType(ctx context.Context) attr.Value {
+	return ExtensionsValue{}
 }
 
-var _ basetypes.ObjectValuable = MaintenanceScheduleValue{}
+var _ basetypes.ObjectValuable = ExtensionsValue{}
 
-type MaintenanceScheduleValue struct {
-	BeginAt                 basetypes.StringValue `tfsdk:"begin_at"`
-	EndAt                   basetypes.StringValue `tfsdk:"end_at"`
-	PotentialImpact         basetypes.StringValue `tfsdk:"potential_impact"`
-	MaintenanceScheduleType basetypes.StringValue `tfsdk:"type"`
-	state                   attr.ValueState
+type ExtensionsValue struct {
+	Name  basetypes.StringValue `tfsdk:"name"`
+	state attr.ValueState
 }
 
-func (v MaintenanceScheduleValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 4)
+func (v ExtensionsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 1)
 
 	var val tftypes.Value
 	var err error
 
-	attrTypes["begin_at"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["end_at"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["potential_impact"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["type"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["name"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 4)
+		vals := make(map[string]tftypes.Value, 1)
 
-		val, err = v.BeginAt.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["begin_at"] = val
-
-		val, err = v.EndAt.ToTerraformValue(ctx)
+		val, err = v.Name.ToTerraformValue(ctx)
 
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
 
-		vals["end_at"] = val
-
-		val, err = v.PotentialImpact.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["potential_impact"] = val
-
-		val, err = v.MaintenanceScheduleType.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["type"] = val
+		vals["name"] = val
 
 		if err := tftypes.ValidateValue(objectType, vals); err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
@@ -689,26 +495,23 @@ func (v MaintenanceScheduleValue) ToTerraformValue(ctx context.Context) (tftypes
 	}
 }
 
-func (v MaintenanceScheduleValue) IsNull() bool {
+func (v ExtensionsValue) IsNull() bool {
 	return v.state == attr.ValueStateNull
 }
 
-func (v MaintenanceScheduleValue) IsUnknown() bool {
+func (v ExtensionsValue) IsUnknown() bool {
 	return v.state == attr.ValueStateUnknown
 }
 
-func (v MaintenanceScheduleValue) String() string {
-	return "MaintenanceScheduleValue"
+func (v ExtensionsValue) String() string {
+	return "ExtensionsValue"
 }
 
-func (v MaintenanceScheduleValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+func (v ExtensionsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	attributeTypes := map[string]attr.Type{
-		"begin_at":         basetypes.StringType{},
-		"end_at":           basetypes.StringType{},
-		"potential_impact": basetypes.StringType{},
-		"type":             basetypes.StringType{},
+		"name": basetypes.StringType{},
 	}
 
 	if v.IsNull() {
@@ -722,17 +525,14 @@ func (v MaintenanceScheduleValue) ToObjectValue(ctx context.Context) (basetypes.
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"begin_at":         v.BeginAt,
-			"end_at":           v.EndAt,
-			"potential_impact": v.PotentialImpact,
-			"type":             v.MaintenanceScheduleType,
+			"name": v.Name,
 		})
 
 	return objVal, diags
 }
 
-func (v MaintenanceScheduleValue) Equal(o attr.Value) bool {
-	other, ok := o.(MaintenanceScheduleValue)
+func (v ExtensionsValue) Equal(o attr.Value) bool {
+	other, ok := o.(ExtensionsValue)
 
 	if !ok {
 		return false
@@ -746,39 +546,24 @@ func (v MaintenanceScheduleValue) Equal(o attr.Value) bool {
 		return true
 	}
 
-	if !v.BeginAt.Equal(other.BeginAt) {
-		return false
-	}
-
-	if !v.EndAt.Equal(other.EndAt) {
-		return false
-	}
-
-	if !v.PotentialImpact.Equal(other.PotentialImpact) {
-		return false
-	}
-
-	if !v.MaintenanceScheduleType.Equal(other.MaintenanceScheduleType) {
+	if !v.Name.Equal(other.Name) {
 		return false
 	}
 
 	return true
 }
 
-func (v MaintenanceScheduleValue) Type(ctx context.Context) attr.Type {
-	return MaintenanceScheduleType{
+func (v ExtensionsValue) Type(ctx context.Context) attr.Type {
+	return ExtensionsType{
 		basetypes.ObjectType{
 			AttrTypes: v.AttributeTypes(ctx),
 		},
 	}
 }
 
-func (v MaintenanceScheduleValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+func (v ExtensionsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"begin_at":         basetypes.StringType{},
-		"end_at":           basetypes.StringType{},
-		"potential_impact": basetypes.StringType{},
-		"type":             basetypes.StringType{},
+		"name": basetypes.StringType{},
 	}
 }
 
@@ -825,24 +610,6 @@ func (t NodeConfigurationType) ValueFromObject(ctx context.Context, in basetypes
 			fmt.Sprintf(`memory_size_gi_b expected to be basetypes.Int64Value, was: %T`, memorySizeGiBAttribute))
 	}
 
-	performanceLevelAttribute, ok := attributes["performance_level"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`performance_level is missing from object`)
-
-		return nil, diags
-	}
-
-	performanceLevelVal, ok := performanceLevelAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`performance_level expected to be basetypes.StringValue, was: %T`, performanceLevelAttribute))
-	}
-
 	vcpuCountAttribute, ok := attributes["vcpu_count"]
 
 	if !ok {
@@ -866,10 +633,9 @@ func (t NodeConfigurationType) ValueFromObject(ctx context.Context, in basetypes
 	}
 
 	return NodeConfigurationValue{
-		MemorySizeGiB:    memorySizeGiBVal,
-		PerformanceLevel: performanceLevelVal,
-		VcpuCount:        vcpuCountVal,
-		state:            attr.ValueStateKnown,
+		MemorySizeGiB: memorySizeGiBVal,
+		VcpuCount:     vcpuCountVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -954,24 +720,6 @@ func NewNodeConfigurationValue(attributeTypes map[string]attr.Type, attributes m
 			fmt.Sprintf(`memory_size_gi_b expected to be basetypes.Int64Value, was: %T`, memorySizeGiBAttribute))
 	}
 
-	performanceLevelAttribute, ok := attributes["performance_level"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`performance_level is missing from object`)
-
-		return NewNodeConfigurationValueUnknown(), diags
-	}
-
-	performanceLevelVal, ok := performanceLevelAttribute.(basetypes.StringValue)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`performance_level expected to be basetypes.StringValue, was: %T`, performanceLevelAttribute))
-	}
-
 	vcpuCountAttribute, ok := attributes["vcpu_count"]
 
 	if !ok {
@@ -995,10 +743,9 @@ func NewNodeConfigurationValue(attributeTypes map[string]attr.Type, attributes m
 	}
 
 	return NodeConfigurationValue{
-		MemorySizeGiB:    memorySizeGiBVal,
-		PerformanceLevel: performanceLevelVal,
-		VcpuCount:        vcpuCountVal,
-		state:            attr.ValueStateKnown,
+		MemorySizeGiB: memorySizeGiBVal,
+		VcpuCount:     vcpuCountVal,
+		state:         attr.ValueStateKnown,
 	}, diags
 }
 
@@ -1070,27 +817,25 @@ func (t NodeConfigurationType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = NodeConfigurationValue{}
 
 type NodeConfigurationValue struct {
-	MemorySizeGiB    basetypes.Int64Value  `tfsdk:"memory_size_gi_b"`
-	PerformanceLevel basetypes.StringValue `tfsdk:"performance_level"`
-	VcpuCount        basetypes.Int64Value  `tfsdk:"vcpu_count"`
-	state            attr.ValueState
+	MemorySizeGiB basetypes.Int64Value `tfsdk:"memory_size_gi_b"`
+	VcpuCount     basetypes.Int64Value `tfsdk:"vcpu_count"`
+	state         attr.ValueState
 }
 
 func (v NodeConfigurationValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 3)
+	attrTypes := make(map[string]tftypes.Type, 2)
 
 	var val tftypes.Value
 	var err error
 
 	attrTypes["memory_size_gi_b"] = basetypes.Int64Type{}.TerraformType(ctx)
-	attrTypes["performance_level"] = basetypes.StringType{}.TerraformType(ctx)
 	attrTypes["vcpu_count"] = basetypes.Int64Type{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 3)
+		vals := make(map[string]tftypes.Value, 2)
 
 		val, err = v.MemorySizeGiB.ToTerraformValue(ctx)
 
@@ -1099,14 +844,6 @@ func (v NodeConfigurationValue) ToTerraformValue(ctx context.Context) (tftypes.V
 		}
 
 		vals["memory_size_gi_b"] = val
-
-		val, err = v.PerformanceLevel.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["performance_level"] = val
 
 		val, err = v.VcpuCount.ToTerraformValue(ctx)
 
@@ -1146,9 +883,8 @@ func (v NodeConfigurationValue) ToObjectValue(ctx context.Context) (basetypes.Ob
 	var diags diag.Diagnostics
 
 	attributeTypes := map[string]attr.Type{
-		"memory_size_gi_b":  basetypes.Int64Type{},
-		"performance_level": basetypes.StringType{},
-		"vcpu_count":        basetypes.Int64Type{},
+		"memory_size_gi_b": basetypes.Int64Type{},
+		"vcpu_count":       basetypes.Int64Type{},
 	}
 
 	if v.IsNull() {
@@ -1162,9 +898,8 @@ func (v NodeConfigurationValue) ToObjectValue(ctx context.Context) (basetypes.Ob
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"memory_size_gi_b":  v.MemorySizeGiB,
-			"performance_level": v.PerformanceLevel,
-			"vcpu_count":        v.VcpuCount,
+			"memory_size_gi_b": v.MemorySizeGiB,
+			"vcpu_count":       v.VcpuCount,
 		})
 
 	return objVal, diags
@@ -1189,10 +924,6 @@ func (v NodeConfigurationValue) Equal(o attr.Value) bool {
 		return false
 	}
 
-	if !v.PerformanceLevel.Equal(other.PerformanceLevel) {
-		return false
-	}
-
 	if !v.VcpuCount.Equal(other.VcpuCount) {
 		return false
 	}
@@ -1210,20 +941,19 @@ func (v NodeConfigurationValue) Type(ctx context.Context) attr.Type {
 
 func (v NodeConfigurationValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"memory_size_gi_b":  basetypes.Int64Type{},
-		"performance_level": basetypes.StringType{},
-		"vcpu_count":        basetypes.Int64Type{},
+		"memory_size_gi_b": basetypes.Int64Type{},
+		"vcpu_count":       basetypes.Int64Type{},
 	}
 }
 
-var _ basetypes.ObjectTypable = TagsType{}
+var _ basetypes.ObjectTypable = StatusType{}
 
-type TagsType struct {
+type StatusType struct {
 	basetypes.ObjectType
 }
 
-func (t TagsType) Equal(o attr.Type) bool {
-	other, ok := o.(TagsType)
+func (t StatusType) Equal(o attr.Type) bool {
+	other, ok := o.(StatusType)
 
 	if !ok {
 		return false
@@ -1232,75 +962,75 @@ func (t TagsType) Equal(o attr.Type) bool {
 	return t.ObjectType.Equal(other.ObjectType)
 }
 
-func (t TagsType) String() string {
-	return "TagsType"
+func (t StatusType) String() string {
+	return "StatusType"
 }
 
-func (t TagsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+func (t StatusType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	attributes := in.Attributes()
 
-	keyAttribute, ok := attributes["key"]
+	messageAttribute, ok := attributes["message"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`key is missing from object`)
+			`message is missing from object`)
 
 		return nil, diags
 	}
 
-	keyVal, ok := keyAttribute.(basetypes.StringValue)
+	messageVal, ok := messageAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
+			fmt.Sprintf(`message expected to be basetypes.StringValue, was: %T`, messageAttribute))
 	}
 
-	valueAttribute, ok := attributes["value"]
+	stateAttribute, ok := attributes["state"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`value is missing from object`)
+			`state is missing from object`)
 
 		return nil, diags
 	}
 
-	valueVal, ok := valueAttribute.(basetypes.StringValue)
+	stateVal, ok := stateAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`value expected to be basetypes.StringValue, was: %T`, valueAttribute))
+			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
 	}
 
 	if diags.HasError() {
 		return nil, diags
 	}
 
-	return TagsValue{
-		Key:   keyVal,
-		Value: valueVal,
-		state: attr.ValueStateKnown,
+	return StatusValue{
+		Message: messageVal,
+		State:   stateVal,
+		state:   attr.ValueStateKnown,
 	}, diags
 }
 
-func NewTagsValueNull() TagsValue {
-	return TagsValue{
+func NewStatusValueNull() StatusValue {
+	return StatusValue{
 		state: attr.ValueStateNull,
 	}
 }
 
-func NewTagsValueUnknown() TagsValue {
-	return TagsValue{
+func NewStatusValueUnknown() StatusValue {
+	return StatusValue{
 		state: attr.ValueStateUnknown,
 	}
 }
 
-func NewTagsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (TagsValue, diag.Diagnostics) {
+func NewStatusValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (StatusValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
@@ -1311,11 +1041,11 @@ func NewTagsValue(attributeTypes map[string]attr.Type, attributes map[string]att
 
 		if !ok {
 			diags.AddError(
-				"Missing TagsValue Attribute Value",
-				"While creating a TagsValue value, a missing attribute value was detected. "+
-					"A TagsValue must contain values for all attributes, even if null or unknown. "+
+				"Missing StatusValue Attribute Value",
+				"While creating a StatusValue value, a missing attribute value was detected. "+
+					"A StatusValue must contain values for all attributes, even if null or unknown. "+
 					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("TagsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+					fmt.Sprintf("StatusValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
 			)
 
 			continue
@@ -1323,12 +1053,12 @@ func NewTagsValue(attributeTypes map[string]attr.Type, attributes map[string]att
 
 		if !attributeType.Equal(attribute.Type(ctx)) {
 			diags.AddError(
-				"Invalid TagsValue Attribute Type",
-				"While creating a TagsValue value, an invalid attribute value was detected. "+
-					"A TagsValue must use a matching attribute type for the value. "+
+				"Invalid StatusValue Attribute Type",
+				"While creating a StatusValue value, an invalid attribute value was detected. "+
+					"A StatusValue must use a matching attribute type for the value. "+
 					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("TagsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
-					fmt.Sprintf("TagsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+					fmt.Sprintf("StatusValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("StatusValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
 			)
 		}
 	}
@@ -1338,68 +1068,68 @@ func NewTagsValue(attributeTypes map[string]attr.Type, attributes map[string]att
 
 		if !ok {
 			diags.AddError(
-				"Extra TagsValue Attribute Value",
-				"While creating a TagsValue value, an extra attribute value was detected. "+
-					"A TagsValue must not contain values beyond the expected attribute types. "+
+				"Extra StatusValue Attribute Value",
+				"While creating a StatusValue value, an extra attribute value was detected. "+
+					"A StatusValue must not contain values beyond the expected attribute types. "+
 					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
-					fmt.Sprintf("Extra TagsValue Attribute Name: %s", name),
+					fmt.Sprintf("Extra StatusValue Attribute Name: %s", name),
 			)
 		}
 	}
 
 	if diags.HasError() {
-		return NewTagsValueUnknown(), diags
+		return NewStatusValueUnknown(), diags
 	}
 
-	keyAttribute, ok := attributes["key"]
+	messageAttribute, ok := attributes["message"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`key is missing from object`)
+			`message is missing from object`)
 
-		return NewTagsValueUnknown(), diags
+		return NewStatusValueUnknown(), diags
 	}
 
-	keyVal, ok := keyAttribute.(basetypes.StringValue)
+	messageVal, ok := messageAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`key expected to be basetypes.StringValue, was: %T`, keyAttribute))
+			fmt.Sprintf(`message expected to be basetypes.StringValue, was: %T`, messageAttribute))
 	}
 
-	valueAttribute, ok := attributes["value"]
+	stateAttribute, ok := attributes["state"]
 
 	if !ok {
 		diags.AddError(
 			"Attribute Missing",
-			`value is missing from object`)
+			`state is missing from object`)
 
-		return NewTagsValueUnknown(), diags
+		return NewStatusValueUnknown(), diags
 	}
 
-	valueVal, ok := valueAttribute.(basetypes.StringValue)
+	stateVal, ok := stateAttribute.(basetypes.StringValue)
 
 	if !ok {
 		diags.AddError(
 			"Attribute Wrong Type",
-			fmt.Sprintf(`value expected to be basetypes.StringValue, was: %T`, valueAttribute))
+			fmt.Sprintf(`state expected to be basetypes.StringValue, was: %T`, stateAttribute))
 	}
 
 	if diags.HasError() {
-		return NewTagsValueUnknown(), diags
+		return NewStatusValueUnknown(), diags
 	}
 
-	return TagsValue{
-		Key:   keyVal,
-		Value: valueVal,
-		state: attr.ValueStateKnown,
+	return StatusValue{
+		Message: messageVal,
+		State:   stateVal,
+		state:   attr.ValueStateKnown,
 	}, diags
 }
 
-func NewTagsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) TagsValue {
-	object, diags := NewTagsValue(attributeTypes, attributes)
+func NewStatusValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) StatusValue {
+	object, diags := NewStatusValue(attributeTypes, attributes)
 
 	if diags.HasError() {
 		// This could potentially be added to the diag package.
@@ -1413,15 +1143,15 @@ func NewTagsValueMust(attributeTypes map[string]attr.Type, attributes map[string
 				diagnostic.Detail()))
 		}
 
-		panic("NewTagsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+		panic("NewStatusValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
 	}
 
 	return object
 }
 
-func (t TagsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+func (t StatusType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
 	if in.Type() == nil {
-		return NewTagsValueNull(), nil
+		return NewStatusValueNull(), nil
 	}
 
 	if !in.Type().Equal(t.TerraformType(ctx)) {
@@ -1429,11 +1159,11 @@ func (t TagsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 	}
 
 	if !in.IsKnown() {
-		return NewTagsValueUnknown(), nil
+		return NewStatusValueUnknown(), nil
 	}
 
 	if in.IsNull() {
-		return NewTagsValueNull(), nil
+		return NewStatusValueNull(), nil
 	}
 
 	attributes := map[string]attr.Value{}
@@ -1456,29 +1186,29 @@ func (t TagsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 		attributes[k] = a
 	}
 
-	return NewTagsValueMust(TagsValue{}.AttributeTypes(ctx), attributes), nil
+	return NewStatusValueMust(StatusValue{}.AttributeTypes(ctx), attributes), nil
 }
 
-func (t TagsType) ValueType(ctx context.Context) attr.Value {
-	return TagsValue{}
+func (t StatusType) ValueType(ctx context.Context) attr.Value {
+	return StatusValue{}
 }
 
-var _ basetypes.ObjectValuable = TagsValue{}
+var _ basetypes.ObjectValuable = StatusValue{}
 
-type TagsValue struct {
-	Key   basetypes.StringValue `tfsdk:"key"`
-	Value basetypes.StringValue `tfsdk:"value"`
-	state attr.ValueState
+type StatusValue struct {
+	Message basetypes.StringValue `tfsdk:"message"`
+	State   basetypes.StringValue `tfsdk:"state"`
+	state   attr.ValueState
 }
 
-func (v TagsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+func (v StatusValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
 	attrTypes := make(map[string]tftypes.Type, 2)
 
 	var val tftypes.Value
 	var err error
 
-	attrTypes["key"] = basetypes.StringType{}.TerraformType(ctx)
-	attrTypes["value"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["message"] = basetypes.StringType{}.TerraformType(ctx)
+	attrTypes["state"] = basetypes.StringType{}.TerraformType(ctx)
 
 	objectType := tftypes.Object{AttributeTypes: attrTypes}
 
@@ -1486,21 +1216,21 @@ func (v TagsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 	case attr.ValueStateKnown:
 		vals := make(map[string]tftypes.Value, 2)
 
-		val, err = v.Key.ToTerraformValue(ctx)
+		val, err = v.Message.ToTerraformValue(ctx)
 
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
 
-		vals["key"] = val
+		vals["message"] = val
 
-		val, err = v.Value.ToTerraformValue(ctx)
+		val, err = v.State.ToTerraformValue(ctx)
 
 		if err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
 		}
 
-		vals["value"] = val
+		vals["state"] = val
 
 		if err := tftypes.ValidateValue(objectType, vals); err != nil {
 			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
@@ -1516,24 +1246,24 @@ func (v TagsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) 
 	}
 }
 
-func (v TagsValue) IsNull() bool {
+func (v StatusValue) IsNull() bool {
 	return v.state == attr.ValueStateNull
 }
 
-func (v TagsValue) IsUnknown() bool {
+func (v StatusValue) IsUnknown() bool {
 	return v.state == attr.ValueStateUnknown
 }
 
-func (v TagsValue) String() string {
-	return "TagsValue"
+func (v StatusValue) String() string {
+	return "StatusValue"
 }
 
-func (v TagsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+func (v StatusValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	attributeTypes := map[string]attr.Type{
-		"key":   basetypes.StringType{},
-		"value": basetypes.StringType{},
+		"message": basetypes.StringType{},
+		"state":   basetypes.StringType{},
 	}
 
 	if v.IsNull() {
@@ -1547,15 +1277,15 @@ func (v TagsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, di
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"key":   v.Key,
-			"value": v.Value,
+			"message": v.Message,
+			"state":   v.State,
 		})
 
 	return objVal, diags
 }
 
-func (v TagsValue) Equal(o attr.Value) bool {
-	other, ok := o.(TagsValue)
+func (v StatusValue) Equal(o attr.Value) bool {
+	other, ok := o.(StatusValue)
 
 	if !ok {
 		return false
@@ -1569,29 +1299,29 @@ func (v TagsValue) Equal(o attr.Value) bool {
 		return true
 	}
 
-	if !v.Key.Equal(other.Key) {
+	if !v.Message.Equal(other.Message) {
 		return false
 	}
 
-	if !v.Value.Equal(other.Value) {
+	if !v.State.Equal(other.State) {
 		return false
 	}
 
 	return true
 }
 
-func (v TagsValue) Type(ctx context.Context) attr.Type {
-	return TagsType{
+func (v StatusValue) Type(ctx context.Context) attr.Type {
+	return StatusType{
 		basetypes.ObjectType{
 			AttrTypes: v.AttributeTypes(ctx),
 		},
 	}
 }
 
-func (v TagsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+func (v StatusValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"key":   basetypes.StringType{},
-		"value": basetypes.StringType{},
+		"message": basetypes.StringType{},
+		"state":   basetypes.StringType{},
 	}
 }
 
@@ -1619,24 +1349,6 @@ func (t VolumeType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 	var diags diag.Diagnostics
 
 	attributes := in.Attributes()
-
-	iopsAttribute, ok := attributes["iops"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`iops is missing from object`)
-
-		return nil, diags
-	}
-
-	iopsVal, ok := iopsAttribute.(basetypes.Int64Value)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`iops expected to be basetypes.Int64Value, was: %T`, iopsAttribute))
-	}
 
 	sizeGiBAttribute, ok := attributes["size_gi_b"]
 
@@ -1679,7 +1391,6 @@ func (t VolumeType) ValueFromObject(ctx context.Context, in basetypes.ObjectValu
 	}
 
 	return VolumeValue{
-		Iops:       iopsVal,
 		SizeGiB:    sizeGiBVal,
 		VolumeType: typeVal,
 		state:      attr.ValueStateKnown,
@@ -1749,24 +1460,6 @@ func NewVolumeValue(attributeTypes map[string]attr.Type, attributes map[string]a
 		return NewVolumeValueUnknown(), diags
 	}
 
-	iopsAttribute, ok := attributes["iops"]
-
-	if !ok {
-		diags.AddError(
-			"Attribute Missing",
-			`iops is missing from object`)
-
-		return NewVolumeValueUnknown(), diags
-	}
-
-	iopsVal, ok := iopsAttribute.(basetypes.Int64Value)
-
-	if !ok {
-		diags.AddError(
-			"Attribute Wrong Type",
-			fmt.Sprintf(`iops expected to be basetypes.Int64Value, was: %T`, iopsAttribute))
-	}
-
 	sizeGiBAttribute, ok := attributes["size_gi_b"]
 
 	if !ok {
@@ -1808,7 +1501,6 @@ func NewVolumeValue(attributeTypes map[string]attr.Type, attributes map[string]a
 	}
 
 	return VolumeValue{
-		Iops:       iopsVal,
 		SizeGiB:    sizeGiBVal,
 		VolumeType: typeVal,
 		state:      attr.ValueStateKnown,
@@ -1883,19 +1575,17 @@ func (t VolumeType) ValueType(ctx context.Context) attr.Value {
 var _ basetypes.ObjectValuable = VolumeValue{}
 
 type VolumeValue struct {
-	Iops       basetypes.Int64Value  `tfsdk:"iops"`
 	SizeGiB    basetypes.Int64Value  `tfsdk:"size_gi_b"`
 	VolumeType basetypes.StringValue `tfsdk:"type"`
 	state      attr.ValueState
 }
 
 func (v VolumeValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
-	attrTypes := make(map[string]tftypes.Type, 3)
+	attrTypes := make(map[string]tftypes.Type, 2)
 
 	var val tftypes.Value
 	var err error
 
-	attrTypes["iops"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["size_gi_b"] = basetypes.Int64Type{}.TerraformType(ctx)
 	attrTypes["type"] = basetypes.StringType{}.TerraformType(ctx)
 
@@ -1903,15 +1593,7 @@ func (v VolumeValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error
 
 	switch v.state {
 	case attr.ValueStateKnown:
-		vals := make(map[string]tftypes.Value, 3)
-
-		val, err = v.Iops.ToTerraformValue(ctx)
-
-		if err != nil {
-			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
-		}
-
-		vals["iops"] = val
+		vals := make(map[string]tftypes.Value, 2)
 
 		val, err = v.SizeGiB.ToTerraformValue(ctx)
 
@@ -1959,7 +1641,6 @@ func (v VolumeValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 	var diags diag.Diagnostics
 
 	attributeTypes := map[string]attr.Type{
-		"iops":      basetypes.Int64Type{},
 		"size_gi_b": basetypes.Int64Type{},
 		"type":      basetypes.StringType{},
 	}
@@ -1975,7 +1656,6 @@ func (v VolumeValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, 
 	objVal, diags := types.ObjectValue(
 		attributeTypes,
 		map[string]attr.Value{
-			"iops":      v.Iops,
 			"size_gi_b": v.SizeGiB,
 			"type":      v.VolumeType,
 		})
@@ -1996,10 +1676,6 @@ func (v VolumeValue) Equal(o attr.Value) bool {
 
 	if v.state != attr.ValueStateKnown {
 		return true
-	}
-
-	if !v.Iops.Equal(other.Iops) {
-		return false
 	}
 
 	if !v.SizeGiB.Equal(other.SizeGiB) {
@@ -2023,7 +1699,6 @@ func (v VolumeValue) Type(ctx context.Context) attr.Type {
 
 func (v VolumeValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
-		"iops":      basetypes.Int64Type{},
 		"size_gi_b": basetypes.Int64Type{},
 		"type":      basetypes.StringType{},
 	}

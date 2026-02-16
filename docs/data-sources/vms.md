@@ -116,7 +116,6 @@ Read-Only:
 
 - `architecture` (String) The architecture of the VM (`i386` \| `x86_64`).
 - `block_device_mappings` (Attributes List) The block device mapping of the VM. (see [below for nested schema](#nestedatt--items--block_device_mappings))
-- `bsu_optimized` (Boolean) This parameter is not available. It is present in our API for the sake of historical compatibility with AWS.
 - `client_token` (String) The idempotency token provided when launching the VM.
 - `creation_date` (String) The date and time of creation of the VM.
 - `deletion_protection` (Boolean) If true, you cannot delete the VM unless you change this parameter back to false.

@@ -20,15 +20,19 @@ type TfRequestResp interface {
 }
 
 const (
-	TfRequestRetryTimeout = 5 * time.Minute
-	TfRequestRetryDelay   = 5 * time.Second
+	TfRequestRetryTimeout      = 5 * time.Minute
+	TfRequestStateRetryTimeout = 15 * time.Minute
+	TfRequestRetryDelay        = 5 * time.Second
 )
 
 var (
 	StatusCodeRetryOnDelete     = []int{http.StatusConflict, http.StatusFailedDependency}
 	StatusCodeStopRetryOnDelete = []int{http.StatusNoContent, http.StatusCreated, http.StatusBadRequest}
-	StatusCodeRetryOnCreate     = []int{http.StatusConflict, http.StatusFailedDependency}
-	StatusCodeStopRetryOnCreate = []int{http.StatusNoContent, http.StatusCreated}
+	StatusCodeRetryOnCreate     = []int{http.StatusConflict, http.StatusFailedDependency, http.StatusAccepted}
+	StatusCodeStopRetryOnCreate = []int{http.StatusNoContent, http.StatusCreated, http.StatusOK, http.StatusForbidden}
+
+	StateStopRetryOnCreate = []string{"RUNNING", "FAILED"}
+	StateRetryOnCreate     = []string{"PENDING", "CREATING", "DELETING"}
 )
 
 // ParseRetryBackoff retrieves the retry backoff duration from the
@@ -208,6 +212,20 @@ func getFieldFromReflectStructPtr(structPtr reflect.Value, fieldName string) (re
 	return fieldValue, nil
 }
 
+func getFieldFromReflectStruct(structValue reflect.Value, fieldName string) (reflect.Value, error) {
+	if structValue.Kind() != reflect.Struct {
+		return reflect.Value{}, fmt.Errorf("expected a struct but found %v", structValue)
+	}
+
+	fieldValue := structValue.FieldByName(fieldName)
+
+	if !fieldValue.IsValid() {
+		return reflect.Value{}, fmt.Errorf("expected field '%s' in struct but found %v", fieldName, fieldValue)
+	}
+
+	return fieldValue, nil
+}
+
 func ReadResourceUtils[R TfRequestResp, id string | api.ResourceIdentifier](
 	ctx context.Context,
 	createdId id,
@@ -268,4 +286,138 @@ func RetryReadUntilStateValid[R TfRequestResp, ID string | api.ResourceIdentifie
 	}
 
 	return createStateConf.WaitForStateContext(ctx)
+}
+
+func RetryReadUntilStatusStateValid[R TfRequestResp, ID string | api.ResourceIdentifier](
+	ctx context.Context,
+	createdId ID,
+	spaceID api.SpaceId,
+	pendingStates []string,
+	targetStates []string,
+	readFunction func(context.Context, api.SpaceId, ID, ...api.RequestEditorFn) (*R, error),
+) (interface{}, error) {
+	createStateConf := &retry.StateChangeConf{
+		Pending: pendingStates,
+		Target:  targetStates,
+		Refresh: func() (interface{}, string, error) {
+			return ReadStatusResourceUtils(ctx, createdId, spaceID, readFunction)
+		},
+		Timeout: TfRequestStateRetryTimeout,
+		Delay:   ParseRetryBackoff(),
+	}
+
+	return createStateConf.WaitForStateContext(ctx)
+}
+
+func ReadStatusResourceUtils[R TfRequestResp, id string | api.ResourceIdentifier](
+	ctx context.Context,
+	createdId id,
+	spaceID api.SpaceId,
+	readFunction func(context.Context, api.SpaceId, id, ...api.RequestEditorFn) (*R, error),
+) (interface{}, string, error) {
+	readRes, err := readFunction(ctx, spaceID, createdId)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to read resource : %v", err.Error())
+	}
+
+	// Use reflection to access State attribute inside of interface object
+	json200ValuePtr, err := getFieldFromReflectStructPtr(reflect.ValueOf(readRes), "JSON200")
+	if err != nil {
+		return nil, "", err
+	}
+	statusValuePtr, err := getFieldFromReflectStructPtr(json200ValuePtr, "Status")
+	if err != nil {
+		return nil, "", err
+	}
+	stateValuePtr, err := getFieldFromReflectStruct(statusValuePtr, "State")
+	if err != nil {
+		return nil, "", err
+	}
+
+	var stateValue reflect.Value
+	if stateValuePtr.Kind() == reflect.Ptr {
+		stateValue = stateValuePtr.Elem()
+
+		if stateValue.Type().String() != "string" {
+			return nil, "", fmt.Errorf("field 'State' was expected to be a string but %v found", stateValue.Type())
+		}
+
+	} else if stateValuePtr.Kind() == reflect.String {
+		stateValue = reflect.ValueOf(stateValuePtr.Interface())
+	} else {
+		return nil, "", fmt.Errorf("expected a pointer or a string but found %v", stateValuePtr)
+	}
+
+	data := json200ValuePtr.Interface()
+	stateValueStr := stateValue.String()
+
+	return data, stateValueStr, nil
+}
+
+func RetryReadUntilStatusStateValidWith2ID[R TfRequestResp, ID1, ID2 string | api.ResourceIdentifier](
+	ctx context.Context,
+	parentID ID1,
+	childID ID2,
+	spaceID api.SpaceId,
+	pendingStates []string,
+	targetStates []string,
+	readFunction func(context.Context, api.SpaceId, ID1, ID2, ...api.RequestEditorFn) (*R, error),
+) (interface{}, error) {
+	createStateConf := &retry.StateChangeConf{
+		Pending: pendingStates,
+		Target:  targetStates,
+		Refresh: func() (interface{}, string, error) {
+			return ReadStatusResourceUtilsWith2ID(ctx, parentID, childID, spaceID, readFunction)
+		},
+		Timeout: TfRequestRetryTimeout,
+		Delay:   ParseRetryBackoff(),
+	}
+
+	return createStateConf.WaitForStateContext(ctx)
+}
+
+func ReadStatusResourceUtilsWith2ID[R TfRequestResp, ID1, ID2 string | api.ResourceIdentifier](
+	ctx context.Context,
+	parentID ID1,
+	childID ID2,
+	spaceID api.SpaceId,
+	readFunction func(context.Context, api.SpaceId, ID1, ID2, ...api.RequestEditorFn) (*R, error),
+) (interface{}, string, error) {
+	readRes, err := readFunction(ctx, spaceID, parentID, childID)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to read resource : %v", err.Error())
+	}
+
+	// Use reflection to access State attribute inside of interface object
+	json200ValuePtr, err := getFieldFromReflectStructPtr(reflect.ValueOf(readRes), "JSON200")
+	if err != nil {
+		return nil, "", err
+	}
+	statusValuePtr, err := getFieldFromReflectStructPtr(json200ValuePtr, "Status")
+	if err != nil {
+		return nil, "", err
+	}
+	stateValuePtr, err := getFieldFromReflectStruct(statusValuePtr, "State")
+	if err != nil {
+		return nil, "", err
+	}
+
+	var stateValue reflect.Value
+	if stateValuePtr.Kind() == reflect.Ptr {
+		stateValue = stateValuePtr.Elem()
+
+		if stateValue.Type().String() != "string" {
+			return nil, "", fmt.Errorf("field 'State' was expected to be a string but %v found", stateValue.Type())
+		}
+
+	} else if stateValuePtr.Kind() == reflect.String {
+		stateValue = reflect.ValueOf(stateValuePtr.Interface())
+	} else {
+		return nil, "", fmt.Errorf("expected a pointer or a string but found %v", stateValuePtr)
+	}
+
+	data := json200ValuePtr.Interface()
+	stateValueStr := stateValue.String()
+
+	return data, stateValueStr, nil
 }

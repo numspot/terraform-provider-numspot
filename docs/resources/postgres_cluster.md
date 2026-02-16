@@ -15,19 +15,22 @@ description: |-
 ```terraform
 resource "numspot_postgres_cluster" "postgres-cluster" {
   name = "terraform-resource"
-  user = "team.terraform"
+  user = "terraform"
   node_configuration = {
     vcpu_count        = 2
     performance_level = "MEDIUM"
     memory_size_gi_b  = 2
   }
-  automatic_backup = false
   volume = {
-    type      = "IO1",
-    iops      = 200,
+    type      = "GP2",
     size_gi_b = 10
   }
-  allowed_ip_ranges = ["0.0.0.0/0"]
+  visibility = "INTERNAL"
+  extensions = [{
+    name    = "TIMESCALEDB"
+    version = "string"
+  }]
+  replica_count = 1
 }
 ```
 
@@ -36,47 +39,27 @@ resource "numspot_postgres_cluster" "postgres-cluster" {
 
 ### Required
 
-- `allowed_ip_ranges` (List of String)
-- `automatic_backup` (Boolean) Whether automatic backup is enabled for this cluster.
-- `name` (String) A strict slug: starts and ends with an alphanumeric character, allows hyphens or underscores in between but not consecutively or at the edges.
+- `name` (String) A PostgreSQL cluster name.
 - `node_configuration` (Attributes) The configuration used to provision the cluster nodes. (see [below for nested schema](#nestedatt--node_configuration))
-- `user` (String) The name of the user with administration privileges on the cluster.
-- `volume` (Attributes) Common properties to all volume types. (see [below for nested schema](#nestedatt--volume))
+- `user` (String) The name of the user on the cluster.
+- `visibility` (String) Cluster exposition method.
+- `volume` (Attributes) Configuration for a PostgreSQL storage volume. (see [below for nested schema](#nestedatt--volume))
 
 ### Optional
 
-- `is_public` (Boolean) Whether public exposition is enabled for this cluster.
-- `source_backup_id` (String) A backup unique identifier.
-- `tags` (Attributes List) Tags to identify resources (see [below for nested schema](#nestedatt--tags))
-- `vpc_cidr` (String) The CIDR of the network where the cluster will be created.
-
-**Warning**: The CIDR must be in the following three blocks:
-- 10.*.0.0/16
-- 172.(16-31).0.0/16
-- 192.168.0.0/16
-The mask mut not be greater than /24.
+- `cluster_id` (String) The unique identifier of a cluster.
+- `extensions` (Attributes List) List of extensions on the cluster. (see [below for nested schema](#nestedatt--extensions))
+- `major_version` (String) The version of postgresql to create a cluster.
+- `replica_count` (Number) Number of replicas to maintain for high availability. This number does not include the primary instance. The actual distribution across NumSpot subregions depends on available resources.
 
 ### Read-Only
 
-- `available_operations` (List of String) List of operation names
 - `created_on` (String) When the cluster has been created.
-- `error_reason` (String) Detailed information regarding what went wrong, available when status is Error.
-- `host` (String) Where connections to the cluster must be made to.
+- `full_version` (String) The version of postgresql.
+- `host` (String) Public address to be used for connecting to the PostgreSQL cluster from outside or by external clients.
 - `id` (String) A cluster unique identifier.
-- `last_operation_name` (String) Name of an operation
-- `last_operation_result` (String) Result of an operation
-- `maintenance_schedule` (Attributes) Postgres maintenance schedule object. It describes the upcoming maintenance operation for a PostgreSQL cluster, including its timing, type, and potential impact. (see [below for nested schema](#nestedatt--maintenance_schedule))
-- `port` (Number) On which port connections to the host must be made.
-- `private_host` (String) Where connections to the cluster must be made for interconnected services.
-- `status` (String) The last known status of a cluster.
-
-- CREATING: means the cluster is being created.
-- CONFIGURING: means the cluster is being configured according to requested changes.
-- READY: means the cluster is available and accepts connections.
-- FAILED: means that the cluster creation has failed, see errorMessage for details.
-- DELETING: means the cluster has been marked for deletion, it will be deleted soon.
-- DELETED: means the cluster has been deleted successfully, it will disappear from query and search results soon.
-- ERROR: means that an operation went wrong on the cluster, see errorMessage for details.
+- `port` (Number) TCP port on which the PostgreSQL server is exposed for connections
+- `status` (Attributes) The status of the cluster. (see [below for nested schema](#nestedatt--status))
 
 <a id="nestedatt--node_configuration"></a>
 ### Nested Schema for `node_configuration`
@@ -84,11 +67,6 @@ The mask mut not be greater than /24.
 Required:
 
 - `memory_size_gi_b` (Number) The allocated memory size, in GiB.
-- `performance_level` (String) The performance level of the VCPUs.
-
-- HIGHEST: for computationally intensive applications
-- HIGH: the performance level may fluctuate slightly over time
-- MEDIUM: the performance level may fluctuate moderately over time
 - `vcpu_count` (Number) The number of Virtual CPU provisioned.
 
 
@@ -98,28 +76,21 @@ Required:
 Required:
 
 - `size_gi_b` (Number) The size of the volume in GiB.
-- `type` (String) The type of the volume.
-
-Optional:
-
-- `iops` (Number) The number of IOPS to allocate to the volume.
+- `type` (String) The storage volume type.
 
 
-<a id="nestedatt--tags"></a>
-### Nested Schema for `tags`
+<a id="nestedatt--extensions"></a>
+### Nested Schema for `extensions`
 
 Required:
 
-- `key` (String) The key for the tag, must be unique amongst all tags associated with a given resource.
-- `value` (String) The value associated with the tag.
+- `name` (String) The name of the extension.
 
 
-<a id="nestedatt--maintenance_schedule"></a>
-### Nested Schema for `maintenance_schedule`
+<a id="nestedatt--status"></a>
+### Nested Schema for `status`
 
 Read-Only:
 
-- `begin_at` (String) The start date and time of the maintenance window, in ISO 8601 format.
-- `end_at` (String) The end date and time of the maintenance window, in ISO 8601 format.
-- `potential_impact` (String) A description of the potential impact on the cluster's availability and performance during the maintenance window.
-- `type` (String) The type of maintenance operation being performed (e.g., software upgrade, hardware replacement).
+- `message` (String) Detailed information regarding the current state of the cluster.
+- `state` (String) The current state of the cluster.

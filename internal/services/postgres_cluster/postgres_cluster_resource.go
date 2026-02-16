@@ -2,6 +2,7 @@ package postgres_cluster
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -13,7 +14,6 @@ import (
 	"terraform-provider-numspot/internal/sdk/api"
 	"terraform-provider-numspot/internal/services"
 	"terraform-provider-numspot/internal/services/postgres_cluster/resource_postgres_cluster"
-	"terraform-provider-numspot/internal/utils"
 )
 
 var _ resource.Resource = &postgresClusterResource{}
@@ -51,19 +51,19 @@ func (r *postgresClusterResource) Create(ctx context.Context, request resource.C
 	}
 
 	var diags diag.Diagnostics
-	body := deserializeCreatePostgresCluster(ctx, plan, &diags)
+	body := deserializeCreatePostgresCluster(plan, &diags)
 	if diags.HasError() {
 		response.Diagnostics.Append(diags...)
 		return
 	}
 
-	res, err := core.CreatePostgresCluster(ctx, r.provider, body)
+	res, err := core.CreatePostgresCluster(ctx, r.provider, *body)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create postgres cluster", err.Error())
 		return
 	}
 
-	state := serializePostgresCluster(ctx, res, &response.Diagnostics)
+	state := serializePostgresCluster(ctx, res, &response.Diagnostics, plan)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -87,7 +87,7 @@ func (r *postgresClusterResource) Read(ctx context.Context, req resource.ReadReq
 		return
 	}
 
-	state := serializePostgresCluster(ctx, res, &resp.Diagnostics)
+	state := serializePostgresCluster(ctx, res, &resp.Diagnostics, plan)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
@@ -104,178 +104,171 @@ func (r *postgresClusterResource) Delete(ctx context.Context, req resource.Delet
 	}
 
 	clusterId := uuid.MustParse(plan.Id.String())
-	res, err := core.DeletePostgresCluster(ctx, r.provider, clusterId, api.PostgreSQLDeleteClusterJSONRequestBody{})
-	if err != nil {
+
+	if err := core.DeletePostgresCluster(ctx, r.provider, clusterId); err != nil {
 		resp.Diagnostics.AddError("unable to delete postgres cluster", err.Error())
 		return
 	}
-
-	state := serializePostgresCluster(ctx, res, &resp.Diagnostics)
-
-	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
-func deserializeCreatePostgresCluster(ctx context.Context, tf resource_postgres_cluster.PostgresClusterModel, diags *diag.Diagnostics) api.PostgresClusterCreationRequestWithVolume {
+func deserializeCreatePostgresCluster(tf resource_postgres_cluster.PostgresClusterModel, diag *diag.Diagnostics) *api.PostgresClusterCreationRequest {
+	var postgresExtensionsMappingApi []api.PostgresExtension
+	var replicaCount *api.PostgresReplicaCount
 	var nodeConfiguration api.PostgresNodeConfiguration
-	var volume api.PostgresAllVolumes
-	var backupId *api.PostgresBackupId
-	var tags *[]api.PostgresTag
+	var volume api.PostgresVolume
+	var majorVersion *api.PostgresMajorVersion
 
-	if !(tf.NodeConfiguration.IsNull() || tf.NodeConfiguration.IsUnknown()) {
-		nodeConfiguration = api.PostgresNodeConfiguration{
-			MemorySizeGiB:    utils.FromTfInt64ToInt(tf.NodeConfiguration.MemorySizeGiB),
-			PerformanceLevel: api.PostgresNodeConfigurationPerformanceLevel(tf.NodeConfiguration.PerformanceLevel.ValueString()),
-			VcpuCount:        utils.FromTfInt64ToInt(tf.NodeConfiguration.VcpuCount),
+	if !(tf.Extensions.IsNull() || tf.Extensions.IsUnknown()) {
+		postgresExtensionsMappingApi = make([]api.PostgresExtension, 0, len(tf.Extensions.Elements()))
+		for _, pemTf := range tf.Extensions.Elements() {
+			pemTfRes, ok := pemTf.(resource_postgres_cluster.ExtensionsValue)
+			if !ok {
+				diag.AddError("unable to cast extension value to postgres resource", "")
+				return nil
+			}
+
+			pemApi := deserializeExtensionsMapping(pemTfRes)
+			postgresExtensionsMappingApi = append(postgresExtensionsMappingApi, pemApi)
 		}
 	}
 
-	if !(tf.SourceBackupId.IsNull() || tf.SourceBackupId.IsUnknown()) {
-		id := uuid.MustParse(tf.SourceBackupId.ValueString())
-		backupId = &id
+	if !(tf.ReplicaCount.IsNull() || tf.ReplicaCount.IsUnknown()) {
+		rc := api.PostgresReplicaCount(tf.ReplicaCount.ValueInt64())
+		replicaCount = &rc
 	}
 
-	if !(tf.Tags.IsNull() || tf.Tags.IsUnknown()) {
-		tagList := make([]api.PostgresTag, 0, len(tf.Tags.Elements()))
-		diags.Append(tf.Tags.ElementsAs(ctx, &tagList, true)...)
-		tags = &tagList
+	if !(tf.NodeConfiguration.IsNull() || tf.NodeConfiguration.IsUnknown()) {
+		nodeConfiguration = api.PostgresNodeConfiguration{
+			MemorySizeGiB: int32(tf.NodeConfiguration.MemorySizeGiB.ValueInt64()),
+			VcpuCount:     int32(tf.NodeConfiguration.VcpuCount.ValueInt64()),
+		}
+	}
+
+	if !(tf.MajorVersion.IsNull() || tf.MajorVersion.IsUnknown()) {
+		v := api.PostgresMajorVersion(tf.MajorVersion.ValueString())
+		majorVersion = &v
+	} else {
+		defaultVersion := types.StringValue("18")
+		v := api.PostgresMajorVersion(defaultVersion.ValueString())
+		majorVersion = &v
 	}
 
 	if !(tf.Volume.IsNull() || tf.Volume.IsUnknown()) {
 		volumeType := tf.Volume.VolumeType.ValueString()
 		switch volumeType {
-		case "GP2":
-			volume = api.PostgresAllVolumes{
-				Type:    volumeType,
-				SizeGiB: utils.FromTfInt64ToInt(tf.Volume.SizeGiB),
-			}
-
-		case "IO1":
-			volume = api.PostgresAllVolumes{
-				Type:    volumeType,
-				SizeGiB: utils.FromTfInt64ToInt(tf.Volume.SizeGiB),
-				Iops:    utils.FromTfInt64ToIntPtr(tf.Volume.Iops),
+		case "GP2", "IO1", "STANDARD":
+			volume = api.PostgresVolume{
+				Type:    api.PostgresVolumeType(volumeType),
+				SizeGiB: int32(tf.Volume.SizeGiB.ValueInt64()),
 			}
 
 		default:
-			diags.AddError("Unsupported volume type", "Type: "+volumeType+" is not recognized.")
+			diag.AddError(
+				"Unsupported volume type",
+				"Type: "+volumeType+" is not recognized.",
+			)
 		}
 	}
 
-	return api.PostgresClusterCreationRequestWithVolume{
-		AllowedIpRanges:   utils.TfStringListToStringList(ctx, tf.AllowedIpRanges, diags),
-		AutomaticBackup:   utils.FromTfBoolToBoolPtr(tf.AutomaticBackup),
-		IsPublic:          utils.FromTfBoolToBoolPtr(tf.IsPublic),
+	return &api.PostgresClusterCreationRequest{
+		Extensions:        &postgresExtensionsMappingApi,
+		ReplicaCount:      replicaCount,
+		Visibility:        api.PostgresClusterVisibility(tf.Visibility.ValueString()),
 		Name:              tf.Name.ValueString(),
-		NetCidr:           tf.VpcCidr.ValueStringPointer(),
 		NodeConfiguration: nodeConfiguration,
-		SourceBackupId:    backupId,
-		Tags:              tags,
+		MajorVersion:      majorVersion,
 		User:              tf.User.ValueString(),
 		Volume:            volume,
 	}
 }
 
-func serializePostgresCluster(ctx context.Context, cluster *api.PostgresCluster, diags *diag.Diagnostics) resource_postgres_cluster.PostgresClusterModel {
+func deserializeExtensionsMapping(ext resource_postgres_cluster.ExtensionsValue) api.PostgresExtension {
+	return api.PostgresExtension{
+		Name: api.PostgresExtensionName(ext.Name.ValueString()),
+	}
+}
+
+func serializePostgresCluster(ctx context.Context, cluster *api.PostgresCluster, diags *diag.Diagnostics, plan resource_postgres_cluster.PostgresClusterModel) resource_postgres_cluster.PostgresClusterModel {
 	var serializeDiags diag.Diagnostics
-
-	allowedIpRangesList := types.ListNull(types.String{}.Type(ctx))
-	availableOperationsList := types.ListNull(types.String{}.Type(ctx))
-	tagsList := types.List{}
-	maintenanceSchedule := resource_postgres_cluster.MaintenanceScheduleValue{}
-	volume := resource_postgres_cluster.VolumeValue{}
-
-	if cluster.Tags != nil {
-		tagItems, serializeDiags := utils.SerializeDatasourceItems(ctx, cluster.Tags, mappingResourceTags)
-		if serializeDiags.HasError() {
-			return resource_postgres_cluster.PostgresClusterModel{}
-		}
-		tagsList = utils.CreateListValueItems(ctx, tagItems, &serializeDiags)
-		if serializeDiags.HasError() {
-			return resource_postgres_cluster.PostgresClusterModel{}
-		}
-	}
-
-	if cluster.AllowedIpRanges != nil {
-		allowedIpRangesList, serializeDiags = types.ListValueFrom(ctx, types.StringType, cluster.AllowedIpRanges)
-		diags.Append(serializeDiags...)
-	}
-
-	if cluster.AvailableOperations != nil {
-		availableOperationsList, serializeDiags = types.ListValueFrom(ctx, types.StringType, cluster.AvailableOperations)
-		diags.Append(serializeDiags...)
-	}
-
-	if cluster.MaintenanceSchedule != nil {
-		maintenanceSchedule = resource_postgres_cluster.MaintenanceScheduleValue{
-			BeginAt:                 types.StringValue(cluster.MaintenanceSchedule.BeginAt),
-			EndAt:                   types.StringValue(cluster.MaintenanceSchedule.EndAt),
-			PotentialImpact:         types.StringValue(cluster.MaintenanceSchedule.PotentialImpact),
-			MaintenanceScheduleType: types.StringValue(string(cluster.MaintenanceSchedule.Type)),
-		}
-	}
+	var volume resource_postgres_cluster.VolumeValue
+	extensionList := types.List{}
 
 	nodeConfiguration, mappingDiags := resource_postgres_cluster.NewNodeConfigurationValue(resource_postgres_cluster.NodeConfigurationValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"memory_size_gi_b":  types.Int64Value(utils.ConvertIntPtrToInt64(&cluster.NodeConfiguration.MemorySizeGiB)),
-		"performance_level": types.StringValue(string(cluster.NodeConfiguration.PerformanceLevel)),
-		"vcpu_count":        types.Int64Value(utils.ConvertIntPtrToInt64(&cluster.NodeConfiguration.VcpuCount)),
+		"memory_size_gi_b": types.Int64Value(int64(cluster.NodeConfiguration.MemorySizeGiB)),
+		"vcpu_count":       types.Int64Value(int64(cluster.NodeConfiguration.VcpuCount)),
 	})
 	if mappingDiags.HasError() {
 		diags.Append(mappingDiags...)
 	}
 
-	valueD, err := cluster.Volume.ValueByDiscriminator()
-	if err != nil {
-		return resource_postgres_cluster.PostgresClusterModel{}
-	}
-
-	switch v := valueD.(type) {
-	case api.PostgresVolumeGp2:
-		volume, mappingDiags = resource_postgres_cluster.NewVolumeValue(resource_postgres_cluster.VolumeValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"size_gi_b": types.Int64Value(utils.ConvertIntPtrToInt64(&v.SizeGiB)),
-			"type":      types.StringValue(string(v.Type)),
-		})
-		if mappingDiags.HasError() {
-			diags.Append(mappingDiags...)
-		}
-	case api.PostgresVolumeIo1:
-		volume, mappingDiags = resource_postgres_cluster.NewVolumeValue(resource_postgres_cluster.VolumeValue{}.AttributeTypes(ctx), map[string]attr.Value{
-			"size_gi_b": types.Int64Value(utils.ConvertIntPtrToInt64(&v.SizeGiB)),
-			"iops":      types.Int64Value(utils.ConvertIntPtrToInt64(&v.Iops)),
-			"type":      types.StringValue(string(v.Type)),
-		})
-		if mappingDiags.HasError() {
-			diags.AddError("Unsupported volume type", "Type: "+string(v.Type)+" is not recognized.")
-		}
-	default:
+	volume, mappingDiags = resource_postgres_cluster.NewVolumeValue(resource_postgres_cluster.VolumeValue{}.AttributeTypes(ctx), map[string]attr.Value{
+		"size_gi_b": types.Int64Value(int64(cluster.Volume.SizeGiB)),
+		"type":      types.StringValue(string(cluster.Volume.Type)),
+	})
+	if mappingDiags.HasError() {
 		diags.Append(mappingDiags...)
 	}
 
-	return resource_postgres_cluster.PostgresClusterModel{
-		AllowedIpRanges:     allowedIpRangesList,
-		AutomaticBackup:     types.BoolValue(cluster.AutomaticBackup),
-		AvailableOperations: availableOperationsList,
-		CreatedOn:           types.StringValue(cluster.CreatedOn),
-		ErrorReason:         types.StringPointerValue(cluster.ErrorReason),
-		Host:                types.StringPointerValue(cluster.Host),
-		Id:                  types.StringValue(cluster.Id.String()),
-		LastOperationName:   types.StringValue(string(cluster.LastOperationName)),
-		LastOperationResult: types.StringValue(string(cluster.LastOperationResult)),
-		MaintenanceSchedule: maintenanceSchedule,
-		Name:                types.StringValue(cluster.Name),
-		NodeConfiguration:   nodeConfiguration,
-		Port:                types.Int64Value(utils.ConvertIntPtrToInt64(cluster.Port)),
-		PrivateHost:         types.StringPointerValue(cluster.PrivateHost),
-		Status:              types.StringValue(string(cluster.Status)),
-		Tags:                tagsList,
-		User:                types.StringValue(cluster.User),
-		Volume:              volume,
-		VpcCidr:             types.StringPointerValue(cluster.NetCidr),
+	var port types.Int64
+	if cluster.Port != nil {
+		port = types.Int64Value(int64(*cluster.Port))
+	} else {
+		port = types.Int64Null()
 	}
-}
 
-func mappingResourceTags(ctx context.Context, tag api.PostgresTag) (resource_postgres_cluster.TagsValue, diag.Diagnostics) {
-	return resource_postgres_cluster.NewTagsValue(resource_postgres_cluster.TagsValue{}.AttributeTypes(ctx), map[string]attr.Value{
-		"key":   types.StringValue(tag.Key),
-		"value": types.StringValue(tag.Value),
-	})
+	var majorVersion types.String
+
+	if cluster.MajorVersion == nil {
+		majorVersion = types.StringNull()
+	} else {
+		majorVersion = types.StringValue(string(*cluster.MajorVersion))
+	}
+
+	if cluster.Extensions != nil {
+		extensionLen := len(*cluster.Extensions)
+		elementValue := make([]resource_postgres_cluster.ExtensionsValue, extensionLen)
+
+		for i, ext := range *cluster.Extensions {
+			elementValue[i], serializeDiags = resource_postgres_cluster.NewExtensionsValue(resource_postgres_cluster.ExtensionsValue{}.AttributeTypes(ctx), map[string]attr.Value{
+				"name": types.StringValue(string(ext.Name)),
+			})
+			if serializeDiags.HasError() {
+				diags.Append(serializeDiags...)
+				continue
+			}
+		}
+
+		extensionList, serializeDiags = types.ListValueFrom(ctx, new(resource_postgres_cluster.ExtensionsValue).Type(ctx), elementValue)
+		if serializeDiags.HasError() {
+			diags.Append(serializeDiags...)
+			return resource_postgres_cluster.PostgresClusterModel{}
+		}
+	}
+
+	status, diagnostics := resource_postgres_cluster.NewStatusValue(resource_postgres_cluster.StatusValue{}.AttributeTypes(ctx),
+		map[string]attr.Value{
+			"message": types.StringValue(cluster.Status.Message),
+			"state":   types.StringValue(string(cluster.Status.State)),
+		},
+	)
+	if diagnostics.HasError() {
+		diags.Append(diagnostics...)
+	}
+
+	return resource_postgres_cluster.PostgresClusterModel{
+		Visibility:        types.StringValue(plan.Visibility.ValueString()),
+		CreatedOn:         types.StringValue(cluster.CreatedOn.Format(time.RFC3339)),
+		Extensions:        extensionList,
+		ReplicaCount:      types.Int64Value(int64(cluster.ReplicaCount)),
+		Host:              types.StringPointerValue(cluster.Host),
+		Id:                types.StringValue(cluster.Id.String()),
+		Name:              types.StringValue(cluster.Name),
+		NodeConfiguration: nodeConfiguration,
+		MajorVersion:      majorVersion,
+		Port:              port,
+		Status:            status,
+		User:              types.StringValue(cluster.User),
+		Volume:            volume,
+		FullVersion:       types.StringPointerValue(cluster.FullVersion),
+	}
 }

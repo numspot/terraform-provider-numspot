@@ -81,7 +81,6 @@ func UpdateVMKeypair(ctx context.Context, provider *client.NumSpotSDK, numSpotVM
 	}
 
 	numSpotVMUpdate.BlockDeviceMappings = nil
-	numSpotVMUpdate.BsuOptimized = nil
 	numSpotVMUpdate.IsSourceDestChecked = nil
 	numSpotVMUpdate.SecurityGroupIds = nil
 	numSpotVMUpdate.DeletionProtection = nil

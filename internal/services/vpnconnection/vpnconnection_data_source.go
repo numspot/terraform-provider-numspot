@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/core"
 	"terraform-provider-numspot/internal/sdk/api"
@@ -137,8 +138,7 @@ func mappingOptions(ctx context.Context, opt api.VpnOptions) (types.Object, diag
 		return ret, diags
 	}
 
-	var phase1 types.Object
-	var phase2 types.Object
+	phase1 := basetypes.ObjectValue{}
 	if opt.Phase1Options != nil {
 		phase1, diags = mappingPhase1(ctx, *opt.Phase1Options)
 		if diags.HasError() {
@@ -146,7 +146,8 @@ func mappingOptions(ctx context.Context, opt api.VpnOptions) (types.Object, diag
 		}
 	}
 
-	if opt.Phase1Options != nil {
+	phase2 := basetypes.ObjectValue{}
+	if opt.Phase2Options != nil {
 		phase2, diags = mappingPhase2(ctx, *opt.Phase2Options)
 		if diags.HasError() {
 			return ret, diags

@@ -1,0 +1,26 @@
+provider:
+  name: numspot
+
+resources:
+  kubernetes_cluster:
+    create:
+      method: POST
+      path: /kubernetes/spaces/{spaceId}/clusters
+    delete:
+      method: DELETE
+      path: /kubernetes/spaces/{spaceId}/clusters/{clusterId}
+    read:
+      method: GET
+      path: /kubernetes/spaces/{spaceId}/clusters/{clusterId}
+    schema:
+      ignores:
+        - spaceId
+
+data_sources:
+  kubernetes_cluster:
+    read:
+      method: GET
+      path: /kubernetes/spaces/{spaceId}/clusters
+    schema:
+      ignores:
+        - spaceId
