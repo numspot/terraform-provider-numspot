@@ -8,6 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -25,6 +27,9 @@ func KubernetesClusterResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632",
 				MarkdownDescription: "Type defining a CIDR (Classless Inter-Domain Routing) according to the CIDR syntax defined in RFC 4632",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 				Validators: []validator.String{
 					stringvalidator.RegexMatches(regexp.MustCompile("^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)/(3[0-2]|[12]?[0-9])$"), ""),
 				},
@@ -54,6 +59,9 @@ func KubernetesClusterResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.",
 				MarkdownDescription: "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(3, 63),
 					stringvalidator.RegexMatches(regexp.MustCompile("^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$"), ""),
@@ -63,6 +71,9 @@ func KubernetesClusterResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "Profile of the cluster.",
 				MarkdownDescription: "Profile of the cluster.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 				Validators: []validator.String{
 					stringvalidator.OneOf(
 						"xsmall",
@@ -92,6 +103,9 @@ func KubernetesClusterResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "Kubernetes version of the cluster.",
 				MarkdownDescription: "Kubernetes version of the cluster.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 				Validators: []validator.String{
 					stringvalidator.OneOf(
 						"1.31",
@@ -105,6 +119,9 @@ func KubernetesClusterResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "Cluster exposition method.",
 				MarkdownDescription: "Cluster exposition method.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 				Validators: []validator.String{
 					stringvalidator.OneOf(
 						"EXTERNAL",

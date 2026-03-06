@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/uuid"
 	"terraform-provider-numspot/internal/client"
@@ -20,7 +19,7 @@ func ReadKubernetesNodePools(ctx context.Context, provider *client.NumSpotSDK, c
 		return nil, err
 	}
 
-	return res.JSON200, err
+	return res.JSON200, nil
 }
 
 func CreateKubernetesNodePool(ctx context.Context, provider *client.NumSpotSDK, numSpotNodePoolCreate api.CreateKubernetesNodePoolJSONRequestBody, clusterId api.ClusterId) (*api.CreateKubernetesNodePool201Response, error) {
@@ -33,19 +32,7 @@ func CreateKubernetesNodePool(ctx context.Context, provider *client.NumSpotSDK, 
 		return nil, err
 	}
 
-	createdNodePoolID := res.JSON201.Id
-
-	read, err := utils.RetryReadUntilStatusStateValidWith2ID(ctx, clusterId, createdNodePoolID, provider.SpaceID, utils.StateRetryOnCreate, utils.StateStopRetryOnCreate, provider.Client.GetKubernetesNodePoolWithResponse)
-	if err != nil {
-		return nil, err
-	}
-
-	numSpotNodePool, assert := read.(*api.KubernetesNodePool)
-	if !assert {
-		return nil, fmt.Errorf("invalid node pool assertion %s", createdNodePoolID)
-	}
-
-	return numSpotNodePool, err
+	return res.JSON201, nil
 }
 
 func ReadKubernetesNodePool(ctx context.Context, provider *client.NumSpotSDK, clusterId api.ClusterId, nodePoolId string) (*api.GetKubernetesNodePool200Response, error) {

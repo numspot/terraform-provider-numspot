@@ -156,6 +156,13 @@
 										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\\\\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)/(3[0-2]|[12]?[0-9])$\"), \"\")"
 									}
 								}
+							],
+							"plan_modifiers": [
+								{
+									"custom": {
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
 							]
 						}
 					},
@@ -188,6 +195,13 @@
 										"schema_definition": "stringvalidator.RegexMatches(regexp.MustCompile(\"^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$\"), \"\")"
 									}
 								}
+							],
+							"plan_modifiers": [
+								{
+									"custom": {
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
 							]
 						}
 					},
@@ -205,6 +219,13 @@
 											}
 										],
 										"schema_definition": "stringvalidator.OneOf(\n\"xsmall\",\n\"small\",\n\"medium\",\n\"large\",\n)"
+									}
+								}
+							],
+							"plan_modifiers": [
+								{
+									"custom": {
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
 									}
 								}
 							]
@@ -226,6 +247,13 @@
 										"schema_definition": "stringvalidator.OneOf(\n\"1.31\",\n\"1.32\",\n\"1.33\",\n\"1.34\",\n)"
 									}
 								}
+							],
+							"plan_modifiers": [
+								{
+									"custom": {
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
+									}
+								}
 							]
 						}
 					},
@@ -243,6 +271,13 @@
 											}
 										],
 										"schema_definition": "stringvalidator.OneOf(\n\"EXTERNAL\",\n\"INTERNAL\",\n)"
+									}
+								}
+							],
+							"plan_modifiers": [
+								{
+									"custom": {
+										"schema_definition": "stringplanmodifier.RequiresReplaceIfConfigured()"
 									}
 								}
 							]

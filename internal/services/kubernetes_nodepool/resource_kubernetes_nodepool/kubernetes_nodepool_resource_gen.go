@@ -9,6 +9,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -49,6 +52,9 @@ func KubernetesNodepoolResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "List of all Availability Zones name.",
 				MarkdownDescription: "List of all Availability Zones name.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 				Validators: []validator.String{
 					stringvalidator.OneOf(
 						"eu-west-2a",
@@ -65,6 +71,9 @@ func KubernetesNodepoolResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "Identifier of the Cluster",
 				MarkdownDescription: "Identifier of the Cluster",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
@@ -76,6 +85,9 @@ func KubernetesNodepoolResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.",
 				MarkdownDescription: "A string that inherits rules from StrictSlug: lowercase letters, digits, hyphens, and underscores, and must start and end with a letter or digit.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 				Validators: []validator.String{
 					stringvalidator.LengthBetween(3, 63),
 					stringvalidator.RegexMatches(regexp.MustCompile("^[a-zA-Z0-9]+(?:[-_][a-zA-Z0-9]+)*$"), ""),
@@ -91,6 +103,9 @@ func KubernetesNodepoolResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "List of worker node profile names.",
 				MarkdownDescription: "List of worker node profile names.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 				Validators: []validator.String{
 					stringvalidator.OneOf(
 						"small",
@@ -110,6 +125,9 @@ func KubernetesNodepoolResourceSchema(ctx context.Context) schema.Schema {
 				Computed:            true,
 				Description:         "Desired number of this node replicas.",
 				MarkdownDescription: "Desired number of this node replicas.",
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplaceIfConfigured(),
+				},
 				Validators: []validator.Int64{
 					int64validator.Between(1, 20),
 				},
@@ -120,16 +138,25 @@ func KubernetesNodepoolResourceSchema(ctx context.Context) schema.Schema {
 						Required:            true,
 						Description:         "The number of IOPS to allocate to the volume.",
 						MarkdownDescription: "The number of IOPS to allocate to the volume.",
+						PlanModifiers: []planmodifier.Int64{
+							int64planmodifier.RequiresReplaceIfConfigured(),
+						},
 					},
 					"size": schema.Int64Attribute{
 						Required:            true,
 						Description:         "A volume size in GiB",
 						MarkdownDescription: "A volume size in GiB",
+						PlanModifiers: []planmodifier.Int64{
+							int64planmodifier.RequiresReplaceIfConfigured(),
+						},
 					},
 					"type": schema.StringAttribute{
 						Required:            true,
 						Description:         "Types of storage volumes available",
 						MarkdownDescription: "Types of storage volumes available",
+						PlanModifiers: []planmodifier.String{
+							stringplanmodifier.RequiresReplaceIfConfigured(),
+						},
 						Validators: []validator.String{
 							stringvalidator.OneOf(
 								"performance",
