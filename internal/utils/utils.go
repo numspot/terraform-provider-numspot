@@ -40,6 +40,13 @@ func FromTfStringToStringPtr(str types.String) *string {
 	return str.ValueStringPointer()
 }
 
+func FromTfStringToStringPtrExcludeEmpty(str types.String) *string {
+	if str.IsUnknown() || str.IsNull() || str.ValueString() == "" {
+		return nil
+	}
+	return str.ValueStringPointer()
+}
+
 func FromTfStringToAzNamePtr(str types.String) *api.AvailabilityZoneName {
 	if str.IsUnknown() || str.IsNull() {
 		return nil

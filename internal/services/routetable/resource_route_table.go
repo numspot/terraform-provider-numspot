@@ -285,11 +285,11 @@ func deserializeRoutes(ctx context.Context, tfRoutes types.Set) []api.Route {
 	for i := 0; i < len(swap); i++ {
 		obj := api.Route{
 			DestinationIpRange: swap[i].DestinationIpRange.ValueStringPointer(),
-			GatewayId:          swap[i].GatewayId.ValueStringPointer(),
-			NatGatewayId:       swap[i].NatGatewayId.ValueStringPointer(),
-			VpcPeeringId:       swap[i].VpcPeeringId.ValueStringPointer(),
-			NicId:              swap[i].NicId.ValueStringPointer(),
-			VmId:               swap[i].VmId.ValueStringPointer(),
+			GatewayId:          utils.FromTfStringToStringPtrExcludeEmpty(swap[i].GatewayId),
+			NatGatewayId:       utils.FromTfStringToStringPtrExcludeEmpty(swap[i].NatGatewayId),
+			VpcPeeringId:       utils.FromTfStringToStringPtrExcludeEmpty(swap[i].VpcPeeringId),
+			NicId:              utils.FromTfStringToStringPtrExcludeEmpty(swap[i].NicId),
+			VmId:               utils.FromTfStringToStringPtrExcludeEmpty(swap[i].VmId),
 		}
 		routes[i] = obj
 	}

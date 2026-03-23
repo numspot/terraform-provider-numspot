@@ -118,14 +118,12 @@ func UpdateRouteTableTags(
 func createRouteTableRoutes(ctx context.Context, provider *client.NumSpotSDK, routeTableId string, routes []api.Route) error {
 	for _, r := range routes {
 		payload := api.CreateRoute{
-			GatewayId:    r.GatewayId,
-			NatGatewayId: r.NatGatewayId,
-			NicId:        r.NicId,
-			VmId:         r.VmId,
-			VpcPeeringId: r.VpcPeeringId,
-		}
-		if r.DestinationIpRange != nil {
-			payload.DestinationIpRange = *r.DestinationIpRange
+			DestinationIpRange: *r.DestinationIpRange,
+			GatewayId:          r.GatewayId,
+			NatGatewayId:       r.NatGatewayId,
+			NicId:              r.NicId,
+			VmId:               r.VmId,
+			VpcPeeringId:       r.VpcPeeringId,
 		}
 
 		res, err := provider.Client.CreateRouteWithResponse(ctx, provider.SpaceID, routeTableId, payload)

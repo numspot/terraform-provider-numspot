@@ -2,8 +2,6 @@ package core
 
 import (
 	"context"
-	"errors"
-	"net/http"
 
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/sdk/api"
@@ -99,8 +97,8 @@ func UpdateServerCertificate(ctx context.Context, provider *client.NumSpotSDK, i
 		return nil, err
 	}
 
-	if resp.Status() != string(rune(http.StatusNoContent)) {
-		return nil, errors.New("implement error http parsing")
+	if err = utils.ParseHTTPError(resp.Body, resp.StatusCode()); err != nil {
+		return nil, err
 	}
 
 	return ReadServerCertificate(ctx, provider, id)

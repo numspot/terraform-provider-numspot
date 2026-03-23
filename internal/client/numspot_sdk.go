@@ -127,7 +127,6 @@ func (s *NumSpotSDK) GetClient(ctx context.Context) (*api.ClientWithResponses, e
 		if err := s.authenticateUser(ctx); err != nil {
 			return nil, fmt.Errorf("error while refreshing access token : %v", err)
 		}
-		s.AccessTokenExpiration = time.Now()
 	}
 	return s.Client, nil
 }
