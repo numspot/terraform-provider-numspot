@@ -36,3 +36,15 @@ acc-tests-report.xml
 *.winfile eol=crlf
 
 /tmp
+
+# Certificates and private keys
+*.pem
+*.crt
+*.cer
+*.key
+*.p12
+*.pfx
+*.der
+
+# local build
+terraform-provider-numspot

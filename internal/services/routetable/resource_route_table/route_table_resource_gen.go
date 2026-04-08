@@ -210,11 +210,19 @@ func RouteTableResourceSchema(ctx context.Context) schema.Schema {
 			},
 			"subnet_id": schema.StringAttribute{
 				Optional:            true,
-				Description:         "The state of the Subnet (`pending` \\| `available` \\| `deleted`).",
-				MarkdownDescription: "The state of the Subnet (`pending` \\| `available` \\| `deleted`).",
+				Description:         "The ID of the subnet to associate with the route table. Deprecated: use subnet_ids instead.",
+				MarkdownDescription: "The ID of the subnet to associate with the route table. Deprecated: use subnet_ids instead.",
+				DeprecationMessage:  "Use subnet_ids instead. This attribute will be removed in a future version.",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplaceIfConfigured(),
 				},
+			},
+			"subnet_ids": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Optional:            true,
+				Computed:            true,
+				Description:         "List of subnet IDs to associate with the route table.",
+				MarkdownDescription: "List of subnet IDs to associate with the route table.",
 			},
 			"tags": schema.SetNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
@@ -257,6 +265,7 @@ type RouteTableModel struct {
 	RoutePropagatingVirtualGateways types.List      `tfsdk:"route_propagating_virtual_gateways"`
 	Routes                          types.Set       `tfsdk:"routes"`
 	SubnetId                        types.String    `tfsdk:"subnet_id"`
+	SubnetIds                       types.List      `tfsdk:"subnet_ids"`
 	Tags                            types.Set       `tfsdk:"tags"`
 	VpcId                           types.String    `tfsdk:"vpc_id"`
 }

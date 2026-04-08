@@ -2,6 +2,7 @@ package routetable
 
 import (
 	"context"
+	"sort"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -59,17 +60,37 @@ func (r *routeTableResource) Create(ctx context.Context, request resource.Create
 		return
 	}
 
+	if !plan.SubnetId.IsNull() && len(plan.SubnetIds.Elements()) > 0 {
+		response.Diagnostics.AddError(
+			"Invalid configuration",
+			"subnet_id and subnet_ids cannot both be specified. Use subnet_ids (subnet_id is deprecated)",
+		)
+		return
+	}
+
+	var subnetIds []string
+	if !plan.SubnetId.IsNull() {
+		subnetIds = []string{plan.SubnetId.ValueString()}
+	} else if !plan.SubnetIds.IsNull() && !plan.SubnetIds.IsUnknown() {
+		var ids []string
+		response.Diagnostics.Append(plan.SubnetIds.ElementsAs(ctx, &ids, false)...)
+		if response.Diagnostics.HasError() {
+			return
+		}
+		subnetIds = ids
+	}
+
 	payload := deserializeCreateRouteTable(&plan)
 	tagsList := routeTableTags(ctx, plan.Tags)
 	routes := deserializeRoutes(ctx, plan.Routes)
 
-	res, err := core.CreateRouteTable(ctx, r.provider, payload, tagsList, routes, plan.SubnetId.ValueStringPointer())
+	res, err := core.CreateRouteTable(ctx, r.provider, payload, tagsList, routes, subnetIds)
 	if err != nil {
 		response.Diagnostics.AddError("unable to create route table", err.Error())
 		return
 	}
 
-	tf := serializeRouteTable(ctx, res, &response.Diagnostics)
+	tf := serializeRouteTable(ctx, res, &plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -94,6 +115,7 @@ func (r *routeTableResource) Read(ctx context.Context, request resource.ReadRequ
 	tf := serializeRouteTable(
 		ctx,
 		res,
+		&state,
 		&response.Diagnostics,
 	)
 	if response.Diagnostics.HasError() {
@@ -120,6 +142,14 @@ func (r *routeTableResource) Update(ctx context.Context, request resource.Update
 		return
 	}
 
+	if !plan.SubnetId.IsNull() && len(plan.SubnetIds.Elements()) > 0 {
+		response.Diagnostics.AddError(
+			"Invalid configuration",
+			"subnet_id and subnet_ids cannot both be specified. Use subnet_ids (subnet_id is deprecated)",
+		)
+		return
+	}
+
 	stateTags := routeTableTags(ctx, state.Tags)
 	planTags := routeTableTags(ctx, plan.Tags)
 	if !state.Tags.Equal(plan.Tags) {
@@ -140,7 +170,71 @@ func (r *routeTableResource) Update(ctx context.Context, request resource.Update
 		}
 	}
 
-	tf := serializeRouteTable(ctx, routeTable, &response.Diagnostics)
+	var desiredSubnetIds []string
+	if !plan.SubnetId.IsNull() {
+		desiredSubnetIds = []string{plan.SubnetId.ValueString()}
+	} else if !plan.SubnetIds.IsNull() && !plan.SubnetIds.IsUnknown() {
+		var ids []string
+		response.Diagnostics.Append(plan.SubnetIds.ElementsAs(ctx, &ids, false)...)
+		if response.Diagnostics.HasError() {
+			return
+		}
+		desiredSubnetIds = ids
+	}
+
+	var stateSubnetIds []string
+	if !state.SubnetId.IsNull() {
+		stateSubnetIds = []string{state.SubnetId.ValueString()}
+	} else if !state.SubnetIds.IsNull() && !state.SubnetIds.IsUnknown() {
+		var ids []string
+		response.Diagnostics.Append(state.SubnetIds.ElementsAs(ctx, &ids, false)...)
+		if response.Diagnostics.HasError() {
+			return
+		}
+		stateSubnetIds = ids
+	}
+
+	subnetChanged := true
+	if len(desiredSubnetIds) == len(stateSubnetIds) {
+		stateSet := make(map[string]bool)
+		for _, id := range stateSubnetIds {
+			stateSet[id] = true
+		}
+		subnetChanged = false
+		for _, id := range desiredSubnetIds {
+			if !stateSet[id] {
+				subnetChanged = true
+				break
+			}
+		}
+	}
+
+	if subnetChanged && routeTable == nil {
+		res, err := core.ReadRouteTable(ctx, r.provider, state.Id.ValueString())
+		if err != nil {
+			response.Diagnostics.AddError("unable to read route table", err.Error())
+			return
+		}
+		routeTable = res
+	}
+
+	if subnetChanged {
+		routeTable, err = core.UpdateRouteTableSubnets(ctx, r.provider, state.Id.ValueString(), desiredSubnetIds, *routeTable.LinkRouteTables)
+		if err != nil {
+			response.Diagnostics.AddError("unable to update route table subnet associations", err.Error())
+			return
+		}
+	}
+
+	if routeTable == nil {
+		routeTable, err = core.ReadRouteTable(ctx, r.provider, state.Id.ValueString())
+		if err != nil {
+			response.Diagnostics.AddError("unable to read route table", err.Error())
+			return
+		}
+	}
+
+	tf := serializeRouteTable(ctx, routeTable, &plan, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -212,7 +306,7 @@ func serializeLocalRoute(ctx context.Context, route api.Route, diags *diag.Diagn
 	return value
 }
 
-func serializeRouteTable(ctx context.Context, http *api.RouteTable, diags *diag.Diagnostics) *resource_route_table.RouteTableModel {
+func serializeRouteTable(ctx context.Context, http *api.RouteTable, existingModel *resource_route_table.RouteTableModel, diags *diag.Diagnostics) *resource_route_table.RouteTableModel {
 	var (
 		localRoute resource_route_table.LocalRouteValue
 		routes     []api.Route
@@ -243,11 +337,52 @@ func serializeRouteTable(ctx context.Context, http *api.RouteTable, diags *diag.
 		return nil
 	}
 
-	var subnetId *string
+	var allSubnetIds []string
 	for _, assoc := range *http.LinkRouteTables {
 		if assoc.SubnetId != nil {
-			subnetId = assoc.SubnetId
-			break
+			allSubnetIds = append(allSubnetIds, *assoc.SubnetId)
+		}
+	}
+
+	var subnetIdTf types.String
+	var subnetIdsTf types.List
+
+	useSubnetId := existingModel != nil && !existingModel.SubnetId.IsNull() && !existingModel.SubnetId.IsUnknown()
+	useSubnetIds := existingModel != nil && !existingModel.SubnetIds.IsNull() && !existingModel.SubnetIds.IsUnknown()
+
+	if useSubnetIds {
+		if len(allSubnetIds) > 0 {
+			var userSubnetIds []string
+			existingModel.SubnetIds.ElementsAs(ctx, &userSubnetIds, false)
+			apiSubnetSet := make(map[string]bool)
+			for _, id := range allSubnetIds {
+				apiSubnetSet[id] = true
+			}
+			var orderedSubnetIds []string
+			for _, id := range userSubnetIds {
+				if apiSubnetSet[id] {
+					orderedSubnetIds = append(orderedSubnetIds, id)
+				}
+			}
+			subnetIdsTf = utils.StringListToTfListValue(ctx, orderedSubnetIds, diags)
+		} else {
+			subnetIdsTf = existingModel.SubnetIds
+		}
+		subnetIdTf = types.StringNull()
+	} else if useSubnetId {
+		subnetIdTf = existingModel.SubnetId
+		subnetIdsTf = types.ListNull(types.StringType)
+	} else {
+		sort.Strings(allSubnetIds)
+		if len(allSubnetIds) > 1 {
+			subnetIdsTf = utils.StringListToTfListValue(ctx, allSubnetIds, diags)
+			subnetIdTf = types.StringNull()
+		} else if len(allSubnetIds) == 1 {
+			subnetIdTf = types.StringValue(allSubnetIds[0])
+			subnetIdsTf = types.ListNull(types.StringType)
+		} else {
+			subnetIdTf = types.StringNull()
+			subnetIdsTf = types.ListNull(types.StringType)
 		}
 	}
 
@@ -264,7 +399,8 @@ func serializeRouteTable(ctx context.Context, http *api.RouteTable, diags *diag.
 		VpcId:                           types.StringPointerValue(http.VpcId),
 		RoutePropagatingVirtualGateways: types.ListNull(resource_route_table.RoutePropagatingVirtualGatewaysValue{}.Type(ctx)),
 		Routes:                          tfRoutes,
-		SubnetId:                        types.StringPointerValue(subnetId),
+		SubnetId:                        subnetIdTf,
+		SubnetIds:                       subnetIdsTf,
 		Tags:                            tagsTf,
 		LocalRoute:                      localRoute,
 	}

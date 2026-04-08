@@ -39,7 +39,7 @@ func CreateRouteTable(
 	payload api.CreateRouteTableJSONRequestBody,
 	tags []api.ResourceTag,
 	routes []api.Route,
-	subnetID *string,
+	subnetIds []string,
 ) (*api.RouteTable, error) {
 	res, err := utils.RetryCreateUntilResourceAvailableWithBody(
 		ctx,
@@ -64,8 +64,8 @@ func CreateRouteTable(
 		}
 	}
 
-	if subnetID != nil {
-		if err = linkRouteTable(ctx, provider, createdID, *subnetID); err != nil {
+	for _, subnetId := range subnetIds {
+		if err = linkRouteTable(ctx, provider, createdID, subnetId); err != nil {
 			return nil, err
 		}
 	}
@@ -113,6 +113,44 @@ func UpdateRouteTableTags(
 		return nil, err
 	}
 	return ReadRouteTable(ctx, provider, id)
+}
+
+func UpdateRouteTableSubnets(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	routeTableId string,
+	desiredSubnetIds []string,
+	currentLinks []api.LinkRouteTable,
+) (*api.RouteTable, error) {
+	currentSubnetToLink := make(map[string]string)
+	for _, link := range currentLinks {
+		if link.SubnetId != nil {
+			currentSubnetToLink[*link.SubnetId] = *link.Id
+		}
+	}
+
+	desiredSet := make(map[string]bool)
+	for _, subnetId := range desiredSubnetIds {
+		desiredSet[subnetId] = true
+	}
+
+	for subnetId, linkId := range currentSubnetToLink {
+		if !desiredSet[subnetId] {
+			if err := unlinkRouteTable(ctx, provider, routeTableId, linkId); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	for _, subnetId := range desiredSubnetIds {
+		if _, exists := currentSubnetToLink[subnetId]; !exists {
+			if err := linkRouteTable(ctx, provider, routeTableId, subnetId); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return ReadRouteTable(ctx, provider, routeTableId)
 }
 
 func createRouteTableRoutes(ctx context.Context, provider *client.NumSpotSDK, routeTableId string, routes []api.Route) error {
