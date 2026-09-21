@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/sdk/api"
@@ -22,7 +23,7 @@ func ReadKubernetesClusters(ctx context.Context, provider *client.NumSpotSDK) ([
 	return res.JSON200.Items, err
 }
 
-func CreateKubernetesCluster(ctx context.Context, provider *client.NumSpotSDK, numSpotClusterCreate api.CreateKubernetesClusterJSONRequestBody) (*api.KubernetesCluster, error) {
+func CreateKubernetesCluster(ctx context.Context, provider *client.NumSpotSDK, numSpotClusterCreate api.CreateKubernetesClusterJSONRequestBody, timeout *time.Duration) (*api.KubernetesCluster, error) {
 	res, err := provider.Client.CreateKubernetesClusterWithResponse(ctx, provider.SpaceID, numSpotClusterCreate)
 	if err != nil {
 		return nil, err
@@ -34,7 +35,12 @@ func CreateKubernetesCluster(ctx context.Context, provider *client.NumSpotSDK, n
 
 	createdID := res.JSON201.Id
 
-	read, err := utils.RetryReadUntilStatusStateValid(ctx, createdID, provider.SpaceID, utils.StateRetryOnCreate, utils.StateStopRetryOnCreate, provider.Client.GetKubernetesClusterWithResponse)
+	retryTimeout := utils.TfRequestStateRetryTimeout
+	if timeout != nil {
+		retryTimeout = *timeout
+	}
+
+	read, err := utils.RetryReadUntilStatusStateValidWithTimeout(ctx, createdID, provider.SpaceID, utils.StateRetryOnCreate, utils.StateStopRetryOnCreate, provider.Client.GetKubernetesClusterWithResponse, retryTimeout)
 	if err != nil {
 		return nil, err
 	}

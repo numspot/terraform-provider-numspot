@@ -17,7 +17,7 @@ resource "numspot_kubernetes_cluster" "kubernetes-cluster" {
   cidr       = "10.20.0.0/16"
   name       = "test-tf-kube"
   profile    = "small"
-  version    = "1.32"
+  version    = "1.33"
   visibility = "EXTERNAL"
 }
 ```
@@ -36,6 +36,7 @@ resource "numspot_kubernetes_cluster" "kubernetes-cluster" {
 ### Optional
 
 - `cluster_id` (String) Identifier of the Cluster
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 
 ### Read-Only
 
@@ -43,6 +44,14 @@ resource "numspot_kubernetes_cluster" "kubernetes-cluster" {
 - `full_version` (String) Cluster Kubernetes patch version.
 - `id` (String) A string representing uuid.
 - `status` (Attributes) (see [below for nested schema](#nestedatt--status))
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String) Timeout for cluster creation. Defaults to 15m.
+
 
 <a id="nestedatt--status"></a>
 ### Nested Schema for `status`

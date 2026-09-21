@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"terraform-provider-numspot/internal/client"
@@ -16,7 +17,10 @@ import (
 	"terraform-provider-numspot/internal/services/kubernetes_cluster/resource_kubernetes_cluster"
 )
 
-var _ resource.Resource = &kubernetesClusterResource{}
+var (
+	_ resource.Resource                = &kubernetesClusterResource{}
+	_ resource.ResourceWithImportState = &kubernetesClusterResource{}
+)
 
 type kubernetesClusterResource struct {
 	provider *client.NumSpotSDK
@@ -43,6 +47,10 @@ func (r *kubernetesClusterResource) Schema(ctx context.Context, _ resource.Schem
 	resp.Schema = resource_kubernetes_cluster.KubernetesClusterResourceSchema(ctx)
 }
 
+func (r *kubernetesClusterResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+}
+
 func (r *kubernetesClusterResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan resource_kubernetes_cluster.KubernetesClusterModel
 
@@ -52,14 +60,22 @@ func (r *kubernetesClusterResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	createClusterRequest := deserializeCreateCluster(plan)
+	timeout := parseCreateTimeout(plan, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	cluster, err := core.CreateKubernetesCluster(ctx, r.provider, createClusterRequest)
+	cluster, err := core.CreateKubernetesCluster(ctx, r.provider, createClusterRequest, timeout)
 	if err != nil {
 		resp.Diagnostics.AddError("unable to create kubernetes cluster", err.Error())
 		return
 	}
 
-	state := serializeCluster(ctx, cluster, &resp.Diagnostics)
+	timeouts := plan.Timeouts
+	if timeouts.IsNull() {
+		timeouts = resource_kubernetes_cluster.NewTimeoutsValueNull()
+	}
+	state := serializeCluster(ctx, cluster, &resp.Diagnostics, timeouts)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -75,6 +91,19 @@ func deserializeCreateCluster(tf resource_kubernetes_cluster.KubernetesClusterMo
 		Version:    api.KubernetesClusterCreateVersion(tf.Version.ValueString()),
 		Visibility: api.Visibility(tf.Visibility.ValueString()),
 	}
+}
+
+func parseCreateTimeout(plan resource_kubernetes_cluster.KubernetesClusterModel, diags *diag.Diagnostics) *time.Duration {
+	if plan.Timeouts.IsNull() || plan.Timeouts.Create.IsNull() || plan.Timeouts.Create.IsUnknown() {
+		return nil
+	}
+	timeoutStr := plan.Timeouts.Create.ValueString()
+	timeout, err := time.ParseDuration(timeoutStr)
+	if err != nil {
+		diags.AddError("invalid timeout format", err.Error())
+		return nil
+	}
+	return &timeout
 }
 
 func (r *kubernetesClusterResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -96,7 +125,11 @@ func (r *kubernetesClusterResource) Read(ctx context.Context, req resource.ReadR
 		return
 	}
 
-	newState := serializeCluster(ctx, numSpotCluster, &resp.Diagnostics)
+	timeouts := state.Timeouts
+	if timeouts.IsNull() {
+		timeouts = resource_kubernetes_cluster.NewTimeoutsValueNull()
+	}
+	newState := serializeCluster(ctx, numSpotCluster, &resp.Diagnostics, timeouts)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -105,7 +138,40 @@ func (r *kubernetesClusterResource) Read(ctx context.Context, req resource.ReadR
 }
 
 func (r *kubernetesClusterResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// No implementation at this time
+	var plan resource_kubernetes_cluster.KubernetesClusterModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state resource_kubernetes_cluster.KubernetesClusterModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	clusterUuid, err := uuid.Parse(state.Id.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("unable to parse cluster id", err.Error())
+		return
+	}
+
+	numSpotCluster, err := core.ReadKubernetesCluster(ctx, r.provider, clusterUuid)
+	if err != nil {
+		resp.Diagnostics.AddError("unable to read kubernetes cluster", err.Error())
+		return
+	}
+
+	timeouts := plan.Timeouts
+	if timeouts.IsNull() {
+		timeouts = resource_kubernetes_cluster.NewTimeoutsValueNull()
+	}
+	newState := serializeCluster(ctx, numSpotCluster, &resp.Diagnostics, timeouts)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &newState)...)
 }
 
 func (r *kubernetesClusterResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -127,7 +193,7 @@ func (r *kubernetesClusterResource) Delete(ctx context.Context, req resource.Del
 	}
 }
 
-func serializeCluster(ctx context.Context, cluster *api.GetKubernetesCluster200Response, diags *diag.Diagnostics) resource_kubernetes_cluster.KubernetesClusterModel {
+func serializeCluster(ctx context.Context, cluster *api.GetKubernetesCluster200Response, diags *diag.Diagnostics, timeouts resource_kubernetes_cluster.TimeoutsValue) resource_kubernetes_cluster.KubernetesClusterModel {
 	var createdOn types.String
 
 	status, diagnostics := resource_kubernetes_cluster.NewStatusValue(resource_kubernetes_cluster.StatusValue{}.AttributeTypes(ctx),
@@ -157,5 +223,6 @@ func serializeCluster(ctx context.Context, cluster *api.GetKubernetesCluster200R
 		Status:      status,
 		Version:     types.StringValue(cluster.Version),
 		Visibility:  types.StringValue(string(cluster.Visibility)),
+		Timeouts:    timeouts,
 	}
 }

@@ -72,9 +72,9 @@ func ReadBucket(ctx context.Context, provider *client.NumSpotSDK, bucketName str
 	ll := len(res.AllBuckets.Buckets)
 	brk := false
 	for i := 0; ll > i && !brk; i++ {
-		if bucketName == (res.AllBuckets.Buckets)[i].Name {
+		if bucketName == res.AllBuckets.Buckets[i].Name {
 			brk = true
-			ret = (res.AllBuckets.Buckets)[i]
+			ret = res.AllBuckets.Buckets[i]
 		}
 	}
 

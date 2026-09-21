@@ -2,6 +2,7 @@ package kubernetes_nodepool
 
 import (
 	"context"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -16,7 +17,10 @@ import (
 	"terraform-provider-numspot/internal/utils"
 )
 
-var _ resource.Resource = (*kubernetesNodepoolResource)(nil)
+var (
+	_ resource.Resource                = (*kubernetesNodepoolResource)(nil)
+	_ resource.ResourceWithImportState = (*kubernetesNodepoolResource)(nil)
+)
 
 type kubernetesNodepoolResource struct {
 	provider *client.NumSpotSDK
@@ -41,6 +45,22 @@ func (r *kubernetesNodepoolResource) Metadata(ctx context.Context, req resource.
 
 func (r *kubernetesNodepoolResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = resource_kubernetes_nodepool.KubernetesNodepoolResourceSchema(ctx)
+}
+
+func (r *kubernetesNodepoolResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	parts := strings.Split(req.ID, "/")
+	if len(parts) != 2 {
+		resp.Diagnostics.AddError(
+			"invalid import ID format",
+			"expected format: cluster_id/nodepool_id (e.g., abc123-def456/789xyz)",
+		)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &resource_kubernetes_nodepool.KubernetesNodepoolModel{
+		ClusterId: types.StringValue(parts[0]),
+		Id:        types.StringValue(parts[1]),
+	})...)
 }
 
 func (r *kubernetesNodepoolResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -87,8 +107,8 @@ func deserializeCreateNodePool(tf resource_kubernetes_nodepool.KubernetesNodepoo
 
 	if !(tf.Autoscaling.IsNull() || tf.Autoscaling.IsUnknown()) {
 		autoscalling = &api.Autoscaling{
-			Max: utils.FromTfInt64ToInt(tf.RootDisk.Iops),
-			Min: utils.FromTfInt64ToInt(tf.RootDisk.Size),
+			Max: utils.FromTfInt64ToInt(tf.Autoscaling.Max),
+			Min: utils.FromTfInt64ToInt(tf.Autoscaling.Min),
 		}
 	}
 
@@ -132,7 +152,37 @@ func (r *kubernetesNodepoolResource) Read(ctx context.Context, req resource.Read
 }
 
 func (r *kubernetesNodepoolResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// No implementation at this time
+	var plan resource_kubernetes_nodepool.KubernetesNodepoolModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state resource_kubernetes_nodepool.KubernetesNodepoolModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	clusterUuid, err := uuid.Parse(state.ClusterId.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError("unable to parse cluster id", err.Error())
+		return
+	}
+	nodePoolId := state.Id.ValueString()
+
+	nodePool, err := core.ReadKubernetesNodePool(ctx, r.provider, clusterUuid, nodePoolId)
+	if err != nil {
+		resp.Diagnostics.AddError("unable to read kubernetes node pool", err.Error())
+		return
+	}
+
+	newState := serializeNodePool(ctx, nodePool, &resp.Diagnostics, plan)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &newState)...)
 }
 
 func (r *kubernetesNodepoolResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -179,15 +229,26 @@ func serializeNodePool(ctx context.Context, nodePool *api.CreateKubernetesNodePo
 		diags.Append(diagnostics...)
 	}
 
+	var autoscaling resource_kubernetes_nodepool.AutoscalingValue
+	if plan.Autoscaling.IsNull() || plan.Autoscaling.IsUnknown() {
+		autoscaling = resource_kubernetes_nodepool.AutoscalingValue{}
+	} else {
+		autoscaling = plan.Autoscaling
+	}
+
 	return resource_kubernetes_nodepool.KubernetesNodepoolModel{
 		AvailabilityZone: types.StringValue(string(nodePool.AvailabilityZone)),
+		Autoscaling:      autoscaling,
 		ClusterId:        types.StringValue(plan.ClusterId.ValueString()),
 		Id:               types.StringValue(nodePool.Id.String()),
 		Name:             types.StringPointerValue(nodePool.Name),
-		NodePoolId:       types.StringValue(plan.NodePoolId.ValueString()),
+		NodePoolId:       types.StringValue(nodePool.Id.String()),
 		NodeProfile:      types.StringValue(string(nodePool.NodeProfile)),
-		Replicas:         types.Int64Value(int64(nodePool.Replicas)),
-		RootDisk:         rootDisk,
-		Status:           status,
+		// The API returns the *current* replica count (0 while the pool is
+		// being created), not the desired one. Keep the planned/configured
+		// value so refresh does not show drift during provisioning.
+		Replicas: plan.Replicas,
+		RootDisk: rootDisk,
+		Status:   status,
 	}
 }

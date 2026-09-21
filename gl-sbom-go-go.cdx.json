@@ -1,10 +1,10 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
-  "serialNumber": "urn:uuid:1358210a-0bdf-4749-844a-e96710e37b11",
+  "serialNumber": "urn:uuid:ef9bf793-f13b-47e0-ab1a-67f3e6e28f3f",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-04-08T13:22:43Z",
+    "timestamp": "2026-09-21T09:14:57Z",
     "tools": [
       {
         "vendor": "GitLab",
@@ -533,10 +533,10 @@
     },
     {
       "name": "golang.org/x/crypto",
-      "version": "v0.47.0",
-      "purl": "pkg:golang/golang.org/x/crypto@v0.47.0",
+      "version": "v0.52.0",
+      "purl": "pkg:golang/golang.org/x/crypto@v0.52.0",
       "type": "library",
-      "bom-ref": "pkg:golang/golang.org/x/crypto@v0.47.0"
+      "bom-ref": "pkg:golang/golang.org/x/crypto@v0.52.0"
     },
     {
       "name": "golang.org/x/exp",
@@ -547,45 +547,45 @@
     },
     {
       "name": "golang.org/x/mod",
-      "version": "v0.31.0",
-      "purl": "pkg:golang/golang.org/x/mod@v0.31.0",
+      "version": "v0.35.0",
+      "purl": "pkg:golang/golang.org/x/mod@v0.35.0",
       "type": "library",
-      "bom-ref": "pkg:golang/golang.org/x/mod@v0.31.0"
+      "bom-ref": "pkg:golang/golang.org/x/mod@v0.35.0"
     },
     {
       "name": "golang.org/x/net",
-      "version": "v0.49.0",
-      "purl": "pkg:golang/golang.org/x/net@v0.49.0",
+      "version": "v0.55.0",
+      "purl": "pkg:golang/golang.org/x/net@v0.55.0",
       "type": "library",
-      "bom-ref": "pkg:golang/golang.org/x/net@v0.49.0"
+      "bom-ref": "pkg:golang/golang.org/x/net@v0.55.0"
     },
     {
       "name": "golang.org/x/sync",
-      "version": "v0.19.0",
-      "purl": "pkg:golang/golang.org/x/sync@v0.19.0",
+      "version": "v0.20.0",
+      "purl": "pkg:golang/golang.org/x/sync@v0.20.0",
       "type": "library",
-      "bom-ref": "pkg:golang/golang.org/x/sync@v0.19.0"
+      "bom-ref": "pkg:golang/golang.org/x/sync@v0.20.0"
     },
     {
       "name": "golang.org/x/sys",
-      "version": "v0.40.0",
-      "purl": "pkg:golang/golang.org/x/sys@v0.40.0",
+      "version": "v0.45.0",
+      "purl": "pkg:golang/golang.org/x/sys@v0.45.0",
       "type": "library",
-      "bom-ref": "pkg:golang/golang.org/x/sys@v0.40.0"
+      "bom-ref": "pkg:golang/golang.org/x/sys@v0.45.0"
     },
     {
       "name": "golang.org/x/text",
-      "version": "v0.33.0",
-      "purl": "pkg:golang/golang.org/x/text@v0.33.0",
+      "version": "v0.37.0",
+      "purl": "pkg:golang/golang.org/x/text@v0.37.0",
       "type": "library",
-      "bom-ref": "pkg:golang/golang.org/x/text@v0.33.0"
+      "bom-ref": "pkg:golang/golang.org/x/text@v0.37.0"
     },
     {
       "name": "golang.org/x/tools",
-      "version": "v0.40.0",
-      "purl": "pkg:golang/golang.org/x/tools@v0.40.0",
+      "version": "v0.44.0",
+      "purl": "pkg:golang/golang.org/x/tools@v0.44.0",
       "type": "library",
-      "bom-ref": "pkg:golang/golang.org/x/tools@v0.40.0"
+      "bom-ref": "pkg:golang/golang.org/x/tools@v0.44.0"
     },
     {
       "name": "google.golang.org/appengine",
@@ -596,17 +596,17 @@
     },
     {
       "name": "google.golang.org/genproto/googleapis/rpc",
-      "version": "v0.0.0-20260120221211-b8f7ae30c516",
-      "purl": "pkg:golang/google.golang.org/genproto/googleapis/rpc@v0.0.0-20260120221211-b8f7ae30c516",
+      "version": "v0.0.0-20260526163538-3dc84a4a5aaa",
+      "purl": "pkg:golang/google.golang.org/genproto/googleapis/rpc@v0.0.0-20260526163538-3dc84a4a5aaa",
       "type": "library",
-      "bom-ref": "pkg:golang/google.golang.org/genproto/googleapis/rpc@v0.0.0-20260120221211-b8f7ae30c516"
+      "bom-ref": "pkg:golang/google.golang.org/genproto/googleapis/rpc@v0.0.0-20260526163538-3dc84a4a5aaa"
     },
     {
       "name": "google.golang.org/grpc",
-      "version": "v1.80.0",
-      "purl": "pkg:golang/google.golang.org/grpc@v1.80.0",
+      "version": "v1.83.1",
+      "purl": "pkg:golang/google.golang.org/grpc@v1.83.1",
       "type": "library",
-      "bom-ref": "pkg:golang/google.golang.org/grpc@v1.80.0"
+      "bom-ref": "pkg:golang/google.golang.org/grpc@v1.83.1"
     },
     {
       "name": "google.golang.org/protobuf",

@@ -5,19 +5,19 @@ package resource_kubernetes_cluster
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	"regexp"
-	"strings"
-
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
 func KubernetesClusterResourceSchema(ctx context.Context) schema.Schema {
@@ -99,6 +99,21 @@ func KubernetesClusterResourceSchema(ctx context.Context) schema.Schema {
 				},
 				Computed: true,
 			},
+			"timeouts": schema.SingleNestedAttribute{
+				Attributes: map[string]schema.Attribute{
+					"create": schema.StringAttribute{
+						Optional:            true,
+						Description:         "Timeout for cluster creation. Defaults to 15m.",
+						MarkdownDescription: "Timeout for cluster creation. Defaults to 15m.",
+					},
+				},
+				CustomType: TimeoutsType{
+					ObjectType: types.ObjectType{
+						AttrTypes: TimeoutsValue{}.AttributeTypes(ctx),
+					},
+				},
+				Optional: true,
+			},
 			"version": schema.StringAttribute{
 				Required:            true,
 				Description:         "Kubernetes version of the cluster.",
@@ -134,16 +149,17 @@ func KubernetesClusterResourceSchema(ctx context.Context) schema.Schema {
 }
 
 type KubernetesClusterModel struct {
-	Cidr        types.String `tfsdk:"cidr"`
-	ClusterId   types.String `tfsdk:"cluster_id"`
-	CreatedOn   types.String `tfsdk:"created_on"`
-	FullVersion types.String `tfsdk:"full_version"`
-	Id          types.String `tfsdk:"id"`
-	Name        types.String `tfsdk:"name"`
-	Profile     types.String `tfsdk:"profile"`
-	Status      StatusValue  `tfsdk:"status"`
-	Version     types.String `tfsdk:"version"`
-	Visibility  types.String `tfsdk:"visibility"`
+	Cidr        types.String  `tfsdk:"cidr"`
+	ClusterId   types.String  `tfsdk:"cluster_id"`
+	CreatedOn   types.String  `tfsdk:"created_on"`
+	FullVersion types.String  `tfsdk:"full_version"`
+	Id          types.String  `tfsdk:"id"`
+	Name        types.String  `tfsdk:"name"`
+	Profile     types.String  `tfsdk:"profile"`
+	Status      StatusValue   `tfsdk:"status"`
+	Timeouts    TimeoutsValue `tfsdk:"timeouts"`
+	Version     types.String  `tfsdk:"version"`
+	Visibility  types.String  `tfsdk:"visibility"`
 }
 
 var _ basetypes.ObjectTypable = StatusType{}
@@ -522,5 +538,329 @@ func (v StatusValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
 	return map[string]attr.Type{
 		"message": basetypes.StringType{},
 		"state":   basetypes.StringType{},
+	}
+}
+
+var _ basetypes.ObjectTypable = TimeoutsType{}
+
+type TimeoutsType struct {
+	basetypes.ObjectType
+}
+
+func (t TimeoutsType) Equal(o attr.Type) bool {
+	other, ok := o.(TimeoutsType)
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t TimeoutsType) String() string {
+	return "TimeoutsType"
+}
+
+func (t TimeoutsType) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributes := in.Attributes()
+
+	createAttribute, ok := attributes["create"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`create is missing from object`)
+
+		return nil, diags
+	}
+
+	createVal, ok := createAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`create expected to be basetypes.StringValue, was: %T`, createAttribute))
+	}
+
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return TimeoutsValue{
+		Create: createVal,
+		state:  attr.ValueStateKnown,
+	}, diags
+}
+
+func NewTimeoutsValueNull() TimeoutsValue {
+	return TimeoutsValue{
+		state: attr.ValueStateNull,
+	}
+}
+
+func NewTimeoutsValueUnknown() TimeoutsValue {
+	return TimeoutsValue{
+		state: attr.ValueStateUnknown,
+	}
+}
+
+func NewTimeoutsValue(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) (TimeoutsValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	// Reference: https://github.com/hashicorp/terraform-plugin-framework/issues/521
+	ctx := context.Background()
+
+	for name, attributeType := range attributeTypes {
+		attribute, ok := attributes[name]
+
+		if !ok {
+			diags.AddError(
+				"Missing TimeoutsValue Attribute Value",
+				"While creating a TimeoutsValue value, a missing attribute value was detected. "+
+					"A TimeoutsValue must contain values for all attributes, even if null or unknown. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("TimeoutsValue Attribute Name (%s) Expected Type: %s", name, attributeType.String()),
+			)
+
+			continue
+		}
+
+		if !attributeType.Equal(attribute.Type(ctx)) {
+			diags.AddError(
+				"Invalid TimeoutsValue Attribute Type",
+				"While creating a TimeoutsValue value, an invalid attribute value was detected. "+
+					"A TimeoutsValue must use a matching attribute type for the value. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("TimeoutsValue Attribute Name (%s) Expected Type: %s\n", name, attributeType.String())+
+					fmt.Sprintf("TimeoutsValue Attribute Name (%s) Given Type: %s", name, attribute.Type(ctx)),
+			)
+		}
+	}
+
+	for name := range attributes {
+		_, ok := attributeTypes[name]
+
+		if !ok {
+			diags.AddError(
+				"Extra TimeoutsValue Attribute Value",
+				"While creating a TimeoutsValue value, an extra attribute value was detected. "+
+					"A TimeoutsValue must not contain values beyond the expected attribute types. "+
+					"This is always an issue with the provider and should be reported to the provider developers.\n\n"+
+					fmt.Sprintf("Extra TimeoutsValue Attribute Name: %s", name),
+			)
+		}
+	}
+
+	if diags.HasError() {
+		return NewTimeoutsValueUnknown(), diags
+	}
+
+	createAttribute, ok := attributes["create"]
+
+	if !ok {
+		diags.AddError(
+			"Attribute Missing",
+			`create is missing from object`)
+
+		return NewTimeoutsValueUnknown(), diags
+	}
+
+	createVal, ok := createAttribute.(basetypes.StringValue)
+
+	if !ok {
+		diags.AddError(
+			"Attribute Wrong Type",
+			fmt.Sprintf(`create expected to be basetypes.StringValue, was: %T`, createAttribute))
+	}
+
+	if diags.HasError() {
+		return NewTimeoutsValueUnknown(), diags
+	}
+
+	return TimeoutsValue{
+		Create: createVal,
+		state:  attr.ValueStateKnown,
+	}, diags
+}
+
+func NewTimeoutsValueMust(attributeTypes map[string]attr.Type, attributes map[string]attr.Value) TimeoutsValue {
+	object, diags := NewTimeoutsValue(attributeTypes, attributes)
+
+	if diags.HasError() {
+		// This could potentially be added to the diag package.
+		diagsStrings := make([]string, 0, len(diags))
+
+		for _, diagnostic := range diags {
+			diagsStrings = append(diagsStrings, fmt.Sprintf(
+				"%s | %s | %s",
+				diagnostic.Severity(),
+				diagnostic.Summary(),
+				diagnostic.Detail()))
+		}
+
+		panic("NewTimeoutsValueMust received error(s): " + strings.Join(diagsStrings, "\n"))
+	}
+
+	return object
+}
+
+func (t TimeoutsType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	if in.Type() == nil {
+		return NewTimeoutsValueNull(), nil
+	}
+
+	if !in.Type().Equal(t.TerraformType(ctx)) {
+		return nil, fmt.Errorf("expected %s, got %s", t.TerraformType(ctx), in.Type())
+	}
+
+	if !in.IsKnown() {
+		return NewTimeoutsValueUnknown(), nil
+	}
+
+	if in.IsNull() {
+		return NewTimeoutsValueNull(), nil
+	}
+
+	attributes := map[string]attr.Value{}
+
+	val := map[string]tftypes.Value{}
+
+	err := in.As(&val)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for k, v := range val {
+		a, err := t.AttrTypes[k].ValueFromTerraform(ctx, v)
+
+		if err != nil {
+			return nil, err
+		}
+
+		attributes[k] = a
+	}
+
+	return NewTimeoutsValueMust(TimeoutsValue{}.AttributeTypes(ctx), attributes), nil
+}
+
+func (t TimeoutsType) ValueType(ctx context.Context) attr.Value {
+	return TimeoutsValue{}
+}
+
+var _ basetypes.ObjectValuable = TimeoutsValue{}
+
+type TimeoutsValue struct {
+	Create basetypes.StringValue `tfsdk:"create"`
+	state  attr.ValueState
+}
+
+func (v TimeoutsValue) ToTerraformValue(ctx context.Context) (tftypes.Value, error) {
+	attrTypes := make(map[string]tftypes.Type, 1)
+
+	var val tftypes.Value
+	var err error
+
+	attrTypes["create"] = basetypes.StringType{}.TerraformType(ctx)
+
+	objectType := tftypes.Object{AttributeTypes: attrTypes}
+
+	switch v.state {
+	case attr.ValueStateKnown:
+		vals := make(map[string]tftypes.Value, 1)
+
+		val, err = v.Create.ToTerraformValue(ctx)
+
+		if err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		vals["create"] = val
+
+		if err := tftypes.ValidateValue(objectType, vals); err != nil {
+			return tftypes.NewValue(objectType, tftypes.UnknownValue), err
+		}
+
+		return tftypes.NewValue(objectType, vals), nil
+	case attr.ValueStateNull:
+		return tftypes.NewValue(objectType, nil), nil
+	case attr.ValueStateUnknown:
+		return tftypes.NewValue(objectType, tftypes.UnknownValue), nil
+	default:
+		panic(fmt.Sprintf("unhandled Object state in ToTerraformValue: %s", v.state))
+	}
+}
+
+func (v TimeoutsValue) IsNull() bool {
+	return v.state == attr.ValueStateNull
+}
+
+func (v TimeoutsValue) IsUnknown() bool {
+	return v.state == attr.ValueStateUnknown
+}
+
+func (v TimeoutsValue) String() string {
+	return "TimeoutsValue"
+}
+
+func (v TimeoutsValue) ToObjectValue(ctx context.Context) (basetypes.ObjectValue, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	attributeTypes := map[string]attr.Type{
+		"create": basetypes.StringType{},
+	}
+
+	if v.IsNull() {
+		return types.ObjectNull(attributeTypes), diags
+	}
+
+	if v.IsUnknown() {
+		return types.ObjectUnknown(attributeTypes), diags
+	}
+
+	objVal, diags := types.ObjectValue(
+		attributeTypes,
+		map[string]attr.Value{
+			"create": v.Create,
+		})
+
+	return objVal, diags
+}
+
+func (v TimeoutsValue) Equal(o attr.Value) bool {
+	other, ok := o.(TimeoutsValue)
+
+	if !ok {
+		return false
+	}
+
+	if v.state != other.state {
+		return false
+	}
+
+	if v.state != attr.ValueStateKnown {
+		return true
+	}
+
+	if !v.Create.Equal(other.Create) {
+		return false
+	}
+
+	return true
+}
+
+func (v TimeoutsValue) Type(ctx context.Context) attr.Type {
+	return TimeoutsType{
+		basetypes.ObjectType{
+			AttrTypes: v.AttributeTypes(ctx),
+		},
+	}
+}
+
+func (v TimeoutsValue) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"create": basetypes.StringType{},
 	}
 }

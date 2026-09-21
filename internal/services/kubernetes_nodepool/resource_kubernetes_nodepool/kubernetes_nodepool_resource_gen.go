@@ -29,12 +29,18 @@ func KubernetesNodepoolResourceSchema(ctx context.Context) schema.Schema {
 				Attributes: map[string]schema.Attribute{
 					"max": schema.Int64Attribute{
 						Required: true,
+						PlanModifiers: []planmodifier.Int64{
+							int64planmodifier.RequiresReplaceIfConfigured(),
+						},
 						Validators: []validator.Int64{
 							int64validator.Between(1, 20),
 						},
 					},
 					"min": schema.Int64Attribute{
 						Required: true,
+						PlanModifiers: []planmodifier.Int64{
+							int64planmodifier.RequiresReplaceIfConfigured(),
+						},
 						Validators: []validator.Int64{
 							int64validator.Between(1, 20),
 						},

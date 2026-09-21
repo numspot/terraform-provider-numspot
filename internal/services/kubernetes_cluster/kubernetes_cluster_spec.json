@@ -138,6 +138,21 @@
 			"schema": {
 				"attributes": [
 					{
+						"name": "timeouts",
+						"single_nested": {
+							"computed_optional_required": "optional",
+							"attributes": [
+								{
+									"name": "create",
+									"string": {
+										"computed_optional_required": "optional",
+										"description": "Timeout for cluster creation. Defaults to 15m."
+									}
+								}
+							]
+						}
+					},
+					{
 						"name": "cidr",
 						"string": {
 							"computed_optional_required": "required",

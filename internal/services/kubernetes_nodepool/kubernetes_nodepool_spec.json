@@ -157,42 +157,72 @@
 						"single_nested": {
 							"computed_optional_required": "computed_optional",
 							"attributes": [
-								{
-									"name": "max",
-									"int64": {
-										"computed_optional_required": "required",
-										"validators": [
-											{
-												"custom": {
-													"imports": [
-														{
-															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-														}
-													],
-													"schema_definition": "int64validator.Between(1, 20)"
-												}
+							{
+								"name": "max",
+								"int64": {
+									"computed_optional_required": "required",
+									"validators": [
+										{
+											"custom": {
+												"imports": [
+													{
+														"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+													}
+												],
+												"schema_definition": "int64validator.Between(1, 20)"
 											}
-										]
-									}
-								},
-								{
-									"name": "min",
-									"int64": {
-										"computed_optional_required": "required",
-										"validators": [
-											{
-												"custom": {
-													"imports": [
-														{
-															"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
-														}
-													],
-													"schema_definition": "int64validator.Between(1, 20)"
-												}
+										}
+									],
+									"plan_modifiers": [
+										{
+											"custom": {
+												"imports": [
+													{
+														"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+													},
+													{
+														"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+													}
+												],
+												"schema_definition": "int64planmodifier.RequiresReplaceIfConfigured()"
 											}
-										]
-									}
+										}
+									]
 								}
+							},
+							{
+								"name": "min",
+								"int64": {
+									"computed_optional_required": "required",
+									"validators": [
+										{
+											"custom": {
+												"imports": [
+													{
+														"path": "github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+													}
+												],
+												"schema_definition": "int64validator.Between(1, 20)"
+											}
+										}
+									],
+									"plan_modifiers": [
+										{
+											"custom": {
+												"imports": [
+													{
+														"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+													},
+													{
+														"path": "github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+													}
+												],
+												"schema_definition": "int64planmodifier.RequiresReplaceIfConfigured()"
+											}
+										}
+									]
+								}
+							}
 							]
 						}
 					},

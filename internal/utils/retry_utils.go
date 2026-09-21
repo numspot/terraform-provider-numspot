@@ -193,7 +193,7 @@ func RetryDeleteUntilWithBody[R TfRequestResp, BodyType any](
 }
 
 func getFieldFromReflectStructPtr(structPtr reflect.Value, fieldName string) (reflect.Value, error) {
-	if structPtr.Kind() != reflect.Ptr {
+	if structPtr.Kind() != reflect.Pointer {
 		return reflect.Value{}, fmt.Errorf("expected a pointer but found %v", structPtr)
 	}
 
@@ -248,7 +248,7 @@ func ReadResourceUtils[R TfRequestResp, id string | api.ResourceIdentifier](
 	}
 
 	var stateValue reflect.Value
-	if stateValuePtr.Kind() == reflect.Ptr {
+	if stateValuePtr.Kind() == reflect.Pointer {
 		stateValue = stateValuePtr.Elem()
 
 		if stateValue.Type().String() != "string" {
@@ -296,13 +296,25 @@ func RetryReadUntilStatusStateValid[R TfRequestResp, ID string | api.ResourceIde
 	targetStates []string,
 	readFunction func(context.Context, api.SpaceId, ID, ...api.RequestEditorFn) (*R, error),
 ) (interface{}, error) {
+	return RetryReadUntilStatusStateValidWithTimeout(ctx, createdId, spaceID, pendingStates, targetStates, readFunction, TfRequestStateRetryTimeout)
+}
+
+func RetryReadUntilStatusStateValidWithTimeout[R TfRequestResp, ID string | api.ResourceIdentifier](
+	ctx context.Context,
+	createdId ID,
+	spaceID api.SpaceId,
+	pendingStates []string,
+	targetStates []string,
+	readFunction func(context.Context, api.SpaceId, ID, ...api.RequestEditorFn) (*R, error),
+	timeout time.Duration,
+) (interface{}, error) {
 	createStateConf := &retry.StateChangeConf{
 		Pending: pendingStates,
 		Target:  targetStates,
 		Refresh: func() (interface{}, string, error) {
 			return ReadStatusResourceUtils(ctx, createdId, spaceID, readFunction)
 		},
-		Timeout: TfRequestStateRetryTimeout,
+		Timeout: timeout,
 		Delay:   ParseRetryBackoff(),
 	}
 
@@ -335,7 +347,7 @@ func ReadStatusResourceUtils[R TfRequestResp, id string | api.ResourceIdentifier
 	}
 
 	var stateValue reflect.Value
-	if stateValuePtr.Kind() == reflect.Ptr {
+	if stateValuePtr.Kind() == reflect.Pointer {
 		stateValue = stateValuePtr.Elem()
 
 		if stateValue.Type().String() != "string" {
@@ -354,6 +366,7 @@ func ReadStatusResourceUtils[R TfRequestResp, id string | api.ResourceIdentifier
 	return data, stateValueStr, nil
 }
 
+// RetryReadUntilStatusStateValidWith2ID This fonction is unused atm, this was for nodepool but for the long timout we canceled the retry
 func RetryReadUntilStatusStateValidWith2ID[R TfRequestResp, ID1, ID2 string | api.ResourceIdentifier](
 	ctx context.Context,
 	parentID ID1,
@@ -403,7 +416,7 @@ func ReadStatusResourceUtilsWith2ID[R TfRequestResp, ID1, ID2 string | api.Resou
 	}
 
 	var stateValue reflect.Value
-	if stateValuePtr.Kind() == reflect.Ptr {
+	if stateValuePtr.Kind() == reflect.Pointer {
 		stateValue = stateValuePtr.Elem()
 
 		if stateValue.Type().String() != "string" {
