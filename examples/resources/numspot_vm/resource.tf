@@ -63,3 +63,17 @@ resource "numspot_vm" "vm" {
     }
   ]
 }
+
+resource "numspot_vm" "vm-custom-root-volume" {
+  subnet_id = numspot_subnet.subnet.id
+  image_id  = "ami-7eb4b7be"
+  type      = "ns-eco6-2c2r"
+
+  block_device_mappings = [{
+    device_name = "/dev/sda1"
+    bsu = {
+      volume_size = 30
+      volume_type = "gp2"
+    }
+  }]
+}

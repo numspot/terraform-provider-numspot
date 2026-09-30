@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 
 	"terraform-provider-numspot/internal/client"
 	"terraform-provider-numspot/internal/sdk/api"
@@ -115,6 +116,9 @@ func ReadSecurityGroup(ctx context.Context, provider *client.NumSpotSDK, id stri
 	}
 	if err = utils.ParseHTTPError(numSpotReadSecurityGroup.Body, numSpotReadSecurityGroup.StatusCode()); err != nil {
 		return nil, err
+	}
+	if numSpotReadSecurityGroup.JSON200 == nil {
+		return nil, errors.New("unexpected empty response body from ReadSecurityGroupsById")
 	}
 	return numSpotReadSecurityGroup.JSON200, nil
 }

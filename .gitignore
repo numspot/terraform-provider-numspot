@@ -48,3 +48,5 @@ acc-tests-report.xml
 
 # local build
 terraform-provider-numspot
+# internal implementation plans (never commit)
+plans/

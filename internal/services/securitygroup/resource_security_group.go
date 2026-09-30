@@ -138,6 +138,15 @@ func (r *securityGroupResource) Update(ctx context.Context, request resource.Upd
 		numSpotSecurityGroup, err = core.UpdateSecurityGroupRules(ctx, r.provider, securityGroupID, stateInboundRules, stateOutboundRules, planInboundRules, planOutboundRules)
 		if err != nil {
 			response.Diagnostics.AddError("unable to update security group rules", err.Error())
+			return
+		}
+	}
+
+	if numSpotSecurityGroup == nil {
+		numSpotSecurityGroup, err = core.ReadSecurityGroup(ctx, r.provider, securityGroupID)
+		if err != nil {
+			response.Diagnostics.AddError("unable to read security group", err.Error())
+			return
 		}
 	}
 
@@ -167,30 +176,33 @@ func (r *securityGroupResource) Delete(ctx context.Context, request resource.Del
 func serializeSecurityGroup(ctx context.Context, http *api.SecurityGroup, diags *diag.Diagnostics) *resource_security_group.SecurityGroupModel {
 	var tagsTf types.Set
 
-	if http.InboundRules == nil {
+	if http == nil {
+		diags.AddError("nil security group response", "the API returned an empty security group")
 		return nil
 	}
-	ibd := make([]resource_security_group.InboundRulesValue, 0, len(*http.InboundRules))
-	for _, e := range *http.InboundRules {
-		value := serializeInboundRule(ctx, e)
-		if diags.HasError() {
-			return nil
-		}
 
-		ibd = append(ibd, value)
+	ibd := make([]resource_security_group.InboundRulesValue, 0)
+	if http.InboundRules != nil {
+		for _, e := range *http.InboundRules {
+			value := serializeInboundRule(ctx, e)
+			if diags.HasError() {
+				return nil
+			}
+
+			ibd = append(ibd, value)
+		}
 	}
 
-	if http.OutboundRules == nil {
-		return nil
-	}
-	obd := make([]resource_security_group.OutboundRulesValue, 0, len(*http.OutboundRules))
-	for _, e := range *http.OutboundRules {
-		value := serializeOutboundRule(ctx, e)
-		if diags.HasError() {
-			return nil
-		}
+	obd := make([]resource_security_group.OutboundRulesValue, 0)
+	if http.OutboundRules != nil {
+		for _, e := range *http.OutboundRules {
+			value := serializeOutboundRule(ctx, e)
+			if diags.HasError() {
+				return nil
+			}
 
-		obd = append(obd, value)
+			obd = append(obd, value)
+		}
 	}
 
 	ibdsTf, diagnostics := types.SetValueFrom(ctx, resource_security_group.InboundRulesValue{}.Type(ctx), ibd)
@@ -297,7 +309,7 @@ func deserializeInboundRules(ctx context.Context, inboundRules types.Set) []api.
 
 		rules = append(rules, api.SecurityGroupRule{
 			FromPortRange: &fpr,
-			IpProtocol:    e.IpProtocol.ValueStringPointer(),
+			IpProtocol:    ipProtocolOrNull(e.IpProtocol),
 			ToPortRange:   &tpr,
 			IpRanges:      ipRanges,
 		})
@@ -331,13 +343,23 @@ func deserializeOutboundRules(ctx context.Context, outboundRules types.Set) []ap
 
 		rules = append(rules, api.SecurityGroupRule{
 			FromPortRange: &fpr,
-			IpProtocol:    e.IpProtocol.ValueStringPointer(),
+			IpProtocol:    ipProtocolOrNull(e.IpProtocol),
 			ToPortRange:   &tpr,
 			IpRanges:      ipRanges,
 		})
 	}
 
 	return rules
+}
+
+// ipProtocolOrNull keeps the ip_protocol field out of the API request when it
+// is not set by the user (null in state, unknown in plan), so the API applies
+// its documented default instead of receiving an invalid empty protocol.
+func ipProtocolOrNull(v types.String) *string {
+	if v.IsNull() || v.IsUnknown() {
+		return nil
+	}
+	return v.ValueStringPointer()
 }
 
 func serializeInboundRule(ctx context.Context, rules api.SecurityGroupRule) resource_security_group.InboundRulesValue {

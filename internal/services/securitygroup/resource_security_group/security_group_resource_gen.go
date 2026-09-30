@@ -24,6 +24,9 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 				Required:            true,
 				Description:         "A description for the security group.<br />\nThis description can contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, accented letters, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
 				MarkdownDescription: "A description for the security group.<br />\nThis description can contain between 1 and 255 characters. Allowed characters are `a-z`, `A-Z`, `0-9`, accented letters, spaces, and `_.-:/()#,@[]+=&;{}!$*`.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 			},
 			"id": schema.StringAttribute{
 				Computed:            true,
@@ -44,6 +47,9 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 							MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.UseStateForUnknown(),
+							},
 						},
 						"ip_ranges": schema.SetAttribute{
 							ElementType:         types.StringType,
@@ -99,6 +105,9 @@ func SecurityGroupResourceSchema(ctx context.Context) schema.Schema {
 							Computed:            true,
 							Description:         "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
 							MarkdownDescription: "The IP protocol name (`tcp`, `udp`, `icmp`, or `-1` for all protocols). By default, `-1`. In a Vpc, this can also be an IP protocol number. For more information, see the [IANA.org website](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml).",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.UseStateForUnknown(),
+							},
 						},
 						"ip_ranges": schema.SetAttribute{
 							ElementType:         types.StringType,

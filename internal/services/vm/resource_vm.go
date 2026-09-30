@@ -79,6 +79,18 @@ func (r *vmResource) Create(ctx context.Context, request resource.CreateRequest,
 		return
 	}
 
+	// Enrich the root volume state (volume_size, iops, ...) only when the user
+	// configured block_device_mappings: without it the VM read payload already
+	// carries the default mapping, and the extra volume read would break
+	// cassettes recorded before the volume enrichment existed.
+	bdmConfigured := !plan.BlockDeviceMappings.IsNull() && !plan.BlockDeviceMappings.IsUnknown()
+	if bdmConfigured {
+		enrichBlockDeviceMappings(ctx, r.provider, state, true, &response.Diagnostics)
+		if response.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	response.Diagnostics.Append(response.State.Set(ctx, &state)...)
 }
 
@@ -97,6 +109,11 @@ func (r *vmResource) Read(ctx context.Context, request resource.ReadRequest, res
 	}
 
 	newState := serializeNumSpotVM(ctx, numSpotVM, &response.Diagnostics)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	enrichBlockDeviceMappings(ctx, r.provider, newState, false, &response.Diagnostics)
 	if response.Diagnostics.HasError() {
 		return
 	}
@@ -185,9 +202,7 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, dia
 	var securityGroupIds *[]string
 
 	if !(tf.BlockDeviceMappings.IsNull() || tf.BlockDeviceMappings.IsUnknown()) {
-		blockDeviceMapping := make([]api.BlockDeviceMappingVmCreation, 0, len(tf.BlockDeviceMappings.Elements()))
-		diags.Append(tf.BlockDeviceMappings.ElementsAs(ctx, &blockDeviceMapping, true)...)
-		blockDeviceMappingPtr = &blockDeviceMapping
+		blockDeviceMappingPtr = deserializeCreateBlockDeviceMappings(ctx, tf.BlockDeviceMappings, diags)
 	}
 
 	if !(tf.Placement.IsNull() || tf.Placement.IsUnknown()) {
@@ -226,6 +241,55 @@ func deserializeCreateNumSpotVM(ctx context.Context, tf resource_vm.VmModel, dia
 		VmInitiatedShutdownBehavior: utils.FromTfStringToStringPtr(tf.InitiatedShutdownBehavior),
 		Type:                        tf.Type.ValueString(),
 		BlockDeviceMappings:         blockDeviceMappingPtr,
+	}
+}
+
+// deserializeCreateBlockDeviceMappings builds the create body's block device
+// mappings (api.BlockDeviceMappingVmCreation, distinct from the read type).
+// Reflection-based ElementsAs cannot be used here: the api structs have no
+// tfsdk struct tags.
+func deserializeCreateBlockDeviceMappings(ctx context.Context, list types.List, diags *diag.Diagnostics) *[]api.BlockDeviceMappingVmCreation {
+	if list.IsNull() || list.IsUnknown() {
+		return nil
+	}
+	out := make([]api.BlockDeviceMappingVmCreation, 0, len(list.Elements()))
+	for _, e := range list.Elements() {
+		bdm, ok := e.(resource_vm.BlockDeviceMappingsValue)
+		if !ok {
+			diags.AddError("unable to cast block device mapping", "")
+			return nil
+		}
+
+		bsu := resource_vm.NewBsuValueNull()
+		if !(bdm.Bsu.IsNull() || bdm.Bsu.IsUnknown()) {
+			var bsuDiags diag.Diagnostics
+			bsu, bsuDiags = resource_vm.NewBsuValue(bdm.Bsu.AttributeTypes(ctx), bdm.Bsu.Attributes())
+			diags.Append(bsuDiags...)
+			if diags.HasError() {
+				return nil
+			}
+		}
+
+		out = append(out, api.BlockDeviceMappingVmCreation{
+			Bsu:               bsuToCreate(&bsu),
+			DeviceName:        utils.FromTfStringToStringPtr(bdm.DeviceName),
+			NoDevice:          utils.FromTfStringToStringPtr(bdm.NoDevice),
+			VirtualDeviceName: utils.FromTfStringToStringPtr(bdm.VirtualDeviceName),
+		})
+	}
+	return &out
+}
+
+func bsuToCreate(bsu *resource_vm.BsuValue) *api.BsuToCreate {
+	if bsu.IsNull() || bsu.IsUnknown() {
+		return nil
+	}
+	return &api.BsuToCreate{
+		DeleteOnVmDeletion: utils.FromTfBoolToBoolPtr(bsu.DeleteOnVmDeletion),
+		Iops:               utils.FromTfInt64ToIntPtr(bsu.Iops),
+		SnapshotId:         utils.FromTfStringToStringPtr(bsu.SnapshotId),
+		VolumeSize:         utils.FromTfInt64ToIntPtr(bsu.VolumeSize),
+		VolumeType:         utils.FromTfStringToStringPtr(bsu.VolumeType),
 	}
 }
 
@@ -629,4 +693,116 @@ func vmTags(ctx context.Context, tags types.Set) []api.ResourceTag {
 	}
 
 	return apiTags
+}
+
+func intPtrToInt64Ptr(v *int) *int64 {
+	if v == nil {
+		return nil
+	}
+	out := int64(*v)
+	return &out
+}
+
+// enrichBlockDeviceMappings fills the block device mapping creation fields
+// (volume_size, volume_type, iops, snapshot_id) that the VM read payload
+// (BsuCreated) does not carry, by reading each volume from the Volumes API.
+// strict=true (right after Create): a volume read failure is an error.
+// strict=false (refresh/import): a failure leaves the fields null.
+func enrichBlockDeviceMappings(
+	ctx context.Context,
+	provider *client.NumSpotSDK,
+	state *resource_vm.VmModel,
+	strict bool,
+	diags *diag.Diagnostics,
+) {
+	if state.BlockDeviceMappings.IsNull() || state.BlockDeviceMappings.IsUnknown() {
+		return
+	}
+
+	elements := state.BlockDeviceMappings.Elements()
+	enriched := make([]attr.Value, 0, len(elements))
+	changed := false
+
+	for _, e := range elements {
+		bdm, ok := e.(resource_vm.BlockDeviceMappingsValue)
+		if !ok {
+			diags.AddError("unable to cast block device mapping", "")
+			return
+		}
+		if bdm.Bsu.IsNull() || bdm.Bsu.IsUnknown() {
+			enriched = append(enriched, bdm)
+			continue
+		}
+
+		bsu, bsuAsDiags := resource_vm.NewBsuValue(bdm.Bsu.AttributeTypes(ctx), bdm.Bsu.Attributes())
+		diags.Append(bsuAsDiags...)
+		if diags.HasError() {
+			return
+		}
+
+		volumeID := bsu.VolumeId.ValueString()
+		if volumeID == "" {
+			enriched = append(enriched, bdm)
+			continue
+		}
+
+		volume, err := core.ReadVolume(ctx, provider, volumeID)
+		if err != nil {
+			if strict {
+				diags.AddError("unable to read created vm volume", err.Error())
+				return
+			}
+			enriched = append(enriched, bdm)
+			continue
+		}
+		changed = true
+
+		enrichedBsu, bsuDiags := resource_vm.NewBsuValue(
+			resource_vm.BsuValue{}.AttributeTypes(ctx),
+			map[string]attr.Value{
+				"delete_on_vm_deletion": bsu.DeleteOnVmDeletion,
+				"link_date":             bsu.LinkDate,
+				"state":                 bsu.State,
+				"volume_id":             bsu.VolumeId,
+				"iops":                  types.Int64PointerValue(intPtrToInt64Ptr(volume.Iops)),
+				"snapshot_id":           types.StringPointerValue(volume.SnapshotId),
+				"volume_size":           types.Int64PointerValue(intPtrToInt64Ptr(volume.Size)),
+				"volume_type":           types.StringPointerValue(volume.Type),
+			},
+		)
+		diags.Append(bsuDiags...)
+		if diags.HasError() {
+			return
+		}
+		bsuObj, objDiags := enrichedBsu.ToObjectValue(ctx)
+		diags.Append(objDiags...)
+		if diags.HasError() {
+			return
+		}
+
+		newBdm, bdmDiags := resource_vm.NewBlockDeviceMappingsValue(
+			resource_vm.BlockDeviceMappingsValue{}.AttributeTypes(ctx),
+			map[string]attr.Value{
+				"bsu":                 bsuObj,
+				"device_name":         bdm.DeviceName,
+				"no_device":           bdm.NoDevice,
+				"virtual_device_name": bdm.VirtualDeviceName,
+			},
+		)
+		diags.Append(bdmDiags...)
+		if diags.HasError() {
+			return
+		}
+		enriched = append(enriched, newBdm)
+	}
+
+	if !changed {
+		return
+	}
+	list, listDiags := types.ListValueFrom(ctx, resource_vm.BlockDeviceMappingsValue{}.Type(ctx), enriched)
+	diags.Append(listDiags...)
+	if diags.HasError() {
+		return
+	}
+	state.BlockDeviceMappings = list
 }

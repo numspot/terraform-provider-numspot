@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
@@ -35,14 +36,19 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						"bsu": schema.SingleNestedAttribute{
 							Attributes: map[string]schema.Attribute{
 								"delete_on_vm_deletion": schema.BoolAttribute{
+									Optional:            true,
 									Computed:            true,
 									Description:         "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.",
 									MarkdownDescription: "By default or if set to true, the volume is deleted when terminating the VM. If false, the volume is not deleted when terminating the VM.",
 								},
 								"iops": schema.Int64Attribute{
+									Optional:            true,
 									Computed:            true,
 									Description:         "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
 									MarkdownDescription: "The number of I/O operations per second (IOPS). This parameter must be specified only if you create an `io1` volume. The maximum number of IOPS allowed for `io1` volumes is `13000` with a maximum performance ratio of 300 IOPS per gibibyte.",
+									PlanModifiers: []planmodifier.Int64{
+										int64planmodifier.RequiresReplaceIfConfigured(),
+									},
 								},
 								"link_date": schema.StringAttribute{
 									Computed:            true,
@@ -50,9 +56,13 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 									MarkdownDescription: "The date and time of attachment of the volume to the VM, in ISO 8601 date-time format.",
 								},
 								"snapshot_id": schema.StringAttribute{
+									Optional:            true,
 									Computed:            true,
 									Description:         "The ID of the snapshot used to create the volume.",
 									MarkdownDescription: "The ID of the snapshot used to create the volume.",
+									PlanModifiers: []planmodifier.String{
+										stringplanmodifier.RequiresReplaceIfConfigured(),
+									},
 								},
 								"state": schema.StringAttribute{
 									Computed:            true,
@@ -65,14 +75,22 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 									MarkdownDescription: "The ID of the volume.",
 								},
 								"volume_size": schema.Int64Attribute{
+									Optional:            true,
 									Computed:            true,
 									Description:         "The size of the volume, in gibibytes (GiB).<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
 									MarkdownDescription: "The size of the volume, in gibibytes (GiB).<br />\nIf you specify a snapshot ID, the volume size must be at least equal to the snapshot size.<br />\nIf you specify a snapshot ID but no volume size, the volume is created with a size similar to the snapshot one.",
+									PlanModifiers: []planmodifier.Int64{
+										int64planmodifier.RequiresReplaceIfConfigured(),
+									},
 								},
 								"volume_type": schema.StringAttribute{
+									Optional:            true,
 									Computed:            true,
 									Description:         "The type of the volume (`standard` \\| `io1` \\| `gp2`). If not specified in the request, a `standard` volume is created.<br />",
 									MarkdownDescription: "The type of the volume (`standard` \\| `io1` \\| `gp2`). If not specified in the request, a `standard` volume is created.<br />",
+									PlanModifiers: []planmodifier.String{
+										stringplanmodifier.RequiresReplaceIfConfigured(),
+									},
 								},
 							},
 							CustomType: BsuType{
@@ -80,14 +98,19 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 									AttrTypes: BsuValue{}.AttributeTypes(ctx),
 								},
 							},
+							Optional:            true,
 							Computed:            true,
 							Description:         "Information about the BSU volume to create.",
 							MarkdownDescription: "Information about the BSU volume to create.",
 						},
 						"device_name": schema.StringAttribute{
+							Optional:            true,
 							Computed:            true,
 							Description:         "The device name for the volume. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`).",
 							MarkdownDescription: "The device name for the volume. For a root device, you must use `/dev/sda1`. For other volumes, you must use `/dev/sdX`, `/dev/sdXX`, `/dev/xvdX`, or `/dev/xvdXX` (where the first `X` is a letter between `b` and `z`, and the second `X` is a letter between `a` and `z`).",
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplaceIfConfigured(),
+							},
 						},
 						"no_device": schema.StringAttribute{
 							Computed:            true,
@@ -106,6 +129,7 @@ func VmResourceSchema(ctx context.Context) schema.Schema {
 						},
 					},
 				},
+				Optional:            true,
 				Computed:            true,
 				Description:         "One or more block device mappings.",
 				MarkdownDescription: "One or more block device mappings.",
